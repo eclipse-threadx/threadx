@@ -1,0 +1,16 @@
+LICENSED HARDWARE LIST
+
+Last Updated: 2020-05-08
+
+Microsoft has entered into OEM Agreements with manufacturers of the following
+microprocessors and microcontrollers (the “hardware”) to enable those
+manufacturers to include and distribute Azure RTOS in certain hardware. If you
+have obtained and/or are developing on microprocessor(s) and/or
+microcontroller(s) (“hardware”) listed below you inherit the “Distribution and
+Production Use” rights in Section 2 of the Microsoft Software License Terms for
+Microsoft Azure RTOS. If hardware is not listed below, you do not have those
+rights.
+
+--------------------------------------------------------------------------------
+
+More coming soon. Please check back frequently for updates.
