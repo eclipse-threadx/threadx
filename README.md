@@ -6,6 +6,13 @@ This advanced real-time operating system (RTOS) is designed specifically for dee
 
 Documentation for this library can be found here: http://docs.microsoft.com/azure/rtos/threadx
 
+
+# Understanding inter-component dependencies
+
+The main components of Azure RTOS are each provided in their own repository, but there are dependencies between them--shown in the following graph--that are important to understand when setting up your builds.
+
+![dependency graph](docs/deps.png)
+
 # Building and using the library
 
 ## Prerequisites
@@ -22,17 +29,19 @@ Install the following tools:
 $ git clone https://github.com/azure-rtos/threadx.git
 ```
 
-## Building the threadx static library
+## Building as a static library
 
 Each component of Azure RTOS comes with a composible CMake-based build system that supports many different MCUs and host systems. Integrating any of these components into your device app code is as simple as adding a git submodule and then including it in your build using the CMake command `add_subdirectory()`.
 
-While the typical usage pattern is to include threadx into your device code source tree to be built & linked with your code, you can compile threadx as a standalone static library to confirm your build is set up correctly.
+While the typical usage pattern is to include threadx into your device code source tree to be built & linked with your code, you can compile this project as a standalone static library to confirm your build is set up correctly.
 
 ```bash
 $ cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_m4.cmake -GNinja .
 
 $ cmake --build ./build
 ```
+
+NOTE: You will have to take the dependency graph above into account when building anything other than threadx itself.
 
 # Repository Structure and Usage
 
