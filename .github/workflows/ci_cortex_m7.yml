@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: threadx_build_cortex_m4
+name: cortex_m7
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -45,7 +45,7 @@ jobs:
 
     # Prepare the build system
     - name: Prepare build system
-      run: cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m4.cmake -GNinja .
+      run: cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m7.cmake -GNinja .
 
     - name: Compile and link
       run: cmake --build ./build

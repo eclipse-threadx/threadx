@@ -1,3 +1,5 @@
+![threadx_build_cortex_m4](https://github.com/azure-rtos/threadx/workflows/threadx_build_cortex_m4/badge.svg)
+
 # Azure RTOS ThreadX
 
 This advanced real-time operating system (RTOS) is designed specifically for deeply embedded applications. Among the multiple benefits it provides are advanced scheduling facilities, message passing, interrupt management, and messaging services. Azure RTOS ThreadX has many advanced features, including picokernel architecture, preemption threshold, event chaining, and a rich set of system services.
