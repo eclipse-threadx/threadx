@@ -70,3 +70,5 @@ Each official release (preview or GA) will be tagged to mark the commit and push
 # Contribution, feedback and issues
 
 If you encounter any bugs, have suggestions for new features or if you would like to become an active contributor to this project please follow the instructions provided in the contribution guideline for the corresponding repo.
+
+For general support, please post a question to [Stack Overflow](http://stackoverflow.com/questions/tagged/azure-rtos+threadx) using the `threadx` and `azure-rtos` tags.
