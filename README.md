@@ -1,5 +1,7 @@
+![cortex_m0](https://github.com/azure-rtos/threadx/workflows/cortex_m0/badge.svg)
+![cortex_m3](https://github.com/azure-rtos/threadx/workflows/cortex_m3/badge.svg)
 ![cortex_m4](https://github.com/azure-rtos/threadx/workflows/cortex_m4/badge.svg)
-![cortex_m4](https://github.com/azure-rtos/threadx/workflows/cortex_m7/badge.svg)
+![cortex_m7](https://github.com/azure-rtos/threadx/workflows/cortex_m7/badge.svg)
 
 # Azure RTOS ThreadX
 
