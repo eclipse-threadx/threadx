@@ -34,6 +34,7 @@ jobs:
       uses: fiam/arm-none-eabi-gcc@v1
       with:
           release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
+          directory: $HOME/arm-none-eabi-gcc-9-2019-q4
 
     # Get CMake into the environment
     - name: Install cmake 3.17.1
