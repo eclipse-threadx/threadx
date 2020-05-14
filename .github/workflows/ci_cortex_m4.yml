@@ -26,9 +26,7 @@ jobs:
         token: ${{ secrets.REPO_SCOPED_TOKEN }}
         submodules: true
 
-#     - name: Install build-essential
-#       run: sudo apt-get install build-essential
-
+    # Store the arm compilers in the cache to speed up builds
     - name: Cache arm-none-eabi-gcc tools
       id: cache-arm-gcc
       uses: actions/cache@v1
@@ -51,10 +49,6 @@ jobs:
     # Get Ninja into the environment
     - name: Install ninja-build
       uses: seanmiddleditch/gha-setup-ninja@v1
-
-    - name: Update $PATH if using cache
-      if: steps.cache-arm-gcc.outputs.cache-hit == 'true'
-      run: echo "::addPath::$HOME/arm-none-eabi-gcc-9-2019-q4/bin"
 
     # Prepare the build system
     - name: Prepare build system

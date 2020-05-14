@@ -26,14 +26,21 @@ jobs:
         token: ${{ secrets.REPO_SCOPED_TOKEN }}
         submodules: true
 
-#     - name: Install build-essential
-#       run: sudo apt-get install build-essential
+    # Store the arm compilers in the cache to speed up builds
+    - name: Cache arm-none-eabi-gcc tools
+      id: cache-arm-gcc
+      uses: actions/cache@v1
+      with:
+        path: $HOME/arm-none-eabi-gcc-9-2019-q4
+        key: ${{ runner.os }}-arm-gcc-9-2019-q4
 
     # Get the arm-non-eabi-gcc toolchain   
     - name: Install arm-none-eabi-gcc
       uses: fiam/arm-none-eabi-gcc@v1
+      if: steps.cache-arm-gcc.outputs.cache-hit != 'true'
       with:
           release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
+          directory: $HOME/arm-none-eabi-gcc-9-2019-q4
 
     # Get CMake into the environment
     - name: Install cmake 3.17.1
@@ -46,8 +53,12 @@ jobs:
     # Prepare the build system
     - name: Prepare build system
       run: cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m7.cmake -GNinja .
+      env:
+        PATH: "$HOME/arm-none-eabi-gcc-9-2019-q4/bin:$PATH"
 
     - name: Compile and link
       run: cmake --build ./build
+      env:
+        PATH: "$HOME/arm-none-eabi-gcc-9-2019-q4/bin:$PATH"
 
 
