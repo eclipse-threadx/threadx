@@ -52,6 +52,10 @@ jobs:
     - name: Install ninja-build
       uses: seanmiddleditch/gha-setup-ninja@v1
 
+    - name: Update $PATH if using cache
+      if: steps.cache-arm-gcc.outputs.cache-hit == 'true'
+      run: echo "::addPath::$HOME/arm-none-eabi-gcc-9-2019-q4/bin"
+
     # Prepare the build system
     - name: Prepare build system
       run: cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m4.cmake -GNinja .
