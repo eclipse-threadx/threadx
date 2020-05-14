@@ -59,8 +59,12 @@ jobs:
     # Prepare the build system
     - name: Prepare build system
       run: cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m4.cmake -GNinja .
+      env:
+        PATH: "$HOME/arm-none-eabi-gcc-9-2019-q4/bin:$PATH"
 
     - name: Compile and link
       run: cmake --build ./build
+      env:
+        PATH: "$HOME/arm-none-eabi-gcc-9-2019-q4/bin:$PATH"
 
 
