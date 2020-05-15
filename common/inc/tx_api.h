@@ -178,7 +178,7 @@ extern   "C" {
 #endif
 
 
-/* Event numbers 0 through 4095 are reserved by Express Logic. Specific event assignments are: 
+/* Event numbers 0 through 4095 are reserved by Azure RTOS. Specific event assignments are: 
                                 
                                 ThreadX events:     1-199 
                                 FileX events:       200-299
