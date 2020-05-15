@@ -1,7 +1,7 @@
 function(target_sources_if_not_overridden filename)
     list(FIND TX_SRC_OVERRIDES ${filename} OVERRIDE_FOUND)
     if( OVERRIDE_FOUND EQUAL -1 )
-        message(STATUS "** Using original ${filename} from common/src **")
+        # message(STATUS "** Using original ${filename} from common/src **")
         target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src/${filename})
     endif()
 endfunction()
