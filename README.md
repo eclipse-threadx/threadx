@@ -41,9 +41,10 @@ Each component of Azure RTOS comes with a composible CMake-based build system th
 While the typical usage pattern is to include threadx into your device code source tree to be built & linked with your code, you can compile this project as a standalone static library to confirm your build is set up correctly.
 
 ```bash
-$ cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_m4.cmake -GNinja .
-
-$ cmake --build ./build
+$ mkdir -p build
+$ cd build
+$ cmake -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_m4.cmake -GNinja ..
+$ ninja
 ```
 
 NOTE: You will have to take the dependency graph above into account when building anything other than threadx itself.
