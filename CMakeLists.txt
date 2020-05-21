@@ -34,7 +34,7 @@ if (NOT TX_USER_FILE)
     message(STATUS "Using default tx_user.h file")
     set(TX_USER_FILE ${CMAKE_CURRENT_LIST_DIR}/common/inc/tx_user_sample.h)
 else()
-    message(STATUS "Using custom tx_user.h file from ${UX_USER_FILE}")
+    message(STATUS "Using custom tx_user.h file from ${TX_USER_FILE}")
 endif()    
 configure_file(${TX_USER_FILE} ${CUSTOM_INC_DIR}/tx_user.h COPYONLY)
 target_include_directories(${PROJECT_NAME} 
