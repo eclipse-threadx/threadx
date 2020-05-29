@@ -1,6 +1,6 @@
 # Name of the target
 set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_SYSTEM_PROCESSOR cortex-m4)
+set(CMAKE_SYSTEM_PROCESSOR cortex-m0)
 
 set(THREADX_ARCH "cortex_m0")
 set(THREADX_TOOLCHAIN "gnu")
