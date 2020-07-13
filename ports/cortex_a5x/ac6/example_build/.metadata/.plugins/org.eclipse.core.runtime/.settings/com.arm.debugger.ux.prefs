@@ -1,0 +1,6 @@
+ConnectionManager.savedConnections=<?xml version\="1.0" encoding\="UTF-8"?>\n<connections>\n\t<connection current\="yes" mode\="debug" type\="com.arm.debugger.launcher2">VE_AEMv8x1_Simulation</connection>\n</connections>\n
+PreferredTargetHasBeenSet=true
+UXContextManager.savedContexts=<?xml version\="1.0" encoding\="UTF-8"?>\n<contexts>\n\t<context color\="8421504">Connection|95hbfse4c\:gvv8gv0vpkmw|1445364262162|workspace\:\:VE_AEMv8x1_Simulation|VE_AEMv8x1_Simulation</context>\n</contexts>\n
+debugger.perspective.switch.preference.break=never
+debugger.perspective.switch.preference.launch=never
+eclipse.preferences.version=1

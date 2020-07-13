@@ -1,0 +1,5 @@
+config_db_path=C%3A\\Program Files\\DS-5 v5.29.3\\sw\\debugger\\configdb;
+config_db_path0_defaultid=com.arm.ds\:0
+config_db_path0_enabled=true
+eclipse.preferences.version=1
+enabled_config_db_path=C%3A\\Program Files\\DS-5 v5.29.3\\sw\\debugger\\configdb;
