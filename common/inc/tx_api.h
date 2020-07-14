@@ -481,6 +481,8 @@ typedef struct TX_THREAD_STRUCT
        additional fields in the thread control block.  This is 
        defined in the file tx_port.h.  */
     TX_THREAD_USER_EXTENSION
+       
+    INT                 tx_errno;                   /*thread error field*/
 
 } TX_THREAD;
 
