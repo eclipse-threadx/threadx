@@ -9,7 +9,6 @@ target_sources(${PROJECT_NAME}
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_stack_build.S
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_system_return.S
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_timer_interrupt.S
-
     # {{END_TARGET_SOURCES}}
 )
 

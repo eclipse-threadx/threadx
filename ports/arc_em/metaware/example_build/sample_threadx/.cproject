@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" errorParsers="com.arc.cdt.toolchain.ARCCompilerErrorParser;com.arc.cdt.toolchain.ARCLinkerErrorParser;com.arc.cdt.toolchain.ARCAssemblerErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695" name="Debug" parent="com.arc.cdt.toolchain.av2em.exeDebugConfig">
+					<folderInfo id="com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695." name="/" resourcePath="">
+						<toolChain id="com.arc.cdt.toolchain.av2em.exeToolChainDebug.687487123" superClass="com.arc.cdt.toolchain.av2em.exeToolChainDebug">
+							<targetPlatform id="hcTargetPlatform.1489412971" isAbstract="false" name="Generic platform" superClass="hcTargetPlatform"/>
+							<builder buildPath="${workspace_loc:/sample_threadx}/Debug" id="makeBuilder.172080285" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="makeBuilder"/>
+							<tool id="av2em.exe.debug.exeCompilerDebug.670850607" superClass="av2em.exe.debug.exeCompilerDebug">
+								<option id="arc.compiler.options.target.version.713469122" name="ARC Core Version" superClass="arc.compiler.options.target.version" value="arc.compiler.options.target.arcv2em" valueType="enumerated"/>
+								<option id="arc.compiler.options.include_dirs.502094459" isActive="false" isDefinedList="false" name="Include Directories (one per line)" superClass="arc.compiler.options.include_dirs" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tx/inc_generic}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tx/inc_port}&quot;"/>
+								</option>
+								<option id="arc.compiler.options.timers.timer0.514952339" name="Use Timer 0 (-Xtimer0)" superClass="arc.compiler.options.timers.timer0" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.timers.timer1.2077131365" name="Use timer 1 (-Xtimer1)" superClass="arc.compiler.options.timers.timer1" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.arcv2emcore.1571321769" name="ARC EM Core" superClass="arc.compiler.options.arcv2emcore" useByScannerDiscovery="true" value="arc.compiler.options.arcv2emcore.core1" valueType="enumerated"/>
+								<option id="arc.compiler.options.stack_check.852036512" name="Hardware Stack Checking(-Xstack_check)" superClass="arc.compiler.options.stack_check" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<inputType id="com.arc.cdt.toolchain.arc.ccac.inputTypeCPP.603646508" name="MetaWare C++ Input" superClass="com.arc.cdt.toolchain.arc.ccac.inputTypeCPP"/>
+								<inputType id="com.arc.cdt.toolchain.arc.ccac.inputTypeC.1127761944" name="MetaWare C Input" superClass="com.arc.cdt.toolchain.arc.ccac.inputTypeC"/>
+								<inputType id="com.arc.cdt.toolchain.arc.inputTypeCL.66701363" name="MetaWare OpenCL" superClass="com.arc.cdt.toolchain.arc.inputTypeCL"/>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.av2em.asmDebugExe.502330268" superClass="com.arc.cdt.toolchain.av2em.asmDebugExe">
+								<option id="arc.compiler.options.target.asm.version.1322795579" name="ARC Core Version" superClass="arc.compiler.options.target.asm.version" value="arc.compiler.options.target.arcv2em" valueType="enumerated"/>
+								<option id="arc.asm.options.timers.timer0.700216762" name="Use Timer 0 (-Xtimer0)" superClass="arc.asm.options.timers.timer0" value="true" valueType="boolean"/>
+								<option id="arc.asm.options.timers.timer1.1921573159" name="Use timer 1 (-Xtimer1)" superClass="arc.asm.options.timers.timer1" value="true" valueType="boolean"/>
+								<option id="arc.asm.options.stack_check.624314645" name="Hardware Stack Checking(-Xstack_check)" superClass="arc.asm.options.stack_check" value="true" valueType="boolean"/>
+								<option id="com.arc.cdt.toolchain.asm.option.defines.229067703" name="Preprocessor Defines (one per line)" superClass="com.arc.cdt.toolchain.asm.option.defines" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="TX_ENABLE_HW_STACK_CHECKING"/>
+								</option>
+								<inputType id="com.arc.cdt.toolchain.asminput.362750288" name="Assembler Inputs" superClass="com.arc.cdt.toolchain.asminput"/>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.av2em.exeLinkerDebug.994503969" superClass="com.arc.cdt.toolchain.av2em.exeLinkerDebug">
+								<option id="arc.linker.options.target.version.266280641" name="Target Runtime Libraries" superClass="arc.linker.options.target.version" value="arc.compiler.options.target.arcv2em" valueType="enumerated"/>
+								<option id="com.arc.cdt.toolchain.option.linker.svr3.2027621986" name="SVR3-style command files" superClass="com.arc.cdt.toolchain.option.linker.svr3" valueType="userObjs">
+									<listOptionValue builtIn="false" value="../sample_threadx.cmd"/>
+								</option>
+								<option id="arc.link.ld.user_objs.772443345" name="Additional Object Files &amp;&amp; Libraries" superClass="arc.link.ld.user_objs" valueType="userObjs">
+									<listOptionValue builtIn="false" value="&quot;..\..\tx\Debug\tx.a&quot;"/>
+								</option>
+								<option id="arc.linker.options.stack_check.1129063065" name="Hardware Stack Checking(-Xstack_check)" superClass="arc.linker.options.stack_check" value="true" valueType="boolean"/>
+								<option id="com.arc.cdt.toolchain.linker.option.map.460013866" name="Generate listing file (=.map)" superClass="com.arc.cdt.toolchain.linker.option.map" value="true" valueType="boolean"/>
+								<inputType id="com.arc.cdt.toolchain.linker.input.425165876" name="Linker Input" superClass="com.arc.cdt.toolchain.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.arc.archiver.887646463" superClass="com.arc.cdt.toolchain.arc.archiver"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" errorParsers="com.arc.cdt.toolchain.ARCCompilerErrorParser;com.arc.cdt.toolchain.ARCLinkerErrorParser;com.arc.cdt.toolchain.ARCAssemblerErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224" name="Release" parent="com.arc.cdt.toolchain.av2em.exeReleaseConfig">
+					<folderInfo id="com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224." name="/" resourcePath="">
+						<toolChain id="com.arc.cdt.toolchain.av2em.exeReleaseToolChain.1354693166" superClass="com.arc.cdt.toolchain.av2em.exeReleaseToolChain">
+							<targetPlatform id="hcTargetPlatform.1484344501" isAbstract="false" name="Generic platform" superClass="hcTargetPlatform"/>
+							<builder buildPath="${workspace_loc:/sample_threadx}/Release" id="makeBuilder.1056470287" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="makeBuilder"/>
+							<tool id="arc.cdt.toolchain.av2em.exeCompilerRelease.93257878" superClass="arc.cdt.toolchain.av2em.exeCompilerRelease">
+								<inputType id="com.arc.cdt.toolchain.arc.ccac.inputTypeCPP.1040370238" name="MetaWare C++ Input" superClass="com.arc.cdt.toolchain.arc.ccac.inputTypeCPP"/>
+								<inputType id="com.arc.cdt.toolchain.arc.ccac.inputTypeC.1016915037" name="MetaWare C Input" superClass="com.arc.cdt.toolchain.arc.ccac.inputTypeC"/>
+								<inputType id="com.arc.cdt.toolchain.arc.inputTypeCL.1090960130" name="MetaWare OpenCL" superClass="com.arc.cdt.toolchain.arc.inputTypeCL"/>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.av2em.asmReleaseExe.714380962" superClass="com.arc.cdt.toolchain.av2em.asmReleaseExe">
+								<inputType id="com.arc.cdt.toolchain.asminput.1121766557" name="Assembler Inputs" superClass="com.arc.cdt.toolchain.asminput"/>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.av2em.exelinkerRelease.1145338994" superClass="com.arc.cdt.toolchain.av2em.exelinkerRelease">
+								<inputType id="com.arc.cdt.toolchain.linker.input.773394203" name="Linker Input" superClass="com.arc.cdt.toolchain.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.arc.archiver.1360196687" superClass="com.arc.cdt.toolchain.arc.archiver"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="sample_threadx.com.arc.cdt.toolchain.arc.av2em.exeProject.666673635" name="Executable" projectType="com.arc.cdt.toolchain.arc.av2em.exeProject"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/sample_threadx"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/sample_threadx"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224;com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224.;arc.cdt.toolchain.av2em.exeCompilerRelease.93257878;com.arc.cdt.toolchain.arc.ccac.inputTypeCPP.1040370238">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224;com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224.;arc.cdt.toolchain.av2em.exeCompilerRelease.93257878;com.arc.cdt.toolchain.arc.inputTypeCL.1090960130">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695;com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695.;av2em.exe.debug.exeCompilerDebug.670850607;com.arc.cdt.toolchain.arc.ccac.inputTypeC.1127761944">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695;com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695.;av2em.exe.debug.exeCompilerDebug.670850607;com.arc.cdt.toolchain.arc.ccac.inputTypeCPP.603646508">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224;com.arc.cdt.toolchain.av2em.exeReleaseConfig.2022621224.;arc.cdt.toolchain.av2em.exeCompilerRelease.93257878;com.arc.cdt.toolchain.arc.ccac.inputTypeC.1016915037">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695;com.arc.cdt.toolchain.av2em.exeDebugConfig.1217165695.;av2em.exe.debug.exeCompilerDebug.670850607;com.arc.cdt.toolchain.arc.inputTypeCL.66701363">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+</cproject>

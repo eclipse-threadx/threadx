@@ -38,7 +38,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_stack_build                            Cortex-M7/GNU     */
-@/*                                                           6.0          */
+@/*                                                           6.0.1        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -71,6 +71,11 @@
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+@/*  06-30-2020     William E. Lamie         Modified Comment(s), setting  */
+@/*                                             R10 to top of stack is not */
+@/*                                             needed. Removed references */
+@/*                                             to stack frame, resulting  */
+@/*                                             in version 6.0.1           */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -91,7 +96,7 @@ _tx_thread_stack_build:
 @                       r7          Initial value for r7
 @                       r8          Initial value for r8
 @                       r9          Initial value for r9
-@                       r10 (sl)    Initial value for r10 (sl)
+@                       r10         Initial value for r10
 @                       r11         Initial value for r11
 @                       r0          Initial value for r0    (Hardware stack starts here!!)
 @                       r1          Initial value for r1
@@ -119,9 +124,7 @@ _tx_thread_stack_build:
     STR     r3, [r2, #16]                           @ Store initial r7
     STR     r3, [r2, #20]                           @ Store initial r8
     STR     r3, [r2, #24]                           @ Store initial r9
-    LDR     r3, [r0, #12]                           @ Pickup stack starting address
-    STR     r3, [r2, #28]                           @ Store initial r10 (sl)
-    MOV     r3, #0                                  @ Build initial register value
+    STR     r3, [r2, #28]                           @ Store initial r10
     STR     r3, [r2, #32]                           @ Store initial r11
 @
 @    /* Hardware stack follows.  */

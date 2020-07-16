@@ -1,0 +1,15 @@
+LOAD 0x80000000
+{
+  BASE 0x80000000
+  {
+    * (+RO)
+  }
+
+  RAM +0x0
+  {
+    * (+RW, +ZI)
+  }
+  
+  ARM_LIB_STACKHEAP 0x80090000 EMPTY -0x00040000
+  {}
+}

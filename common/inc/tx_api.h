@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.0.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -44,6 +44,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  06-30-2020     William E. Lamie         Modified comment(s), and      */
+/*                                            updated product constants,  */
+/*                                            resulting in version 6.0.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -73,10 +76,13 @@ extern   "C" {
 /* Define the major/minor version information that can be used by the application 
    and the ThreadX source as well.  */
    
-#define EL_PRODUCT_THREADX
+#define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
 #define THREADX_MINOR_VERSION           0
+#define THREADX_PATCH_VERSION           1
 
+/* Define the following symbol for backward compatibility */
+#define EL_PRODUCT_THREADX
 
 /* API input parameters and general constants.  */
 
