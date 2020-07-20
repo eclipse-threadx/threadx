@@ -12,29 +12,29 @@ apply prospectively and do not alter your or Microsoft’s rights relating to
 pre-updated software or services). IF YOU COMPLY WITH THESE LICENSE TERMS, YOU
 HAVE THE RIGHTS BELOW.  BY USING THE SOFTWARE, YOU ACCEPT THESE TERMS. 
 
-INSTALLATION AND USE RIGHTS.  
+1. INSTALLATION AND USE RIGHTS.  
 
-General. You may install and use the software and the included Microsoft
+a) General. You may install and use the software and the included Microsoft
 applications solely for internal development, testing and evaluation purposes.
 Any distribution or production use requires a separate license as set forth in
 Section 2.  
 
-Contributions. Microsoft welcomes contributions to this software. In the event
+b) Contributions. Microsoft welcomes contributions to this software. In the event
 that you make a contribution to this software you will be required to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and
 actually do, grant Microsoft the rights to use your contribution. For details,
 visit https://cla.microsoft.com.  
 
-Included Microsoft Applications. The software includes other Microsoft
+c) Included Microsoft Applications. The software includes other Microsoft
 applications which are governed by the licenses embedded in or made available
 with those applications.  
 
-Third Party Components. The software may include third party components with
+d) Third Party Components. The software may include third party components with
 separate legal notices or governed by other agreements, as may be described
 within the software or in the ThirdPartyNotices file(s) accompanying the
 software. 
 
-Competitive Benchmarking. If you are a direct competitor, and you access or use
+e) Competitive Benchmarking. If you are a direct competitor, and you access or use
 the software for purposes of competitive benchmarking, analysis, or intelligence
 gathering, you waive as against Microsoft, its subsidiaries, and its affiliated
 companies (including prospectively) any competitive use, access, and
@@ -44,100 +44,100 @@ Microsoft’s terms. If you do not waive any such purported restrictions in the
 terms governing your software, you are not allowed to access or use this
 software, and will not do so. 
 
-DISTRIBUTION AND PRODUCTION USE. If you have obtained and/or are developing on
+2. DISTRIBUTION AND PRODUCTION USE. If you have obtained and/or are developing on
 microprocessor(s) and/or microcontroller(s) (“hardware”) listed in the file
 named “LICENSED-HARDWARE.txt” included in the repository and/or distributed with
 the software you have the following rights in and to the software solely when
 used in combination with the hardware. In the event hardware is not listed in
 the LICENSED-HARDWARE.txt file, you do not have the rights in this Section 2. 
 
-Distribution and Production Use Rights.  
+a) Distribution and Production Use Rights.  
 
-You may use the software in production (e.g. program the modified or unmodified
+i. You may use the software in production (e.g. program the modified or unmodified
 software to devices you own or control) and distribute (i.e. make available to
 third parties) the modified or unmodified binary image produced from this code.
 
 
-You may permit your device distributors or developers to copy and distribute the
+ii. You may permit your device distributors or developers to copy and distribute the
 binary image as programmed or to be programmed to your devices. 
 
-You may redistribute the unmodified or modified source to your device
+iii. You may redistribute the unmodified or modified source to your device
 distributors or developers. Modifications must be clearly marked. Any
 redistribution in source code form must contain this license and any other
 licenses that accompany the software. 
 
-Requirements. For any code you distribute, you must: 
+b) Requirements. For any code you distribute, you must: 
 
-when distributed in binary form, except as embedded in a device, include with
+i. when distributed in binary form, except as embedded in a device, include with
 such distribution the terms of this agreement;  
 
-when distributed in source code form to distributors or developers of your
+ii. when distributed in source code form to distributors or developers of your
 devices, include with such distribution the terms of this agreement; and 
 
-indemnify, defend and hold harmless Microsoft from  any claims, including
+iii. indemnify, defend and hold harmless Microsoft from  any claims, including
 attorneys’ fees, related to the distribution or use of your devices, except to
 the extent that any claim is based solely on the unmodified software. 
 
-Restrictions. You may not: 
+c) Restrictions. You may not: 
 
-use or modify the software to create a competing real time operating system
+i. use or modify the software to create a competing real time operating system
 software;  
 
-remove any copyright notices or licenses contained in the software; 
+ii. remove any copyright notices or licenses contained in the software; 
 
-use Microsoft’s trademarks or trade dress in your application in any way that
+iii. use Microsoft’s trademarks or trade dress in your application in any way that
 suggests your device or application comes from or is endorsed by Microsoft;  
 
-transfer individual components, specific libraries, classes, functions or code
+iv. transfer individual components, specific libraries, classes, functions or code
 fragments of the software separately for purposes unrelated to the software; or 
 
-use or distribute the software in any way that would subject the software or
+v. use or distribute the software in any way that would subject the software or
 Microsoft’s intellectual property or technology to any other license terms. 
 
-SCOPE OF LICENSE. The software is licensed, not sold. Microsoft reserves all
+3. SCOPE OF LICENSE. The software is licensed, not sold. Microsoft reserves all
 other rights. Unless applicable law gives you more rights despite this
 limitation, you will not (and have no right to): 
 
-remove, minimize, block, or modify any notices of Microsoft or its suppliers in
+a) remove, minimize, block, or modify any notices of Microsoft or its suppliers in
 the software; 
 
-use the software in any way that is against the law or to create or propagate
+b) use the software in any way that is against the law or to create or propagate
 malware; or 
 
-share, publish, distribute, or lease the software (except as permitted in
+c) share, publish, distribute, or lease the software (except as permitted in
 Section 2 above), or provide the software as a stand-alone offering for others
 to use. 
 
-DATA. This software may interact with other Microsoft products that collect data
+4. DATA. This software may interact with other Microsoft products that collect data
 that is transmitted to Microsoft. To learn more about how Microsoft processes
 personal data we collect, please see the Microsoft Privacy Statement at
 https://go.microsoft.com/fwlink/?LinkId=248681. 
 
-EXPORT RESTRICTIONS. You must comply with all domestic and international export
+5. EXPORT RESTRICTIONS. You must comply with all domestic and international export
 laws and regulations that apply to the software, which include restrictions on
 destinations, end users, and end use. For further information on export
 restrictions, visit https://aka.ms/exporting. 
 
-SUPPORT SERVICES. Microsoft is not obligated under this agreement to provide any
+6. SUPPORT SERVICES. Microsoft is not obligated under this agreement to provide any
 support services for the software. Any support provided is “as is”, “with all
 faults”, and without warranty of any kind. 
 
-UPDATES. Microsoft may periodically update the software. You may obtain updates
+7. UPDATES. Microsoft may periodically update the software. You may obtain updates
 only from Microsoft or Microsoft-authorized sources. Updates may not include or
 support all existing software features, services, or peripheral devices. 
 
-TERMINATION. Without prejudice to any other rights, Microsoft may terminate this
+8. TERMINATION. Without prejudice to any other rights, Microsoft may terminate this
 agreement if you fail to comply with any of its terms or conditions. In such
 event, you must destroy all copies of the software and all of its component
 parts. 
 
-ENTIRE AGREEMENT. This agreement, and any other terms Microsoft may provide for
+9. ENTIRE AGREEMENT. This agreement, and any other terms Microsoft may provide for
 supplements, updates, or third-party applications, is the entire agreement for
 the software. To the extent you have entered into a separate agreement with
 Microsoft relating specifically to the software, the terms in such agreement
 shall control. 
 
-APPLICABLE LAW AND PLACE TO RESOLVE DISPUTES. If you acquired the software in
+10. APPLICABLE LAW AND PLACE TO RESOLVE DISPUTES. If you acquired the software in
 the United States or Canada, the laws of the state or province where you live
 (or, if a business, where your principal place of business is located) govern
 the interpretation of this agreement, claims for its breach, and all other
@@ -149,7 +149,7 @@ King County, Washington for all disputes heard in court. If not, you and
 Microsoft consent to exclusive jurisdiction and venue in the Superior Court of
 King County, Washington for all disputes heard in court. 
 
-CONSUMER RIGHTS; REGIONAL VARIATIONS. This agreement describes certain legal
+11. CONSUMER RIGHTS; REGIONAL VARIATIONS. This agreement describes certain legal
 rights. You may have other rights, including consumer rights, under the laws of
 your state or country. Separate and apart from your relationship with Microsoft,
 you may also have rights with respect to the party from which you acquired the
@@ -158,16 +158,16 @@ state or country do not permit it to do so. For example, if you acquired the
 software in one of the below regions, or mandatory country law applies, then the
 following provisions apply to you: 
 
-Australia. You have statutory guarantees under the Australian Consumer Law and
+a) Australia. You have statutory guarantees under the Australian Consumer Law and
 nothing in this agreement is intended to affect those rights. 
 
-Germany and Austria. 
+b) Germany and Austria. 
 
-i.Warranty. The properly licensed software will perform substantially as
+i. Warranty. The properly licensed software will perform substantially as
 described in any Microsoft materials that accompany the software. However,
 Microsoft gives no contractual guarantee in relation to the licensed software. 
 
-ii.Limitation of Liability. In case of intentional conduct, gross negligence,
+ii. Limitation of Liability. In case of intentional conduct, gross negligence,
 claims based on the Product Liability Act, as well as, in case of death or
 personal or physical injury, Microsoft is liable according to the statutory law.
 
@@ -180,13 +180,13 @@ with which a party may constantly trust in (so-called "cardinal obligations").
 In other cases of slight negligence, Microsoft will not be liable for slight
 negligence. 
 
-DISCLAIMER OF WARRANTY. THE SOFTWARE IS LICENSED “AS IS.” YOU BEAR THE RISK OF
+12. DISCLAIMER OF WARRANTY. THE SOFTWARE IS LICENSED “AS IS.” YOU BEAR THE RISK OF
 USING IT. MICROSOFT GIVES NO EXPRESS WARRANTIES, GUARANTEES, OR CONDITIONS. TO
 THE EXTENT PERMITTED UNDER APPLICABLE LAWS, MICROSOFT EXCLUDES ALL IMPLIED
 WARRANTIES, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
 NON-INFRINGEMENT. 
 
-LIMITATION ON AND EXCLUSION OF DAMAGES. IF YOU HAVE ANY BASIS FOR RECOVERING
+13. LIMITATION ON AND EXCLUSION OF DAMAGES. IF YOU HAVE ANY BASIS FOR RECOVERING
 DAMAGES DESPITE THE PRECEDING DISCLAIMER OF WARRANTY, YOU CAN RECOVER FROM
 MICROSOFT AND ITS SUPPLIERS ONLY DIRECT DAMAGES UP TO U.S. $5.00. YOU CANNOT
 RECOVER ANY OTHER DAMAGES, INCLUDING CONSEQUENTIAL, LOST PROFITS, SPECIAL,
