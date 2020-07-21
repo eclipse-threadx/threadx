@@ -150,15 +150,15 @@ _tx_initialize_low_level:
     .ifdef TX_TIMER_1_SETUP
     mov     r0, 17                                      ; Select timer 1
     sr      r0, [IRQ_SELECT]                            ;
-    mov     r0, 2                                       ; Set timer 1 to priority 14
+    mov     r0, 2                                       ; Set timer 1 to priority 2
     sr      r0, [IRQ_PRIORITY]                          ;
     mov     r0, 1                                       ; Enable this interrupt
     sr      r0, [IRQ_ENABLE]                            ;
     mov     r0, 0x10020                                 ; Setup timer period
     sr      r0, [LIMIT1]                                ;
-    mov     r0, 0                                       ; Clear timer 0 current count
+    mov     r0, 0                                       ; Clear timer 1 current count
     sr      r0, [COUNT1]                                ;
-    mov     r0, 3                                       ; Enable timer 0
+    mov     r0, 3                                       ; Enable timer 1
     sr      r0, [CONTROL1]                              ;
     .endif
 ;

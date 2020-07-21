@@ -21,18 +21,12 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
 ;
     .equ    BTA, 0x412
     .equ    KSTACK_TOP,     0x264
     .equ    KSTACK_BASE,    0x265
     .equ    STATUS32_SC,    0x4000
 ;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
 ;
 ;
 ;/**************************************************************************/ 
@@ -84,6 +78,8 @@ _tx_thread_context_save:
 ;       has already been allocated, and the interrupted blink register is already saved.  */
 ;
     clri                                                ; Disable interrupts
+    st      r3, [sp, 120]                               ; Save r3
+    st      r2, [sp, 124]                               ; Save r2
     st      r1, [sp, 128]                               ; Save r1
     st      r0, [sp, 132]                               ; Save r0
 ;
@@ -92,8 +88,6 @@ _tx_thread_context_save:
 ;    {
 ;
     ld      r0, [gp, _tx_thread_system_state@sda]       ; Pickup system state
-    st      r3, [sp, 120]                               ; Save r3
-    st      r2, [sp, 124]                               ; Save r2
     breq    r0, 0, __tx_thread_not_nested_save          ; If 0, we are not in a nested
                                                         ;   condition
 ;
@@ -114,7 +108,7 @@ __tx_thread_nested_save:                                ; Label is for special n
     st      r7,  [sp, 104]                              ; Save r7
     st      r6,  [sp, 108]                              ; Save r6
     st      r5,  [sp, 112]                              ; Save r5
-    st      r4,  [sp, 116]                              ; Save r6
+    st      r4,  [sp, 116]                              ; Save r4
     lr      r10, [LP_START]                             ; Pickup LP_START
     lr      r9,  [LP_END]                               ; Pickup LP_END
     st      LP_COUNT, [sp, 12]                          ; Save LP_COUNT
@@ -156,13 +150,13 @@ __tx_thread_not_nested_save:
     add     r0, r0, 1                                   ; Increment the nested interrupt count
     st      r0, [gp, _tx_thread_system_state@sda]       ; Update system state
     ld      r1, [gp, _tx_thread_current_ptr@sda]        ; Pickup current thread pointer
-    st      r12, [sp, 84]                               ; Save r12
-    st      r11, [sp, 88]                               ; Save r11
     breq    r1, 0, __tx_thread_idle_system_save         ; If no thread is running, idle system was
                                                         ;   interrupted.
 ;
 ;    /* Save minimal context of interrupted thread.  */
 ;
+    st      r12, [sp, 84]                               ; Save r12
+    st      r11, [sp, 88]                               ; Save r11
     st      r10, [sp, 92]                               ; Save r10
     st      r9,  [sp, 96]                               ; Save r9
     st      r8,  [sp, 100]                              ; Save r8

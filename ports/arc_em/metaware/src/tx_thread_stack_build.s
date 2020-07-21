@@ -21,13 +21,6 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
 ;
 ;
     .equ    LONG_ALIGN_MASK, 0xFFFFFFFC     

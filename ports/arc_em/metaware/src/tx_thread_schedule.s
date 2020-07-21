@@ -21,7 +21,6 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
 ;
 ;
     .equ    BTA, 0x412
@@ -29,11 +28,6 @@
     .equ    KSTACK_BASE,    0x265
     .equ    STATUS32_SC,    0x4000
 ;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
 ;
 ;
 ;/**************************************************************************/ 
@@ -115,7 +109,6 @@ __tx_thread_schedule_loop:
 ;    _tx_thread_current_ptr -> tx_thread_run_count++;
 ;
     ld      r3, [r0, 4]                                 ; Pickup run counter
-    ld      r4, [r0, 24]                                ; Pickup time-slice for this thread
     add     r3, r3, 1                                   ; Increment run counter
     st      r3, [r0, 4]                                 ; Store the new run counter
 
@@ -129,8 +122,8 @@ __tx_thread_schedule_loop:
     sr      r3, [KSTACK_BASE]                           ; Setup KSTACK_BASE
     .endif
 ;
-;    /* Setup time-slice, if present.  */
-;    _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;
+;    /* Switch to the thread's stack.  */
+;    sp =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;
 ;
     ld      sp, [r0, 8]                                 ; Switch to thread's stack
 
@@ -138,12 +131,13 @@ __tx_thread_schedule_loop:
     or      r2, r2, STATUS32_SC                         ; Or in hardware stack checking enable bit (SC)
     kflag   r2                                          ; Enable hardware stack checking
     .endif
-
+;
+;    /* Setup time-slice, if present.  */
+;    _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;
+;
+    ld      r4, [r0, 24]                                ; Pickup time-slice for this thread
     st      r4, [gp, _tx_timer_time_slice@sda]          ; Setup time-slice
-;
-;    /* Switch to the thread's stack.  */
-;    sp =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;
-;
+
     .ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 ;
 ;    /* Call the thread entry function to indicate the thread is executing.  */

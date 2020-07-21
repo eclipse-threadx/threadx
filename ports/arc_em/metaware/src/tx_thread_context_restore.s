@@ -21,18 +21,12 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
 ;
     .equ    BTA, 0x412
     .equ    KSTACK_TOP,     0x264
     .equ    KSTACK_BASE,    0x265
     .equ    STATUS32_SC,    0x4000
 ;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
 ;
 ;
 ;/**************************************************************************/ 
