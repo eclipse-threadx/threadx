@@ -120,7 +120,7 @@ _tx_thread_stack_build:
     STR     r3, [r2, #28]                           ; Store initial r10
     STR     r3, [r2, #32]                           ; Store initial r11
 ;
-;    /* Hardware stack follows.  /
+;    /* Hardware stack follows.  */
 ;
     STR     r3, [r2, #36]                           ; Store initial r0
     STR     r3, [r2, #40]                           ; Store initial r1
