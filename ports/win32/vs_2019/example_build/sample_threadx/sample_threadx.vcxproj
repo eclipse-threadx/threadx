@@ -102,7 +102,7 @@
       <PrecompiledHeaderOutputFile>.\Release\sample_threadx.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\Release\</ObjectFileName>
       <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>../../../generic</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\inc;..\..\..\..\..\common\inc</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Midl>
