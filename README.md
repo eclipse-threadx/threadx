@@ -105,5 +105,5 @@ The following are references to additional Azure RTOS and Azure IoT in general:
 | Azure RTOS Website: | https://azure.microsoft.com/en-us/services/rtos/ |
 | Azure RTOS Sales Questions: | https://azure-rtos.ms-iot-contact.com/ |
 | Microsoft Q/A for Azure IoT: | https://docs.microsoft.com/en-us/answers/products/azure?product=iot |
-| Internet of Things Show: | [aka.ms/iotshow](aka.ms/iotshow) |
-| IoT Tech Community: | [aka.ms/iottechcommunity](aka.ms/iottechcommunity) |
+| Internet of Things Show: | https://aka.ms/iotshow |
+| IoT Tech Community: | https://aka.ms/iottechcommunity |
