@@ -102,8 +102,9 @@ Professional support plans (https://azure.microsoft.com/en-us/support/options/) 
 The following are references to additional Azure RTOS and Azure IoT in general:
 |   |   |
 |---|---|
-| Azure RTOS Website: | https://azure.microsoft.com/en-us/services/rtos/ |
+| Azure RTOS Documenation and Guides: | https://docs.microsoft.com/azure/rtos |
+| Azure RTOS Website: | https://azure.microsoft.com/services/rtos/ |
 | Azure RTOS Sales Questions: | https://azure-rtos.ms-iot-contact.com/ |
-| Microsoft Q/A for Azure IoT: | https://docs.microsoft.com/en-us/answers/products/azure?product=iot |
-| Internet of Things Show: | https://aka.ms/iotshow |
-| IoT Tech Community: | https://aka.ms/iottechcommunity |
+| For technical questions check out Microsoft Q/A for Azure IoT: | https://aka.ms/QnA/azure-rtos |
+| Internet of Things Show for latest announcements and online training: | https://aka.ms/iotshow |
+| IoT Tech Community: | https://aka.ms/community/azure-rtos |
