@@ -1,0 +1,39 @@
+;*******************************************************
+; Copyright (c) 2011-2017 Arm Limited (or its affiliates). All rights reserved.
+; Use, modification and redistribution of this file is subject to your possession of a
+; valid End User License Agreement for the Arm Product of which these examples are part of 
+; and your compliance with all applicable terms and conditions of such licence agreement.
+;*******************************************************
+
+; Scatter-file for Cortex-R5 bare-metal example
+; Addresses suitable for Cortex-R5 Logic Tile on Versatile Express with SRAM from 0x48000000 to 0x4C000000
+; Change these addresses to match the memory map your own target
+
+LOAD 0x48000000
+{
+    CODE +0
+    {
+        startup.o (VECTORS, +First)         ; Startup code
+        * (InRoot$$Sections)                ; All library sections that must be in a root region
+        * (+RO)                             ; Application code, including C library
+    }
+
+    DATA 0x48010000
+    {
+        * (+RW,+ZI)                         ; All RW and ZI Data
+    }
+
+    ARM_LIB_STACKHEAP 0x48020000 EMPTY 0x4000   ; Stack and heap
+    {
+    }
+}
+
+; The Cortex-R5 Logic Tile on Versatile Express has
+; 64K ATCM from 0x40000000 to 0x4000FFFF
+; 64K BTCM from 0xE0FE0000 to 0xE0FEFFFF
+;
+; Use these regions to place code and/or data in TCM:
+;    ATCM 0x40000000 0x10000 { ... }
+;    BTCM 0xE0FE0000 0x10000 { ... }
+;
+; Scatterloading can be used to copy code and/or data into the TCMs

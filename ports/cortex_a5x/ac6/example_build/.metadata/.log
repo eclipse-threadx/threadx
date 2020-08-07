@@ -1,0 +1,1195 @@
+!SESSION 2020-06-17 10:59:22.780 -----------------------------------------------
+eclipse.buildId=4.6.3.M20170301-0400
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product com.arm.ds.ult
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product com.arm.ds.ult
+
+!ENTRY org.eclipse.core.resources 4 567 2020-06-17 10:59:38.827
+!MESSAGE Workspace restored, but some problems occurred.
+!SUBENTRY 1 org.eclipse.core.resources 4 567 2020-06-17 10:59:38.827
+!MESSAGE Could not read metadata for 'RemoteSystemsTempFiles'.
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: The project description file (.project) for 'RemoteSystemsTempFiles' is missing.  This file contains important information about the project.  The project will not function properly until this file is restored.
+	at org.eclipse.core.internal.localstore.FileSystemResourceManager.read(FileSystemResourceManager.java:907)
+	at org.eclipse.core.internal.resources.SaveManager.restoreMetaInfo(SaveManager.java:904)
+	at org.eclipse.core.internal.resources.SaveManager.restoreMetaInfo(SaveManager.java:884)
+	at org.eclipse.core.internal.resources.SaveManager.restore(SaveManager.java:735)
+	at org.eclipse.core.internal.resources.SaveManager.startup(SaveManager.java:1587)
+	at org.eclipse.core.internal.resources.Workspace.startup(Workspace.java:2399)
+	at org.eclipse.core.internal.resources.Workspace.open(Workspace.java:2156)
+	at org.eclipse.core.resources.ResourcesPlugin.start(ResourcesPlugin.java:464)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:774)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:767)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:724)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:932)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:309)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:581)
+	at org.eclipse.osgi.container.Module.start(Module.java:449)
+	at org.eclipse.osgi.framework.util.SecureAction.start(SecureAction.java:470)
+	at org.eclipse.osgi.internal.hooks.EclipseLazyStarter.postFindLocalClass(EclipseLazyStarter.java:107)
+	at org.eclipse.osgi.internal.loader.classpath.ClasspathManager.findLocalClass(ClasspathManager.java:529)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.findLocalClass(ModuleClassLoader.java:325)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findLocalClass(BundleLoader.java:345)
+	at org.eclipse.osgi.internal.loader.sources.SingleSourcePackage.loadClass(SingleSourcePackage.java:36)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClassInternal(BundleLoader.java:419)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:372)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:364)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.loadClass(ModuleClassLoader.java:161)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:139)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:196)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:388)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:243)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:673)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:610)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1519)
+	at com.arm.workbench.Hook.run(Hook.java:487)
+!SUBENTRY 2 org.eclipse.core.resources 4 567 2020-06-17 10:59:38.829
+!MESSAGE The project description file (.project) for 'RemoteSystemsTempFiles' is missing.  This file contains important information about the project.  The project will not function properly until this file is restored.
+!SUBENTRY 1 org.eclipse.core.resources 4 567 2020-06-17 10:59:38.829
+!MESSAGE Could not read metadata for 'sample_threadx'.
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: The project description file (.project) for 'sample_threadx' is missing.  This file contains important information about the project.  The project will not function properly until this file is restored.
+	at org.eclipse.core.internal.localstore.FileSystemResourceManager.read(FileSystemResourceManager.java:907)
+	at org.eclipse.core.internal.resources.SaveManager.restoreMetaInfo(SaveManager.java:904)
+	at org.eclipse.core.internal.resources.SaveManager.restoreMetaInfo(SaveManager.java:884)
+	at org.eclipse.core.internal.resources.SaveManager.restore(SaveManager.java:735)
+	at org.eclipse.core.internal.resources.SaveManager.startup(SaveManager.java:1587)
+	at org.eclipse.core.internal.resources.Workspace.startup(Workspace.java:2399)
+	at org.eclipse.core.internal.resources.Workspace.open(Workspace.java:2156)
+	at org.eclipse.core.resources.ResourcesPlugin.start(ResourcesPlugin.java:464)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:774)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:767)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:724)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:932)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:309)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:581)
+	at org.eclipse.osgi.container.Module.start(Module.java:449)
+	at org.eclipse.osgi.framework.util.SecureAction.start(SecureAction.java:470)
+	at org.eclipse.osgi.internal.hooks.EclipseLazyStarter.postFindLocalClass(EclipseLazyStarter.java:107)
+	at org.eclipse.osgi.internal.loader.classpath.ClasspathManager.findLocalClass(ClasspathManager.java:529)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.findLocalClass(ModuleClassLoader.java:325)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findLocalClass(BundleLoader.java:345)
+	at org.eclipse.osgi.internal.loader.sources.SingleSourcePackage.loadClass(SingleSourcePackage.java:36)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClassInternal(BundleLoader.java:419)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:372)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:364)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.loadClass(ModuleClassLoader.java:161)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:139)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:196)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:388)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:243)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:673)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:610)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1519)
+	at com.arm.workbench.Hook.run(Hook.java:487)
+!SUBENTRY 2 org.eclipse.core.resources 4 567 2020-06-17 10:59:38.831
+!MESSAGE The project description file (.project) for 'sample_threadx' is missing.  This file contains important information about the project.  The project will not function properly until this file is restored.
+
+!ENTRY org.eclipse.cdt.core 1 0 2020-06-17 10:59:54.322
+!MESSAGE Indexed 'tx' (186 sources, 15 headers) in 5.58 sec: 2,675 declarations; 14,493 references; 0 unresolved inclusions; 6 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.237
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\charsets.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\charsets.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.245
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\access-bridge-64.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\access-bridge-64.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.249
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\cldrdata.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\cldrdata.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.251
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\dnsns.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\dnsns.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.253
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\jaccess.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\jaccess.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.255
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\jfxrt.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\jfxrt.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.259
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\localedata.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\localedata.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.261
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\nashorn.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\nashorn.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.263
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\sunec.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\sunec.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.265
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\sunjce_provider.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\sunjce_provider.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.267
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\sunmscapi.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\sunmscapi.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.269
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\sunpkcs11.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\sunpkcs11.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.272
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\zipfs.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\ext\zipfs.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.274
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\jce.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\jce.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.276
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\jfr.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\jfr.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.278
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\jsse.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\jsse.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.280
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\resources.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\resources.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.281
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\rt.jar
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.24.0\sw\java\lib\rt.jar
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.282
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.27.0\sw\eclipse\dropins\plugins\com.arm.debug.interpreter.jython.api_5.27.0.20170426_161840
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.27.0\sw\eclipse\dropins\plugins\com.arm.debug.interpreter.jython.api_5.27.0.20170426_161840
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.284
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.27.0\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20170426_161840\Jython\Lib
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.27.0\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20170426_161840\Jython\Lib
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.286
+!MESSAGE Unable to track file that does not exist: C:\Program Files\DS-5 v5.27.0\sw\eclipse\plugins\org.python.pydev_5.1.2.201606231256\pysrc
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Program Files\DS-5 v5.27.0\sw\eclipse\plugins\org.python.pydev_5.1.2.201606231256\pysrc
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:05.287
+!MESSAGE Unable to track file that does not exist: C:\Users\Bill\AppData\Roaming\ARM\DS-5_v5.27.0\workbench\configuration\org.eclipse.osgi\413\0\.cp
+!STACK 0
+java.lang.RuntimeException: Unable to track file that does not exist: C:\Users\Bill\AppData\Roaming\ARM\DS-5_v5.27.0\workbench\configuration\org.eclipse.osgi\413\0\.cp
+	at org.python.pydev.shared_core.log.Log.logInfo(Log.java:52)
+	at org.python.pydev.shared_core.path_watch.PathWatch.track(PathWatch.java:316)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:463)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.afterSetInfos(SyncSystemModulesManagerScheduler.java:444)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.registerInterpreterManager(SyncSystemModulesManagerScheduler.java:67)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler.start(SyncSystemModulesManagerScheduler.java:89)
+	at org.python.pydev.plugin.PydevPlugin$1.run(PydevPlugin.java:222)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.egit.ui 2 0 2020-06-17 11:00:05.358
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\nisohack'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.jdt.launching 4 4 2020-06-17 11:00:08.584
+!MESSAGE C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1082)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.timeStampChanged(LaunchingPlugin.java:992)
+	at org.eclipse.jdt.internal.launching.StandardVMType.getLibraryInfo(StandardVMType.java:205)
+	at org.eclipse.jdt.internal.launching.StandardVMType.getDefaultJavadocLocation(StandardVMType.java:748)
+	at org.eclipse.jdt.internal.launching.StandardVMType.getDefaultLibraryLocations(StandardVMType.java:429)
+	at org.eclipse.jdt.internal.launching.StandardVMType.canDetectDefaultSystemLibraries(StandardVMType.java:230)
+	at org.eclipse.jdt.internal.launching.StandardVMType.getJavaHomeLocation(StandardVMType.java:303)
+	at org.eclipse.jdt.internal.launching.StandardVMType.detectInstallLocation(StandardVMType.java:257)
+	at org.eclipse.jdt.launching.JavaRuntime.detectEclipseRuntime(JavaRuntime.java:1792)
+	at org.eclipse.jdt.launching.JavaRuntime.initializeVMs(JavaRuntime.java:2695)
+	at org.eclipse.jdt.launching.JavaRuntime.getDefaultVMId(JavaRuntime.java:548)
+	at org.eclipse.jdt.launching.JavaRuntime.getDefaultVMInstall(JavaRuntime.java:493)
+	at org.python.copiedfromeclipsesrc.JavaVmLocationFinder$1.call(JavaVmLocationFinder.java:69)
+	at org.python.copiedfromeclipsesrc.JavaVmLocationFinder.findDefaultJavaExecutable(JavaVmLocationFinder.java:41)
+	at org.python.pydev.runners.SimpleJythonRunner.runAndGetOutputWithJar(SimpleJythonRunner.java:53)
+	at org.python.pydev.ui.interpreters.JythonInterpreterManager.doCreateInterpreterInfo(JythonInterpreterManager.java:75)
+	at org.python.pydev.ui.interpreters.JythonInterpreterManager.internalCreateInterpreterInfo(JythonInterpreterManager.java:47)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.createInterpreterInfo(AbstractInterpreterManager.java:390)
+	at com.arm.pydev.StartupListener.updateConfig(StartupListener.java:131)
+	at com.arm.pydev.StartupListener.earlyStartup(StartupListener.java:81)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.runEarlyStartup(EarlyStartupRunnable.java:77)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.run(EarlyStartupRunnable.java:53)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.ui.internal.Workbench$55.run(Workbench.java:2835)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:13.164
+!MESSAGE Restoring info for: C:\Program Files\DS-5 v5.29.3\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20191002_110027\lib\jython-2.7.0-standalone.jar
+!STACK 0
+java.lang.RuntimeException: Restoring info for: C:\Program Files\DS-5 v5.29.3\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20191002_110027\lib\jython-2.7.0-standalone.jar
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.getInterpretersFromPersistedString(AbstractInterpreterManager.java:529)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.internalRecreateCacheGetInterpreterInfos(AbstractInterpreterManager.java:345)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.setInfos(AbstractInterpreterManager.java:655)
+	at com.arm.pydev.StartupListener.updateConfig(StartupListener.java:222)
+	at com.arm.pydev.StartupListener.earlyStartup(StartupListener.java:81)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.runEarlyStartup(EarlyStartupRunnable.java:77)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.run(EarlyStartupRunnable.java:53)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.ui.internal.Workbench$55.run(Workbench.java:2835)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+Caused by: java.io.IOException: Expecting: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.python.pydev\v1_6mreyygygeqhdt73aqmeprc33\modulesKeys to exist (and be a file).
+	at org.python.pydev.editor.codecompletion.revisited.ModulesManager.loadFromFile(ModulesManager.java:293)
+	at org.python.pydev.editor.codecompletion.revisited.SystemModulesManager.load(SystemModulesManager.java:397)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.getInterpretersFromPersistedString(AbstractInterpreterManager.java:527)
+	... 9 more
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-06-17 11:00:13.724
+!MESSAGE Finished restoring information for: C:\Program Files\DS-5 v5.29.3\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20191002_110027\lib\jython-2.7.0-standalone.jar at: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.python.pydev\v1_6mreyygygeqhdt73aqmeprc33
+!STACK 0
+java.lang.RuntimeException: Finished restoring information for: C:\Program Files\DS-5 v5.29.3\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20191002_110027\lib\jython-2.7.0-standalone.jar at: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.python.pydev\v1_6mreyygygeqhdt73aqmeprc33
+	at org.python.pydev.core.log.Log.logInfo(Log.java:66)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.getInterpretersFromPersistedString(AbstractInterpreterManager.java:574)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.internalRecreateCacheGetInterpreterInfos(AbstractInterpreterManager.java:345)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.setInfos(AbstractInterpreterManager.java:655)
+	at com.arm.pydev.StartupListener.updateConfig(StartupListener.java:222)
+	at com.arm.pydev.StartupListener.earlyStartup(StartupListener.java:81)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.runEarlyStartup(EarlyStartupRunnable.java:77)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.run(EarlyStartupRunnable.java:53)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.ui.internal.Workbench$55.run(Workbench.java:2835)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 4 4 2020-06-17 11:00:14.267
+!MESSAGE Info: Rebuilding internal caches: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\com.python.pydev.analysis\jython_v1_6mreyygygeqhdt73aqmeprc33\jython.pydevsysteminfo (Expected error to be provided and got no error!)
+
+!ENTRY org.eclipse.jdt.launching 4 4 2020-06-17 11:00:20.790
+!MESSAGE C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1082)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.access$0(LaunchingPlugin.java:1055)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin$1.saving(LaunchingPlugin.java:550)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:389)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:198)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:201)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1186)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1165)
+	at org.eclipse.core.internal.resources.DelayedSnapshotJob.run(DelayedSnapshotJob.java:52)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.jdt.launching 4 4 2020-06-17 11:00:38.365
+!MESSAGE C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1082)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.access$0(LaunchingPlugin.java:1055)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin$1.saving(LaunchingPlugin.java:550)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:389)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:198)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:201)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1186)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1165)
+	at org.eclipse.core.internal.resources.DelayedSnapshotJob.run(DelayedSnapshotJob.java:52)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.cdt.managedbuilder.core 4 0 2020-06-17 11:00:38.737
+!MESSAGE The resource tree is locked for modifications.
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: The resource tree is locked for modifications.
+	at org.eclipse.core.internal.resources.WorkManager.checkIn(WorkManager.java:119)
+	at org.eclipse.core.internal.resources.Workspace.prepareOperation(Workspace.java:2188)
+	at org.eclipse.core.internal.resources.Resource.deleteMarkers(Resource.java:821)
+	at org.eclipse.cdt.managedbuilder.core.ToolchainManager.validateAndMark(ToolchainManager.java:126)
+	at org.eclipse.cdt.managedbuilder.core.ToolchainManager$1.handleEvent(ToolchainManager.java:63)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.notifyListeners(CProjectDescriptionManager.java:2180)
+	at org.eclipse.cdt.internal.core.settings.model.AbstractCProjectDescriptionStorage.fireLoadedEvent(AbstractCProjectDescriptionStorage.java:268)
+	at org.eclipse.cdt.internal.core.settings.model.xml.XmlProjectDescriptionStorage.getProjectDescription(XmlProjectDescriptionStorage.java:264)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.getProjectDescriptionInternal(CProjectDescriptionManager.java:426)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.getProjectDescription(CProjectDescriptionManager.java:408)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.getProjectDescription(CProjectDescriptionManager.java:402)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.getProjectDescription(CProjectDescriptionManager.java:395)
+	at org.eclipse.cdt.internal.core.model.CProject.computeSourceRoots(CProject.java:608)
+	at org.eclipse.cdt.internal.core.model.CProject.computeChildren(CProject.java:629)
+	at org.eclipse.cdt.internal.core.model.CProject.buildStructure(CProject.java:593)
+	at org.eclipse.cdt.internal.core.model.Openable.generateInfos(Openable.java:261)
+	at org.eclipse.cdt.internal.core.model.CElement.openWhenClosed(CElement.java:427)
+	at org.eclipse.cdt.internal.core.model.CElement.getElementInfo(CElement.java:305)
+	at org.eclipse.cdt.internal.core.model.CElement.getElementInfo(CElement.java:295)
+	at org.eclipse.cdt.internal.core.model.Parent.getChildren(Parent.java:55)
+	at org.eclipse.cdt.internal.core.model.CProject.getSourceRoots(CProject.java:467)
+	at org.eclipse.cdt.internal.core.model.CModelManager.create(CModelManager.java:340)
+	at org.eclipse.cdt.internal.core.model.CModelManager.create(CModelManager.java:268)
+	at org.eclipse.cdt.internal.core.model.DeltaProcessor.createElement(DeltaProcessor.java:87)
+	at org.eclipse.cdt.internal.core.model.DeltaProcessor.traverseDelta(DeltaProcessor.java:453)
+	at org.eclipse.cdt.internal.core.model.DeltaProcessor.traverseDelta(DeltaProcessor.java:471)
+	at org.eclipse.cdt.internal.core.model.DeltaProcessor.processResourceDelta(DeltaProcessor.java:433)
+	at org.eclipse.cdt.internal.core.model.CModelManager.resourceChanged(CModelManager.java:922)
+	at org.eclipse.core.internal.events.NotificationManager$1.run(NotificationManager.java:299)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.NotificationManager.notify(NotificationManager.java:289)
+	at org.eclipse.core.internal.events.NotificationManager.broadcastChanges(NotificationManager.java:152)
+	at org.eclipse.core.internal.resources.Workspace.broadcastPostChange(Workspace.java:374)
+	at org.eclipse.core.internal.resources.Workspace.endOperation(Workspace.java:1469)
+	at org.eclipse.core.internal.resources.InternalWorkspaceJob.run(InternalWorkspaceJob.java:46)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+!SUBENTRY 1 org.eclipse.core.resources 4 380 2020-06-17 11:00:38.737
+!MESSAGE The resource tree is locked for modifications.
+
+!ENTRY org.eclipse.cdt.core 1 0 2020-06-17 11:00:40.440
+!MESSAGE Indexed 'sample_threadx' (3 sources, 8 headers) in 0.286 sec: 1,757 declarations; 1,971 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.python.pydev.shared_core 4 4 2020-06-17 11:00:41.672
+!MESSAGE The python client still hasn't connected back to the eclipse java vm (will retry...)
+!STACK 0
+java.lang.RuntimeException: The python client still hasn't connected back to the eclipse java vm (will retry...)
+	at org.python.pydev.core.log.Log.log(Log.java:54)
+	at org.python.pydev.editor.codecompletion.shell.AbstractShell.startIt(AbstractShell.java:334)
+	at org.python.pydev.editor.codecompletion.shell.ShellsContainer.getServerShell(ShellsContainer.java:232)
+	at org.python.pydev.editor.codecompletion.shell.ShellsContainer.getServerShell(ShellsContainer.java:165)
+	at org.python.pydev.editor.codecompletion.shell.AbstractShell.getServerShell(AbstractShell.java:222)
+	at org.python.pydev.editor.codecompletion.revisited.modules.CompiledModule.createTokensFromServer(CompiledModule.java:372)
+	at org.python.pydev.editor.codecompletion.revisited.modules.CompiledModule.<init>(CompiledModule.java:176)
+	at org.python.pydev.editor.codecompletion.revisited.SystemModulesManager.getBuiltinModule(SystemModulesManager.java:332)
+	at org.python.pydev.editor.codecompletion.revisited.SystemModulesManager.getModule(SystemModulesManager.java:371)
+	at com.python.pydev.analysis.additionalinfo.AbstractAdditionalDependencyInfo.updateKeysIfNeededAndSave(AbstractAdditionalDependencyInfo.java:256)
+	at com.python.pydev.analysis.system_info_builder.InterpreterInfoBuilder.syncInfoToPythonPath(InterpreterInfoBuilder.java:154)
+	at com.python.pydev.analysis.system_info_builder.InterpreterInfoBuilder.syncInfoToPythonPath(InterpreterInfoBuilder.java:80)
+	at org.python.pydev.editor.codecompletion.revisited.SynchSystemModulesManager.synchronizeManagerToNameToInfoPythonpath(SynchSystemModulesManager.java:390)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler$SynchJob.run(SyncSystemModulesManagerScheduler.java:261)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.python.pydev.shared_core 4 4 2020-06-17 11:00:46.704
+!MESSAGE Attempt: 2 of 5 failed, trying again...(socket connected: still null)
+!STACK 0
+java.lang.RuntimeException: Attempt: 2 of 5 failed, trying again...(socket connected: still null)
+	at org.python.pydev.core.log.Log.log(Log.java:54)
+	at org.python.pydev.editor.codecompletion.shell.AbstractShell.startIt(AbstractShell.java:353)
+	at org.python.pydev.editor.codecompletion.shell.ShellsContainer.getServerShell(ShellsContainer.java:232)
+	at org.python.pydev.editor.codecompletion.shell.ShellsContainer.getServerShell(ShellsContainer.java:165)
+	at org.python.pydev.editor.codecompletion.shell.AbstractShell.getServerShell(AbstractShell.java:222)
+	at org.python.pydev.editor.codecompletion.revisited.modules.CompiledModule.createTokensFromServer(CompiledModule.java:372)
+	at org.python.pydev.editor.codecompletion.revisited.modules.CompiledModule.<init>(CompiledModule.java:176)
+	at org.python.pydev.editor.codecompletion.revisited.SystemModulesManager.getBuiltinModule(SystemModulesManager.java:332)
+	at org.python.pydev.editor.codecompletion.revisited.SystemModulesManager.getModule(SystemModulesManager.java:371)
+	at com.python.pydev.analysis.additionalinfo.AbstractAdditionalDependencyInfo.updateKeysIfNeededAndSave(AbstractAdditionalDependencyInfo.java:256)
+	at com.python.pydev.analysis.system_info_builder.InterpreterInfoBuilder.syncInfoToPythonPath(InterpreterInfoBuilder.java:154)
+	at com.python.pydev.analysis.system_info_builder.InterpreterInfoBuilder.syncInfoToPythonPath(InterpreterInfoBuilder.java:80)
+	at org.python.pydev.editor.codecompletion.revisited.SynchSystemModulesManager.synchronizeManagerToNameToInfoPythonpath(SynchSystemModulesManager.java:390)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler$SynchJob.run(SyncSystemModulesManagerScheduler.java:261)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.jdt.launching 4 4 2020-06-17 11:01:05.184
+!MESSAGE C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1082)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.access$0(LaunchingPlugin.java:1055)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin$1.saving(LaunchingPlugin.java:550)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:389)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:198)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:201)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1186)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2283)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor$4.run(IDEWorkbenchAdvisor.java:456)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:119)
+!SESSION 2020-06-17 11:02:45.647 -----------------------------------------------
+eclipse.buildId=4.6.3.M20170301-0400
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product com.arm.ds.ult
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product com.arm.ds.ult
+
+!ENTRY org.eclipse.egit.ui 2 0 2020-06-17 11:03:07.493
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\nisohack'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.jdt.launching 4 4 2020-06-17 11:03:42.902
+!MESSAGE C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1082)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.timeStampChanged(LaunchingPlugin.java:992)
+	at org.eclipse.jdt.internal.launching.VMDefinitionsContainer.populateVMForType(VMDefinitionsContainer.java:557)
+	at org.eclipse.jdt.internal.launching.VMDefinitionsContainer.populateVMTypes(VMDefinitionsContainer.java:494)
+	at org.eclipse.jdt.internal.launching.VMDefinitionsContainer.parseXMLIntoContainer(VMDefinitionsContainer.java:473)
+	at org.eclipse.jdt.launching.JavaRuntime.addPersistedVMs(JavaRuntime.java:1499)
+	at org.eclipse.jdt.launching.JavaRuntime.initializeVMs(JavaRuntime.java:2671)
+	at org.eclipse.jdt.launching.JavaRuntime.getDefaultVMId(JavaRuntime.java:548)
+	at org.eclipse.jdt.launching.JavaRuntime.getDefaultVMInstall(JavaRuntime.java:493)
+	at org.python.copiedfromeclipsesrc.JavaVmLocationFinder$1.call(JavaVmLocationFinder.java:69)
+	at org.python.copiedfromeclipsesrc.JavaVmLocationFinder.findDefaultJavaExecutable(JavaVmLocationFinder.java:41)
+	at org.python.pydev.runners.SimpleJythonRunner.runAndGetOutputWithJar(SimpleJythonRunner.java:53)
+	at org.python.pydev.ui.interpreters.JythonInterpreterManager.doCreateInterpreterInfo(JythonInterpreterManager.java:75)
+	at org.python.pydev.ui.interpreters.JythonInterpreterManager.internalCreateInterpreterInfo(JythonInterpreterManager.java:47)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.createInterpreterInfo(AbstractInterpreterManager.java:390)
+	at org.python.pydev.editor.codecompletion.revisited.SynchSystemModulesManager$CreateInterpreterInfoCallback.createInterpreterInfo(SynchSystemModulesManager.java:173)
+	at org.python.pydev.editor.codecompletion.revisited.SynchSystemModulesManager.updateStructures(SynchSystemModulesManager.java:252)
+	at org.python.pydev.editor.codecompletion.revisited.SyncSystemModulesManagerScheduler$SynchJob.run(SyncSystemModulesManagerScheduler.java:238)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.jdt.launching 4 4 2020-06-17 11:08:16.585
+!MESSAGE C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1082)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.access$0(LaunchingPlugin.java:1055)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin$1.saving(LaunchingPlugin.java:550)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:389)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:198)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:201)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1186)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1165)
+	at org.eclipse.core.internal.resources.DelayedSnapshotJob.run(DelayedSnapshotJob.java:52)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.jdt.launching 4 4 2020-06-17 13:52:12.068
+!MESSAGE C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1082)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.access$0(LaunchingPlugin.java:1055)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin$1.saving(LaunchingPlugin.java:550)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:389)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:198)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:201)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1186)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1165)
+	at org.eclipse.core.internal.resources.DelayedSnapshotJob.run(DelayedSnapshotJob.java:52)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.jdt.launching 4 4 2020-06-17 13:58:25.334
+!MESSAGE C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1082)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.access$0(LaunchingPlugin.java:1055)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin$1.saving(LaunchingPlugin.java:550)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:389)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:198)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:201)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1186)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1165)
+	at org.eclipse.core.internal.resources.DelayedSnapshotJob.run(DelayedSnapshotJob.java:52)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.jdt.launching 4 4 2020-06-17 14:29:32.344
+!MESSAGE C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.jdt.launching\.install.xml (Access is denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1082)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.access$0(LaunchingPlugin.java:1055)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin$1.saving(LaunchingPlugin.java:550)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:389)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:198)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:201)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1186)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2283)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor$4.run(IDEWorkbenchAdvisor.java:456)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:119)
+!SESSION 2020-07-24 13:46:29.714 -----------------------------------------------
+eclipse.buildId=4.6.3.M20170301-0400
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product com.arm.ds.ult
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product com.arm.ds.ult
+
+!ENTRY org.eclipse.core.resources 4 567 2020-07-24 13:46:36.836
+!MESSAGE Workspace restored, but some problems occurred.
+!SUBENTRY 1 org.eclipse.core.resources 4 567 2020-07-24 13:46:36.836
+!MESSAGE Could not read metadata for 'RemoteSystemsTempFiles'.
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException(C:/Users/nisohack/Documents/work/x-ware_libs/threadx/ports/cortex_a5x/ac6/example_build/.metadata/.plugins/org.eclipse.core.resources/.projects/RemoteSystemsTempFiles/1.tree)[568]: java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.core.resources\.projects\RemoteSystemsTempFiles\1.tree (The system cannot find the path specified)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.core.internal.localstore.SafeFileOutputStream.<init>(SafeFileOutputStream.java:51)
+	at org.eclipse.core.internal.resources.SaveManager.writeTree(SaveManager.java:2107)
+	at org.eclipse.core.internal.resources.SaveManager.restoreMetaInfo(SaveManager.java:924)
+	at org.eclipse.core.internal.resources.SaveManager.restoreMetaInfo(SaveManager.java:884)
+	at org.eclipse.core.internal.resources.SaveManager.restore(SaveManager.java:735)
+	at org.eclipse.core.internal.resources.SaveManager.startup(SaveManager.java:1587)
+	at org.eclipse.core.internal.resources.Workspace.startup(Workspace.java:2399)
+	at org.eclipse.core.internal.resources.Workspace.open(Workspace.java:2156)
+	at org.eclipse.core.resources.ResourcesPlugin.start(ResourcesPlugin.java:464)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:774)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:767)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:724)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:932)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:309)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:581)
+	at org.eclipse.osgi.container.Module.start(Module.java:449)
+	at org.eclipse.osgi.framework.util.SecureAction.start(SecureAction.java:470)
+	at org.eclipse.osgi.internal.hooks.EclipseLazyStarter.postFindLocalClass(EclipseLazyStarter.java:107)
+	at org.eclipse.osgi.internal.loader.classpath.ClasspathManager.findLocalClass(ClasspathManager.java:529)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.findLocalClass(ModuleClassLoader.java:325)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findLocalClass(BundleLoader.java:345)
+	at org.eclipse.osgi.internal.loader.sources.SingleSourcePackage.loadClass(SingleSourcePackage.java:36)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClassInternal(BundleLoader.java:419)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:372)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:364)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.loadClass(ModuleClassLoader.java:161)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:139)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:196)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:388)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:243)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:673)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:610)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1519)
+	at com.arm.workbench.Hook.run(Hook.java:487)
+!SUBENTRY 2 org.eclipse.core.resources 4 568 2020-07-24 13:46:36.836
+!MESSAGE Could not write metadata for '/RemoteSystemsTempFiles'.
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.core.resources\.projects\RemoteSystemsTempFiles\1.tree (The system cannot find the path specified)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.core.internal.localstore.SafeFileOutputStream.<init>(SafeFileOutputStream.java:51)
+	at org.eclipse.core.internal.resources.SaveManager.writeTree(SaveManager.java:2107)
+	at org.eclipse.core.internal.resources.SaveManager.restoreMetaInfo(SaveManager.java:924)
+	at org.eclipse.core.internal.resources.SaveManager.restoreMetaInfo(SaveManager.java:884)
+	at org.eclipse.core.internal.resources.SaveManager.restore(SaveManager.java:735)
+	at org.eclipse.core.internal.resources.SaveManager.startup(SaveManager.java:1587)
+	at org.eclipse.core.internal.resources.Workspace.startup(Workspace.java:2399)
+	at org.eclipse.core.internal.resources.Workspace.open(Workspace.java:2156)
+	at org.eclipse.core.resources.ResourcesPlugin.start(ResourcesPlugin.java:464)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:774)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:767)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:724)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:932)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:309)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:581)
+	at org.eclipse.osgi.container.Module.start(Module.java:449)
+	at org.eclipse.osgi.framework.util.SecureAction.start(SecureAction.java:470)
+	at org.eclipse.osgi.internal.hooks.EclipseLazyStarter.postFindLocalClass(EclipseLazyStarter.java:107)
+	at org.eclipse.osgi.internal.loader.classpath.ClasspathManager.findLocalClass(ClasspathManager.java:529)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.findLocalClass(ModuleClassLoader.java:325)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findLocalClass(BundleLoader.java:345)
+	at org.eclipse.osgi.internal.loader.sources.SingleSourcePackage.loadClass(SingleSourcePackage.java:36)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClassInternal(BundleLoader.java:419)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:372)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:364)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.loadClass(ModuleClassLoader.java:161)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:139)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:196)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:388)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:243)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:673)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:610)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1519)
+	at com.arm.workbench.Hook.run(Hook.java:487)
+
+!ENTRY org.eclipse.core.resources 4 1 2020-07-24 13:46:42.164
+!MESSAGE Problems occurred while refreshing local changes
+!SUBENTRY 1 org.eclipse.core.resources 4 1 2020-07-24 13:46:42.164
+!MESSAGE Problems occurred while refreshing local changes
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: Errors occurred while refreshing resources with the local file system.
+	at org.eclipse.core.internal.localstore.FileSystemResourceManager.refreshResource(FileSystemResourceManager.java:977)
+	at org.eclipse.core.internal.localstore.FileSystemResourceManager.refresh(FileSystemResourceManager.java:960)
+	at org.eclipse.core.internal.resources.Resource.refreshLocal(Resource.java:1594)
+	at org.eclipse.core.internal.refresh.RefreshJob.runInWorkspace(RefreshJob.java:163)
+	at org.eclipse.core.internal.resources.InternalWorkspaceJob.run(InternalWorkspaceJob.java:39)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+Contains: The project description file (.project) for 'RemoteSystemsTempFiles' is missing.  This file contains important information about the project.  The project will not function properly until this file is restored.
+!SUBENTRY 2 org.eclipse.core.resources 4 271 2020-07-24 13:46:42.164
+!MESSAGE Errors occurred while refreshing resources with the local file system.
+!SUBENTRY 3 org.eclipse.core.resources 4 567 2020-07-24 13:46:42.164
+!MESSAGE The project description file (.project) for 'RemoteSystemsTempFiles' is missing.  This file contains important information about the project.  The project will not function properly until this file is restored.
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-07-24 13:46:56.261
+!MESSAGE Restoring info for: C:\Program Files\DS-5 v5.29.3\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20191002_110027\lib\jython-2.7.0-standalone.jar
+!STACK 0
+java.lang.RuntimeException: Restoring info for: C:\Program Files\DS-5 v5.29.3\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20191002_110027\lib\jython-2.7.0-standalone.jar
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.getInterpretersFromPersistedString(AbstractInterpreterManager.java:529)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.internalRecreateCacheGetInterpreterInfos(AbstractInterpreterManager.java:345)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.getInterpreterInfos(AbstractInterpreterManager.java:332)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.<init>(AbstractInterpreterManager.java:185)
+	at org.python.pydev.ui.interpreters.JythonInterpreterManager.<init>(JythonInterpreterManager.java:31)
+	at org.python.pydev.plugin.PydevPlugin.start(PydevPlugin.java:246)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:774)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:767)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:724)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:932)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:309)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:581)
+	at org.eclipse.osgi.container.Module.start(Module.java:449)
+	at org.eclipse.osgi.framework.util.SecureAction.start(SecureAction.java:470)
+	at org.eclipse.osgi.internal.hooks.EclipseLazyStarter.postFindLocalClass(EclipseLazyStarter.java:107)
+	at org.eclipse.osgi.internal.loader.classpath.ClasspathManager.findLocalClass(ClasspathManager.java:529)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.findLocalClass(ModuleClassLoader.java:325)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findLocalClass(BundleLoader.java:345)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClassInternal(BundleLoader.java:423)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:372)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:364)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.loadClass(ModuleClassLoader.java:161)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.loadClass(EquinoxBundle.java:564)
+	at org.eclipse.core.internal.registry.osgi.RegistryStrategyOSGI.createExecutableExtension(RegistryStrategyOSGI.java:174)
+	at org.eclipse.core.internal.registry.ExtensionRegistry.createExecutableExtension(ExtensionRegistry.java:905)
+	at org.eclipse.core.internal.registry.ConfigurationElement.createExecutableExtension(ConfigurationElement.java:243)
+	at org.eclipse.core.internal.registry.ConfigurationElementHandle.createExecutableExtension(ConfigurationElementHandle.java:55)
+	at org.eclipse.ui.internal.navigator.filters.CommonFilterDescriptor$1.run(CommonFilterDescriptor.java:139)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.ui.internal.navigator.filters.CommonFilterDescriptor.createFilter(CommonFilterDescriptor.java:119)
+	at org.eclipse.ui.internal.navigator.NavigatorFilterService.getViewerFilter(NavigatorFilterService.java:177)
+	at org.eclipse.ui.internal.navigator.NavigatorFilterService.getVisibleFilters(NavigatorFilterService.java:146)
+	at org.eclipse.ui.navigator.CommonNavigator.createPartControl(CommonNavigator.java:195)
+	at org.eclipse.ui.navigator.resources.ProjectExplorer.createPartControl(ProjectExplorer.java:88)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityPart.createPartControl(CompatibilityPart.java:150)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityView.createPartControl(CompatibilityView.java:143)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityPart.create(CompatibilityPart.java:340)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.eclipse.e4.core.internal.di.MethodRequestor.execute(MethodRequestor.java:55)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.processAnnotated(InjectorImpl.java:966)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.processAnnotated(InjectorImpl.java:931)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.inject(InjectorImpl.java:151)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.internalMake(InjectorImpl.java:375)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.make(InjectorImpl.java:294)
+	at org.eclipse.e4.core.contexts.ContextInjectionFactory.make(ContextInjectionFactory.java:162)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.createFromBundle(ReflectionContributionFactory.java:105)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.doCreate(ReflectionContributionFactory.java:74)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.create(ReflectionContributionFactory.java:56)
+	at org.eclipse.e4.ui.workbench.renderers.swt.ContributedPartRenderer.createWidget(ContributedPartRenderer.java:129)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createWidget(PartRenderingEngine.java:975)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:651)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$1.run(PartRenderingEngine.java:536)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:520)
+	at org.eclipse.e4.ui.workbench.renderers.swt.ElementReferenceRenderer.createWidget(ElementReferenceRenderer.java:70)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createWidget(PartRenderingEngine.java:975)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:651)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer.showTab(StackRenderer.java:1324)
+	at org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer.postProcess(LazyStackRenderer.java:103)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:669)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:70)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SashRenderer.processContents(SashRenderer.java:142)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:665)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:70)
+	at org.eclipse.e4.ui.workbench.renderers.swt.PerspectiveRenderer.processContents(PerspectiveRenderer.java:49)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:665)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.PerspectiveStackRenderer.showTab(PerspectiveStackRenderer.java:82)
+	at org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer.postProcess(LazyStackRenderer.java:103)
+	at org.eclipse.e4.ui.workbench.renderers.swt.PerspectiveStackRenderer.postProcess(PerspectiveStackRenderer.java:63)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:669)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:70)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SashRenderer.processContents(SashRenderer.java:142)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:665)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:70)
+	at org.eclipse.e4.ui.workbench.renderers.swt.WBWRenderer.processContents(WBWRenderer.java:725)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:665)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$4.run(PartRenderingEngine.java:1059)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:336)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1022)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:150)
+	at org.eclipse.ui.internal.Workbench$5.run(Workbench.java:693)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:336)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:610)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:148)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:138)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:196)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:388)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:243)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:673)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:610)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1519)
+	at com.arm.workbench.Hook.run(Hook.java:487)
+Caused by: java.lang.RuntimeException: Could not load modules manager from C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.python.pydev\v1_6mreyygygeqhdt73aqmeprc33\modulesKeys (version changed).
+	at org.python.pydev.editor.codecompletion.revisited.ModulesManager.loadFromFile(ModulesManager.java:301)
+	at org.python.pydev.editor.codecompletion.revisited.SystemModulesManager.load(SystemModulesManager.java:397)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.getInterpretersFromPersistedString(AbstractInterpreterManager.java:527)
+	... 138 more
+
+!ENTRY org.python.pydev.shared_core 1 1 2020-07-24 13:46:57.027
+!MESSAGE Finished restoring information for: C:\Program Files\DS-5 v5.29.3\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20191002_110027\lib\jython-2.7.0-standalone.jar at: C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.python.pydev\v1_6mreyygygeqhdt73aqmeprc33
+!STACK 0
+java.lang.RuntimeException: Finished restoring information for: C:\Program Files\DS-5 v5.29.3\sw\eclipse\dropins\plugins\com.arm.tpip.jython_2.7.0.20191002_110027\lib\jython-2.7.0-standalone.jar at: C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.python.pydev\v1_6mreyygygeqhdt73aqmeprc33
+	at org.python.pydev.core.log.Log.logInfo(Log.java:66)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.getInterpretersFromPersistedString(AbstractInterpreterManager.java:574)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.internalRecreateCacheGetInterpreterInfos(AbstractInterpreterManager.java:345)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.getInterpreterInfos(AbstractInterpreterManager.java:332)
+	at org.python.pydev.ui.interpreters.AbstractInterpreterManager.<init>(AbstractInterpreterManager.java:185)
+	at org.python.pydev.ui.interpreters.JythonInterpreterManager.<init>(JythonInterpreterManager.java:31)
+	at org.python.pydev.plugin.PydevPlugin.start(PydevPlugin.java:246)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:774)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:767)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:724)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:932)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:309)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:581)
+	at org.eclipse.osgi.container.Module.start(Module.java:449)
+	at org.eclipse.osgi.framework.util.SecureAction.start(SecureAction.java:470)
+	at org.eclipse.osgi.internal.hooks.EclipseLazyStarter.postFindLocalClass(EclipseLazyStarter.java:107)
+	at org.eclipse.osgi.internal.loader.classpath.ClasspathManager.findLocalClass(ClasspathManager.java:529)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.findLocalClass(ModuleClassLoader.java:325)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findLocalClass(BundleLoader.java:345)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClassInternal(BundleLoader.java:423)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:372)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:364)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.loadClass(ModuleClassLoader.java:161)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.loadClass(EquinoxBundle.java:564)
+	at org.eclipse.core.internal.registry.osgi.RegistryStrategyOSGI.createExecutableExtension(RegistryStrategyOSGI.java:174)
+	at org.eclipse.core.internal.registry.ExtensionRegistry.createExecutableExtension(ExtensionRegistry.java:905)
+	at org.eclipse.core.internal.registry.ConfigurationElement.createExecutableExtension(ConfigurationElement.java:243)
+	at org.eclipse.core.internal.registry.ConfigurationElementHandle.createExecutableExtension(ConfigurationElementHandle.java:55)
+	at org.eclipse.ui.internal.navigator.filters.CommonFilterDescriptor$1.run(CommonFilterDescriptor.java:139)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.ui.internal.navigator.filters.CommonFilterDescriptor.createFilter(CommonFilterDescriptor.java:119)
+	at org.eclipse.ui.internal.navigator.NavigatorFilterService.getViewerFilter(NavigatorFilterService.java:177)
+	at org.eclipse.ui.internal.navigator.NavigatorFilterService.getVisibleFilters(NavigatorFilterService.java:146)
+	at org.eclipse.ui.navigator.CommonNavigator.createPartControl(CommonNavigator.java:195)
+	at org.eclipse.ui.navigator.resources.ProjectExplorer.createPartControl(ProjectExplorer.java:88)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityPart.createPartControl(CompatibilityPart.java:150)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityView.createPartControl(CompatibilityView.java:143)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityPart.create(CompatibilityPart.java:340)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.eclipse.e4.core.internal.di.MethodRequestor.execute(MethodRequestor.java:55)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.processAnnotated(InjectorImpl.java:966)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.processAnnotated(InjectorImpl.java:931)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.inject(InjectorImpl.java:151)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.internalMake(InjectorImpl.java:375)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.make(InjectorImpl.java:294)
+	at org.eclipse.e4.core.contexts.ContextInjectionFactory.make(ContextInjectionFactory.java:162)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.createFromBundle(ReflectionContributionFactory.java:105)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.doCreate(ReflectionContributionFactory.java:74)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.create(ReflectionContributionFactory.java:56)
+	at org.eclipse.e4.ui.workbench.renderers.swt.ContributedPartRenderer.createWidget(ContributedPartRenderer.java:129)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createWidget(PartRenderingEngine.java:975)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:651)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$1.run(PartRenderingEngine.java:536)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:520)
+	at org.eclipse.e4.ui.workbench.renderers.swt.ElementReferenceRenderer.createWidget(ElementReferenceRenderer.java:70)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createWidget(PartRenderingEngine.java:975)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:651)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer.showTab(StackRenderer.java:1324)
+	at org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer.postProcess(LazyStackRenderer.java:103)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:669)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:70)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SashRenderer.processContents(SashRenderer.java:142)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:665)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:70)
+	at org.eclipse.e4.ui.workbench.renderers.swt.PerspectiveRenderer.processContents(PerspectiveRenderer.java:49)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:665)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.PerspectiveStackRenderer.showTab(PerspectiveStackRenderer.java:82)
+	at org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer.postProcess(LazyStackRenderer.java:103)
+	at org.eclipse.e4.ui.workbench.renderers.swt.PerspectiveStackRenderer.postProcess(PerspectiveStackRenderer.java:63)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:669)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:70)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SashRenderer.processContents(SashRenderer.java:142)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:665)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:70)
+	at org.eclipse.e4.ui.workbench.renderers.swt.WBWRenderer.processContents(WBWRenderer.java:725)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:665)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:757)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.access$0(PartRenderingEngine.java:728)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:722)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:706)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$4.run(PartRenderingEngine.java:1059)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:336)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1022)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:150)
+	at org.eclipse.ui.internal.Workbench$5.run(Workbench.java:693)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:336)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:610)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:148)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:138)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:196)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:388)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:243)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:673)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:610)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1519)
+	at com.arm.workbench.Hook.run(Hook.java:487)
+
+!ENTRY org.eclipse.egit.ui 2 0 2020-07-24 13:47:00.345
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\nisohack'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.ui.ide 4 4 2020-07-24 13:50:25.662
+!MESSAGE Problems saving workspace
+
+!ENTRY org.eclipse.ui.ide 4 1 2020-07-24 13:50:25.662
+!MESSAGE Problems occurred while trying to save the state of the workbench.
+!SUBENTRY 1 org.eclipse.core.resources 4 568 2020-07-24 13:50:25.662
+!MESSAGE Could not write metadata for '/RemoteSystemsTempFiles'.
+!STACK 0
+java.io.FileNotFoundException: C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a5x\ac6\example_build\.metadata\.plugins\org.eclipse.core.resources\.projects\RemoteSystemsTempFiles\.markers (The system cannot find the path specified)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at org.eclipse.core.internal.localstore.SafeFileOutputStream.<init>(SafeFileOutputStream.java:51)
+	at org.eclipse.core.internal.resources.SaveManager.visitAndSave(SaveManager.java:1657)
+	at org.eclipse.core.internal.resources.SaveManager.visitAndSave(SaveManager.java:1739)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1199)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2283)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor$4.run(IDEWorkbenchAdvisor.java:456)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:119)

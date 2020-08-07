@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.cdt.launch.localCLaunch">
+<stringAttribute key="SeeCodeDisplay.break.profilingColumns" value="0"/>
+<mapAttribute key="SeeCodeDisplay.break.valueUpdates"/>
+<stringAttribute key="SeeCodeDisplay.disasm.profilingColumns" value="0.ARCV2HS"/>
+<mapAttribute key="SeeCodeDisplay.disasm.valueUpdates"/>
+<stringAttribute key="SeeCodeDisplay.expr.profilingColumns" value="0"/>
+<mapAttribute key="SeeCodeDisplay.expr.valueUpdates"/>
+<stringAttribute key="SeeCodeDisplay.mem.profilingColumns" value="0"/>
+<mapAttribute key="SeeCodeDisplay.mem.valueUpdates">
+<mapEntry key="data_addr_eval" value="0x80003530"/>
+</mapAttribute>
+<stringAttribute key="com.arc.cdt.debug.seecode.core.CPU" value="ac"/>
+<mapAttribute key="com.arc.cdt.debug.seecode.core.GUIHILI_PROPS">
+<mapEntry key="$cache_feature_id" value="2"/>
+<mapEntry key="$enable_triggers_encountered$" value="1"/>
+<mapEntry key="A6_dpfp" value="false"/>
+<mapEntry key="A6_dpfpfast" value="false"/>
+<mapEntry key="A6_spfp" value="false"/>
+<mapEntry key="A6_spfpfast" value="false"/>
+<mapEntry key="A7_ATB" value="false"/>
+<mapEntry key="A7_MX" value="false"/>
+<mapEntry key="A7_MX2" value="false"/>
+<mapEntry key="A7_MX_audio" value="false"/>
+<mapEntry key="A7_MX_video" value="false"/>
+<mapEntry key="A7_SCQ" value="false"/>
+<mapEntry key="A7_evec_init" value="1"/>
+<mapEntry key="A7_exceptions" value="false"/>
+<mapEntry key="A7_memsplit" value="false"/>
+<mapEntry key="A7_recur" value="1"/>
+<mapEntry key="A7_user_brk" value="1"/>
+<mapEntry key="A7_vree" value="false"/>
+<mapEntry key="A7_vrme" value="false"/>
+<mapEntry key="AC600_dcache" value="1"/>
+<mapEntry key="AC600_dcache_line_size" value="32"/>
+<mapEntry key="AC600_dcache_repalg" value="Round_robin"/>
+<mapEntry key="AC600_dcache_size" value="16384"/>
+<mapEntry key="AC600_dcache_ways" value="2"/>
+<mapEntry key="AC600_icache" value="1"/>
+<mapEntry key="AC600_icache_line_size" value="64"/>
+<mapEntry key="AC600_icache_repalg" value="Round_robin"/>
+<mapEntry key="AC600_icache_size" value="16384"/>
+<mapEntry key="AC600_icache_ways" value="2"/>
+<mapEntry key="ACTION" value="{&quot;-c \&quot;sysprop command_processor include_local_symbols=1\&quot;&quot; }"/>
+<mapEntry key="AC_chipinit" value="false"/>
+<mapEntry key="AC_dcache" value="1"/>
+<mapEntry key="AC_dcache_line_size" value="32"/>
+<mapEntry key="AC_dcache_repalg" value="Random"/>
+<mapEntry key="AC_dcache_size" value="16384"/>
+<mapEntry key="AC_dcache_ways" value="2"/>
+<mapEntry key="AC_icache" value="1"/>
+<mapEntry key="AC_icache_line_size" value="64"/>
+<mapEntry key="AC_icache_repalg" value="Random"/>
+<mapEntry key="AC_icache_size" value="16384"/>
+<mapEntry key="AC_icache_ways" value="2"/>
+<mapEntry key="ARC4_CAS_DLL" value="casseia.dll"/>
+<mapEntry key="ARC5_Core_Version" value="3"/>
+<mapEntry key="ARC600_CAS_DLL" value="arc600cas.dll"/>
+<mapEntry key="ARC600_CAS_DLL_systemc" value="arc600cas.dll"/>
+<mapEntry key="ARC600_XY_banks" value="1"/>
+<mapEntry key="ARC600_XY_size" value="512"/>
+<mapEntry key="ARC600_config" value="config"/>
+<mapEntry key="ARC600_config_already" value="config"/>
+<mapEntry key="ARC600_crc" value="false"/>
+<mapEntry key="ARC600_ea" value="false"/>
+<mapEntry key="ARC600_fast_loads" value="false"/>
+<mapEntry key="ARC600_fast_xmac_wb" value="false"/>
+<mapEntry key="ARC600_mem_bus_width" value="32"/>
+<mapEntry key="ARC600_mult32" value="false"/>
+<mapEntry key="ARC600_norm" value="false"/>
+<mapEntry key="ARC600_reg4" value="false"/>
+<mapEntry key="ARC600_timer0" value="false"/>
+<mapEntry key="ARC600_timer1" value="false"/>
+<mapEntry key="ARC600_xmac_24" value="false"/>
+<mapEntry key="ARC600_xmac_32x16d16" value="false"/>
+<mapEntry key="ARC600_xmac_acc_shortcut" value="false"/>
+<mapEntry key="ARC600_xmac_d16" value="false"/>
+<mapEntry key="ARC600_xy" value="false"/>
+<mapEntry key="ARC600_xy_modulo_addr" value="false"/>
+<mapEntry key="ARC6_Core_Version" value="1"/>
+<mapEntry key="ARC700_CAS_DLL" value="arc700cas.dll"/>
+<mapEntry key="ARC700_XY_banks" value="1"/>
+<mapEntry key="ARC700_XY_size" value="4096"/>
+<mapEntry key="ARC700_config" value="config"/>
+<mapEntry key="ARC700_crc" value="false"/>
+<mapEntry key="ARC700_dvbf" value="false"/>
+<mapEntry key="ARC700_logfile" value="cas_trace.txt"/>
+<mapEntry key="ARC700_mem_bus_width" value="32"/>
+<mapEntry key="ARC700_mul32x16" value="false"/>
+<mapEntry key="ARC700_xmac_24" value="false"/>
+<mapEntry key="ARC700_xmac_d16" value="false"/>
+<mapEntry key="ARC700_xy" value="false"/>
+<mapEntry key="ARC700_xy_modulo_addr" value="false"/>
+<mapEntry key="ARC7_Core_Version" value="2"/>
+<mapEntry key="ARC_DSP_memory" value="ARC_nodsp"/>
+<mapEntry key="ARC_MX2_SCM_size" value="5120"/>
+<mapEntry key="ARC_MX2_SCQ_size" value="256"/>
+<mapEntry key="ARC_MX2_VRF_size" value="24"/>
+<mapEntry key="ARC_MX_SCM_size" value="5120"/>
+<mapEntry key="ARC_MX_SCQ_size" value="256"/>
+<mapEntry key="ARC_MX_SDM_size" value="32768"/>
+<mapEntry key="ARC_MX_VRF_size" value="24"/>
+<mapEntry key="ARC_Timeout" value="100"/>
+<mapEntry key="ARC_addr_size" value="32"/>
+<mapEntry key="ARC_agu" value="-Xagu_small"/>
+<mapEntry key="ARC_atomic" value="0"/>
+<mapEntry key="ARC_bad_instr_intr" value="false"/>
+<mapEntry key="ARC_bad_instr_intr7" value="false"/>
+<mapEntry key="ARC_bad_instr_intr_NSIM" value="1"/>
+<mapEntry key="ARC_bad_instr_intr_NSIM7" value="1"/>
+<mapEntry key="ARC_barrel_shifter" value="0"/>
+<mapEntry key="ARC_bitstream" value="false"/>
+<mapEntry key="ARC_blast_spec" value="false"/>
+<mapEntry key="ARC_cache_rams" value="false"/>
+<mapEntry key="ARC_code_density" value="0"/>
+<mapEntry key="ARC_code_protect" value="0000"/>
+<mapEntry key="ARC_crc" value="false"/>
+<mapEntry key="ARC_cycle_spec" value="1"/>
+<mapEntry key="ARC_cycles" value="0"/>
+<mapEntry key="ARC_dcache_feature" value="2"/>
+<mapEntry key="ARC_dcache_mem_cycles" value="2"/>
+<mapEntry key="ARC_deadbeef" value="1"/>
+<mapEntry key="ARC_default_ext_interrupts" value="0"/>
+<mapEntry key="ARC_default_interrupts" value="0"/>
+<mapEntry key="ARC_dma" value="false"/>
+<mapEntry key="ARC_dmulpf" value="false"/>
+<mapEntry key="ARC_dsp" value="false"/>
+<mapEntry key="ARC_dsp2" value="false"/>
+<mapEntry key="ARC_dsp_accshift" value="full"/>
+<mapEntry key="ARC_dsp_complex" value="false"/>
+<mapEntry key="ARC_dsp_divsqrt" value="radix2"/>
+<mapEntry key="ARC_dsp_itu" value="false"/>
+<mapEntry key="ARC_dvbf" value="false"/>
+<mapEntry key="ARC_ea" value="false"/>
+<mapEntry key="ARC_ext_interrupt_num" value="0"/>
+<mapEntry key="ARC_fpuda" value="false"/>
+<mapEntry key="ARC_fsfpus_div" value="Slow"/>
+<mapEntry key="ARC_fsfpus_mpy" value="Fast"/>
+<mapEntry key="ARC_fujitsu_if" value="false"/>
+<mapEntry key="ARC_hardware_selection" value="ARC_raw"/>
+<mapEntry key="ARC_icache_feature" value="2"/>
+<mapEntry key="ARC_interrupt_baseaddr" value="0x0"/>
+<mapEntry key="ARC_interrupt_num" value="0"/>
+<mapEntry key="ARC_interrupt_priorities_LIST" value="{&quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; &quot;5&quot; &quot;6&quot; &quot;7&quot; &quot;8&quot; &quot;9&quot; &quot;10&quot; &quot;11&quot; &quot;12&quot; &quot;13&quot; &quot;14&quot; &quot;15&quot; &quot;16&quot; }"/>
+<mapEntry key="ARC_interrupt_vector_count" value="(default)"/>
+<mapEntry key="ARC_isa_counters" value="false"/>
+<mapEntry key="ARC_ldst_ram_base" value="(none)"/>
+<mapEntry key="ARC_ldst_ram_size" value="(none)"/>
+<mapEntry key="ARC_ll64" value="0"/>
+<mapEntry key="ARC_lpc_width" value="32"/>
+<mapEntry key="ARC_mac" value="0"/>
+<mapEntry key="ARC_macd" value="0"/>
+<mapEntry key="ARC_mcip" value="false"/>
+<mapEntry key="ARC_mcip_bsu" value="false"/>
+<mapEntry key="ARC_mcip_cirqnum" value="8"/>
+<mapEntry key="ARC_mcip_dvfs" value="false"/>
+<mapEntry key="ARC_mcip_grtc" value="false"/>
+<mapEntry key="ARC_mcip_ici" value="false"/>
+<mapEntry key="ARC_mcip_ics" value="false"/>
+<mapEntry key="ARC_mcip_idu" value="false"/>
+<mapEntry key="ARC_mcip_llm" value="false"/>
+<mapEntry key="ARC_mcip_llm_base" value="0"/>
+<mapEntry key="ARC_mcip_llm_size" value="128K"/>
+<mapEntry key="ARC_mcip_mcd" value="false"/>
+<mapEntry key="ARC_mcip_mps" value="false"/>
+<mapEntry key="ARC_mcip_numsemas" value="16"/>
+<mapEntry key="ARC_mcip_pmu" value="false"/>
+<mapEntry key="ARC_mcip_sram_size" value="512"/>
+<mapEntry key="ARC_mcip_version" value="3"/>
+<mapEntry key="ARC_mem_bus_width" value="32"/>
+<mapEntry key="ARC_mem_exc_intr" value="false"/>
+<mapEntry key="ARC_mem_exc_intr7" value="false"/>
+<mapEntry key="ARC_mem_exc_intr_NSIM" value="1"/>
+<mapEntry key="ARC_mem_exc_intr_NSIM7" value="1"/>
+<mapEntry key="ARC_memsize" value="(none)"/>
+<mapEntry key="ARC_mpy" value="0"/>
+<mapEntry key="ARC_mpy16" value="0"/>
+<mapEntry key="ARC_mul32x16" value="false"/>
+<mapEntry key="ARC_mult32" value="0"/>
+<mapEntry key="ARC_norm" value="0"/>
+<mapEntry key="ARC_opellaXD_DLL" value="c:/AshlingOpellaXDforARC/opxdarc"/>
+<mapEntry key="ARC_opella_DLL" value="c:/AshlingOpellaforARC/opellarc"/>
+<mapEntry key="ARC_parallel_port_address" value="0x378"/>
+<mapEntry key="ARC_pc_width" value="32"/>
+<mapEntry key="ARC_pmu" value="false"/>
+<mapEntry key="ARC_qmpyh" value="0"/>
+<mapEntry key="ARC_replay_file" value="replay.bin"/>
+<mapEntry key="ARC_reset_on_restart" value="false"/>
+<mapEntry key="ARC_rgf_num_wr_ports" value="2"/>
+<mapEntry key="ARC_shift_assist" value="0"/>
+<mapEntry key="ARC_sliding_pointers" value="false"/>
+<mapEntry key="ARC_swap" value="0"/>
+<mapEntry key="ARC_target" value="ARCSIM"/>
+<mapEntry key="ARC_timer0" value="1"/>
+<mapEntry key="ARC_timer1" value="1"/>
+<mapEntry key="ARC_uart_0" value="false"/>
+<mapEntry key="ARC_uart_1" value="false"/>
+<mapEntry key="ARC_uart_2" value="false"/>
+<mapEntry key="ARC_ultraXD_DLL" value="C:/AshlingUltra-XDforARC/uxdarc.dll"/>
+<mapEntry key="ARC_unalighned_NA" value="1"/>
+<mapEntry key="ARC_unaligned" value="0"/>
+<mapEntry key="ARC_vmac_0" value="false"/>
+<mapEntry key="ARC_vmac_1" value="false"/>
+<mapEntry key="ARC_vmac_2" value="false"/>
+<mapEntry key="ARC_xlib" value="0"/>
+<mapEntry key="ARC_xmac_24" value="false"/>
+<mapEntry key="ARC_xmac_d16" value="false"/>
+<mapEntry key="ARC_xy" value="false"/>
+<mapEntry key="ARG_ACTION" value="{&quot;-targs=AC&quot; &quot;-toggle=include_local_symbols=1&quot; &quot;-profile&quot; &quot;-nsim&quot; &quot;-Xrtc&quot; &quot;-toggle=deadbeef=1&quot; &quot;-interrupt_priorities=16&quot; &quot;-firq&quot; &quot;-rgf_num_banks=4&quot; }"/>
+<mapEntry key="Dont_download" value="false"/>
+<mapEntry key="EIA_path" value="path_to_eia/lib"/>
+<mapEntry key="IDE_ARC_DSP_memory" value="ARC_nodsp"/>
+<mapEntry key="IDE_ARC_crc" value="0"/>
+<mapEntry key="IDE_ARC_dmulpf" value="0"/>
+<mapEntry key="IDE_ARC_dvbf" value="0"/>
+<mapEntry key="IDE_ARC_ea" value="0"/>
+<mapEntry key="IDE_ARC_mul32x16" value="0"/>
+<mapEntry key="IDE_ARC_timer0" value="1"/>
+<mapEntry key="IDE_ARC_timer1" value="1"/>
+<mapEntry key="IDE_ARC_xmac_24" value="0"/>
+<mapEntry key="IDE_ARC_xmac_d16" value="0"/>
+<mapEntry key="Local_symbols" value="1"/>
+<mapEntry key="MX_ARC_speed" value="1"/>
+<mapEntry key="MX_DMA_speed" value="1"/>
+<mapEntry key="MX_SIMD_speed" value="1"/>
+<mapEntry key="MX_perfres" value="10000"/>
+<mapEntry key="MX_system_speed" value="1"/>
+<mapEntry key="NA_BPU_BC_ENTRIES" value="512"/>
+<mapEntry key="NA_BPU_BC_FULL_TAG" value="0"/>
+<mapEntry key="NA_BPU_BC_TAG_SIZE" value="4"/>
+<mapEntry key="NA_BPU_BT_ENTRIES" value="8192"/>
+<mapEntry key="NA_BPU_FB_ENTRIES" value="2"/>
+<mapEntry key="NA_BPU_RS_ENTRIES" value="4"/>
+<mapEntry key="NA_BPU_TOSQ_ENTRIES" value="5"/>
+<mapEntry key="PROJECT" value="sample_threadx Debug"/>
+<mapEntry key="RASCAL_ENV" value="rascal.env"/>
+<mapEntry key="RTOS" value="(none)"/>
+<mapEntry key="ReadingXML" value="false"/>
+<mapEntry key="SCIT_port" value="10875"/>
+<mapEntry key="SCIT_tcpip" value="localhost"/>
+<mapEntry key="SCXISS_ACSI" value="0"/>
+<mapEntry key="SCXISS_CONNECTION" value="TCPIP"/>
+<mapEntry key="SCXISS_DELAY" value="12"/>
+<mapEntry key="SCXISS_IPADDR" value="127.0.0.1"/>
+<mapEntry key="SCXISS_IPPORT" value="8123"/>
+<mapEntry key="SCXISS_LAUNCH" value="false"/>
+<mapEntry key="SCXISS_WD" value=""/>
+<mapEntry key="UART_COUNT" value="0"/>
+<mapEntry key="UART_PBASE" value="0xC0FC0000"/>
+<mapEntry key="UART_pbase_default" value="1"/>
+<mapEntry key="XD_adaptive" value="(none)"/>
+<mapEntry key="XD_gclk" value="crystal"/>
+<mapEntry key="XD_gclk1" value="crystal"/>
+<mapEntry key="XD_gclk2" value="crystal"/>
+<mapEntry key="XD_reset" value="50"/>
+<mapEntry key="XD_roboSS" value="0x1234"/>
+<mapEntry key="XD_roboSSEXP" value="0x1234"/>
+<mapEntry key="XD_robosd" value="0x1234"/>
+<mapEntry key="XISS_bridge_0_length" value="0x2000"/>
+<mapEntry key="XISS_bridge_0_start" value="0x0"/>
+<mapEntry key="XISS_bridge_0_target" value="&lt;Choose Core&gt;"/>
+<mapEntry key="XISS_bridge_0_target_address" value="0x0"/>
+<mapEntry key="XISS_bridge_1_length" value="0x2000"/>
+<mapEntry key="XISS_bridge_1_start" value="0x0"/>
+<mapEntry key="XISS_bridge_1_target" value="&lt;Choose Core&gt;"/>
+<mapEntry key="XISS_bridge_1_target_address" value="0x0"/>
+<mapEntry key="XISS_bridge_2_length" value="0x2000"/>
+<mapEntry key="XISS_bridge_2_start" value="0x0"/>
+<mapEntry key="XISS_bridge_2_target" value="&lt;Choose Core&gt;"/>
+<mapEntry key="XISS_bridge_2_target_address" value="0x0"/>
+<mapEntry key="XISS_bridge_3_length" value="0x2000"/>
+<mapEntry key="XISS_bridge_3_start" value="0x0"/>
+<mapEntry key="XISS_bridge_3_target" value="&lt;Choose Core&gt;"/>
+<mapEntry key="XISS_bridge_3_target_address" value="0x0"/>
+<mapEntry key="XISS_bridge_4_length" value="0x2000"/>
+<mapEntry key="XISS_bridge_4_start" value="0x0"/>
+<mapEntry key="XISS_bridge_4_target" value="&lt;Choose Core&gt;"/>
+<mapEntry key="XISS_bridge_4_target_address" value="0x0"/>
+<mapEntry key="XISS_bridge_5_length" value="0x2000"/>
+<mapEntry key="XISS_bridge_5_start" value="0x0"/>
+<mapEntry key="XISS_bridge_5_target" value="&lt;Choose Core&gt;"/>
+<mapEntry key="XISS_bridge_5_target_address" value="0x0"/>
+<mapEntry key="XISS_bridge_6_length" value="0x2000"/>
+<mapEntry key="XISS_bridge_6_start" value="0x0"/>
+<mapEntry key="XISS_bridge_6_target" value="&lt;Choose Core&gt;"/>
+<mapEntry key="XISS_bridge_6_target_address" value="0x0"/>
+<mapEntry key="XISS_bridge_7_length" value="0x2000"/>
+<mapEntry key="XISS_bridge_7_start" value="0x0"/>
+<mapEntry key="XISS_bridge_7_target" value="&lt;Choose Core&gt;"/>
+<mapEntry key="XISS_bridge_7_target_address" value="0x0"/>
+<mapEntry key="XISS_bridge_8_length" value="0x2000"/>
+<mapEntry key="XISS_bridge_8_start" value="0x0"/>
+<mapEntry key="XISS_bridge_8_target" value="&lt;Choose Core&gt;"/>
+<mapEntry key="XISS_bridge_8_target_address" value="0x0"/>
+<mapEntry key="arcsim_jit" value="0"/>
+<mapEntry key="arcsim_jit_threads" value="1"/>
+<mapEntry key="arcsim_systemc" value="0"/>
+<mapEntry key="backdoor_mem" value="1"/>
+<mapEntry key="cache_target_mem" value="1"/>
+<mapEntry key="cas600_coderam_size" value="512k"/>
+<mapEntry key="cas600_ldstram_size" value="512k"/>
+<mapEntry key="cas600_profiling" value="1"/>
+<mapEntry key="cas700_profiling" value="1"/>
+<mapEntry key="cas_shmem6" value="123"/>
+<mapEntry key="cas_shmem7" value="123"/>
+<mapEntry key="comm_baud" value="9600"/>
+<mapEntry key="comm_flowcontrol" value="D"/>
+<mapEntry key="comm_parity" value="N"/>
+<mapEntry key="comm_rxqsize" value="1024"/>
+<mapEntry key="comm_stopbits" value="1"/>
+<mapEntry key="comm_txqsize" value="1024"/>
+<mapEntry key="comm_wordlength" value="8"/>
+<mapEntry key="command_logging" value="false"/>
+<mapEntry key="commtermsim" value="none"/>
+<mapEntry key="connect_only" value="LE"/>
+<mapEntry key="connect_only_selection" value="false"/>
+<mapEntry key="dcache7" value="none"/>
+<mapEntry key="dccm7" value="none"/>
+<mapEntry key="dump_file" value="(none)"/>
+<mapEntry key="dump_range" value="(default)"/>
+<mapEntry key="fpu_mac" value="false"/>
+<mapEntry key="fpud" value="false"/>
+<mapEntry key="fpud_div" value="false"/>
+<mapEntry key="fpus" value="false"/>
+<mapEntry key="fpus_div" value="false"/>
+<mapEntry key="gclk1_XD" value="false"/>
+<mapEntry key="gclk2_XD" value="false"/>
+<mapEntry key="gclk_XD" value="false"/>
+<mapEntry key="hw_stack_checking" value="false"/>
+<mapEntry key="icache7" value="none"/>
+<mapEntry key="iccm7" value="none"/>
+<mapEntry key="iss_av2_override" value="0"/>
+<mapEntry key="log_filename" value="logfile"/>
+<mapEntry key="opella106_jtag_frequency" value="2Mhz"/>
+<mapEntry key="opella108_jtag_frequency" value="2Mhz"/>
+<mapEntry key="opellaXD_blast_frequency" value="6Mhz"/>
+<mapEntry key="opellaXD_jtag_frequency" value="8MHz"/>
+<mapEntry key="optimize_XD" value="false"/>
+<mapEntry key="parallel_jtag" value="1"/>
+<mapEntry key="prefer_sw_bp" value="1"/>
+<mapEntry key="profiling_window" value="1"/>
+<mapEntry key="quicksim6" value="false"/>
+<mapEntry key="read_ro_from_exe" value="false"/>
+<mapEntry key="roboSSEXP_XD" value="false"/>
+<mapEntry key="roboSS_XD" value="false"/>
+<mapEntry key="robosd_XD" value="false"/>
+<mapEntry key="show_string" value="1"/>
+<mapEntry key="sim_unhalt_arc" value="false"/>
+<mapEntry key="simextDLLKind" value="EIA"/>
+<mapEntry key="stop_sim_when_arc_halts" value="1"/>
+<mapEntry key="term_base" value="0xfc1000"/>
+<mapEntry key="term_default_receive" value="1"/>
+<mapEntry key="term_default_send" value="1"/>
+<mapEntry key="term_default_vector" value="1"/>
+<mapEntry key="term_external" value="0"/>
+<mapEntry key="term_int_vector" value="2"/>
+<mapEntry key="term_log_only" value="false"/>
+<mapEntry key="term_port" value="1"/>
+<mapEntry key="term_tcp_port" value="+0"/>
+<mapEntry key="term_use_input" value="false"/>
+<mapEntry key="term_use_log" value="0"/>
+<mapEntry key="title" value="Target reset"/>
+<mapEntry key="trace_history" value="true"/>
+<mapEntry key="trace_history_vlz" value="false"/>
+<mapEntry key="trace_size" value="500000"/>
+<mapEntry key="use_rascal_perfmon" value="1"/>
+<mapEntry key="v2em_core_version" value="1"/>
+<mapEntry key="v2em_regis_bank" value="1"/>
+<mapEntry key="v2em_regis_bank_LIST" value="{&quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; }"/>
+<mapEntry key="v2hs_core_version" value="1"/>
+<mapEntry key="verify_download" value="false"/>
+<mapEntry key="which6cas" value="c6I"/>
+<mapEntry key="which7cas" value="c7I"/>
+<mapEntry key="whichOptions" value="machine"/>
+<mapEntry key="which_arc" value="ARCV2HS"/>
+<mapEntry key="which_arc_name" value="ARC HS"/>
+<mapEntry key="which_opella_version" value="v106"/>
+<mapEntry key="wires" value="4-wire (standard)"/>
+<mapEntry key="x600_dcache_pipe_depth" value="2"/>
+<mapEntry key="x600_trace_level" value="off"/>
+<mapEntry key="x700_logging" value="1"/>
+<mapEntry key="x700log_start" value="none"/>
+<mapEntry key="x700log_stop" value="none"/>
+</mapAttribute>
+<listAttribute key="com.arc.cdt.debug.seecode.core.SWAHILI_ARGS">
+<listEntry value="-targs=AC"/>
+<listEntry value="-toggle=include_local_symbols=1"/>
+<listEntry value="-profile"/>
+<listEntry value="-nsim"/>
+<listEntry value="-toggle=deadbeef=1"/>
+<listEntry value="-av2hs"/>
+<listEntry value="-Xtimer0"/>
+<listEntry value="-Xtimer1"/>
+<listEntry value="-core1"/>
+<listEntry value="-Xmpy_option=none"/>
+<listEntry value="-rgf_num_banks=1"/>
+<listEntry value="-addr_size=32"/>
+<listEntry value="-interrupts=0"/>
+<listEntry value="-ext_interrupts=0"/>
+<listEntry value="-interrupt_base=0x0"/>
+<listEntry value="-Xunaligned"/>
+<listEntry value="-bpu_bc_entries=512"/>
+<listEntry value="-bpu_pt_entries=8192"/>
+<listEntry value="-bpu_rs_entries=4"/>
+<listEntry value="-bpu_bc_full_tag=0"/>
+<listEntry value="-bpu_bc_tag_size=4"/>
+<listEntry value="-bpu_tosq_entries=5"/>
+<listEntry value="-bpu_fb_entries=2"/>
+<listEntry value="-icache_feature=2"/>
+<listEntry value="-dcache_feature=2"/>
+<listEntry value="-rgf_num_wr_ports=2"/>
+<listEntry value="-dcache_mem_cycles=2"/>
+<listEntry value="-dcache=16384,32,2,a"/>
+<listEntry value="-icache=16384,64,2,a"/>
+</listAttribute>
+<listAttribute key="com.arc.cdt.debug.seecode.core.SWAHILI_TCF_ARGS">
+<listEntry value="-rgf_num_banks=1"/>
+<listEntry value="-addr_size=32"/>
+<listEntry value="-interrupts=0"/>
+<listEntry value="-ext_interrupts=0"/>
+<listEntry value="-interrupt_base=0x0"/>
+<listEntry value="-Xunaligned"/>
+<listEntry value="-bpu_bc_entries=512"/>
+<listEntry value="-bpu_pt_entries=8192"/>
+<listEntry value="-bpu_rs_entries=4"/>
+<listEntry value="-bpu_bc_full_tag=0"/>
+<listEntry value="-bpu_bc_tag_size=4"/>
+<listEntry value="-bpu_tosq_entries=5"/>
+<listEntry value="-bpu_fb_entries=2"/>
+<listEntry value="-icache_feature=2"/>
+<listEntry value="-dcache_feature=2"/>
+<listEntry value="-rgf_num_wr_ports=2"/>
+<listEntry value="-dcache_mem_cycles=2"/>
+<listEntry value="-dcache=16384,32,2,a"/>
+<listEntry value="-icache=16384,64,2,a"/>
+</listAttribute>
+<intAttribute key="org.eclipse.cdt.launch.ATTR_BUILD_BEFORE_LAUNCH_ATTR" value="2"/>
+<stringAttribute key="org.eclipse.cdt.launch.COREFILE_PATH" value=""/>
+<stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_ID" value="com.arc.cdt.debug.seecode.core.SeeCodeDebugger"/>
+<stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_REGISTER_GROUPS" value=""/>
+<booleanAttribute key="org.eclipse.cdt.launch.DEBUGGER_RESUME_AT_START" value="true"/>
+<stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_START_MODE" value="run"/>
+<booleanAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN" value="true"/>
+<stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN_SYMBOL" value="main"/>
+<booleanAttribute key="org.eclipse.cdt.launch.DISABLE_STOPATMAIN_RESUME" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.launch.ENABLE_REGISTER_BOOKKEEPING" value="false"/>
+<booleanAttribute key="org.eclipse.cdt.launch.ENABLE_VARIABLE_BOOKKEEPING" value="false"/>
+<stringAttribute key="org.eclipse.cdt.launch.FORMAT" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&lt;contentList/&gt;"/>
+<stringAttribute key="org.eclipse.cdt.launch.GLOBAL_VARIABLES" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;globalVariableList/&gt;&#13;&#10;"/>
+<stringAttribute key="org.eclipse.cdt.launch.MEMORY_BLOCKS" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;memoryBlockExpressionList/&gt;&#13;&#10;"/>
+<booleanAttribute key="org.eclipse.cdt.launch.NOPROJECT" value="false"/>
+<listAttribute key="org.eclipse.cdt.launch.NOTONGUISWAHILI_ARGS">
+<listEntry value="-Xunaligned"/>
+<listEntry value="-bpu_bc_entries=512"/>
+<listEntry value="-bpu_pt_entries=8192"/>
+<listEntry value="-bpu_rs_entries=4"/>
+<listEntry value="-bpu_bc_full_tag=0"/>
+<listEntry value="-bpu_bc_tag_size=4"/>
+<listEntry value="-bpu_tosq_entries=5"/>
+<listEntry value="-bpu_fb_entries=2"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug\sample_threadx.elf"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="sample_threadx"/>
+<booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="true"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="com.arc.cdt.toolchain.av2hs.exeDebugConfig.585788724"/>
+<stringAttribute key="org.eclipse.cdt.launch.disassemblyViewID" value="com.arc.cdt.debug.seecode.ui.views.disasm"/>
+<booleanAttribute key="org.eclipse.cdt.launch.ui.ApplicationCDebuggerTab.DEFAULTS_SET" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.launch.use_terminal" value="true"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/sample_threadx"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="4"/>
+</listAttribute>
+<stringAttribute key="process_factory_id" value="com.arc.cdt.debug.seecode.processFactory"/>
+</launchConfiguration>

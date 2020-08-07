@@ -1,0 +1,41 @@
+;*******************************************************
+; Copyright (c) 2010-2011 Arm Limited (or its affiliates). All rights reserved.
+; Use, modification and redistribution of this file is subject to your possession of a
+; valid End User License Agreement for the Arm Product of which these examples are part of 
+; and your compliance with all applicable terms and conditions of such licence agreement.
+;*******************************************************
+
+; Scatter-file for bare-metal example on BeagleBoard
+
+; This scatter-file places application code, data, stack and heap at suitable addresses in the memory map.
+
+; BeagleBoard has 256MB DDR SDRAM in its POP device at 0x80000000 to 0x8FFFFFFF, which this scatter-file uses.
+; Alternatively, OMAP3530 has 64KB internal SRAM, from 0x40200000 to 0x4020FFFF, which could be used for some regions instead.
+
+SDRAM 0x80000000 0x10000000
+{
+    APP_CODE +0
+    {
+        * (VECTORS, +FIRST)     ; Vector table and other (assembler) startup code
+        * (+RO-CODE)            ; Application RO code (.text)
+        * (+RO-DATA)            ; Application RO data (.constdata)
+        * (InRoot$$Sections)    ; All library code that must be in a root region
+    }
+
+	APP_DATA +0
+	{
+        * (+RW, +ZI)            ; Application RW (.data) and ZI (.bss) data
+    }
+
+	ARM_LIB_HEAP  0x80040000 EMPTY  0x00040000 ; Application heap
+	{ }
+
+	ARM_LIB_STACK 0x80090000 EMPTY 0x00010000 ; Application (SVC mode) stack
+	{ }
+
+	;IRQ_STACK     0x800A0000 EMPTY 0x00010000 ; IRQ mode stack
+	;{ }
+
+	TTB     0x80100000 EMPTY 0x4000            ; Level-1 Translation Table for MMU
+	{ }
+}

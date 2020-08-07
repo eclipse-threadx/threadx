@@ -1,0 +1,41 @@
+
+;*******************************************************
+; Copyright (c) 2012-2016 Arm Limited (or its affiliates). All rights reserved.
+; Use, modification and redistribution of this file is subject to your possession of a
+; valid End User License Agreement for the Arm Product of which these examples are part of 
+; and your compliance with all applicable terms and conditions of such licence agreement.
+;*******************************************************
+
+; Scatter-file for SMP Primes example on Cortex-A9x4 FVP model, Versatile Express or PandaBoard.
+
+LOAD_ROOT 0x0
+{
+    Root +0 0x10000
+    {
+	    startup.o (StartUp, +FIRST)
+    }
+}
+
+LOAD 0x80000000
+{
+  CODE +0
+  {
+        * (+RO)
+  }
+  
+  SHARED_DATA +0
+  {
+        * (+RW,+ZI)
+  }
+
+  ; App heap for all CPUs
+  ARM_LIB_HEAP  +0 ALIGN 8 EMPTY 0x2000 {}
+
+  ; App stacks for all CPUs - see startup.s
+  ARM_LIB_STACK +0 ALIGN 8 EMPTY 4*0x1000 {}
+
+  ; IRQ stacks for all CPUs - see startup.s
+  IRQ_STACKS    +0 ALIGN 8 EMPTY 4*256 {}
+
+  PAGETABLES 0x80500000 EMPTY 0x00100000 {}
+}

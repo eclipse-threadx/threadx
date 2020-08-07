@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<windowLayout version="3" model="sash">
+  <mdiFrame model="sash" x="130" y="8" width="1565" height="942">
+    <splitPane orientation="horizontal" divider="320">
+      <splitPane orientation="vertical" divider="409">
+        <pane>
+          <tabbedPanel name="locals" process="1" selected="1">
+            <toolBar id="0" visible="0"/>
+            <toolBar id="1" visible="1"/>
+            <toolBar id="2" visible="0"/>
+          </tabbedPanel>
+          <tabbedPanel name="locals" process="2">
+            <toolBar id="0" visible="0"/>
+            <toolBar id="1" visible="1"/>
+            <toolBar id="2" visible="0"/>
+          </tabbedPanel>
+        </pane>
+        <splitPane orientation="vertical" divider="203">
+          <pane>
+            <tabbedPanel name="stack" process="1" selected="1">
+              <toolBar id="0" visible="0"/>
+              <toolBar id="1" visible="1"/>
+              <toolBar id="2" visible="0"/>
+            </tabbedPanel>
+            <tabbedPanel name="stack" process="2">
+              <toolBar id="0" visible="0"/>
+              <toolBar id="1" visible="1"/>
+              <toolBar id="2" visible="0"/>
+            </tabbedPanel>
+          </pane>
+          <pane>
+            <tabbedPanel name="instrhist" process="2" selected="1">
+              <toolBar id="0" visible="0"/>
+              <toolBar id="1" visible="1"/>
+              <toolBar id="2" visible="0"/>
+            </tabbedPanel>
+          </pane>
+        </splitPane>
+      </splitPane>
+      <splitPane orientation="vertical" divider="478">
+        <splitPane orientation="vertical" divider="239">
+          <splitPane orientation="horizontal" divider="612">
+            <pane>
+              <tabbedPanel name="source" process="1" selected="1">
+                <toolBar id="0" visible="0"/>
+                <toolBar id="1" visible="1"/>
+                <toolBar id="2" visible="0"/>
+                <toolBar id="3" visible="0"/>
+              </tabbedPanel>
+              <tabbedPanel name="source" process="2">
+                <toolBar id="0" visible="0"/>
+                <toolBar id="1" visible="1"/>
+                <toolBar id="2" visible="0"/>
+                <toolBar id="3" visible="0"/>
+              </tabbedPanel>
+            </pane>
+            <pane>
+              <tabbedPanel name="instrhist" process="1" selected="1">
+                <toolBar id="0" visible="0"/>
+                <toolBar id="1" visible="1"/>
+                <toolBar id="2" visible="0"/>
+              </tabbedPanel>
+            </pane>
+          </splitPane>
+          <splitPane orientation="horizontal" divider="612">
+            <pane>
+              <tabbedPanel name="mem" process="1" selected="1">
+                <toolBar id="0" visible="0"/>
+                <toolBar id="1" visible="1"/>
+                <toolBar id="2" visible="0"/>
+              </tabbedPanel>
+            </pane>
+            <pane>
+              <tabbedPanel name="examine" process="1" selected="1">
+                <toolBar id="0" visible="0"/>
+                <toolBar id="1" visible="1"/>
+                <toolBar id="2" visible="0"/>
+              </tabbedPanel>
+            </pane>
+          </splitPane>
+        </splitPane>
+        <splitPane orientation="horizontal" divider="469">
+          <pane>
+            <tabbedPanel name="break" process="1">
+              <toolBar id="0" visible="0"/>
+              <toolBar id="1" visible="1"/>
+              <toolBar id="2" visible="0"/>
+            </tabbedPanel>
+            <tabbedPanel name="break" process="2">
+              <toolBar id="0" visible="0"/>
+              <toolBar id="1" visible="1"/>
+              <toolBar id="2" visible="0"/>
+            </tabbedPanel>
+            <tabbedPanel name="watchdisp" process="1" selected="1">
+              <toolBar id="0" visible="0"/>
+              <toolBar id="1" visible="1"/>
+              <toolBar id="2" visible="0"/>
+            </tabbedPanel>
+            <tabbedPanel name="watchdisp" process="2">
+              <toolBar id="0" visible="0"/>
+              <toolBar id="1" visible="1"/>
+              <toolBar id="2" visible="0"/>
+            </tabbedPanel>
+            <tabbedPanel name="command"/>
+          </pane>
+          <splitPane orientation="horizontal" divider="83">
+            <splitPane orientation="vertical" divider="91">
+              <pane>
+                <tabbedPanel name="processes" selected="1">
+                  <toolBar id="0" visible="0"/>
+                  <toolBar id="1" visible="1"/>
+                  <toolBar id="2" visible="0"/>
+                </tabbedPanel>
+              </pane>
+              <pane>
+                <tabbedPanel name="expr" process="2" selected="1">
+                  <toolBar id="0" visible="0"/>
+                  <toolBar id="1" visible="1"/>
+                  <toolBar id="2" visible="0"/>
+                  <initState>ver 1.0;</initState>
+                </tabbedPanel>
+              </pane>
+            </splitPane>
+            <pane>
+              <tabbedPanel name="expr" process="1" selected="1">
+                <toolBar id="0" visible="0"/>
+                <toolBar id="1" visible="1"/>
+                <toolBar id="2" visible="0"/>
+                <valueUpdate name="id1" value="_tx_thread_system_stack_ptr"/>
+                <initState>ver 1.0;E:thread_0_counter:0:0;E:thread_0_counter:0:0;E:thread_1_counter:0:0;E:thread_1_counter:0:0;E:thread_2_counter:0:0;E:thread_2_counter:0:0;E:thread_3_counter:0:0;E:thread_3_counter:0:0;E:thread_4_counter:0:0;E:thread_4_counter:0:0;E:thread_5_counter:0:0;E:thread_5_counter:0:0;E:thread_6_counter:0:0;E:thread_6_counter:0:0;E:thread_7_counter:0:0;E:thread_7_counter:0:0;E:_tx_timer_system_clock:0:0;E:_tx_timer_system_clock:0:0;E:_tx_thread_execute_ptr:0:0;M:1:1:0;E:_tx_thread_execute_ptr:0:0;E:thread_1:1:0;E:thread_1:0:0;E:thread_2:0:0;E:thread_2:0:0;E:thread_0:0:0;E:thread_0:0:0;E:_tx_thread_system_stack_ptr:0:0;</initState>
+              </tabbedPanel>
+            </pane>
+          </splitPane>
+        </splitPane>
+      </splitPane>
+    </splitPane>
+  </mdiFrame>
+</windowLayout>

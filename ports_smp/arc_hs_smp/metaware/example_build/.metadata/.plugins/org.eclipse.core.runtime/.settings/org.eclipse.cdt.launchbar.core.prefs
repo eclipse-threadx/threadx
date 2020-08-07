@@ -1,0 +1,5 @@
+activeConfigDesc=sample_threadx Debug.org.eclipse.cdt.launchbar.core.descriptor.default
+configDescList=[sample_threadx Debug.org.eclipse.cdt.launchbar.core.descriptor.default]
+sample_threadx\ Debug.org.eclipse.cdt.launchbar.core.descriptor.default/activeLaunchMode=debug
+sample_threadx\ Debug.org.eclipse.cdt.launchbar.core.descriptor.default/activeLaunchTarget=org.eclipse.cdt.launchbar.core.target.local
+eclipse.preferences.version=1

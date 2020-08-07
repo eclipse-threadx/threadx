@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<settings>
+    <Stack>
+        <FillEnabled>0</FillEnabled>
+        <OverflowWarningsEnabled>1</OverflowWarningsEnabled>
+        <WarningThreshold>90</WarningThreshold>
+        <SpWarningsEnabled>1</SpWarningsEnabled>
+        <WarnLogOnly>1</WarnLogOnly>
+        <UseTrigger>1</UseTrigger>
+        <TriggerName>main</TriggerName>
+        <LimitSize>0</LimitSize>
+        <ByteLimit>50</ByteLimit>
+    </Stack>
+    <JLinkDriver>
+        <CStepIntDis>_ 0</CStepIntDis>
+        <LeaveTargetRunning>_ 0</LeaveTargetRunning>
+    </JLinkDriver>
+    <DebugChecksum>
+        <Checksum>2229266535</Checksum>
+    </DebugChecksum>
+    <Disassembly>
+        <InstrCount>0</InstrCount>
+        <MixedMode>1</MixedMode>
+    </Disassembly>
+    <CodeCoverage>
+        <Enabled>0</Enabled>
+        <ShowSource>0</ShowSource>
+        <HideCovered>0</HideCovered>
+    </CodeCoverage>
+    <Trace1>
+        <Enabled>0</Enabled>
+        <ShowSource>1</ShowSource>
+    </Trace1>
+    <Exceptions>
+        <StopOnUncaught>_ 0</StopOnUncaught>
+        <StopOnThrow>_ 0</StopOnThrow>
+    </Exceptions>
+    <CallStack>
+        <ShowArgs>0</ShowArgs>
+    </CallStack>
+    <array_types>
+        <Fmt0>ULONG[3]	4	0</Fmt0>
+    </array_types>
+    <watch_formats>
+        <Fmt0>{W}1:param_0	4	0</Fmt0>
+    </watch_formats>
+    <DriverProfiling>
+        <Enabled>0</Enabled>
+        <Mode>1</Mode>
+        <Graph>0</Graph>
+        <Symbiont>0</Symbiont>
+    </DriverProfiling>
+    <CallStackLog>
+        <Enabled>0</Enabled>
+    </CallStackLog>
+    <CallStackStripe>
+        <ShowTiming>1</ShowTiming>
+    </CallStackStripe>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
+    <LogFile>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+        <Category>_ 0</Category>
+    </LogFile>
+    <InterruptLog>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+        <SumSortOrder>0</SumSortOrder>
+    </InterruptLog>
+    <DataLog>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+    </DataLog>
+    <DisassembleMode>
+        <mode>0</mode>
+    </DisassembleMode>
+    <Breakpoints2>
+        <Bp0>_ 0 "STD_CODE2" "0x08002F32" 0 0 1 "" 0 ""</Bp0>
+        <Count>1</Count>
+    </Breakpoints2>
+    <Interrupts>
+        <Enabled>1</Enabled>
+        <Irq0>_ 0 9999 0 9999 1 0 0 100 0 1 "SysTick 1 0x3C"</Irq0>
+        <Count>1</Count>
+    </Interrupts>
+    <MemConfig>
+        <Base>1</Base>
+        <Manual>0</Manual>
+        <Ddf>1</Ddf>
+        <TypeViol>0</TypeViol>
+        <Stop>1</Stop>
+        <Mem0>_ 0 134217728 135266303 1</Mem0>
+        <Mem1>_ 0 536870912 537198591 0</Mem1>
+        <Mem2>_ 0 541392896 541458432 0</Mem2>
+        <Count>3</Count>
+    </MemConfig>
+    <Aliases>
+        <A0>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_block_allocate.c" ""</A0>
+        <A1>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_block_pool_cleanup.c" ""</A1>
+        <A2>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_block_pool_create.c" ""</A2>
+        <A3>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_block_pool_delete.c" ""</A3>
+        <A4>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_block_pool_info_get.c" ""</A4>
+        <A5>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_block_pool_performance_info_get.c" ""</A5>
+        <A6>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_block_pool_performance_system_info_get.c" ""</A6>
+        <A7>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_block_pool_prioritize.c" ""</A7>
+        <A8>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_block_release.c" ""</A8>
+        <A9>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_byte_allocate.c" ""</A9>
+        <A10>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_byte_pool_cleanup.c" ""</A10>
+        <A11>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_byte_pool_create.c" ""</A11>
+        <A12>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_byte_pool_delete.c" ""</A12>
+        <A13>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_byte_pool_info_get.c" ""</A13>
+        <A14>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_byte_pool_performance_info_get.c" ""</A14>
+        <A15>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_byte_pool_performance_system_info_get.c" ""</A15>
+        <A16>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_byte_pool_prioritize.c" ""</A16>
+        <A17>_ "C:\Users\nisohack\Documents\work\tasks\st_work\threadx_07242020_rc2\common\src\tx_byte_pool_search.c" ""</A17>
+        <Count>18</Count>
+        <SuppressDialog>1</SuppressDialog>
+    </Aliases>
+    <Simulator>
+        <Freq>10000000</Freq>
+        <FreqHi>0</FreqHi>
+        <MultiCoreRunAll>1</MultiCoreRunAll>
+    </Simulator>
+</settings>

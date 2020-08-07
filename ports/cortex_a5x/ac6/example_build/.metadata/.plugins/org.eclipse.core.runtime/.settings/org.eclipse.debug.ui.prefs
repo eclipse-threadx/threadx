@@ -1,0 +1,4 @@
+eclipse.preferences.version=1
+org.eclipse.debug.ui.PREF_LAUNCH_PERSPECTIVES=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<launchPerspectives/>\r\n
+org.eclipse.debug.ui.switch_to_perspective=prompt
+preferredTargets=com.arm.debugger.ux.toggleARMBreakpointTarget\:com.arm.debugger.ux.toggleARMBreakpointTarget|com.arm.debugger.ux.toggleARMBreakpointTarget,org.eclipse.cdt.debug.ui.toggleCBreakpointTarget,org.eclipse.cdt.debug.ui.toggleCDynamicPrintfTarget\:com.arm.debugger.ux.toggleARMBreakpointTarget|com.arm.debugger.ux.toggleARMBreakpointTarget,default\:com.arm.debugger.ux.toggleARMBreakpointTarget|

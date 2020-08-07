@@ -1,0 +1,19 @@
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.4\arm\bin\armproc.dll" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.4\arm\bin\armsim2.dll" 
+
+"C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports_module\cortex-m7\iar\example_build\Debug\Exe\sample_threadx_module_manager_stm32f4xx.out" 
+
+--plugin="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.4\arm\bin\armbat.dll" 
+
+--device_macro="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.4\arm\config\debugger\ST\STM32F7xx.dmac" 
+
+--device_macro="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.4\arm\config\debugger\ST\STM32F7xx_DBG.dmac" 
+
+--device_macro="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.4\arm\config\debugger\ST\STM32F7xx_OB.dmac" 
+
+--device_macro="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.4\arm\config\debugger\ST\STM32F7xx_TRACE.dmac" 
+
+
+
+

@@ -1,0 +1,6 @@
+read ".sc.project/.sc.args.Core1.multi"
+read ".sc.project/.sc.args.Core2.multi"
+select
+load
+nohist readq .scrc
+nohist nolog gui E> ok_to_load_windows

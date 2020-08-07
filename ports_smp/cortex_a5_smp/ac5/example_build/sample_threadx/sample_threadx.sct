@@ -1,0 +1,37 @@
+;**************************************************
+; Copyright (c) 2012 Arm Limited (or its affiliates). All rights reserved.
+; Use, modification and redistribution of this file is subject to your possession of a
+; valid End User License Agreement for the Arm Product of which these examples are part of 
+; and your compliance with all applicable terms and conditions of such licence agreement.
+;**************************************************
+
+; Scatter-file for Cortex-A5 MPCore bare-metal example on Versatile Express
+
+; This scatter-file places application code, data, stack and heap at suitable addresses in memory map.
+
+; CoreTile Express A5x2 has 1GB SDRAM at 0x80000000 to 0xBFFFFFFF, which this scatter-file uses.
+
+LOAD 0x80000000  0x00010000
+{
+  EXEC +0
+  {
+    startup.o (StartUp, +FIRST)
+    * (+RO)
+  }
+
+  ; App heap for all CPUs
+  ARM_LIB_HEAP  +0 ALIGN 8 EMPTY 0x8000 {}
+
+  ; App stacks for all CPUs - see startup.s
+  ARM_LIB_STACK +0 ALIGN 8 EMPTY 4*0x4000 {}
+
+  ; IRQ stacks for all CPUs - see startup.s
+  IRQ_STACKS    +0 ALIGN 8 EMPTY 4*1024 {}
+
+  SHARED_DATA +0x0
+  {
+    * (+RW,+ZI)
+  }
+
+  PAGETABLES 0x80500000 EMPTY 0x00100000 {}
+}

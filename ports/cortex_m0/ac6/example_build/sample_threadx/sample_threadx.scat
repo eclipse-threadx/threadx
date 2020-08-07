@@ -1,0 +1,46 @@
+#! armclang -E --target=arm-arm-none-eabi -mcpu=cortex-m0 -xc
+
+;*******************************************************
+; Copyright (c) 2006-2017 Arm Limited (or its affiliates). All rights reserved.
+; Use, modification and redistribution of this file is subject to your possession of a
+; valid End User License Agreement for the Arm Product of which these examples are part of 
+; and your compliance with all applicable terms and conditions of such licence agreement.
+;*******************************************************
+
+; Scatter-file for Cortex-M0 bare-metal example
+
+; This scatter-file places the vector table, application code, data, stacks and heap at suitable addresses in the memory map.
+
+; The vector table is placed first at the start of the image.
+; Code starts after the last entry in the vector table.
+; Data is placed at an address that must correspond to RAM.
+; Stack and Heap are placed using ARM_LIB_STACKHEAP, to eliminate the need to set stack-base or heap-base in the debugger.
+; System Control Space registers appear at their architecturally-defined addresses, based at 0xE000E000.
+
+
+LOAD_REGION 0x00000000
+{
+  VECTORS +0 0xC0     ; 16 exceptions + up to 32 interrupts, 4 bytes each entry == 0xC0
+  {
+    exceptions.o (vectors, +FIRST)     ; from exceptions.c
+  }
+
+  ; Code is placed immediately (+0) after the previous root region
+  ; (so code region will also be a root region)
+  CODE +0
+  {
+    * (+RO)           ; All program code, including library code
+  }
+
+  DATA +0
+  {
+    * (+RW, +ZI)      ; All RW and ZI data
+  }
+
+  ; Heap grows upwards from start of this region and
+  ; Stack grows downwards from end of this region
+  ; The Main Stack Pointer is initialized on reset to the top addresses of this region
+  ARM_LIB_STACKHEAP +0 EMPTY 0x1000
+  {
+  }
+}

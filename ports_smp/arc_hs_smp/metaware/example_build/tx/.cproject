@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tx"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tx/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tx" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" errorParsers="com.arc.cdt.toolchain.ARCCompilerErrorParser;com.arc.cdt.toolchain.ARCLinkerErrorParser;com.arc.cdt.toolchain.ARCAssemblerErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274" name="Debug" parent="com.arc.cdt.toolchain.av2hs.libDebugConfig">
+					<folderInfo id="com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274." name="/" resourcePath="">
+						<toolChain id="com.arc.cdt.toolchain.av2hs.libDebugToolChain.1385404397" superClass="com.arc.cdt.toolchain.av2hs.libDebugToolChain">
+							<targetPlatform id="hcTargetPlatform.567731658" isAbstract="false" name="Generic platform" superClass="hcTargetPlatform"/>
+							<builder buildPath="${workspace_loc:/tx}/Debug" id="makeBuilder.1853351928" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="makeBuilder"/>
+							<tool id="av2hs.lib.debug.libCompiler.2145942775" superClass="av2hs.lib.debug.libCompiler">
+								<option id="arc.compiler.options.target.version.101453396" isActive="false" name="ARC Core Version" superClass="arc.compiler.options.target.version" value="arc.compiler.options.target.arcv2hs" valueType="enumerated"/>
+								<option id="arc.compiler.options.bs.8501396" isActive="false" name="Barrel shifter (-Xbs/-Xbarrel_shifter)" superClass="arc.compiler.options.bs" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.pc_width.82208768" isActive="false" name="PC register width (-Hpc_width=)" superClass="arc.compiler.options.pc_width" value="com.arc.cdt.toolchain.arc.pcwidth.32" valueType="enumerated"/>
+								<option id="arc.compiler.options.lpc_width.1235958347" isActive="false" name="LP_COUNT register width (-Hlpc_width=)" superClass="arc.compiler.options.lpc_width" value="com.arc.cdt.toolchain.arc.lpcwidth.32" valueType="enumerated"/>
+								<option id="arc.compiler.options.bcf.1916820815" isActive="false" name="Tools Configuration File" superClass="arc.compiler.options.bcf" value="${METAWARE_ROOT}/arc/tcf/hs36.tcf" valueType="string"/>
+								<option id="arc.compiler.options.arcv2hscore.768696014" isActive="false" name="ARC HS Core" superClass="arc.compiler.options.arcv2hscore" useByScannerDiscovery="true" value="arc.compiler.options.arcv2hscore.core3" valueType="enumerated"/>
+								<option id="arc.compiler.options.sa.1594635554" isActive="false" name="Shift Assist (-Xsa/-Xshift_assist)" superClass="arc.compiler.options.sa" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.unaligned.1579659143" isActive="false" name="Unaligned memory access  (-Xunaligned)" superClass="arc.compiler.options.unaligned" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.mpyHSoption.824882315" isActive="false" name="Multiply Option -Xmpy_option=" superClass="arc.compiler.options.mpyHSoption" useByScannerDiscovery="true" value="arc.options.mpyoption.mpy" valueType="enumerated"/>
+								<option id="arc.compiler.options.bitscan.1651988636" isActive="false" name="Bit scan instructions (-Xbitscan)" superClass="arc.compiler.options.bitscan" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.swap.2004975586" isActive="false" name="Swap instruction (-Xswap)" superClass="arc.compiler.options.swap" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.cd.331870622" isActive="false" name="Code density extension (-Xcd/-Xcode_density)" superClass="arc.compiler.options.cd" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.atomic.1335191149" isActive="false" name="Atomic option (-Xatomic)" superClass="arc.compiler.options.atomic" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.hcl.522850713" isActive="false" name="Compile/Link with Compact Lib (-Hcl)" superClass="arc.compiler.options.hcl" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.timers.timer0.608274025" isActive="false" name="Use Timer 0 (-Xtimer0)" superClass="arc.compiler.options.timers.timer0" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.timers.timer1.1705824225" isActive="false" name="Use timer 1 (-Xtimer1)" superClass="arc.compiler.options.timers.timer1" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.include_dirs.664356780" isActive="false" isDefinedList="false" name="Include Directories (one per line)" superClass="arc.compiler.options.include_dirs" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inc_generic}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inc_port}&quot;"/>
+								</option>
+								<option id="arc.compiler.options.defines.1165007551" isActive="false" isDefinedList="false" name="Preprocessor Defines (one per line)" superClass="arc.compiler.options.defines" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="TX_ZERO_BASED_CORE_ID"/>
+								</option>
+								<inputType id="com.arc.cdt.toolchain.arc.ccac.inputTypeCPP.1637036237" name="MetaWare C++ Input" superClass="com.arc.cdt.toolchain.arc.ccac.inputTypeCPP"/>
+								<inputType id="com.arc.cdt.toolchain.arc.ccac.inputTypeC.549306996" name="MetaWare C Input" superClass="com.arc.cdt.toolchain.arc.ccac.inputTypeC"/>
+								<inputType id="com.arc.cdt.toolchain.arc.inputTypeCL.1110534467" name="MetaWare OpenCL" superClass="com.arc.cdt.toolchain.arc.inputTypeCL"/>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.av2hs.libDebugAsm.1626881776" superClass="com.arc.cdt.toolchain.av2hs.libDebugAsm">
+								<option id="arc.asm.options.bs.2017513108" isActive="false" name="Barrel shifter (-Xbs/-Xbarrel_shifter)" superClass="arc.asm.options.bs" value="true" valueType="boolean"/>
+								<option id="arc.compiler.options.target.asm.version.1349338992" isActive="false" name="ARC Core Version" superClass="arc.compiler.options.target.asm.version" value="arc.compiler.options.target.arcv2hs" valueType="enumerated"/>
+								<option id="arc.compiler.options.asm.arcv2hscore.678352642" isActive="false" name="ARC HS Core" superClass="arc.compiler.options.asm.arcv2hscore" value="arc.compiler.options.arcv2hscore.core3" valueType="enumerated"/>
+								<option id="arc.asm.options.sa.842153044" isActive="false" name="Shift Assist (-Xsa/-Xshift_assist)" superClass="arc.asm.options.sa" value="true" valueType="boolean"/>
+								<option id="arc.asm.options.unaligned.1389584646" isActive="false" name="Unaligned memory access (-Xunaligned)" superClass="arc.asm.options.unaligned" value="true" valueType="boolean"/>
+								<option id="arc.asm.options.mpyHSoption.1471229542" isActive="false" name="Multiply Option -Xmpy_option=" superClass="arc.asm.options.mpyHSoption" value="arc.options.mpyoption.mpy" valueType="enumerated"/>
+								<option id="arc.asm.options.bitscan.586404482" isActive="false" name="Bit scan (includes norm) (-Xbitscan)" superClass="arc.asm.options.bitscan" value="true" valueType="boolean"/>
+								<option id="arc.asm.options.swap.857218740" isActive="false" name="Swap instruction (-Xswap)" superClass="arc.asm.options.swap" value="true" valueType="boolean"/>
+								<option id="arc.asm.options.cd.1557031030" isActive="false" name="Code density extension (-Xcd/-Xcode_density)" superClass="arc.asm.options.cd" value="true" valueType="boolean"/>
+								<option id="arc.asm.options.atomic.1786532432" isActive="false" name="Atomic option (-Xatomic)" superClass="arc.asm.options.atomic" value="true" valueType="boolean"/>
+								<option id="arc.asm.options.timers.timer0.1270285358" isActive="false" name="Use Timer 0 (-Xtimer0)" superClass="arc.asm.options.timers.timer0" value="true" valueType="boolean"/>
+								<option id="arc.asm.options.timers.timer1.363855780" isActive="false" name="Use timer 1 (-Xtimer1)" superClass="arc.asm.options.timers.timer1" value="true" valueType="boolean"/>
+								<option id="com.arc.cdt.toolchain.asm.option.defines.480287270" isActive="false" isDefinedList="false" name="Preprocessor Defines (one per line)" superClass="com.arc.cdt.toolchain.asm.option.defines" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="TX_ARC_SIMULATOR_WORKAROUND"/>
+									<listOptionValue builtIn="false" value="TX_ZERO_BASED_CORE_ID"/>
+								</option>
+								<inputType id="com.arc.cdt.toolchain.asminput.55282519" name="Assembler Inputs" superClass="com.arc.cdt.toolchain.asminput"/>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.arc.Linker.41800372" superClass="com.arc.cdt.toolchain.arc.Linker">
+								<option id="arc.linker.options.bs.1711887192" isActive="false" name="Barrel shifter (-Xbs/-Xbarrel_shifter)" superClass="arc.linker.options.bs" value="true" valueType="boolean"/>
+								<option id="arc.linker.options.pc_width.418951752" isActive="false" name="PC register width (-Bpc_width=)" superClass="arc.linker.options.pc_width" value="com.arc.cdt.toolchain.arc.pcwidth.32" valueType="enumerated"/>
+								<option id="arc.linker.options.target.version.162822807" isActive="false" name="Target Runtime Libraries" superClass="arc.linker.options.target.version" value="arc.compiler.options.target.arcv2hs" valueType="enumerated"/>
+								<option id="arc.linker.options.hlib.757572454" isActive="false" name="Named library from buildlib tool (-Hlib=)" superClass="arc.linker.options.hlib" value="hs36" valueType="string"/>
+								<option id="arc.compiler.options.linker.arcv2hscore.1808214297" isActive="false" name="ARC HS Core" superClass="arc.compiler.options.linker.arcv2hscore" value="arc.compiler.options.arcv2hscore.core3" valueType="enumerated"/>
+								<option id="arc.linker.options.sa.923405785" isActive="false" name="Shift Assist (-Xsa/-Xshift_assist)" superClass="arc.linker.options.sa" value="true" valueType="boolean"/>
+								<option id="arc.linker.options.unaligned.60172924" isActive="false" name="Unaligned memory access (-Xunaligned)" superClass="arc.linker.options.unaligned" value="true" valueType="boolean"/>
+								<option id="arc.linker.options.mpyHSoption.1204555502" isActive="false" name="Multiply Option -Xmpy_option=" superClass="arc.linker.options.mpyHSoption" value="arc.options.mpyoption.mpy" valueType="enumerated"/>
+								<option id="arc.linker.options.bitscan.1192544685" isActive="false" name="Bit scan instructions (-Xbitscan)" superClass="arc.linker.options.bitscan" value="true" valueType="boolean"/>
+								<option id="arc.linker.options.swap.1083980278" isActive="false" name="Swap instruction (-Xswap)" superClass="arc.linker.options.swap" value="true" valueType="boolean"/>
+								<option id="arc.linker.options.cd.349107482" isActive="false" name="Code density extension (-Xcd/-Xcode_density)" superClass="arc.linker.options.cd" value="true" valueType="boolean"/>
+								<option id="arc.linker.options.atomic.999898137" isActive="false" name="Atomic option (-Xatomic)" superClass="arc.linker.options.atomic" value="true" valueType="boolean"/>
+								<option id="arc.linker.options.hcl.744834717" isActive="false" name="Compile/Link with Compact Lib(-Hcl)" superClass="arc.linker.options.hcl" value="true" valueType="boolean"/>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.av2hs.ArDebug.1591578035" superClass="com.arc.cdt.toolchain.av2hs.ArDebug"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="src_generic/tx_misra.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tx"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tx/Release"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tx" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arc.cdt.toolchain.ARCAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" errorParsers="com.arc.cdt.toolchain.ARCCompilerErrorParser;com.arc.cdt.toolchain.ARCLinkerErrorParser;com.arc.cdt.toolchain.ARCAssemblerErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021" name="Release" parent="com.arc.cdt.toolchain.av2hs.libReleaseConfig">
+					<folderInfo id="com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021." name="/" resourcePath="">
+						<toolChain id="com.arc.cdt.toolchain.av2hs.libReleaseToolChain.1456119623" superClass="com.arc.cdt.toolchain.av2hs.libReleaseToolChain">
+							<targetPlatform id="hcTargetPlatform.1992979981" isAbstract="false" name="Generic platform" superClass="hcTargetPlatform"/>
+							<builder buildPath="${workspace_loc:/tx}/Release" id="makeBuilder.1947766678" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="makeBuilder"/>
+							<tool id="com.arc.cdt.toolchain.av2hs.libCompilerRelease.1920721386" superClass="com.arc.cdt.toolchain.av2hs.libCompilerRelease">
+								<inputType id="com.arc.cdt.toolchain.arc.ccac.inputTypeCPP.1954569804" name="MetaWare C++ Input" superClass="com.arc.cdt.toolchain.arc.ccac.inputTypeCPP"/>
+								<inputType id="com.arc.cdt.toolchain.arc.ccac.inputTypeC.837775901" name="MetaWare C Input" superClass="com.arc.cdt.toolchain.arc.ccac.inputTypeC"/>
+								<inputType id="com.arc.cdt.toolchain.arc.inputTypeCL.2089257210" name="MetaWare OpenCL" superClass="com.arc.cdt.toolchain.arc.inputTypeCL"/>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.av2hs.libReleaseAsm.1207600374" superClass="com.arc.cdt.toolchain.av2hs.libReleaseAsm">
+								<inputType id="com.arc.cdt.toolchain.asminput.257029724" name="Assembler Inputs" superClass="com.arc.cdt.toolchain.asminput"/>
+							</tool>
+							<tool id="com.arc.cdt.toolchain.arc.Linker.1382145468" superClass="com.arc.cdt.toolchain.arc.Linker"/>
+							<tool id="com.arc.cdt.toolchain.av2hs.ArRelease.217147730" superClass="com.arc.cdt.toolchain.av2hs.ArRelease"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="src_generic/tx_misra.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="tx.com.arc.cdt.toolchain.arc.av2hs.libProject.1128858457" name="Static Library" projectType="com.arc.cdt.toolchain.arc.av2hs.libProject"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021;com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021.;com.arc.cdt.toolchain.av2hs.libCompilerRelease.1920721386;com.arc.cdt.toolchain.arc.inputTypeCL.2089257210">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274;com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274.;av2hs.lib.debug.libCompiler.2145942775;com.arc.cdt.toolchain.arc.ccac.inputTypeC.549306996">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274;com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274.;av2hs.lib.debug.libCompiler.2145942775;com.arc.cdt.toolchain.arc.inputTypeCL.1110534467">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021;com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021.;com.arc.cdt.toolchain.av2hs.libCompilerRelease.1920721386;com.arc.cdt.toolchain.arc.ccac.inputTypeC.837775901">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274;com.arc.cdt.toolchain.av2hs.libDebugConfig.2063275274.;av2hs.lib.debug.libCompiler.2145942775;com.arc.cdt.toolchain.arc.ccac.inputTypeCPP.1637036237">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021;com.arc.cdt.toolchain.av2hs.libReleaseConfig.1202427021.;com.arc.cdt.toolchain.av2hs.libCompilerRelease.1920721386;com.arc.cdt.toolchain.arc.ccac.inputTypeCPP.1954569804">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/tx"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/tx"/>
+		</configuration>
+	</storageModule>
+</cproject>

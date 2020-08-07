@@ -1,0 +1,6 @@
+#Fri Oct 16 15:53:24 PDT 2015
+options.traceBuffer.traceWrapMode=wrap
+options.traceBuffer.clearTraceOnConnect=true
+options.traceBuffer.bufferSize=Buffer16M
+options.traceBuffer.traceCaptureDevice=None
+options.traceBuffer.startTraceOnConnect=true

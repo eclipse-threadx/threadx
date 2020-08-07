@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.arm.eclipse.build.config.v6.exe.debug.base.var.arm_compiler_6-6.4.1908576142">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.arm.eclipse.build.config.v6.exe.debug.base.var.arm_compiler_6-6.4.1908576142" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arm.eclipse.builder.armcc.error" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="axf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="clean" description="" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;com.arm.eclipse.builder.armcc.error;org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="com.arm.eclipse.build.config.v6.exe.debug.base.var.arm_compiler_6-6.4.1908576142" name="Debug" parent="com.arm.eclipse.build.config.v6.exe.debug.base.var.arm_compiler_6-6.4.1908576142" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
+					<folderInfo id="com.arm.eclipse.build.config.v6.exe.debug.base.var.arm_compiler_6-6.4.1908576142." name="/" resourcePath="">
+						<toolChain errorParsers="" id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.toolchain.var.gcc-8.3.0-aarch64-elf.1517422209" name="GCC 8.3.0 [aarch64-elf]" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.toolchain.var.gcc-8.3.0-aarch64-elf">
+							<targetPlatform binaryParser="" id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.toolchain.var.gcc-8.3.0-aarch64-elf.1517422209.1120320260" name=""/>
+							<builder buildPath="${workspace_loc:/sample_threadx}/Debug" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.CWDLocator" id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.target.builder.1542203223" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.target.builder"/>
+							<tool id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.cpp.compiler.var.gcc-8.3.0-aarch64-elf.1520025658" name="GCC C++ Compiler 8.3.0 [aarch64-elf]" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.cpp.compiler.var.gcc-8.3.0-aarch64-elf">
+								<option defaultValue="gnu.c.optimization.level.none" id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.opt.733297432" name="Optimization Level" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.opt" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.debug.1099394321" name="Debug Level" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.debug" useByScannerDiscovery="false"/>
+							</tool>
+							<tool command="aarch64-elf-gcc.exe" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.var.gcc-8.3.0-aarch64-elf.929917641" name="GCC C Compiler 8.3.0 [aarch64-elf]" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.var.gcc-8.3.0-aarch64-elf">
+								<option id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.includepath.886257941" name="Include paths (-I)" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.includepath" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tx/inc_generic}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tx/inc_port}&quot;"/>
+								</option>
+								<option defaultValue="gnu.c.optimization.level.none" id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.opt.411837414" name="Optimization Level" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.opt" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.debug.689703749" name="Debug Level" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.debug" useByScannerDiscovery="false"/>
+								<option id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.other.915431608" name="Other flags" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.option.other" useByScannerDiscovery="false" value="" valueType="string"/>
+								<inputType id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.input.119569849" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.input"/>
+							</tool>
+							<tool command="aarch64-elf-gcc.exe" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.assembler.var.gcc-8.3.0-aarch64-elf.709337015" name="GCC Assembler 8.3.0 [aarch64-elf]" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.assembler.var.gcc-8.3.0-aarch64-elf">
+								<option defaultValue="true" id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.assembler.option.debug.1867786110" name="Generate debugging information (-g)" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.assembler.option.debug" useByScannerDiscovery="false" valueType="boolean"/>
+								<inputType id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.assembler.input.767265295" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.assembler.input"/>
+							</tool>
+							<tool id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.cpp.linker.var.gcc-8.3.0-aarch64-elf.870265443" name="GCC C++ Linker 8.3.0 [aarch64-elf]" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.cpp.linker.var.gcc-8.3.0-aarch64-elf"/>
+							<tool command="aarch64-elf-gcc.exe" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.var.gcc-8.3.0-aarch64-elf.1707777905" name="GCC C Linker 8.3.0 [aarch64-elf]" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.var.gcc-8.3.0-aarch64-elf">
+								<option id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.libs.341582150" name="Libraries (-l)" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.libs" useByScannerDiscovery="false" valueType="libs">
+									<listOptionValue builtIn="false" value="tx"/>
+								</option>
+								<option id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.libsearch.203566774" name="Library search path (-L)" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.libsearch" useByScannerDiscovery="false" valueType="libPaths">
+									<listOptionValue builtIn="false" value="../../tx/Debug"/>
+								</option>
+								<option id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.flags.2120898467" name="Other flags" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.flags" useByScannerDiscovery="false" value="--specs=rdimon.specs" valueType="string"/>
+								<option id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.script.1931325091" name="Linker script" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.script" useByScannerDiscovery="false" value="..\..\common\sample_threadx.ld" valueType="string"/>
+								<option id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.extras.904152686" name="Other options (-Xlinker [option])" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.option.extras" useByScannerDiscovery="false" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map=sample_threadx.map"/>
+								</option>
+								<inputType id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.input.936696184" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.linker.input">
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+								</inputType>
+							</tool>
+							<tool id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.archiver.var.gcc-8.3.0-aarch64-elf.976529604" name="GCC Archiver 8.3.0 [aarch64-elf]" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.archiver.var.gcc-8.3.0-aarch64-elf"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="intrinsics.h|handlers.c|fvp.S|fvp.h|fvp_defs.h|xtables.S|xtables.h|retarget.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="sample_threadx.com.arm.eclipse.build.project.v6.exe.base.var.arm_compiler_6-6.4.1786842207" name="Executable"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/sample_threadx"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cproject>

@@ -1,0 +1,10 @@
+13:49:41 **** Incremental Build of configuration Debug for project sample_threadx ****
+make -j8 all 
+Building target: sample_threadx.axf
+Invoking: ARM Linker 6
+armlink --entry=start64 --scatter="..\sample_threadx.txt" --map --verbose --info=sizes --info=totals --list="sample_threadx.map" -o "sample_threadx.axf"  ./armv8_aarch64_SystemTimer.o ./el3_vectors.o ./gic400_gic.o ./hw_setup.o ./sample_threadx.o ./startup.o   ../../tx/Debug/tx.a
+Finished building target: sample_threadx.axf
+ 
+
+13:49:42 Build Finished (took 847ms)
+

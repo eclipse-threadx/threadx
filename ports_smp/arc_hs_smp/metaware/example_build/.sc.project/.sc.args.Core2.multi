@@ -1,0 +1,10 @@
+
+// ARGS: -pset=2 -psetname=Core2 sample_threadx\Debug\sample_threadx.elf -arconnect -connect_ici -av2hs -Xatomic -Xunaligned -core3 -Xmpy_option=mpy -Xtimer0 -Xtimer1 -nooptions -interrupts=32 -ext_interrupts=3 -prop=nsim_isa_num_actionpoints=8 -off=prefer_soft_bp -nogoifmain
+macro multi_Core2
+     nocomment prop DLL)=^C:\MWLite\MetaWare\arc/../../nSIM/lib/libsim^
+     nocomment prop cpunum=$cid timer0_regs=1 timer1_regs=1 cloneable=1 icnts=1 killeds=1 delay_killeds=1 trace_enabled=1 semint)=^C:\MWLite\MetaWare\arc/bin/archw^ semint)=^C:\MWLite\MetaWare\arc/bin/prof.dll^ semint)=^C:\MWLite\MetaWare\arc/bin/profmm.dll^ nsim_isa_family=av2hs nsim_isa_core=3 arcver=83 nsim_isa_atomic_option=1 nsim_isa_shift_option=3 nsim_isa_code_density_option=2 nsim_isa_swap_option=1 nsim_isa_bitscan_option=1 nsim_isa_enable_timer_0=1 nsim_isa_enable_timer_1=1 nsim_isa_number_of_interrupts=32 nsim_isa_number_of_external_interrupts=3 nsim_isa_has_interrupts=1 nsim_connect=2 nsim_connect_ici=2 nsim_isa_unaligned_option=1 nsim_isa_mpy_option=6 nsim_isa_num_actionpoints=8 port=0x378 include_local_symbols=1 prefer_soft_bp=0 flush_pipe=0 prompt=mdb dname=MetaWare sys_cmpd=1
+endm
+defclass name=class_multi_Core2 newsys=multi_Core2 clone_noprops=1 system1=ARC_DLL system2=BRC_DLL
+defset Core2 [2]
+newcmd [Core2] class_multi_Core2
+[Core2] defargs sample_threadx\Debug\sample_threadx.elf
