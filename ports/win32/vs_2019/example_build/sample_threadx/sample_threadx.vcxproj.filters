@@ -23,7 +23,4 @@
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\tx\Debug\tx.lib" />
-  </ItemGroup>
 </Project>

@@ -284,9 +284,10 @@
       <PrecompiledHeaderOutputFile>.\Release\tx.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\Release\</ObjectFileName>
       <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>..\;..\..\..\generic</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\inc;..\..\..\..\..\common\inc</AdditionalIncludeDirectories>
       <DebugInformationFormat>None</DebugInformationFormat>
       <ExceptionHandling>false</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
