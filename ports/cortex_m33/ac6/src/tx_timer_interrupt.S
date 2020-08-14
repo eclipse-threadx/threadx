@@ -26,7 +26,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_timer_interrupt                               Cortex-M33/AC6    */
-/*                                                           6.0.1        */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -61,6 +61,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
+/*  08-14-2020      Scott Larson            Modified comment(s), clean up */
+/*                                            whitespace, add DSB before  */
+/*                                            returning, resulting        */
+/*                                            in version 6.0.2            */
 /*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_timer_interrupt(VOID)
@@ -90,7 +94,7 @@ _tx_timer_interrupt:
     // if (_tx_timer_time_slice)
     // {
 
-    LDR     r3, =_tx_timer_time_slice               // Pickup address of time-slice 
+    LDR     r3, =_tx_timer_time_slice               // Pickup address of time-slice
     LDR     r2, [r3, #0]                            // Pickup time-slice
     CBZ     r2,  __tx_timer_no_time_slice           // Is it non-active?
                                                     // Yes, skip time-slice processing
@@ -206,13 +210,13 @@ __tx_timer_dont_activate:
     // if (_tx_timer_expired_time_slice)
     // {
 
-    LDR     r3, =_tx_timer_expired_time_slice       // Pickup addr of time-slice expired 
+    LDR     r3, =_tx_timer_expired_time_slice       // Pickup addr of time-slice expired
     LDR     r2, [r3, #0]                            // Pickup the actual flag
     CBZ     r2, __tx_timer_not_ts_expiration        // See if the flag is set
                                                     // No, skip time-slice processing
 
     /* Time slice interrupted thread.  */
-    // _tx_thread_time_slice(); 
+    // _tx_thread_time_slice();
 
     BL      _tx_thread_time_slice                   // Call time-slice processing
     LDR     r0, =_tx_thread_preempt_disable         // Build address of preempt disable flag
@@ -239,6 +243,7 @@ __tx_timer_not_ts_expiration:
 
 __tx_timer_nothing_expired:
 
+    DSB                                             // Complete all memory access
     BX      lr                                      // Return to caller
 
 // }

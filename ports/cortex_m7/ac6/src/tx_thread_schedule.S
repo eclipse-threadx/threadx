@@ -21,15 +21,6 @@
 @/**************************************************************************/
 @
 @
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_thread.h"
-@#include "tx_timer.h"
-@   
     .global     _tx_thread_current_ptr
     .global     _tx_thread_execute_ptr
     .global     _tx_timer_time_slice
@@ -44,7 +35,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_schedule                               Cortex-M7/AC6     */
-@/*                                                           6.0.1        */
+@/*                                                           6.0.2        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -78,6 +69,9 @@
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+@/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+@/*                                            whitespace, resulting       */
+@/*                                            in version 6.0.2            */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_schedule(VOID)
@@ -91,7 +85,7 @@ _tx_thread_schedule:
 @       from the PendSV handling routines below. */
 @
 @    /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
-@     
+@
     MOV     r0, #0                                  @ Build value for TX_FALSE
     LDR     r2, =_tx_thread_preempt_disable         @ Build address of preempt disable flag
     STR     r0, [r2, #0]                            @ Clear preempt disable flag
@@ -100,14 +94,14 @@ _tx_thread_schedule:
 @
 #ifdef TX_ENABLE_FPU_SUPPORT
     MRS     r0, CONTROL                             @ Pickup current CONTROL register
-    BIC     r0, r0, #4                              @ Clear the FPCA bit 
+    BIC     r0, r0, #4                              @ Clear the FPCA bit
     MSR     CONTROL, r0                             @ Setup new CONTROL register
 #endif
 @
 @    /* Enable interrupts */
 @
     CPSIE   i
-@            
+@
 @    /* Enter the scheduler for the first time.  */
 @
     MOV     r0, #0x10000000                         @ Load PENDSVSET bit
@@ -117,14 +111,14 @@ _tx_thread_schedule:
     ISB                                             @ Flush pipeline
 @
 @    /* Wait here for the PendSV to take place.  */
-@     
+@
 __tx_wait_here:
     B       __tx_wait_here                          @ Wait for the PendSV to happen
 @}
 @
-@    /* Generic context switch-out switch-in handler...  Note that this handler is 
+@    /* Generic context switch-out switch-in handler...  Note that this handler is
 @       common for both PendSV and SVCall.  */
-@     
+@
     .global  PendSV_Handler
     .global  __tx_PendSVHandler
     .thumb_func
@@ -133,8 +127,8 @@ PendSV_Handler:
 __tx_PendSVHandler:
 @
 @    /* Get current thread value and new thread pointer.  */
-@       
-__tx_ts_handler: 
+@
+__tx_ts_handler:
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 @
@@ -152,7 +146,7 @@ __tx_ts_handler:
     LDR     r1, [r0]                                @ Pickup current thread pointer
 @
 @    /* Determine if there is a current thread to finish preserving.  */
-@       
+@
     CBZ     r1, __tx_ts_new                         @ If NULL, skip preservation
 @
 @    /* Recover PSP and preserve current thread context.  */
@@ -183,7 +177,6 @@ _skip_vfp_save:
 @
     STR     r3, [r4]                                @ Clear time-slice
 @
-@       
 @    /* Executing thread is now completely preserved!!!  */
 @
 __tx_ts_new:
@@ -227,7 +220,7 @@ __tx_ts_restore:
     LDMIA   r12!, {LR}                              @ Pickup LR
 #ifdef TX_ENABLE_FPU_SUPPORT
     TST     LR, #0x10                               @ Determine if the VFP extended frame is present
-    BNE     _skip_vfp_restore                       @ If not, skip VFP restore 
+    BNE     _skip_vfp_restore                       @ If not, skip VFP restore
     VLDMIA  r12!, {s16-s31}                         @ Yes, restore additional VFP registers
 _skip_vfp_restore:
 #endif
@@ -235,11 +228,11 @@ _skip_vfp_restore:
     MSR     PSP, r12                                @ Setup the thread's stack pointer
 @
 @    /* Return to thread.  */
-@       
+@
     BX      lr                                      @ Return to thread!
 @
 @    /* The following is the idle wait processing... in this case, no threads are ready for execution and the
-@       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts 
+@       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts
 @       are disabled to allow use of WFI for waiting for a thread to arrive.  */
 @
 __tx_ts_wait:
@@ -255,40 +248,37 @@ __tx_ts_wait:
     CPSIE   i                                       @ Enable interrupts
     B       __tx_ts_wait                            @ Loop to continue waiting
 @
-@    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are 
+@    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are
 @       already in the handler!  */
 @
 __tx_ts_ready:
     MOV     r7, #0x08000000                         @ Build clear PendSV value
     MOV     r8, #0xE000E000                         @ Build base NVIC address
-    STR     r7, [r8, #0xD04]                        @ Clear any PendSV 
+    STR     r7, [r8, #0xD04]                        @ Clear any PendSV
 @
 @    /* Re-enable interrupts and restore new thread.  */
-@       
+@
     CPSIE   i                                       @ Enable interrupts
     B       __tx_ts_restore                         @ Restore the thread
-    
 
 #ifdef TX_ENABLE_FPU_SUPPORT
 
-        .global  tx_thread_fpu_enable
-        .thumb_func
+    .global  tx_thread_fpu_enable
+    .thumb_func
 tx_thread_fpu_enable:
 @
-@    /* Automatic VPF logic is supported, this function is present only for 
+@    /* Automatic VPF logic is supported, this function is present only for
 @       backward compatibility purposes and therefore simply returns.  */
 @
     BX      LR                                      @ Return to caller
 
-        .global  tx_thread_fpu_disable
-        .thumb_func
+    .global  tx_thread_fpu_disable
+    .thumb_func
 tx_thread_fpu_disable:
 @
-@    /* Automatic VPF logic is supported, this function is present only for 
+@    /* Automatic VPF logic is supported, this function is present only for
 @       backward compatibility purposes and therefore simply returns.  */
 @
     BX      LR                                      @ Return to caller
 
-
 #endif
-

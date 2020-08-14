@@ -51,7 +51,7 @@ SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_initialize_low_level                          Cortex-M0/GNU     */
-@/*                                                           6.0          */
+@/*                                                           6.0.2        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -85,6 +85,10 @@ SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+@/*  08-14-2020     Scott Larson             Modified comment(s), and      */
+@/*                                            commented out code for      */
+@/*                                            enabling DWT,               */
+@/*                                            resulting in version 6.0.2  */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_initialize_low_level(VOID)
@@ -105,12 +109,12 @@ _tx_initialize_low_level:
     STR     r1, [r0]                                @ Setup first unused memory pointer
 @
 @    /* Enable the cycle count register.  */
-@
-    LDR     r0, =0xE0001000                         @ Build address of DWT register
-    LDR     r1, [r0]                                @ Pickup the current value
-    MOVS    r2, #1
-    ORRS    r1, r1, r2                              @ Set the CYCCNTENA bit
-    STR     r1, [r0]                                @ Enable the cycle count register 
+@    /* Not all M0 have DWT, uncomment if you have a DWT and want to use it. */
+@    LDR     r0, =0xE0001000                         @ Build address of DWT register
+@    LDR     r1, [r0]                                @ Pickup the current value
+@    MOVS    r2, #1
+@    ORRS    r1, r1, r2                              @ Set the CYCCNTENA bit
+@    STR     r1, [r0]                                @ Enable the cycle count register 
 @
 @    /* Setup Vector Table Offset Register.  */
 @    

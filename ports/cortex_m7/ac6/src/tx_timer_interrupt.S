@@ -20,17 +20,6 @@
 @/**************************************************************************/
 @/**************************************************************************/
 @
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_timer.h"
-@#include "tx_thread.h"
-@
-@
-@Define Assembly language external references...
 @
     .global      _tx_timer_time_slice
     .global      _tx_timer_system_clock
@@ -51,7 +40,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_timer_interrupt                               Cortex-M7/AC6     */
-@/*                                                           6.0.1        */
+@/*                                                           6.0.2        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -86,6 +75,9 @@
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+@/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+@/*                                            whitespace, resulting       */
+@/*                                            in version 6.0.2            */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_timer_interrupt(VOID)
@@ -110,7 +102,7 @@ _tx_timer_interrupt:
 @    if (_tx_timer_time_slice)
 @    {
 @
-    LDR     r3, =_tx_timer_time_slice               @ Pickup address of time-slice 
+    LDR     r3, =_tx_timer_time_slice               @ Pickup address of time-slice
     LDR     r2, [r3, #0]                            @ Pickup time-slice
     CMP     r2, #0                                  @ Is it non-active?
     BEQ     __tx_timer_no_time_slice                @ Yes, skip time-slice processing
@@ -228,13 +220,13 @@ __tx_timer_dont_activate:
 @    if (_tx_timer_expired_time_slice)
 @    {
 @
-    LDR     r3, =_tx_timer_expired_time_slice       @ Pickup addr of time-slice expired 
+    LDR     r3, =_tx_timer_expired_time_slice       @ Pickup addr of time-slice expired
     LDR     r2, [r3, #0]                            @ Pickup the actual flag
     CMP     r2, #0                                  @ See if the flag is set
     BEQ     __tx_timer_not_ts_expiration            @ No, skip time-slice processing
 @
 @        /* Time slice interrupted thread.  */
-@        _tx_thread_time_slice(); 
+@        _tx_thread_time_slice();
 @
     BL      _tx_thread_time_slice                   @ Call time-slice processing
     LDR     r0, =_tx_thread_preempt_disable         @ Build address of preempt disable flag
@@ -266,5 +258,3 @@ __tx_timer_nothing_expired:
     BX      lr                                      @ Return to caller
 @
 @}
-
-

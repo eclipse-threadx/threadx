@@ -28,7 +28,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_interrupt_restore                      Cortex-M33/IAR    */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
@@ -59,6 +59,9 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
+;/*  08-14-2020      Scott Larson            Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_interrupt_restore(UINT new_posture)

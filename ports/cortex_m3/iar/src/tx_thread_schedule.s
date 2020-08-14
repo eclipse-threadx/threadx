@@ -21,32 +21,23 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
+    EXTERN  _tx_thread_current_ptr
+    EXTERN  _tx_thread_execute_ptr
+    EXTERN  _tx_timer_time_slice
+    EXTERN  _tx_thread_system_stack_ptr
+    EXTERN  _tx_execution_thread_enter
+    EXTERN  _tx_execution_thread_exit
+    EXTERN  _tx_thread_preempt_disable
 ;
 ;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;   
-        EXTERN  _tx_thread_current_ptr
-        EXTERN  _tx_thread_execute_ptr
-        EXTERN  _tx_timer_time_slice
-        EXTERN  _tx_thread_system_stack_ptr
-        EXTERN  _tx_execution_thread_enter
-        EXTERN  _tx_execution_thread_exit
-        EXTERN  _tx_thread_preempt_disable
-;
-;
-        SECTION `.text`:CODE:NOROOT(2)
-        THUMB
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                               Cortex-M3/IAR     */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -80,6 +71,9 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -92,7 +86,7 @@ _tx_thread_schedule:
 ;       from the PendSV handling routines below. */
 ;
 ;    /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
-;     
+;
     MOV     r0, #0                                  ; Build value for TX_FALSE
     LDR     r2, =_tx_thread_preempt_disable         ; Build address of preempt disable flag
     STR     r0, [r2, #0]                            ; Clear preempt disable flag
@@ -100,7 +94,7 @@ _tx_thread_schedule:
 ;    /* Enable interrupts */
 ;
     CPSIE   i
-;            
+;
 ;    /* Enter the scheduler for the first time.  */
 ;
     MOV     r0, #0x10000000                         ; Load PENDSVSET bit
@@ -110,21 +104,21 @@ _tx_thread_schedule:
     ISB                                             ; Flush pipeline
 ;
 ;    /* Wait here for the PendSV to take place.  */
-;     
+;
 __tx_wait_here:
     B       __tx_wait_here                          ; Wait for the PendSV to happen
 ;}
 ;
 ;    /* Generic context PendSV handler.  */
-;     
+;
     PUBLIC  PendSV_Handler
     PUBLIC  __tx_PendSVHandler
 PendSV_Handler:
 __tx_PendSVHandler:
 ;
 ;    /* Get current thread value and new thread pointer.  */
-;       
-__tx_ts_handler: 
+;
+__tx_ts_handler:
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 ;
@@ -142,7 +136,7 @@ __tx_ts_handler:
     LDR     r1, [r0]                                ; Pickup current thread pointer
 ;
 ;    /* Determine if there is a current thread to finish preserving.  */
-;       
+;
     CBZ     r1, __tx_ts_new                         ; If NULL, skip preservation
 ;
 ;    /* Recover PSP and preserve current thread context.  */
@@ -167,7 +161,7 @@ __tx_ts_handler:
 ;
     STR     r3, [r4]                                ; Clear time-slice
 ;
-;       
+;
 ;    /* Executing thread is now completely preserved!!!  */
 ;
 __tx_ts_new:
@@ -213,11 +207,11 @@ __tx_ts_restore:
     MSR     PSP, r12                                ; Setup the thread's stack pointer
 ;
 ;    /* Return to thread.  */
-;       
+;
     BX      lr                                      ; Return to thread!
 ;
 ;    /* The following is the idle wait processing... in this case, no threads are ready for execution and the
-;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts 
+;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts
 ;       are disabled to allow use of WFI for waiting for a thread to arrive.  */
 ;
 __tx_ts_wait:
@@ -233,18 +227,17 @@ __tx_ts_wait:
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_wait                            ; Loop to continue waiting
 ;
-;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are 
+;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are
 ;       already in the handler!  */
 ;
 __tx_ts_ready:
     MOV     r7, #0x08000000                         ; Build clear PendSV value
     MOV     r8, #0xE000E000                         ; Build base NVIC address
-    STR     r7, [r8, #0xD04]                        ; Clear any PendSV 
+    STR     r7, [r8, #0xD04]                        ; Clear any PendSV
 ;
 ;    /* Re-enable interrupts and restore new thread.  */
-;       
+;
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_restore                         ; Restore the thread
 ;}
     END
-        

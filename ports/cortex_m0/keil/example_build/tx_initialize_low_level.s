@@ -20,16 +20,6 @@
 ;/**************************************************************************/
 ;/**************************************************************************/
 ;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_initialize.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
 ;
     IMPORT  _tx_thread_system_stack_ptr
     IMPORT  _tx_initialize_unused_memory
@@ -87,7 +77,7 @@ __tx_vectors
     DCD     __tx_IntHandler                         ; Int 0
     DCD     __tx_IntHandler                         ; Int 1
     DCD     __tx_IntHandler                         ; Int 2
-    DCD     __tx_IntHandler                         ; Int 3    
+    DCD     __tx_IntHandler                         ; Int 3
 ;
 ;
     AREA ||.text||, CODE, READONLY
@@ -96,13 +86,13 @@ Reset_Handler
     CPSID   i
     LDR     R0, =__main
     BX      R0
-   
+
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_initialize_low_level                          Cortex-M0/AC5     */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -136,29 +126,32 @@ Reset_Handler
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
 ;{
     EXPORT  _tx_initialize_low_level
 _tx_initialize_low_level
-;       
+;
 ;    /* Ensure that interrupts are disabled.  */
 ;
     CPSID   i                                       ; Disable interrupts
 ;
 ;    /* Set base of available memory to end of non-initialised RAM area.  */
-;     
+;
     LDR     r0, =_tx_initialize_unused_memory       ; Build address of unused memory pointer
     LDR     r1, =|Image$$ZI$$Limit|                 ; Build first free address
-    ADDS    r1, r1, #4                              ; 
+    ADDS    r1, r1, #4                              ;
     STR     r1, [r0]                                ; Setup first unused memory pointer
 ;
 ;    /* Setup Vector Table Offset Register.  */
-;    
+;
     LDR     r0, =0xE000ED08                         ; Build address of NVIC registers
     LDR     r1, =__tx_vectors                       ; Pickup address of vector table
-    STR     r1, [r0]                                ; Set vector table address   
+    STR     r1, [r0]                                ; Set vector table address
 ;
 ;    /* Enable the cycle count register.  */
 ;
@@ -166,15 +159,15 @@ _tx_initialize_low_level
 ;    LDR     r1, [r0]                                ; Pickup the current value
 ;    MOVS    r2, #1
 ;    ORRS    r1, r1, r2                              ; Set the CYCCNTENA bit
-;    STR     r1, [r0]                                ; Enable the cycle count register 
+;    STR     r1, [r0]                                ; Enable the cycle count register
 ;
 ;    /* Setup Vector Table Offset Register.  */
-;    
+;
     LDR     r0, =0xE000E000                         ; Build address of NVIC registers
     LDR     r2, =0xD08                              ; Offset to vector base register
     ADD     r0, r0, r2                              ; Build vector base register
     LDR     r1, =__tx_vectors                       ; Pickup address of vector table
-    STR     r1, [r0]                                ; Set vector table address   
+    STR     r1, [r0]                                ; Set vector table address
 ;
 ;    /* Set system stack pointer from vector value.  */
 ;
@@ -195,30 +188,30 @@ _tx_initialize_low_level
 ;
     LDR     r1, =0x00000000                         ; Rsrv, UsgF, BusF, MemM
     LDR     r0, =0xE000E000                         ; Build address of NVIC registers
-    LDR     r2, =0xD18                              ; 
-    ADD     r0, r0, r2                              ; 
+    LDR     r2, =0xD18                              ;
+    ADD     r0, r0, r2                              ;
     STR     r1, [r0]                                ; Setup System Handlers 4-7 Priority Registers
 
     LDR     r1, =0xFF000000                         ; SVCl, Rsrv, Rsrv, Rsrv
     LDR     r0, =0xE000E000                         ; Build address of NVIC registers
-    LDR     r2, =0xD1C                              ; 
-    ADD     r0, r0, r2                              ; 
+    LDR     r2, =0xD1C                              ;
+    ADD     r0, r0, r2                              ;
     STR     r1, [r0]                                ; Setup System Handlers 8-11 Priority Registers
                                                     ; Note: SVC must be lowest priority, which is 0xFF
 
     LDR     r1, =0x40FF0000                         ; SysT, PnSV, Rsrv, DbgM
     LDR     r0, =0xE000E000                         ; Build address of NVIC registers
-    LDR     r2, =0xD20                              ; 
-    ADD     r0, r0, r2                              ; 
+    LDR     r2, =0xD20                              ;
+    ADD     r0, r0, r2                              ;
     STR     r1, [r0]                                ; Setup System Handlers 12-15 Priority Registers
                                                     ; Note: PnSV must be lowest priority, which is 0xFF
 ;
 ;    /* Return to caller.  */
-;    
-    BX      lr 
+;
+    BX      lr
 ;}
 ;
-;       
+;
 ;/* Define initial heap/stack routine for the ARM RVCT startup code.
 ;   This routine will set the initial stack and heap locations */
 ;
@@ -239,14 +232,14 @@ __tx_BadHandler
 
     EXPORT  __tx_SVCallHandler
 __tx_SVCallHandler
-    B       __tx_SVCallHandler 
+    B       __tx_SVCallHandler
 
     EXPORT  __tx_IntHandler
 __tx_IntHandler
 ; VOID InterruptHandler (VOID)
 ; {
     PUSH    {r0, lr}
-        
+
 ;    /* Do interrupt handler work here */
 ;    /* .... */
 
@@ -269,7 +262,7 @@ SysTick_Handler
     BX      lr
 ; }
 
-    EXPORT  __tx_NMIHandler 
+    EXPORT  __tx_NMIHandler
 __tx_NMIHandler
     B       __tx_NMIHandler
 
@@ -280,5 +273,4 @@ __tx_DBGHandler
     ALIGN
     LTORG
     END
-                
 

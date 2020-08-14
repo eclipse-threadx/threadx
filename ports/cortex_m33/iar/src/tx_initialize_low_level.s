@@ -48,7 +48,7 @@ __tx_free_memory_start
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_initialize_low_level                          Cortex-M33/IAR    */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
@@ -82,6 +82,9 @@ __tx_free_memory_start
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
+;/*  08-14-2020      Scott Larson            Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
@@ -94,13 +97,13 @@ _tx_initialize_low_level:
     CPSID   i
 ;
 ;    /* Set base of available memory to end of non-initialised RAM area.  */
-;     
+;
     LDR     r0, =_tx_initialize_unused_memory       ; Build address of unused memory pointer
     LDR     r1, =__tx_free_memory_start             ; Build first free address
     STR     r1, [r0]                                ; Setup first unused memory pointer
 ;
 ;    /* Setup Vector Table Offset Register.  */
-;    
+;
     MOV     r0, #0xE000E000                         ; Build address of NVIC registers
     LDR     r1, =__vector_table                     ; Pickup address of vector table
     STR     r1, [r0, #0xD08]                        ; Set vector table address
@@ -110,7 +113,7 @@ _tx_initialize_low_level:
 ;    LDR     r0, =0xE0001000                         ; Build address of DWT register
 ;    LDR     r1, [r0]                                ; Pickup the current value
 ;    ORR     r1, r1, #1                              ; Set the CYCCNTENA bit
-;    STR     r1, [r0]                                ; Enable the cycle count register 
+;    STR     r1, [r0]                                ; Enable the cycle count register
 ;
 ;    /* Set system stack pointer from vector value.  */
 ;
@@ -141,7 +144,7 @@ _tx_initialize_low_level:
                                                     ; Note: PnSV must be lowest priority, which is 0xFF
 ;
 ;    /* Return to caller.  */
-;    
+;
     BX      lr
 ;}
 ;
@@ -158,7 +161,7 @@ __tx_IntHandler:
 ; VOID InterruptHandler (VOID)
 ; {
     PUSH    {r0,lr}     ; Save LR (and dummy r0 to maintain stack alignment)
-        
+
 ;    /* Do interrupt handler work here */
 ;    /* .... */
 
@@ -194,34 +197,34 @@ UsageFault_Handler:
     TST     r1, #0x00100000                         ; Check for Stack Overflow
 _unhandled_usage_loop
     BEQ     _unhandled_usage_loop                   ; If not stack overflow then loop
-    
+
     ; Handle stack overflow
     STR     r1, [r0]                                ; Clear CFSR flag(s)
-    
+
 #ifdef __ARMVFP__
     LDR     r0, =0xE000EF34                         ; Cleanup FPU context: Load FPCCR address
     LDR     r1, [r0]                                ; Load FPCCR
     BIC     r1, r1, #1                              ; Clear the lazy preservation active bit
     STR     r1, [r0]                                ; Store the value
 #endif
-    
+
     MOV32   r0, _tx_thread_current_ptr              ; Build current thread pointer address
     LDR     r0,[r0]                                 ; Pick up current thread pointer
     PUSH    {r0,lr}                                 ; Save LR (and r0 to maintain stack alignment)
     BL      _tx_thread_stack_error_handler          ; Call ThreadX/user handler
     POP     {r0,lr}                                 ; Restore LR and dummy reg
-    
+
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     ; Call the thread exit function to indicate the thread is no longer executing.
     PUSH    {r0, lr}                                ; Save LR (and r0 just for alignment)
     BL      _tx_execution_thread_exit               ; Call the thread exit function
     POP     {r0, lr}                                ; Recover LR
 #endif
-    
+
     MOV     r1, #0                                  ; Build NULL value
     LDR     r0, =_tx_thread_current_ptr             ; Pickup address of current thread pointer
     STR     r1, [r0]                                ; Clear current thread pointer
-    
+
     ; Return from UsageFault_Handler exception
     LDR     r0, =0xE000ED04                         ; Load ICSR
     LDR     r1, =0x10000000                         ; Set PENDSVSET bit
@@ -234,8 +237,8 @@ _unhandled_usage_loop
     PUBLIC  __tx_NMIHandler
 __tx_NMIHandler:
     B       __tx_NMIHandler
-    
-    
+
+
     PUBLIC  __tx_DBGHandler
 __tx_DBGHandler:
     B       __tx_DBGHandler

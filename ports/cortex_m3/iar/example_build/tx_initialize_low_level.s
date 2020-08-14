@@ -20,42 +20,32 @@
 ;/**************************************************************************/
 ;/**************************************************************************/
 ;
-;#define TX_SOURCE_CODE
 ;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_initialize.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
-        EXTERN  _tx_thread_system_stack_ptr
-        EXTERN  _tx_initialize_unused_memory
-        EXTERN  _tx_timer_interrupt
-        EXTERN  __vector_table
-        EXTERN  _tx_execution_isr_enter
-        EXTERN  _tx_execution_isr_exit
+    EXTERN  _tx_thread_system_stack_ptr
+    EXTERN  _tx_initialize_unused_memory
+    EXTERN  _tx_timer_interrupt
+    EXTERN  __vector_table
+    EXTERN  _tx_execution_isr_enter
+    EXTERN  _tx_execution_isr_exit
 ;
 ;
 SYSTEM_CLOCK      EQU   7200000
 SYSTICK_CYCLES    EQU   ((SYSTEM_CLOCK / 100) -1)
-        
+
     RSEG    FREE_MEM:DATA
     PUBLIC  __tx_free_memory_start
 __tx_free_memory_start
-    DS32    4        
+    DS32    4
 ;
 ;
-        SECTION `.text`:CODE:NOROOT(2)
-        THUMB
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_initialize_low_level                          Cortex-M3/IAR     */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -89,6 +79,9 @@ __tx_free_memory_start
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
@@ -102,7 +95,7 @@ _tx_initialize_low_level:
 ;
 ;
 ;    /* Set base of available memory to end of non-initialised RAM area.  */
-;     
+;
     LDR     r0, =__tx_free_memory_start             ; Get end of non-initialized RAM area
     LDR     r2, =_tx_initialize_unused_memory       ; Build address of unused memory pointer
     STR     r0, [r2, #0]                            ; Save first free memory address
@@ -112,13 +105,13 @@ _tx_initialize_low_level:
     LDR     r0, =0xE0001000                         ; Build address of DWT register
     LDR     r1, [r0]                                ; Pickup the current value
     ORR     r1, r1, #1                              ; Set the CYCCNTENA bit
-    STR     r1, [r0]                                ; Enable the cycle count register 
+    STR     r1, [r0]                                ; Enable the cycle count register
 ;
 ;    /* Setup Vector Table Offset Register.  */
-;    
+;
     MOV     r0, #0xE000E000                         ; Build address of NVIC registers
     LDR     r1, =__vector_table                     ; Pickup address of vector table
-    STR     r1, [r0, #0xD08]                        ; Set vector table address   
+    STR     r1, [r0, #0xD08]                        ; Set vector table address
 ;
 ;    /* Set system stack pointer from vector value.  */
 ;
@@ -149,8 +142,8 @@ _tx_initialize_low_level:
                                                     ; Note: PnSV must be lowest priority, which is 0xFF
 ;
 ;    /* Return to caller.  */
-;    
-    BX      lr 
+;
+    BX      lr
 ;}
 ;
 ;
@@ -175,7 +168,5 @@ __tx_SysTickHandler:
     POP     {r0, lr}
     BX      LR
 ; }
-        
-    END
-                
 
+    END

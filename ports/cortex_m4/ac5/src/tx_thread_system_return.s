@@ -2,6 +2,11 @@
 ;/*                                                                        */
 ;/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
 ;/*                                                                        */
+;/*       This software is licensed under the Microsoft Software License   */
+;/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+;/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+;/*       and in the root directory of this software.                      */
+;/*                                                                        */
 ;/**************************************************************************/
 ;
 ;
@@ -15,16 +20,6 @@
 ;/**************************************************************************/
 ;/**************************************************************************/
 ;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
 ;
     AREA    ||.text||, CODE, READONLY
 ;/**************************************************************************/
@@ -32,7 +27,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_system_return                          Cortex-M4/AC5     */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -65,6 +60,9 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
@@ -72,9 +70,9 @@
     EXPORT  _tx_thread_system_return
 _tx_thread_system_return
 ;
-;    /* Return to real scheduler via PendSV. Note that this routine is often 
+;    /* Return to real scheduler via PendSV. Note that this routine is often
 ;       replaced with in-line assembly in tx_port.h to improved performance.  */
-;     
+;
     MOV     r0, #0x10000000                         ; Load PENDSVSET bit
     MOV     r1, #0xE000E000                         ; Load NVIC base
     STR     r0, [r1, #0xD04]                        ; Set PENDSVBIT in ICSR
@@ -85,7 +83,6 @@ _tx_thread_system_return
     CPSIE   i                                       ; Enable interrupts
     MSR     PRIMASK, r1                             ; Restore original interrupt posture
 _isr_context
-    BX      lr                                      ; Return to caller 
+    BX      lr                                      ; Return to caller
 ;}
-    END  
-    
+    END

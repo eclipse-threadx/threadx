@@ -34,7 +34,7 @@ HEAP_SIZE           =     0x00000000
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                          Cortex-M33/AC6    */
-/*                                                           6.0.1        */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -68,6 +68,9 @@ HEAP_SIZE           =     0x00000000
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
+/*  08-14-2020      Scott Larson            Modified comment(s), clean up */
+/*                                            whitespace, resulting       */
+/*                                            in version 6.0.2            */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_initialize_low_level(VOID)
@@ -87,7 +90,7 @@ _tx_initialize_low_level:
     /* Set base of available memory to end of non-initialised RAM area.  */
     LDR     r0, =_tx_initialize_unused_memory       // Build address of unused memory pointer
     LDR     r1, =Image$$ARM_LIB_STACK$$ZI$$Limit    // Build first free address
-    ADD     r1, r1, #4                              // 
+    ADD     r1, r1, #4                              //
     STR     r1, [r0]                                // Setup first unused memory pointer
 
     /* Setup Vector Table Offset Register.  */
@@ -99,7 +102,7 @@ _tx_initialize_low_level:
     LDR     r0, =0xE0001000                         // Build address of DWT register
     LDR     r1, [r0]                                // Pickup the current value
     ORR     r1, r1, #1                              // Set the CYCCNTENA bit
-    STR     r1, [r0]                                // Enable the cycle count register 
+    STR     r1, [r0]                                // Enable the cycle count register
 
     /* Set system stack pointer from vector value.  */
     LDR     r0, =_tx_thread_system_stack_ptr        // Build address of system stack pointer
@@ -154,7 +157,7 @@ __tx_IntHandler:
 // VOID InterruptHandler (VOID)
 // {
     PUSH    {r0,lr}     // Save LR (and dummy r0 to maintain stack alignment)
-    
+
     /* Do interrupt handler work here */
     /* .... */
 
@@ -206,23 +209,23 @@ UsageFault_Handler:
     TST     r1, #0x00100000                         // Check for Stack Overflow
 _unhandled_usage_loop:
     BEQ     _unhandled_usage_loop                   // If not stack overflow then loop
-    
+
     // Handle stack overflow
     STR     r1, [r0]                                // Clear CFSR flag(s)
-    
+
 #ifdef __ARM_PCS_VFP
     LDR     r0, =0xE000EF34                         // Cleanup FPU context: Load FPCCR address
     LDR     r1, [r0]                                // Load FPCCR
     BIC     r1, r1, #1                              // Clear the lazy preservation active bit
     STR     r1, [r0]                                // Store the value
 #endif
-    
+
     LDR     r0, =_tx_thread_current_ptr             // Build current thread pointer address
     LDR     r0,[r0]                                 // Pick up current thread pointer
     PUSH    {r0,lr}                                 // Save LR (and r0 to maintain stack alignment)
     BL      _tx_thread_stack_error_handler          // Call ThreadX/user handler
     POP     {r0,lr}                                 // Restore LR and dummy reg
-    
+
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     // Call the thread exit function to indicate the thread is no longer executing.
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)

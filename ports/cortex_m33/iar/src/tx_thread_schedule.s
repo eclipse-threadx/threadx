@@ -41,7 +41,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                               Cortex-M33/IAR    */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
@@ -74,6 +74,9 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
+;/*  08-14-2020      Scott Larson            Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -86,7 +89,7 @@ _tx_thread_schedule:
 ;       from the PendSV handling routines below. */
 ;
 ;    /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
-;     
+;
     MOV     r0, #0                                  ; Build value for TX_FALSE
     LDR     r2, =_tx_thread_preempt_disable         ; Build address of preempt disable flag
     STR     r0, [r2, #0]                            ; Clear preempt disable flag
@@ -95,7 +98,7 @@ _tx_thread_schedule:
 ;
 #ifdef __ARMVFP__
     MRS     r0, CONTROL                             ; Pickup current CONTROL register
-    BIC     r0, r0, #4                              ; Clear the FPCA bit 
+    BIC     r0, r0, #4                              ; Clear the FPCA bit
     MSR     CONTROL, r0                             ; Setup new CONTROL register
 #endif
 ;
@@ -118,12 +121,12 @@ __tx_wait_here:
 ;}
 ;
 ;    /* Generic context switching PendSV handler.  */
-;    
+;
     PUBLIC  PendSV_Handler
 PendSV_Handler:
 ;
 ;    /* Get current thread value and new thread pointer.  */
-;       
+;
 __tx_ts_handler:
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
@@ -159,7 +162,7 @@ _skip_vfp_save:
     MOV32   r4, _tx_timer_time_slice                ; Build address of time-slice variable
     STMDB   r12!, {LR}                              ; Save LR on the stack
     STR     r12, [r1, #8]                           ; Save the thread stack pointer
-    
+
 #if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE)
     ; Save secure context
     LDR     r5, [r1,#0x90]                          ; Load secure stack index
@@ -183,7 +186,7 @@ _skip_secure_save:
 ;    /* Clear the global time-slice.  */
 ;
     STR     r3, [r4]                                ; Clear time-slice
-;       
+;
 ;    /* Executing thread is now completely preserved!!!  */
 ;
 __tx_ts_new:
@@ -241,7 +244,7 @@ _skip_secure_restore:
     LDMIA   r12!, {LR}                              ; Pickup LR
 #ifdef __ARMVFP__
     TST     LR, #0x10                               ; Determine if the VFP extended frame is present
-    BNE     _skip_vfp_restore                       ; If not, skip VFP restore 
+    BNE     _skip_vfp_restore                       ; If not, skip VFP restore
     VLDMIA  r12!, {s16-s31}                         ; Yes, restore additional VFP registers
 _skip_vfp_restore:
 #endif
@@ -253,7 +256,7 @@ _skip_vfp_restore:
     BX      lr                                      ; Return to thread!
 ;
 ;    /* The following is the idle wait processing... in this case, no threads are ready for execution and the
-;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts 
+;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts
 ;       are disabled to allow use of WFI for waiting for a thread to arrive.  */
 ;
 __tx_ts_wait:
@@ -269,16 +272,16 @@ __tx_ts_wait:
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_wait                            ; Loop to continue waiting
 ;
-;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are 
+;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are
 ;       already in the handler!  */
 ;
 __tx_ts_ready:
     MOV     r7, #0x08000000                         ; Build clear PendSV value
     MOV     r8, #0xE000E000                         ; Build base NVIC address
-    STR     r7, [r8, #0xD04]                        ; Clear any PendSV 
+    STR     r7, [r8, #0xD04]                        ; Clear any PendSV
 ;
 ;    /* Re-enable interrupts and restore new thread.  */
-;       
+;
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_restore                         ; Restore the thread
 
@@ -301,10 +304,10 @@ SVC_Handler:
 
     CMP     r1, #2                  ; Is it a secure stack free request?
     BEQ     _tx_svc_secure_free     ; Yes, go there
-    
+
     ; Unknown SVC argument - just return
     BX      lr
-    
+
 _tx_svc_secure_alloc:
     PUSH    {r0,lr}                 ; Save SP and EXC_RETURN
     LDM     r0, {r0-r3}             ; Load function parameters from stack

@@ -26,16 +26,14 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_save                           Cortex-M33/AC6    */
-/*                                                           6.0.1        */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function saves the context of an executing thread in the       */
-/*    beginning of interrupt processing.  The function also ensures that  */
-/*    the system stack is used upon return to the calling ISR.            */
+/*    This function is not needed for Cortex-M.                           */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -58,6 +56,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
+/*  08-14-2020      Scott Larson            Modified comment(s), remove   */
+/*                                            EPK, clean up whitespace    */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_save(VOID)
@@ -70,14 +71,6 @@
     .thumb_func
 .type _tx_thread_context_save, function
 _tx_thread_context_save:
-
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-    /* Call the ISR enter function to indicate an ISR is executing.  */
-    PUSH    {r0,lr}                                 // Save ISR lr (and r0 for 8-byte stack alignment)
-    BL      _tx_execution_isr_enter                 // Call the ISR enter function
-    POP     {r0,lr}                                 // Recover ISR lr (and r0)
-#endif
-
     /* Return to interrupt processing.  */
     BX      lr
 // }

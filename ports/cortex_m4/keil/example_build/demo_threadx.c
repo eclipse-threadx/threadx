@@ -43,7 +43,7 @@ UCHAR                   thread_5_stack[DEMO_STACK_SIZE];
 
 /* Define the queue area.  */
 
-UCHAR					queue_0_area[DEMO_QUEUE_SIZE*sizeof(ULONG)];
+UCHAR                   queue_0_area[DEMO_QUEUE_SIZE*sizeof(ULONG)];
 
 
 /* Define thread prototypes.  */

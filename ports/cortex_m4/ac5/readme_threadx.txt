@@ -112,22 +112,22 @@ FPU Stack Frame (only interrupted thread with FPU enabled):
      0x78               s30
      0x7C               s31
      0x80               fpscr
-     0x84               r4          
-     0x88               r5          
-     0x8C               r6          
-     0x90               r7          
-     0x94               r8          
-     0x98               r9          
-     0x9C               r10 (sl)    
-     0xA0               r11         
+     0x84               r4
+     0x88               r5
+     0x8C               r6
+     0x90               r7
+     0x94               r8
+     0x98               r9
+     0x9C               r10
+     0xA0               r11
      0xA4               r0          (Hardware stack starts here!!)
-     0xA8               r1          
-     0xAC               r2          
-     0xB0               r3          
-     0xB4               r12         
-     0xB8               lr          
-     0xBC               pc          
-     0xC0               xPSR        
+     0xA8               r1
+     0xAC               r2
+     0xB0               r3
+     0xB4               r12
+     0xB8               lr
+     0xBC               pc
+     0xC0               xPSR
 
 
 5.  Improving Performance
@@ -196,6 +196,11 @@ context - no additional setup by the application.
 For generic code revision information, please refer to the readme_threadx_generic.txt
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
+
+08-14-2020  ThreadX update of Cortex-M4/AC5 port. The following files were 
+            changed/added for port specific version 6.0.2:
+            tx_thread_context_save.s        Fixed register names.
+            *.s                             Modified comments and whitespace.
 
 06/30/2020  Initial ThreadX 6.0.1 version for Cortex-M4 using AC5 tools.
 

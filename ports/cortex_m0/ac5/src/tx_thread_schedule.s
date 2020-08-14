@@ -21,15 +21,6 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;   
     IMPORT  _tx_thread_current_ptr
     IMPORT  _tx_thread_execute_ptr
     IMPORT  _tx_timer_time_slice
@@ -37,7 +28,7 @@
     IMPORT  _tx_thread_preempt_disable
     IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     IMPORT  _tx_execution_thread_enter
-    IMPORT  _tx_execution_thread_exit        
+    IMPORT  _tx_execution_thread_exit
     ENDIF
 ;
 ;
@@ -48,7 +39,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                               Cortex-M0/AC5     */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -82,6 +73,9 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -94,7 +88,7 @@ _tx_thread_schedule
 ;       from the PendSV handling routines below. */
 ;
 ;    /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
-;     
+;
     MOVS    r0, #0                                  ; Build value for TX_FALSE
     LDR     r2, =_tx_thread_preempt_disable         ; Build address of preempt disable flag
     STR     r0, [r2, #0]                            ; Clear preempt disable flag
@@ -102,7 +96,7 @@ _tx_thread_schedule
 ;    /* Enable interrupts */
 ;
     CPSIE   i
-;       
+;
 ;    /* Enter the scheduler for the first time.  */
 ;
     LDR     r0, =0x10000000                         ; Load PENDSVSET bit
@@ -112,22 +106,22 @@ _tx_thread_schedule
     ISB                                             ; Flush pipeline
 ;
 ;    /* Wait here for the PendSV to take place.  */
-;     
+;
 __tx_wait_here
     B       __tx_wait_here                          ; Wait for the PendSV to happen
 ;}
 ;
-;    /* Generic context switch-out switch-in handler...  Note that this handler is 
+;    /* Generic context switch-out switch-in handler...  Note that this handler is
 ;       common for both PendSV and SVCall.  */
-;     
+;
     EXPORT  PendSV_Handler
     EXPORT  __tx_PendSVHandler
 PendSV_Handler
 __tx_PendSVHandler
 ;
 ;    /* Get current thread value and new thread pointer.  */
-;       
-__tx_ts_handler 
+;
+__tx_ts_handler
 
     IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 ;
@@ -137,7 +131,7 @@ __tx_ts_handler
     PUSH    {r0, lr}                                ; Save LR (and r0 just for alignment)
     BL      _tx_execution_thread_exit               ; Call the thread exit function
     POP     {r0, r1}                                ; Recover LR
-    MOV     lr, r1                                  ; 
+    MOV     lr, r1                                  ;
     CPSIE   i                                       ; Enable interrupts
     ENDIF
     LDR     r0, =_tx_thread_current_ptr             ; Build current thread pointer address
@@ -146,9 +140,9 @@ __tx_ts_handler
     LDR     r1, [r0]                                ; Pickup current thread pointer
 ;
 ;    /* Determine if there is a current thread to finish preserving.  */
-;       
+;
     CMP     r1,#0                                   ; If NULL, skip preservation
-    BEQ     __tx_ts_new                             ; 
+    BEQ     __tx_ts_new                             ;
 ;
 ;    /* Recover PSP and preserve current thread context.  */
 ;
@@ -156,15 +150,15 @@ __tx_ts_handler
     MRS     r3, PSP                                 ; Pickup PSP pointer (thread's stack pointer)
     SUBS    r3, r3, #16                             ; Allocate stack space
     STM     r3!, {r4-r7}                            ; Save its remaining registers (M3 Instruction: STMDB r12!, {r4-r11})
-    MOV     r4,r8                                   ; 
-    MOV     r5,r9                                   ; 
-    MOV     r6,r10                                  ; 
-    MOV     r7,r11                                  ; 
+    MOV     r4,r8                                   ;
+    MOV     r5,r9                                   ;
+    MOV     r6,r10                                  ;
+    MOV     r7,r11                                  ;
     SUBS    r3, r3, #32                             ; Allocate stack space
-    STM     r3!, {r4-r7}                            ; 
+    STM     r3!, {r4-r7}                            ;
     SUBS    r3, r3, #20                             ; Allocate stack space
-    MOV     r5, LR                                  ;     
-    STR     r5, [r3]                                ; Save LR on the stack  
+    MOV     r5, LR                                  ;
+    STR     r5, [r3]                                ; Save LR on the stack
     STR     r3, [r1, #8]                            ; Save its stack pointer
 ;
 ;    /* Determine if time-slice is active. If it isn't, skip time handling processing.  */
@@ -172,7 +166,7 @@ __tx_ts_handler
     LDR     r4, =_tx_timer_time_slice               ; Build address of time-slice variable
     LDR     r5, [r4]                                ; Pickup current time-slice
     CMP     r5, #0                                  ; If not active, skip processing
-    BEQ     __tx_ts_new                             ; 
+    BEQ     __tx_ts_new                             ;
 ;
 ;    /* Time-slice is active, save the current thread's time-slice and clear the global time-slice variable.  */
 ;
@@ -183,7 +177,6 @@ __tx_ts_handler
     MOVS    r5, #0                                  ; Build clear value
     STR     r5, [r4]                                ; Clear time-slice
 ;
-;       
 ;    /* Executing thread is now completely preserved!!!  */
 ;
 __tx_ts_new
@@ -192,7 +185,7 @@ __tx_ts_new
 ;
     CPSID   i                                       ; Disable interrupts
     LDR     r1, [r2]                                ; Is there another thread ready to execute?
-    CMP     r1, #0                                  ; 
+    CMP     r1, #0                                  ;
     BEQ     __tx_ts_wait                            ; No, skip to the wait processing
 ;
 ;    /* Yes, another thread is ready for else, make the current thread the new thread.  */
@@ -229,26 +222,26 @@ __tx_ts_restore
     ADDS    r3, r3, #4                              ; Position past LR
     MOV     lr, r5                                  ; Restore LR
     LDM     r3!,{r4-r7}                             ; Recover thread's registers (r4-r11)
-    MOV     r11,r7                                  ; 
-    MOV     r10,r6                                  ; 
-    MOV     r9,r5                                   ; 
-    MOV     r8,r4                                   ; 
-    LDM     r3!,{r4-r7}                             ;                     
+    MOV     r11,r7                                  ;
+    MOV     r10,r6                                  ;
+    MOV     r9,r5                                   ;
+    MOV     r8,r4                                   ;
+    LDM     r3!,{r4-r7}                             ;
     MSR     PSP, r3                                 ; Setup the thread's stack pointer
 ;
 ;    /* Return to thread.  */
-;       
+;
     BX      lr                                      ; Return to thread!
 ;
 ;    /* The following is the idle wait processing... in this case, no threads are ready for execution and the
-;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts 
+;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts
 ;       are disabled to allow use of WFI for waiting for a thread to arrive.  */
 ;
 __tx_ts_wait
     CPSID   i                                       ; Disable interrupts
     LDR     r1, [r2]                                ; Pickup the next thread to execute pointer
     STR     r1, [r0]                                ; Store it in the current pointer
-    CMP     r1, #0                                  ; If non-NULL, a new thread is ready!        
+    CMP     r1, #0                                  ; If non-NULL, a new thread is ready!
     BNE     __tx_ts_ready                           ;
     IF :DEF:TX_ENABLE_WFI
     DSB                                             ; Ensure no outstanding memory transactions
@@ -259,20 +252,19 @@ __tx_ts_ISB
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_wait                            ; Loop to continue waiting
 ;
-;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are 
+;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are
 ;       already in the handler!  */
 ;
 __tx_ts_ready
     LDR     r7, =0x08000000                         ; Build clear PendSV value
     LDR     r5, =0xE000ED04                         ; Build base NVIC address
-    STR     r7, [r5]                                ; Clear any PendSV 
+    STR     r7, [r5]                                ; Clear any PendSV
 ;
 ;    /* Re-enable interrupts and restore new thread.  */
-;       
+;
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_restore                         ; Restore the thread
 
     ALIGN
     LTORG
     END
-

@@ -21,15 +21,6 @@
 @/**************************************************************************/
 @
 @
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_thread.h"
-@
-@
     .text
     .align 4
     .syntax unified
@@ -38,7 +29,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_stack_build                            Cortex-M4/AC6     */
-@/*                                                           6.0.1        */
+@/*                                                           6.0.2        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -71,6 +62,9 @@
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+@/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+@/*                                            whitespace, resulting       */
+@/*                                            in version 6.0.2            */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -79,11 +73,11 @@
     .thumb_func
 _tx_thread_stack_build:
 @
-@       
+@
 @    /* Build a fake interrupt frame.  The form of the fake interrupt stack
 @       on the Cortex-M4 should look like the following after it is built:
-@       
-@       Stack Top:      
+@
+@       Stack Top:
 @                       LR          Interrupted LR (LR at time of PENDSV)
 @                       r4          Initial value for r4
 @                       r5          Initial value for r5
@@ -142,5 +136,3 @@ _tx_thread_stack_build:
                                                     @   control block
     BX      lr                                      @ Return to caller
 @}
-
-

@@ -11,7 +11,7 @@
 @
 @
 @/**************************************************************************/
-@@/**************************************************************************/
+@/**************************************************************************/
 @/**                                                                       */
 @/** ThreadX Component                                                     */
 @/**                                                                       */
@@ -19,15 +19,6 @@
 @/**                                                                       */
 @/**************************************************************************/
 @/**************************************************************************/
-@
-@/* #define TX_SOURCE_CODE  */
-@
-@
-@/* Include necessary system files.  */
-@
-@/*  #include "tx_api.h"
-@    #include "tx_thread.h"
-@    #include "tx_timer.h"  */
 
 
     .text
@@ -38,7 +29,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_system_return                          Cortex-M0/AC6     */
-@/*                                                           6.0.1        */
+@/*                                                           6.0.2        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -71,6 +62,9 @@
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+@/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+@/*                                            whitespace, resulting       */
+@/*                                            in version 6.0.2            */
 @/*                                                                        */
 @/**************************************************************************/
 @/* VOID   _tx_thread_system_return(VOID)
@@ -79,9 +73,9 @@
     .thumb_func
 _tx_thread_system_return:
 @
-@    /* Return to real scheduler via PendSV. Note that this routine is often 
+@    /* Return to real scheduler via PendSV. Note that this routine is often
 @       replaced with in-line assembly in tx_port.h to improved performance.  */
-@     
+@
     LDR     r0, =0x10000000                         @ Load PENDSVSET bit
     LDR     r1, =0xE000ED04                         @ Load NVIC base
     STR     r0, [r1]                                @ Set PENDSVBIT in ICSR
@@ -92,6 +86,5 @@ _tx_thread_system_return:
     CPSIE   i                                       @ Enable interrupts
     MSR     PRIMASK, r1                             @ Restore original interrupt posture
 _isr_context:
-    BX      lr                                      @ Return to caller 
+    BX      lr                                      @ Return to caller
 @/* }  */
-

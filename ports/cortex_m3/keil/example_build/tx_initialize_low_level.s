@@ -20,16 +20,6 @@
 ;/**************************************************************************/
 ;/**************************************************************************/
 ;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_initialize.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
 ;
     IMPORT  _tx_thread_system_stack_ptr
     IMPORT  _tx_initialize_unused_memory
@@ -88,7 +78,6 @@ __tx_vectors
     DCD     __tx_IntHandler                         ; Int 1
     DCD     __tx_IntHandler                         ; Int 2
     DCD     __tx_IntHandler                         ; Int 3
-        
 ;
 ;
     AREA ||.text||, CODE, READONLY
@@ -104,7 +93,7 @@ Reset_Handler
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_initialize_low_level                          Cortex-M3/RVDS    */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -138,6 +127,9 @@ Reset_Handler
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
@@ -150,24 +142,24 @@ _tx_initialize_low_level
     CPSID   i
 ;
 ;    /* Set base of available memory to end of non-initialised RAM area.  */
-;     
+;
     LDR     r0, =_tx_initialize_unused_memory   ; Build address of unused memory pointer
     LDR     r1, =|Image$$ZI$$Limit|             ; Build first free address
-    ADD     r1, r1, #4                          ; 
+    ADD     r1, r1, #4                          ;
     STR     r1, [r0]                            ; Setup first unused memory pointer
 ;
 ;    /* Setup Vector Table Offset Register.  */
-;    
+;
     MOV     r0, #0xE000E000                     ; Build address of NVIC registers
     LDR     r1, =__tx_vectors                   ; Pickup address of vector table
-    STR     r1, [r0, #0xD08]                    ; Set vector table address   
+    STR     r1, [r0, #0xD08]                    ; Set vector table address
 ;
 ;    /* Enable the cycle count register.  */
 ;
 ;    LDR     r0, =0xE0001000                     ; Build address of DWT register
 ;    LDR     r1, [r0]                            ; Pickup the current value
 ;    ORR     r1, r1, #1                          ; Set the CYCCNTENA bit
-;    STR     r1, [r0]                            ; Enable the cycle count register 
+;    STR     r1, [r0]                            ; Enable the cycle count register
 ;
 ;    /* Set system stack pointer from vector value.  */
 ;
@@ -198,11 +190,11 @@ _tx_initialize_low_level
                                                 ; Note: PnSV must be lowest priority, which is 0xFF
 ;
 ;    /* Return to caller.  */
-;    
-    BX      lr 
+;
+    BX      lr
 ;}
 ;
-;       
+;
 ;/* Define initial heap/stack routine for the ARM RVCT startup code.
 ;   This routine will set the initial stack and heap locations */
 ;
@@ -218,13 +210,13 @@ __user_initial_stackheap
 ;/* Define shells for each of the unused vectors.  */
 ;
     EXPORT  __tx_BadHandler
-__tx_BadHandler 
+__tx_BadHandler
     B   __tx_BadHandler
 
 
     EXPORT  __tx_SVCallHandler
 __tx_SVCallHandler
-    B       __tx_SVCallHandler 
+    B       __tx_SVCallHandler
 
 
     EXPORT  __tx_IntHandler
@@ -232,7 +224,7 @@ __tx_IntHandler
 ; VOID InterruptHandler (VOID)
 ; {
     PUSH    {r0, lr}
-        
+
 ;    /* Do interrupt handler work here */
 ;    /* .... */
 
@@ -251,7 +243,7 @@ __tx_SysTickHandler
     BX      LR
 ; }
 
-    EXPORT  __tx_NMIHandler 
+    EXPORT  __tx_NMIHandler
 __tx_NMIHandler
     B       __tx_NMIHandler
 
@@ -262,5 +254,3 @@ __tx_DBGHandler
     ALIGN
     LTORG
     END
-                
-

@@ -21,9 +21,6 @@
 ;/**************************************************************************/
 ;
 ;
-    EXTERN  _tx_execution_isr_exit
-;
-;
     SECTION `.text`:CODE:NOROOT(2)
     THUMB
 ;/**************************************************************************/
@@ -31,17 +28,14 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_context_restore                        Cortex-M33/IAR    */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
 ;/*                                                                        */
-;/*    This function restores the interrupt context if it is processing a  */
-;/*    nested interrupt.  If not, it returns to the interrupt thread if no */
-;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
-;/*    if no thread was running, the function returns to the scheduler.    */
+;/*    This function is not needed for Cortex-M.                           */
 ;/*                                                                        */
 ;/*  INPUT                                                                 */
 ;/*                                                                        */
@@ -64,25 +58,18 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
+;/*  08-14-2020      Scott Larson            Modified comment(s), remove   */
+;/*                                            EPK, clean up whitespace    */
+;/*                                            resulting in version 6.0.2  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)
 ;{
     PUBLIC  _tx_thread_context_restore
 _tx_thread_context_restore:
-
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-;
-;    /* Call the ISR exit function to indicate an ISR is complete.  */
-;
-    PUSH    {r0, lr}                            ; Save return address
-    BL      _tx_execution_isr_exit              ; Call the ISR exit function
-    POP     {r0, lr}                            ; Recover Save return address
-#endif
 ;
 ;    /* Return to interrupt processing.  */
 ;
     BX      lr
 ;}
-        END
-
+    END

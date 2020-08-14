@@ -21,26 +21,6 @@
 @/**************************************************************************/
 @
 @
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_thread.h"
-@#include "tx_timer.h"
-@
-@
-    .global     _tx_thread_system_state
-    .global     _tx_thread_current_ptr
-    .global     _tx_thread_system_stack_ptr
-    .global     _tx_thread_execute_ptr
-    .global     _tx_timer_time_slice
-    .global     _tx_thread_schedule
-    .global     _tx_thread_preempt_disable
-    .global     _tx_execution_isr_exit
-@
-@
     .text
     .align 4
     .syntax unified
@@ -49,13 +29,15 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_context_restore                        Cortex-M7/GNU     */
-@/*                                                           6.0          */
+@/*                                                           6.0.2        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
 @/*                                                                        */
+@/*    This function is only needed for legacy applications and it should  */
+@/*    not be called in any new development on a Cortex-M.                 */
 @/*    This function restores the interrupt context if it is processing a  */
 @/*    nested interrupt.  If not, it returns to the interrupt thread if no */
 @/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
@@ -82,6 +64,9 @@
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+@/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+@/*                                            whitespace, resulting       */
+@/*                                            in version 6.0.2            */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_context_restore(VOID)
@@ -93,4 +78,3 @@ _tx_thread_context_restore:
 @ /* Not needed for this port - just return!  */
     BX      lr
 @}
-

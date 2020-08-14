@@ -21,23 +21,14 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;
-;
-        SECTION `.text`:CODE:NOROOT(2)
-        THUMB
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_stack_build                            Cortex-M0/IAR     */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -70,6 +61,9 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -77,11 +71,11 @@
     PUBLIC  _tx_thread_stack_build
 _tx_thread_stack_build:
 ;
-;       
+;
 ;    /* Build a fake interrupt frame.  The form of the fake interrupt stack
 ;       on the Cortex-M0 should look like the following after it is built:
-;       
-;       Stack Top:      
+;
+;       Stack Top:
 ;                       LR          Interrupted LR (LR at time of PENDSV)
 ;                       r8          Initial value for r8
 ;                       r9          Initial value for r9
@@ -103,7 +97,7 @@ _tx_thread_stack_build:
 ;    Stack Bottom: (higher memory address)  */
 ;
     LDR     r2, [r0, #16]                           ; Pickup end of stack area
-    MOVS    r3, #0x7                                ; 
+    MOVS    r3, #0x7                                ;
     BICS    r2, r2, r3                              ; Align frame for 8-byte alignment
     SUBS    r2, r2, #68                             ; Subtract frame size
     LDR     r3, =0xFFFFFFFD                         ; Build initial LR value
@@ -142,4 +136,3 @@ _tx_thread_stack_build:
     BX      lr                                      ; Return to caller
 ;}
     END
-

@@ -26,7 +26,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_system_return                          Cortex-M33/AC6    */
-/*                                                           6.0.1        */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -59,6 +59,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
+/*  08-14-2020      Scott Larson            Modified comment(s), clean up */
+/*                                            whitespace, resulting       */
+/*                                            in version 6.0.2            */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_system_return(VOID)
@@ -71,7 +74,7 @@
     .thumb_func
 .type _tx_thread_system_return, function
 _tx_thread_system_return:
-    /* Return to real scheduler via PendSV. Note that this routine is often 
+    /* Return to real scheduler via PendSV. Note that this routine is often
        replaced with in-line assembly in tx_port.h to improved performance.  */
 
     MOV     r0, #0x10000000                         // Load PENDSVSET bit
@@ -84,6 +87,6 @@ _tx_thread_system_return:
     CPSIE   i                                       // Enable interrupts
     MSR     PRIMASK, r1                             // Restore original interrupt posture
 _isr_context:
-    BX      lr                                      // Return to caller 
+    BX      lr                                      // Return to caller
 // }
     .end

@@ -2,6 +2,11 @@
 ;/*                                                                        */
 ;/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
 ;/*                                                                        */
+;/*       This software is licensed under the Microsoft Software License   */
+;/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+;/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+;/*       and in the root directory of this software.                      */
+;/*                                                                        */
 ;/**************************************************************************/
 ;
 ;
@@ -16,15 +21,6 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;   
     IMPORT  _tx_thread_current_ptr
     IMPORT  _tx_thread_execute_ptr
     IMPORT  _tx_timer_time_slice
@@ -32,7 +28,7 @@
     IMPORT  _tx_thread_preempt_disable
     IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     IMPORT  _tx_execution_thread_enter
-    IMPORT  _tx_execution_thread_exit        
+    IMPORT  _tx_execution_thread_exit
     ENDIF
 ;
 ;
@@ -43,7 +39,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                               Cortex-M4/AC5     */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -77,6 +73,9 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -89,7 +88,7 @@ _tx_thread_schedule
 ;       from the PendSV handling routines below. */
 ;
 ;    /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
-;     
+;
     MOV     r0, #0                                  ; Build value for TX_FALSE
     LDR     r2, =_tx_thread_preempt_disable         ; Build address of preempt disable flag
     STR     r0, [r2, #0]                            ; Clear preempt disable flag
@@ -98,14 +97,14 @@ _tx_thread_schedule
 ;
     IF  {TARGET_FPU_VFP} = {TRUE}
     MRS     r0, CONTROL                             ; Pickup current CONTROL register
-    BIC     r0, r0, #4                              ; Clear the FPCA bit 
+    BIC     r0, r0, #4                              ; Clear the FPCA bit
     MSR     CONTROL, r0                             ; Setup new CONTROL register
     ENDIF
 ;
 ;    /* Enable the interrupts */
 ;
     CPSIE   i
-;       
+;
 ;    /* Enter the scheduler for the first time.  */
 ;
     MOV     r0, #0x10000000                         ; Load PENDSVSET bit
@@ -115,21 +114,21 @@ _tx_thread_schedule
     ISB                                             ; Flush pipeline
 ;
 ;    /* Wait here for the PendSV to take place.  */
-;     
+;
 __tx_wait_here
     B       __tx_wait_here                          ; Wait for the PendSV to happen
 ;}
 ;
 ;    /* Generic context switching PendSV handler.  */
-;     
+;
         EXPORT  __tx_PendSVHandler
         EXPORT  PendSV_Handler
-__tx_PendSVHandler  
+__tx_PendSVHandler
 PendSV_Handler
 ;
 ;    /* Get current thread value and new thread pointer.  */
-;       
-__tx_ts_handler 
+;
+__tx_ts_handler
 
     IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 ;
@@ -147,7 +146,7 @@ __tx_ts_handler
     LDR     r1, [r0]                                ; Pickup current thread pointer
 ;
 ;    /* Determine if there is a current thread to finish preserving.  */
-;       
+;
     CBZ     r1, __tx_ts_new                         ; If NULL, skip preservation
 ;
 ;    /* Recover PSP and preserve current thread context.  */
@@ -177,10 +176,10 @@ _skip_vfp_save
 ;    /* Clear the global time-slice.  */
 ;
     STR     r3, [r4]                                ; Clear time-slice
-;       
+;
 ;    /* Executing thread is now completely preserved!!!  */
 ;
-__tx_ts_new 
+__tx_ts_new
 ;
 ;    /* Now we are looking for a new thread to execute!  */
 ;
@@ -195,7 +194,7 @@ __tx_ts_new
 ;
 ;    /* Increment the thread run count.  */
 ;
-__tx_ts_restore 
+__tx_ts_restore
     LDR     r7, [r1, #4]                            ; Pickup the current thread run count
     MOV32   r4, _tx_timer_time_slice                ; Build address of time-slice variable
     LDR     r5, [r1, #24]                           ; Pickup thread's current time-slice
@@ -221,7 +220,7 @@ __tx_ts_restore
     LDMIA   r12!, {LR}                              ; Pickup LR
     IF  {TARGET_FPU_VFP} = {TRUE}
     TST     LR, #0x10                               ; Determine if the VFP extended frame is present
-    BNE     _skip_vfp_restore                       ; If not, skip VFP restore 
+    BNE     _skip_vfp_restore                       ; If not, skip VFP restore
     VLDMIA  r12!, {s16-s31}                         ; Yes, restore additional VFP registers
 _skip_vfp_restore
     ENDIF
@@ -229,14 +228,14 @@ _skip_vfp_restore
     MSR     PSP, r12                                ; Setup the thread's stack pointer
 ;
 ;    /* Return to thread.  */
-;       
+;
         BX      lr                                  ; Return to thread!
 ;
 ;    /* The following is the idle wait processing... in this case, no threads are ready for execution and the
-;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts 
+;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts
 ;       are disabled to allow use of WFI for waiting for a thread to arrive.  */
 ;
-__tx_ts_wait    
+__tx_ts_wait
     CPSID   i                                       ; Disable interrupts
     LDR     r1, [r2]                                ; Pickup the next thread to execute pointer
     STR     r1, [r0]                                ; Store it in the current pointer
@@ -249,16 +248,16 @@ __tx_ts_wait
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_wait                            ; Loop to continue waiting
 ;
-;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are 
+;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are
 ;       already in the handler!  */
 ;
-__tx_ts_ready   
+__tx_ts_ready
     MOV     r7, #0x08000000                         ; Build clear PendSV value
     MOV     r8, #0xE000E000                         ; Build base NVIC address
-    STR     r7, [r8, #0xD04]                        ; Clear any PendSV 
+    STR     r7, [r8, #0xD04]                        ; Clear any PendSV
 ;
 ;    /* Re-enable interrupts and restore new thread.  */
-;       
+;
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_restore                         ; Restore the thread
 
@@ -266,7 +265,7 @@ __tx_ts_ready
     EXPORT  tx_thread_fpu_enable
 tx_thread_fpu_enable
 ;
-;    /* Automatic VPF logic is supported, this function is present only for 
+;    /* Automatic VPF logic is supported, this function is present only for
 ;       backward compatibility purposes and therefore simply returns.  */
 ;
     BX      LR                                      ; Return to caller
@@ -274,7 +273,7 @@ tx_thread_fpu_enable
     EXPORT  tx_thread_fpu_disable
 tx_thread_fpu_disable
 ;
-;    /* Automatic VPF logic is supported, this function is present only for 
+;    /* Automatic VPF logic is supported, this function is present only for
 ;       backward compatibility purposes and therefore simply returns.  */
 ;
     BX      LR                                      ; Return to caller
@@ -290,4 +289,3 @@ _tx_vfp_access
     ALIGN
     LTORG
     END
-    

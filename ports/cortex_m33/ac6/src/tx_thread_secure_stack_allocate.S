@@ -26,7 +26,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_allocate                  Cortex-M33/AC6    */
-/*                                                           6.0.1        */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -58,6 +58,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+/*                                            whitespace, resulting       */
+/*                                            in version 6.0.2            */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_secure_stack_allocate(TX_THREAD *thread_ptr, ULONG stack_size)

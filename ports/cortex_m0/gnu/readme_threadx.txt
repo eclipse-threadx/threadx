@@ -145,6 +145,12 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
+08-14-2020  ThreadX update of Cortex-M0/GNU port. The following files were 
+            changed/added for port specific version 6.0.2:
+
+            tx_initialize_low_level.S       Comment out DWT code.
+            *.S                             Modified comments and whitespace.
+
 05/19/2020  Initial ThreadX 6.0 version for Cortex-M0 using GNU tools.
 
 

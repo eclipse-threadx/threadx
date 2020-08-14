@@ -2,6 +2,11 @@
 ;/*                                                                        */
 ;/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
 ;/*                                                                        */
+;/*       This software is licensed under the Microsoft Software License   */
+;/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+;/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+;/*       and in the root directory of this software.                      */
+;/*                                                                        */
 ;/**************************************************************************/
 ;
 ;
@@ -15,14 +20,6 @@
 ;/**************************************************************************/
 ;/**************************************************************************/
 ;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;
 ;
     AREA ||.text||, CODE, READONLY
 ;/**************************************************************************/
@@ -30,7 +27,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_interrupt_restore                      Cortex-M4/AC5     */
-;/*                                                           6.0.1        */
+;/*                                                           6.0.2        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation.                            */
@@ -61,6 +58,9 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
+;/*                                            whitespace, resulting       */
+;/*                                            in version 6.0.2            */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_interrupt_restore(UINT new_posture)
