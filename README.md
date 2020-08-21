@@ -102,7 +102,7 @@ Professional support plans (https://azure.microsoft.com/en-us/support/options/) 
 The following are references to additional Azure RTOS and Azure IoT in general:
 |   |   |
 |---|---|
-| TraceX Installer | azrtos-tracex-installer |
+| TraceX Installer | https://azrtos-tracex-installer |
 | Azure RTOS Documenation and Guides: | https://docs.microsoft.com/azure/rtos |
 | Azure RTOS Website: | https://azure.microsoft.com/services/rtos/ |
 | Azure RTOS Sales Questions: | https://azure-rtos.ms-iot-contact.com/ |
