@@ -1,6 +1,6 @@
 LICENSED HARDWARE LIST
 
-Last Updated: 2020-05-08
+Last Updated: 2020-09-10
 
 Microsoft has entered into OEM Agreements with manufacturers of the following
 microprocessors and microcontrollers (the “hardware”) to enable those
@@ -10,6 +10,11 @@ microcontroller(s) (“hardware”) listed below you inherit the “Distribution
 Production Use” rights in Section 2 of the Microsoft Software License Terms for
 Microsoft Azure RTOS. If hardware is not listed below, you do not have those
 rights.
+
+Renesas 
+Synergy Platform
+RX Family of MCUs
+RZ Family of MPUs
 
 --------------------------------------------------------------------------------
 
