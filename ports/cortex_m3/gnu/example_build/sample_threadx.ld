@@ -15,24 +15,24 @@ MEMORY
 
 SECTIONS
 {
-  __CM3_System_Control_Space_segment_start__ = 0xe000e000;
-  __CM3_System_Control_Space_segment_end__ = 0xe000f000;
-  __AHB_Peripherals_segment_start__ = 0x50000000;
-  __AHB_Peripherals_segment_end__ = 0x50200000;
-  __APB1_Peripherals_segment_start__ = 0x40080000;
-  __APB1_Peripherals_segment_end__ = 0x40100000;
-  __APB0_Peripherals_segment_start__ = 0x40000000;
-  __APB0_Peripherals_segment_end__ = 0x40080000;
-  __GPIO_segment_start__ = 0x2009c000;
-  __GPIO_segment_end__ = 0x200a0000;
-  __AHBSRAM1_segment_start__ = 0x20080000;
-  __AHBSRAM1_segment_end__ = 0x20084000;
-  __AHBSRAM0_segment_start__ = 0x2007c000;
-  __AHBSRAM0_segment_end__ = 0x20080000;
-  __RAM_segment_start__ = 0x10000000;
-  __RAM_segment_end__ = 0x10008000;
-  __FLASH_segment_start__ = 0x00000000;
-  __FLASH_segment_end__ = 0x00080000;
+  __CM3_System_Control_Space_segment_start__ = ORIGIN(CM3_System_Control_Space);
+  __CM3_System_Control_Space_segment_end__ = ORIGIN(CM3_System_Control_Space) + LENGTH(CM3_System_Control_Space);
+  __AHB_Peripherals_segment_start__ = ORIGIN(AHB_Peripherals);
+  __AHB_Peripherals_segment_end__ = ORIGIN(AHB_Peripherals) + LENGTH(AHB_Peripherals);
+  __APB1_Peripherals_segment_start__ = ORIGIN(APB1_Peripherals);
+  __APB1_Peripherals_segment_end__ = ORIGIN(APB1_Peripherals) + LENGTH(APB1_Peripherals);
+  __APB0_Peripherals_segment_start__ = ORIGIN(APB0_Peripherals);
+  __APB0_Peripherals_segment_end__ = ORIGIN(APB0_Peripherals) + LENGTH(APB0_Peripherals);
+  __GPIO_segment_start__ = ORIGIN(GPIO);
+  __GPIO_segment_end__ = ORIGIN(GPIO) + LENGTH(GPIO);
+  __AHBSRAM1_segment_start__ = ORIGIN(AHBSRAM1);
+  __AHBSRAM1_segment_end__ = ORIGIN(AHBSRAM1) + LENGTH(AHBSRAM1);
+  __AHBSRAM0_segment_start__ = ORIGIN(AHBSRAM0);
+  __AHBSRAM0_segment_end__ = ORIGIN(AHBSRAM0) + LENGTH(AHBSRAM0);
+  __RAM_segment_start__ = ORIGIN(RAM);
+  __RAM_segment_end__ = ORIGIN(RAM) + LENGTH(RAM);
+  __FLASH_segment_start__ = ORIGIN(FLASH);
+  __FLASH_segment_end__ = ORIGIN(FLASH) + LENGTH(FLASH);
 
   __STACKSIZE__ = 1024;
   __STACKSIZE_PROCESS__ = 0;
@@ -51,7 +51,7 @@ SECTIONS
   }
   __vectors_end__ = __vectors_start__ + SIZEOF(.vectors);
 
-  . = ASSERT(__vectors_end__ >= __FLASH_segment_start__ && __vectors_end__ <= (__FLASH_segment_start__ + 0x00080000) , "error: .vectors is too large to fit in FLASH memory segment");
+  . = ASSERT(__vectors_end__ >= __FLASH_segment_start__ && __vectors_end__ <= __FLASH_segment_end__ , "error: .vectors is too large to fit in FLASH memory segment");
 
   __init_load_start__ = ALIGN(__vectors_end__ , 4);
   .init ALIGN(__vectors_end__ , 4) : AT(ALIGN(__vectors_end__ , 4))
@@ -61,7 +61,7 @@ SECTIONS
   }
   __init_end__ = __init_start__ + SIZEOF(.init);
 
-  . = ASSERT(__init_end__ >= __FLASH_segment_start__ && __init_end__ <= (__FLASH_segment_start__ + 0x00080000) , "error: .init is too large to fit in FLASH memory segment");
+  . = ASSERT(__init_end__ >= __FLASH_segment_start__ && __init_end__ <= __FLASH_segment_end__ , "error: .init is too large to fit in FLASH memory segment");
 
   __text_load_start__ = ALIGN(__init_end__ , 4);
   .text ALIGN(__init_end__ , 4) : AT(ALIGN(__init_end__ , 4))
@@ -71,7 +71,7 @@ SECTIONS
   }
   __text_end__ = __text_start__ + SIZEOF(.text);
 
-  . = ASSERT(__text_end__ >= __FLASH_segment_start__ && __text_end__ <= (__FLASH_segment_start__ + 0x00080000) , "error: .text is too large to fit in FLASH memory segment");
+  . = ASSERT(__text_end__ >= __FLASH_segment_start__ && __text_end__ <= __FLASH_segment_end__ , "error: .text is too large to fit in FLASH memory segment");
 
   __dtors_load_start__ = ALIGN(__text_end__ , 4);
   .dtors ALIGN(__text_end__ , 4) : AT(ALIGN(__text_end__ , 4))
@@ -81,7 +81,7 @@ SECTIONS
   }
   __dtors_end__ = __dtors_start__ + SIZEOF(.dtors);
 
-  . = ASSERT(__dtors_end__ >= __FLASH_segment_start__ && __dtors_end__ <= (__FLASH_segment_start__ + 0x00080000) , "error: .dtors is too large to fit in FLASH memory segment");
+  . = ASSERT(__dtors_end__ >= __FLASH_segment_start__ && __dtors_end__ <= __FLASH_segment_end__ , "error: .dtors is too large to fit in FLASH memory segment");
 
   __ctors_load_start__ = ALIGN(__dtors_end__ , 4);
   .ctors ALIGN(__dtors_end__ , 4) : AT(ALIGN(__dtors_end__ , 4))
@@ -91,7 +91,7 @@ SECTIONS
   }
   __ctors_end__ = __ctors_start__ + SIZEOF(.ctors);
 
-  . = ASSERT(__ctors_end__ >= __FLASH_segment_start__ && __ctors_end__ <= (__FLASH_segment_start__ + 0x00080000) , "error: .ctors is too large to fit in FLASH memory segment");
+  . = ASSERT(__ctors_end__ >= __FLASH_segment_start__ && __ctors_end__ <= __FLASH_segment_end__ , "error: .ctors is too large to fit in FLASH memory segment");
 
   __rodata_load_start__ = ALIGN(__ctors_end__ , 4);
   .rodata ALIGN(__ctors_end__ , 4) : AT(ALIGN(__ctors_end__ , 4))
@@ -101,7 +101,7 @@ SECTIONS
   }
   __rodata_end__ = __rodata_start__ + SIZEOF(.rodata);
 
-  . = ASSERT(__rodata_end__ >= __FLASH_segment_start__ && __rodata_end__ <= (__FLASH_segment_start__ + 0x00080000) , "error: .rodata is too large to fit in FLASH memory segment");
+  . = ASSERT(__rodata_end__ >= __FLASH_segment_start__ && __rodata_end__ <= __FLASH_segment_end__ , "error: .rodata is too large to fit in FLASH memory segment");
 
   __fast_load_start__ = ALIGN(__rodata_end__ , 4);
   .fast ALIGN(__RAM_segment_start__ , 4) : AT(ALIGN(__rodata_end__ , 4))
@@ -113,7 +113,7 @@ SECTIONS
 
   __fast_load_end__ = __fast_load_start__ + SIZEOF(.fast);
 
-  . = ASSERT((__fast_load_start__ + SIZEOF(.fast)) >= __FLASH_segment_start__ && (__fast_load_start__ + SIZEOF(.fast)) <= (__FLASH_segment_start__ + 0x00080000) , "error: .fast is too large to fit in FLASH memory segment");
+  . = ASSERT((__fast_load_start__ + SIZEOF(.fast)) >= __FLASH_segment_start__ && (__fast_load_start__ + SIZEOF(.fast)) <= __FLASH_segment_end__ , "error: .fast is too large to fit in FLASH memory segment");
 
   .fast_run ALIGN(__RAM_segment_start__ , 4) (NOLOAD) :
   {
@@ -122,7 +122,7 @@ SECTIONS
   }
   __fast_run_end__ = __fast_run_start__ + SIZEOF(.fast_run);
 
-  . = ASSERT(__fast_run_end__ >= __RAM_segment_start__ && __fast_run_end__ <= (__RAM_segment_start__ + 0x00008000) , "error: .fast_run is too large to fit in RAM memory segment");
+  . = ASSERT(__fast_run_end__ >= __RAM_segment_start__ && __fast_run_end__ <= __RAM_segment_end__ , "error: .fast_run is too large to fit in RAM memory segment");
 
   __data_load_start__ = ALIGN(__fast_load_start__ + SIZEOF(.fast) , 4);
   .data ALIGN(__fast_run_end__ , 4) : AT(ALIGN(__fast_load_start__ + SIZEOF(.fast) , 4))
@@ -136,7 +136,7 @@ SECTIONS
 
   __FLASH_segment_used_end__ = ALIGN(__fast_load_start__ + SIZEOF(.fast) , 4) + SIZEOF(.data);
 
-  . = ASSERT((__data_load_start__ + SIZEOF(.data)) >= __FLASH_segment_start__ && (__data_load_start__ + SIZEOF(.data)) <= (__FLASH_segment_start__ + 0x00080000) , "error: .data is too large to fit in FLASH memory segment");
+  . = ASSERT((__data_load_start__ + SIZEOF(.data)) >= __FLASH_segment_start__ && (__data_load_start__ + SIZEOF(.data)) <= __FLASH_segment_end__ , "error: .data is too large to fit in FLASH memory segment");
 
   .data_run ALIGN(__fast_run_end__ , 4) (NOLOAD) :
   {
@@ -145,7 +145,7 @@ SECTIONS
   }
   __data_run_end__ = __data_run_start__ + SIZEOF(.data_run);
 
-  . = ASSERT(__data_run_end__ >= __RAM_segment_start__ && __data_run_end__ <= (__RAM_segment_start__ + 0x00008000) , "error: .data_run is too large to fit in RAM memory segment");
+  . = ASSERT(__data_run_end__ >= __RAM_segment_start__ && __data_run_end__ <= __RAM_segment_end__ , "error: .data_run is too large to fit in RAM memory segment");
 
   __bss_load_start__ = ALIGN(__data_run_end__ , 4);
   .bss ALIGN(__data_run_end__ , 4) (NOLOAD) : AT(ALIGN(__data_run_end__ , 4))
@@ -155,7 +155,7 @@ SECTIONS
   }
   __bss_end__ = __bss_start__ + SIZEOF(.bss);
 
-  . = ASSERT(__bss_end__ >= __RAM_segment_start__ && __bss_end__ <= (__RAM_segment_start__ + 0x00008000) , "error: .bss is too large to fit in RAM memory segment");
+  . = ASSERT(__bss_end__ >= __RAM_segment_start__ && __bss_end__ <= __RAM_segment_end__ , "error: .bss is too large to fit in RAM memory segment");
 
   __non_init_load_start__ = ALIGN(__bss_end__ , 4);
   .non_init ALIGN(__bss_end__ , 4) (NOLOAD) : AT(ALIGN(__bss_end__ , 4))
@@ -165,7 +165,7 @@ SECTIONS
   }
   __non_init_end__ = __non_init_start__ + SIZEOF(.non_init);
 
-  . = ASSERT(__non_init_end__ >= __RAM_segment_start__ && __non_init_end__ <= (__RAM_segment_start__ + 0x00008000) , "error: .non_init is too large to fit in RAM memory segment");
+  . = ASSERT(__non_init_end__ >= __RAM_segment_start__ && __non_init_end__ <= __RAM_segment_end__ , "error: .non_init is too large to fit in RAM memory segment");
 
   __heap_load_start__ = ALIGN(__non_init_end__ , 4);
   .heap ALIGN(__non_init_end__ , 4) (NOLOAD) : AT(ALIGN(__non_init_end__ , 4))
@@ -176,7 +176,7 @@ SECTIONS
   }
   __heap_end__ = __heap_start__ + SIZEOF(.heap);
 
-  . = ASSERT(__heap_end__ >= __RAM_segment_start__ && __heap_end__ <= (__RAM_segment_start__ + 0x00008000) , "error: .heap is too large to fit in RAM memory segment");
+  . = ASSERT(__heap_end__ >= __RAM_segment_start__ && __heap_end__ <= __RAM_segment_end__ , "error: .heap is too large to fit in RAM memory segment");
 
   __stack_load_start__ = ALIGN(__heap_end__ , 4);
   .stack ALIGN(__heap_end__ , 4) (NOLOAD) : AT(ALIGN(__heap_end__ , 4))
@@ -187,7 +187,7 @@ SECTIONS
   }
   __stack_end__ = __stack_start__ + SIZEOF(.stack);
 
-  . = ASSERT(__stack_end__ >= __RAM_segment_start__ && __stack_end__ <= (__RAM_segment_start__ + 0x00008000) , "error: .stack is too large to fit in RAM memory segment");
+  . = ASSERT(__stack_end__ >= __RAM_segment_start__ && __stack_end__ <= __RAM_segment_end__ , "error: .stack is too large to fit in RAM memory segment");
 
   __stack_process_load_start__ = ALIGN(__stack_end__ , 4);
   .stack_process ALIGN(__stack_end__ , 4) (NOLOAD) : AT(ALIGN(__stack_end__ , 4))
@@ -200,7 +200,7 @@ SECTIONS
 
   __RAM_segment_used_end__ = ALIGN(__stack_end__ , 4) + SIZEOF(.stack_process);
 
-  . = ASSERT(__stack_process_end__ >= __RAM_segment_start__ && __stack_process_end__ <= (__RAM_segment_start__ + 0x00008000) , "error: .stack_process is too large to fit in RAM memory segment");
+  . = ASSERT(__stack_process_end__ >= __RAM_segment_start__ && __stack_process_end__ <= __RAM_segment_end__ , "error: .stack_process is too large to fit in RAM memory segment");
 
 }
 
