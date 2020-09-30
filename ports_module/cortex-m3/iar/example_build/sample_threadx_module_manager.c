@@ -14,7 +14,7 @@ TXM_MODULE_INSTANCE     my_module;
 
 /* Define the object pool area.  */
 
-UCHAR                   object_memory[8192];
+UCHAR                   object_memory[16384];
 
 
 /* Define the count of memory faults.  */

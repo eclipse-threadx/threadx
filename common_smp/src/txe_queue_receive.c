@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _txe_queue_receive                                  PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -72,7 +72,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txe_queue_receive(TX_QUEUE *queue_ptr, VOID *destination_ptr, ULONG wait_option)

@@ -43,7 +43,7 @@ CPSR_MASK       DEFINE  0x9F                    ; Mask initial CPSR, IRQ ints en
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_stack_build                             Cortex-A5/IAR    */ 
-;/*                                                           6.0.1        */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -75,7 +75,7 @@ CPSR_MASK       DEFINE  0x9F                    ; Mask initial CPSR, IRQ ints en
 ;/*                                                                        */ 
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))

@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.50.1.24770</state>
+                    <state>8.50.4.26131</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -349,9 +349,9 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>../inc</state>
-                    <state>../../../../common/inc</state>
-                    <state>../../../../common_modules//inc</state>
+                    <state>$PROJ_DIR$\..\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common_modules\inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1007,7 +1007,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>sample_threadx_module_import_lib.o</state>
+                    <state>###Unitialized###</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>

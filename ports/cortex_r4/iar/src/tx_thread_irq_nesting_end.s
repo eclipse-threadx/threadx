@@ -39,7 +39,7 @@ IRQ_MODE        DEFINE  0x12                    ; IRQ mode
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_irq_nesting_end                         Cortex-R4/IAR    */ 
-;/*                                                           6.0.1        */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -78,7 +78,7 @@ IRQ_MODE        DEFINE  0x12                    ; IRQ mode
 ;/*                                                                        */ 
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_irq_nesting_end(VOID)

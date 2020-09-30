@@ -10,70 +10,57 @@
 ;/**************************************************************************/
 ;
 ;
-;/**************************************************************************/ 
-;/**************************************************************************/ 
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
-;/**                                                                       */ 
-;/**   Module                                                              */ 
-;/**                                                                       */ 
-;/**************************************************************************/ 
-;/**************************************************************************/ 
-;
-;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-
-#include "txm_module_port.h"
-
+;/**************************************************************************/
+;/**************************************************************************/
+;/**                                                                       */
+;/** ThreadX Component                                                     */
+;/**                                                                       */
+;/**   Module                                                              */
+;/**                                                                       */
+;/**************************************************************************/
+;/**************************************************************************/
 ;
 ;
     IMPORT      __use_two_region_memory
     IMPORT      __scatterload
     IMPORT      txm_heap
-    
-    
+
     AREA ||.text||, CODE, READONLY
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _txm_module_initialize                          Cortex-M7/MPU/AC5   */ 
-;/*                                                           6.0.1        */
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _txm_module_initialize                          Cortex-M7/MPU/AC5   */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function initializes the module c runtime.                     */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    __scatterload                         Initialize C runtime          */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _txm_module_thread_shell_entry        Start module thread           */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function initializes the module c runtime.                     */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    __scatterload                         Initialize C runtime          */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _txm_module_thread_shell_entry        Start module thread           */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+;/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _txm_module_initialize(VOID)
@@ -81,7 +68,7 @@
     EXPORT  _txm_module_initialize
 _txm_module_initialize
     PUSH    {r4-r12,lr}                         ; Save dregs and LR
-    
+
     B       __scatterload                       ; Call ARM func to initialize variables
 
 ;
@@ -89,7 +76,7 @@ _txm_module_initialize
 ;
     EXPORT  __rt_exit
 __rt_exit
-    
+
     POP     {r4-r12,lr}                         ; Restore dregs and LR
     BX      lr                                  ; Return to caller
 ;
@@ -106,12 +93,12 @@ __user_setup_stackheap
     MOV     r2, #TXM_MODULE_HEAP_SIZE           ; load heap size
     ADD     r2, r2, r0                          ; calculate heap end address
     BX      lr
-    
+
     ALIGN 4
 _tx_heap_offset
     DCDO        txm_heap
     AREA ||.arm_vfe_header||, DATA, READONLY, NOALLOC, ALIGN=2
-    
+
     IMPORT txm_heap [DATA]
 
 ;
@@ -121,6 +108,5 @@ _tx_heap_offset
     EXPORT main
 main
     BX lr
-    
-    END
 
+    END

@@ -60,7 +60,7 @@ extern UINT  _txm_module_manager_usbx_stop(TXM_MODULE_INSTANCE *module_instance)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_stop                            PORTABLE C      */
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -108,7 +108,7 @@ extern UINT  _txm_module_manager_usbx_stop(TXM_MODULE_INSTANCE *module_instance)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_stop(TXM_MODULE_INSTANCE *module_instance)

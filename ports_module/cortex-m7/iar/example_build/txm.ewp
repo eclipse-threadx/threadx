@@ -349,9 +349,9 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>../inc</state>
-                    <state>../../../../common/inc</state>
-                    <state>../../../../common_modules/inc</state>
+                    <state>$PROJ_DIR$\..\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common_modules\inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1048,7 +1048,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports_module\cortex-m7\iar\example_build\Debug\Exe\txm.a</state>
+                    <state></state>
                 </option>
             </data>
         </settings>
@@ -2165,13 +2165,13 @@
             <name>$PROJ_DIR$\..\..\..\..\common\inc\tx_user_sample.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common_modules\txm_module.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\common_modules\inc\txm_module.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\module_common\inc\txm_module_port.h</name>
+            <name>$PROJ_DIR$\..\inc\txm_module_port.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common_modules\module_common\inc\txm_module_user.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\common_modules\inc\txm_module_user.h</name>
         </file>
     </group>
     <group>

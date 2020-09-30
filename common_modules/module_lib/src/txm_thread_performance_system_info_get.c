@@ -28,7 +28,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_performance_system_info_get              PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -83,7 +83,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT _tx_thread_performance_system_info_get(ULONG *resumptions, ULONG *suspensions, ULONG *solicited_preemptions, ULONG *interrupt_preemptions, ULONG *priority_inversions, ULONG *time_slices, ULONG *relinquishes, ULONG *timeouts, ULONG *wait_aborts, ULONG *non_idle_returns, ULONG *idle_returns)

@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.50.1.24770</state>
+                    <state>8.50.4.26131</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -349,11 +349,11 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>../inc</state>
-                    <state>../module_manager/inc</state>
-                    <state>../../../../common/inc</state>
-                    <state>../../../../common_modules/inc</state>
-                    <state>../../../../common_modules/module_manager/inc</state>
+                    <state>$PROJ_DIR$\..\inc</state>
+                    <state>$PROJ_DIR$\..\module_manager\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common_modules\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common_modules\module_manager\inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1050,7 +1050,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports_module\cortex-m4\iar\example_build\Debug\Exe\tx.a</state>
+                    <state></state>
                 </option>
             </data>
         </settings>
@@ -1176,7 +1176,7 @@
                 </option>
                 <option>
                     <name>RTConfigPath2</name>
-                    <state>dl-stnl0.a</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
@@ -2146,7 +2146,7 @@
             <name>$PROJ_DIR$\..\..\..\..\common\inc\tx_mutex.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\module_common\inc\tx_port.h</name>
+            <name>$PROJ_DIR$\..\inc\tx_port.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\common\inc\tx_queue.h</name>
@@ -2167,7 +2167,7 @@
             <name>$PROJ_DIR$\..\..\..\..\common\inc\tx_user_sample.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common_modules\module_common\inc\txm_module.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\common_modules\inc\txm_module.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\common_modules\module_manager\inc\txm_module_manager_dispatch.h</name>
@@ -2176,10 +2176,10 @@
             <name>$PROJ_DIR$\..\..\..\..\common_modules\module_manager\inc\txm_module_manager_util.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\module_common\inc\txm_module_port.h</name>
+            <name>$PROJ_DIR$\..\inc\txm_module_port.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common_modules\module_common\inc\txm_module_user.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\common_modules\inc\txm_module_user.h</name>
         </file>
     </group>
     <group>

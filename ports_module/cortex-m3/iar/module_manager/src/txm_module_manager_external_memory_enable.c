@@ -10,15 +10,15 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Manager                                                      */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Manager                                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 #define TX_SOURCE_CODE
 
@@ -29,52 +29,53 @@
 #include "txm_module.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_external_memory_enable      Cortex-M3/MPU/IAR   */ 
-/*                                                           6.0.1        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_external_memory_enable      Cortex-M3/MPU/IAR   */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function creates an entry in the MPU table for a shared        */ 
-/*    memory space.                                                       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    module_instance                   Module instance pointer           */ 
-/*    start_address                     Start address of memory           */ 
-/*    length                            Length of external memory         */ 
-/*    attributes                        Memory attributes (r/w)           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_mutex_get                     Get protection mutex              */ 
-/*    _tx_mutex_put                     Release protection mutex          */ 
-/*    _txm_power_of_two_block_size      Round length to power of two      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function creates an entry in the MPU table for a shared        */
+/*    memory space.                                                       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_instance                   Module instance pointer           */
+/*    start_address                     Start address of memory           */
+/*    length                            Length of external memory         */
+/*    attributes                        Memory attributes (r/w)           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_mutex_get                     Get protection mutex              */
+/*    _tx_mutex_put                     Release protection mutex          */
+/*    _txm_power_of_two_block_size      Round length to power of two      */
+/*    _txm_module_manager_mm_register_setup    Reconfigure MPU registers  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txm_module_manager_external_memory_enable(TXM_MODULE_INSTANCE *module_instance, 
-                                                 VOID *start_address, 
-                                                 ULONG length, 
+UINT  _txm_module_manager_external_memory_enable(TXM_MODULE_INSTANCE *module_instance,
+                                                 VOID *start_address,
+                                                 ULONG length,
                                                  UINT attributes)
 {
 
@@ -88,15 +89,13 @@ TXM_MODULE_PREAMBLE     *module_preamble;
     /* Determine if the module manager has not been initialized yet.  */
     if (_txm_module_manager_ready != TX_TRUE)
     {
-    
         /* Module manager has not been initialized.  */
-        return(TX_NOT_AVAILABLE); 
+        return(TX_NOT_AVAILABLE);
     }
 
     /* Determine if the module is valid.  */
     if (module_instance == TX_NULL)
     {
-    
         /* Invalid module pointer.  */
         return(TX_PTR_ERROR);
     }
@@ -107,7 +106,6 @@ TXM_MODULE_PREAMBLE     *module_preamble;
     /* Determine if the module instance is valid.  */
     if (module_instance -> txm_module_instance_id != TXM_MODULE_ID)
     {
-
         /* Release the protection mutex.  */
         _tx_mutex_put(&_txm_module_manager_mutex);
 
@@ -118,7 +116,6 @@ TXM_MODULE_PREAMBLE     *module_preamble;
     /* Determine if the module instance is in the loaded state.  */
     if (module_instance -> txm_module_instance_state != TXM_MODULE_LOADED)
     {
-    
         /* Release the protection mutex.  */
         _tx_mutex_put(&_txm_module_manager_mutex);
 
@@ -138,7 +135,7 @@ TXM_MODULE_PREAMBLE     *module_preamble;
         return(TXM_MODULE_INVALID_PROPERTIES);
     }
     
-    /* Start address and length must adhere to Cortex-M MPU. 
+    /* Start address and length must adhere to Cortex-M MPU.
        The address must align with the block size.  */
     
     block_size = _txm_power_of_two_block_size(length);
@@ -183,4 +180,3 @@ TXM_MODULE_PREAMBLE     *module_preamble;
     /* Return success.  */
     return(TX_SUCCESS);
 }
-

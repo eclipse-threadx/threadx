@@ -40,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_smp_core_preempt                      Cortex-A5x-SMP/AC6 */  
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -73,15 +73,21 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_core_preempt
     .type    _tx_thread_smp_core_preempt, @function
 _tx_thread_smp_core_preempt:
     DSB ISH
+#ifdef TX_ARMV8_2
+    MOV x2, #0x1                                // Build the target list field
+    LSL x3, x0, #16                             // Build the affinity1 field
+    ORR x2, x2, x3                              // Combine the fields
+#else
     MOV x2, #0x1                                //
     LSL x2, x2, x0                              // Shift by the core ID
+#endif
     MSR ICC_SGI1R_EL1, x2                       // Issue inter-core interrupt
     RET
 

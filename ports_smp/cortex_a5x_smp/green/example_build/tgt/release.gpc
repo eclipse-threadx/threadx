@@ -1,0 +1,9 @@
+#!gbuild
+macro __BINDIR=%expand_path(bin/release)
+[Build Configuration]
+	-G
+	-O
+	-object_dir=objs/release
+	:outputDir=objs/release
+	:binDir=${__BINDIR}
+	

@@ -2,6 +2,11 @@
 ;/*                                                                        */
 ;/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
 ;/*                                                                        */
+;/*       This software is licensed under the Microsoft Software License   */
+;/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+;/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+;/*       and in the root directory of this software.                      */
+;/*                                                                        */
 ;/**************************************************************************/
 ;
 ;
@@ -21,8 +26,8 @@
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
-;/*    _tx_thread_stack_build                            Cortex-M4/AC5     */
-;/*                                                           6.0.1        */
+;/*    _tx_thread_stack_build                            Cortex-M7/AC5     */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -54,7 +59,7 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -62,11 +67,11 @@
     EXPORT  _tx_thread_stack_build
 _tx_thread_stack_build
 ;
-;       
+;
 ;    /* Build a fake interrupt frame.  The form of the fake interrupt stack
-;       on the Cortex-M4 should look like the following after it is built:
-;       
-;       Stack Top:      
+;       on the Cortex-M7 should look like the following after it is built:
+;
+;       Stack Top:
 ;                       LR          Interrupted LR (LR at time of PENDSV)
 ;                       r4          Initial value for r4
 ;                       r5          Initial value for r5
@@ -126,4 +131,3 @@ _tx_thread_stack_build
     BX      lr                                      ; Return to caller
 ;}
     END
-

@@ -349,17 +349,11 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>../inc</state>
-                    <state>../module_manager/inc</state>
-                    <state>../../../../common/inc</state>
+                    <state>$PROJ_DIR$\..\inc</state>
+                    <state>$PROJ_DIR$\..\module_manager\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\common_modules\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\common_modules\module_manager\inc</state>
-                    <state>./libraries/libchip_samv7/include/cmsis/CMSIS/Include</state>
-                    <state>./libraries/libchip_samv7</state>
-                    <state>./libraries/libchip_samv7/include</state>
-                    <state>./libraries/libboard_samv7-ek</state>
-                    <state>./libraries/libboard_samv7-ek/include</state>
-                    <state>./libraries/</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -663,7 +657,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>sample_threadx_module_manager_stm32f4xx.srec</state>
+                    <state>sample_threadx_module_manager.srec</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -718,7 +712,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>sample_threadx_module_manager_stm32f4xx.out</state>
+                    <state>sample_threadx_module_manager.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>

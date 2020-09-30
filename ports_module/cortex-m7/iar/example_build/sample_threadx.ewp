@@ -349,11 +349,8 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>../inc</state>
-                    <state>../module_manager/inc</state>
-                    <state>../../../../common/inc</state>
-                    <state>../../../../modules/module_common/inc</state>
-                    <state>../../../../modules/module_manager/inc</state>
+                    <state>$PROJ_DIR$\..\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common\inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1176,7 +1173,7 @@
                 </option>
                 <option>
                     <name>RTConfigPath2</name>
-                    <state>dl-stnl0.a</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>GBECoreSlave</name>

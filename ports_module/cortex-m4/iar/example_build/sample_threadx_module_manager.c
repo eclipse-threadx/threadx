@@ -40,7 +40,6 @@ VOID module_fault_handler(TX_THREAD *thread, TXM_MODULE_INSTANCE *module)
 
 int main()
 {
-
     /* Enter the ThreadX kernel.  */
     tx_kernel_enter();
 }
@@ -103,7 +102,6 @@ void    module_manager_entry(ULONG thread_input)
     /* Now just spin...  */
     while(1)
     {
-    
         tx_thread_sleep(100);
     }
 }

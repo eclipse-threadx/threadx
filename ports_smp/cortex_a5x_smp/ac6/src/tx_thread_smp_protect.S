@@ -44,7 +44,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_smp_protect                           Cortex-A5x-SMP/AC6 */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -75,7 +75,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_protect
@@ -90,10 +90,17 @@ _tx_thread_smp_protect:
     /* Pickup the CPU ID.   */
 
     MRS     x1, MPIDR_EL1                       // Pickup the core ID
+#ifdef TX_ARMV8_2
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x7, x1, #16, #8                     // Isolate cluster ID
+#endif
+    UBFX    x1, x1, #8, #8                      // Isolate core ID
+#else
 #if TX_THREAD_SMP_CLUSTERS > 1
     UBFX    x7, x1, #8, #8                      // Isolate cluster ID
 #endif
     UBFX    x1, x1, #0, #8                      // Isolate core ID
+#endif
 #if TX_THREAD_SMP_CLUSTERS > 1
     ADDS    x1, x1, x7, LSL #2                  // Calculate CPU ID
 #endif
@@ -248,10 +255,17 @@ _try_to_get_lock:
     /* Pickup the CPU ID.   */
 
     MRS     x1, MPIDR_EL1                       // Pickup the core ID
+#ifdef TX_ARMV8_2
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x7, x1, #16, #8                     // Isolate cluster ID
+#endif
+    UBFX    x1, x1, #8, #8                      // Isolate core ID
+#else
 #if TX_THREAD_SMP_CLUSTERS > 1
     UBFX    x7, x1, #8, #8                      // Isolate cluster ID
 #endif
     UBFX    x1, x1, #0, #8                      // Isolate core ID
+#endif
 #if TX_THREAD_SMP_CLUSTERS > 1
     ADDS    x1, x1, x7, LSL #2                  // Calculate CPU ID
 #endif

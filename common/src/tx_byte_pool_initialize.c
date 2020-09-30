@@ -80,7 +80,6 @@ ULONG            _tx_byte_pool_performance_suspension_count;
 ULONG            _tx_byte_pool_performance_timeout_count;
 
 #endif
-#endif
 
 
 /**************************************************************************/
@@ -88,7 +87,7 @@ ULONG            _tx_byte_pool_performance_timeout_count;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_byte_pool_initialize                            PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -119,6 +118,11 @@ ULONG            _tx_byte_pool_performance_timeout_count;
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            opt out of function when    */
+/*                                            TX_INLINE_INITIALIZATION is */
+/*                                            defined,                    */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_byte_pool_initialize(VOID)
@@ -144,4 +148,4 @@ VOID  _tx_byte_pool_initialize(VOID)
 #endif
 #endif
 }
-
+#endif

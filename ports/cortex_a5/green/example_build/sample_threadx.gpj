@@ -1,0 +1,11 @@
+#!gbuild
+[Program]
+	-I../../../../common/inc
+	-I../../../../ports_common_green/inc
+	-I../inc
+reset.arm
+tx_initialize_low_level.arm
+sample_threadx.c
+tx.a
+sample_threadx.ld
+sample_threadx.con

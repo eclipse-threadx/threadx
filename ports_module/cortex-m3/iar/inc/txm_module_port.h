@@ -10,44 +10,55 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module                                                              */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module                                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
-/*                                                                        */ 
-/*    txm_module_port.h                               Cortex-M3/MPU/IAR   */ 
-/*                                                           6.0.1        */
+/**************************************************************************/
+/*                                                                        */
+/*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
+/*                                                                        */
+/*    txm_module_port.h                               Cortex-M3/MPU/IAR   */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This file defines the basic module constants, interface structures, */ 
-/*    and function prototypes.                                            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This file defines the basic module constants, interface structures, */
+/*    and function prototypes.                                            */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef TXM_MODULE_PORT_H
 #define TXM_MODULE_PORT_H
 
-/* It is assumed that the base ThreadX tx_port.h file has been modified to add the 
+/* Determine if the optional Modules user define file should be used.  */
+
+#ifdef TXM_MODULE_INCLUDE_USER_DEFINE_FILE
+
+
+/* Yes, include the user defines in txm_module_user.h. The defines in this file may
+   alternately be defined on the command line.  */
+
+#include "txm_module_user.h"
+#endif
+
+/* It is assumed that the base ThreadX tx_port.h file has been modified to add the
   following extensions to the ThreadX thread control block (this code should replace
   the corresponding macro define in tx_port.h):
 
@@ -81,22 +92,10 @@ The following extensions must also be defined in tx_port.h:
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 */
 
-#define TXM_MODULE_THREAD_ENTRY_INFO_USER_EXTENSION 
-
-/**************************************************************************/ 
-/* User-adjustable constants                                              */ 
-/**************************************************************************/ 
-
 /* Define the kernel stack size for a module thread.  */
 #ifndef TXM_MODULE_KERNEL_STACK_SIZE
 #define TXM_MODULE_KERNEL_STACK_SIZE            512
 #endif
-
-/**************************************************************************/ 
-/* End of user-adjustable constants                                       */ 
-/**************************************************************************/ 
-
-
 
 /* Define constants specific to the tools the module can be built with for this particular modules port.  */
 
@@ -152,7 +151,7 @@ The following extensions must also be defined in tx_port.h:
 
 #define INLINE_DECLARE inline
 
-/* Define the number of MPU entries assigned to the code and data sections. On Cortex-M parts, there can only be 7 total 
+/* Define the number of MPU entries assigned to the code and data sections. On Cortex-M parts, there can only be 7 total
    entries, since ThreadX uses one for access to the kernel dispatch function.  */
 
 #define TXM_MODULE_MANAGER_CODE_MPU_ENTRIES     4
@@ -180,8 +179,9 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
     TX_THREAD           *txm_module_manager_memory_fault_info_thread_ptr;
     VOID                *txm_module_manager_memory_fault_info_code_location;
     ULONG               txm_module_manager_memory_fault_info_shcsr;
-    ULONG               txm_module_manager_memory_fault_info_mmfsr;
+    ULONG               txm_module_manager_memory_fault_info_cfsr;
     ULONG               txm_module_manager_memory_fault_info_mmfar;
+    ULONG               txm_module_manager_memory_fault_info_bfar;
     ULONG               txm_module_manager_memory_fault_info_control;
     ULONG               txm_module_manager_memory_fault_info_sp;
     ULONG               txm_module_manager_memory_fault_info_r0;
@@ -204,10 +204,6 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 
 #define TXM_MODULE_MANAGER_FAULT_INFO                                               \
     TXM_MODULE_MANAGER_MEMORY_FAULT_INFO    _txm_module_manager_memory_fault_info;
-
-/* Define the macro to check the stack available in dispatch.  */
-#define TXM_MODULE_MANAGER_CHECK_STACK_AVAILABLE
-
 
 /* Define the macro to check the code alignment.  */
 
@@ -293,30 +289,16 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 #define TXM_MODULE_MANAGER_MODULE_UNLOAD(module_instance)
 
 
-/* Define the macro to perform port-specific functions when passing pointer to kernel.  */
-/* Determine if the pointer is within the module's data or shared memory.  */
-#define TXM_MODULE_MANAGER_CHECK_DATA_POINTER(module_instance, pointer)                             \
-    if ((pointer < (ULONG) module_instance -> txm_module_instance_data_start) ||                    \
-        ((pointer+sizeof(pointer)) > (ULONG) module_instance -> txm_module_instance_data_end))      \
-    {                                                                                               \
-        if((pointer < module_instance -> txm_module_instance_shared_memory_address) ||              \
-          ((pointer+sizeof(pointer)) > module_instance -> txm_module_instance_shared_memory_address \
-            + module_instance -> txm_module_instance_shared_memory_length))                         \
-        {                                                                                           \
-            return(TXM_MODULE_INVALID_MEMORY);                                                      \
-        }                                                                                           \
-    }
+/* Define the macros to perform port-specific checks when passing pointers to the kernel.  */
 
-/* Define the macro to perform port-specific functions when passing function pointer to kernel.  */
-/* Determine if the pointer is within the module's code memory.  */
-#define TXM_MODULE_MANAGER_CHECK_FUNCTION_POINTER(module_instance, pointer)                         \
-    if (((pointer < sizeof(TXM_MODULE_PREAMBLE) + (ULONG) module_instance -> txm_module_instance_code_start) || \
-        ((pointer+sizeof(pointer)) > (ULONG) module_instance -> txm_module_instance_code_end))      \
-       && (pointer != (ULONG) TX_NULL))                                                             \
-    {                                                                                               \
-        return(TX_PTR_ERROR);                                                                       \
-    }
-
+/* Define macro to make sure object is inside the module's data.  */
+#define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size) \
+    /* Check if it's inside module data.  */ \
+    ((((obj_ptr) >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) && \
+     (((obj_ptr) + (obj_size)) <= ((ALIGN_TYPE) module_instance -> txm_module_instance_data_end + 1))) || \
+    /* Check if it's inside shared memory.  */ \
+     (((obj_ptr) >= (ALIGN_TYPE) module_instance -> txm_module_instance_shared_memory_address) && \
+     (((obj_ptr) + (obj_size)) <= (ALIGN_TYPE) (module_instance -> txm_module_instance_shared_memory_address + module_instance -> txm_module_instance_shared_memory_length))))
 
 
 /* Define some internal prototypes to this module port.  */
@@ -326,21 +308,17 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 #endif
 
 
-#define TXM_MODULE_MANAGER_ADDITIONAL_PROTOTYPES                                                                                    \
+#define TXM_MODULE_MANAGER_ADDITIONAL_PROTOTYPES                                                                                \
 VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble, ULONG *code_size, ULONG *code_alignment, ULONG *data_size, ULONG *data_alignment);   \
-VOID  _txm_module_manager_memory_fault_handler(VOID);                                                                               \
-UINT  _txm_module_manager_memory_fault_notify(VOID (*notify_function)(TX_THREAD *, TXM_MODULE_INSTANCE *));                         \
-VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance);                                                  \
-ULONG _txm_power_of_two_block_size(ULONG size);                                                                                     \
-ULONG _txm_module_manager_calculate_srd_bits(ULONG block_size, ULONG length);                                                       \
-ULONG _txm_module_manager_region_size_get(ULONG block_size);                                                                        \
-UCHAR _txm_module_manager_shared_memory_check_outside(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, UINT obj_size);     \
-UCHAR _txm_module_manager_shared_memory_check_inside(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, UINT obj_size);      \
-UCHAR _txm_module_manager_shared_memory_check_inside_byte(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr);
+VOID  _txm_module_manager_memory_fault_handler(VOID);                                                                           \
+UINT  _txm_module_manager_memory_fault_notify(VOID (*notify_function)(TX_THREAD *, TXM_MODULE_INSTANCE *));                     \
+VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance);                                              \
+ULONG _txm_power_of_two_block_size(ULONG size);                                                                                 \
+ULONG _txm_module_manager_calculate_srd_bits(ULONG block_size, ULONG length);                                                   \
+ULONG _txm_module_manager_region_size_get(ULONG block_size);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M3/MPU/IAR Version 6.0.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M3/MPU/IAR Version 6.1 *";
 
 #endif
-

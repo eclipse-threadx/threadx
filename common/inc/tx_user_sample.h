@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_user.h                                           PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -45,6 +45,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -153,7 +155,7 @@
    processing when not needed. The user will also have to comment out the call to 
    tx_timer_interrupt, which is typically made from assembly language in 
    tx_initialize_low_level. Note: if TX_NO_TIMER is used, the define TX_TIMER_PROCESS_IN_ISR
-   must also be used.  */
+   must also be used and tx_timer_initialize must be removed from ThreadX library.  */
 
 /*
 #define TX_NO_TIMER

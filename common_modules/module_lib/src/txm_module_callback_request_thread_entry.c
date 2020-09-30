@@ -47,7 +47,7 @@ extern TXM_MODULE_THREAD_ENTRY_INFO    *_txm_module_entry_info;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _txm_module_callback_request_thread_entry           PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -79,7 +79,7 @@ extern TXM_MODULE_THREAD_ENTRY_INFO    *_txm_module_entry_info;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_callback_request_thread_entry(ULONG id)

@@ -349,8 +349,8 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>../inc</state>
-                    <state>../../../../common/inc</state>
+                    <state>$PROJ_DIR$\..\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\common_modules\inc</state>
                 </option>
                 <option>
@@ -655,7 +655,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>sample_threadx_module_stm32f4xx.bin</state>
+                    <state>sample_threadx_module.bin</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -1007,7 +1007,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>sample_threadx_module_import_lib.o</state>
+                    <state>###Unitialized###</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>

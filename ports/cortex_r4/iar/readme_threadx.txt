@@ -416,7 +416,7 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
-06/30/2020  Initial ThreadX version 6.0.1 for Cortex-R4 using IAR's ARM tools.
+09-30-2020  Initial ThreadX version 6.1 for Cortex-R4 using IAR's ARM tools.
 
 
 Copyright(c) 1996-2020 Microsoft Corporation

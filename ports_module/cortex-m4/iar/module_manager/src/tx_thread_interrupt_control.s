@@ -20,23 +20,15 @@
 ;/**************************************************************************/
 ;/**************************************************************************/
 ;
-;#define TX_SOURCE_CODE
 ;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;
-;
-        SECTION `.text`:CODE:NOROOT(2)
-        THUMB
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_interrupt_control                      Cortex-M4/IAR     */
-;/*                                                           6.0.1        */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -66,21 +58,17 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;UINT   _tx_thread_interrupt_control(UINT new_posture)
 ;{
     PUBLIC  _tx_thread_interrupt_control
 _tx_thread_interrupt_control:
-;
-;    /* Pickup current interrupt lockout posture.  */
-;
-    MRS     r1, PRIMASK
-    MSR     PRIMASK, r0
-    MOV     r0, r1
-    BX      lr
+    MRS     r1, PRIMASK                         ; Pickup current interrupt lockout
+    MSR     PRIMASK, r0                         ; Apply the new interrupt lockout
+    MOV     r0, r1                              ; Transfer old to return register
+    BX      lr                                  ; Return to caller
 ;
 ;}
     END
-        

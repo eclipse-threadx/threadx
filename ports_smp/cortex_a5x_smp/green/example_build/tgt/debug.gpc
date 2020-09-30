@@ -1,0 +1,8 @@
+#!gbuild
+macro __BINDIR=%expand_path(bin/debug)
+[Build Configuration]
+	-G
+	-Odebug
+	-object_dir=objs/debug
+	:outputDir=objs/debug
+	:binDir=${__BINDIR}

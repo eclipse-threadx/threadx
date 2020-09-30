@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_mutex_cleanup                                   PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -70,7 +70,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_mutex_cleanup(TX_THREAD  *thread_ptr, ULONG suspension_sequence)
@@ -218,7 +218,7 @@ TX_THREAD           *previous_thread;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_mutex_thread_release                            PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -249,7 +249,7 @@ TX_THREAD           *previous_thread;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_mutex_thread_release(TX_THREAD  *thread_ptr)

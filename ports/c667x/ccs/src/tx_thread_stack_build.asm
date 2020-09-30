@@ -40,7 +40,7 @@ ADDRESS_MSK .set    0xFFFFFFF0
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_stack_build                              C667x/TI        */ 
-;/*                                                           6.0          */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -72,7 +72,7 @@ ADDRESS_MSK .set    0xFFFFFFF0
 ;/*                                                                        */ 
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))

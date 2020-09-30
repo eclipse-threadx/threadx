@@ -10,15 +10,15 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Manager                                                      */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Manager                                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 #define TX_SOURCE_CODE
 
@@ -26,42 +26,42 @@
 #include "txm_module.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_power_of_two_block_size                    Cortex-M7/MPU/IAR   */ 
-/*                                                           6.0.1        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_power_of_two_block_size                    Cortex-M7/MPU/IAR   */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function calculates a power of two size at or immediately above*/ 
-/*    the input size and returns it to the caller.                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    size                              Block size                        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    calculated size                   Rounded up to power of two        */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _txm_module_manager_alignment_adjust  Adjust alignment for Cortex-M */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function calculates a power of two size at or immediately above*/
+/*    the input size and returns it to the caller.                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    size                              Block size                        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    calculated size                   Rounded up to power of two        */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _txm_module_manager_alignment_adjust  Adjust alignment for Cortex-M */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_power_of_two_block_size(ULONG size)
@@ -89,52 +89,52 @@ ULONG  _txm_power_of_two_block_size(ULONG size)
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_alignment_adjust            Cortex-M7/MPU/IAR   */ 
-/*                                                           6.0.1        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_alignment_adjust            Cortex-M7/MPU/IAR   */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function adjusts the alignment and size of the code and data   */ 
-/*    section for a given module implementation.                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    module_preamble                   Pointer to module preamble        */ 
-/*    code_size                         Size of the code area (updated)   */ 
-/*    code_alignment                    Code area alignment (updated)     */ 
-/*    data_size                         Size of data area (updated)       */ 
-/*    data_alignment                    Data area alignment (updated)     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _txm_power_of_two_block_size      Calculate power of two size       */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Initial thread stack frame                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function adjusts the alignment and size of the code and data   */
+/*    section for a given module implementation.                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_preamble                   Pointer to module preamble        */
+/*    code_size                         Size of the code area (updated)   */
+/*    code_alignment                    Code area alignment (updated)     */
+/*    data_size                         Size of data area (updated)       */
+/*    data_alignment                    Data area alignment (updated)     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_power_of_two_block_size      Calculate power of two size       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Initial thread stack frame                                          */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
-VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble, 
-                                           ULONG *code_size, 
-                                           ULONG *code_alignment, 
-                                           ULONG *data_size, 
+VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,
+                                           ULONG *code_size,
+                                           ULONG *code_alignment,
+                                           ULONG *data_size,
                                            ULONG *data_alignment)
 {
 
@@ -178,11 +178,8 @@ ULONG   data_size_accum;
     local_data_size =  data_size_accum;
     
     /* Return all the information to the caller.  */
-    *code_size =        local_code_size; 
+    *code_size =        local_code_size;
     *code_alignment =   local_code_alignment;
     *data_size =        local_data_size;
     *data_alignment =   local_data_alignment;
 }
-
-
-

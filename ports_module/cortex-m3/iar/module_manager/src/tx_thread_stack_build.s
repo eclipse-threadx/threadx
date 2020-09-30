@@ -21,14 +21,14 @@
 ;/**************************************************************************/
 ;
 ;
-        SECTION `.text`:CODE:NOROOT(2)
-        THUMB
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_stack_build                            Cortex-M3/IAR     */
-;/*                                                           6.0.1        */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -60,7 +60,7 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -68,11 +68,11 @@
     PUBLIC  _tx_thread_stack_build
 _tx_thread_stack_build:
 ;
-;       
+;
 ;    /* Build a fake interrupt frame.  The form of the fake interrupt stack
 ;       on the Cortex-M should look like the following after it is built:
-;       
-;       Stack Top:      
+;
+;       Stack Top:
 ;                       LR          Interrupted LR (LR at time of PENDSV)
 ;                       r4          Initial value for r4
 ;                       r5          Initial value for r5
@@ -132,4 +132,3 @@ _tx_thread_stack_build:
     BX      lr                                      ; Return to caller
 ;}
     END
-

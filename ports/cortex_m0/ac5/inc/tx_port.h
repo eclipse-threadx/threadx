@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M0/AC5     */
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,7 +47,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 
@@ -318,7 +318,7 @@ unsigned int          was_masked;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M0/AC5 Version 6.0 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M0/AC5 Version 6.1 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

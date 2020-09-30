@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_create                                  PORTABLE SMP     */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -80,7 +80,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ULONG id), ULONG entry_input,
@@ -95,8 +95,8 @@ TX_THREAD               *next_thread;
 TX_THREAD               *previous_thread;
 UCHAR                   *temp_ptr;
 #ifdef TX_ENABLE_STACK_CHECKING
-ULONG                   new_stack_start;
-ULONG                   updated_stack_start;
+ALIGN_TYPE              new_stack_start;
+ALIGN_TYPE              updated_stack_start;
 #endif
 
 
@@ -116,7 +116,7 @@ ULONG                   updated_stack_start;
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
 
     /* Ensure the starting stack address is evenly aligned.  */
-    new_stack_start =  TX_POINTER_TO_ULONG_CONVERT(stack_start);
+    new_stack_start =  TX_POINTER_TO_ALIGN_TYPE_CONVERT(stack_start);
     updated_stack_start =  ((((ULONG) new_stack_start) + ((sizeof(ULONG)) - ((ULONG) 1)) ) & (~((sizeof(ULONG)) - ((ULONG) 1))));
 
     /* Determine if the starting stack address is different.  */
@@ -128,7 +128,7 @@ ULONG                   updated_stack_start;
     }
 
     /* Update the starting stack pointer.  */
-    stack_start =  TX_ULONG_TO_POINTER_CONVERT(updated_stack_start);
+    stack_start =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(updated_stack_start);
 #endif
 
     /* Prepare the thread control block prior to placing it on the created
@@ -266,6 +266,12 @@ ULONG                   updated_stack_start;
 
     /* Log this kernel call.  */
     TX_EL_THREAD_CREATE_INSERT
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+    /* Temporarily disable preemption.  */
+    _tx_thread_preempt_disable++;
+#endif
      
     /* Determine if an automatic start was requested.  If so, call the resume
        thread function and then check for a preemption condition.  */
@@ -281,9 +287,6 @@ ULONG                   updated_stack_start;
         _tx_thread_system_ni_resume(thread_ptr);
 
 #else
-
-        /* Temporarily disable preemption.  */
-        _tx_thread_preempt_disable++;
 
         /* Restore previous interrupt posture.  */
         TX_RESTORE
@@ -335,10 +338,44 @@ ULONG                   updated_stack_start;
             _tx_thread_smp_debug_entry_insert(13, 0, thread_ptr);
 #endif
         } 
-    }
 
-    /* Restore interrupts.  */
-    TX_RESTORE
+#ifndef TX_NOT_INTERRUPTABLE
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+#endif
+    }
+    else
+    {
+
+#ifdef TX_NOT_INTERRUPTABLE
+
+        /* Perform any additional activities for tool or user purpose.  */
+        TX_THREAD_CREATE_EXTENSION(thread_ptr)
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+#else
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+
+        /* Perform any additional activities for tool or user purpose.  */
+        TX_THREAD_CREATE_EXTENSION(thread_ptr)
+
+        /* Disable interrupts.  */
+        TX_DISABLE
+
+        /* Re-enable preemption.  */
+        _tx_thread_preempt_disable--;
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+
+        /* Check for preemption.  */
+        _tx_thread_system_preempt_check();
+#endif
+    }
 
     /* Always return a success.  */
     return(TX_SUCCESS);

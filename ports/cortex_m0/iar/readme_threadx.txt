@@ -148,13 +148,7 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
-08-14-2020  ThreadX update of Cortex-M0/IAR port. The following files were 
-            changed/added for port specific version 6.0.2:
-
-            tx_initialize_low_level.s       Comment out DWT code.
-            *.s                             Modified comments and whitespace.
-
-06/30/2020  Initial ThreadX version 6.0.1 for Cortex-M0 using IAR's ARM tools.
+09-30-2020  Initial ThreadX version 6.1 for Cortex-M0 using IAR's ARM tools.
 
 
 Copyright(c) 1996-2020 Microsoft Corporation

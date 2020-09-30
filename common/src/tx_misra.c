@@ -29,10 +29,11 @@
 /**************************************************************************/
 /**************************************************************************/
 
-#ifdef TX_MISRA_ENABLE
+#ifndef TX_MISRA_ENABLE
+#include "tx_api.h"
+#else
 #define TX_THREAD_INIT
-//CHAR  _tx_version_id[100] =  "Copyright (c) Microsoft Corporation. All rights reserved.  * ThreadX 6.0       MISRA C Compliant *";
-#endif
+//CHAR  _tx_version_id[100] =  "Copyright (c) Microsoft Corporation. All rights reserved.  * ThreadX 6.1       MISRA C Compliant *";
 
 #include "tx_api.h"
 #include "tx_thread.h"
@@ -48,7 +49,7 @@
 /**************************************************************************/
 VOID  _tx_misra_memset(VOID *ptr, UINT value, UINT size)
 {
-    memset(ptr, value, size);
+    memset(ptr, (INT)value, size);
 }
 
 
@@ -92,7 +93,7 @@ ULONG  _tx_misra_uchar_pointer_dif(UCHAR *ptr1, UCHAR *ptr2)
 
 ULONG   value;
     
-    value =  ptr1 - ptr2;
+    value =  (ULONG)(ptr1 - ptr2);
     return(value);
 }
 
@@ -150,7 +151,7 @@ ULONG   _tx_misra_ulong_pointer_dif(ULONG *ptr1, ULONG *ptr2)
 {
 ULONG   value;
     
-    value =  ptr1 - ptr2;
+    value =  (ULONG)(ptr1 - ptr2);
     return(value);
 }
 
@@ -220,7 +221,7 @@ ULONG  _tx_misra_timer_pointer_dif(TX_TIMER_INTERNAL **ptr1, TX_TIMER_INTERNAL *
 
 ULONG   value;
 
-    value =  ptr1 - ptr2;
+    value =  (ULONG)(ptr1 - ptr2);
     return(value);
 }
 
@@ -625,6 +626,7 @@ TX_MUTEX  *_tx_misra_void_to_mutex_pointer_convert(VOID *pointer)
 /**************************************************************************/
 UINT  _tx_misra_status_get(UINT status)
 {
+    (VOID)status;
 
     /* Return a successful status.  */
     return(TX_SUCCESS);
@@ -830,4 +832,5 @@ UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer)
 }
 
 
+#endif
 

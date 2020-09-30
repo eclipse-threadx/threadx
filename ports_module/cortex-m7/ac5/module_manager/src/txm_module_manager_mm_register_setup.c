@@ -10,66 +10,64 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Manager                                                      */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Manager                                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 #define TX_SOURCE_CODE
 
 #include "tx_api.h"
 #include "txm_module.h"
-#include "txm_module_manager_util.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_region_size_get             Cortex-M7/MPU/AC5   */ 
-/*                                                           6.0.1        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_region_size_get             Cortex-M7/MPU/AC5   */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function converts the region size in bytes to the block size   */ 
-/*    for the Cortex-M7 MPU specification.                                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    block_size                        Size of the block in bytes        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    MPU size specification                                              */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _txm_module_manager_mm_register_setup                               */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function converts the region size in bytes to the block size   */
+/*    for the Cortex-M7 MPU specification.                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    block_size                        Size of the block in bytes        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    MPU size specification                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _txm_module_manager_mm_register_setup                               */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_module_manager_region_size_get(ULONG block_size)
 {
 
 ULONG   return_value;
-
 
     /* Process relative to the input block size.  */
     if (block_size == 32)
@@ -140,7 +138,7 @@ ULONG   return_value;
     {
         return_value =  0x14;
     }
-    else 
+    else
     {
         /* Max 4MB MPU pages for modules.  */
         return_value =  0x15;
@@ -150,45 +148,43 @@ ULONG   return_value;
 }
 
 
-
-
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_calculate_srd_bits          Cortex-M7/MPU/AC5   */ 
-/*                                                           6.0.1        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_calculate_srd_bits          Cortex-M7/MPU/AC5   */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function calculates the SRD bits that need to be set to        */ 
-/*    protect "length" bytes in a block.                                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    block_size                        Size of the block in bytes        */ 
-/*    length                            Actual length in bytes            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    SRD bits to be OR'ed with region attribute register.                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _txm_module_manager_mm_register_setup                               */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function calculates the SRD bits that need to be set to        */
+/*    protect "length" bytes in a block.                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    block_size                        Size of the block in bytes        */
+/*    length                            Actual length in bytes            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    SRD bits to be OR'ed with region attribute register.                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _txm_module_manager_mm_register_setup                               */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_module_manager_calculate_srd_bits(ULONG block_size, ULONG length)
@@ -230,62 +226,61 @@ UINT    srd_bit_index;
 }
 
 
-
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_mm_register_setup           Cortex-M7/MPU/AC5   */ 
-/*                                                           6.0.1        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_mm_register_setup           Cortex-M7/MPU/AC5   */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function sets up the MPU register definitions based on the     */ 
-/*    module's memory characteristics.                                    */ 
-/*    MPU layout for the Cortex-M7:                                       */ 
-/*    Entry     Description                                               */ 
-/*      0       Kernel mode entry                                         */ 
-/*      1       Module code region                                        */ 
-/*      2       Module code region                                        */ 
-/*      3       Module code region                                        */ 
-/*      4       Module code region                                        */ 
-/*      5       Module data region                                        */ 
-/*      6       Module data region                                        */ 
-/*      7       Module data region                                        */ 
-/*      8       Module data region                                        */ 
-/*      9       Module shared memory region                               */ 
-/*      10      Module shared memory region                               */ 
-/*      11      Module shared memory region                               */ 
-/*      12      Unused region                                             */ 
-/*      13      Unused region                                             */ 
-/*      14      Unused region                                             */ 
-/*      15      Unused region                                             */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    module_instance                   Pointer to module instance        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    MPU specifications for module in module_instance                    */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _txm_module_manager_region_size_get                                 */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _txm_module_manager_thread_create                                   */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function sets up the MPU register definitions based on the     */
+/*    module's memory characteristics.                                    */
+/*    MPU layout for the Cortex-M7:                                       */
+/*    Entry     Description                                               */
+/*      0       Kernel mode entry                                         */
+/*      1       Module code region                                        */
+/*      2       Module code region                                        */
+/*      3       Module code region                                        */
+/*      4       Module code region                                        */
+/*      5       Module data region                                        */
+/*      6       Module data region                                        */
+/*      7       Module data region                                        */
+/*      8       Module data region                                        */
+/*      9       Module shared memory region                               */
+/*      10      Module shared memory region                               */
+/*      11      Module shared memory region                               */
+/*      12      Unused region                                             */
+/*      13      Unused region                                             */
+/*      14      Unused region                                             */
+/*      15      Unused region                                             */
+/*                                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_instance                   Pointer to module instance        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    MPU specifications for module in module_instance                    */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_region_size_get                                 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _txm_module_manager_thread_create                                   */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance)
@@ -305,7 +300,7 @@ UINT    i;
 
 
     /* Setup the first MPU region for kernel mode entry.  */
-    /* Set address register to user mode entry function address, which is guaranteed to be at least 32-byte aligned. 
+    /* Set address register to user mode entry function address, which is guaranteed to be at least 32-byte aligned.
        Mask address to proper range, region 0, set Valid bit. */
     module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MPU_KERNEL_ENTRY_INDEX].txm_module_mpu_region_address = ((ULONG) _txm_module_manager_user_mode_entry & 0xFFFFFFE0) | 0x10;
     /* Set the attributes, size (32 bytes) and enable bit.  */
@@ -378,7 +373,7 @@ UINT    i;
     srd_bits = 0;
     
     /* Pickup data starting address and actual size.  */
-    data_address =  (ULONG) module_instance -> txm_module_instance_data_start; 
+    data_address =  (ULONG) module_instance -> txm_module_instance_data_start;
     
     /* Adjust the size of the module elements to be aligned to the default alignment. We do this
        so that when we partition the allocated memory, we can simply place these regions right beside
@@ -460,48 +455,48 @@ UINT    i;
     
 }
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_shared_memory_check_outside                     */ 
-/*                                                   Cortex-M7/MPU/AC5    */ 
-/*                                                           6.0.1        */
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_inside_data_check          Cortex-M7/MPU/AC5    */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function checks if the specified object is outside shared      */ 
-/*    memory.                                                             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    module_instance                   Pointer to module instance        */ 
-/*    obj_ptr                           Pointer to the object             */ 
-/*    obj_size                          Size of the object                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Whether the object is outside the shared memory region.             */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    N/A                                                                 */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Module dispatch check functions                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks if the specified object is inside shared       */
+/*    memory.                                                             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_instance                   Pointer to module instance        */
+/*    obj_ptr                           Pointer to the object             */
+/*    obj_size                          Size of the object                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Whether the object is inside the shared memory region.              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module dispatch check functions                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
-UCHAR _txm_module_manager_shared_memory_check_outside(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, UINT obj_size)
+UINT _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, UINT obj_size)
 {
 
 UINT shared_memory_index;
@@ -509,71 +504,14 @@ UINT num_shared_memory_mpu_entries;
 ALIGN_TYPE shared_memory_address_start;
 ALIGN_TYPE shared_memory_address_end;
 
-    num_shared_memory_mpu_entries = module_instance -> txm_module_instance_shared_memory_count;
-    for (shared_memory_index = 0; shared_memory_index < num_shared_memory_mpu_entries; shared_memory_index++)
+    /* Check if the object is inside the module data.  */
+    if ((obj_ptr >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) &&
+        ((obj_ptr + obj_size) <= ((ALIGN_TYPE) module_instance -> txm_module_instance_data_end + 1)))
     {
-
-        shared_memory_address_start = (ALIGN_TYPE) module_instance -> txm_module_instance_shared_memory_address[shared_memory_index];
-        shared_memory_address_end = shared_memory_address_start + module_instance -> txm_module_instance_shared_memory_length[shared_memory_index];
-
-        if (TXM_MODULE_MANAGER_CHECK_INSIDE_RANGE_EXCLUSIVE(shared_memory_address_start, shared_memory_address_end,
-                                                            obj_ptr, obj_size))
-        {
-            return(TX_FALSE);
-        }
+        return(TX_TRUE);
     }
 
-    return(TX_TRUE);
-}
-
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_shared_memory_check_inside Cortex-M7/MPU/AC5    */ 
-/*                                                           6.0.1        */
-/*  AUTHOR                                                                */
-/*                                                                        */
-/*    Scott Larson, Microsoft Corporation                                 */
-/*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function checks if the specified object is inside shared       */ 
-/*    memory.                                                             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    module_instance                   Pointer to module instance        */ 
-/*    obj_ptr                           Pointer to the object             */ 
-/*    obj_size                          Size of the object                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Whether the object is inside the shared memory region.              */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    N/A                                                                 */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Module dispatch check functions                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
-/*                                                                        */
-/**************************************************************************/
-UCHAR _txm_module_manager_shared_memory_check_inside(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, UINT obj_size)
-{
-
-UINT shared_memory_index;
-UINT num_shared_memory_mpu_entries;
-ALIGN_TYPE shared_memory_address_start;
-ALIGN_TYPE shared_memory_address_end;
-
+    /* Check if the object is inside the shared memory.  */
     num_shared_memory_mpu_entries = module_instance -> txm_module_instance_shared_memory_count;
     for (shared_memory_index = 0; shared_memory_index < num_shared_memory_mpu_entries; shared_memory_index++)
     {
@@ -581,72 +519,8 @@ ALIGN_TYPE shared_memory_address_end;
         shared_memory_address_start = (ALIGN_TYPE) module_instance -> txm_module_instance_shared_memory_address[shared_memory_index];
         shared_memory_address_end = shared_memory_address_start + module_instance -> txm_module_instance_shared_memory_length[shared_memory_index];
 
-        if (TXM_MODULE_MANAGER_CHECK_INSIDE_RANGE_EXCLUSIVE(shared_memory_address_start, shared_memory_address_end,
-                                                            obj_ptr, obj_size))
-        {
-            return(TX_TRUE);
-        }
-    }
-
-    return(TX_FALSE);
-}
-
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_shared_memory_check_inside_byte                 */ 
-/*                                                   Cortex-M7/MPU/AC5    */ 
-/*                                                           6.0.1        */
-/*  AUTHOR                                                                */
-/*                                                                        */
-/*    Scott Larson, Microsoft Corporation                                 */
-/*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function checks if the specified byte is inside shared memory. */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    module_instance                   Pointer to module instance        */ 
-/*    byte_ptr                          Pointer to the byte               */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Whether the byte is inside the shared memory region.                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    N/A                                                                 */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Module dispatch check functions                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
-/*                                                                        */
-/**************************************************************************/
-UCHAR _txm_module_manager_shared_memory_check_inside_byte(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE byte_ptr)
-{
-
-UINT shared_memory_index;
-UINT num_shared_memory_mpu_entries;
-ALIGN_TYPE shared_memory_address_start;
-ALIGN_TYPE shared_memory_address_end;
-
-    num_shared_memory_mpu_entries = module_instance -> txm_module_instance_shared_memory_count;
-    for (shared_memory_index = 0; shared_memory_index < num_shared_memory_mpu_entries; shared_memory_index++)
-    {
-
-        shared_memory_address_start = (ALIGN_TYPE) module_instance -> txm_module_instance_shared_memory_address[shared_memory_index];
-        shared_memory_address_end = shared_memory_address_start + module_instance -> txm_module_instance_shared_memory_length[shared_memory_index];
-
-        if (TXM_MODULE_MANAGER_CHECK_INSIDE_RANGE_EXCLUSIVE_BYTE(shared_memory_address_start, shared_memory_address_end,
-                                                                 byte_ptr))
+        if ((obj_ptr >= (ALIGN_TYPE) shared_memory_address_start) &&
+            ((obj_ptr + obj_size) <= (ALIGN_TYPE) shared_memory_address_end))
         {
             return(TX_TRUE);
         }

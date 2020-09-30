@@ -38,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_system_suspend                          PORTABLE SMP     */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -87,7 +87,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_system_suspend(TX_THREAD *thread_ptr)
@@ -514,38 +514,35 @@ UINT                        processing_complete;
 
             /* Check to see if the thread is in the execute list.  */
             i =  thread_ptr -> tx_thread_smp_core_mapped;
-            if (_tx_thread_execute_ptr[i] == thread_ptr)
-            {
-        
-                /* Clear the entry in the thread execution list.  */
-                _tx_thread_execute_ptr[i] =  TX_NULL;
+
+            /* Clear the entry in the thread execution list.  */
+            _tx_thread_execute_ptr[i] =  TX_NULL;
 
 #ifdef TX_THREAD_SMP_INTER_CORE_INTERRUPT
 
-                /* Determine if we need to preempt the core.  */
-                if (i != core_index)
-                {  
-                  
-                    if (_tx_thread_system_state[i] < TX_INITIALIZE_IN_PROGRESS)
-                    {
+            /* Determine if we need to preempt the core.  */
+            if (i != core_index)
+            {
 
-                        /* Preempt the mapped thread.  */
-                        _tx_thread_smp_core_preempt(i);
-                    }
+                if (_tx_thread_system_state[i] < TX_INITIALIZE_IN_PROGRESS)
+                {
+
+                    /* Preempt the mapped thread.  */
+                    _tx_thread_smp_core_preempt(i);
                 }
+            }
 #endif
 
 #ifdef TX_THREAD_SMP_WAKEUP_LOGIC
 
-                /* Does this need to be waked up?  */
-                if ((i != core_index) && (_tx_thread_execute_ptr[i] != TX_NULL))
-                {
+            /* Does this need to be waked up?  */
+            if ((i != core_index) && (_tx_thread_execute_ptr[i] != TX_NULL))
+            {
 
-                    /* Wakeup based on application's macro.  */
-                    TX_THREAD_SMP_WAKEUP(i);
-                }
-#endif
+                /* Wakeup based on application's macro.  */
+                TX_THREAD_SMP_WAKEUP(i);
             }
+#endif
             
 #ifdef TX_THREAD_SMP_DEBUG_ENABLE
 
@@ -891,32 +888,6 @@ UINT                        processing_complete;
         /* Determine if a preemption condition is present.  */
         if (_tx_thread_current_ptr[core_index] != _tx_thread_execute_ptr[core_index]) 
         {
-
-#ifdef TX_THREAD_SMP_WAKEUP_LOGIC
-
-            /* Loop to wakeup any cores that have a thread ready to schedule.  */
-            i = ((UINT) 0);
-#ifndef TX_THREAD_SMP_DYNAMIC_CORE_MAX
-
-            while (i < ((UINT) TX_THREAD_SMP_MAX_CORES))
-#else
-
-            while (i < _tx_thread_smp_max_cores)
-#endif
-            {
-            
-                /* Is there a thread for this core?  */
-                if (_tx_thread_execute_ptr[i] != NULL)
-                {
-            
-                    /* Yes, wake it up!  */
-                    TX_THREAD_SMP_WAKEUP(i);
-                }
-
-                /* Move to next entry.  */
-                i++;            
-            }
-#endif
 
 #ifdef TX_ENABLE_STACK_CHECKING 
 

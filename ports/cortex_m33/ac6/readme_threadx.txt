@@ -204,15 +204,7 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
-08-14-2020  ThreadX update of Cortex-M33/AC6 port. The following files were 
-            changed/added for port specific version 6.0.2:
-
-            tx_thread_context_restore.S     Remove execution profile kit call.
-            tx_thread_context_save.S        Remove execution profile kit call.
-            tx_timer_interrupt.S            Add DSB instruction before returning.
-            *.S                             Modified comments and whitespace.
-
-06-30-2020  Initial ThreadX 6.0.1 version for Cortex-M33 using AC6 tools.
+09-30-2020  Initial ThreadX 6.1 version for Cortex-M33 using AC6 tools.
 
 
 Copyright(c) 1996-2020 Microsoft Corporation

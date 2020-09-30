@@ -31,8 +31,7 @@
 
 #ifdef TX_MISRA_ENABLE
 #define TX_THREAD_INIT
-//CHAR  _tx_version_id[100] =  "Copyright (c) Microsoft Corporation. All rights reserved.  * ThreadX 6.0.1       MISRA C Compliant *";
-#endif
+//CHAR  _tx_version_id[100] =  "Copyright (c) Microsoft Corporation. All rights reserved.  * ThreadX 6.1       MISRA C Compliant *";
 
 #include "tx_api.h"
 #include "tx_thread.h"
@@ -830,4 +829,5 @@ UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer)
 }
 
 
+#endif
 

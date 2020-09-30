@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_preemption_change                       PORTABLE SMP     */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -72,7 +72,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_preemption_change(TX_THREAD *thread_ptr, UINT new_threshold, UINT *old_threshold)
@@ -173,21 +173,21 @@ UINT        status;
                 /* Yes, preemption-threshold is being disabled.  */
 
                 /* Determine if this thread was scheduled with preemption-threshold in force.  */
-                if (_tx_thread_preemption_threshold_list[thread_ptr -> tx_thread_user_priority] == thread_ptr)
+                if (_tx_thread_preemption_threshold_list[thread_ptr -> tx_thread_priority] == thread_ptr)
                 {
 
                     /* Clear the entry in the preempted list.  */
-                    _tx_thread_preemption_threshold_list[thread_ptr -> tx_thread_user_priority] =  TX_NULL;
+                    _tx_thread_preemption_threshold_list[thread_ptr -> tx_thread_priority] =  TX_NULL;
 
 #if TX_MAX_PRIORITIES > 32
 
                     /* Calculate the index into the bit map array.  */
-                    map_index =  (thread_ptr -> tx_thread_user_priority)/((UINT) 32);
+                    map_index =  (thread_ptr -> tx_thread_priority)/((UINT) 32);
 #endif
 
                     /* Yes, this thread is at the front of the list.  Make sure
                        the preempted bit is cleared for this thread.  */
-                    TX_MOD32_BIT_SET(thread_ptr -> tx_thread_user_priority, priority_bit)
+                    TX_MOD32_BIT_SET(thread_ptr -> tx_thread_priority, priority_bit)
                     _tx_thread_preempted_maps[MAP_INDEX] =  _tx_thread_preempted_maps[MAP_INDEX] & (~(priority_bit));
 
 #if TX_MAX_PRIORITIES > 32
@@ -197,7 +197,7 @@ UINT        status;
                     {
 
                         /* No, clear the active bit to signify this preempt map has nothing set.  */
-                        TX_DIV32_BIT_SET(thread_ptr -> tx_thread_user_priority, priority_bit)
+                        TX_DIV32_BIT_SET(thread_ptr -> tx_thread_priority, priority_bit)
                         _tx_thread_preempted_map_active =  _tx_thread_preempted_map_active & (~(priority_bit));
                     }
 #endif

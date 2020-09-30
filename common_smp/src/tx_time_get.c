@@ -26,6 +26,7 @@
 /* Include necessary system files.  */
 
 #include "tx_api.h"
+#ifdef TX_MISRA_ENABLE
 #include "tx_trace.h"
 #include "tx_timer.h"
 
@@ -35,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_time_get                                        PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -65,7 +66,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _tx_time_get(VOID)
@@ -97,4 +98,5 @@ ULONG   temp_time;
     /* Return the time.  */
     return(temp_time);
 }
+#endif /* TX_MISRA_ENABLE */
 

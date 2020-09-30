@@ -1,0 +1,13 @@
+#!gbuild
+[Program]
+	-DTX_ENABLE_EVENT_LOGGING
+	-I../../../../common/inc
+	-I../../../../ports_common_green/inc
+	-I../inc
+reset.arm
+tx_initialize_low_level.arm
+sample_threadx.c
+txe.a
+sample_threadx_el.ld
+sample_threadx.con
+readme_threadx.txt

@@ -20,25 +20,15 @@
 ;/**************************************************************************/
 ;/**************************************************************************/
 ;
-;#define TX_SOURCE_CODE
 ;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
-;
-        SECTION `.text`:CODE:NOROOT(2)
-        THUMB
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_system_return                          Cortex-M4/IAR     */
-;/*                                                           6.0.1        */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -70,7 +60,7 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
@@ -79,9 +69,9 @@
 _tx_thread_system_return??rA:
 _tx_thread_system_return:
 ;
-;    /* Return to real scheduler via PendSV. Note that this routine is often 
+;    /* Return to real scheduler via PendSV. Note that this routine is often
 ;       replaced with in-line assembly in tx_port.h to improved performance.  */
-;     
+;
     MOV     r0, #0x10000000                         ; Load PENDSVSET bit
     MOV     r1, #0xE000E000                         ; Load NVIC base
     STR     r0, [r1, #0xD04]                        ; Set PENDSVBIT in ICSR
@@ -92,7 +82,6 @@ _tx_thread_system_return:
     CPSIE   i                                       ; Enable interrupts
     MSR     PRIMASK, r1                             ; Restore original interrupt posture
 _isr_context:
-    BX      lr                                      ; Return to caller 
+    BX      lr                                      ; Return to caller
 ;}
-    END  
-    
+    END

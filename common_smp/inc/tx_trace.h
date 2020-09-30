@@ -25,7 +25,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    tx_trace.h                                         PORTABLE SMP     */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -40,7 +40,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 
@@ -242,7 +242,7 @@ typedef struct TX_TRACE_OBJECT_ENTRY_STRUCT
 /* Define ThreadX Trace Events, along with a brief description of the additional information fields,
    where I1 -> Information Field 1, I2 -> Information Field 2, etc.  */
 
-/* Event numbers 0 through 4095 are reserved by Express Logic. Specific event assignments are: 
+/* Event numbers 0 through 4095 are reserved by Azure RTOS. Specific event assignments are: 
                                 
                                 ThreadX events:     1-199 
                                 FileX events:       200-299

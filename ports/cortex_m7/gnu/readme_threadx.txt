@@ -141,8 +141,8 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
-08-14-2020  ThreadX update of Cortex-M7/GNU port. The following files were 
-            changed/added for port specific version 6.0.2:
+09-30-2020  ThreadX update of Cortex-M7/GNU port. The following files were 
+            changed/added for port specific version 6.1:
 
             *.S                             Modified comments and whitespace.
 

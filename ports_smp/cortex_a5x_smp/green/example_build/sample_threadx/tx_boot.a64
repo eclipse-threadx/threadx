@@ -1,0 +1,276 @@
+/**************************************************************************/
+/*                                                                        */
+/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
+/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+/*       and in the root directory of this software.                      */
+/*                                                                        */
+/**************************************************************************/
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/** bootstrap for Zynq UltraScale+ MPSoC / Cortex-A53-SMP                 */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+/* generic timer clock frequency */
+#define GENERIC_TIMER_FREQ        99990000
+
+/* Zynq registers */
+#define RVBAR_BASE    0xFD5C0040
+#define RST_FPD_APU   0xFD1A0104
+
+/* global symbols */
+
+.global _boot
+.global _vector_table
+
+.global _start
+.global __tx_irq_handler
+.global _tx_platform_smp_initialize_low_level
+.global _tx_thread_smp_initialize_wait
+
+.global __el3_stack
+.global __el3_1_stack
+.global __el3_2_stack
+.global __el3_3_stack
+
+
+/* exception vector table */
+
+.section .vectors, "ax"
+.align 0x800  // 0x000
+_vector_table:
+  b  _boot
+
+.align 0x80   // 0x080
+  b  .
+
+.align 0x80   // 0x100
+  b  .
+
+.align 0x80   // 0x180
+  b  .
+
+.align 0x80   // 0x200
+  b  .
+
+.align 0x80   // 0x280
+  b  __tx_irq_handler
+
+.align 0x80   // 0x300
+  b  .
+
+.align 0x80   // 0x380
+  b  .
+
+.align 0x80   // 0x400
+  b  .
+
+.align 0x80   // 0x480
+  b  .
+
+.align 0x80   // 0x500
+  b  .
+
+.align 0x80   // 0x580
+  b  .
+
+.align 0x80   // 0x600
+  b  .
+
+.align 0x80   // 0x680
+  b  .
+
+.align 0x80   // 0x700
+  b  .
+
+.align 0x80   // 0x780
+  b  .
+
+.align 0x80   // 0x800
+
+
+.section .boot, "ax"
+
+_boot:
+  // check that it is core 0 running
+  mrs     x0, MPIDR_EL1
+  ands    x0, x0, #0xFF
+  b.eq    core0
+not_core0:
+  wfi
+  b       not_core0
+
+core0:
+  // set cores 1-3 in reset state
+  ldr     x0, =RST_FPD_APU
+  ldr     w1, [x0]
+  orr     w1, w1, #(7 << 1)             // Hold cores 1-3 in reset
+  str     w1, [x0]
+  and     w1, w1, #~(7 << 11)           // Remove the power-on reset on cores 1-3
+  str     w1, [x0]
+
+  // set reset vector for cores 0-3
+  ldr     x0, =RVBAR_BASE
+  ldr     x1, =_boot
+  str     x1, [x0]
+  ldr     x1, =_boot_smp
+  str     x1, [x0, #8]
+  str     x1, [x0, #16]
+  str     x1, [x0, #24]
+
+/* common boot code */
+_boot_smp:
+  // reset all registers
+  mov     x3, #0
+  mov     x4, #0
+  mov     x5, #0
+  mov     x6, #0
+  mov     x7, #0
+  mov     x8, #0
+  mov     x9, #0
+  mov     x10, #0
+  mov     x11, #0
+  mov     x12, #0
+  mov     x13, #0
+  mov     x14, #0
+  mov     x15, #0
+  mov     x16, #0
+  mov     x17, #0
+  mov     x18, #0
+  mov     x19, #0
+  mov     x20, #0
+  mov     x21, #0
+  mov     x22, #0
+  mov     x23, #0
+  mov     x24, #0
+  mov     x25, #0
+  mov     x26, #0
+  mov     x27, #0
+  mov     x28, #0
+  mov     x29, #0
+  mov     x30, #0
+
+  // go to error if current exception level not EL3
+  mrs     x0, CurrentEL
+  cmp     x0, #0xC
+  b.ne    error
+
+  // set vector table base address
+  ldr     x0, =_vector_table
+  msr     VBAR_EL3, x0
+
+  // get core id in x0
+  mrs     x0, MPIDR_EL1
+  and     x0, x0, #0xFF
+
+  // set stack pointer for current core
+  ldr     x2, =EL3_stacks
+  lsl     x1, x0, #3        // coreid * 8
+  ldr     x2, [x2, x1]
+  mov     sp, x2
+
+  // disable trapping of SIMD/FPU registers
+  mov     x1, #0
+  msr     CPTR_EL3, x1
+
+  // set SCR_EL3
+  ldr     x1, =0xC0E
+  msr     SCR_EL3, x1
+
+  // set CPUACTLR_EL1
+  ldr     x1, =0x1000080CA000
+  msr     S3_1_C15_C2_0, x1
+
+  // set the generic timer frequency
+  ldr     x1, =GENERIC_TIMER_FREQ
+  msr     CNTFRQ_EL0, x1
+
+  // enable hardware coherency between cores
+  mrs     x1, S3_1_C15_C2_1
+  orr     x1, x1, #(1 << 6)
+  msr     S3_1_C15_C2_1, x1
+  isb
+
+  // invalidate caches
+	tlbi    ALLE3
+	ic      IALLU
+	bl 	    invalidate_dcaches
+	dsb	    sy
+	isb
+
+  // jump to main only from core 0
+  mrs     x0, MPIDR_EL1
+  ands    x0, x0, #0xFF
+  b.ne    cores_1_3_init
+  mov     x2, 0    // Clear envp reg
+  mov     x1, 0    // Clear argv reg
+  b       _start   // go to C land
+
+cores_1_3_init:
+  // low level initialization for cores 1-3
+  bl      _tx_platform_smp_initialize_low_level
+  // continue to threadx smp initialization
+  b       _tx_thread_smp_initialize_wait
+
+error:
+  b       error
+
+  .align 8
+EL3_stacks:
+  .quad   __el3_stack
+  .quad   __el3_1_stack
+  .quad   __el3_2_stack
+  .quad   __el3_3_stack
+
+
+invalidate_dcaches:
+  mrs x0, CLIDR_EL1
+  and w3, w0, #0x07000000  // Get 2 x Level of Coherence
+  lsr w3, w3, #23
+  cbz w3, Finished
+  mov w10, #0              // w10 = 2 x cache level
+  mov w8, #1               // w8 = constant 0b1
+Loop1:
+  add w2, w10, w10, lsr #1 // Calculate 3 x cache level
+  lsr w1, w0, w2           // extract 3-bit cache type for this level
+  and w1, w1, #0x7
+  cmp W1, #2
+  b.lt Skip                // No data or unified cache at this level
+  msr CSSELR_EL1, x10      // Select this cache level
+  isb                      // Synchronize change of CSSELR
+  mrs x1, CCSIDR_EL1       // Read CCSIDR
+  and w2, w1, #7           // w2 = log2(linelen)-4
+  add w2, w2, #4           // w2 = log2(linelen)
+  ubfx w4, w1, #3, #10     // w4 = max way number, right aligned
+  clz w5, w4               // w5 = 32-log2(ways), bit position of way in DC operand
+  lsl w9, w4, w5           // w9 = max way number, aligned to position in DC operand
+  lsl w16, w8, w5          // w16 = amount to decrement way number per iteration
+Loop2:
+  ubfx w7, w1, #13, #15    // w7 = max set number, right aligned
+  lsl w7, w7, w2           // w7 = max set number, aligned to position in DC operand
+  lsl w17, w8, w2          // w17 = amount to decrement set number per iteration
+Loop3:
+  orr w11, w10, w9         // w11 = combine way number and cache number...
+  orr w11, w11, w7         // ... and set number for DC operand
+  dc csw, x11              // Do data cache clean by set and way
+  subs w7, w7, w17         // Decrement set number
+  b.ge Loop3
+  subs x9, x9, x16         // Decrement way number
+  b.ge Loop2
+Skip:
+  add w10, w10, #2         // Increment 2 x cache level
+  cmp w3, w10
+  dsb sy                   // Ensure completion of previous cache maintenance operation
+  b.gt Loop1
+Finished:
+  ret
+
+.end

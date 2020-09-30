@@ -517,7 +517,7 @@ The project options "General Options -> Library Configuration" should also have 
 
 11.  Revision History
 
-06/30/2020  Initial ThreadX 6.0.1 version for ARM11 using IAR's ARM tools.
+09-30-2020  Initial ThreadX 6.1 version for ARM11 using IAR's ARM tools.
 
 
 Copyright(c) 1996-2020 Microsoft Corporation

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_priority_change                          PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -77,6 +77,13 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     William E. Lamie         Modified comment(s), and      */
+/*                                            change thread state from    */
+/*                                            TX_SUSPENDED to             */
+/*                                            TX_PRIORITY_CHANGE before   */
+/*                                            calling                     */
+/*                                            _tx_thread_system_suspend,  */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_priority_change(TX_THREAD *thread_ptr, UINT new_priority, UINT *old_priority)
@@ -133,8 +140,8 @@ UINT            original_priority;
     else
     {
 
-        /* Set the state to suspended.  */
-        thread_ptr -> tx_thread_state =    TX_SUSPENDED;
+        /* Set the state to priority change.  */
+        thread_ptr -> tx_thread_state =    TX_PRIORITY_CHANGE;
 
         /* Pickup the next thread to execute.  */
         execute_ptr =  _tx_thread_execute_ptr;

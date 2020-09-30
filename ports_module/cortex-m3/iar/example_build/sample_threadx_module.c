@@ -14,8 +14,8 @@
 
 /* Define constants.  */
 
-#define DEMO_STACK_SIZE         1024
-#define DEMO_BYTE_POOL_SIZE     9120
+#define DEMO_STACK_SIZE         512
+#define DEMO_BYTE_POOL_SIZE     6000
 #define DEMO_BLOCK_POOL_SIZE    100
 #define DEMO_QUEUE_SIZE         100
 
@@ -120,7 +120,7 @@ CHAR    *pointer;
                                
 
     /* Create a byte memory pool from which to allocate the thread stacks.  */
-    tx_byte_pool_create(byte_pool_0, "module byte pool 0", demo_module_pool_space, DEMO_BYTE_POOL_SIZE);
+    tx_byte_pool_create(byte_pool_0, "module byte pool 0", (UCHAR*)demo_module_pool_space, DEMO_BYTE_POOL_SIZE);
 
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */

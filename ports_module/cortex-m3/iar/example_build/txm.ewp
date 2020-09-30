@@ -349,9 +349,9 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>../inc</state>
-                    <state>../../../../common/inc</state>
-                    <state>../../../../common_modules/inc</state>
+                    <state>$PROJ_DIR$\..\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common_modules\inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1048,7 +1048,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>C:\Users\yuxzho\Downloads\threadx_07242020_rc2\ports_module\cortex-m3\iar\example_build\Debug\Exe\txm.a</state>
+                    <state></state>
                 </option>
             </data>
         </settings>

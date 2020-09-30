@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project>
+    	
+    <configuration id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.config.exe.debug.var.gcc-8.3.0-aarch64-elf.794347674" name="Debug">
+        		
+        <extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+            			
+            <provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+            			
+            <provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
+            			
+            <provider class="com.arm.managedbuilder.gcc.langsettings.ArmGCCBaremetalLanguageSettingsProvider" console="false" env-hash="-606533458206092714" id="com.arm.managedbuilder.langsettingsprovider.arm.gcc.baremetal" keep-relative-paths="false" name="Arm GCC Built-in Compiler Settings Baremetal" parameter="${COMMAND} ${FLAGS} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+                				
+                <language-scope id="org.eclipse.cdt.core.gcc"/>
+                				
+                <language-scope id="org.eclipse.cdt.core.g++"/>
+                			
+            </provider>
+            			
+            <provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+            		
+        </extension>
+        	
+    </configuration>
+    	
+    <configuration id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.config.exe.release.var.gcc-8.3.0-aarch64-elf.413724976" name="Release">
+        		
+        <extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+            			
+            <provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+            			
+            <provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
+            			
+            <provider class="com.arm.managedbuilder.gcc.langsettings.ArmGCCBaremetalLanguageSettingsProvider" console="false" env-hash="-606533458206092714" id="com.arm.managedbuilder.langsettingsprovider.arm.gcc.baremetal" keep-relative-paths="false" name="Arm GCC Built-in Compiler Settings Baremetal" parameter="${COMMAND} ${FLAGS} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+                				
+                <language-scope id="org.eclipse.cdt.core.gcc"/>
+                				
+                <language-scope id="org.eclipse.cdt.core.g++"/>
+                			
+            </provider>
+            			
+            <provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+            		
+        </extension>
+        	
+    </configuration>
+    
+</project>

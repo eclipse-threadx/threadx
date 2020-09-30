@@ -58,7 +58,7 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_initialize                Cortex-M33/IAR    */
-/*                                                           6.0.1        */
+/*                                                            6.1         */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -90,7 +90,7 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -115,7 +115,7 @@ void    _tx_thread_secure_stack_initialize(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_allocate               PORTABLE C      */
-/*                                                           6.0.1        */
+/*                                                            6.1         */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -154,7 +154,7 @@ void    _tx_thread_secure_stack_initialize(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -237,7 +237,7 @@ UCHAR   *stack_mem;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_free                   PORTABLE C      */
-/*                                                           6.0.1        */
+/*                                                            6.1         */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -269,7 +269,7 @@ UCHAR   *stack_mem;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -318,7 +318,7 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_context_save                PORTABLE C      */
-/*                                                           6.0.1        */
+/*                                                            6.1         */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -350,7 +350,7 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -400,7 +400,7 @@ ULONG   sp;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_context_restore             PORTABLE C      */
-/*                                                           6.0.1        */
+/*                                                            6.1         */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -431,7 +431,7 @@ ULONG   sp;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))

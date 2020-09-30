@@ -62,6 +62,9 @@ sem_t               _tx_linux_timer_semaphore;
 sem_t               _tx_linux_isr_semaphore;
 void               *_tx_linux_timer_interrupt(void *p);
 
+void    _tx_linux_thread_resume_handler(int sig);
+void    _tx_linux_thread_suspend_handler(int sig);
+void    _tx_linux_thread_suspend(pthread_t thread_id);
 
 #ifdef TX_LINUX_DEBUG_ENABLE
 
@@ -172,7 +175,7 @@ extern VOID     *_tx_initialize_unused_memory;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_initialize_low_level                            Linux/GNU       */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -214,7 +217,7 @@ extern VOID     *_tx_initialize_unused_memory;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_initialize_low_level(VOID)
@@ -321,6 +324,8 @@ struct timespec ts;
 long timer_periodic_nsec;
 int err;
 
+    (VOID)p;
+
     /* Calculate periodic timer. */
     timer_periodic_nsec = 1000000000 / TX_TIMER_TICKS_PER_SECOND;
     nice(10);
@@ -379,10 +384,13 @@ int err;
 /* Define functions for linux thread. */
 void    _tx_linux_thread_resume_handler(int sig)
 {
+    (VOID)sig;
 }
 
 void    _tx_linux_thread_suspend_handler(int sig)
 {
+    (VOID)sig;
+
     if(pthread_equal(pthread_self(), _tx_linux_timer_id))
         tx_linux_sem_post_nolock(&_tx_linux_thread_timer_wait);
     else

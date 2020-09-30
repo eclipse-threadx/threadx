@@ -1,23 +1,12 @@
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*            Copyright (c) 1996-2018 by Express Logic Inc.               */ 
-;/*                                                                        */ 
-;/*  This software is copyrighted by and is the sole property of Express   */ 
-;/*  Logic, Inc.  All rights, title, ownership, or other interests         */ 
-;/*  in the software remain the property of Express Logic, Inc.  This      */ 
-;/*  software may only be used in accordance with the corresponding        */ 
-;/*  license agreement.  Any unauthorized use, duplication, transmission,  */ 
-;/*  distribution, or disclosure of this software is expressly forbidden.  */ 
+
+;/**************************************************************************/
 ;/*                                                                        */
-;/*  This Copyright notice may not be removed or modified without prior    */ 
-;/*  written consent of Express Logic, Inc.                                */ 
-;/*                                                                        */ 
-;/*  Express Logic, Inc. reserves the right to modify this software        */ 
-;/*  without notice.                                                       */ 
-;/*                                                                        */ 
-;/*  Express Logic, Inc.                     info@expresslogic.com         */
-;/*  11423 West Bernardo Court               http://www.expresslogic.com   */
-;/*  San Diego, CA  92127                                                  */
+;/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+;/*                                                                        */
+;/*       This software is licensed under the Microsoft Software License   */
+;/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+;/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+;/*       and in the root directory of this software.                      */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;
@@ -69,10 +58,10 @@ SVC_MODE_BITS   DEFINE  0x13                    ; SVC mode value
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_context_restore                          ARM11/IAR       */ 
-;/*                                                           6.0.1        */ 
+;/*                                                            6.1         */ 
 ;/*  AUTHOR                                                                */ 
 ;/*                                                                        */ 
-;/*    William E. Lamie, Express Logic, Inc.                               */ 
+;/*    William E. Lamie, Microsoft Corporation                             */ 
 ;/*                                                                        */ 
 ;/*  DESCRIPTION                                                           */ 
 ;/*                                                                        */ 
@@ -101,7 +90,7 @@ SVC_MODE_BITS   DEFINE  0x13                    ; SVC mode value
 ;/*                                                                        */ 
 ;/*    DATE              NAME                      DESCRIPTION             */ 
 ;/*                                                                        */ 
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */ 
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */ 
 ;/*                                                                        */ 
 ;/**************************************************************************/ 
 ;VOID   _tx_thread_context_restore(VOID)

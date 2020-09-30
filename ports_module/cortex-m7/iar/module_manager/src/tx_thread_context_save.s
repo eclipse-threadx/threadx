@@ -21,35 +21,27 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
+    EXTERN  _tx_thread_system_state
+    EXTERN  _tx_thread_current_ptr
+    EXTERN  _tx_execution_isr_enter
 ;
 ;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
-        EXTERN  _tx_thread_system_state
-        EXTERN  _tx_thread_current_ptr
-        EXTERN  _tx_execution_isr_enter
-;
-;
-        SECTION `.text`:CODE:NOROOT(2)
-        THUMB
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_context_save                           Cortex-M7/IAR     */
-;/*                                                           6.0.1        */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
 ;/*                                                                        */
+;/*    This function is only needed for legacy applications and it should  */
+;/*    not be called in any new development on a Cortex-M.                 */
 ;/*    This function saves the context of an executing thread in the       */
 ;/*    beginning of interrupt processing.  The function also ensures that  */
 ;/*    the system stack is used upon return to the calling ISR.            */
@@ -74,7 +66,7 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_save(VOID)
@@ -84,7 +76,7 @@ _tx_thread_context_save:
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 ;
 ;    /* Call the ISR enter function to indicate an ISR is starting.  */
-;   
+;
     PUSH    {r0, lr}                                ; Save return address
     BL      _tx_execution_isr_enter                 ; Call the ISR enter function
     POP     {r0, lr}                                ; Recover return address

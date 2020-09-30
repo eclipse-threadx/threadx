@@ -133,12 +133,7 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
-08-14-2020  ThreadX update of Cortex-M0/AC5 port. The following files were 
-            changed/added for port specific version 6.0.2:
-
-            *.s                             Modified comments and whitespace.
-
-06/30/2020  Initial ThreadX 6.0.1 version for Cortex-M0 using AC5 tools.
+09-30-2020  Initial ThreadX 6.1 version for Cortex-M0 using AC5 tools.
 
 
 Copyright(c) 1996-2020 Microsoft Corporation

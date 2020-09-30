@@ -1,0 +1,16 @@
+#!gbuild
+[Program]
+	-object_dir=${%option_value(-object_dir)}/sample_threadx
+	-I../../../../../common_smp/inc
+	-I../../../../../ports_common_green/inc
+	-I../../inc
+	{config(DBG)} -L../bin/Debug
+	-ltx
+	-e _boot
+	-memory
+	--gnu_asm
+tgt\standalone_ram.ld
+sample_threadx.c
+tx_boot.a64
+stdio_ghs.c
+tx_zynqmp_low_level.c

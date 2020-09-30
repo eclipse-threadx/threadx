@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                        Cortex-A5x-SMP/AC6 */ 
-/*                                                           6.0.1        */
+/*                                                            6.1         */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,7 +47,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 
@@ -418,7 +418,7 @@ VOID    tx_thread_fp_disable(VOID);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) 1996-2019 Express Logic Inc. * ThreadX Cortex-A5x-SMP/AC6 Version 6.0.1 *";
+                                    "Copyright (c) 1996-2019 Express Logic Inc. * ThreadX Cortex-A5x-SMP/AC6 Version 6.1   *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

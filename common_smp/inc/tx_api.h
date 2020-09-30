@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    tx_api.h                                            PORTABLE SMP    */ 
-/*                                                           6.0.2        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -43,10 +43,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
-/*  08-14-2020     William E. Lamie         Modified comment(s), and      */
-/*                                            updated product constants,  */
-/*                                            resulting in version 6.0.2  */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 
@@ -85,8 +82,8 @@ extern   "C" {
    
 #define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
-#define THREADX_MINOR_VERSION           0
-#define THREADX_PATCH_VERSION           2
+#define THREADX_MINOR_VERSION           1
+#define THREADX_PATCH_VERSION           0
 
 /* Define the following symbol for backward compatibility */
 #define EL_PRODUCT_THREADX
@@ -140,6 +137,7 @@ extern   "C" {
 #define TX_FILE                         ((UINT) 11)
 #define TX_TCP_IP                       ((UINT) 12)
 #define TX_MUTEX_SUSP                   ((UINT) 13)
+#define TX_PRIORITY_CHANGE              ((UINT) 14)
 
 
 /* API return values.  */
@@ -192,7 +190,7 @@ extern   "C" {
 #endif
 
 
-/* Event numbers 0 through 4095 are reserved by Express Logic. Specific event assignments are: 
+/* Event numbers 0 through 4095 are reserved by Azure RTOS. Specific event assignments are: 
                                 
                                 ThreadX events:     1-199 
                                 FileX events:       200-299
@@ -1887,6 +1885,8 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 #define TX_ULONG_POINTER_DIF(a,b)                       ((ULONG)(((ULONG *) (a)) - ((ULONG *) (b))))
 #define TX_POINTER_TO_ULONG_CONVERT(a)                  ((ULONG) ((VOID *) (a)))
 #define TX_ULONG_TO_POINTER_CONVERT(a)                  ((VOID *) ((ULONG) (a)))
+#define TX_POINTER_TO_ALIGN_TYPE_CONVERT(a)             ((ALIGN_TYPE) ((VOID *) (a)))
+#define TX_ALIGN_TYPE_TO_POINTER_CONVERT(a)             ((VOID *) ((ALIGN_TYPE) (a)))
 #define TX_TIMER_POINTER_DIF(a,b)                       ((ULONG)(((TX_TIMER_INTERNAL **) (a)) - ((TX_TIMER_INTERNAL **) (b))))
 #define TX_TIMER_POINTER_ADD(a,b)                       (((TX_TIMER_INTERNAL **) (a)) + ((ULONG) (b)))
 #define TX_USER_TIMER_POINTER_GET(a,b)                  { \

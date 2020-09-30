@@ -1,0 +1,3 @@
+wait
+load ..\sample_threadx_module\Debug\sample_threadx_module.axf
+wait

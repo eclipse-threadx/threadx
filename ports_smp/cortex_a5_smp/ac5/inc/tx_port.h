@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                        SMP/Cortex-A5/AC5  */ 
-/*                                                           6.0.1        */
+/*                                                            6.1         */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,7 +47,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 
@@ -394,7 +394,7 @@ void    tx_thread_vfp_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX SMP/Cortex-A5/AC5 Version 6.0.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX SMP/Cortex-A5/AC5 Version 6.1   *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

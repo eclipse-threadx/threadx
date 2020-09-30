@@ -28,7 +28,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_interrupt_control                      Cortex-M4/IAR     */
-;/*                                                           6.0.2        */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -58,23 +58,17 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
-;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
-;/*                                            whitespace, resulting       */
-;/*                                            in version 6.0.2            */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;UINT   _tx_thread_interrupt_control(UINT new_posture)
 ;{
     PUBLIC  _tx_thread_interrupt_control
 _tx_thread_interrupt_control:
-;
-;    /* Pickup current interrupt lockout posture.  */
-;
-    MRS     r1, PRIMASK
-    MSR     PRIMASK, r0
-    MOV     r0, r1
-    BX      lr
+    MRS     r1, PRIMASK                         ; Pickup current interrupt lockout
+    MSR     PRIMASK, r0                         ; Apply the new interrupt lockout
+    MOV     r0, r1                              ; Transfer old to return register
+    BX      lr                                  ; Return to caller
 ;
 ;}
     END

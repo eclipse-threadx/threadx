@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_priority_change                         PORTABLE SMP     */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -79,7 +79,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_priority_change(TX_THREAD *thread_ptr, UINT new_priority, UINT *old_priority)
@@ -270,8 +270,8 @@ UINT            status;
                 /* Increment the preempt disable flag.  */
                 _tx_thread_preempt_disable++;
 
-                /* Set the state to suspended.  */
-                thread_ptr -> tx_thread_state =    TX_SUSPENDED;
+                /* Set the state to priority change.  */
+                thread_ptr -> tx_thread_state =    TX_PRIORITY_CHANGE;
 
                 /* Call actual non-interruptable thread suspension routine.  */
                 _tx_thread_system_ni_suspend(thread_ptr, ((ULONG) 0));
@@ -310,8 +310,8 @@ UINT            status;
                 /* Increment the preempt disable flag.  */
                 _tx_thread_preempt_disable =  _tx_thread_preempt_disable + ((UINT) 3);
 
-                /* Set the state to suspended.  */
-                thread_ptr -> tx_thread_state =    TX_SUSPENDED;
+                /* Set the state to priority change.  */
+                thread_ptr -> tx_thread_state =    TX_PRIORITY_CHANGE;
 
                 /* Set the suspending flag. */
                 thread_ptr -> tx_thread_suspending =  TX_TRUE;
@@ -376,19 +376,24 @@ UINT            status;
                 if (thread_ptr == execute_ptr)
                 {
 
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
-                    /* Determine if preemption-threshold is in force at the new priority level.  */
-                    if (_tx_thread_preemption_threshold_list[thread_ptr -> tx_thread_priority] == TX_NULL)
+                    /* Make sure the thread is still ready.  */
+                    if (thread_ptr -> tx_thread_state == TX_READY)
                     {
-                    
-                        /* Ensure that this thread is placed at the front of the priority list.  */
-                        _tx_thread_priority_list[thread_ptr -> tx_thread_priority] =  thread_ptr;
-                    }
+
+#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
+                        /* Determine if preemption-threshold is in force at the new priority level.  */
+                        if (_tx_thread_preemption_threshold_list[thread_ptr -> tx_thread_priority] == TX_NULL)
+                        {
+
+                            /* Ensure that this thread is placed at the front of the priority list.  */
+                            _tx_thread_priority_list[thread_ptr -> tx_thread_priority] =  thread_ptr;
+                        }
 #else
 
-                    /* Ensure that this thread is placed at the front of the priority list.  */
-                    _tx_thread_priority_list[thread_ptr -> tx_thread_priority] =  thread_ptr;
+                        /* Ensure that this thread is placed at the front of the priority list.  */
+                        _tx_thread_priority_list[thread_ptr -> tx_thread_priority] =  thread_ptr;
 #endif
+                    }
                 }
         
                 /* Pickup the core index.  */

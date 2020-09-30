@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M7/GNU     */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     William E. Lamie         Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -482,7 +484,7 @@ void    tx_thread_fpu_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M7/GNU Version 6.0 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M7/GNU Version 6.1 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

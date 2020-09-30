@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.50.1.24770</state>
+                    <state>8.50.4.26131</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -349,9 +349,9 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>../inc</state>
-                    <state>../module_manager/inc</state>
-                    <state>../../../../common/inc</state>
+                    <state>$PROJ_DIR$\..\inc</state>
+                    <state>$PROJ_DIR$\..\module_manager\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\common_modules\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\common_modules\module_manager\inc</state>
                 </option>
@@ -657,7 +657,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>sample_threadx_module_manager_stm32f4xx.srec</state>
+                    <state>sample_threadx_module_manager.srec</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -712,7 +712,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>sample_threadx_module_manager_stm32f4xx.out</state>
+                    <state>sample_threadx_module_manager.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>

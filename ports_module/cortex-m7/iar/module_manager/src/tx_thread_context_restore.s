@@ -21,40 +21,32 @@
 ;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
+    EXTERN  _tx_thread_system_state
+    EXTERN  _tx_thread_current_ptr
+    EXTERN  _tx_thread_system_stack_ptr
+    EXTERN  _tx_thread_execute_ptr
+    EXTERN  _tx_timer_time_slice
+    EXTERN  _tx_thread_schedule
+    EXTERN  _tx_thread_preempt_disable
+    EXTERN  _tx_execution_isr_exit
 ;
 ;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
-        EXTERN  _tx_thread_system_state
-        EXTERN  _tx_thread_current_ptr
-        EXTERN  _tx_thread_system_stack_ptr
-        EXTERN  _tx_thread_execute_ptr
-        EXTERN  _tx_timer_time_slice
-        EXTERN  _tx_thread_schedule
-        EXTERN  _tx_thread_preempt_disable
-        EXTERN  _tx_execution_isr_exit
-;
-;
-        SECTION `.text`:CODE:NOROOT(2)
-        THUMB
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_context_restore                        Cortex-M7/IAR     */
-;/*                                                           6.0.1        */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
 ;/*                                                                        */
+;/*    This function is only needed for legacy applications and it should  */
+;/*    not be called in any new development on a Cortex-M.                 */
 ;/*    This function restores the interrupt context if it is processing a  */
 ;/*    nested interrupt.  If not, it returns to the interrupt thread if no */
 ;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
@@ -80,7 +72,7 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)
@@ -101,5 +93,4 @@ _tx_thread_context_restore:
     BX      lr
 ;
 ;}
-        END
-
+    END

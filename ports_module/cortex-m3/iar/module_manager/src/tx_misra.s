@@ -101,7 +101,7 @@
 
         SECTION `.data`:DATA:REORDER:NOROOT(2)
         DATA
-//   51 CHAR  _tx_version_id[100] =  "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX 6.0.1     MISRA C Compliant *";
+//   51 CHAR  _tx_version_id[100] =  "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX 6.1       MISRA C Compliant *";
 _tx_version_id:
         DC8 43H, 6FH, 70H, 79H, 72H, 69H, 67H, 68H
         DC8 74H, 20H, 28H, 63H, 29H, 20H, 31H, 39H

@@ -51,7 +51,7 @@ SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_initialize_low_level                          Cortex-M0/GNU     */
-@/*                                                           6.0.2        */
+@/*                                                           6.1          */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -85,10 +85,10 @@ SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-@/*  08-14-2020     Scott Larson             Modified comment(s), and      */
+@/*  09-30-2020     Scott Larson             Modified comment(s), and      */
 @/*                                            commented out code for      */
 @/*                                            enabling DWT,               */
-@/*                                            resulting in version 6.0.2  */
+@/*                                            resulting in version 6.1    */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_initialize_low_level(VOID)

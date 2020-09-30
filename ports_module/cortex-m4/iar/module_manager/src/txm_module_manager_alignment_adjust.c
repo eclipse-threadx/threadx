@@ -31,7 +31,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_power_of_two_block_size                    Cortex-M4/MPU/IAR   */
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -61,7 +61,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_power_of_two_block_size(ULONG size)
@@ -69,11 +69,11 @@ ULONG  _txm_power_of_two_block_size(ULONG size)
     /* Check for 0 size. */
     if(size == 0)
         return 0;
-
+    
     /* Minimum MPU block size is 32. */
     if(size <= 32)
         return 32;
-
+    
     /* Bit twiddling trick to round to next high power of 2
        (if original size is power of 2, it will return original size. Perfect!) */
     size--;
@@ -83,7 +83,7 @@ ULONG  _txm_power_of_two_block_size(ULONG size)
     size |= size >> 8;
     size |= size >> 16;
     size++;
-
+    
     /* Return a power of 2 size at or above the input size.  */
     return(size);
 }
@@ -94,15 +94,15 @@ ULONG  _txm_power_of_two_block_size(ULONG size)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_alignment_adjust            Cortex-M4/MPU/IAR   */
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function adjusts the alignment and size of the code and data   */ 
-/*    section for a given module implementation.                          */ 
+/*    This function adjusts the alignment and size of the code and data   */
+/*    section for a given module implementation.                          */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -128,7 +128,7 @@ ULONG  _txm_power_of_two_block_size(ULONG size)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,
@@ -253,19 +253,18 @@ ULONG   data_size_accum;
             /* Just set block size to 32MB just to create an allocation error!  */
             code_block_size =  33554432;
         }
-
+        
         /* Calculate the new code size.  */
         local_code_size =  code_block_size*(TXM_MODULE_MANAGER_CODE_MPU_ENTRIES - 1);
-
+        
         /* Determine if the code block size is greater than the current alignment. If so, use block size
            as the alignment.  */
         if (code_block_size > local_code_alignment)
             local_code_alignment = code_block_size;
-
+        
     }
     else
     {
-
         /* Determine code block sizes. Minimize the alignment requirement.
            There are 4 MPU code entries available. The following is how the code size
            will be distributed:
@@ -279,11 +278,10 @@ ULONG   data_size_accum;
         code_size_accum =  code_size_accum + _txm_power_of_two_block_size(local_code_size - code_size_accum);
         local_code_size =  code_size_accum;
     }
-
+    
     /* Determine the best data block size, which in our case is the minimal alignment.  */
     if (local_data_size <= (32*TXM_MODULE_MANAGER_DATA_MPU_ENTRIES))
     {
-
         /* Block size of 32 is best.   */
         data_block_size =  32;
     }
@@ -374,7 +372,6 @@ ULONG   data_size_accum;
     }
     else
     {
-
         /* Just set data block size to 32MB just to create an allocation error!  */
         data_block_size =  33554432;
     }
@@ -386,11 +383,13 @@ ULONG   data_size_accum;
         data_size_accum += data_block_size;
     }
     local_data_size = data_size_accum;
-
+    
     /* Determine if the data block size is greater than the current alignment. If so, use block size
        as the alignment.  */
     if (data_block_size > local_data_alignment)
+    {
         local_data_alignment =  data_block_size;
+    }
 
     /* Return all the information to the caller.  */
     *code_size =        local_code_size;

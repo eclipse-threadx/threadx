@@ -38,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_system_return                         Cortex-A5x-SMP/AC6 */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -70,7 +70,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_system_return(VOID)
@@ -90,10 +90,17 @@ _tx_thread_system_return:
     STP     x25, x26, [sp, #-16]!               // Save x25, x26
     STP     x27, x28, [sp, #-16]!               // Save x27, x28
     MRS     x8, MPIDR_EL1                       // Pickup the core ID
+#ifdef TX_ARMV8_2
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x3, x8, #16, #8                     // Isolate cluster ID
+#endif
+    UBFX    x8, x8, #8, #8                      // Isolate core ID
+#else
 #if TX_THREAD_SMP_CLUSTERS > 1
     UBFX    x3, x8, #8, #8                      // Isolate cluster ID
 #endif
     UBFX    x8, x8, #0, #8                      // Isolate core ID
+#endif
 #if TX_THREAD_SMP_CLUSTERS > 1
     ADDS    x8, x8, x3, LSL #2                  // Calculate CPU ID
 #endif

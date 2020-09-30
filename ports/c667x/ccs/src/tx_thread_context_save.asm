@@ -45,7 +45,7 @@ SP          .set    B15
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_context_save                             C667x/TI        */ 
-;/*                                                           6.0          */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -76,7 +76,7 @@ SP          .set    B15
 ;/*                                                                        */ 
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_save(VOID)

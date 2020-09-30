@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_create                                   PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -80,6 +80,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     William E. Lamie         Modified comment(s), and      */
+/*                                            changed stack calculations  */
+/*                                            to use ALIGN_TYPE integers, */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ULONG id), ULONG entry_input,
@@ -96,8 +100,8 @@ UINT                    saved_threshold =  ((UINT) 0);
 UCHAR                   *temp_ptr;
 
 #ifdef TX_ENABLE_STACK_CHECKING
-ULONG                   new_stack_start;
-ULONG                   updated_stack_start;
+ALIGN_TYPE              new_stack_start;
+ALIGN_TYPE              updated_stack_start;
 #endif
 
 #ifndef TX_DISABLE_STACK_FILLING
@@ -116,7 +120,7 @@ ULONG                   updated_stack_start;
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
 
     /* Ensure the starting stack address is evenly aligned.  */
-    new_stack_start =  TX_POINTER_TO_ULONG_CONVERT(stack_start);
+    new_stack_start =  TX_POINTER_TO_ALIGN_TYPE_CONVERT(stack_start);
     updated_stack_start =  ((((ULONG) new_stack_start) + ((sizeof(ULONG)) - ((ULONG) 1)) ) & (~((sizeof(ULONG)) - ((ULONG) 1))));
 
     /* Determine if the starting stack address is different.  */
@@ -128,7 +132,7 @@ ULONG                   updated_stack_start;
     }
 
     /* Update the starting stack pointer.  */
-    stack_start =  TX_ULONG_TO_POINTER_CONVERT(updated_stack_start);
+    stack_start =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(updated_stack_start);
 #endif
 
     /* Prepare the thread control block prior to placing it on the created

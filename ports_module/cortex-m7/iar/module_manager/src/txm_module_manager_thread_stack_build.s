@@ -10,66 +10,57 @@
 ;/**************************************************************************/
 ;
 ;
-;/**************************************************************************/ 
-;/**************************************************************************/ 
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
-;/**                                                                       */ 
-;/**   Module Manager                                                      */ 
-;/**                                                                       */ 
-;/**************************************************************************/ 
-;/**************************************************************************/ 
+;/**************************************************************************/
+;/**************************************************************************/
+;/**                                                                       */
+;/** ThreadX Component                                                     */
+;/**                                                                       */
+;/**   Module Manager                                                      */
+;/**                                                                       */
+;/**************************************************************************/
+;/**************************************************************************/
 ;
 ;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;
-;
-        SECTION `.text`:CODE:NOROOT(2)
-        THUMB
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _txm_module_manager_thread_stack_build          Cortex-M7/MPU/IAR   */ 
-;/*                                                           6.0.1        */
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _txm_module_manager_thread_stack_build          Cortex-M7/MPU/IAR   */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function builds a stack frame on the supplied thread's stack.  */ 
-;/*    The stack frame results in a fake interrupt return to the supplied  */ 
-;/*    function pointer.                                                   */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    thread_ptr                            Pointer to thread             */ 
-;/*    function_ptr                          Pointer to shell function     */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_thread_create                     Create thread service         */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function builds a stack frame on the supplied thread's stack.  */
+;/*    The stack frame results in a fake interrupt return to the supplied  */
+;/*    function pointer.                                                   */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    thread_ptr                            Pointer to thread             */
+;/*    function_ptr                          Pointer to shell function     */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_thread_create                     Create thread service         */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+;/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _txm_module_manager_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(TX_THREAD *, TXM_MODULE_INSTANCE *))
@@ -77,11 +68,11 @@
     PUBLIC  _txm_module_manager_thread_stack_build
 _txm_module_manager_thread_stack_build:
 ;
-;       
+;
 ;    /* Build a fake interrupt frame.  The form of the fake interrupt stack
 ;       on the Cortex-M should look like the following after it is built:
-;       
-;       Stack Top:      
+;
+;       Stack Top:
 ;                       LR          Interrupted LR (LR at time of PENDSV)
 ;                       r4          Initial value for r4
 ;                       r5          Initial value for r5
@@ -89,7 +80,7 @@ _txm_module_manager_thread_stack_build:
 ;                       r7          Initial value for r7
 ;                       r8          Initial value for r8
 ;                       r9          Initial value for r9
-;                       r10 (sl)    Initial value for r10 (sl)
+;                       r10         Initial value for r10
 ;                       r11         Initial value for r11
 ;                       r0          Initial value for r0    (Hardware stack starts here!!)
 ;                       r1          Initial value for r1
@@ -116,17 +107,15 @@ _txm_module_manager_thread_stack_build:
     STR     r3, [r2, #12]                       ; Store initial r6
     STR     r3, [r2, #16]                       ; Store initial r7
     STR     r3, [r2, #20]                       ; Store initial r8
-    LDR     r3, [r0, #12]                       ; Pickup stack starting address
-    STR     r3, [r2, #28]                       ; Store initial r10 (sl)
-    MOV     r3, #0                              ; Build initial register value
+    STR     r3, [r2, #28]                       ; Store initial r10
     STR     r3, [r2, #32]                       ; Store initial r11
 ;
-;    /* Hardware stack follows.  /
+;    /* Hardware stack follows.  */
 ;
     STR     r0, [r2, #36]                       ; Store initial r0, which is the thread control block
 
     LDR     r3, [r0, #8]                        ; Pickup thread entry info pointer,which is in the stack pointer position of the thread control block.
-                                                ;   It was setup in the txm_module_manager_thread_create function. It will be overwritten later in this 
+                                                ;   It was setup in the txm_module_manager_thread_create function. It will be overwritten later in this
                                                 ;   function with the actual, initial stack pointer.
     STR     r3, [r2, #40]                       ; Store initial r1, which is the module entry information.
     LDR     r3, [r3, #8]                        ; Pickup data base register from the module information
@@ -145,8 +134,7 @@ _txm_module_manager_thread_stack_build:
 ;    /* Setup stack pointer.  */
 ;    thread_ptr -> tx_thread_stack_ptr =  r2;
 ;
-    STR     r2, [r0, #8]                        ; Save stack pointer in thread's
-                                                ;   control block
+    STR     r2, [r0, #8]                        ; Save stack pointer in thread's control block
     BX      lr                                  ; Return to caller
 ;}
     END
