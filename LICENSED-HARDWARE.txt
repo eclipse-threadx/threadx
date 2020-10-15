@@ -17,6 +17,9 @@ Microchip:
     SAM 32-bit MCUs
     SAM 32-bit MPUs
 
+NXP:
+    i.MX RT105x/6x cross over MCUs
+
 Renesas:
 
     Synergy Platform
