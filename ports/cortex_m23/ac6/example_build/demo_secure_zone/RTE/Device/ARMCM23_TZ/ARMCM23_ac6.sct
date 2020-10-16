@@ -71,4 +71,8 @@ LR_ROM __RO_BASE __RO_SIZE  {                       ; load region size_region
 
   ARM_LIB_STACK __STACK_TOP EMPTY -__STACK_SIZE {   ; Reserve empty region for stack
   }
+  SEAL +0
+  {
+    *.o(.seal+FIRST)
+  }
 }

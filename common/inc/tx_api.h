@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -51,6 +51,9 @@
 /*                                            added macros for casting    */
 /*                                            pointers to ALIGN_TYPE,     */
 /*                                            resulting in version 6.1    */
+/*  10-16-2020     William E. Lamie         Modified comment(s), and      */
+/*                                            increased patch version,    */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -83,7 +86,7 @@ extern   "C" {
 #define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
 #define THREADX_MINOR_VERSION           1
-#define THREADX_PATCH_VERSION           0
+#define THREADX_PATCH_VERSION           1
 
 /* Define the following symbol for backward compatibility */
 #define EL_PRODUCT_THREADX

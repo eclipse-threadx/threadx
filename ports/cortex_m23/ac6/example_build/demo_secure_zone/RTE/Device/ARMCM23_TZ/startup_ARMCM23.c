@@ -117,6 +117,9 @@ extern const pFunc __VECTOR_TABLE[240];
 #pragma GCC diagnostic pop
 #endif
 
+/* The linker will place this value at the bottom of the stack to seal the secure main stack. */
+const int stack_seal __attribute__((section (".seal"))) = 0xFEF5EDA5;
+
 /*----------------------------------------------------------------------------
   Reset Handler called on controller reset
  *----------------------------------------------------------------------------*/

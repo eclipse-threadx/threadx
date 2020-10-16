@@ -99,7 +99,6 @@ void SystemInit (void)
     
     *(uint32_t *)0xE000ED24 = 0x000F0000;   /* S: enable secure, usage, bus, mem faults */
     *(uint32_t *)0xE002ED24 = 0x000F0000;   /* NS: enable secure, usage, bus, mem faults */
-
 }
 
 #if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE)

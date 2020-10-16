@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_suspend                                  PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -70,6 +70,10 @@
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
 /*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-16-2020     Yuxin Zhou               Modified comment(s), and      */
+/*                                            added type cast to address  */
+/*                                            a MISRA compliance issue,   */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_suspend(TX_THREAD *thread_ptr)
@@ -103,7 +107,7 @@ UINT        status;
         status =  TX_SUCCESS;
 
         /* Determine if we are in a thread context.  */
-        if (TX_THREAD_GET_SYSTEM_STATE() == 0)
+        if (TX_THREAD_GET_SYSTEM_STATE() == ((ULONG) 0))
         {
         
             /* Yes, we are in a thread context.  */
@@ -264,7 +268,7 @@ ULONG                       time_stamp =  ((ULONG) 0);
         status =  TX_SUCCESS;
 
         /* Determine if we are in a thread context.  */
-        if (TX_THREAD_GET_SYSTEM_STATE() == 0)
+        if (TX_THREAD_GET_SYSTEM_STATE() == ((ULONG) 0))
         {
         
             /* Yes, we are in a thread context.  */

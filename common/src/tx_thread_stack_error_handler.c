@@ -26,7 +26,7 @@
 /* Include necessary system files.  */
 
 #include "tx_api.h"
-#ifdef TX_MISRA_ENABLE
+#if defined(TX_MISRA_ENABLE) || defined(TX_ENABLE_STACK_CHECKING)
 #include "tx_thread.h"
 
 
@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_stack_error_handler                      PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -69,6 +69,9 @@
 /*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
 /*                                            update misra support,       */
 /*                                            resulting in version 6.1    */
+/*  10-16-2020     William E. Lamie         Modified comment(s),          */
+/*                                            fixed link issue,           */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_stack_error_handler(TX_THREAD *thread_ptr)
