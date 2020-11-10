@@ -20,7 +20,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
     .text
     .align 4
     .syntax unified
@@ -29,7 +28,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_stack_build                            Cortex-M7/AC6     */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -62,6 +61,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -96,7 +97,7 @@ _tx_thread_stack_build:
     Stack Bottom: (higher memory address)  */
 
     LDR     r2, [r0, #16]                           // Pickup end of stack area
-    BIC     r2, r2, #0x7                            // Align frame
+    BIC     r2, r2, #0x7                            // Align frame for 8-byte alignment
     SUB     r2, r2, #68                             // Subtract frame size
     LDR     r3, =0xFFFFFFFD                         // Build initial LR value
     STR     r3, [r2, #0]                            // Save on the stack

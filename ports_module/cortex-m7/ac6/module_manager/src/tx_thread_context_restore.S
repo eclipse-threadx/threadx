@@ -20,7 +20,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
     .text
     .align 4
     .syntax unified
@@ -29,7 +28,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_restore                        Cortex-M7/AC6     */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -38,10 +37,6 @@
 /*                                                                        */
 /*    This function is only needed for legacy applications and it should  */
 /*    not be called in any new development on a Cortex-M.                 */
-/*    This function restores the interrupt context if it is processing a  */
-/*    nested interrupt.  If not, it returns to the interrupt thread if no */
-/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
-/*    if no thread was running, the function returns to the scheduler.    */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -53,7 +48,7 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    _tx_thread_schedule                   Thread scheduling routine     */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -64,6 +59,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_restore(VOID)

@@ -2,6 +2,7 @@
 /*                                                                        */
 /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
 /*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
 /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
 /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
 /*       and in the root directory of this software.                      */
@@ -19,10 +20,8 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
     .global     __use_two_region_memory
     .global     __scatterload
-
 
     .eabi_attribute Tag_ABI_PCS_RO_data, 1
     .eabi_attribute Tag_ABI_PCS_R9_use,  1
@@ -34,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_initialize                          Cortex-M7/MPU/AC6   */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -64,6 +63,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Andres Mlinar            Initial Version 6.1           */
+/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_initialize(VOID)

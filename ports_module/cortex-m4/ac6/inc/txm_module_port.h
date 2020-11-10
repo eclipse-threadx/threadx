@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    txm_module_port.h                               Cortex-M4/MPU/AC6   */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -41,6 +41,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Andres Mlinar            Initial Version 6.1           */
+/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -96,16 +98,6 @@ The following extensions must also be defined in tx_port.h:
 #define TXM_MODULE_KERNEL_STACK_SIZE            768
 #endif
 
-/* For the following 3 access control settings, change TEX and C, B, S (bits 21 through 16 of MPU_RASR)
- * to reflect your system memory attributes (cache, shareable, memory type).  */
-/* Code region access control: privileged read-only, outer & inner write-back, normal memory, shareable.  */
-#define TXM_MODULE_MPU_CODE_ACCESS_CONTROL      0x06070000
-/* Data region access control: execute never, read/write, outer & inner write-back, normal memory, shareable.  */
-#define TXM_MODULE_MPU_DATA_ACCESS_CONTROL      0x13070000
-/* Shared region access control: execute never, read-only, outer & inner write-back, normal memory, shareable.  */
-#define TXM_MODULE_MPU_SHARED_ACCESS_CONTROL    0x12070000
-
-
 /* Define constants specific to the tools the module can be built with for this particular modules port.  */
 
 #define TXM_MODULE_IAR_COMPILER                 0x00000000
@@ -160,9 +152,9 @@ The following extensions must also be defined in tx_port.h:
 
 #define INLINE_DECLARE inline
 
-/* Define the number of MPU entries assigned to the code and data sections. On Cortex-M parts, there can only be 7 total
-   entries, since ThreadX uses one for access to the kernel dispatch function.  */
-
+/* Define the number of MPU entries assigned to the code and data sections.
+   On Cortex-M4 parts, there are 8 total entries. ThreadX uses one for access
+   to the kernel entry function, thus 7 remain for code and data protection.  */
 #define TXM_MODULE_MANAGER_CODE_MPU_ENTRIES     4
 #define TXM_MODULE_MANAGER_DATA_MPU_ENTRIES     3
 #define TXM_MODULE_MANAGER_SHARED_MPU_INDEX     8
@@ -213,18 +205,6 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 
 #define TXM_MODULE_MANAGER_FAULT_INFO                                               \
     TXM_MODULE_MANAGER_MEMORY_FAULT_INFO    _txm_module_manager_memory_fault_info;
-
-/* Define the macro to check the stack available in dispatch.  */
-#define TXM_MODULE_MANAGER_CHECK_STACK_AVAILABLE                                    \
-    ULONG stack_available;                                                          \
-    __asm("MOV %0, SP" : "=r"(stack_available));                                    \
-    stack_available -= (ULONG)_tx_thread_current_ptr->tx_thread_stack_start;        \
-    if((stack_available < TXM_MODULE_MINIMUM_STACK_AVAILABLE) ||                    \
-       (stack_available > _tx_thread_current_ptr->tx_thread_stack_size))            \
-    {                                                                               \
-        return(TX_SIZE_ERROR);                                                      \
-    }
-
 
 /* Define the macro to check the code alignment.  */
 
@@ -340,6 +320,6 @@ ULONG _txm_module_manager_region_size_get(ULONG block_size);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M4/MPU/AC6 Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M4/MPU/AC6 Version 6.1.2 *";
 
 #endif

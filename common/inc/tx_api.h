@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE C      */
-/*                                                           6.1.1        */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -54,6 +54,10 @@
 /*  10-16-2020     William E. Lamie         Modified comment(s), and      */
 /*                                            increased patch version,    */
 /*                                            resulting in version 6.1.1  */
+/*  11-09-2020     Yuxin Zhou               Modified comment(s), and      */
+/*                                            moved TX_THREAD_GET_SYSTEM_ */
+/*                                            STATE to tx_api.h,          */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -86,7 +90,7 @@ extern   "C" {
 #define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
 #define THREADX_MINOR_VERSION           1
-#define THREADX_PATCH_VERSION           1
+#define THREADX_PATCH_VERSION           2
 
 /* Define the following symbol for backward compatibility */
 #define EL_PRODUCT_THREADX
@@ -2212,6 +2216,13 @@ void __ghs_rnerr(char *errMsg, int stackLevels, int stackTraceDisplay, void *hex
 #define TX_EL_TIMER_PERFORMANCE_SYSTEM_INFO_GET_INSERT
 
 #endif
+
+/* Define the get system state macro. By default, it simply maps to the variable _tx_thread_system_state.  */
+/* Note that prior to Azure RTOS 6.1, this symbol was defined in tx_thread.h. */   
+#ifndef TX_THREAD_GET_SYSTEM_STATE
+#define TX_THREAD_GET_SYSTEM_STATE()        _tx_thread_system_state
+#endif
+
 
 
 

@@ -23,7 +23,6 @@
     .global  _tx_thread_current_ptr
     .global  _tx_thread_execute_ptr
     .global  _tx_timer_time_slice
-    .global  _tx_thread_system_stack_ptr
     .global  _tx_execution_thread_enter
     .global  _tx_execution_thread_exit
     .global  _tx_thread_preempt_disable
@@ -38,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                             Cortex-M4/MPU/GNU   */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -72,6 +71,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  11-09-2020     Scott Larson             Modified comment(s), arrange  */
+/*                                            code to fix link error when */
+/*                                            VFP is enabled, resulting   */
+/*                                            in version 6.1.2            */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -92,7 +95,7 @@ _tx_thread_schedule:
 
     /* Clear CONTROL.FPCA bit so FPU registers aren't unnecessarily stacked.  */
 
-#ifdef __ARMVFP__
+#ifdef __ARM_PCS_VFP
     MRS     r0, CONTROL                             // Pickup current CONTROL register
     BIC     r0, r0, #4                              // Clear the FPCA bit
     MSR     CONTROL, r0                             // Setup new CONTROL register
@@ -124,6 +127,7 @@ __tx_wait_here:
 
 
     /* Memory Exception Handler.  */
+
     .global  MemManage_Handler
     .global  BusFault_Handler
     .global  UsageFault_Handler
@@ -192,7 +196,7 @@ UsageFault_Handler:
                                                     //     Bit 7 = 1 -> MMFAR is valid
     STRB    r1, [r0]                                // Clear the MMFSR
 
-#ifdef __ARMVFP__
+#ifdef __ARM_PCS_VFP
     LDR     r0, =0xE000EF34                         // Cleanup FPU context: Load FPCCR address
     LDR     r1, [r0]                                // Load FPCCR
     BIC     r1, r1, #1                              // Clear the lazy preservation active bit
@@ -202,9 +206,7 @@ UsageFault_Handler:
     BL      _txm_module_manager_memory_fault_handler    // Call memory manager fault handler
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-
     /* Call the thread exit function to indicate the thread is no longer executing.  */
-
     CPSID   i                                       // Disable interrupts
     BL      _tx_execution_thread_exit               // Call the thread exit function
     CPSIE   i                                       // Enable interrupts
@@ -239,9 +241,7 @@ __tx_PendSVHandler:
 __tx_ts_handler:
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-
     /* Call the thread exit function to indicate the thread is no longer executing.  */
-
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
     BL      _tx_execution_thread_exit               // Call the thread exit function
@@ -263,7 +263,7 @@ __tx_ts_handler:
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r12, PSP                                // Pickup PSP pointer (thread's stack pointer)
     STMDB   r12!, {r4-r11}                          // Save its remaining registers
-#ifdef __ARMVFP__
+#ifdef __ARM_PCS_VFP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_save
     VSTMDB  r12!,{s16-s31}                          // Yes, save additional VFP registers
@@ -294,16 +294,42 @@ __tx_ts_new:
 
     CPSID   i                                       // Disable interrupts
     LDR     r1, [r2]                                // Is there another thread ready to execute?
-    CBZ     r1, __tx_ts_wait                        // No, skip to the wait processing
+    CBNZ    r1, __tx_ts_restore                     // Yes, schedule it
 
-    /* Yes, another thread is ready for else, make the current thread the new thread.  */
+    /* The following is the idle wait processing... in this case, no threads are ready for execution and the
+       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts
+       are disabled to allow use of WFI for waiting for a thread to arrive.  */
+
+__tx_ts_wait:
+    CPSID   i                                       // Disable interrupts
+    LDR     r1, [r2]                                // Pickup the next thread to execute pointer
+    CBNZ    r1, __tx_ts_ready                       // If non-NULL, a new thread is ready!
+#ifdef TX_ENABLE_WFI
+    DSB                                             // Ensure no outstanding memory transactions
+    WFI                                             // Wait for interrupt
+    ISB                                             // Ensure pipeline is flushed
+#endif
+    CPSIE   i                                       // Enable interrupts
+    B       __tx_ts_wait                            // Loop to continue waiting
+
+    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are
+       already in the handler!  */
+
+__tx_ts_ready:
+    MOV     r7, #0x08000000                         // Build clear PendSV value
+    MOV     r8, #0xE000E000                         // Build base NVIC address
+    STR     r7, [r8, #0xD04]                        // Clear any PendSV
+
+__tx_ts_restore:
+
+    /* A thread is ready, make the current thread the new thread
+       and enable interrupts.  */
 
     STR     r1, [r0]                                // Setup the current thread pointer to the new thread
     CPSIE   i                                       // Enable interrupts
 
     /* Increment the thread run count.  */
 
-__tx_ts_restore:
     LDR     r7, [r1, #4]                            // Pickup the current thread run count
     LDR     r4, =_tx_timer_time_slice               // Build address of time-slice variable
     LDR     r5, [r1, #24]                           // Pickup thread's current time-slice
@@ -315,9 +341,7 @@ __tx_ts_restore:
     STR     r5, [r4]                                // Setup global time-slice
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-
     /* Call the thread entry function to indicate the thread is executing.  */
-
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
     POP     {r0, r1}                                // Recover r0 and r1
@@ -353,7 +377,7 @@ __tx_ts_restore:
     STR     r1, [r0]                                // Enable MPU
 skip_mpu_setup:
     LDMIA   r12!, {LR}                              // Pickup LR
-#ifdef __ARMVFP__
+#ifdef __ARM_PCS_VFP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_restore                       // If not, skip VFP restore
     VLDMIA  r12!, {s16-s31}                         // Yes, restore additional VFP registers
@@ -365,36 +389,6 @@ _skip_vfp_restore:
     /* Return to thread.  */
 
     BX      lr                                      // Return to thread!
-
-    /* The following is the idle wait processing... in this case, no threads are ready for execution and the
-       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts
-       are disabled to allow use of WFI for waiting for a thread to arrive.  */
-
-__tx_ts_wait:
-    CPSID   i                                       // Disable interrupts
-    LDR     r1, [r2]                                // Pickup the next thread to execute pointer
-    STR     r1, [r0]                                // Store it in the current pointer
-    CBNZ    r1, __tx_ts_ready                       // If non-NULL, a new thread is ready!
-#ifdef TX_ENABLE_WFI
-    DSB                                             // Ensure no outstanding memory transactions
-    WFI                                             // Wait for interrupt
-    ISB                                             // Ensure pipeline is flushed
-#endif
-    CPSIE   i                                       // Enable interrupts
-    B       __tx_ts_wait                            // Loop to continue waiting
-
-    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are
-       already in the handler!  */
-
-__tx_ts_ready:
-    MOV     r7, #0x08000000                         // Build clear PendSV value
-    MOV     r8, #0xE000E000                         // Build base NVIC address
-    STR     r7, [r8, #0xD04]                        // Clear any PendSV
-
-    /* Re-enable interrupts and restore new thread.  */
-
-    CPSIE   i                                       // Enable interrupts
-    B       __tx_ts_restore                         // Restore the thread
 
 
     /* SVC Handler.  */
@@ -549,3 +543,17 @@ _txm_module_user_mode_exit:
     NOP
     NOP
 // }
+
+#ifdef __ARM_PCS_VFP
+    .global  tx_thread_fpu_disable
+    .thumb_func
+tx_thread_fpu_disable:
+    .global  tx_thread_fpu_enable
+    .thumb_func
+tx_thread_fpu_enable:
+    /* Automatic VPF logic is supported, this function is present only for
+       backward compatibility purposes and therefore simply returns.  */
+
+    BX      LR                                      // Return to caller
+
+#endif

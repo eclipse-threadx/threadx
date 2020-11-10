@@ -20,7 +20,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
     .global      _tx_timer_time_slice
     .global      _tx_timer_system_clock
     .global      _tx_timer_current_ptr
@@ -31,7 +30,6 @@
     .global      _tx_thread_time_slice
     .global      _tx_timer_expiration_process
 
-
     .text
     .align 4
     .syntax unified
@@ -40,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_timer_interrupt                               Cortex-M7/AC6     */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -50,8 +48,7 @@
 /*    This function processes the hardware timer interrupt.  This         */
 /*    processing includes incrementing the system clock and checking for  */
 /*    time slice and/or timer expiration.  If either is found, the        */
-/*    interrupt context save/restore functions are called along with the  */
-/*    expiration functions.                                               */
+/*    expiration functions are called.                                    */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -75,6 +72,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
@@ -83,8 +82,7 @@
     .thumb_func
 _tx_timer_interrupt:
 
-    /* Upon entry to this routine, it is assumed that context save has already
-       been called, and therefore the compiler scratch registers are available
+    /* Upon entry to this routine, it is assumed that the compiler scratch registers are available
        for use.  */
 
     /* Increment the system clock.  */
@@ -114,7 +112,6 @@ _tx_timer_interrupt:
        // if (__tx_timer_time_slice == 0)
 
     CBNZ    r2, __tx_timer_no_time_slice            // Has it expired?
-                                                    // No, skip expiration processing
 
        /* Set the time-slice expired flag.  */
        // _tx_timer_expired_time_slice =  TX_TRUE;
@@ -176,7 +173,6 @@ __tx_timer_skip_wrap:
 
 __tx_timer_done:
 
-
     /* See if anything has expired.  */
     // if ((_tx_timer_expired_time_slice) || (_tx_timer_expired))
     // {
@@ -191,7 +187,6 @@ __tx_timer_done:
                                                     // No, nothing expired
 
 __tx_something_expired:
-
 
     STMDB   sp!, {r0, lr}                           // Save the lr register on the stack
                                                     //   and save r0 just to keep 8-byte alignment

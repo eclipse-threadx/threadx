@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    txm_module_port.h                               Cortex-M4/MPU/IAR   */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -41,6 +41,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*                                            increase kernel stack size, */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -94,7 +97,7 @@ The following extensions must also be defined in tx_port.h:
 
 /* Define the kernel stack size for a module thread.  */
 #ifndef TXM_MODULE_KERNEL_STACK_SIZE
-#define TXM_MODULE_KERNEL_STACK_SIZE            512
+#define TXM_MODULE_KERNEL_STACK_SIZE            768
 #endif
 
 /* Define constants specific to the tools the module can be built with for this particular modules port.  */
@@ -151,9 +154,9 @@ The following extensions must also be defined in tx_port.h:
 
 #define INLINE_DECLARE inline
 
-/* Define the number of MPU entries assigned to the code and data sections. On Cortex-M parts, there can only be 7 total
-   entries, since ThreadX uses one for access to the kernel dispatch function.  */
-
+/* Define the number of MPU entries assigned to the code and data sections.
+   On Cortex-M4 parts, there are 8 total entries. ThreadX uses one for access
+   to the kernel entry function, thus 7 remain for code and data protection.  */
 #define TXM_MODULE_MANAGER_CODE_MPU_ENTRIES     4
 #define TXM_MODULE_MANAGER_DATA_MPU_ENTRIES     3
 #define TXM_MODULE_MANAGER_SHARED_MPU_INDEX     8
@@ -319,6 +322,6 @@ ULONG _txm_module_manager_region_size_get(ULONG block_size);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M4/MPU/IAR Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M4/MPU/IAR Version 6.1.2 *";
 
 #endif

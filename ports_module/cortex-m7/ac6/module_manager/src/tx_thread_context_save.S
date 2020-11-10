@@ -20,7 +20,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
     .text
     .align 4
     .syntax unified
@@ -29,7 +28,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_save                           Cortex-M7/AC6     */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -38,9 +37,6 @@
 /*                                                                        */
 /*    This function is only needed for legacy applications and it should  */
 /*    not be called in any new development on a Cortex-M.                 */
-/*    This function saves the context of an executing thread in the       */
-/*    beginning of interrupt processing.  The function also ensures that  */
-/*    the system stack is used upon return to the calling ISR.            */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -63,6 +59,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_save(VOID)

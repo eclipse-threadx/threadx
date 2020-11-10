@@ -46,7 +46,7 @@ SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                          Cortex-M4/AC6     */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -80,6 +80,8 @@ SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_initialize_low_level(VOID)
@@ -105,6 +107,13 @@ _tx_initialize_low_level:
     LDR     r1, =vector_table                       // Pickup address of vector table
     STR     r1, [r0, #0xD08]                        // Set vector table address
 
+    /* Enable the cycle count register.  */
+
+//    LDR     r0, =0xE0001000                         // Build address of DWT register
+//    LDR     r1, [r0]                                // Pickup the current value
+//    ORR     r1, r1, #1                              // Set the CYCCNTENA bit
+//    STR     r1, [r0]                                // Enable the cycle count register 
+
     /* Set system stack pointer from vector value.  */
 
     LDR     r0, =_tx_thread_system_stack_ptr        // Build address of system stack pointer
@@ -112,14 +121,7 @@ _tx_initialize_low_level:
     LDR     r1, [r1]                                // Pickup reset stack pointer
     STR     r1, [r0]                                // Save system stack pointer
 
-    /* Enable the cycle count register.  */
-
-    LDR     r0, =0xE0001000                         // Build address of DWT register
-    LDR     r1, [r0]                                // Pickup the current value
-    ORR     r1, r1, #1                              // Set the CYCCNTENA bit
-    STR     r1, [r0]                                // Enable the cycle count register
-
-    /* Configure SysTick for 100Hz clock, or 16384 cycles if no reference.  */
+    /* Configure SysTick.  */
 
     MOV     r0, #0xE000E000                         // Build address of NVIC registers
     LDR     r1, =SYSTICK_CYCLES

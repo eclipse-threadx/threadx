@@ -21,7 +21,7 @@ __txm_module_preamble:
     .dc.l      0x02000007                                       // Module Properties where:
                                                                 //   Bits 31-24: Compiler ID
                                                                 //           0 -> IAR
-                                                                //           1 -> RVDS
+                                                                //           1 -> ARM
                                                                 //           2 -> GNU
                                                                 //   Bits 23-3: Reserved
                                                                 //   Bit 2:  0 -> Disable shared/external memory access
