@@ -1,6 +1,6 @@
 LICENSED HARDWARE LIST
 
-Last Updated: 2020-10-15
+Last Updated: 2020-11-17
 
 Microsoft has entered into OEM Agreements with manufacturers of the following
 microprocessors and microcontrollers (the “hardware”) to enable those
@@ -11,6 +11,12 @@ Production Use” rights in Section 2 of the Microsoft Software License Terms fo
 Microsoft Azure RTOS. If hardware is not listed below, you do not have those
 rights.
 
+
+STMicroelectronics:
+
+    STM32 MCUs
+    STM32 MPUs
+
 Microchip:
 
     PIC 32-bit MCUs
@@ -18,6 +24,7 @@ Microchip:
     SAM 32-bit MPUs
 
 NXP:
+
     i.MX RT105x/6x cross over MCUs
 
 Renesas:
