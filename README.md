@@ -36,7 +36,7 @@ $ git clone https://github.com/azure-rtos/threadx.git
 
 ## Building as a static library
 
-Each component of Azure RTOS comes with a composible CMake-based build system that supports many different MCUs and host systems. Integrating any of these components into your device app code is as simple as adding a git submodule and then including it in your build using the CMake command `add_subdirectory()`.
+Each component of Azure RTOS comes with a composable CMake-based build system that supports many different MCUs and host systems. Integrating any of these components into your device app code is as simple as adding a git submodule and then including it in your build using the CMake command `add_subdirectory()`.
 
 While the typical usage pattern is to include threadx into your device code source tree to be built & linked with your code, you can compile this project as a standalone static library to confirm your build is set up correctly.
 
@@ -103,7 +103,7 @@ The following are references to additional Azure RTOS and Azure IoT in general:
 |   |   |
 |---|---|
 | TraceX Installer | https://aka.ms/azrtos-tracex-installer |
-| Azure RTOS Documenation and Guides: | https://docs.microsoft.com/azure/rtos |
+| Azure RTOS Documentation and Guides: | https://docs.microsoft.com/azure/rtos |
 | Azure RTOS Website: | https://azure.microsoft.com/services/rtos/ |
 | Azure RTOS Sales Questions: | https://azure-rtos.ms-iot-contact.com/ |
 | For technical questions check out Microsoft Q/A for Azure IoT: | https://aka.ms/QnA/azure-rtos |
