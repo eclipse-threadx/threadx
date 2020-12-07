@@ -48,7 +48,7 @@ jobs:
 
     # Get Ninja into the environment
     - name: Install ninja-build
-      uses: seanmiddleditch/gha-setup-ninja@v1
+      uses: seanmiddleditch/gha-setup-ninja@v3
 
     # Prepare the build system
     - name: Prepare build system
