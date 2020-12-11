@@ -1,6 +1,6 @@
 LICENSED HARDWARE LIST
 
-Last Updated: 2020-11-17
+Last Updated: 2020-12-11
 
 Microsoft has entered into OEM Agreements with manufacturers of the following
 microprocessors and microcontrollers (the “hardware”) to enable those
@@ -16,6 +16,10 @@ STMicroelectronics:
 
     STM32 MCUs
     STM32 MPUs
+
+MediaTek:
+
+    MT3620 MCU (Azure Sphere)
 
 Microchip:
 
