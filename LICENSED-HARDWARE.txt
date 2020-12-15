@@ -1,6 +1,6 @@
 LICENSED HARDWARE LIST
 
-Last Updated: 2020-12-11
+Last Updated: 2020-12-15
 
 Microsoft has entered into OEM Agreements with manufacturers of the following
 microprocessors and microcontrollers (the “hardware”) to enable those
@@ -29,7 +29,7 @@ Microchip:
 
 NXP:
 
-    i.MX RT105x/6x cross over MCUs
+    NXP i.MX RT10xx series crossover MCUs
 
 Renesas:
 
