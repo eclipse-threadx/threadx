@@ -29,7 +29,6 @@
 
 #define TX_SOURCE_CODE
 
-#include "ARMCM23_TZ.h"                 /* For intrinsic functions. */
 #include "tx_secure_interface.h"        /* Interface for NS code. */
 
 /* Minimum size of secure stack. */
@@ -63,7 +62,7 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_initialize                Cortex-M23/GNU    */
-/*                                                           6.1.1        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -82,10 +81,7 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_CONTROL                         Intrinsic to get CONTROL      */
-/*    __set_CONTROL                         Intrinsic to set CONTROL      */
-/*    __set_PSPLIM                          Intrinsic to set PSP limit    */
-/*    __set_PSP                             Intrinsic to set PSP          */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -98,19 +94,25 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.1  */
+/*  12-31-2020      Scott Larson            Modified comment(s), and      */
+/*                                            fixed M23 GCC build,        */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
 void    _tx_thread_secure_stack_initialize(void)
 {
+    ULONG control;
     
     /* Set secure mode to use PSP. */
-    __set_CONTROL(__get_CONTROL() | 2);
+    asm volatile("MRS     %0, CONTROL" : "=r" (control));   /* Get CONTROL register. */
+    control |= 2;                                           /* Use PSP. */
+    asm volatile("MSR     CONTROL, %0" :: "r" (control));   /* Set CONTROL register. */
     
     /* Set process stack pointer and stack limit to 0 to throw exception when a thread
        without a secure stack calls a secure function that tries to use secure stack. */
-    __set_PSPLIM(0);
-    __set_PSP(0);
+    asm volatile("MSR     PSPLIM, %0" :: "r" (0));
+    asm volatile("MSR     PSP, %0" :: "r" (0));
     
     return;
 }
@@ -122,7 +124,7 @@ void    _tx_thread_secure_stack_initialize(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_allocate             Cortex-M23/GNU    */
-/*                                                           6.1.1        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -145,13 +147,9 @@ void    _tx_thread_secure_stack_initialize(void)
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_IPSR                            Intrinsic to get IPSR         */
 /*    calloc                                Compiler's calloc function    */
 /*    malloc                                Compiler's malloc function    */
 /*    free                                  Compiler's free() function    */
-/*    __set_PSPLIM                          Intrinsic to set PSP limit    */
-/*    __set_PSP                             Intrinsic to set PSP          */
-/*    __TZ_get_PSPLIM_NS                    Intrinsic to get NS PSP       */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -165,6 +163,10 @@ void    _tx_thread_secure_stack_initialize(void)
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            added stack sealing,        */
 /*                                            resulting in version 6.1.1  */
+/*  12-31-2020      Scott Larson            Modified comment(s), and      */
+/*                                            fixed M23 GCC build,        */
+/*                                            resulting in version 6.1.3  */
+
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -173,12 +175,14 @@ UINT    _tx_thread_secure_mode_stack_allocate(TX_THREAD *thread_ptr, ULONG stack
 UINT    status;
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 UCHAR   *stack_mem;
-ULONG   sp;
+ULONG   ipsr;
+ULONG   psplim_ns;
 
     status = TX_SUCCESS;
     
     /* Make sure function is called from interrupt (threads should not call). */
-    if (__get_IPSR() == 0)
+    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    if (ipsr == 0)
     {
         status = TX_CALLER_ERROR;
     }
@@ -217,14 +221,13 @@ ULONG   sp;
                 /* Save info pointer in thread. */
                 thread_ptr -> tx_thread_secure_stack_context = info_ptr;
                 
-                /* Check if this thread is running by looking at PSP_NS and seeing if it is within
-                   the stack_start and stack_end range. */
-                sp = __TZ_get_PSP_NS();
-                if(sp > ((ULONG) thread_ptr -> tx_thread_stack_start) && sp < ((ULONG) thread_ptr -> tx_thread_stack_end))
+                /* Check if this thread is running by looking at its stack start and PSPLIM_NS */
+                asm volatile("MRS     %0, PSPLIM_NS" : "=r" (psplim_ns));   /* Get PSPLIM_NS register. */
+                if(((ULONG) thread_ptr -> tx_thread_stack_start & 0xFFFFFFF8) == psplim_ns)
                 {
                     /* If this thread is running, set Secure PSP and PSPLIM. */
-                    __set_PSPLIM((ULONG)(info_ptr -> tx_thread_secure_stack_limit));
-                    __set_PSP((ULONG)(info_ptr -> tx_thread_secure_stack_ptr));
+                    asm volatile("MSR     PSPLIM, %0" :: "r" ((ULONG)(info_ptr -> tx_thread_secure_stack_limit)));
+                    asm volatile("MSR     PSP, %0" :: "r" ((ULONG)(info_ptr -> tx_thread_secure_stack_ptr)));
                 }
             }
             
@@ -252,7 +255,7 @@ ULONG   sp;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_free                 Cortex-M23/GNU    */
-/*                                                           6.1.1        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -273,7 +276,6 @@ ULONG   sp;
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_IPSR                            Intrinsic to get IPSR         */
 /*    free                                  Compiler's free() function    */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -287,6 +289,9 @@ ULONG   sp;
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.1  */
+/*  12-31-2020      Scott Larson            Modified comment(s), and      */
+/*                                            fixed M23 GCC build,        */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -294,14 +299,16 @@ UINT    _tx_thread_secure_mode_stack_free(TX_THREAD *thread_ptr)
 {
 UINT    status;
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
-    
+ULONG   ipsr;
+
     status = TX_SUCCESS;
     
     /* Pickup stack info from thread. */
     info_ptr = thread_ptr -> tx_thread_secure_stack_context;
     
     /* Make sure function is called from interrupt (threads should not call). */
-    if (__get_IPSR() == 0)
+    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    if (ipsr == 0)
     {
         status = TX_CALLER_ERROR;
     }
@@ -335,7 +342,7 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_context_save              Cortex-M23/GNU    */
-/*                                                           6.1.1        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -354,10 +361,7 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_IPSR                            Intrinsic to get IPSR         */
-/*    __get_PSP                             Intrinsic to get PSP          */
-/*    __set_PSPLIM                          Intrinsic to set PSP limit    */
-/*    __set_PSP                             Intrinsic to set PSP          */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -370,6 +374,9 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.1  */
+/*  12-31-2020      Scott Larson            Modified comment(s), and      */
+/*                                            fixed M23 GCC build,        */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -377,9 +384,11 @@ void _tx_thread_secure_stack_context_save(TX_THREAD *thread_ptr)
 {
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 ULONG   sp;
-    
+ULONG   ipsr;
+
     /* This function should be called from scheduler only. */
-    if (__get_IPSR() == 0)
+    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    if (ipsr == 0)
     {
         return;
     }
@@ -394,7 +403,7 @@ ULONG   sp;
     }
     
     /* Check that stack pointer is in range */
-    sp = __get_PSP();
+    asm volatile("MRS     %0, PSP" : "=r" (sp));   /* Get PSP register. */
     if ((sp < (ULONG)info_ptr -> tx_thread_secure_stack_limit) || 
         (sp > (ULONG)info_ptr -> tx_thread_secure_stack_start))
     {
@@ -406,8 +415,8 @@ ULONG   sp;
     
     /* Set process stack pointer and stack limit to 0 to throw exception when a thread
        without a secure stack calls a secure function that tries to use secure stack. */
-    __set_PSPLIM(0);
-    __set_PSP(0);
+    asm volatile("MSR     PSPLIM, %0" :: "r" (0));
+    asm volatile("MSR     PSP, %0" :: "r" (0));
     
     return;
 }
@@ -419,7 +428,7 @@ ULONG   sp;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_context_restore           Cortex-M23/GNU    */
-/*                                                           6.1.1        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -438,9 +447,7 @@ ULONG   sp;
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_IPSR                            Intrinsic to get IPSR         */
-/*    __set_PSPLIM                          Intrinsic to set PSP limit    */
-/*    __set_PSP                             Intrinsic to set PSP          */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -453,15 +460,20 @@ ULONG   sp;
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.1  */
+/*  12-31-2020      Scott Larson            Modified comment(s), and      */
+/*                                            fixed M23 GCC build,        */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
 void _tx_thread_secure_stack_context_restore(TX_THREAD *thread_ptr)
 {
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
+ULONG   ipsr;
 
     /* This function should be called from scheduler only. */
-    if (__get_IPSR() == 0)
+    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    if (ipsr == 0)
     {
         return;
     }
@@ -476,8 +488,8 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
     }
     
     /* Set stack pointer and limit. */
-    __set_PSPLIM((ULONG)info_ptr -> tx_thread_secure_stack_limit);
-    __set_PSP   ((ULONG)info_ptr -> tx_thread_secure_stack_ptr);
+    asm volatile("MSR     PSPLIM, %0" :: "r" ((ULONG)info_ptr -> tx_thread_secure_stack_limit));
+    asm volatile("MSR     PSP, %0" :: "r" ((ULONG)info_ptr -> tx_thread_secure_stack_ptr));
     
     return;
 }

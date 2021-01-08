@@ -1,57 +1,69 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="com.arm.debugger.launcher2">
+    <listAttribute key="7726568867342656373.viewid=2">
+        <listEntry value="module_location"/>
+        <listEntry value="code_alignment"/>
+        <listEntry value="status"/>
+    </listAttribute>
+    <mapAttribute key="7726568867342656373.viewid=2.ExpressionsData">
+        <mapEntry key="0" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Hexadecimal"/>
+        <mapEntry key="1" value=""/>
+        <mapEntry key="2" value=""/>
+    </mapAttribute>
+    <stringAttribute key="7726568867342656373.viewid=2:DebugOutlineColumnState" value="OutlineConfig1&#9;8&#9;0&#9;true&#9;true&#9;255&#9;-1&#9;true&#9;1&#9;false&#9;true&#9;127&#9;-1&#9;true&#9;2&#9;true&#9;true&#9;376&#9;-1&#9;true&#9;3&#9;true&#9;true&#9;54&#9;-1&#9;true&#9;4&#9;true&#9;true&#9;65&#9;-1&#9;true&#9;5&#9;true&#9;true&#9;48&#9;-1&#9;true&#9;6&#9;true&#9;true&#9;84&#9;-1&#9;true&#9;7&#9;true&#9;true&#9;69&#9;-1&#9;true"/>
     <mapAttribute key="AverageDurationTracker">
-        <mapEntry key="*Fetching Data Model" value="2887558"/>
+        <mapEntry key="*Fetching Data Model" value="1447972"/>
         <mapEntry key="*FunctionLoader" value="214992700"/>
         <mapEntry key="*ListDynamicObjects" value="61100"/>
-        <mapEntry key="*list global low level symbols" value="9370891"/>
+        <mapEntry key="*list global low level symbols" value="1840075"/>
         <mapEntry key="*loading memory from target" value="1110358"/>
-        <mapEntry key="*loading values from target" value="8310340"/>
+        <mapEntry key="*loading values from target" value="5167565"/>
         <mapEntry key="*trace" value="38872798"/>
-        <mapEntry key="*updating expressions" value="61166027"/>
+        <mapEntry key="*updating expressions" value="53143906"/>
         <mapEntry key="*updating local_variables" value="6060821"/>
         <mapEntry key="*updating registers" value="3315038"/>
-        <mapEntry key="AddEventObserver" value="7229809"/>
-        <mapEntry key="Evaluate" value="2459191"/>
+        <mapEntry key="AddEventObserver" value="4901218"/>
+        <mapEntry key="Evaluate" value="4536197"/>
         <mapEntry key="SourceToAddress" value="1178100"/>
         <mapEntry key="areCachesAvailable" value="802125"/>
         <mapEntry key="backtrace" value="4840175"/>
-        <mapEntry key="break" value="47306816"/>
+        <mapEntry key="break" value="5325546"/>
         <mapEntry key="checking tracepoints" value="141269"/>
-        <mapEntry key="compute execution mode" value="2982244"/>
+        <mapEntry key="compute execution mode" value="5311716"/>
         <mapEntry key="console" value="2807900"/>
-        <mapEntry key="continue" value="70417515"/>
+        <mapEntry key="continue" value="67287632"/>
         <mapEntry key="core" value="6820750"/>
-        <mapEntry key="disassemble" value="62307917"/>
+        <mapEntry key="disassemble" value="41929939"/>
         <mapEntry key="evaluate address" value="758578"/>
         <mapEntry key="get byte order" value="322003"/>
-        <mapEntry key="get capabilities" value="2329837"/>
-        <mapEntry key="get execution addresss" value="1119951"/>
-        <mapEntry key="get source lines" value="1456512"/>
+        <mapEntry key="get capabilities" value="585052"/>
+        <mapEntry key="get execution addresss" value="387444"/>
+        <mapEntry key="get source lines" value="453685"/>
         <mapEntry key="getValidEncodings" value="2540450"/>
-        <mapEntry key="initialize command help" value="113682822"/>
+        <mapEntry key="initialize command help" value="53046776"/>
         <mapEntry key="interrupt" value="7691497"/>
-        <mapEntry key="list breakpoint options" value="251393"/>
-        <mapEntry key="list breakpoints" value="1729500"/>
-        <mapEntry key="list instruction sets" value="2446547"/>
-        <mapEntry key="list signals" value="7127146"/>
-        <mapEntry key="list watchpoint options" value="6289089"/>
-        <mapEntry key="list watchpoints" value="1080090"/>
-        <mapEntry key="loadfile" value="790923696"/>
-        <mapEntry key="next" value="45551172"/>
-        <mapEntry key="remove" value="2611023"/>
+        <mapEntry key="list breakpoint options" value="190256"/>
+        <mapEntry key="list breakpoints" value="1654130"/>
+        <mapEntry key="list instruction sets" value="1118577"/>
+        <mapEntry key="list signals" value="44653071"/>
+        <mapEntry key="list watchpoint options" value="3557205"/>
+        <mapEntry key="list watchpoints" value="730224"/>
+        <mapEntry key="loadfile" value="356525818"/>
+        <mapEntry key="next" value="31655516"/>
+        <mapEntry key="remove" value="2745078"/>
+        <mapEntry key="run script" value="27519512"/>
         <mapEntry key="select-frame" value="2720250"/>
-        <mapEntry key="set CWD" value="7691839"/>
-        <mapEntry key="set breakpoint properties" value="28197737"/>
-        <mapEntry key="set debug-from" value="11382151"/>
+        <mapEntry key="set CWD" value="4343514"/>
+        <mapEntry key="set breakpoint properties" value="6165571"/>
+        <mapEntry key="set debug-from" value="2007840"/>
         <mapEntry key="source sample_threadx_module_manager.ds" value="237787324"/>
         <mapEntry key="source sample_threadx_module_manager_debug.ds" value="145111082"/>
-        <mapEntry key="start" value="296844545"/>
-        <mapEntry key="step" value="41375081"/>
+        <mapEntry key="start" value="97315784"/>
+        <mapEntry key="step" value="47252310"/>
         <mapEntry key="synchronizing trace ranges" value="37187"/>
-        <mapEntry key="toggleBreakpoint" value="9917156"/>
+        <mapEntry key="toggleBreakpoint" value="9688552"/>
         <mapEntry key="updateBreakpointLocation" value="8450100"/>
-        <mapEntry key="waitForTargetToStop" value="41796648"/>
+        <mapEntry key="waitForTargetToStop" value="32104771"/>
     </mapAttribute>
     <intAttribute key="DEBUG_TAB..RESOURCES.COUNT" value="0"/>
     <intAttribute key="FILES.CONNECT_TO_GDB_SERVER.RESOURCES.COUNT" value="0"/>
@@ -73,11 +85,11 @@
     <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.0.VALUE" value=""/>
     <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.1.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
     <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.1.OPTION.ON_DEMAND_LOAD" value="true"/>
-    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.1.TYPE" value="TARGET_WORKING_DIR"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.1.TYPE" value="TARGET_DOWNLOAD_DIR"/>
     <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.1.VALUE" value=""/>
     <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.2.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
     <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.2.OPTION.ON_DEMAND_LOAD" value="true"/>
-    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.2.TYPE" value="TARGET_DOWNLOAD_DIR"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.2.TYPE" value="TARGET_WORKING_DIR"/>
     <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.2.VALUE" value=""/>
     <intAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.COUNT" value="3"/>
     <listAttribute key="FILES.DOWNLOAD_DEBUG"/>
@@ -87,11 +99,11 @@
     <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.0.VALUE" value=""/>
     <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.1.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
     <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.1.OPTION.ON_DEMAND_LOAD" value="true"/>
-    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.1.TYPE" value="TARGET_WORKING_DIR"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.1.TYPE" value="TARGET_DOWNLOAD_DIR"/>
     <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.1.VALUE" value=""/>
     <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.2.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
     <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.2.OPTION.ON_DEMAND_LOAD" value="true"/>
-    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.2.TYPE" value="TARGET_DOWNLOAD_DIR"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.2.TYPE" value="TARGET_WORKING_DIR"/>
     <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.2.VALUE" value=""/>
     <intAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.COUNT" value="3"/>
     <intAttribute key="FILES.DOWNLOAD_DEBUG_ANDROID.RESOURCES.COUNT" value="0"/>
@@ -125,8 +137,9 @@
     <stringAttribute key="FILES.SELECTED_DEBUG_OPEATION" value="ICE_DEBUG"/>
     <stringAttribute key="HOST_WORKING_DIR" value="${workspace_loc}"/>
     <booleanAttribute key="HOST_WORKING_DIR_USE_DEFAULT" value="true"/>
-    <booleanAttribute key="KEY_COMMANDS_AFTER_CONNECT" value="false"/>
-    <stringAttribute key="KEY_COMMANDS_AFTER_CONNECT_TEXT" value=""/>
+    <booleanAttribute key="InstructionStepping" value="false"/>
+    <booleanAttribute key="KEY_COMMANDS_AFTER_CONNECT" value="true"/>
+    <stringAttribute key="KEY_COMMANDS_AFTER_CONNECT_TEXT" value="load ${workspace_loc:/sample_threadx_module/Debug/sample_threadx_module.axf}&#13;&#10;add-symbol-file ${workspace_loc:/sample_threadx_module/Debug/sample_threadx_module.axf}"/>
     <booleanAttribute key="KEY_COMMANDS_AS_CONNECT" value="false"/>
     <intAttribute key="Messages.POST_TRIGGER_CAPTURE_SIZE.getLocalisedValue().FMTrace" value="50"/>
     <booleanAttribute key="Messages.STOP_ON_TRIGGER.getLocalisedValue().FMTrace" value="false"/>
@@ -136,14 +149,15 @@
     <booleanAttribute key="VFS_ENABLED" value="true"/>
     <stringAttribute key="VFS_LOCAL_DIR" value="${workspace_loc}"/>
     <stringAttribute key="VFS_REMOTE_MOUNT" value="/writeable"/>
+    <stringAttribute key="breakpoints" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;breakpoints order=&quot;ALPHA&quot;&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010CC4&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;112&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010C7C&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;112&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010CCE&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;115&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010C86&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;115&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010CDC&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;118&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010C94&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;118&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010CEA&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;124&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010CA2&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;124&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010C3A&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;89&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010BF2&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;89&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010C68&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;97&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010C20&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;97&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x0000A270&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/common_modules/module_manager/src/txm_module_manager_in_place_load.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\common_modules\module_manager\src\txm_module_manager_in_place_load.c&quot; line=&quot;119&quot; function=&quot;_txm_module_manager_in_place_load&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x0000A270&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/common_modules/module_manager/src/txm_module_manager_in_place_load.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\common_modules\module_manager\src\txm_module_manager_in_place_load.c&quot; line=&quot;119&quot; function=&quot;_txm_module_manager_in_place_load&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010CA4&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;103&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010C5C&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;103&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x0000BD60&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/common_modules/module_manager/src/txm_module_manager_start.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\common_modules\module_manager\src\txm_module_manager_start.c&quot; line=&quot;225&quot; function=&quot;_txm_module_manager_start&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x0000BD18&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/common_modules/module_manager/src/txm_module_manager_start.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\common_modules\module_manager\src\txm_module_manager_start.c&quot; line=&quot;225&quot; function=&quot;_txm_module_manager_start&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010CB2&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;106&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010C6A&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;106&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010CBA&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;109&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x00010C72&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx/ports_module/cortex-m7/ac6/example_build/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\ac6\example_build\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;109&quot; function=&quot;module_manager_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&lt;/breakpoints&gt;&#10;"/>
     <listAttribute key="com.arm.debug.views.common.AddressTracker.debugger.view.DisassemblyView.addresses">
+        <listEntry value="&lt;Next Instruction&gt;"/>
         <listEntry value=""/>
         <listEntry value="0x00030F38"/>
-        <listEntry value="&lt;Next Instruction&gt;"/>
     </listAttribute>
     <listAttribute key="com.arm.debug.views.common.AddressTracker.debugger.view.DisassemblyView.ranges">
-        <listEntry value=""/>
         <listEntry value="100"/>
+        <listEntry value=""/>
         <listEntry value="100"/>
     </listAttribute>
     <listAttribute key="com.arm.debug.views.common.AddressTracker.debugger.view.MemoryView.addresses">
@@ -165,8 +179,8 @@
     <stringAttribute key="config_file" value="CDB://cadi_config.xml"/>
     <booleanAttribute key="connectOnly" value="false"/>
     <listAttribute key="debugger.view.DisassemblyView:current">
-        <listEntry value=""/>
-        <listEntry value=""/>
+        <listEntry value="&lt;Next Instruction&gt;"/>
+        <listEntry value="100"/>
     </listAttribute>
     <listAttribute key="debugger.view.ExpressionsView">
         <listEntry value="thread_0_counter"/>
@@ -192,7 +206,7 @@
         <mapEntry key="8" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
         <mapEntry key="9" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
     </mapAttribute>
-    <stringAttribute key="debugger.view.ExpressionsView:DebugOutlineColumnState" value="OutlineConfig1&#9;8&#9;0&#9;true&#9;true&#9;200&#9;-1&#9;true&#9;1&#9;false&#9;true&#9;90&#9;-1&#9;true&#9;2&#9;true&#9;true&#9;108&#9;-1&#9;true&#9;3&#9;true&#9;true&#9;57&#9;-1&#9;true&#9;4&#9;true&#9;true&#9;50&#9;-1&#9;true&#9;5&#9;true&#9;true&#9;37&#9;-1&#9;true&#9;6&#9;true&#9;true&#9;80&#9;-1&#9;true&#9;7&#9;true&#9;true&#9;53&#9;-1&#9;true"/>
+    <stringAttribute key="debugger.view.ExpressionsView:DebugOutlineColumnState" value="OutlineConfig1&#9;8&#9;0&#9;true&#9;true&#9;274&#9;-1&#9;true&#9;1&#9;false&#9;true&#9;127&#9;-1&#9;true&#9;2&#9;true&#9;true&#9;159&#9;-1&#9;true&#9;3&#9;true&#9;true&#9;75&#9;-1&#9;true&#9;4&#9;true&#9;true&#9;65&#9;-1&#9;true&#9;5&#9;true&#9;true&#9;48&#9;-1&#9;true&#9;6&#9;true&#9;true&#9;119&#9;-1&#9;true&#9;7&#9;true&#9;true&#9;69&#9;-1&#9;true"/>
     <stringAttribute key="debugger.view.MemoryView" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;page&gt;&#10;&#9;&lt;memoryView/&gt;&#10;&lt;/page&gt;&#10;"/>
     <listAttribute key="debugger.view.MemoryView:current">
         <listEntry value=""/>
@@ -216,8 +230,6 @@
     <stringAttribute key="model_params" value=""/>
     <stringAttribute key="os_extension_id" value="com.arm.debug.os.threadx"/>
     <booleanAttribute key="runAfterConnect" value="false"/>
-    <stringAttribute key="runScriptAfterConnect" value="${workspace_loc:/sample_threadx_module_manager/sample_threadx_module_manager_debug.ds}"/>
-    <stringAttribute key="runTargetInitializationScript" value="${workspace_loc:/sample_threadx_module_manager/sample_threadx_module_manager.ds}"/>
     <listAttribute key="setup">
         <listEntry value="CDB://Scripts/rtsm_launcher.py"/>
         <listEntry value="&quot;FVP_MPS2_Cortex-M7&quot;"/>

@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M23/GNU    */
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  12-31-2020     Scott Larson             Modified comment(s),          */
+/*                                            remove unneeded headers,    */
+/*                                            use builtins,               */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -67,8 +71,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <arm_compat.h>
-#include "ARMCM23_TZ.h"          /* For intrinsic functions. */
 
 /* Define ThreadX basic types for this port.  */
 
@@ -275,8 +277,6 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 #ifndef TX_MISRA_ENABLE
 
-//register unsigned int _ipsr __asm ("MRS %[result], ipsr" : [result] "=r" (_ipsr) : );
-inline static unsigned int _get_ipsr(void);
 inline static unsigned int _get_ipsr(void)
 {
     unsigned int _ipsr;
@@ -352,7 +352,7 @@ extern void    _tx_thread_secure_stack_initialize(void);
 
 #ifndef TX_DISABLE_INLINE
 
-#define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __clz(__rbit((m)));
+#define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __builtin_ctz(m);
 
 #endif
 
@@ -364,41 +364,73 @@ extern void    _tx_thread_secure_stack_initialize(void);
    is used to define a local function save area for the disable and restore
    macros.  */
 
-#ifdef TX_DISABLE_INLINE
+#ifndef TX_DISABLE_INLINE
 
-UINT                                            _tx_thread_interrupt_disable(VOID);
-VOID                                            _tx_thread_interrupt_restore(UINT previous_posture);
+/* Define GNU specific macros, with in-line assembly for performance.  */
 
-#define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save;
+__attribute__( ( always_inline ) ) static inline unsigned int __disable_interrupts(void)
+{
 
-#define TX_DISABLE                              interrupt_save = _tx_thread_interrupt_disable();
+unsigned int  primask_value;
 
-#define TX_RESTORE                              _tx_thread_interrupt_restore(interrupt_save);
+    __asm__ volatile (" MRS  %0,PRIMASK ": "=r" (primask_value) );
+    __asm__ volatile (" CPSID i" : : : "memory" );
+    return(primask_value);
+}
 
-#else
+__attribute__( ( always_inline ) ) static inline void __restore_interrupts(unsigned int primask_value)
+{
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int  was_masked;
-#define TX_DISABLE                              was_masked = __disable_irq();
-#define TX_RESTORE                              if (was_masked == 0) __enable_irq();
+    __asm__ volatile (" MSR  PRIMASK,%0": : "r" (primask_value): "memory" );
+}
+
+__attribute__( ( always_inline ) ) static inline unsigned int __get_primask_value(void)
+{
+
+unsigned int  primask_value;
+
+    __asm__ volatile (" MRS  %0,PRIMASK ": "=r" (primask_value) );
+    return(primask_value);
+}
+
+__attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
+{
+
+    __asm__ volatile (" CPSIE  i": : : "memory" );
+}
+
+
+__attribute__( ( always_inline ) ) static inline void _tx_thread_system_return_inline(void)
+{
+unsigned int interrupt_save;
+
+    *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    if (_get_ipsr() == 0)
+    {
+        interrupt_save = __get_primask_value();
+        __enable_interrupts();
+        __restore_interrupts(interrupt_save);
+    }
+}
+
+
+#define TX_INTERRUPT_SAVE_AREA  unsigned int interrupt_save;
+
+#define TX_DISABLE                              interrupt_save =  __disable_interrupts();
+#define TX_RESTORE                              __restore_interrupts(interrupt_save);
+
+
+/* Redefine _tx_thread_system_return for improved performance.  */
 
 #define _tx_thread_system_return                _tx_thread_system_return_inline
 
 
-static void _tx_thread_system_return_inline(void)
-{
-unsigned int          was_masked;
+#else
 
+#define TX_INTERRUPT_SAVE_AREA  unsigned int interrupt_save;
 
-    /* Set PendSV to invoke ThreadX scheduler.  */
-    *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
-    if (_get_ipsr() == 0)
-    {
-        was_masked = __disable_irq();
-        __enable_irq();
-        if (was_masked != 0)
-            __disable_irq();
-    }
-}
+#define TX_DISABLE                              interrupt_save = _tx_thread_interrupt_control(TX_INT_DISABLE);
+#define TX_RESTORE                              _tx_thread_interrupt_control(interrupt_save);
 #endif
 
 
@@ -406,7 +438,7 @@ unsigned int          was_masked;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M23/GNU Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M23/GNU Version 6.1.3 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

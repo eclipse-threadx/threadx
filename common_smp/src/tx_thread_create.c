@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -32,58 +32,61 @@
 #include "tx_initialize.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_create                                  PORTABLE SMP     */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_create                                  PORTABLE SMP     */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates a thread and places it on the list of created */ 
-/*    threads.                                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                            Thread control block pointer  */ 
-/*    name_ptr                              Pointer to thread name string */ 
-/*    entry_function                        Entry function of the thread  */ 
-/*    entry_input                           32-bit input value to thread  */ 
-/*    stack_start                           Pointer to start of stack     */ 
-/*    stack_size                            Stack size in bytes           */ 
-/*    priority                              Priority of thread (0-31)     */ 
+/*                                                                        */
+/*    This function creates a thread and places it on the list of created */
+/*    threads.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Thread control block pointer  */
+/*    name_ptr                              Pointer to thread name string */
+/*    entry_function                        Entry function of the thread  */
+/*    entry_input                           32-bit input value to thread  */
+/*    stack_start                           Pointer to start of stack     */
+/*    stack_size                            Stack size in bytes           */
+/*    priority                              Priority of thread (0-31)     */
 /*    preempt_threshold                     Preemption threshold          */
-/*    time_slice                            Thread time-slice value       */ 
-/*    auto_start                            Automatic start selection     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    return status                         Thread create return status   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_rebalance_execute_list Rebalance execution list      */ 
-/*    _tx_thread_stack_build                Build initial thread stack    */ 
-/*    _tx_thread_system_resume              Resume automatic start thread */ 
-/*    _tx_thread_system_ni_resume           Noninterruptable resume thread*/ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*    _tx_timer_initialize                  Create system timer thread    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*    time_slice                            Thread time-slice value       */
+/*    auto_start                            Automatic start selection     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    return status                         Thread create return status   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_rebalance_execute_list Rebalance execution list      */
+/*    _tx_thread_stack_build                Build initial thread stack    */
+/*    _tx_thread_system_resume              Resume automatic start thread */
+/*    _tx_thread_system_ni_resume           Noninterruptable resume thread*/
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*    _tx_timer_initialize                  Create system timer thread    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  12-31-2020     Andres Mlinar            Modified comment(s),          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ULONG id), ULONG entry_input,
+UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+                            VOID (*entry_function)(ULONG id), ULONG entry_input,
                             VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                             ULONG time_slice, UINT auto_start)
 {
@@ -135,7 +138,7 @@ ALIGN_TYPE              updated_stack_start;
        list.  */
 
     /* Initialize thread control block to all zeros.  */
-    TX_MEMSET(thread_ptr, 0, (sizeof(TX_THREAD)));
+    TX_MEMSET(thread_ptr, 0, sizeof(TX_THREAD));
 
     /* Place the supplied parameters into the thread's control block.  */
     thread_ptr -> tx_thread_name =                name_ptr;
@@ -190,7 +193,7 @@ ALIGN_TYPE              updated_stack_start;
            disable all preemption.  */
         thread_ptr -> tx_thread_preempt_threshold =       ((UINT) 0);
         thread_ptr -> tx_thread_user_preempt_threshold =  ((UINT) 0);
-    } 
+    }
     else
     {
 
@@ -207,7 +210,7 @@ ALIGN_TYPE              updated_stack_start;
     TX_THREAD_CREATE_TIMEOUT_SETUP(thread_ptr)
 
     /* Perform any additional thread setup activities for tool or user purpose.  */
-    TX_THREAD_CREATE_INTERNAL_EXTENSION(thread_ptr) 
+    TX_THREAD_CREATE_INTERNAL_EXTENSION(thread_ptr)
 
     /* Call the target specific stack frame building routine to build the 
        thread's initial stack and to setup the actual stack pointer in the
@@ -249,7 +252,7 @@ ALIGN_TYPE              updated_stack_start;
 
         /* Setup this thread's created links.  */
         thread_ptr -> tx_thread_created_previous =  previous_thread;
-        thread_ptr -> tx_thread_created_next =      next_thread;    
+        thread_ptr -> tx_thread_created_next =      next_thread;
     }
 
     /* Increment the thread created count.  */
@@ -272,7 +275,7 @@ ALIGN_TYPE              updated_stack_start;
     /* Temporarily disable preemption.  */
     _tx_thread_preempt_disable++;
 #endif
-     
+
     /* Determine if an automatic start was requested.  If so, call the resume
        thread function and then check for a preemption condition.  */
     if (auto_start == TX_AUTO_START)
@@ -294,13 +297,13 @@ ALIGN_TYPE              updated_stack_start;
         /* Perform any additional activities for tool or user purpose.  */
         TX_THREAD_CREATE_EXTENSION(thread_ptr)
 
-        /* Call the resume thread function to make this thread ready.  */ 
+        /* Call the resume thread function to make this thread ready.  */
         _tx_thread_system_resume(thread_ptr);
-        
+
         /* Disable interrupts again.  */
         TX_DISABLE
 #endif
- 
+
         /* Determine if the execution list needs to be re-evaluated.  */
         if (_tx_thread_smp_current_state_get() >= TX_INITIALIZE_IN_PROGRESS)
         {
@@ -325,7 +328,7 @@ ALIGN_TYPE              updated_stack_start;
             /* Debug entry.  */
             _tx_thread_smp_debug_entry_insert(12, 0, thread_ptr);
 #endif
-            
+
             /* Get the core index.  */
             core_index =  TX_SMP_CORE_ID;
 
@@ -337,7 +340,7 @@ ALIGN_TYPE              updated_stack_start;
             /* Debug entry.  */
             _tx_thread_smp_debug_entry_insert(13, 0, thread_ptr);
 #endif
-        } 
+        }
 
 #ifndef TX_NOT_INTERRUPTABLE
 
@@ -377,7 +380,7 @@ ALIGN_TYPE              updated_stack_start;
 #endif
     }
 
-    /* Always return a success.  */
+    /* Return success.  */
     return(TX_SUCCESS);
 }
 

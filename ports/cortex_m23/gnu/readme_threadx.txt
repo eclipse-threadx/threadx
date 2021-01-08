@@ -5,12 +5,12 @@
 
 1.  Building the ThreadX run-time Library
 
-
+An example .bat file is in the example_build directory.
 
 
 2.  Demonstration System
 
-
+No demonstration example is provided.
 
 
 3.  System Initialization
@@ -126,6 +126,18 @@ located in either your runtime startup file or in the tx_initialize_low_level.S 
 For generic code revision information, please refer to the readme_threadx_generic.txt
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
+
+12-31-2020  The following files were 
+            changed/added for port specific version 6.1.3:
+            
+            
+            tx_port.h                       Remove unneeded include files, 
+                                            use builtin functions,
+                                            modified comments.
+                                            
+            tx_thread_secure_stack.c        Remove unneeded include file, 
+                                            use inline get/set functions,
+                                            modified comments.
 
 09-30-2020  Initial ThreadX 6.1 version for Cortex-M23 using GNU tools.
 

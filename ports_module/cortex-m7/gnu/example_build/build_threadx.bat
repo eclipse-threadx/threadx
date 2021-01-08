@@ -1,5 +1,7 @@
 del tx.a
+
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb tx_initialize_low_level.S
+
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb ..\module_manager\src\tx_thread_stack_build.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb ..\module_manager\src\tx_thread_schedule.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb ..\module_manager\src\tx_thread_system_return.S
@@ -8,6 +10,12 @@ arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb 
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb ..\module_manager\src\tx_thread_interrupt_control.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb ..\module_manager\src\tx_timer_interrupt.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb ..\module_manager\src\txm_module_manager_thread_stack_build.S
+
+arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_alignment_adjust.c
+arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_external_memory_enable.c
+arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_memory_fault_handler.c
+arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_mm_register_setup.c
+arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_memory_fault_notify.c
 
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc ..\..\..\..\common\src\tx_block_allocate.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc ..\..\..\..\common\src\tx_block_pool_cleanup.c
@@ -194,19 +202,16 @@ arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb 
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc ..\..\..\..\common\src\txe_timer_delete.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc ..\..\..\..\common\src\txe_timer_info_get.c
 
-arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_alignment_adjust.c
+arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_absolute_load.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_application_request.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_callback_request.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_event_flags_notify_trampoline.c
-arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_external_memory_enable.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_file_load.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_in_place_load.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_internal_load.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_initialize.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_kernel_dispatch.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_maximum_module_priority_set.c
-arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_memory_fault_handler.c
-arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_memory_fault_notify.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_memory_load.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_object_allocate.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_object_deallocate.c
@@ -216,7 +221,6 @@ arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb 
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_properties_get.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_queue_notify_trampoline.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_semaphore_notify_trampoline.c
-arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\module_manager\src\txm_module_manager_mm_register_setup.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_start.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_stop.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mthumb -I..\inc -I..\..\..\..\common\inc -I..\..\..\..\common_modules\inc -I..\..\..\..\common_modules\module_manager\inc ..\..\..\..\common_modules\module_manager\src\txm_module_manager_thread_create.c
@@ -252,6 +256,7 @@ arm-none-eabi-ar -r tx.a tx_timer_info_get.o tx_timer_initialize.o tx_timer_perf
 arm-none-eabi-ar -r tx.a tx_timer_system_deactivate.o tx_timer_thread_entry.o tx_trace_enable.o tx_trace_disable.o tx_trace_initialize.o tx_trace_interrupt_control.o 
 arm-none-eabi-ar -r tx.a tx_trace_isr_enter_insert.o tx_trace_isr_exit_insert.o tx_trace_object_register.o tx_trace_object_unregister.o tx_trace_user_event_insert.o
 arm-none-eabi-ar -r tx.a tx_trace_buffer_full_notify.o tx_trace_event_filter.o tx_trace_event_unfilter.o
+
 arm-none-eabi-ar -r tx.a txe_block_allocate.o txe_block_pool_create.o txe_block_pool_delete.o txe_block_pool_info_get.o txe_block_pool_prioritize.o txe_block_release.o 
 arm-none-eabi-ar -r tx.a txe_byte_allocate.o txe_byte_pool_create.o txe_byte_pool_delete.o txe_byte_pool_info_get.o txe_byte_pool_prioritize.o txe_byte_release.o 
 arm-none-eabi-ar -r tx.a txe_event_flags_create.o txe_event_flags_delete.o txe_event_flags_get.o txe_event_flags_info_get.o txe_event_flags_set.o 
@@ -265,16 +270,11 @@ arm-none-eabi-ar -r tx.a txe_thread_wait_abort.o txe_timer_activate.o txe_timer_
 
 arm-none-eabi-ar -r tx.a txm_module_manager_alignment_adjust.o txm_module_manager_application_request.o txm_module_manager_callback_request.o
 arm-none-eabi-ar -r tx.a txm_module_manager_event_flags_notify_trampoline.o txm_module_manager_external_memory_enable.o txm_module_manager_file_load.o
-arm-none-eabi-ar -r tx.a txm_module_manager_in_place_load.o txm_module_manager_initialize.o
+arm-none-eabi-ar -r tx.a txm_module_manager_absolute_load.o txm_module_manager_in_place_load.o txm_module_manager_initialize.o txm_module_manager_internal_load.o
 arm-none-eabi-ar -r tx.a txm_module_manager_kernel_dispatch.o txm_module_manager_maximum_module_priority_set.o txm_module_manager_memory_fault_handler.o
 arm-none-eabi-ar -r tx.a txm_module_manager_memory_fault_notify.o txm_module_manager_memory_load.o txm_module_manager_object_pointer_get.o
 arm-none-eabi-ar -r tx.a txm_module_manager_object_pool_create.o txm_module_manager_queue_notify_trampoline.o txm_module_manager_semaphore_notify_trampoline.o
 arm-none-eabi-ar -r tx.a txm_module_manager_mm_register_setup.o txm_module_manager_start.o txm_module_manager_stop.o
 arm-none-eabi-ar -r tx.a txm_module_manager_thread_create.o txm_module_manager_thread_notify_trampoline.o txm_module_manager_thread_reset.o
 arm-none-eabi-ar -r tx.a txm_module_manager_timer_notify_trampoline.o txm_module_manager_unload.o txm_module_manager_thread_stack_build.o
-arm-none-eabi-ar -r tx.a txm_module_manager_internal_load.o
-arm-none-eabi-ar -r tx.a txm_module_manager_object_allocate.o
-arm-none-eabi-ar -r tx.a txm_module_manager_object_deallocate.o
-arm-none-eabi-ar -r tx.a txm_module_manager_object_pointer_get_extended.o
-arm-none-eabi-ar -r tx.a txm_module_manager_properties_get.o
-arm-none-eabi-ar -r tx.a txm_module_manager_util.o
+arm-none-eabi-ar -r tx.a txm_module_manager_object_allocate.o txm_module_manager_object_deallocate.o txm_module_manager_object_pointer_get_extended.o txm_module_manager_properties_get.o txm_module_manager_util.o

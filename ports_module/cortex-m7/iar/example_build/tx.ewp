@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.50.4.26131</state>
+                    <state>8.50.9.33458</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -481,7 +481,7 @@
             <name>AARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>10</version>
+                <version>11</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -636,6 +636,10 @@
                 <option>
                     <name>AsmNoLiteralPool</name>
                     <state>0</state>
+                </option>
+                <option>
+                    <name>PreInclude</name>
+                    <state></state>
                 </option>
             </data>
         </settings>
@@ -1050,7 +1054,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state></state>
+                    <state>C:\Users\andrejm\work\git\AzureRTOS\threadx\ports_module\cortex-m7\iar\example_build\Debug\Exe\tx.a</state>
                 </option>
             </data>
         </settings>
@@ -1541,7 +1545,7 @@
             <name>AARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>10</version>
+                <version>11</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
                 <option>
@@ -1696,6 +1700,10 @@
                 <option>
                     <name>AsmNoLiteralPool</name>
                     <state>0</state>
+                </option>
+                <option>
+                    <name>PreInclude</name>
+                    <state></state>
                 </option>
             </data>
         </settings>
@@ -2765,6 +2773,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\common\src\txe_timer_info_get.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common_modules\module_manager\src\txm_module_manager_absolute_load.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\module_manager\src\txm_module_manager_alignment_adjust.c</name>

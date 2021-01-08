@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Module Manager                                                      */
 /**                                                                       */
@@ -36,50 +36,53 @@
 #include "txm_module_manager_util.h"
 #include "txm_module_manager_dispatch.h"
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_kernel_dispatch                         PORTABLE C      */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_kernel_dispatch                 PORTABLE C      */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function dispatches the module's kernel request based upon the */ 
-/*    ID and parameters specified in the request.                         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    kernel_request                    Module's kernel request           */ 
-/*    param_1                           First parameter                   */ 
-/*    param_2                           Second parameter                  */ 
-/*    param_3                           Third parameter                   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _txm_module_manager_application_request   Application-specific req  */ 
-/*    _txm_module_manager_object_pointer_get    Find object pointer       */ 
-/*    _txm_module_manager_thread_create         Module thread create      */ 
-/*    [_txm_module_manager_*_dispatch]          Optional external         */ 
-/*                                                component dispatch      */ 
-/*    ThreadX API Calls                                                   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function dispatches the module's kernel request based upon the */
+/*    ID and parameters specified in the request.                         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    kernel_request                    Module's kernel request           */
+/*    param_1                           First parameter                   */
+/*    param_2                           Second parameter                  */
+/*    param_3                           Third parameter                   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_application_request   Application-specific req  */
+/*    _txm_module_manager_object_pointer_get    Find object pointer       */
+/*    _txm_module_manager_thread_create         Module thread create      */
+/*    [_txm_module_manager_*_dispatch]          Optional external         */
+/*                                                component dispatch      */
+/*    ThreadX API Calls                                                   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  12-31-2020      Scott Larson            Modified comment(s), added    */
+/*                                            port-specific dispatch,     */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 ALIGN_TYPE _txm_module_manager_kernel_dispatch(ULONG kernel_request, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2)
@@ -679,6 +682,15 @@ TXM_MODULE_INSTANCE *module_instance;
 
     default:
     {
+#ifdef TXM_MODULE_PORT_DISPATCH
+        /* Is this a port-specific request? */
+        if ((kernel_request >= TXM_MODULE_PORT_EXTENSION_API_ID_START) && (kernel_request <= TXM_MODULE_PORT_EXTENSION_API_ID_END))
+        {
+            /* Yes, call the port-specific dispatcher. */
+            return_value = (ALIGN_TYPE) _txm_module_manager_port_dispatch(module_instance, kernel_request, param_0, param_1, param_2);
+        }
+#endif
+        
         /* Determine if an application request is present.   */
         if (kernel_request >= TXM_APPLICATION_REQUEST_ID_BASE)
         {
