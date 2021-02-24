@@ -26,82 +26,79 @@
 /* Include necessary system files.  */
 
 #include "tx_api.h"
-#include "tx_thread.h"
-#ifdef TX_ENABLE_EVENT_TRACE
 #include "tx_trace.h"
+#include "tx_thread.h"
+
+#ifndef TX_THREAD_LOCAL_STORAGE_SLOTS
+#define TX_THREAD_LOCAL_STORAGE_SLOTS 0
 #endif
 
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_identify                                 PORTABLE C      */
+/*    _tx_thread_local_storage_set                        PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Alex Earl                                                           */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function returns the control block pointer of the currently    */
-/*    executing thread.  If the return value is NULL, no thread is        */
-/*    executing.                                                          */
+/*    This function sets the value of a thread local variable             */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    None                                                                */
+/*    thread_ptr                            Thread control block pointer  */
+/*    index                                 Index of thread local data    */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    TX_THREAD *                           Pointer to control block of   */
-/*                                            currently executing thread  */
+/*    return status                         Thread local return status    */
 /*                                                                        */
 /*  CALLS                                                                 */
-/*                                                                        */
-/*    None                                                                */
+/*  _tx_thread_identify                                                   */
 /*                                                                        */
 /*  CALLED BY                                                             */
-/*                                                                        */
-/*    Application Code                                                    */
-/*    _tx_thread_local_storage_get                                        */
-/*    _tx_thread_local_storage_set                                        */
+/*  Application code                                                      */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*  01-27-2021     Alex Earl                Initial Version 6.0           */
 /*                                                                        */
 /**************************************************************************/
-TX_THREAD  *_tx_thread_identify(VOID)
+UINT  _tx_thread_local_storage_set(TX_THREAD *thread_ptr, UINT index, VOID *value)
 {
 
-TX_THREAD       *thread_ptr;
+    #if TX_THREAD_LOCAL_STORAGE_SLOTS > 0
+    if(index < TX_THREAD_LOCAL_STORAGE_SLOTS)
+    {
 
-TX_INTERRUPT_SAVE_AREA
+        /* Check if we need to get the current thread pointer */
+        if(NULL == thread_ptr)
+        {
 
-    
-    /* Disable interrupts to put the timer on the created list.  */
-    TX_DISABLE
+            /* Retrieve the current thread pointer */
+            thread_ptr = _tx_thread_identify();
+        }
 
-#ifdef TX_ENABLE_EVENT_TRACE
+        if(NULL != thread_ptr)
+        {
 
-    /* If trace is enabled, insert this event into the trace buffer.  */
-    TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_IDENTIFY, 0, 0, 0, 0, TX_TRACE_THREAD_EVENTS)
-#endif
+            /* If we have a thread pointer, retrieve the data from the index location */
+            thread_ptr->tx_thread_local_storage_pointers[index] = value;
+            return(TX_SUCCESS);
+        }
+        else
+        {
 
-   /* Log this kernel call.  */
-    TX_EL_THREAD_IDENTIFY_INSERT
+            return(TX_THREAD_ERROR);
+        }
+    }
+    #endif
 
-    /* Pickup thread pointer.  */
-    TX_THREAD_GET_CURRENT(thread_ptr)
-
-    /* Restore interrupts.  */
-    TX_RESTORE
-
-    /* Return the current thread pointer.  */
-    return(thread_ptr);
+    return(TX_NOT_AVAILABLE);
 }
 

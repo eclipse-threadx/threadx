@@ -167,6 +167,8 @@
     <ClCompile Include="..\..\..\..\..\common\src\tx_thread_identify.c" />
     <ClCompile Include="..\..\..\..\..\common\src\tx_thread_info_get.c" />
     <ClCompile Include="..\..\..\..\..\common\src\tx_thread_initialize.c" />
+    <ClCompile Include="..\..\..\..\..\common\src\tx_thread_local_storage_get.c" />
+    <ClCompile Include="..\..\..\..\..\common\src\tx_thread_local_storage_set.c" />
     <ClCompile Include="..\..\..\..\..\common\src\tx_thread_performance_info_get.c" />
     <ClCompile Include="..\..\..\..\..\common\src\tx_thread_performance_system_info_get.c" />
     <ClCompile Include="..\..\..\..\..\common\src\tx_thread_preemption_change.c" />

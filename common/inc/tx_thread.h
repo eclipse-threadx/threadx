@@ -268,6 +268,11 @@
 #define TX_THREAD_CREATE_INTERNAL_EXTENSION(t)
 #endif
 
+/* Define default number of local storage slots to be 0, if it hasn't been defined previously (typically in tx_port.h).  */
+#ifndef TX_THREAD_LOCAL_STORAGE_SLOTS
+#define TX_THREAD_LOCAL_STORAGE_SLOTS 0
+#endif
+
 
 /* Define internal thread control function prototypes.  */
 
@@ -286,6 +291,8 @@ VOID        _tx_thread_system_suspend(TX_THREAD *thread_ptr);
 VOID        _tx_thread_system_ni_suspend(TX_THREAD *thread_ptr, ULONG wait_option);
 VOID        _tx_thread_time_slice(VOID);
 VOID        _tx_thread_timeout(ULONG timeout_input);
+VOID       *_tx_thread_local_storage_get(TX_THREAD *thread_ptr, UINT index);
+UINT        _tx_thread_local_storage_set(TX_THREAD *thread_ptr, UINT index, VOID* value);
 
 
 /* Thread control component data declarations follow.  */

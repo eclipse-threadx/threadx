@@ -336,6 +336,10 @@ typedef struct TX_TIMER_STRUCT
 
 } TX_TIMER;
 
+#ifndef TX_THREAD_LOCAL_STORAGE_SLOTS
+#define TX_THREAD_LOCAL_STORAGE_SLOTS 0
+#endif
+
 
 /* ThreadX thread control block structure follows.  Additional fields
    can be added providing they are added after the information that is
@@ -471,6 +475,10 @@ typedef struct TX_THREAD_STRUCT
     /* Define the total number of times this thread had suspension lifted
        because of the tx_thread_wait_abort service.  */
     ULONG               tx_thread_performance_wait_abort_count;
+#endif
+
+#if TX_THREAD_LOCAL_STORAGE_SLOTS > 0
+    VOID                *tx_thread_local_storage_pointers[ TX_THREAD_LOCAL_STORAGE_SLOTS ];
 #endif
 
     /* Define the highest stack pointer variable.  */
@@ -1060,6 +1068,8 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_thread_terminate                         _tx_thread_terminate
 #define tx_thread_time_slice_change                 _tx_thread_time_slice_change
 #define tx_thread_wait_abort                        _tx_thread_wait_abort
+#define tx_thread_local_storage_get                 _tx_thread_local_storage_get
+#define tx_thread_local_storage_set                 _tx_thread_local_storage_set
 
 #define tx_time_get                                 _tx_time_get
 #define tx_time_set                                 _tx_time_set
@@ -1184,6 +1194,9 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_thread_terminate                         _txr_thread_terminate
 #define tx_thread_time_slice_change                 _txr_thread_time_slice_change
 #define tx_thread_wait_abort                        _txr_thread_wait_abort
+#define tx_thread_local_storage_get                 _tx_thread_local_storage_get
+#define tx_thread_local_storage_set                 _tx_thread_local_storage_set
+
 
 #define tx_time_get                                 _tx_time_get
 #define tx_time_set                                 _tx_time_set
@@ -1295,6 +1308,9 @@ UINT    _tx_el_interrupt_control(UINT new_posture);
 #define tx_thread_terminate                         _txe_thread_terminate
 #define tx_thread_time_slice_change                 _txe_thread_time_slice_change
 #define tx_thread_wait_abort                        _txe_thread_wait_abort
+#define tx_thread_local_storage_get                 _tx_thread_local_storage_get
+#define tx_thread_local_storage_set                 _tx_thread_local_storage_set
+
 
 #define tx_time_get                                 _tx_time_get
 #define tx_time_set                                 _tx_time_set
@@ -1634,6 +1650,8 @@ UINT        _tx_thread_suspend(TX_THREAD *thread_ptr);
 UINT        _tx_thread_terminate(TX_THREAD *thread_ptr);
 UINT        _tx_thread_time_slice_change(TX_THREAD *thread_ptr, ULONG new_time_slice, ULONG *old_time_slice);
 UINT        _tx_thread_wait_abort(TX_THREAD *thread_ptr);
+VOID       *_tx_thread_local_storage_get(TX_THREAD* thread_ptr, UINT index);
+UINT        _tx_thread_local_storage_set(TX_THREAD* thread_ptr, UINT index, VOID* value);
 
 
 /* Define error checking shells for API services.  These are only referenced by the 
