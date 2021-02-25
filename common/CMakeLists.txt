@@ -89,6 +89,8 @@ target_sources(${PROJECT_NAME}
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_identify.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_info_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_local_storage_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_local_storage_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_performance_info_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_performance_system_info_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_preemption_change.c
