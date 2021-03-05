@@ -247,19 +247,19 @@ __tx_ts_wait
     STR     r1, [r0]                                ; Store it in the current pointer
     CMP     r1, #0                                  ; If non-NULL, a new thread is ready!
     BNE     __tx_ts_ready                           ;
-    IF:DEF:TX_LOW_POWER
+    IF :DEF:TX_LOW_POWER
     PUSH    {r0-r3}
     BL      tx_low_power_enter                      ; Possibly enter low power mode
     POP     {r0-r3}
     ENDIF
 
-    IF:DEF:TX_ENABLE_WFI
+    IF :DEF:TX_ENABLE_WFI
     DSB                                             ; Ensure no outstanding memory transactions
     WFI                                             ; Wait for interrupt
     ISB                                             ; Ensure pipeline is flushed
     ENDIF
 
-    IF:DEF:TX_LOW_POWER
+    IF :DEF:TX_LOW_POWER
     PUSH    {r0-r3}
     BL      tx_low_power_exit                       ; Exit low power mode
     POP     {r0-r3}

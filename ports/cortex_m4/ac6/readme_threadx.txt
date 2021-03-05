@@ -211,6 +211,9 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
+03-02-2021  The following files were changed/added for version 6.1.5:
+            tx_thread_schedule.s            Added low power feature
+
 09-30-2020  Initial ThreadX 6.1 version for Cortex-M4 using AC6 tools.
 
 
