@@ -47,11 +47,12 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
-/*  12-31-2020     Scott Larson             Modified comment(s),          */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  03-02-2021      Scott Larson            Modified comment(s),          */
 /*                                            remove unneeded headers,    */
-/*                                            use builtins,               */
-/*                                            resulting in version 6.1.3  */
+/*                                            use builtins, added         */
+/*                                            ULONG64_DEFINED,            */
+/*                                            resulting in version 6.1.5  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -84,6 +85,7 @@ typedef unsigned long                           ULONG;
 typedef unsigned long long                      ULONG64;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
+#define ULONG64_DEFINED
 
 /* Function prototypes for this port. */
 struct  TX_THREAD_STRUCT;

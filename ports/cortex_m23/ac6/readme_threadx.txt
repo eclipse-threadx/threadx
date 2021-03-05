@@ -15,6 +15,8 @@ Building the ThreadX library is easy; simply set the ThreadX_Library project
 as active, then then build the library. You should now observe the compilation 
 and assembly of the ThreadX library. This project build produces the ThreadX
 library file ThreadX_Library.lib.
+Files tx_thread_stack_error_handler.c and tx_thread_stack_error_notify.c 
+replace the common files of the same name. 
 
 
 3.  Demonstration System

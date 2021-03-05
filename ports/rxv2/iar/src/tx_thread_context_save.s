@@ -12,67 +12,57 @@
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
+
     extern __tx_thread_system_state
     extern __tx_thread_current_ptr
 
     section .text:CODE:ROOT
-    ;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_context_save                              RX/IAR         */
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_context_save                              RXv2/IAR       */
 ;/*                                                           6.1.3        */
-;/*  AUTHOR                                                                */ 
-;/*                                                                        */ 
+;/*  AUTHOR                                                                */
+;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
-;/*                                                                        */ 
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function saves the context of an executing thread in the       */ 
-;/*    beginning of interrupt processing.  The function also ensures that  */ 
-;/*    the system stack is used upon return to the calling ISR.            */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                                                */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function saves the context of an executing thread in the       */
+;/*    beginning of interrupt processing.  The function also ensures that  */
+;/*    the system stack is used upon return to the calling ISR.            */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                                                */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
+;/*    DATE              NAME                      DESCRIPTION             */
+;/*                                                                        */
 ;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
-;/*                                                                        */ 
-;/**************************************************************************/ 
+;/*                                                                        */
+;/**************************************************************************/
 ;VOID   _tx_thread_context_save(VOID)
 ;{
     public __tx_thread_context_save

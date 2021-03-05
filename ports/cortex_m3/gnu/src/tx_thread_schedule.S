@@ -27,6 +27,10 @@
     .global     _tx_thread_system_stack_ptr
     .global     _tx_execution_thread_enter
     .global     _tx_execution_thread_exit
+#ifdef TX_LOW_POWER
+    .global tx_low_power_enter
+    .global tx_low_power_exit
+#endif
 @
 @
     .text
@@ -37,7 +41,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_schedule                               Cortex-M3/GNU     */
-@/*                                                           6.1          */
+@/*                                                           6.1.5        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -70,9 +74,12 @@
 @/*                                                                        */
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-@/*  09-30-2020     William E. Lamie         Modified comment(s),          */
-@/*                                            resulting in version 6.1    */                
+@/*  05-19-2020     William E. Lamie        Initial Version 6.0            */
+@/*  09-30-2020     William E. Lamie        Modified comment(s),           */
+@/*                                            resulting in version 6.1    */
+@/*  03-02-2021     Scott Larson            Modified comment(s), add       */
+@/*                                           low power code,              */
+@/*                                           resulting in version 6.1.5   */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_schedule(VOID)
@@ -222,11 +229,25 @@ __tx_ts_wait:
     LDR     r1, [r2]                                @ Pickup the next thread to execute pointer
     STR     r1, [r0]                                @ Store it in the current pointer
     CBNZ    r1, __tx_ts_ready                       @ If non-NULL, a new thread is ready!
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_enter                      @ Possibly enter low power mode
+    POP     {r0-r3}
+#endif
+
 #ifdef TX_ENABLE_WFI
     DSB                                             @ Ensure no outstanding memory transactions
     WFI                                             @ Wait for interrupt
     ISB                                             @ Ensure pipeline is flushed
 #endif
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_exit                       @ Exit low power mode
+    POP     {r0-r3}
+#endif
+
     CPSIE   i                                       @ Enable interrupts
     B       __tx_ts_wait                            @ Loop to continue waiting
 @

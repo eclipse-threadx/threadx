@@ -19,19 +19,7 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_timer.h"
-;#include "tx_thread.h"
-;
-;
-;Define Assembly language external references...
-;
+
     .global     __tx_timer_time_slice
     .global     __tx_timer_system_clock
     .global     __tx_timer_current_ptr
@@ -43,13 +31,13 @@
     .global     __tx_thread_context_save
     .global     __tx_thread_time_slice
     .global     __tx_thread_context_restore
-;
+
     .SECTION    P,CODE
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
-;/*    _tx_timer_interrupt                                  RX/GNURX       */
+;/*    _tx_timer_interrupt                                  RXv2/GNURX     */
 ;/*                                                           6.1.3        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */

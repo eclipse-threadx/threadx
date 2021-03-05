@@ -28,7 +28,7 @@
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
-;/*    _tx_initialize_low_level                             RX/GNURX       */
+;/*    _tx_initialize_low_level                             RXv2/GNURX     */
 ;/*                                                           6.1.3        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */

@@ -27,7 +27,7 @@
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
-;/*    _tx_thread_stack_build                               RX/IAR         */
+;/*    _tx_thread_stack_build                               RXv2/IAR       */
 ;/*                                                           6.1.3        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */

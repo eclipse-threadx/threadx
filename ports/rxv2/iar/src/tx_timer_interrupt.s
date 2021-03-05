@@ -36,7 +36,7 @@
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
-;/*    _tx_timer_interrupt                                  RX/IAR         */
+;/*    _tx_timer_interrupt                                  RXv2/IAR       */
 ;/*                                                           6.1.3        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */

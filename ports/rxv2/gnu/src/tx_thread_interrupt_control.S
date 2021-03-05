@@ -19,22 +19,13 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;
-;
+
     .text
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
-;/*    _tx_thread_interrupt_control                         RX/GNURX       */
+;/*    _tx_thread_interrupt_control                         RXv2/GNURX     */
 ;/*                                                           6.1.3        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */

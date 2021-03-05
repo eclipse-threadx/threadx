@@ -81,78 +81,80 @@ tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
 Non-FPU Stack Frame:
 
-  Stack Offset     Stack Contents 
+    Stack Offset    Stack Contents
 
-     0x00               r4
-     0x04               r5
-     0x08               r6
-     0x0C               r7
-     0x10               r8
-     0x14               r9
-     0x18               r10
-     0x1C               r11
-     0x20               r0          (Hardware stack starts here!!)
-     0x24               r1
-     0x28               r2
-     0x2C               r3
-     0x30               r12
-     0x34               lr
-     0x38               pc
-     0x3C               xPSR
+    0x00            LR          Interrupted LR (LR at time of PENDSV)
+    0x04            r4          Software stacked GP registers
+    0x08            r5
+    0x0C            r6
+    0x10            r7
+    0x14            r8
+    0x18            r9
+    0x1C            r10
+    0x20            r11
+    0x24            r0          Hardware stacked registers
+    0x28            r1
+    0x2C            r2
+    0x30            r3
+    0x34            r12
+    0x38            lr
+    0x3C            pc
+    0x40            xPSR
 
 FPU Stack Frame (only interrupted thread with FPU enabled):
 
-  Stack Offset     Stack Contents 
+    Stack Offset    Stack Contents
 
-     0x00               s0
-     0x04               s1
-     0x08               s2
-     0x0C               s3
-     0x10               s4
-     0x14               s5
-     0x18               s6
-     0x1C               s7
-     0x20               s8
-     0x24               s9
-     0x28               s10
-     0x2C               s11
-     0x30               s12
-     0x34               s13
-     0x38               s14
-     0x3C               s15
-     0x40               s16
-     0x44               s17
-     0x48               s18
-     0x4C               s19
-     0x50               s20
-     0x54               s21
-     0x58               s22
-     0x5C               s23
-     0x60               s24
-     0x64               s25
-     0x68               s26
-     0x6C               s27
-     0x70               s28
-     0x74               s29
-     0x78               s30
-     0x7C               s31
-     0x80               fpscr
-     0x84               r4          
-     0x88               r5          
-     0x8C               r6          
-     0x90               r7          
-     0x94               r8          
-     0x98               r9          
-     0x9C               r10 (sl)    
-     0xA0               r11         
-     0xA4               r0          (Hardware stack starts here!!)
-     0xA8               r1          
-     0xAC               r2          
-     0xB0               r3          
-     0xB4               r12         
-     0xB8               lr          
-     0xBC               pc          
-     0xC0               xPSR        
+    0x00            LR          Interrupted LR (LR at time of PENDSV)
+    0x04            s16         Software stacked FPU registers
+    0x08            s17
+    0x0C            s18
+    0x10            s19
+    0x14            s20
+    0x18            s21
+    0x1C            s22
+    0x20            s23
+    0x24            s24
+    0x28            s25
+    0x2C            s26
+    0x30            s27
+    0x34            s28
+    0x38            s29
+    0x3C            s30
+    0x40            s31
+    0x44            r4          Software stacked registers
+    0x48            r5
+    0x4C            r6
+    0x50            r7
+    0x54            r8
+    0x58            r9
+    0x5C            r10
+    0x60            r11
+    0x64            r0          Hardware stacked registers
+    0x68            r1
+    0x6C            r2
+    0x70            r3
+    0x74            r12
+    0x78            lr
+    0x7C            pc
+    0x80            xPSR
+    0x84            s0          Hardware stacked FPU registers
+    0x88            s1
+    0x8C            s2
+    0x90            s3
+    0x94            s4
+    0x98            s5
+    0x9C            s6
+    0xA0            s7
+    0xA4            s8
+    0xA8            s9
+    0xAC            s10
+    0xB0            s11
+    0xB4            s12
+    0xB8            s13
+    0xBC            s14
+    0xC0            s15
+    0xC4            fpscr
 
 
 7. Improving Performance

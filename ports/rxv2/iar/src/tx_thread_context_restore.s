@@ -12,25 +12,14 @@
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
+
     extern __tx_thread_system_state
     extern __tx_thread_current_ptr
     extern __tx_thread_preempt_disable
@@ -40,46 +29,46 @@
 
     section .text:CODE:ROOT
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_context_restore                           RX/IAR         */
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_context_restore                           RXv2/IAR       */
 ;/*                                                           6.1.3        */
-;/*  AUTHOR                                                                */ 
-;/*                                                                        */ 
+;/*  AUTHOR                                                                */
+;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
-;/*                                                                        */ 
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function restores the interrupt context if it is processing a  */ 
-;/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-;/*    if no thread was running, the function returns to the scheduler.    */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                  Interrupt Service Routines    */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function restores the interrupt context if it is processing a  */
+;/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+;/*    if no thread was running, the function returns to the scheduler.    */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_schedule                   Thread scheduling routine     */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                  Interrupt Service Routines    */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
+;/*    DATE              NAME                      DESCRIPTION             */
+;/*                                                                        */
 ;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
-;/*                                                                        */ 
-;/**************************************************************************/ 
+;/*                                                                        */
+;/**************************************************************************/
     public __tx_thread_context_restore
 
 __tx_thread_context_restore:

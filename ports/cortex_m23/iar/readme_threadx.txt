@@ -9,7 +9,8 @@ Import all ThreadX common and port-specific source files into an IAR project.
 Configure the project to build a library rather than an executable. This 
 results in the ThreadX run-time library file tx.a, which is needed by 
 the application.
-
+Files tx_thread_stack_error_handler.c and tx_thread_stack_error_notify.c 
+replace the common files of the same name. 
 
 2.  Demonstration System
 

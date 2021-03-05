@@ -45,7 +45,7 @@
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
-;/*    _tx_thread_context_restore                           RX/GNURX       */
+;/*    _tx_thread_context_restore                           RXv2/GNURX     */
 ;/*                                                           6.1.3        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */

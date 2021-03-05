@@ -6,7 +6,8 @@
 1.  Building the ThreadX run-time Library
 
 An example .bat file is in the example_build directory.
-
+Files tx_thread_stack_error_handler.c and tx_thread_stack_error_notify.c 
+replace the common files of the same name. 
 
 2.  Demonstration System
 

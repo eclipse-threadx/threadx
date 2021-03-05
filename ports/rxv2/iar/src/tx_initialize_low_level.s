@@ -12,8 +12,8 @@
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Initialize                                                          */
 ;/**                                                                       */
@@ -26,47 +26,47 @@
     section .text:CODE:ROOT
 
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_low_level                             RX/IAR         */
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_initialize_low_level                             RXv2/IAR       */
 ;/*                                                           6.1.3        */
-;/*  AUTHOR                                                                */ 
-;/*                                                                        */ 
+;/*  AUTHOR                                                                */
+;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
-;/*                                                                        */ 
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function is responsible for any low-level processor            */ 
-;/*    initialization, including setting up interrupt vectors, setting     */ 
-;/*    up a periodic timer interrupt source, saving the system stack       */ 
-;/*    pointer for use in ISR processing later, and finding the first      */ 
-;/*    available RAM memory address for tx_application_define.             */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function is responsible for any low-level processor            */
+;/*    initialization, including setting up interrupt vectors, setting     */
+;/*    up a periodic timer interrupt source, saving the system stack       */
+;/*    pointer for use in ISR processing later, and finding the first      */
+;/*    available RAM memory address for tx_application_define.             */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter           ThreadX entry function        */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
+;/*    DATE              NAME                      DESCRIPTION             */
+;/*                                                                        */
 ;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
-;/*                                                                        */ 
-;/**************************************************************************/ 
+;/*                                                                        */
+;/**************************************************************************/
     public __tx_initialize_low_level
 
 __tx_initialize_low_level:

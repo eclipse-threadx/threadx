@@ -30,6 +30,10 @@
     IMPORT  _tx_execution_thread_enter
     IMPORT  _tx_execution_thread_exit
     ENDIF
+    IF :DEF:TX_LOW_POWER
+    IMPORT  tx_low_power_enter
+    IMPORT  tx_low_power_exit
+    ENDIF
 ;
 ;
     AREA    ||.text||, CODE, READONLY
@@ -39,7 +43,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                               Cortex-M0/AC5     */
-;/*                                                           6.1          */
+;/*                                                           6.1.5        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -72,7 +76,10 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  09-30-2020     William E. Lamie        Initial Version 6.1            */
+;/*  03-02-2021     Scott Larson            Modified comment(s), add       */
+;/*                                           low power code,              */
+;/*                                           resulting in version 6.1.5   */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -240,10 +247,22 @@ __tx_ts_wait
     STR     r1, [r0]                                ; Store it in the current pointer
     CMP     r1, #0                                  ; If non-NULL, a new thread is ready!
     BNE     __tx_ts_ready                           ;
-    IF :DEF:TX_ENABLE_WFI
+    IF:DEF:TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_enter                      ; Possibly enter low power mode
+    POP     {r0-r3}
+    ENDIF
+
+    IF:DEF:TX_ENABLE_WFI
     DSB                                             ; Ensure no outstanding memory transactions
     WFI                                             ; Wait for interrupt
     ISB                                             ; Ensure pipeline is flushed
+    ENDIF
+
+    IF:DEF:TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_exit                       ; Exit low power mode
+    POP     {r0-r3}
     ENDIF
 __tx_ts_ISB
     CPSIE   i                                       ; Enable interrupts

@@ -12,72 +12,61 @@
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
+
     extern __tx_thread_execute_ptr
     extern __tx_thread_current_ptr
     extern __tx_timer_time_slice
 
     section .text:CODE:ROOT
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                                  RX/IAR         */
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_schedule                                  RXv2/IAR       */
 ;/*                                                           6.1.3        */
-;/*  AUTHOR                                                                */ 
-;/*                                                                        */ 
+;/*  AUTHOR                                                                */
+;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
-;/*                                                                        */ 
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function waits for a thread control block pointer to appear in */ 
-;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-;/*    in the variable, the corresponding thread is resumed.               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function waits for a thread control block pointer to appear in */
+;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+;/*    in the variable, the corresponding thread is resumed.               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-;/*    _tx_thread_system_return             Return to system from thread   */ 
-;/*    _tx_thread_context_restore           Restore thread's context       */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */ 
-;/*                                                                        */ 
-;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
-;/*                                                                        */ 
-;/**************************************************************************/ 
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+;/*    _tx_thread_system_return             Return to system from thread   */
+;/*    _tx_thread_context_restore           Restore thread's context       */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
+;/*    DATE              NAME                      DESCRIPTION             */
+;/*                                                                        */
+;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3        */
+;/*                                                                        */
+;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
 ;{
     public __tx_thread_schedule

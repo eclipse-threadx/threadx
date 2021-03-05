@@ -19,18 +19,7 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
+
     .global     __tx_thread_execute_ptr
     .global     __tx_thread_current_ptr
     .global     __tx_timer_time_slice
@@ -41,7 +30,7 @@
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
-;/*    _tx_thread_schedule                                  RX/GNURX       */
+;/*    _tx_thread_schedule                                  RXv2/GNURX     */
 ;/*                                                           6.1.3        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */

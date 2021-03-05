@@ -12,7 +12,7 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   User Specific                                                       */
@@ -21,30 +21,34 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
-/*                                                                        */ 
-/*    tx_user.h                                           PORTABLE C      */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+/*                                                                        */
+/*    tx_user.h                                           PORTABLE C      */
+/*                                                           6.1.5        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file contains user defines for configuring ThreadX in specific */ 
-/*    ways. This file will have an effect only if the application and     */ 
-/*    ThreadX library are built with TX_INCLUDE_USER_DEFINE_FILE defined. */ 
-/*    Note that all the defines in this file may also be made on the      */ 
-/*    command line when building ThreadX library and application objects. */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This file contains user defines for configuring ThreadX in specific */
+/*    ways. This file will have an effect only if the application and     */
+/*    ThreadX library are built with TX_INCLUDE_USER_DEFINE_FILE defined. */
+/*    Note that all the defines in this file may also be made on the      */
+/*    command line when building ThreadX library and application objects. */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
+/*  03-02-2021      Scott Larson            Modified comment(s),          */
+/*                                            added option to remove      */
+/*                                            FileX pointer,              */
+/*                                            resulting in version 6.1.5  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -58,7 +62,7 @@
    
    For maximum speed, the following should be defined:
 
-        TX_MAX_PRIORITIES                       32  
+        TX_MAX_PRIORITIES                       32
         TX_DISABLE_PREEMPTION_THRESHOLD
         TX_DISABLE_REDUNDANT_CLEARING
         TX_DISABLE_NOTIFY_CALLBACKS
@@ -70,10 +74,11 @@
    
    For minimum size, the following should be defined:
    
-        TX_MAX_PRIORITIES                       32  
+        TX_MAX_PRIORITIES                       32
         TX_DISABLE_PREEMPTION_THRESHOLD
         TX_DISABLE_REDUNDANT_CLEARING
         TX_DISABLE_NOTIFY_CALLBACKS
+        TX_NO_FILEX_POINTER
         TX_NOT_INTERRUPTABLE
         TX_TIMER_PROCESS_IN_ISR
    
@@ -89,11 +94,21 @@
    to tx_port.h for descriptions on each of these options.  */
 
 /*
-#define TX_MAX_PRIORITIES                       32  
-#define TX_MINIMUM_STACK                        ????         
+#define TX_MAX_PRIORITIES                       32
+#define TX_MINIMUM_STACK                        ????
 #define TX_THREAD_USER_EXTENSION                ????
 #define TX_TIMER_THREAD_STACK_SIZE              ????
 #define TX_TIMER_THREAD_PRIORITY                ????
+*/
+
+/* Determine if there is a FileX pointer in the thread control block.
+   By default, the pointer is there for legacy/backwards compatibility. 
+   The pointer must also be there for applications using FileX.
+   Define this to save space in the thread control block. 
+*/
+
+/*
+#define TX_NO_FILEX_POINTER
 */
 
 /* Determine if timer expirations (application timers, timeouts, and tx_thread_sleep calls 
@@ -109,10 +124,10 @@
 /* Determine if in-line timer reactivation should be used within the timer expiration processing.
    By default, this is disabled and a function call is used. When the following is defined,
    reactivating is performed in-line resulting in faster timer processing but slightly larger
-   code size.  */ 
+   code size.  */
 
 /*
-#define TX_REACTIVATE_INLINE 
+#define TX_REACTIVATE_INLINE
 */
 
 /* Determine is stack filling is enabled. By default, ThreadX stack filling is enabled,
@@ -120,7 +135,7 @@
    debuggers with ThreadX-awareness and by the ThreadX run-time stack checking feature.  */
 
 /*
-#define TX_DISABLE_STACK_FILLING 
+#define TX_DISABLE_STACK_FILLING
 */
 
 /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
@@ -153,9 +168,9 @@
    processing when not needed. The user will also have to comment out the call to 
    tx_timer_interrupt, which is typically made from assembly language in 
    tx_initialize_low_level. Note: if TX_NO_TIMER is used, the define TX_TIMER_PROCESS_IN_ISR
-   must also be used.  */
+   must also be used and tx_timer_initialize must be removed from ThreadX library.  */
 
-/* 
+/*
 #define TX_NO_TIMER
 #ifndef TX_TIMER_PROCESS_IN_ISR
 #define TX_TIMER_PROCESS_IN_ISR
