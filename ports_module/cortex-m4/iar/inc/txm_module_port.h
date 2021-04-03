@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    txm_module_port.h                               Cortex-M4/MPU/IAR   */
-/*                                                           6.1.2        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -44,6 +44,9 @@
 /*  11-09-2020     Scott Larson             Modified comment(s),          */
 /*                                            increase kernel stack size, */
 /*                                            resulting in version 6.1.2  */
+/*  04-02-2021      Scott Larson            Modified comment(s),          */
+/*                                            added check for overflow,   */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -296,12 +299,14 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 
 /* Define macro to make sure object is inside the module's data.  */
 #define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size) \
+    /* Check for overflow. */   \
+    (((obj_ptr) < ((obj_ptr) + (obj_size))) && \
     /* Check if it's inside module data.  */ \
-    ((((obj_ptr) >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) && \
+     ((((obj_ptr) >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) && \
      (((obj_ptr) + (obj_size)) <= ((ALIGN_TYPE) module_instance -> txm_module_instance_data_end + 1))) || \
     /* Check if it's inside shared memory.  */ \
      (((obj_ptr) >= (ALIGN_TYPE) module_instance -> txm_module_instance_shared_memory_address) && \
-     (((obj_ptr) + (obj_size)) <= (ALIGN_TYPE) (module_instance -> txm_module_instance_shared_memory_address + module_instance -> txm_module_instance_shared_memory_length))))
+     (((obj_ptr) + (obj_size)) <= (ALIGN_TYPE) (module_instance -> txm_module_instance_shared_memory_address + module_instance -> txm_module_instance_shared_memory_length)))))
 
 
 /* Define some internal prototypes to this module port.  */

@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M3/AC6     */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*                                            macro definition,           */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -319,7 +322,7 @@ unsigned int interrupt_save;
 }
 
 
-#define TX_INTERRUPT_SAVE_AREA  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save =  __disable_interrupts();
 #define TX_RESTORE                              __restore_interrupts(interrupt_save);
@@ -332,7 +335,7 @@ unsigned int interrupt_save;
 
 #else
 
-#define TX_INTERRUPT_SAVE_AREA  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save = _tx_thread_interrupt_control(TX_INT_DISABLE);
 #define TX_RESTORE                              _tx_thread_interrupt_control(interrupt_save);
@@ -343,7 +346,7 @@ unsigned int interrupt_save;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M3/AC6 Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M3/AC6 Version 6.1.6 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

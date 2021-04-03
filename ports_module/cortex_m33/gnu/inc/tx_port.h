@@ -648,7 +648,7 @@ unsigned int interrupt_save;
 }
 
 
-#define TX_INTERRUPT_SAVE_AREA  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 #define TX_DISABLE                              interrupt_save =  __disable_interrupt();
 #define TX_RESTORE                              __restore_interrupt(interrupt_save);
 

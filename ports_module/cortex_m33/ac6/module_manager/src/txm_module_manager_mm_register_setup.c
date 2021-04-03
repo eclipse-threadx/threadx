@@ -29,8 +29,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_mm_register_setup             Cortex-M33/MPU    */
-/*                                                           6.1.3        */
+/*    _txm_module_manager_mm_register_setup           Cortex-M33/Generic  */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -60,7 +60,10 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  12-31-2020     Scott Larson             Initial Version 6.1.3         */
+/*  12-31-2020      Scott Larson            Initial Version 6.1.3         */
+/*  04-02-2021      Scott Larson            Modified comments and check   */
+/*                                            for overflow,               */
+/*                                            resulting 6.1.6             */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance)
@@ -120,8 +123,8 @@ ULONG   callback_stack_size;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_inside_data_check          Cortex-M33/MPU/AC6   */
-/*                                                           6.1.3        */
+/*    _txm_module_manager_inside_data_check           Cortex-M33/Generic  */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -153,7 +156,9 @@ ULONG   callback_stack_size;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  12-31-2020     Scott Larson             Initial Version 6.1.3         */
+/*  12-31-2020      Scott Larson            Initial Version 6.1.3         */
+/*  04-02-2021      Scott Larson            Modified comments,            */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, UINT obj_size)
@@ -164,6 +169,12 @@ UINT num_shared_memory_mpu_entries;
 ALIGN_TYPE shared_memory_address_start;
 ALIGN_TYPE shared_memory_address_end;
 
+    /* Check for overflow. */
+    if ((obj_ptr) > ((obj_ptr) + (obj_size)))
+    {
+        return(TX_FALSE);
+    }
+    
     /* Check if the object is inside the module data.  */
     if ((obj_ptr >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) &&
         ((obj_ptr + obj_size) <= ((ALIGN_TYPE) module_instance -> txm_module_instance_data_end + 1)))

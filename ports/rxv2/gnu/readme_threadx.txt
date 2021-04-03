@@ -157,6 +157,8 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
+04-02-2021  Release 6.1.6 changes:
+            tx_port.h                           Updated macro definition
 
 12-31-2020  Initial ThreadX release for the RXv2 using GNURX tools, version 6.1.3
 

@@ -29,7 +29,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                             Cortex-M33/MPU/GNU  */
-/*                                                           6.1.5        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -62,6 +62,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  03-02-2021      Scott Larson            Initial Version 6.1.5         */
+/*  04-02-2021      Scott Larson            Modified comments and fixed   */
+/*                                            MPU region configuration,   */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -382,6 +385,8 @@ _skip_secure_restore:
     LDR     r1, =0xE000ED9C                         // Build address of MPU base register
 
     // Use alias registers to quickly load MPU
+    LDR     r2, =0xE000ED98                         // Get region register
+    STR     r3, [r2]                                // Set region to 0
     ADD     r0, r0, #0x64                           // Build address of MPU register start in thread control block
     LDM     r0!, {r2-r9}                            // Load first four MPU regions
     STM     r1, {r2-r9}                             // Store first four MPU regions

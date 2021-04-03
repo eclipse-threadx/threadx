@@ -41,7 +41,7 @@ UINT    tx_low_power_entered;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    tx_low_power_enter                                  PORTABLE C      */
-/*                                                           6.1.5        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -76,16 +76,21 @@ UINT    tx_low_power_entered;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021     William E. Lamie         Initial Version 6.1.5         */
+/*  03-02-2021      William E. Lamie        Initial Version 6.1.5         */
+/*  04-02-2021      Scott Larson            Modified comments and fixed   */
+/*                                            compiler warning,           */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 VOID  tx_low_power_enter(VOID)
 {
 
 TX_INTERRUPT_SAVE_AREA
+
+#ifdef TX_LOW_POWER_TIMER_SETUP
 ULONG   tx_low_power_next_expiration;   /* The next timer experation (units of ThreadX timer ticks). */
 ULONG   timers_active;
-
+#endif
 
     /* Disable interrupts while we prepare for low power mode.  */
     TX_DISABLE

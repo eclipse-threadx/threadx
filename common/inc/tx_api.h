@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE C      */
-/*                                                           6.1.5        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -66,6 +66,9 @@
 /*                                            add option to remove FileX  */
 /*                                            pointer,                    */
 /*                                            resulting in version 6.1.5  */
+/*  04-02-2021      Scott Larson            Modified comment(s), and      */
+/*                                            update patch number,        */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -98,7 +101,7 @@ extern   "C" {
 #define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
 #define THREADX_MINOR_VERSION           1
-#define THREADX_PATCH_VERSION           5
+#define THREADX_PATCH_VERSION           6
 
 /* Define the following symbol for backward compatibility */
 #define EL_PRODUCT_THREADX

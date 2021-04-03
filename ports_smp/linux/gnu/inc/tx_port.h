@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         SMP/Linux/GCC     */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*                                            macro definition,           */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -600,7 +603,7 @@ void                        _tx_thread_smp_debug_entry_insert(ULONG id, ULONG su
    is used to define a local function save area for the disable and restore
    macros.  */
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int tx_interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT tx_interrupt_save;
 
 #define TX_DISABLE                              tx_interrupt_save =  _tx_thread_smp_protect();
 #define TX_RESTORE                              _tx_thread_smp_unprotect(tx_interrupt_save);
@@ -628,7 +631,7 @@ void                        _tx_thread_smp_debug_entry_insert(ULONG id, ULONG su
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX SMP/Linux/gcc Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX SMP/Linux/gcc Version 6.1.6 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

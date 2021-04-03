@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                       ARCv2_EM/MetaWare   */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*                                            macro definition,           */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -288,7 +291,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
    macros.  */
 
 
-#define TX_INTERRUPT_SAVE_AREA                  register unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save =  _clri();
 #define TX_RESTORE                              _seti(interrupt_save);
@@ -308,7 +311,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARCv2_EM/MetaWare Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARCv2_EM/MetaWare Version 6.1.6 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

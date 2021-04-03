@@ -222,7 +222,7 @@ static void _tx_thread_interrupt_restore(UINT old_posture){
     MVTC r2,PSW   ;
 }
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save =  _tx_thread_interrupt_disable();
 

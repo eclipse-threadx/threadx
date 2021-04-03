@@ -32,6 +32,10 @@
     EXTERN  _tx_thread_secure_stack_context_save
     EXTERN  _tx_thread_secure_mode_stack_allocate
     EXTERN  _tx_thread_secure_mode_stack_free
+#ifdef TX_LOW_POWER
+    EXTERN  tx_low_power_enter
+    EXTERN  tx_low_power_exit
+#endif
 ;
 ;
     SECTION `.text`:CODE:NOROOT(2)
@@ -41,7 +45,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                               Cortex-M23/IAR    */
-;/*                                                           6.1          */
+;/*                                                           6.1.6        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
@@ -74,6 +78,9 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+;/*  04-02-2021      Scott Larson            Modified comment(s), added    */
+;/*                                           low power code,              */
+;/*                                           resulting in version 6.1.6   */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -266,11 +273,25 @@ __tx_ts_wait:
     LDR     r1, [r2]                                ; Pickup the next thread to execute pointer
     STR     r1, [r0]                                ; Store it in the current pointer
     CBNZ    r1, __tx_ts_ready                       ; If non-NULL, a new thread is ready!
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_enter                      ; Possibly enter low power mode
+    POP     {r0-r3}
+#endif
+
 #ifdef TX_ENABLE_WFI
     DSB                                             ; Ensure no outstanding memory transactions
     WFI                                             ; Wait for interrupt
     ISB                                             ; Ensure pipeline is flushed
 #endif
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_exit                       ; Exit low power mode
+    POP     {r0-r3}
+#endif
+
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_wait                            ; Loop to continue waiting
 ;

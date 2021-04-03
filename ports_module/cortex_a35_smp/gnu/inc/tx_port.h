@@ -407,7 +407,7 @@ typedef struct TX_THREAD_SMP_PROTECT_STRUCT
    is used to define a local function save area for the disable and restore
    macros.  */
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save =  _tx_thread_smp_protect();
 #define TX_RESTORE                              _tx_thread_smp_unprotect(interrupt_save);

@@ -344,7 +344,7 @@ unsigned long long temp;
 }
 
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 #define TX_DISABLE                              interrupt_save =  __disable_interrupts();
 #define TX_RESTORE                              __restore_interrupts(interrupt_save);
 
@@ -354,7 +354,7 @@ unsigned int   _tx_thread_interrupt_disable(void);
 unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
 
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save =  _tx_thread_interrupt_disable();
 #define TX_RESTORE                              _tx_thread_interrupt_restore(interrupt_save);

@@ -233,6 +233,9 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
+04-02-2021  Release 6.1.6 changes:
+            tx_port.h                           Updated macro definition
+
 08/09/2020  Initial ThreadX version for RISC-V using IAR Tools.
 
 

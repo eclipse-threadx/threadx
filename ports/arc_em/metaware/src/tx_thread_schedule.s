@@ -8,73 +8,67 @@
 ;/*       and in the root directory of this software.                      */
 ;/*                                                                        */
 ;/**************************************************************************/
-;
-;
+
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;
-;#define TX_SOURCE_CODE
-;
-;
+
     .equ    BTA, 0x412
     .equ    KSTACK_TOP,     0x264
     .equ    KSTACK_BASE,    0x265
     .equ    STATUS32_SC,    0x4000
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_schedule                             ARCv2_EM/MetaWare   */
-;/*                                                           6.1          */
+;/*                                                           6.1.6        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function waits for a thread control block pointer to appear in */ 
-;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-;/*    in the variable, the corresponding thread is resumed.               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function waits for a thread control block pointer to appear in */
+;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+;/*    in the variable, the corresponding thread is resumed.               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-;/*    _tx_thread_system_return             Return to system from thread   */ 
-;/*    _tx_thread_context_restore           Restore thread's context       */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+;/*    _tx_thread_system_return             Return to system from thread   */
+;/*    _tx_thread_context_restore           Restore thread's context       */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  04-02-2021     Andres Mlinar              Modified comment(s), and    */
+;/*                                            fixed interrupt priority    */
+;/*                                            overwritting bug, and       */
+;/*                                            fixed hardware stack checker*/
+;/*                                            disable and reenable logic, */
+;/*                                            resulting in version 6.1.6  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -85,8 +79,13 @@ _tx_thread_schedule:
 ;
 ;    /* Enable interrupts.  */
 ;
-    mov     r0, 0x1F                                    ; Build enable interrupt value
-    seti    r0                                          ; Enable interrupts
+    seti    0                                           ; Enable interrupts without changing threshold level
+
+    .ifdef  TX_ENABLE_HW_STACK_CHECKING
+    lr      r2, [status32]                              ; Pickup current STATUS32
+    and     r2, r2, ~STATUS32_SC                        ; Clear the hardware stack checking enable bit (SC)
+    kflag   r2                                          ; Disable hardware stack checking
+    .endif
 ;
 ;    /* Wait for a thread to execute.  */
 ;    do
@@ -99,7 +98,7 @@ __tx_thread_schedule_loop:
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr == TX_NULL);
-;    
+;
 ;    /* Yes! We have a thread to execute.  Lockout interrupts and
 ;       transfer control to it.  */
 ;
@@ -118,16 +117,6 @@ __tx_thread_schedule_loop:
     ld      r4, [r0, 24]                                ; Pickup time-slice for this thread
     add     r3, r3, 1                                   ; Increment run counter
     st      r3, [r0, 4]                                 ; Store the new run counter
-
-    .ifdef  TX_ENABLE_HW_STACK_CHECKING
-    lr      r2, [status32]                              ; Pickup current STATUS32
-    and     r2, r2, ~STATUS32_SC                        ; Clear the hardware stack checking enable bit (SC)
-    kflag   r2                                          ; Disable hardware stack checking
-    ld      r3, [r0, 12]                                ; Pickup the top of the thread's stack (lowest address)
-    sr		r3, [KSTACK_TOP]                            ; Setup KSTACK_TOP
-    ld      r3, [r0, 16]                                ; Pickup the base of the thread's stack (highest address)
-    sr      r3, [KSTACK_BASE]                           ; Setup KSTACK_BASE
-    .endif
 ;
 ;    /* Setup time-slice, if present.  */
 ;    _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;
@@ -135,6 +124,10 @@ __tx_thread_schedule_loop:
     ld      sp, [r0, 8]                                 ; Switch to thread's stack
 
     .ifdef  TX_ENABLE_HW_STACK_CHECKING
+    ld      r3, [r0, 12]                                ; Pickup the top of the thread's stack (lowest address)
+    sr      r3, [KSTACK_TOP]                            ; Setup KSTACK_TOP
+    ld      r3, [r0, 16]                                ; Pickup the base of the thread's stack (highest address)
+    sr      r3, [KSTACK_BASE]                           ; Setup KSTACK_BASE
     or      r2, r2, STATUS32_SC                         ; Or in hardware stack checking enable bit (SC)
     kflag   r2                                          ; Enable hardware stack checking
     .endif
@@ -176,8 +169,8 @@ __tx_thread_schedule_loop:
     ld      r13, [sp, 64]                               ; Recover r13
     ld      r1,  [sp, 68]                               ; Pickup status32
     ld      r30, [sp, 72]                               ; Recover r30
-    add     sp, sp, 76                                  ; Recover solicited stack frame 
-    j_s.d   [blink]                                     ; Return to thread and restore flags 
+    add     sp, sp, 76                                  ; Recover solicited stack frame
+    j_s.d   [blink]                                     ; Return to thread and restore flags
     seti    r1                                          ; Recover STATUS32
 ;
 __tx_thread_schedule_int_ret:
@@ -189,7 +182,7 @@ __tx_thread_schedule_int_ret:
     sr      r0, [LP_START]                              ; Restore LP_START
     ld      r1, [sp, 8]                                 ; Recover LP_END
     sr      r1, [LP_END]                                ; Restore LP_END
-    ld      r2, [sp, 12]                                ; Recover LP_COUNT      
+    ld      r2, [sp, 12]                                ; Recover LP_COUNT
     mov     LP_COUNT, r2
     ld      r0, [sp, 156]                               ; Pickup saved BTA
     sr      r0, [BTA]                                   ; Recover BTA
@@ -230,7 +223,7 @@ __tx_thread_schedule_int_ret:
     .endif
     add     sp, sp, 160                                 ; Recover interrupt stack frame
     rtie                                                ; Return to point of interrupt
-   
+
 ;
 ;}
 ;

@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M4/AC5     */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*                                            macro definition,           */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -424,7 +427,7 @@ VOID                                            _tx_thread_interrupt_restore(UIN
 
 #else
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int  was_masked;
+#define TX_INTERRUPT_SAVE_AREA                  UINT was_masked;
 #define TX_DISABLE                              was_masked = __disable_irq();
 #define TX_RESTORE                              if (was_masked == 0) __enable_irq();
 

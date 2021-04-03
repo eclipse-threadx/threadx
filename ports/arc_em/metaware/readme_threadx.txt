@@ -209,6 +209,18 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
+04-02-2021  Release 6.1.6 changes:
+            tx_port.h                           Updated macro definition
+            tx_initialize_low_level.s           Modified comments
+            tx_thread_context_restore.s         r25/r30 are caller saved
+            tx_thread_context_save.s            r25/r30 are caller saved
+            tx_thread_interrupt_control.s       Modified comments
+            tx_thread_schedule.s                fixed interrupt priority overwritting bug, 
+                                                and fixed hardware stack checker disable and reenable logic
+            tx_thread_stack_build.s             Modified comments
+            tx_thread_system_return.s           Modified comments
+            tx_timer_interrupt.s                remove unneeded load of _tx_thread_preempt_disable
+            
 09-30-2020  Initial ThreadX 6.1 for ARCv2 EM using MetaWare tools.
 
 

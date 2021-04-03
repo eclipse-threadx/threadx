@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*                                            macro definition,           */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -284,7 +287,7 @@ typedef unsigned short                          USHORT;
 
 #ifndef __thumb
 
-#define TX_INTERRUPT_SAVE_AREA                  register unsigned int interrupt_save_disabled;
+#define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save_disabled;
 
 #ifdef  TX_ENABLE_FIQ_SUPPORT
 
@@ -315,7 +318,7 @@ unsigned int   _tx_thread_interrupt_disable(void);
 unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
 
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save =  _tx_thread_interrupt_disable();
 #define TX_RESTORE                              _tx_thread_interrupt_restore(interrupt_save);
@@ -343,7 +346,7 @@ void    tx_thread_vfp_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-R4/AC6 Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-R4/AC6 Version 6.1.6 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

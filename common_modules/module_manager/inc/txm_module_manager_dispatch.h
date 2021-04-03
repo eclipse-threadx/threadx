@@ -68,6 +68,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[1], extra_parameters[2]))
             return(TXM_MODULE_INVALID_MEMORY);
     }
@@ -131,6 +134,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[5])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -179,6 +185,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[3])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -216,6 +225,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -311,6 +323,9 @@ ALIGN_TYPE return_value;
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(VOID *)))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
+            return(TXM_MODULE_INVALID_MEMORY);
     }
 
     return_value = (ALIGN_TYPE) _txe_byte_allocate(
@@ -340,6 +355,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[3])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], extra_parameters[1]))
@@ -404,6 +422,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[5])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -453,6 +474,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[6])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -507,6 +531,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[5])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -668,6 +695,9 @@ ALIGN_TYPE return_value;
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[1], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[3])))
+            return(TXM_MODULE_INVALID_MEMORY);
     }
 
     return_value = (ALIGN_TYPE) _txe_event_flags_get(
@@ -699,6 +729,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[4])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -745,6 +778,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[3])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -782,6 +818,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -886,6 +925,9 @@ ALIGN_TYPE return_value;
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
+            return(TXM_MODULE_INVALID_MEMORY);
     }
 
     return_value = (ALIGN_TYPE) _txe_mutex_create(
@@ -967,6 +1009,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[5])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -1017,6 +1062,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[5])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -1064,6 +1112,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[4])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -1149,6 +1200,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[4])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[1], extra_parameters[2]))
@@ -1264,6 +1318,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[5])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -1314,6 +1371,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[5])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -1361,6 +1421,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[4])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -1551,6 +1614,9 @@ ALIGN_TYPE return_value;
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
+            return(TXM_MODULE_INVALID_MEMORY);
     }
 
     return_value = (ALIGN_TYPE) _txe_semaphore_create(
@@ -1631,6 +1697,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[4])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -1675,6 +1744,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[3])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -1712,6 +1784,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -1838,6 +1913,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[9])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[2], extra_parameters[3]))
@@ -1977,6 +2055,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[7])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(UINT)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -2056,6 +2137,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[9])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -2124,6 +2208,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[9])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -2535,6 +2622,9 @@ VOID (*expiration_function)(ULONG);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[6])))
+            return(TXM_MODULE_INVALID_MEMORY);
     }
 
     /* Is it a disable request?  */
@@ -2646,6 +2736,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[4])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(UINT)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -2691,6 +2784,9 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[4])))
+            return(TXM_MODULE_INVALID_MEMORY);
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
 
@@ -2733,6 +2829,9 @@ ALIGN_TYPE return_value;
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[3])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[0], sizeof(ULONG)))
@@ -2890,6 +2989,12 @@ static ALIGN_TYPE _txm_module_manager_tx_trace_user_event_insert_dispatch(TXM_MO
 
 ALIGN_TYPE return_value;
 
+    if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
+    {
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[3])))
+            return(TXM_MODULE_INVALID_MEMORY);
+    }
+    
     return_value = (ALIGN_TYPE) _tx_trace_user_event_insert(
         (ULONG) param_0,
         (ULONG) param_1,
@@ -3013,6 +3118,9 @@ ALIGN_TYPE return_value;
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[1], sizeof(VOID *)))

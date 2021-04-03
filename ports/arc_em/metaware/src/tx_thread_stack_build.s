@@ -8,70 +8,60 @@
 ;/*       and in the root directory of this software.                      */
 ;/*                                                                        */
 ;/**************************************************************************/
-;
-;
+
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;
-;
-    .equ    LONG_ALIGN_MASK, 0xFFFFFFFC     
+
+    .equ    LONG_ALIGN_MASK, 0xFFFFFFFC
     .equ    INT_ENABLE_BITS, 0x8000001E
-;
-;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_stack_build                          ARCv2_EM/MetaWare   */
-;/*                                                           6.1          */
+;/*                                                           6.1.6        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
+;/*                                                                        */
 ;/*    This function builds a stack frame on the supplied thread's stack.  */
 ;/*    The stack frame results in a fake interrupt return to the supplied  */
-;/*    function pointer.                                                   */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
+;/*    function pointer.                                                   */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    thread_ptr                            Pointer to thread control blk */
 ;/*    function_ptr                          Pointer to return function    */
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
 ;/*    _tx_thread_create                     Create thread service         */
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  04-02-2021     Andres Mlinar            Modified comments,            */
+;/*                                            resulting in version 6.1.6  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -80,11 +70,11 @@
     .type   _tx_thread_stack_build, @function
 _tx_thread_stack_build:
 ;
-;       
+;
 ;    /* Build a fake interrupt frame.  The form of the fake interrupt stack
 ;       on the ARCv2 EM should look like the following after it is built.
 ;       Note that the extension registers are always assigned space here.
-;       
+;
 ;       Stack Top:      1           Interrupt stack frame type
 ;                       LP_START    Initial loop start
 ;                       LP_END      Initial loop end
@@ -119,7 +109,7 @@ _tx_thread_stack_build:
 ;                       r2          Initial r2
 ;                       r1          Initial r1
 ;                       r0          Initial r0
-;                       r30         Initial r30 
+;                       r30         Initial r30
 ;                       r58         Initial r58
 ;                       r59         Initial r59
 ;                       0           Reserved
@@ -127,10 +117,10 @@ _tx_thread_stack_build:
 ;                       0           Initial BTA
 ;                       0           Point of Interrupt (thread entry point)
 ;                       0           Initial STATUS32
-;                       0           Backtrace 
-;                       0           Backtrace 
-;                       0           Backtrace 
-;                       0           Backtrace 
+;                       0           Backtrace
+;                       0           Backtrace
+;                       0           Backtrace
+;                       0           Backtrace
 ;
 ; *: these registers will only be saved and restored if flag -Xxmac_d16 is passed to hcac
 ;
@@ -179,19 +169,19 @@ _tx_thread_stack_build:
     st      r5, [r3, 128]                               ; Store initial r1
     st      r5, [r3, 132]                               ; Store initial r0
     st      r5, [r3, 136]                               ; Store initial r30
-    st      r5, [r3, 140]                               ; Store initial r58 
+    st      r5, [r3, 140]                               ; Store initial r58
     st      r5, [r3, 144]                               ; Store initial r59
     st      r5, [r3, 148]                               ; Reserved
     st      r5, [r3, 152]                               ; Reserved
     st      r5, [r3, 156]                               ; Store initial BTA
-    st      r1, [r3, 160]                               ; Store initial point of entry 
+    st      r1, [r3, 160]                               ; Store initial point of entry
     lr      r6, [status32]                              ; Pickup STATUS32
     or      r6, r6, INT_ENABLE_BITS                     ; Make sure interrupts are enabled
     st      r6, [r3, 164]                               ; Store initial STATUS32
-    st      r5, [r3, 168]                               ; Backtrace 0 
-    st      r5, [r3, 172]                               ; Backtrace 0 
-    st      r5, [r3, 176]                               ; Backtrace 0 
-    st      r5, [r3, 180]                               ; Backtrace 0 
+    st      r5, [r3, 168]                               ; Backtrace 0
+    st      r5, [r3, 172]                               ; Backtrace 0
+    st      r5, [r3, 176]                               ; Backtrace 0
+    st      r5, [r3, 180]                               ; Backtrace 0
 ;
 ;    /* Setup stack pointer.  */
 ;    thread_ptr -> tx_thread_stack_ptr =  r3;

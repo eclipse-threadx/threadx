@@ -510,7 +510,7 @@ VOID                                            _tx_thread_interrupt_restore(UIN
 
 #else
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int  was_masked;
+#define TX_INTERRUPT_SAVE_AREA                  UINT was_masked;
 #define TX_DISABLE                              was_masked = __disable_irq();
 #define TX_RESTORE                              if (was_masked == 0) __enable_irq();
 

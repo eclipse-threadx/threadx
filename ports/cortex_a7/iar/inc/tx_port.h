@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                         Cortex-A7/IAR     */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*                                            macro definition,           */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -335,9 +338,9 @@ __intrinsic void          __set_CPSR( unsigned long );
 
 
 #if (__VER__ < 8002000)
-#define TX_INTERRUPT_SAVE_AREA      unsigned long interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA      ULONG interrupt_save;
 #else
-#define TX_INTERRUPT_SAVE_AREA      unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA      UINT interrupt_save;
 #endif
 
 #define TX_DISABLE                  interrupt_save =  __get_CPSR(); \
@@ -380,7 +383,7 @@ void    tx_thread_vfp_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-A7/IAR Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-A7/IAR Version 6.1.6 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

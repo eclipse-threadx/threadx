@@ -8,77 +8,70 @@
 ;/*       and in the root directory of this software.                      */
 ;/*                                                                        */
 ;/**************************************************************************/
-;
-;
+
+
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;
-;#define TX_SOURCE_CODE
-;
+
     .equ    BTA, 0x412
     .equ    KSTACK_TOP,     0x264
     .equ    KSTACK_BASE,    0x265
     .equ    STATUS32_SC,    0x4000
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_thread.h"
-;#include "tx_timer.h"
-;
-;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_context_restore                      ARCv2_EM/MetaWare   */
-;/*                                                           6.1          */
+;/*                                                           6.1.6        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function restores the interrupt context if it is processing a  */ 
-;/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-;/*    if no thread was running, the function returns to the scheduler.    */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                  Interrupt Service Routines    */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function restores the interrupt context if it is processing a  */
+;/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+;/*    if no thread was running, the function returns to the scheduler.    */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_schedule                   Thread scheduling routine     */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                  Interrupt Service Routines    */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  04-02-2021     Andres Mlinar            Modified comment(s), and      */
+;/*                                            r25/r30 are caller saved,   */
+;/*                                            resulting in version 6.1.6  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)
 ;{
     .global _tx_thread_context_restore
-    .type   _tx_thread_context_restore, @function 
+    .type   _tx_thread_context_restore, @function
 _tx_thread_context_restore:
 ;
 ;    /* Note: it is assumed that the stack pointer is in the same position now as
@@ -109,7 +102,7 @@ _tx_thread_context_restore:
 ;
 ;    /* Interrupts are nested.  */
 ;
-;    /* Just recover the saved registers and return to the point of 
+;    /* Just recover the saved registers and return to the point of
 ;       interrupt.  */
 ;
 
@@ -119,7 +112,7 @@ __tx_thread_nested_restore:
     sr      r0, [LP_START]                              ; Restore LP_START
     ld      r1, [sp, 8]                                 ; Recover LP_END
     sr      r1, [LP_END]                                ; Restore LP_END
-    ld      r2, [sp, 12]                                ; Recover LP_COUNT 
+    ld      r2, [sp, 12]                                ; Recover LP_COUNT
     mov     LP_COUNT, r2
     ld      r2, [sp, 156]                               ; Pickup BTA
     sr      r2, [BTA]                                   ; Recover BTA
@@ -128,6 +121,7 @@ __tx_thread_nested_restore:
     ld      r59, [sp, 144]                              ; Recover r59
     .endif
     ld      blink, [sp, 16]                             ; Recover blink
+    ld      r25, [sp, 32]                               ; Recover r25
     ld      r12, [sp, 84]                               ; Recover r12
     ld      r11, [sp, 88]                               ; Recover r11
     ld      r10, [sp, 92]                               ; Recover r10
@@ -140,8 +134,9 @@ __tx_thread_nested_restore:
     ld      r3,  [sp, 120]                              ; Recover r3
     ld      r2,  [sp, 124]                              ; Recover r2
     ld      r1,  [sp, 128]                              ; Recover r1
-    ld      r0, [sp, 132]                               ; Recover r0
-    add     sp, sp, 160                                 ; Recover interrupt stack frame 
+    ld      r0,  [sp, 132]                              ; Recover r0
+    ld      r30, [sp, 136]                              ; Recover r30
+    add     sp, sp, 160                                 ; Recover interrupt stack frame
     rtie                                                ; Return from interrupt
 ;
 ;
@@ -149,7 +144,7 @@ __tx_thread_nested_restore:
 __tx_thread_not_nested_restore:
 ;
 ;    /* Determine if a thread was interrupted and no preemption is required.  */
-;    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr) 
+;    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr)
 ;               || (_tx_thread_preempt_disable))
 ;    {
 ;
@@ -207,6 +202,7 @@ __tx_thread_no_preempt_restore:
     ld      r59, [sp, 144]                              ; Recover r59
     .endif
     ld      blink, [sp, 16]                             ; Recover blink
+    ld      r25, [sp, 32]                               ; Recover r25
     ld      r12, [sp, 84]                               ; Recover r12
     ld      r11, [sp, 88]                               ; Recover r11
     ld      r10, [sp, 92]                               ; Recover r10
@@ -220,6 +216,7 @@ __tx_thread_no_preempt_restore:
     ld      r2,  [sp, 124]                              ; Recover r2
     ld      r1,  [sp, 128]                              ; Recover r1
     ld      r0,  [sp, 132]                              ; Recover r0
+    ld      r30, [sp, 136]                              ; Recover r30
     add     sp, sp, 160                                 ; Recover interrupt stack frame
     rtie                                                ; Return from interrupt
 ;

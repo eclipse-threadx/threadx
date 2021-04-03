@@ -461,7 +461,7 @@ UINT    i;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_inside_data_check          Cortex-M7/MPU/AC5    */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -493,7 +493,10 @@ UINT    i;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  04-02-2021      Scott Larson            Modified comments, added      */
+/*                                            check for overflow,         */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, UINT obj_size)
@@ -504,6 +507,12 @@ UINT num_shared_memory_mpu_entries;
 ALIGN_TYPE shared_memory_address_start;
 ALIGN_TYPE shared_memory_address_end;
 
+    /* Check for overflow. */
+    if ((obj_ptr) > ((obj_ptr) + (obj_size)))
+    {
+        return(TX_FALSE);
+    }
+    
     /* Check if the object is inside the module data.  */
     if ((obj_ptr >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) &&
         ((obj_ptr + obj_size) <= ((ALIGN_TYPE) module_instance -> txm_module_instance_data_end + 1)))

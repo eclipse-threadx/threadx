@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M7/GHS     */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*                                            macro definition,           */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -324,7 +327,7 @@ typedef unsigned short                          USHORT;
 UINT                                            _tx_thread_interrupt_disable(VOID);
 VOID                                            _tx_thread_interrupt_restore(UINT previous_posture);
 
-#define TX_INTERRUPT_SAVE_AREA                  register int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  register INT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save = _tx_thread_interrupt_control(TX_INT_DISABLE);
 
@@ -332,7 +335,7 @@ VOID                                            _tx_thread_interrupt_restore(UIN
 
 #else
 
-#define TX_INTERRUPT_SAVE_AREA                  register int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  register INT interrupt_save;
 
 /* Define ThreadX interrupt lockout and restore macros using
    asm macros.  */
@@ -383,8 +386,8 @@ void    tx_thread_fpu_disable(void);
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M7/GHS Version 6.1 *";
+CHAR                            _tx_version_id[] =
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M7/GHS Version 6.1.6 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

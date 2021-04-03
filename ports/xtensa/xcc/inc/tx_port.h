@@ -35,7 +35,10 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
+/*  11-09-2020     Cadence Design Systems   Initial Version 6.1.2         */ 
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */ 
+/*                                            macro definition,           */ 
+/*                                            resulting in version 6.1.6  */ 
 /*                                                                        */ 
 /**************************************************************************/ 
 
@@ -436,7 +439,7 @@ extern void _xt_coproc_release(void * coproc_sa_base);
 
 extern unsigned int                 _tx_thread_interrupt_control(unsigned int new_posture);
 
-#define TX_INTERRUPT_SAVE_AREA      register unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA      register UINT interrupt_save;
 
 #ifdef TX_DISABLE_INLINE_MACROS
 #define TX_DISABLE                  interrupt_save = _tx_thread_interrupt_control(TX_INT_DISABLE);
@@ -468,7 +471,7 @@ extern int xt_timer_intnum;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. * Azure RTOS Xtensa Version 6.1.3 *";
+                                    "Copyright (c) Microsoft Corporation. * Azure RTOS Xtensa Version 6.1.6 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
