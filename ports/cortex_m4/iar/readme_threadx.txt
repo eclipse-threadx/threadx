@@ -1,6 +1,6 @@
-                       Microsoft's Azure RTOS ThreadX for Cortex-M4 
-
-                                   Using the IAR Tools
+                       Microsoft's Azure RTOS ThreadX for ARMv7-M
+                            (Cortex-M3, Cortex-M4, Cortex-M7)
+                              Using IAR EWARM Tools
 
 
 1.  Building the ThreadX run-time Library
@@ -25,12 +25,12 @@ Workbench, and select the "Make" button.
 You should observe the compilation of sample_threadx.c (which is the demonstration 
 application) and linking with tx.a. The resulting file sample_threadx.out is a 
 binary ELF file that can be downloaded and executed on the IAR Windows-based 
-Cortex-M4 simulator.
+Cortex-M simulator.
 
 
 3.  System Initialization
 
-The entry point in ThreadX for the Cortex-M4 using IAR tools is at label 
+The entry point in ThreadX for the Cortex-M using IAR tools is at label 
 __iar_program_start. This is defined within the IAR compiler's startup code. 
 In addition, this is where all static and global preset C variable 
 initialization processing takes place.
@@ -52,7 +52,7 @@ other RAM sections in memory.
 
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
-All suspended threads have the same stack frame in the Cortex-M4 version of
+All suspended threads have the same stack frame in the Cortex-M version of
 ThreadX. The top of the suspended thread's stack is pointed to by 
 tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
@@ -60,7 +60,7 @@ Non-FPU Stack Frame:
 
     Stack Offset    Stack Contents
 
-    0x00            LR          Interrupted LR (LR at time of PENDSV)
+    0x00            lr          Interrupted lr (lr at time of PENDSV)
     0x04            r4          Software stacked GP registers
     0x08            r5
     0x0C            r6
@@ -82,7 +82,7 @@ FPU Stack Frame (only interrupted thread with FPU enabled):
 
     Stack Offset    Stack Contents
 
-    0x00            LR          Interrupted LR (LR at time of PENDSV)
+    0x00            lr          Interrupted lr (lr at time of PENDSV)
     0x04            s16         Software stacked FPU registers
     0x08            s17
     0x0C            s18
@@ -140,7 +140,7 @@ The distribution version of ThreadX is built without any compiler
 optimizations. This makes it easy to debug because you can trace or set 
 breakpoints inside of ThreadX itself. Of course, this costs some 
 performance. To make it run faster, you can change the ThreadX library
-project to enable various compiler optimizations. 
+project to enable various compiler optimizations.
 
 In addition, you can eliminate the ThreadX basic API error checking by 
 compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
@@ -149,7 +149,7 @@ defined.
 
 6.  Interrupt Handling
 
-The Cortex-M4 vectors start at the label __vector_table and is defined in cstartup_M.s. 
+The Cortex-M vectors start at the label __vector_table and is defined in cstartup_M.s. 
 The application may modify the vector area according to its needs.
 
 
@@ -172,21 +172,12 @@ ISRs written in assembly language will take the form:
         PUBLIC  your_assembly_isr
 your_assembly_isr:
 
-    PUSH    {lr}
+    PUSH    {r0, lr}
 
     ; ISR processing goes here, including any needed function calls.
 
-    POP     {lr}
+    POP     {r0, lr}
     BX      lr
-
-
-7.  IAR Thread-safe Library Support
-
-Thread-safe support for the IAR tools is easily enabled by building the ThreadX library
-and the application with TX_ENABLE_IAR_LIBRARY_SUPPORT. Also, the linker control file
-should have the following line added (if not already in place):
-
-initialize by copy with packing = none { section __DLIB_PERTHREAD }; // Required in a multi-threaded application
 
 
 7.  IAR Thread-safe Library Support
@@ -203,7 +194,7 @@ The project options "General Options -> Library Configuration" should also have 
 
 8. VFP Support
 
-ThreadX for Cortex-M4 supports automatic ("lazy") VFP support, which means that applications threads 
+ThreadX for Cortex-M supports automatic ("lazy") VFP support, which means that applications threads 
 can simply use the VFP and ThreadX automatically maintains the VFP registers as part of the thread 
 context - no additional setup by the application.
 
@@ -214,16 +205,10 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
-04-02-2021  Release 6.1.6 changes:
-            tx_port.h                           Updated macro definition
-
-03-02-2021  The following files were changed/added for version 6.1.5:
-            tx_thread_schedule.s            Added low power feature
-
-09-30-2020  Initial ThreadX 6.1 version for Cortex-M4 using IAR's ARM tools.
+06-02-2021  Initial ThreadX version 6.1.7 for Cortex-M using IAR's ARM tools.
 
 
-Copyright(c) 1996-2020 Microsoft Corporation
+Copyright(c) 1996-2021 Microsoft Corporation
 
 
 https://azure.com/rtos

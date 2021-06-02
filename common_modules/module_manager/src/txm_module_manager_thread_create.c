@@ -108,10 +108,8 @@ UINT                    core_index;
 #endif
 TX_THREAD               *next_thread;
 TX_THREAD               *previous_thread;
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 TX_THREAD               *saved_thread_ptr;
 UINT                    saved_threshold =  ((UINT) 0);
-#endif
 UCHAR                   *temp_ptr;
 #ifdef TX_ENABLE_STACK_CHECKING
 ALIGN_TYPE              new_stack_start;
@@ -155,7 +153,7 @@ ULONG                   i;
         /* Determine if this thread matches the thread in the list.  */
         if (thread_ptr == next_thread)
         {
-        
+
             break;
         }
 
@@ -177,7 +175,7 @@ ULONG                   i;
 
     /* Decrement the preempt disable flag.  */
     _tx_thread_preempt_disable--;
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 
@@ -260,11 +258,11 @@ ULONG                   i;
     /* Check for interrupt call.  */
     if (TX_THREAD_GET_SYSTEM_STATE() != 0)
     {
-    
+
         /* Now, make sure the call is from an interrupt and not initialization.  */
         if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
         {
-            
+
             /* Invalid caller of this function, return appropriate error code.  */
             return(TX_CALLER_ERROR);
         }
@@ -280,7 +278,7 @@ ULONG                   i;
 
 #ifdef TX_ENABLE_STACK_CHECKING
 
-    /* Ensure that there are two ULONG of 0xEF patterns at the top and 
+    /* Ensure that there are two ULONG of 0xEF patterns at the top and
        bottom of the thread's stack. This will be used to check for stack
        overflow conditions during run-time.  */
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
@@ -292,7 +290,7 @@ ULONG                   i;
     /* Determine if the starting stack address is different.  */
     if (new_stack_start != updated_stack_start)
     {
-    
+
         /* Yes, subtract another ULONG from the size to avoid going past the stack area.  */
         stack_size =  stack_size - (sizeof(ULONG));
     }
@@ -301,7 +299,7 @@ ULONG                   i;
     stack_start =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(updated_stack_start);
 #endif
 
-    /* Allocate the thread entry information at the top of thread's stack - Leaving one 
+    /* Allocate the thread entry information at the top of thread's stack - Leaving one
        ULONG worth of 0xEF pattern between the actual stack and the entry info structure.  */
     stack_size =  stack_size - (sizeof(TXM_MODULE_THREAD_ENTRY_INFO) + (3*sizeof(ULONG)));
 
@@ -368,7 +366,7 @@ ULONG                   i;
     /* Default thread creation such that core0 is the only allowed core for execution, i.e., bit 1 is set to exclude core1.  */
     thread_ptr -> tx_thread_smp_cores_excluded =  (TX_THREAD_SMP_CORE_MASK & 0xFFFFFFFE);
     thread_ptr -> tx_thread_smp_cores_allowed  =  1;
-    
+
     /* Default the timers to run on core 0 as well.  */
     thread_ptr -> tx_thread_timer.tx_timer_internal_smp_cores_excluded =  (TX_THREAD_SMP_CORE_MASK & 0xFFFFFFFE);
 
@@ -420,11 +418,11 @@ ULONG                   i;
     TX_THREAD_CREATE_INTERNAL_EXTENSION(thread_ptr)
 
     /* Setup pointer to the thread entry information structure, which will live at the top of each
-       module thread's stack. This will allow the module thread entry function to avoid direct 
+       module thread's stack. This will allow the module thread entry function to avoid direct
        access to the actual thread control block.  */
     thread_entry_info =  (TXM_MODULE_THREAD_ENTRY_INFO *) (((UCHAR *) thread_ptr -> tx_thread_stack_end) + (2*sizeof(ULONG)) + 1);
     thread_entry_info =  (TXM_MODULE_THREAD_ENTRY_INFO *) (((ALIGN_TYPE)(thread_entry_info)) & (~0x3));
-    
+
     /* Build the thread entry information structure.  */
     thread_entry_info -> txm_module_thread_entry_info_thread =                   thread_ptr;
     thread_entry_info -> txm_module_thread_entry_info_module =                   module_instance;
@@ -458,7 +456,7 @@ ULONG                   i;
        with the actual stack pointer at the end of stack build.  */
     thread_ptr -> tx_thread_stack_ptr =  (VOID *) thread_entry_info;
 
-    /* Call the target specific stack frame building routine to build the 
+    /* Call the target specific stack frame building routine to build the
        thread's initial stack and to setup the actual stack pointer in the
        control block.  */
     _txm_module_manager_thread_stack_build(thread_ptr, shell_function);
@@ -648,22 +646,22 @@ ULONG                   i;
             /* Yes, this create call was made from initialization.  */
 
             /* Pickup the current thread execute pointer, which corresponds to the
-               highest priority thread ready to execute.  Interrupt lockout is 
-               not required, since interrupts are assumed to be disabled during 
+               highest priority thread ready to execute.  Interrupt lockout is
+               not required, since interrupts are assumed to be disabled during
                initialization.  */
             saved_thread_ptr =  _tx_thread_execute_ptr;
 
             /* Determine if there is thread ready for execution.  */
             if (saved_thread_ptr != TX_NULL)
             {
-                
+
                 /* Yes, a thread is ready for execution when initialization completes.  */
 
                 /* Save the current preemption-threshold.  */
                 saved_threshold =  saved_thread_ptr -> tx_thread_preempt_threshold;
 
-                /* For initialization, temporarily set the preemption-threshold to the 
-                   priority level to make sure the highest-priority thread runs once 
+                /* For initialization, temporarily set the preemption-threshold to the
+                   priority level to make sure the highest-priority thread runs once
                    initialization is complete.  */
                 saved_thread_ptr -> tx_thread_preempt_threshold =  saved_thread_ptr -> tx_thread_priority;
             }

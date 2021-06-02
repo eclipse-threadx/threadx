@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -69,6 +69,9 @@
 /*  04-02-2021      Scott Larson            Modified comment(s), and      */
 /*                                            update patch number,        */
 /*                                            resulting in version 6.1.6  */
+/*  06-02-2021      Yuxin Zhou              Modified comment(s), added    */
+/*                                            Execution Profile support,  */
+/*                                            resulting in version 6.1.7  */   
 /*                                                                        */
 /**************************************************************************/
 
@@ -101,7 +104,7 @@ extern   "C" {
 #define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
 #define THREADX_MINOR_VERSION           1
-#define THREADX_PATCH_VERSION           6
+#define THREADX_PATCH_VERSION           7
 
 /* Define the following symbol for backward compatibility */
 #define EL_PRODUCT_THREADX
@@ -497,6 +500,17 @@ typedef struct TX_THREAD_STRUCT
     /* Define the fourth port extension in the thread control block. This 
        is typically defined to whitespace in tx_port.h.  */
     TX_THREAD_EXTENSION_3
+
+
+    /* Define variables for supporting execution profile. */
+    /* Note that in ThreadX 5.x, user would define TX_ENABLE_EXECUTION_CHANGE_NOTIFY and use TX_THREAD_EXTENSION_3
+       to define the following two variables.  
+       For Azure RTOS 6, user shall use TX_EXECUTION_PROFILE_ENABLE instead of TX_ENABLE_EXECUTION_CHANGE_NOTIFY,
+       and SHALL NOT add variables to TX_THREAD_EXTENSION_3. */
+#if (defined(TX_EXECUTION_PROFILE_ENABLE) && !defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY))
+    unsigned long long  tx_thread_execution_time_total;  
+    unsigned long long  tx_thread_execution_time_last_start; 
+#endif
 
     /* Define suspension sequence number.  This is used to ensure suspension is still valid when 
        cleanup routine executes.  */

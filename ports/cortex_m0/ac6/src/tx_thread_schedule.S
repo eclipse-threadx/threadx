@@ -25,6 +25,10 @@
     .global  _tx_thread_execute_ptr
     .global  _tx_timer_time_slice
     .global  _tx_thread_system_stack_ptr
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))     
+    .global _tx_execution_thread_enter
+    .global _tx_execution_thread_exit
+#endif
 #ifdef TX_LOW_POWER
     .global tx_low_power_enter
     .global tx_low_power_exit
@@ -131,7 +135,7 @@ __tx_SVCallHandler:
     .thumb_func
 __tx_ts_handler:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))     
 @
 @    /* Call the thread exit function to indicate the thread is no longer executing.  */
 @
@@ -214,7 +218,7 @@ __tx_ts_restore:
 @
     STR     r5, [r4]                                @ Setup global time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))           
 @
 @    /* Call the thread entry function to indicate the thread is executing.  */
 @

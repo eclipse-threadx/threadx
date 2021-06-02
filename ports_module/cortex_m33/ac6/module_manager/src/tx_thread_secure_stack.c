@@ -63,7 +63,7 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_initialize                Cortex-M33/AC6    */
-/*                                                           6.1.3        */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -95,7 +95,9 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  12-31-2020      Scott Larson            Initial Version 6.1.3         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -120,7 +122,7 @@ void    _tx_thread_secure_stack_initialize(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_allocate             Cortex-M33/AC6    */
-/*                                                           6.1.3        */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -160,9 +162,9 @@ void    _tx_thread_secure_stack_initialize(void)
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  12-31-2020      Scott Larson            Modified comment(s),          */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            added stack sealing,        */
-/*                                            resulting in version 6.1.3  */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -247,7 +249,7 @@ UCHAR   *stack_mem;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_free                 Cortex-M33/AC6    */
-/*                                                           6.1.3        */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -280,8 +282,8 @@ UCHAR   *stack_mem;
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  12-31-2020      Scott Larson            Modified comment(s),          */
-/*                                            resulting in version 6.1.3  */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -330,7 +332,7 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_context_save              Cortex-M33/AC6    */
-/*                                                           6.1.3        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -363,8 +365,10 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  12-31-2020      Scott Larson            Modified comment(s),          */
-/*                                            resulting in version 6.1.3  */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
+/*                                            resulting in version 6.1.1  */
+/*  06-02-2021      Scott Larson            Fix stack pointer save,       */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -397,7 +401,7 @@ ULONG   sp;
     }
     
     /* Save stack pointer. */
-    *(ULONG *) info_ptr -> tx_thread_secure_stack_ptr = sp;
+    info_ptr -> tx_thread_secure_stack_ptr = (VOID *) sp;
     
     /* Set process stack pointer and stack limit to 0 to throw exception when a thread
        without a secure stack calls a secure function that tries to use secure stack. */
@@ -414,7 +418,7 @@ ULONG   sp;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_context_restore           Cortex-M33/AC6    */
-/*                                                           6.1.3        */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -446,8 +450,8 @@ ULONG   sp;
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  12-31-2020      Scott Larson            Modified comment(s),          */
-/*                                            resulting in version 6.1.3  */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))

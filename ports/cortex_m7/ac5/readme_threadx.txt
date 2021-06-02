@@ -1,12 +1,11 @@
-                     Microsoft's Azure RTOS ThreadX for Cortex-M7 
+                       Microsoft's Azure RTOS ThreadX for ARMv7-M
+                            (Cortex-M3, Cortex-M4, Cortex-M7)
+                              Using ARM Compiler 5 (AC5)
 
-                               Thumb & 32-bit Mode
 
-                            Using ARM Compiler 5 (AC5)
- 
 1.  Building the ThreadX run-time Library
 
-First make sure you are in the "example_build" directory. Also, make sure that 
+Navigate to the "example_build" directory. Ensure that 
 you have setup your path and other environment variables necessary for the AC5 
 compiler. At this point you may run the build_threadx.bat batch file. This will 
 build the ThreadX run-time environment in the "example_build" directory. 
@@ -19,21 +18,21 @@ application in order to use ThreadX.
 
 2.  Demonstration System
 
-The ThreadX demonstration is designed to execute under the ARM DS Cortex-M7
+The ThreadX demonstration is designed to execute under the ARM DS Cortex-M
 simulator.
 
 Building the demonstration is easy; simply execute the build_threadx_sample.bat 
-batch file while inside the "example_build" directory. 
+batch file while inside the "example_build" directory.
 
 You should observe the compilation of sample_threadx.c (which is the demonstration 
 application) and linking with tx.a. The resulting file sample_threadx.axf 
-is a binary file that can be downloaded and executed on the ARM DS Cortex-M7 
+is a binary file that can be downloaded and executed on the ARM DS Cortex-M
 simulator.
 
 
 3.  System Initialization
 
-The entry point in ThreadX for the Cortex-M7 using AC5 tools is at label 
+The entry point in ThreadX for the Cortex-M using AC5 tools is at label 
 __main. This is defined within the AC5 compiler's startup code. In 
 addition, this is where all static and global pre-set C variable 
 initialization processing takes place.
@@ -51,7 +50,7 @@ parameter to your application definition function, tx_application_define.
 
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
-All suspended threads have the same stack frame in the Cortex-M7 version of
+All suspended threads have the same stack frame in the Cortex-M version of
 ThreadX. The top of the suspended thread's stack is pointed to by 
 tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
@@ -59,7 +58,7 @@ Non-FPU Stack Frame:
 
     Stack Offset    Stack Contents
 
-    0x00            LR          Interrupted LR (LR at time of PENDSV)
+    0x00            lr          Interrupted lr (lr at time of PENDSV)
     0x04            r4          Software stacked GP registers
     0x08            r5
     0x0C            r6
@@ -81,7 +80,7 @@ FPU Stack Frame (only interrupted thread with FPU enabled):
 
     Stack Offset    Stack Contents
 
-    0x00            LR          Interrupted LR (LR at time of PENDSV)
+    0x00            lr          Interrupted lr (lr at time of PENDSV)
     0x04            s16         Software stacked FPU registers
     0x08            s17
     0x0C            s18
@@ -138,8 +137,8 @@ FPU Stack Frame (only interrupted thread with FPU enabled):
 The distribution version of ThreadX is built without any compiler 
 optimizations. This makes it easy to debug because you can trace or set 
 breakpoints inside of ThreadX itself. Of course, this costs some 
-performance. To make it run faster, you can change the ThreadX_Library.Uv2 
-project to debugging and enable all compiler optimizations. 
+performance. To make it run faster, you can change the ThreadX library
+project to enable various compiler optimizations.
 
 In addition, you can eliminate the ThreadX basic API error checking by 
 compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
@@ -148,14 +147,14 @@ defined.
 
 6.  Interrupt Handling
 
-ThreadX provides complete and high-performance interrupt handling for Cortex-M7
+ThreadX provides complete and high-performance interrupt handling for Cortex-M
 targets. There are a certain set of requirements that are defined in the 
 following sub-sections:
 
 
 6.1  Vector Area
 
-The Cortex-M7 vectors start at the label __tx_vectors. The application may modify
+The Cortex-M vectors start at the label __tx_vectors. The application may modify
 the vector area according to its needs.
 
 
@@ -188,7 +187,7 @@ your_assembly_isr
 
 7. FPU Support
 
-ThreadX for Cortex-M7 supports automatic ("lazy") VFP support, which means that applications threads 
+ThreadX for Cortex-M supports automatic ("lazy") VFP support, which means that applications threads 
 can simply use the VFP and ThreadX automatically maintains the VFP registers as part of the thread 
 context - no additional setup by the application.
 
@@ -199,17 +198,10 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
-04-02-2021  Release 6.1.6 changes:
-            tx_port.h                           Updated macro definition
-            tx_thread_schedule.s                Fix compilation error
-
-03-02-2021  The following files were changed/added for version 6.1.5:
-            tx_thread_schedule.s            Added low power feature
-
-09-30-2020  Initial ThreadX 6.1 version for Cortex-M7 using AC5 tools.
+06-02-2021  Initial ThreadX version 6.1.7 for Cortex-M using AC5 tools.
 
 
-Copyright(c) 1996-2020 Microsoft Corporation
+Copyright(c) 1996-2021 Microsoft Corporation
 
 
 https://azure.com/rtos

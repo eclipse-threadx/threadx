@@ -188,6 +188,11 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
+06-02-2021  Release 6.1.7 changes:
+            tx_thread_secure_stack_initialize.S New file
+            tx_thread_schedule.S                Added secure stack initialize to SVC hander
+            tx_thread_secure_stack.c            Fixed stack pointer save, initialize in handler mode
+
 04-02-2021  Release 6.1.6 changes:
             tx_port.h                           Updated macro definition
             tx_thread_schedule.s                Added low power support

@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE SMP    */
-/*                                                           6.1.6        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -58,6 +58,9 @@
 /*  04-02-2021      Scott Larson            Modified comment(s), and      */
 /*                                            update patch number,        */
 /*                                            resulting in version 6.1.6  */
+/*  06-02-2021      Scott Larson            Added options for multiple    */
+/*                                            block pool search & delay,  */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -88,6 +91,15 @@ extern   "C" {
 #endif
 
 
+/* Define default block pool search and delay values.  */
+#ifndef TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH
+#define TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH    20
+#endif
+#ifndef TX_BTYE_POOL_DELAY_VALUE
+#define TX_BYTE_POOL_DELAY_VALUE              3
+#endif
+
+
 /* Define basic constants for the ThreadX kernel.  */
 
 
@@ -97,7 +109,7 @@ extern   "C" {
 #define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
 #define THREADX_MINOR_VERSION           1
-#define THREADX_PATCH_VERSION           6
+#define THREADX_PATCH_VERSION           7
 
 /* Define the following symbol for backward compatibility */
 #define EL_PRODUCT_THREADX

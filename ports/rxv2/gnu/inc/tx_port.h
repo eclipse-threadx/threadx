@@ -26,11 +26,11 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                            RXv2/GNURX     */
-/*                                                           6.1.3        */
+/*                                                           6.1.7        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Express Logic, Inc.                               */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -48,6 +48,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
+/*  06-02-2021     William E. Lamie         Modified comments,            */
+/*                                            resulting in version 6.1.7  */   
 /*                                                                        */
 /**************************************************************************/
 
@@ -221,8 +223,8 @@ VOID                                            _tx_thread_interrupt_restore(UIN
 
 #else
 
-#define TX_INTERRUPT_SAVE_AREA                  UCHAR interrupt_save;
-#define TX_DISABLE                              {interrupt_save = ((UCHAR)__builtin_rx_mvfc(0u) && 0x8u); __builtin_rx_clrpsw(8u);};
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
+#define TX_DISABLE                              {interrupt_save = ((UINT)__builtin_rx_mvfc(0u) && 0x8u); __builtin_rx_clrpsw(8u);};
 #define TX_RESTORE                              {if(interrupt_save != 0u) {__builtin_rx_setpsw(8u);}};
 
 #define _tx_thread_system_return                _tx_thread_system_return_inline
@@ -255,7 +257,7 @@ static void _tx_thread_system_return_inline(void)
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv2/GNURX Version 6.1.3 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv2/GNURX Version 6.1.7 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

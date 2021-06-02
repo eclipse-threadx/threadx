@@ -73,7 +73,7 @@
 ;{
     PUBLIC  _tx_thread_context_save
 _tx_thread_context_save:
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)) 
 ;
 ;    /* Call the ISR enter function to indicate an ISR is starting.  */
 ;

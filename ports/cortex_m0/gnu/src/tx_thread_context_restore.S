@@ -29,6 +29,9 @@
     .global  _tx_thread_schedule
     .global  _tx_thread_preempt_disable
     .global _tx_execution_isr_exit
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                        
+    .global  _tx_execution_isr_exit
+#endif
 @
 @
     .text 32
@@ -85,6 +88,11 @@
     .thumb_func
 _tx_thread_context_restore:
 @
-@ /* Not needed for this port - just return!  */
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    /* Call the ISR exit function to indicate an ISR is complete.  */
+    PUSH    {r0, lr}                                // Save return address
+    BL      _tx_execution_isr_exit                  // Call the ISR exit function
+    POP     {r0, lr}                                // Recover return address
+#endif
     BX      lr
 @}
