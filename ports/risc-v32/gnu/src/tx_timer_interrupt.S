@@ -29,19 +29,7 @@
     #include "tx_timer.h"
     #include "tx_thread.h"  */
 
-    EXTERN      _tx_timer_system_clock
-    EXTERN      _tx_timer_time_slice
-    EXTERN      _tx_timer_expired_time_slice
-    EXTERN      _tx_timer_current_ptr
-    EXTERN      _tx_timer_expired
-    EXTERN      _tx_timer_list_end
-    EXTERN      _tx_timer_list_start
-    EXTERN      _tx_timer_expiration_process
-    EXTERN      _tx_thread_time_slice
-
-
-    SECTION `.mtext`:CODE:REORDER:NOROOT(2)
-    CODE
+    .section .text
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
@@ -87,44 +75,44 @@
 /**************************************************************************/ 
 /* VOID   _tx_timer_interrupt(VOID)
 {  */
-    PUBLIC      _tx_timer_interrupt
+    .global      _tx_timer_interrupt
 _tx_timer_interrupt:
 
     /* Increment the system clock.  */
     /* _tx_timer_system_clock++;  */
 
-    la      t0, _tx_timer_system_clock                  ; Pickup address of system clock
-    lw      t1, 0(t0)                                   ; Pickup system clock
-    la      t2, _tx_timer_time_slice                    ; Pickup address of time slice
-    lw      t3, 0(t2)                                   ; Pickup time slice
-    addi    t1, t1, 1                                   ; Increment system clock
-    sw      t1, 0(t0)                                   ; Store new system clock
-    li      t6, 0                                       ; Clear local expired flag
+    la      t0, _tx_timer_system_clock                  # Pickup address of system clock
+    lw      t1, 0(t0)                                   # Pickup system clock
+    la      t2, _tx_timer_time_slice                    # Pickup address of time slice
+    lw      t3, 0(t2)                                   # Pickup time slice
+    addi    t1, t1, 1                                   # Increment system clock
+    sw      t1, 0(t0)                                   # Store new system clock
+    li      t6, 0                                       # Clear local expired flag
 
     /* Test for time-slice expiration.  */
     /* if (_tx_timer_time_slice)
     {  */
 
-    beqz    t3, _tx_timer_no_time_slice                 ; If 0, skip time slice processing
-    addi    t3, t3, -1                                  ; Decrement the time slice
+    beqz    t3, _tx_timer_no_time_slice                 # If 0, skip time slice processing
+    addi    t3, t3, -1                                  # Decrement the time slice
 
        /* Decrement the time_slice.  */
        /* _tx_timer_time_slice--;  */
 
-    sw      t3, 0(t2)                                   ; Store new time slice
+    sw      t3, 0(t2)                                   # Store new time slice
 
        /* Check for expiration.  */
        /* if (__tx_timer_time_slice == 0)  */
 
-    bgtz    t3, _tx_timer_no_time_slice                 ; If not 0, has not expired yet
-    li      t1, 1                                       ; Build expired flag
+    bgtz    t3, _tx_timer_no_time_slice                 # If not 0, has not expired yet
+    li      t1, 1                                       # Build expired flag
 
        /* Set the time-slice expired flag.  */
        /* _tx_timer_expired_time_slice =  TX_TRUE;  */
 
-    la      t4, _tx_timer_expired_time_slice            ; Get address of expired flag
-    sw      t1, 0(t4)                                   ; Set expired flag
-    ori     t6, t6, 1                                   ; Set local expired flag
+    la      t4, _tx_timer_expired_time_slice            # Get address of expired flag
+    sw      t1, 0(t4)                                   # Set expired flag
+    ori     t6, t6, 1                                   # Set local expired flag
 
     /* }  */
 
@@ -134,19 +122,19 @@ _tx_timer_no_time_slice:
     /* if (*_tx_timer_current_ptr)
     {  */
 
-    la      t0, _tx_timer_current_ptr                   ; Pickup address of current ptr
-    lw      t1, 0(t0)                                   ; Pickup current pointer
-    lw      t3, 0(t1)                                   ; Pickup the current timer entry
-    la      t2, _tx_timer_expired                       ; Pickup address of timer expired flag
-    li      t4, 1                                       ; Build TX_TRUE flag
-    beqz    t3, _tx_timer_no_timer                      ; If NULL, no timer has expired
+    la      t0, _tx_timer_current_ptr                   # Pickup address of current ptr
+    lw      t1, 0(t0)                                   # Pickup current pointer
+    lw      t3, 0(t1)                                   # Pickup the current timer entry
+    la      t2, _tx_timer_expired                       # Pickup address of timer expired flag
+    li      t4, 1                                       # Build TX_TRUE flag
+    beqz    t3, _tx_timer_no_timer                      # If NULL, no timer has expired
 
         /* Set expiration flag.  */
         /* _tx_timer_expired =  TX_TRUE;  */
 
-    ori     t6, t6, 2                                   ; Set local expired flag
-    sw      t4, 0(t2)                                   ; Set expired flag in memory
-    j       _tx_timer_done                              ; Finished timer processing
+    ori     t6, t6, 2                                   # Set local expired flag
+    sw      t4, 0(t2)                                   # Set expired flag in memory
+    j       _tx_timer_done                              # Finished timer processing
 
 
     /* }
@@ -160,18 +148,18 @@ _tx_timer_no_timer:
         /* Check for wrap-around.  */
         /* if (_tx_timer_current_ptr == _tx_timer_list_end)  */
 
-    la      t2, _tx_timer_list_end                      ; Pickup address of list end pointer
-    lw      t3, 0(t2)                                   ; Pickup actual list end
-    addi    t1, t1, 4                                   ; Point to next timer entry
-    sw      t1, 0(t0)                                   ; Store new timer pointer
-    bne     t1, t3, _tx_timer_skip_wrap                 ; If not same, good pointer
+    la      t2, _tx_timer_list_end                      # Pickup address of list end pointer
+    lw      t3, 0(t2)                                   # Pickup actual list end
+    addi    t1, t1, 4                                   # Point to next timer entry
+    sw      t1, 0(t0)                                   # Store new timer pointer
+    bne     t1, t3, _tx_timer_skip_wrap                 # If not same, good pointer
 
             /* Wrap to beginning of list.  */
             /* _tx_timer_current_ptr =  _tx_timer_list_start;  */
 
-    la      t2, _tx_timer_list_start                    ; Pickup address of list start pointer
-    lw      t4, 0(t2)                                   ; Pickup start of the list
-    sw      t4, 0(t0)                                   ; Store new timer pointer*/
+    la      t2, _tx_timer_list_start                    # Pickup address of list start pointer
+    lw      t4, 0(t2)                                   # Pickup start of the list
+    sw      t4, 0(t0)                                   # Store new timer pointer*/
 
 
 _tx_timer_skip_wrap:
@@ -184,23 +172,23 @@ _tx_timer_done:
     /* if ((_tx_timer_expired_time_slice) || (_tx_timer_expired))
     {  */
 
-    beqz    t6, _tx_timer_nothing_expired               ; If nothing expired skip the rest
-    and     t2, t6, 2                                   ; Isolate the timer expired bit
-    addi    sp, sp, -16                                 ; Allocate some storage on the stack
-    sw      t6, 0(sp)                                   ; Save local expired flag
-    sw      ra, 4(sp)                                   ; Save ra
+    beqz    t6, _tx_timer_nothing_expired               # If nothing expired skip the rest
+    and     t2, t6, 2                                   # Isolate the timer expired bit
+    addi    sp, sp, -16                                 # Allocate some storage on the stack
+    sw      t6, 0(sp)                                   # Save local expired flag
+    sw      ra, 4(sp)                                   # Save ra
 
     /* Did a timer expire?  */
     /* if (_tx_timer_expired)
     {  */
 
-    beqz    t2, _tx_timer_dont_activate                 ; No, timer not expired
+    beqz    t2, _tx_timer_dont_activate                 # No, timer not expired
 
         /* Call the timer expiration processing.  */
         /* _tx_timer_expiration_process(void);  */
 
-    call    _tx_timer_expiration_process                ; Call _tx_timer_expiration_process
-    lw      t6, 0(sp)                                   ; Recover local expired flag
+    call    _tx_timer_expiration_process                # Call _tx_timer_expiration_process
+    lw      t6, 0(sp)                                   # Recover local expired flag
 
     /* }  */
 _tx_timer_dont_activate:
@@ -209,20 +197,20 @@ _tx_timer_dont_activate:
     /* if (_tx_timer_expired_time_slice)
     {  */
 
-    and     t2, t6, 1                                   ; Is the timer expired bit set?
-    beqz    t2, _tx_timer_not_ts_expiration             ; If not, skip time slice processing
+    and     t2, t6, 1                                   # Is the timer expired bit set?
+    beqz    t2, _tx_timer_not_ts_expiration             # If not, skip time slice processing
 
         /* Time slice interrupted thread.  */
         /* _tx_thread_time_slice();  */
 
-    call    _tx_thread_time_slice                       ; Call time slice
+    call    _tx_thread_time_slice                       # Call time slice
 
      /* }  */
 
 _tx_timer_not_ts_expiration:
 
-    lw      ra, 4(sp)                                   ; Recover ra
-    addi    sp, sp, 16                                  ; Recover stack space
+    lw      ra, 4(sp)                                   # Recover ra
+    addi    sp, sp, 16                                  # Recover stack space
     /* }  */
 
 _tx_timer_nothing_expired:
@@ -230,5 +218,4 @@ _tx_timer_nothing_expired:
     ret
 
 /* }  */
-    END
     

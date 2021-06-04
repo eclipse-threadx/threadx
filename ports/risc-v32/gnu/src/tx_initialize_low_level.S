@@ -31,20 +31,13 @@
     #include "tx_thread.h"
     #include "tx_timer.h"  */
     
-    EXTERN      _tx_thread_system_stack_ptr
-    EXTERN      _tx_initialize_unused_memory
-    EXTERN      _tx_thread_context_save
-    EXTERN      _tx_thread_context_restore
-    EXTERN      _tx_timer_interrupt
-    
-    RSEG    FREE_MEM:DATA
-    PUBLIC  __tx_free_memory_start
+    .section .data
+    .global  __tx_free_memory_start
 __tx_free_memory_start:
-    DS32    4        
+    .string "FREE_MEM" # Useful for debug purposes       
 
 
-    SECTION `.text`:CODE:REORDER:NOROOT(2)
-    CODE
+    .section .text
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
@@ -89,42 +82,39 @@ __tx_free_memory_start:
 /**************************************************************************/ 
 /* VOID   _tx_initialize_low_level(VOID)
 {  */
-    PUBLIC  _tx_initialize_low_level
+    .global  _tx_initialize_low_level
 _tx_initialize_low_level:
-    sw      sp, _tx_thread_system_stack_ptr, t0     ; Save system stack pointer
+    sw      sp, _tx_thread_system_stack_ptr, t0     # Save system stack pointer
 
-    la      t0, __tx_free_memory_start              ; Pickup first free address
-    sw      t0, _tx_initialize_unused_memory, t1    ; Save unused memory address
+    la      t0, __tx_free_memory_start              # Pickup first free address
+    sw      t0, _tx_initialize_unused_memory, t1    # Save unused memory address
 
-    ret                              
+    nop
+    li      t0, 0x80                            
+    csrw    mie, t0                                 # Enable systick interrupt
+    csrwi   mstatus, 0x8                            # Enable global interrupt                        
+
+    ret      
 
 
     /* Define the actual timer interrupt/exception handler.  */
 
-    PUBLIC  _tx_timer_interrupt_handler
-    PUBLIC  __minterrupt_000007
-    EXTWEAK __require_minterrupt_vector_table
+    .global _tx_timer_interrupt_handler
 _tx_timer_interrupt_handler:
-__minterrupt_000007:
-    REQUIRE __require_minterrupt_vector_table
-
 
     /* Before calling _tx_thread_context_save, we have to allocate an interrupt
        stack frame and save the current value of x1 (ra). */
-#if __iar_riscv_base_isa == rv32e 
-    addi    sp, sp, -260                            ; Allocate space for all registers - with floating point enabled
-#else
-    addi    sp, sp, -128                            ; Allocate space for all registers - without floating point enabled
-#endif
-    sw      x1, 0x70(sp)                            ; Store RA
-    call    _tx_thread_context_save                 ; Call ThreadX context save
+.if __riscv_base_isa == rv32f 
+    addi    sp, sp, -260                            # Allocate space for all registers - with floating point enabled
+.else
+    addi    sp, sp, -128                            # Allocate space for all registers - without floating point enabled
+.endif
+    sw      x1, 0x70(sp)                            # Store RA
+    call    _tx_thread_context_save                 # Call ThreadX context save
 
     /* Call the ThreadX timer routine.  */
-    call    _tx_timer_interrupt                     ; Call timer interrupt handler
+    call    _tx_timer_interrupt                     # Call timer interrupt handler
 
     /* Timer interrupt processing is done, jump to ThreadX context restore.  */
-    j       _tx_thread_context_restore              ; Jump to ThreadX context restore function. Note: this does not return!
-
-
-    END
+    j       _tx_thread_context_restore              # Jump to ThreadX context restore function. Note: this does not return!
     
