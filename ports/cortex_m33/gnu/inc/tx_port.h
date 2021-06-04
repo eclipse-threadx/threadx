@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M33/GNU    */
-/*                                                           6.1.5        */
+/*                                                           6.1.7        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,6 +51,12 @@
 /*  03-02-2021      Scott Larson            Modified comment(s), added    */
 /*                                            ULONG64_DEFINED,            */
 /*                                            resulting in version 6.1.5  */
+/*  06-02-2021      Scott Larson            Modified comment(s), changed  */
+/*                                            set_control and get_control */
+/*                                            to be inline functions,     */
+/*                                            added symbol to enable      */
+/*                                            stack error handler,        */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -91,6 +97,12 @@ UINT    _txe_thread_secure_stack_allocate(struct TX_THREAD_STRUCT *thread_ptr, U
 UINT    _txe_thread_secure_stack_free(struct TX_THREAD_STRUCT *thread_ptr);
 UINT    _tx_thread_secure_stack_allocate(struct TX_THREAD_STRUCT *tx_thread, ULONG stack_size);
 UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
+
+/* This port overrides tx_thread_stack_error_notify with an architecture specific version */
+#define TX_PORT_THREAD_STACK_ERROR_NOTIFY
+
+/* This port overrides tx_thread_stack_error_handler with an architecture specific version */
+#define TX_PORT_THREAD_STACK_ERROR_HANDLER
 
 /* This hardware has stack checking that we take advantage of - do NOT define. */
 #ifdef TX_ENABLE_STACK_CHECKING
@@ -302,16 +314,16 @@ void   _tx_misra_vfp_touch(void);
 
 #ifdef TX_SOURCE_CODE
 
-static unsigned int _get_control(void);
-static unsigned int _get_control(void)
+static inline unsigned int _get_control(void);
+static inline unsigned int _get_control(void)
 {
     unsigned int _control;
     __asm("MRS %[result], control" : [result] "=r" (_control) : );
     return _control;
 }
 
-static void _set_control(unsigned int _control);
-static void _set_control(unsigned int _control)
+static inline void _set_control(unsigned int _control);
+static inline void _set_control(unsigned int _control)
 {
     __asm("MSR control, %[input]" : : [input] "r" (_control));
 }
@@ -570,7 +582,7 @@ unsigned int interrupt_save;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M33/GNU Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M33/GNU Version 6.1.7 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

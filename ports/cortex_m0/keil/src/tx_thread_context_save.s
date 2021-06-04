@@ -21,9 +21,9 @@
 ;/**************************************************************************/
 ;
 ;
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))           
     IMPORT  _tx_execution_isr_enter
-    ENDIF
+#endif
 ;
 ;
     AREA    ||.text||, CODE, READONLY
@@ -73,7 +73,7 @@
 ;{
     EXPORT  _tx_thread_context_save
 _tx_thread_context_save
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))           
 ;
 ;    /* Call the ISR enter function to indicate an ISR is executing.  */
 ;
@@ -81,7 +81,7 @@ _tx_thread_context_save
     BL      _tx_execution_isr_enter             ; Call the ISR enter function
     POP     {r0, r1}                            ; Recover ISR lr
     MOV     lr, r1
-    ENDIF
+#endif
 ;
 ;    /* Return to interrupt processing.  */
 ;

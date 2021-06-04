@@ -2,11 +2,11 @@
  * @file     system_ARMCM23.c
  * @brief    CMSIS Device System Source File for
  *           ARMCM23 Device
- * @version  V5.3.1
- * @date     09. July 2018
+ * @version  V1.0.1
+ * @date     15. November 2019
  ******************************************************************************/
 /*
- * Copyright (c) 2009-2018 Arm Limited. All rights reserved.
+ * Copyright (c) 2009-2019 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -42,13 +42,11 @@
 
 #define  SYSTEM_CLOCK    (XTAL / 2U)
 
-
 /*----------------------------------------------------------------------------
-  Externals
+  Exception / Interrupt Vector table
  *----------------------------------------------------------------------------*/
-#if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
-  extern uint32_t __VECTOR_TABLE;
-#endif
+extern const VECTOR_TABLE_Type __VECTOR_TABLE[240];
+
 
 /*----------------------------------------------------------------------------
   System Core Clock Variable
@@ -71,7 +69,7 @@ void SystemInit (void)
 {
 
 #if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
-  SCB->VTOR = (uint32_t) &__VECTOR_TABLE;
+  SCB->VTOR = (uint32_t) &(__VECTOR_TABLE[0]);
 #endif
 
 #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)

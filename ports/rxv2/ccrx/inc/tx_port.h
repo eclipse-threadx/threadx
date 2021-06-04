@@ -26,11 +26,11 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                            RXv2/CCRX      */
-/*                                                           6.1.3        */
+/*                                                           6.1.7        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Express Logic, Inc.                               */
+/*    William E. Lamie, Microsoft Corporation                             */ 
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -48,6 +48,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
+/*  06-02-2021     William E. Lamie         Modified comments,            */
+/*                                            resulting in version 6.1.7  */   
 /*                                                                        */
 /**************************************************************************/
 
@@ -271,7 +273,7 @@ extern volatile ULONG  _tx_thread_system_state;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv2/CCRX Version 6.1.3 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv2/CCRX Version 6.1.7 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

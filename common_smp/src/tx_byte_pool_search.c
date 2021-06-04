@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Byte Pool                                                           */
 /**                                                                       */
@@ -30,53 +30,57 @@
 #include "tx_byte_pool.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_byte_pool_search                               PORTABLE SMP     */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_byte_pool_search                               PORTABLE SMP     */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function searches a byte pool for a memory block to satisfy    */ 
-/*    the requested number of bytes.  Merging of adjacent free blocks     */ 
-/*    takes place during the search and a split of the block that         */ 
-/*    satisfies the request may occur before this function returns.       */ 
-/*                                                                        */ 
-/*    It is assumed that this function is called with interrupts enabled  */ 
-/*    and with the tx_pool_owner field set to the thread performing the   */ 
-/*    search.  Also note that the search can occur during allocation and  */ 
-/*    release of a memory block.                                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pool_ptr                          Pointer to pool control block     */ 
-/*    memory_size                       Number of bytes required          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    UCHAR *                           Pointer to the allocated memory,  */ 
-/*                                        if successful.  Otherwise, a    */ 
-/*                                        NULL is returned                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_byte_allocate                 Allocate bytes of memory          */ 
-/*    _tx_byte_release                  Release bytes of memory           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function searches a byte pool for a memory block to satisfy    */
+/*    the requested number of bytes.  Merging of adjacent free blocks     */
+/*    takes place during the search and a split of the block that         */
+/*    satisfies the request may occur before this function returns.       */
+/*                                                                        */
+/*    It is assumed that this function is called with interrupts enabled  */
+/*    and with the tx_pool_owner field set to the thread performing the   */
+/*    search.  Also note that the search can occur during allocation and  */
+/*    release of a memory block.                                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pool_ptr                          Pointer to pool control block     */
+/*    memory_size                       Number of bytes required          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    UCHAR *                           Pointer to the allocated memory,  */
+/*                                        if successful.  Otherwise, a    */
+/*                                        NULL is returned                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_byte_allocate                 Allocate bytes of memory          */
+/*    _tx_byte_release                  Release bytes of memory           */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
+/*  06-02-2021      Scott Larson            Improve possible free bytes   */
+/*                                            calculation, and reduced    */
+/*                                            number of search resets,    */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 UCHAR  *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size)
@@ -84,17 +88,18 @@ UCHAR  *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size)
 
 TX_INTERRUPT_SAVE_AREA
 
-UCHAR           *current_ptr;                
-UCHAR           *next_ptr;                   
+UCHAR           *current_ptr;
+UCHAR           *next_ptr;
 UCHAR           **this_block_link_ptr;
 UCHAR           **next_block_link_ptr;
-ULONG           available_bytes;            
-UINT            examine_blocks;             
+ULONG           available_bytes;
+UINT            examine_blocks;
 UINT            first_free_block_found =  TX_FALSE;
 TX_THREAD       *thread_ptr;
 ALIGN_TYPE      *free_ptr;
 UCHAR           *work_ptr;
-
+volatile ULONG  delay_count;
+ULONG           total_theoretical_available;
 #ifdef TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH
 UINT            blocks_searched =  ((UINT) 0);
 #endif
@@ -104,7 +109,9 @@ UINT            blocks_searched =  ((UINT) 0);
     TX_DISABLE
 
     /* First, determine if there are enough bytes in the pool.  */
-    if (memory_size >= pool_ptr -> tx_byte_pool_available)
+    /* Theoretical bytes available = free bytes + ((fragments-2) * overhead of each block) */
+    total_theoretical_available = pool_ptr -> tx_byte_pool_available + ((pool_ptr -> tx_byte_pool_fragments - 2) * ((sizeof(UCHAR *)) + (sizeof(ALIGN_TYPE))));
+    if (memory_size >= total_theoretical_available)
     {
 
         /* Restore interrupts.  */
@@ -121,7 +128,7 @@ UINT            blocks_searched =  ((UINT) 0);
 
         /* Setup ownership of the byte pool.  */
         pool_ptr -> tx_byte_pool_owner =  thread_ptr;
-    
+
         /* Walk through the memory pool in search for a large enough block.  */
         current_ptr =      pool_ptr -> tx_byte_pool_search;
         examine_blocks =   pool_ptr -> tx_byte_pool_fragments + ((UINT) 1);
@@ -148,7 +155,6 @@ UINT            blocks_searched =  ((UINT) 0);
                 /* Determine if this is the first free block.  */
                 if (first_free_block_found == TX_FALSE)
                 {
-                
                     /* This is the first free block.  */
                     pool_ptr->tx_byte_pool_search =  current_ptr;
 
@@ -171,7 +177,6 @@ UINT            blocks_searched =  ((UINT) 0);
                    has been satisfied!  */
                 if (available_bytes >= memory_size)
                 {
-
                     /* Get out of the search loop!  */
                     break;
                 }
@@ -181,7 +186,7 @@ UINT            blocks_searched =  ((UINT) 0);
                     /* Clear the available bytes variable.  */
                     available_bytes =  ((ULONG) 0);
 
-                    /* Not enough memory, check to see if the neighbor is 
+                    /* Not enough memory, check to see if the neighbor is
                        free and can be merged.  */
                     work_ptr =  TX_UCHAR_POINTER_ADD(next_ptr, (sizeof(UCHAR *)));
                     free_ptr =  TX_UCHAR_TO_ALIGN_TYPE_POINTER_CONVERT(work_ptr);
@@ -210,17 +215,15 @@ UINT            blocks_searched =  ((UINT) 0);
                         /* See if the search pointer is affected.  */
                         if (pool_ptr -> tx_byte_pool_search ==  next_ptr)
                         {
-                    
                             /* Yes, update the search pointer.   */
                             pool_ptr -> tx_byte_pool_search =  current_ptr;
                         }
                     }
                     else
                     {
-
                         /* Neighbor is not free so we can skip over it!  */
                         next_block_link_ptr =  TX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(next_ptr);
-                        current_ptr =  *next_block_link_ptr;                    
+                        current_ptr =  *next_block_link_ptr;
 
                         /* Decrement the examined block count to account for this one.  */
                         if (examine_blocks != ((UINT) 0))
@@ -243,9 +246,9 @@ UINT            blocks_searched =  ((UINT) 0);
             {
 
                 /* Block is not free, move to next block.  */
-                this_block_link_ptr =  TX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(current_ptr);               
+                this_block_link_ptr =  TX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(current_ptr);
                 current_ptr =  *this_block_link_ptr;
-            } 
+            }
 
             /* Another block has been searched... decrement counter.  */
             if (examine_blocks != ((UINT) 0))
@@ -282,12 +285,23 @@ UINT            blocks_searched =  ((UINT) 0);
 
             /* Disable interrupts.  */
             TX_DISABLE
-#endif        
-        
+#endif
             /* Determine if anything has changed in terms of pool ownership.  */
             if (pool_ptr -> tx_byte_pool_owner != thread_ptr)
             {
-
+                /* Loop to delay changing the ownership back to avoid thrashing.  */
+                delay_count =  0;
+                do
+                {
+                    /* Restore interrupts temporarily.  */
+                    TX_RESTORE
+                    
+                    /* Increment the delay counter.  */
+                    delay_count++;
+                    
+                    /* Disable interrupts.  */
+                    TX_DISABLE
+                } while (delay_count < ((ULONG) TX_BYTE_POOL_DELAY_VALUE));
                 /* Pool changed ownership in the brief period interrupts were
                    enabled.  Reset the search.  */
                 current_ptr =      pool_ptr -> tx_byte_pool_search;
@@ -317,7 +331,7 @@ UINT            blocks_searched =  ((UINT) 0);
                 work_ptr =              TX_UCHAR_POINTER_ADD(next_ptr, (sizeof(UCHAR *)));
                 free_ptr =              TX_UCHAR_TO_ALIGN_TYPE_POINTER_CONVERT(work_ptr);
                 *free_ptr =             TX_BYTE_BLOCK_FREE;
-            
+
                 /* Increase the total fragment counter.  */
                 pool_ptr -> tx_byte_pool_fragments++;
 
@@ -371,7 +385,7 @@ UINT            blocks_searched =  ((UINT) 0);
             current_ptr =  TX_NULL;
         }
     }
-    
+
     /* Return the search pointer.  */
     return(current_ptr);
 }

@@ -1,3 +1,0 @@
-wait
-add-symbol-file ..\sample_threadx_module\Debug\sample_threadx_module.axf
-wait

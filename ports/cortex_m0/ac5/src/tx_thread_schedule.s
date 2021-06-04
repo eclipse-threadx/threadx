@@ -26,10 +26,10 @@
     IMPORT  _tx_timer_time_slice
     IMPORT  _tx_thread_system_stack_ptr
     IMPORT  _tx_thread_preempt_disable
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))    
     IMPORT  _tx_execution_thread_enter
     IMPORT  _tx_execution_thread_exit
-    ENDIF
+#endif
     IF :DEF:TX_LOW_POWER
     IMPORT  tx_low_power_enter
     IMPORT  tx_low_power_exit
@@ -127,7 +127,7 @@ __tx_PendSVHandler
 ;
 __tx_ts_handler
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))   
 ;
 ;    /* Call the thread exit function to indicate the thread is no longer executing.  */
 ;
@@ -137,7 +137,7 @@ __tx_ts_handler
     POP     {r0, r1}                                ; Recover LR
     MOV     lr, r1                                  ;
     CPSIE   i                                       ; Enable interrupts
-    ENDIF
+#endif
     LDR     r0, =_tx_thread_current_ptr             ; Build current thread pointer address
     LDR     r2, =_tx_thread_execute_ptr             ; Build execute thread pointer address
     MOVS    r3, #0                                  ; Build NULL value
@@ -210,14 +210,14 @@ __tx_ts_restore
 ;
     STR     r5, [r4]                                ; Setup global time-slice
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)) 
 ;
 ;    /* Call the thread entry function to indicate the thread is executing.  */
 ;
     PUSH    {r0, r1}                                ; Save r0/r1
     BL      _tx_execution_thread_enter              ; Call the thread execution enter function
     POP     {r0, r1}                                ; Recover r0/r1
-    ENDIF
+#endif
 ;
 ;    /* Restore the thread context and PSP.  */
 ;

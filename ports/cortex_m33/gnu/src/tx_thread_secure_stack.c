@@ -61,8 +61,8 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_secure_stack_initialize                Cortex-M33/GNU    */
-/*                                                           6.1.1        */
+/*    _tx_thread_secure_mode_stack_initialize           Cortex-M33/GNU    */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -77,7 +77,7 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    None                                                                */
+/*    status                                                              */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -97,24 +97,40 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.1  */
+/*  06-02-2021      Scott Larson            Change name, execute in       */
+/*                                            handler mode,               */
+/*                                            disable optimizations,      */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
-__attribute__((cmse_nonsecure_entry))
-void    _tx_thread_secure_stack_initialize(void)
+__attribute__((cmse_nonsecure_entry, optimize(0)))
+UINT    _tx_thread_secure_mode_stack_initialize(void)
 {
-    ULONG control;
-    
-    /* Set secure mode to use PSP. */
-    asm volatile("MRS     %0, CONTROL" : "=r" (control));   /* Get CONTROL register. */
-    control |= 2;                                           /* Use PSP. */
-    asm volatile("MSR     CONTROL, %0" :: "r" (control));   /* Set CONTROL register. */
-    
-    /* Set process stack pointer and stack limit to 0 to throw exception when a thread
-       without a secure stack calls a secure function that tries to use secure stack. */
-    asm volatile("MSR     PSPLIM, %0" :: "r" (0));
-    asm volatile("MSR     PSP, %0" :: "r" (0));
-    
-    return;
+UINT    status;
+ULONG   control;
+ULONG   ipsr;
+
+    /* Make sure function is called from interrupt (threads should not call). */
+    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    if (ipsr == 0)
+    {
+        status = TX_CALLER_ERROR;
+    }
+    else
+    {
+        /* Set secure mode to use PSP. */
+        asm volatile("MRS     %0, CONTROL" : "=r" (control));   /* Get CONTROL register. */
+        control |= 2;                                           /* Use PSP. */
+        asm volatile("MSR     CONTROL, %0" :: "r" (control));   /* Set CONTROL register. */
+        
+        /* Set process stack pointer and stack limit to 0 to throw exception when a thread
+           without a secure stack calls a secure function that tries to use secure stack. */
+        asm volatile("MSR     PSPLIM, %0" :: "r" (0));
+        asm volatile("MSR     PSP, %0" :: "r" (0));
+        
+        status = TX_SUCCESS;
+    }
+    return status;
 }
 
 
@@ -339,7 +355,7 @@ ULONG   ipsr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_context_save              Cortex-M33/GNU    */
-/*                                                           6.1.1        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -374,6 +390,8 @@ ULONG   ipsr;
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.1  */
+/*  06-02-2021      Scott Larson            Fix stack pointer save,       */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -408,7 +426,7 @@ ULONG   ipsr;
     }
     
     /* Save stack pointer. */
-    *(ULONG *) info_ptr -> tx_thread_secure_stack_ptr = sp;
+    info_ptr -> tx_thread_secure_stack_ptr = (VOID *) sp;
     
     /* Set process stack pointer and stack limit to 0 to throw exception when a thread
        without a secure stack calls a secure function that tries to use secure stack. */

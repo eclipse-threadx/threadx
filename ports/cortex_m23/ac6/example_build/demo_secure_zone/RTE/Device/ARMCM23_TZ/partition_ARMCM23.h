@@ -1,7 +1,7 @@
 /**************************************************************************//**
  * @file     partition_ARMCM23.h
  * @brief    CMSIS-CORE Initial Setup for Secure / Non-Secure Zones for ARMCM23
- * @version  V5.3.1
+ * @version  V1.0.0
  * @date     09. July 2018
  ******************************************************************************/
 /*

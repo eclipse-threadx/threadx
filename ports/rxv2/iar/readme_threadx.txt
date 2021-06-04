@@ -118,25 +118,17 @@ of the EPK for generic usage details.
 To add the EPK to your RXv2 release make the following modifications:
 
 * Enable the following define for both the Threadx library and the application
-TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-
-* in tx_port.h, change around line 183
-change #define TX_THREAD_EXTENSION_3     
-into #include "tx_execution_profile.h"   
+TX_EXECUTION_PROFILE_ENABLE
 
 * Setup CMT1 as a free running 16 bit timer.
 
-* In tx_execution_profile.h, change following around line 74:
+* In tx_execution_profile.h, change following around line 52:
 
 #ifdef TX_EXECUTION_64BIT_TIME
 typedef unsigned long long              EXECUTION_TIME;
-#define TX_THREAD_EXTENSION_3           unsigned long long  tx_thread_execution_time_total; \
-                                        unsigned long long  tx_thread_execution_time_last_start; 
 #define TX_EXECUTION_MAX_TIME_SOURCE    0xFFFFFFFFFFFFFFFF
 #else
 typedef unsigned long                   EXECUTION_TIME;
-#define TX_THREAD_EXTENSION_3           unsigned long   tx_thread_execution_time_total; \
-                                        unsigned long   tx_thread_execution_time_last_start; 
 #define TX_EXECUTION_MAX_TIME_SOURCE    0xFFFF
 #endif
                                         
@@ -153,6 +145,9 @@ Refer to the EPK documentation how to interpret the results.
 For generic code revision information, please refer to the readme_threadx_generic.txt
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
+
+xx-xx-xxxx  Release 6.1.7 changes:
+            readme_threadx.txt                  Updated instructions on how to use execution profile.
 
 04-02-2021  Release 6.1.6 changes:
             tx_port.h                           Updated macro definition

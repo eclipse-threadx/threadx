@@ -21,9 +21,10 @@
 ;/**************************************************************************/
 ;
 ;
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))  
     IMPORT  _tx_execution_isr_exit
-    ENDIF
+#endif
+        
 ;
     AREA    ||.text||, CODE, READONLY
     PRESERVE8
@@ -74,12 +75,12 @@
     EXPORT  _tx_thread_context_restore
 _tx_thread_context_restore
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)) 
 ;
 ;    /* Call the ISR exit function to indicate an ISR is complete.  */
 ;
     BL      _tx_execution_isr_exit              ; Call the ISR exit function
-    ENDIF
+#endif
 ;
 ;    /* Preemption has already been addressed - just return!  */
 ;

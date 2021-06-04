@@ -1373,6 +1373,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\tx_thread_stack_error_notify.c</FilePath>
             </File>
+            <File>
+              <FileName>tx_thread_secure_stack_initialize.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\src\tx_thread_secure_stack_initialize.S</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

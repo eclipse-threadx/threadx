@@ -21,6 +21,10 @@
 /**************************************************************************/
 
 
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))     
+    .global _tx_execution_thread_enter
+    .global _tx_execution_thread_exit
+#endif
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -62,6 +66,9 @@
 /*  04-02-2021      Scott Larson            Modified comment(s), added    */
 /*                                            low power code,             */
 /*                                            resulting in version 6.1.6  */
+/*  06-02-2021      Scott Larson            Added secure stack initialize */
+/*                                            in SVC handler,             */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -113,13 +120,13 @@ __tx_wait_here:
 PendSV_Handler:
 __tx_ts_handler:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                        
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
     BL      _tx_execution_thread_exit               // Call the thread exit function
     POP     {r0, r1}                                // Recover LR
-    MOV     lr, r1
+    MOV     lr, r1                                  //
     CPSIE   i                                       // Enable interrupts
 #endif
     
@@ -207,11 +214,11 @@ __tx_ts_restore:
 
     STR     r5, [r4]                                // Setup global time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                
     /* Call the thread entry function to indicate the thread is executing.  */
-    PUSH    {r0, r1}                                // Save r0/r1
+    PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
-    POP     {r0, r1}                                // Recover r0/r1
+    POP     {r0, r1}                                // Recover r0 and r1
 #endif
 
 #if (!defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE))
@@ -248,7 +255,7 @@ _skip_secure_restore:
     BX      lr                                      // Return to thread!
 
     /* The following is the idle wait processing... in this case, no threads are ready for execution and the
-       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts 
+       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts
        are disabled to allow use of WFI for waiting for a thread to arrive.  */
 
 __tx_ts_wait:
@@ -278,13 +285,12 @@ __tx_ts_wait:
     CPSIE   i                                       // Enable interrupts
     B       __tx_ts_wait                            // Loop to continue waiting
 
-    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are 
+    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are
        already in the handler!  */
-
 __tx_ts_ready:
     LDR     r7, =0x08000000                         // Build clear PendSV value
     LDR     r5, =0xE000ED04                         // Build ICSR address
-    STR     r7, [r5]                                // Clear any PendSV 
+    STR     r7, [r5]                                // Clear any PendSV
 
     /* Re-enable interrupts and restore new thread.  */
     CPSIE   i                                       // Enable interrupts
@@ -320,9 +326,12 @@ _tx_got_sp:
     CMP     r1, #2                  // Is it a secure stack free request?
     BEQ     _tx_svc_secure_free     // Yes, go there
     
+    CMP     r1, #3                  // Is it a secure stack init request?
+    BEQ     _tx_svc_secure_init     // Yes, go there
+
     // Unknown SVC argument - just return
     BX      lr
-    
+
 _tx_svc_secure_alloc:
     PUSH    {r0, lr}                // Save SP and EXC_RETURN
     LDM     r0, {r0-r3}             // Load function parameters from stack
@@ -339,6 +348,12 @@ _tx_svc_secure_free:
     STR     r0, [r1]                // Store function return value
     MOV     lr, r2
     BX      lr
-#endif   // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
+_tx_svc_secure_init:
+    PUSH    {r0,lr}                 // Save SP and EXC_RETURN
+    BL      _tx_thread_secure_mode_stack_initialize
+    POP     {r1, r2}                // Restore SP and EXC_RETURN
+    MOV     lr, r2
+    BX      lr
+#endif  // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
 
 .end

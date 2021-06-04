@@ -49,6 +49,9 @@
 /*                                            added option to remove      */
 /*                                            FileX pointer,              */
 /*                                            resulting in version 6.1.5  */
+/*  06-02-2021      Scott Larson            Added options for multiple    */
+/*                                            block pool search & delay,  */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -266,6 +269,18 @@
 
 /*
 #define TX_TIMER_ENABLE_PERFORMANCE_INFO
+*/
+
+/*  Override options for byte pool searches of multiple blocks. */
+
+/*
+#define TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH    20
+*/
+
+/*  Override options for byte pool search delay to avoid thrashing. */
+
+/*
+#define TX_BYTE_POOL_DELAY_VALUE              3
 */
 
 #endif

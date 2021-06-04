@@ -26,7 +26,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                             Cortex-M33/MPU/AC6  */
-/*                                                           6.1.6        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -62,6 +62,9 @@
 /*  04-02-2021      Scott Larson            Modified comments and fixed   */
 /*                                            MPU region configuration,   */
 /*                                            resulting in version 6.1.6  */
+/*  06-02-2021      Scott Larson            Fixed extended stack handling */
+/*                                            when calling kernel APIs,   */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -471,20 +474,24 @@ SVC_Handler:
     STR     r0, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
 #endif
-
     MRS     r3, PSP                                 // Pickup thread stack pointer
+    TST     lr, #0x10                               // Test for extended module stack
+    ITT     EQ
+    ORREQ   r3, r3, #1                              // If so, set LSB in thread stack pointer to indicate extended frame
+    ORREQ   lr, lr, #0x10                           // Set bit, return with standard frame
     STR     r3, [r2, #0xB0]                         // Save thread stack pointer
-
+    BIC     r3, #1                                  // Clear possibly OR'd bit
+    
     /* Build kernel stack by copying thread stack two registers at a time */
     ADD     r3, r3, #32                             // Start at bottom of hardware stack
-    LDMDB   r3!,{r1-r2}
-    STMDB   r0!,{r1-r2}
-    LDMDB   r3!,{r1-r2}
-    STMDB   r0!,{r1-r2}
-    LDMDB   r3!,{r1-r2}
-    STMDB   r0!,{r1-r2}
-    LDMDB   r3!,{r1-r2}
-    STMDB   r0!,{r1-r2}
+    LDMDB   r3!, {r1-r2}
+    STMDB   r0!, {r1-r2}
+    LDMDB   r3!, {r1-r2}
+    STMDB   r0!, {r1-r2}
+    LDMDB   r3!, {r1-r2}
+    STMDB   r0!, {r1-r2}
+    LDMDB   r3!, {r1-r2}
+    STMDB   r0!, {r1-r2}
 
     MSR     PSP, r0                                 // Set kernel stack pointer
 
@@ -524,16 +531,21 @@ _tx_thread_user_return:
 #endif
     LDR     r0, [r2, #0xB0]                         // Load the module thread stack pointer
     MRS     r3, PSP                                 // Pickup kernel stack pointer
+    TST     r0, #1                                  // Is module stack extended?
+    ITTE    NE                                      // If so...
+    BICNE   lr, #0x10                               // Clear bit, return with extended frame
+    BICNE   r0, #1                                  // Clear bit that indicates extended module frame
+    ORREQ   lr, lr, #0x10                           // Else set bit, return with standard frame
 
     /* Copy kernel hardware stack to module thread stack. */
-    LDM     r3!,{r1-r2}
-    STM     r0!,{r1-r2}
-    LDM     r3!,{r1-r2}
-    STM     r0!,{r1-r2}
-    LDM     r3!,{r1-r2}
-    STM     r0!,{r1-r2}
-    LDM     r3!,{r1-r2}
-    STM     r0!,{r1-r2}
+    LDM     r3!, {r1-r2}
+    STM     r0!, {r1-r2}
+    LDM     r3!, {r1-r2}
+    STM     r0!, {r1-r2}
+    LDM     r3!, {r1-r2}
+    STM     r0!, {r1-r2}
+    LDM     r3!, {r1-r2}
+    STM     r0!, {r1-r2}
     SUB     r0, r0, #32                             // Subtract 32 to get back to top of stack
     MSR     PSP, r0                                 // Set thread stack pointer
 
