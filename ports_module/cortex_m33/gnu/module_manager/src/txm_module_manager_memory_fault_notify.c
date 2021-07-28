@@ -38,8 +38,8 @@ extern VOID    (*_txm_module_manager_fault_notify)(TX_THREAD *, TXM_MODULE_INSTA
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_memory_fault_notify         Cortex-M33/MPU/GNU  */
-/*                                                           6.1.5        */
+/*    _txm_module_manager_memory_fault_notify            Cortex-M33       */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */

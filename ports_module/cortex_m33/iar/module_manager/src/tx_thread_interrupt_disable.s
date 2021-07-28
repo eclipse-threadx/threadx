@@ -26,8 +26,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_interrupt_disable                      Cortex-M/IAR      */
-/*                                                           6.1.5        */
+/*    _tx_thread_interrupt_disable                      Cortex-M33/IAR    */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -57,19 +57,22 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021      Scott Larson            Initial Version 6.1.5         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_interrupt_disable(VOID)
 // {
     PUBLIC  _tx_thread_interrupt_disable
 _tx_thread_interrupt_disable:
-
     /* Return current interrupt lockout posture.  */
-
+#ifdef TX_PORT_USE_BASEPRI
+    MRS     r0, BASEPRI
+    LDR     r1, =TX_PORT_BASEPRI
+    MSR     BASEPRI, r1
+#else
     MRS     r0, PRIMASK
     CPSID   i
+#endif
     BX      lr
-
 // }
     END

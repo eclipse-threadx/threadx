@@ -47,11 +47,11 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
-/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  04-02-2021      Bhupendra Naphade       Modified comment(s),updated   */
 /*                                            macro definition,           */
 /*                                            resulting in version 6.1.6  */
-/*  06-02-2021     Bhupendra Naphade        Modified comment(s),          */
+/*  06-02-2021      Bhupendra Naphade       Modified comment(s),          */
 /*                                            added symbol to enable      */
 /*                                            stack error handler,        */
 /*                                            resulting in version 6.1.7  */
@@ -75,7 +75,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arm_compat.h>
-#include "ARMCM33_DSP_FP_TZ.h"          /* For intrinsic functions. */
 
 /* Define ThreadX basic types for this port.  */
 

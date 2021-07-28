@@ -28,8 +28,8 @@
 #include "tx_api.h"
 #include "tx_thread.h"
 
-/* Define the global function pointer for stack error handling. If a stack error is 
-   detected and the application has registered a stack error handler, it will be 
+/* Define the global function pointer for stack error handling. If a stack error is
+   detected and the application has registered a stack error handler, it will be
    called via this function pointer.  */
 
 VOID    (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr);
@@ -38,8 +38,8 @@ VOID    (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr);
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_stack_error_handler                    Cortex-M33/IAR    */
-/*                                                            6.1         */
+/*    _tx_thread_stack_error_handler                      Cortex-M33      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -75,7 +75,6 @@ VOID    (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr);
 /**************************************************************************/
 VOID  _tx_thread_stack_error_handler(TX_THREAD *thread_ptr)
 {
-
     #ifndef TX_THREAD_NO_TERMINATE_STACK_ERROR
     /* Is there a thread?  */
     if (thread_ptr)
@@ -88,10 +87,7 @@ VOID  _tx_thread_stack_error_handler(TX_THREAD *thread_ptr)
     /* Determine if the application has registered an error handler.  */
     if (_tx_thread_application_stack_error_handler != TX_NULL)
     {
-
         /* Yes, an error handler is present, simply call the application error handler.  */
         (_tx_thread_application_stack_error_handler)(thread_ptr);
     }
-
 }
-

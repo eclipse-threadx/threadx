@@ -243,7 +243,7 @@ static StatusType      ActivateISR(ISRType ISRID);
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    StartOS                                             PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -273,7 +273,7 @@ static StatusType      ActivateISR(ISRType ISRID);
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 void   StartOS(StatusType  os_mode)
@@ -326,7 +326,7 @@ StatusType          status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    CreateTask                                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -365,7 +365,7 @@ StatusType          status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 TaskType       CreateTask(const CHAR *name, void(*entry_function)(), UINT priority, UINT max_activation,
@@ -522,7 +522,7 @@ ULONG           status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    CreateISR                                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -561,7 +561,7 @@ ULONG           status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -690,7 +690,7 @@ ULONG           status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    ActivateTask                                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -734,7 +734,7 @@ ULONG           status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType ActivateTask(TaskType TaskId)
@@ -843,7 +843,7 @@ TX_THREAD       *p_thread;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    TerminateTask                                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -892,7 +892,7 @@ TX_THREAD       *p_thread;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  TerminateTask(void)
@@ -1015,7 +1015,7 @@ TX_THREAD      *p_thread;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    ChainTask                                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1068,7 +1068,7 @@ TX_THREAD      *p_thread;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType ChainTask(TaskType  TaskID)
@@ -1212,7 +1212,7 @@ TX_THREAD      *p_thread;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    GetTaskID                                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1247,7 +1247,7 @@ TX_THREAD      *p_thread;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType GetTaskID(TaskRefType TaskID)
@@ -1295,7 +1295,7 @@ TX_THREAD      *thread_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    GetTaskState                                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1337,7 +1337,7 @@ TX_THREAD      *thread_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType GetTaskState(TaskType TaskID, TaskStateRefType State)
@@ -1429,7 +1429,7 @@ TX_THREAD      *p_thread;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    Schedule                                            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1471,7 +1471,7 @@ TX_THREAD      *p_thread;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType Schedule (void)
@@ -1590,7 +1590,7 @@ ULONG           area;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    CreateResource                                      PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1625,7 +1625,7 @@ ULONG           area;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 ResourceType  CreateResource(const CHAR *name, StatusType type, ResourceType linked_res)
@@ -1736,7 +1736,7 @@ UINT            iter_max;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    GetResource                                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1782,7 +1782,7 @@ UINT            iter_max;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  GetResource(ResourceType id)
@@ -2019,7 +2019,7 @@ ULONG           area;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    ReleaseResource                                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -2065,7 +2065,7 @@ ULONG           area;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  ReleaseResource(ResourceType id)
@@ -2390,7 +2390,7 @@ ULONG          area;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    RegisterTasktoResource                              PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -2430,7 +2430,7 @@ ULONG          area;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType     RegisterTasktoResource(ResourceType Resource, TaskType TaskID)
@@ -2576,7 +2576,7 @@ UINT            index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    RegisterISRtoResource                               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -2616,7 +2616,7 @@ UINT            index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType     RegisterISRtoResource(ResourceType Resource, ISRType ISRID)
@@ -2633,7 +2633,7 @@ StatusType     status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    CreateEvent                                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -2661,7 +2661,7 @@ StatusType     status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 EventMaskType CreateEvent(void)
@@ -2685,7 +2685,7 @@ EventMaskType  event;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    SetEvent                                            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -2718,7 +2718,7 @@ EventMaskType  event;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  SetEvent(TaskType task_id, EventMaskType mask)
@@ -2835,7 +2835,7 @@ OSEK_TCB       *p_this_tcb;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    ClearEvent                                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -2869,7 +2869,7 @@ OSEK_TCB       *p_this_tcb;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  ClearEvent(EventMaskType mask)
@@ -2929,7 +2929,7 @@ ULONG                    area;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    GetEvent                                            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -2960,7 +2960,7 @@ ULONG                    area;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  GetEvent(TaskType task_id, EventMaskRefType event)
@@ -3026,7 +3026,7 @@ OSEK_TCB               *tcb_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    WaitEvent                                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3060,7 +3060,7 @@ OSEK_TCB               *tcb_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  WaitEvent(EventMaskType mask)
@@ -3185,7 +3185,7 @@ UINT                   status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    RegisterEventtoTask                                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3222,7 +3222,7 @@ UINT                   status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType    RegisterEventtoTask(EventMaskType eventid, TaskType TaskID)
@@ -3283,7 +3283,7 @@ OSEK_TCB      *tcb_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    EnableInterrupt                                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3304,7 +3304,7 @@ OSEK_TCB      *tcb_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  EnableInterrupt(void)
@@ -3328,7 +3328,7 @@ StatusType  EnableInterrupt(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    DisableInterrupt                                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3349,7 +3349,7 @@ StatusType  EnableInterrupt(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  DisableInterrupt(void)
@@ -3371,7 +3371,7 @@ StatusType  DisableInterrupt(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    GetInterruptDescriptor                              PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3405,7 +3405,7 @@ StatusType  DisableInterrupt(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  GetInterruptDescriptor(UINT *mask)
@@ -3433,7 +3433,7 @@ UINT       new_posture;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    SuspendAllInterrupts                                PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3455,7 +3455,7 @@ UINT       new_posture;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 void   SuspendAllInterrupts (void)
@@ -3472,7 +3472,7 @@ void   SuspendAllInterrupts (void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    ResumeAllInterrupts                                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3500,7 +3500,7 @@ void   SuspendAllInterrupts (void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 void   ResumeAllInterrupts (void)
@@ -3560,7 +3560,7 @@ ULONG          request[SYSMGR_QUEUE_MSG_LENGTH];
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    DisableAllInterrupts                                PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3578,7 +3578,7 @@ ULONG          request[SYSMGR_QUEUE_MSG_LENGTH];
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 void   DisableAllInterrupts (void)
@@ -3595,7 +3595,7 @@ TX_INTERRUPT_SAVE_AREA
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    EnableAllInterrupts                                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3612,7 +3612,7 @@ TX_INTERRUPT_SAVE_AREA
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 void   EnableAllInterrupts (void)
@@ -3633,7 +3633,7 @@ TX_INTERRUPT_SAVE_AREA
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    SuspendOSInterrupts                                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3651,7 +3651,7 @@ TX_INTERRUPT_SAVE_AREA
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 void   SuspendOSInterrupts (void)
@@ -3668,7 +3668,7 @@ TX_INTERRUPT_SAVE_AREA
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    ResumeOSInterrupts                                  PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3692,7 +3692,7 @@ TX_INTERRUPT_SAVE_AREA
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 void   ResumeOSInterrupts (void)
@@ -3753,7 +3753,7 @@ ULONG          request[SYSMGR_QUEUE_MSG_LENGTH];
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    GetActiveApplicationMode                            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3775,7 +3775,7 @@ ULONG          request[SYSMGR_QUEUE_MSG_LENGTH];
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 AppModeType GetActiveApplicationMode(void)
@@ -3789,7 +3789,7 @@ AppModeType GetActiveApplicationMode(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    GetCounterValue                                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3820,7 +3820,7 @@ AppModeType GetActiveApplicationMode(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  GetCounterValue(OSEK_COUNTER *counter_ptr, TickRefType tick_ptr)
@@ -3846,7 +3846,7 @@ StatusType  GetCounterValue(OSEK_COUNTER *counter_ptr, TickRefType tick_ptr)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    CreateCounter                                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -3877,7 +3877,7 @@ StatusType  GetCounterValue(OSEK_COUNTER *counter_ptr, TickRefType tick_ptr)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 CounterType  CreateCounter(const CHAR *name, TickType max_allowed_value, TickType ticks_per_base,
@@ -3979,7 +3979,7 @@ UINT             index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    IncrCouner                                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -4012,7 +4012,7 @@ UINT             index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType     IncrCounter(CounterType cntr)
@@ -4375,7 +4375,7 @@ cntr_ptr = (OSEK_COUNTER *)cntr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    DefineSystemCounter                                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -4410,7 +4410,7 @@ cntr_ptr = (OSEK_COUNTER *)cntr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType DefineSystemCounter (CounterType cntr)
@@ -4494,7 +4494,7 @@ UINT          attached;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    CreateAlarm                                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -4523,7 +4523,7 @@ UINT          attached;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 AlarmType  CreateAlarm(const CHAR *name, CounterType cntr, UINT action, ULONG events, TaskType task,
@@ -4781,7 +4781,7 @@ StatusType       status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    GetAlarmBase                                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -4811,7 +4811,7 @@ StatusType       status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  GetAlarmBase(AlarmType AlarmID, AlarmBaseRefType info)
@@ -4848,7 +4848,7 @@ OSEK_ALARM          *alarm_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    SetAbsAlarm                                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -4884,7 +4884,7 @@ OSEK_ALARM          *alarm_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType SetAbsAlarm(AlarmType  AlarmID, TickType start, TickType cycle)
@@ -4972,7 +4972,7 @@ StatusType SetAbsAlarm(AlarmType  AlarmID, TickType start, TickType cycle)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    SetRelAlarm                                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5007,7 +5007,7 @@ StatusType SetAbsAlarm(AlarmType  AlarmID, TickType start, TickType cycle)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  SetRelAlarm(AlarmType AlarmID, TickType increment, TickType cycle)
@@ -5106,7 +5106,7 @@ StatusType          status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    CancelAlarm                                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5137,7 +5137,7 @@ StatusType          status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  CancelAlarm(AlarmType  AlarmID)
@@ -5185,7 +5185,7 @@ TX_INTERRUPT_SAVE_AREA
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    GetAlarm                                            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5216,7 +5216,7 @@ TX_INTERRUPT_SAVE_AREA
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 StatusType  GetAlarm(AlarmType AlarmID, TickRefType tick_ptr)
@@ -5286,7 +5286,7 @@ StatusType           status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*  osek_initialize                                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5324,7 +5324,7 @@ StatusType           status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -5440,7 +5440,7 @@ UINT         j;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*  osek_cleanup                                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5465,7 +5465,7 @@ UINT         j;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -5545,7 +5545,7 @@ OSEK_TCB *p_tcb;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    process_ISR2                                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5569,7 +5569,7 @@ OSEK_TCB *p_tcb;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 void   process_ISR2(ISRType isrname)
@@ -5592,7 +5592,7 @@ void   process_ISR2(ISRType isrname)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    ShutdownOS                                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5622,7 +5622,7 @@ void   process_ISR2(ISRType isrname)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 void   ShutdownOS(StatusType error)
@@ -5678,7 +5678,7 @@ UINT        status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    ActivateISR                                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5720,7 +5720,7 @@ UINT        status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static StatusType ActivateISR(ISRType ISRID)
@@ -5783,7 +5783,7 @@ ULONG           request[SYSMGR_QUEUE_MSG_LENGTH];
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    TerminateISR                                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5826,7 +5826,7 @@ ULONG           request[SYSMGR_QUEUE_MSG_LENGTH];
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static StatusType  TerminateISR(void)
@@ -5936,7 +5936,7 @@ TX_THREAD      *p_thread;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_system_manager_entry                          PORTABLE C       */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -5981,7 +5981,7 @@ TX_THREAD      *p_thread;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  osek_system_manager_entry(ULONG input)
@@ -6265,7 +6265,7 @@ ULONG           request[SYSMGR_QUEUE_MSG_LENGTH];
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*  osek_memory_init                                      PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6297,7 +6297,7 @@ ULONG           request[SYSMGR_QUEUE_MSG_LENGTH];
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static UINT osek_memory_init (void  *region0_ptr)
@@ -6320,7 +6320,7 @@ UINT    retval;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_counter_init                                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6351,7 +6351,7 @@ UINT    retval;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  osek_counter_init(void)
@@ -6372,7 +6372,7 @@ ULONG       index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_reset_counter                                  PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6401,7 +6401,7 @@ ULONG       index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void osek_reset_counter(OSEK_COUNTER *counter_ptr)
@@ -6448,7 +6448,7 @@ UINT  index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_alarm_init                                   PORTABLE C        */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6479,7 +6479,7 @@ UINT  index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  osek_alarm_init(void)
@@ -6500,7 +6500,7 @@ ULONG       index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_reset_alarm                                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6529,7 +6529,7 @@ ULONG       index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void osek_reset_alarm(OSEK_ALARM *alarm_ptr)
@@ -6576,7 +6576,7 @@ TX_INTERRUPT_SAVE_AREA
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_tcb_init                                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6607,7 +6607,7 @@ TX_INTERRUPT_SAVE_AREA
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  osek_tcb_init(void)
@@ -6627,7 +6627,7 @@ ULONG       index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_resource_init                                  PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6659,7 +6659,7 @@ ULONG       index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  osek_resource_init(void)
@@ -6685,7 +6685,7 @@ OSEK_RESOURCE     *res_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_reset_res                                      PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6714,7 +6714,7 @@ OSEK_RESOURCE     *res_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void osek_reset_res(OSEK_RESOURCE  *res_ptr)
@@ -6737,7 +6737,7 @@ TX_INTERRUPT_SAVE_AREA
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_do_task_terminate                              PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6770,7 +6770,7 @@ TX_INTERRUPT_SAVE_AREA
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static StatusType osek_do_task_terminate(OSEK_TCB  *tcb_ptr)
@@ -6871,7 +6871,7 @@ UINT                  priority;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_do_activate_task                               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6902,7 +6902,7 @@ UINT                  priority;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static StatusType osek_do_activate_task (OSEK_TCB  *tcb_ptr)
@@ -6931,7 +6931,7 @@ TX_INTERRUPT_SAVE_AREA
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*  osek_thread2tcb                                      PORTABLE C       */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -6962,7 +6962,7 @@ TX_INTERRUPT_SAVE_AREA
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static OSEK_TCB  *osek_thread2tcb(TX_THREAD *thread_ptr)
@@ -6991,7 +6991,7 @@ OSEK_TCB   *tcb;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_task_independent_area                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7023,7 +7023,7 @@ OSEK_TCB   *tcb;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static ULONG  osek_task_independent_area(void)
@@ -7056,7 +7056,7 @@ static ULONG  osek_task_independent_area(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_create_task                                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7089,7 +7089,7 @@ static ULONG  osek_task_independent_area(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static StatusType osek_create_task(OSEK_TCB * tcb_ptr)
@@ -7171,7 +7171,7 @@ TX_RESTORE
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_allocate_tcb                                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7204,7 +7204,7 @@ TX_RESTORE
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static ULONG osek_allocate_tcb(ULONG stack_size, OSEK_TCB **tcb_ptr)
@@ -7275,7 +7275,7 @@ ULONG             retval;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_memory_allocate                                PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7308,7 +7308,7 @@ ULONG             retval;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static UINT osek_memory_allocate(ULONG size, void  **memory_ptr)
@@ -7349,7 +7349,7 @@ UINT    retval;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_reset_tcb                                      PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7378,7 +7378,7 @@ UINT    retval;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void osek_reset_tcb(OSEK_TCB  *tcb_ptr)
@@ -7461,7 +7461,7 @@ UINT  index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_get_resource                                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7490,7 +7490,7 @@ UINT  index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static ResourceType osek_get_resource(void)
@@ -7536,7 +7536,7 @@ OSEK_RESOURCE     *res_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*  osek_get_alarm                                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7566,7 +7566,7 @@ OSEK_RESOURCE     *res_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static UINT   osek_get_alarm(void)
@@ -7620,7 +7620,7 @@ UINT              index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*  osek_get_events                                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7650,7 +7650,7 @@ UINT              index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static EventMaskType  osek_get_event(void)
@@ -7684,7 +7684,7 @@ EventMaskType     event_mask;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*  osek_get_alarm                                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7714,7 +7714,7 @@ EventMaskType     event_mask;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static CounterType   osek_get_counter(void)
@@ -7765,7 +7765,7 @@ UINT               index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_system_timer_entry                             PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7795,7 +7795,7 @@ UINT               index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void osek_system_timer_entry(ULONG input)
@@ -7846,7 +7846,7 @@ UINT               found;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_remap_priority                                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7876,7 +7876,7 @@ UINT               found;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static UINT osek_remap_priority(UINT osek_priority)
@@ -7897,7 +7897,7 @@ static UINT osek_remap_priority(UINT osek_priority)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_task_wrapper                                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -7933,7 +7933,7 @@ static UINT osek_remap_priority(UINT osek_priority)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void osek_task_wrapper(ULONG tcb)
@@ -8017,7 +8017,7 @@ StatusType      status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    osek_internal_error                                  PORTABLE C     */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8048,7 +8048,7 @@ StatusType      status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void osek_internal_error(ULONG error_code)
@@ -8066,7 +8066,7 @@ static void osek_internal_error(ULONG error_code)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    exec_ErrorHook                                       PORTABLE C     */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8103,7 +8103,7 @@ static void osek_internal_error(ULONG error_code)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  exec_ErrorHook (StatusType error)
@@ -8177,7 +8177,7 @@ ULONG          request[SYSMGR_QUEUE_MSG_LENGTH];
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    exec_PreTaskHook                                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8207,7 +8207,7 @@ ULONG          request[SYSMGR_QUEUE_MSG_LENGTH];
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  exec_PreTaskHook(void)
@@ -8238,7 +8238,7 @@ UINT           save_op_mode;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    exec_PostTaskHook                                    PORTABLE C     */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8268,7 +8268,7 @@ UINT           save_op_mode;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  exec_PostTaskHook(void)
@@ -8299,7 +8299,7 @@ UINT           sav_op_mode;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    add_task_to_table                                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8328,7 +8328,7 @@ UINT           sav_op_mode;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  add_task_to_table(OSEK_TCB *tcb_ptr)
@@ -8371,7 +8371,7 @@ UINT         i;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    push_task_to_table                                   PORTABLE C     */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8400,7 +8400,7 @@ UINT         i;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void   push_task_to_table(OSEK_TCB *tcb_ptr)
@@ -8439,7 +8439,7 @@ UINT    k;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    start_osek_tasks                                     PORTABLE C     */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8468,7 +8468,7 @@ UINT    k;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void start_osek_tasks(void)
@@ -8570,7 +8570,7 @@ UINT       found;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    check_task_to_run                                    PORTABLE C     */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8600,7 +8600,7 @@ UINT       found;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static UINT check_task_to_run (OSEK_TCB *tcb_ptr)
@@ -8670,7 +8670,7 @@ TX_INTERRUPT_SAVE_AREA
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    pop_task_from_table                                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8696,7 +8696,7 @@ TX_INTERRUPT_SAVE_AREA
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void  pop_task_from_table(OSEK_TCB *tcb_ptr)
@@ -8733,7 +8733,7 @@ UINT         k;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    check_linked_resources                              PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8750,7 +8750,7 @@ UINT         k;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static void        check_linked_resources(void)
@@ -8789,7 +8789,7 @@ OSEK_RESOURCE     *linked_res_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    get_internal_resource                               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8835,7 +8835,7 @@ OSEK_RESOURCE     *linked_res_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static StatusType get_internal_resource(OSEK_TCB  *tcb_ptr)
@@ -8919,7 +8919,7 @@ TX_DISABLE
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    release_internal_resource                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -8954,7 +8954,7 @@ TX_DISABLE
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static StatusType  release_internal_resource(OSEK_TCB  *tcb_ptr)
@@ -9000,7 +9000,7 @@ UINT           index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    check_external_resource                             PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -9046,7 +9046,7 @@ UINT           index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static StatusType      check_external_resource(OSEK_TCB *tcb_ptr)

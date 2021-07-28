@@ -20,17 +20,15 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
-    .global      _tx_timer_time_slice
-    .global      _tx_timer_system_clock
-    .global      _tx_timer_current_ptr
-    .global      _tx_timer_list_start
-    .global      _tx_timer_list_end
-    .global      _tx_timer_expired_time_slice
-    .global      _tx_timer_expired
-    .global      _tx_thread_time_slice
-    .global      _tx_timer_expiration_process
-
+    .global _tx_timer_time_slice
+    .global _tx_timer_system_clock
+    .global _tx_timer_current_ptr
+    .global _tx_timer_list_start
+    .global _tx_timer_list_end
+    .global _tx_timer_expired_time_slice
+    .global _tx_timer_expired
+    .global _tx_thread_time_slice
+    .global _tx_timer_expiration_process
 
     .text
     .align 4
@@ -39,19 +37,18 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_timer_interrupt                               Cortex-M3/AC6     */
-/*                                                           6.1          */
+/*    _tx_timer_interrupt                              Cortex-Mx/AC6      */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    This function processes the hardware timer interrupt.  This         */
 /*    processing includes incrementing the system clock and checking for  */
 /*    time slice and/or timer expiration.  If either is found, the        */
-/*    interrupt context save/restore functions are called along with the  */
-/*    expiration functions.                                               */
+/*    expiration functions are called.                                    */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -74,7 +71,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  08-02-2021     Scott Larson             Initial Version 6.1.8         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
@@ -83,8 +80,7 @@
     .thumb_func
 _tx_timer_interrupt:
 
-    /* Upon entry to this routine, it is assumed that context save has already
-       been called, and therefore the compiler scratch registers are available
+    /* Upon entry to this routine, it is assumed that the compiler scratch registers are available
        for use.  */
 
     /* Increment the system clock.  */
@@ -176,7 +172,6 @@ __tx_timer_skip_wrap:
 
 __tx_timer_done:
 
-
     /* See if anything has expired.  */
     // if ((_tx_timer_expired_time_slice) || (_tx_timer_expired))
     // {
@@ -191,7 +186,6 @@ __tx_timer_done:
                                                     // No, nothing expired
 
 __tx_something_expired:
-
 
     STMDB   sp!, {r0, lr}                           // Save the lr register on the stack
                                                     //   and save r0 just to keep 8-byte alignment
@@ -253,5 +247,4 @@ __tx_timer_nothing_expired:
 
     DSB                                             // Complete all memory access
     BX      lr                                      // Return to caller
-
 // }

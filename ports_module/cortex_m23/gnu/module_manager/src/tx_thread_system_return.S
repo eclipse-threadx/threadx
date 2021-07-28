@@ -71,7 +71,7 @@
     .thumb_func
 .type _tx_thread_system_return, function
 _tx_thread_system_return:
-    /* Return to real scheduler via PendSV. Note that this routine is often 
+    /* Return to real scheduler via PendSV. Note that this routine is often
        replaced with in-line assembly in tx_port.h to improved performance.  */
 
     LDR     r0, =0x10000000                         // Load PENDSVSET bit

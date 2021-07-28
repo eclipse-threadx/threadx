@@ -27,11 +27,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_stack_build                            Cortex-M7/GNU     */
-/*                                                           6.1.2        */
+/*    _tx_thread_stack_build                           Cortex-Mx/GNU      */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -60,9 +60,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -70,7 +68,6 @@
     .global  _tx_thread_stack_build
     .thumb_func
 _tx_thread_stack_build:
-
 
     /* Build a fake interrupt frame.  The form of the fake interrupt stack
        on the Cortex-M should look like the following after it is built:

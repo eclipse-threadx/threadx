@@ -40,11 +40,11 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  11-09-2020      Scott Larson            Modified comment(s),          */
 /*                                            increase kernel stack size, */
 /*                                            resulting in version 6.1.2  */
-/*  04-02-2021     Scott Larson             Modified comment(s),          */
+/*  04-02-2021      Scott Larson            Modified comment(s),          */
 /*                                            added check for overflow,   */
 /*                                            resulting in version 6.1.6  */
 /*                                                                        */
@@ -105,6 +105,21 @@ The following extensions must also be defined in tx_port.h:
 /* Define the kernel stack size for a module thread.  */
 #ifndef TXM_MODULE_KERNEL_STACK_SIZE
 #define TXM_MODULE_KERNEL_STACK_SIZE            768
+#endif
+
+/* For the following 3 access control settings, change TEX and C, B, S (bits 21 through 16 of MPU_RASR)
+ * to reflect your system memory attributes (cache, shareable, memory type).  */
+/* Code region access control: privileged read-only, outer & inner write-back, normal memory, shareable.  */
+#ifndef TXM_MODULE_MPU_CODE_ACCESS_CONTROL
+#define TXM_MODULE_MPU_CODE_ACCESS_CONTROL      0x06070000
+#endif
+/* Data region access control: execute never, read/write, outer & inner write-back, normal memory, shareable.  */
+#ifndef TXM_MODULE_MPU_DATA_ACCESS_CONTROL
+#define TXM_MODULE_MPU_DATA_ACCESS_CONTROL      0x13070000
+#endif
+/* Shared region access control: execute never, read-only, outer & inner write-back, normal memory, shareable.  */
+#ifndef TXM_MODULE_MPU_SHARED_ACCESS_CONTROL
+#define TXM_MODULE_MPU_SHARED_ACCESS_CONTROL    0x12070000
 #endif
 
 /* Define constants specific to the tools the module can be built with for this particular modules port.  */

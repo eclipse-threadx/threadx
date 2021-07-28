@@ -207,7 +207,7 @@ typedef struct TXM_MODULE_MPU_INFO_STRUCT
 #else   /* TXM_MODULE_MANAGER_8_MPU is defined */
 
 /* Define the number of MPU entries assigned to the code and data sections.
-   On Cortex-M4 parts, there are 8 total entries. ThreadX uses one for access
+   On some Cortex-M7 parts, there are 8 total entries. ThreadX uses one for access
    to the kernel entry function, thus 7 remain for code and data protection.  */
 #define TXM_MODULE_MANAGER_CODE_MPU_ENTRIES     4
 #define TXM_MODULE_MANAGER_DATA_MPU_ENTRIES     3

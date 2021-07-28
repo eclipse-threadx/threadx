@@ -19,7 +19,8 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                        
+
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     .global  _tx_execution_isr_exit
 #endif
 

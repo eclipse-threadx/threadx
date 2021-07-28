@@ -66,7 +66,7 @@
     PUBLIC  _tx_thread_context_restore
 _tx_thread_context_restore:
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                        
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the ISR exit function to indicate an ISR is complete.  */
     PUSH    {r0, lr}                                // Save return address
     BL      _tx_execution_isr_exit                  // Call the ISR exit function

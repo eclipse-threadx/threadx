@@ -80,7 +80,7 @@ THUMB_MASK      EQU     0x20                    ; Thumb bit (5) of CPSR/SPSR
 ;/*                                                                        */ 
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))

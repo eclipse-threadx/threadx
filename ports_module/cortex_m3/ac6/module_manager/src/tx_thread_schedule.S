@@ -20,18 +20,21 @@
 /**************************************************************************/
 /**************************************************************************/
 
-    .global  _tx_thread_current_ptr
-    .global  _tx_thread_execute_ptr
-    .global  _tx_timer_time_slice
-    .global  _tx_thread_system_stack_ptr
-    .global  _tx_thread_preempt_disable
-    .global  _txm_module_manager_memory_fault_handler
-    .global  _txm_module_manager_memory_fault_info
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-    .global  _tx_execution_thread_enter
-    .global  _tx_execution_thread_exit
+    .global _tx_thread_current_ptr
+    .global _tx_thread_execute_ptr
+    .global _tx_timer_time_slice
+    .global _tx_thread_system_stack_ptr
+    .global _tx_thread_preempt_disable
+    .global _txm_module_manager_memory_fault_handler
+    .global _txm_module_manager_memory_fault_info
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    .global _tx_execution_thread_enter
+    .global _tx_execution_thread_exit
 #endif
-
+#ifdef TX_LOW_POWER
+    .global tx_low_power_enter
+    .global tx_low_power_exit
+#endif
     .text
     .align 4
     .syntax unified
@@ -73,7 +76,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -84,7 +87,7 @@ _tx_thread_schedule:
 
     /* This function should only ever be called on Cortex-M
        from the first schedule request. Subsequent scheduling occurs
-       from the PendSV handling routines below. */
+       from the PendSV handling routine below. */
 
     /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
 
@@ -99,7 +102,6 @@ _tx_thread_schedule:
     STR     r1, [r0]                                //
 
     /* Enable interrupts */
-
     CPSIE   i
 
     /* Enter the scheduler for the first time.  */
@@ -188,10 +190,8 @@ UsageFault_Handler:
 
     BL      _txm_module_manager_memory_fault_handler    // Call memory manager fault handler
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
-
     CPSID   i                                       // Disable interrupts
     BL      _tx_execution_thread_exit               // Call the thread exit function
     CPSIE   i                                       // Enable interrupts
@@ -224,10 +224,8 @@ __tx_PendSVHandler:
 
 __tx_ts_handler:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
-
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
     BL      _tx_execution_thread_exit               // Call the thread exit function
@@ -294,10 +292,8 @@ __tx_ts_restore:
 
     STR     r5, [r4]                                // Setup global time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing.  */
-
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
     POP     {r0, r1}                                // Recover r0 and r1
@@ -324,10 +320,10 @@ __tx_ts_restore:
 
     // Use alias registers to quickly load MPU
     ADD     r0, r0, #100                            // Build address of MPU register start in thread control block
-    LDM     r0!,{r2-r9}                             // Load MPU regions 0-3
-    STM     r1,{r2-r9}                              // Store MPU regions 0-3
-    LDM     r0!,{r2-r9}                             // Load MPU regions 4-7
-    STM     r1,{r2-r9}                              // Store MPU regions 4-7
+    LDM     r0!,{r2-r9}                             // Load first four MPU regions
+    STM     r1,{r2-r9}                              // Store first four MPU regions
+    LDM     r0,{r2-r9}                              // Load second four MPU regions
+    STM     r1,{r2-r9}                              // Store second four MPU regions
     LDR     r0, =0xE000ED94                         // Build MPU control reg address
     MOV     r1, #5                                  // Build enable value with background region enabled
     STR     r1, [r0]                                // Enable MPU
@@ -349,11 +345,25 @@ __tx_ts_wait:
     LDR     r1, [r2]                                // Pickup the next thread to execute pointer
     STR     r1, [r0]                                // Store it in the current pointer
     CBNZ    r1, __tx_ts_ready                       // If non-NULL, a new thread is ready!
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_enter                      // Possibly enter low power mode
+    POP     {r0-r3}
+#endif
+
 #ifdef TX_ENABLE_WFI
     DSB                                             // Ensure no outstanding memory transactions
     WFI                                             // Wait for interrupt
     ISB                                             // Ensure pipeline is flushed
 #endif
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_exit                       // Exit low power mode
+    POP     {r0-r3}
+#endif
+
     CPSIE   i                                       // Enable interrupts
     B       __tx_ts_wait                            // Loop to continue waiting
 
@@ -369,6 +379,7 @@ __tx_ts_ready:
 
     CPSIE   i                                       // Enable interrupts
     B       __tx_ts_restore                         // Restore the thread
+// }
 
 
     /* SVC Handler.  */
@@ -393,6 +404,7 @@ __tx_SVCallHandler:
        the kernel from a module thread with user mode selected. */
 
     LDR     r2, =_txm_module_priv                   // Load address of where we should have come from
+                                                    // Subtract 1 because of THUMB mode.
     CMP     r1, r2                                  // Did we come from user_mode_entry?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came.
@@ -425,14 +437,14 @@ __tx_SVCallHandler:
 
     /* Build kernel stack by copying thread stack two registers at a time */
     ADD     r3, r3, #32                             // Start at bottom of hardware stack
-    LDMDB   r3!,{r1-r2}
-    STMDB   r0!,{r1-r2}
-    LDMDB   r3!,{r1-r2}
-    STMDB   r0!,{r1-r2}
-    LDMDB   r3!,{r1-r2}
-    STMDB   r0!,{r1-r2}
-    LDMDB   r3!,{r1-r2}
-    STMDB   r0!,{r1-r2}
+    LDMDB   r3!, {r1-r2}
+    STMDB   r0!, {r1-r2}
+    LDMDB   r3!, {r1-r2}
+    STMDB   r0!, {r1-r2}
+    LDMDB   r3!, {r1-r2}
+    STMDB   r0!, {r1-r2}
+    LDMDB   r3!, {r1-r2}
+    STMDB   r0!, {r1-r2}
 
     MSR     PSP, r0                                 // Set kernel stack pointer
 
@@ -444,6 +456,7 @@ _tx_skip_kernel_stack_enter:
 
 _tx_thread_user_return:
     LDR     r2, =_txm_module_user_mode_exit         // Load address of where we should have come from
+                                                    // Subtract 1 because of THUMB mode.
     CMP     r1, r2                                  // Did we come from user_mode_exit?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came
@@ -471,14 +484,14 @@ _tx_thread_user_return:
     MRS     r3, PSP                                 // Pickup kernel stack pointer
 
     /* Copy kernel hardware stack to module thread stack. */
-    LDM     r3!,{r1-r2}
-    STM     r0!,{r1-r2}
-    LDM     r3!,{r1-r2}
-    STM     r0!,{r1-r2}
-    LDM     r3!,{r1-r2}
-    STM     r0!,{r1-r2}
-    LDM     r3!,{r1-r2}
-    STM     r0!,{r1-r2}
+    LDM     r3!, {r1-r2}
+    STM     r0!, {r1-r2}
+    LDM     r3!, {r1-r2}
+    STM     r0!, {r1-r2}
+    LDM     r3!, {r1-r2}
+    STM     r0!, {r1-r2}
+    LDM     r3!, {r1-r2}
+    STM     r0!, {r1-r2}
     SUB     r0, r0, #32                             // Subtract 32 to get back to top of stack
     MSR     PSP, r0                                 // Set thread stack pointer
 
@@ -493,10 +506,10 @@ _tx_skip_kernel_stack_exit:
     BX      lr                                      // Return to thread
 
 
-   /* Kernel entry function from user mode.  */
+    /* Kernel entry function from user mode.  */
 
     .global  _txm_module_manager_kernel_dispatch
-    .align 5
+    .align  5
     .syntax unified
 // VOID   _txm_module_manager_user_mode_entry(VOID)
 // {

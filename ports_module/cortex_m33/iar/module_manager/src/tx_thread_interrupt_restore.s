@@ -26,8 +26,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_interrupt_restore                      Cortex-M/IAR      */
-/*                                                           6.1.5        */
+/*    _tx_thread_interrupt_restore                      Cortex-M33/IAR    */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -57,18 +57,19 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021      Scott Larson            Initial Version 6.1.5         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_interrupt_restore(UINT previous_posture)
 // {
     PUBLIC  _tx_thread_interrupt_restore
 _tx_thread_interrupt_restore:
-
     /* Restore previous interrupt lockout posture.  */
-
+#ifdef TX_PORT_USE_BASEPRI
+    MSR     BASEPRI, r0
+#else
     MSR     PRIMASK, r0
+#endif
     BX      lr
-
 // }
     END

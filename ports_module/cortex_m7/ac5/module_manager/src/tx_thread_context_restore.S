@@ -20,9 +20,9 @@
 /**************************************************************************/
 /**************************************************************************/
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     IMPORT  _tx_execution_isr_exit
-    ENDIF
+#endif
 
     AREA    ||.text||, CODE, READONLY
     PRESERVE8
@@ -30,11 +30,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_context_restore                        Cortex-M7/AC5     */
-/*                                                           6.1.2        */
+/*    _tx_thread_context_restore                       Cortex-Mx/AC5      */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -51,7 +51,7 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    None                                                                */
+/*    [_tx_execution_isr_exit]              Execution profiling ISR exit  */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -61,9 +61,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_restore(VOID)
@@ -71,14 +69,13 @@
     EXPORT  _tx_thread_context_restore
 _tx_thread_context_restore
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the ISR exit function to indicate an ISR is complete.  */
-    PUSH    {r0,lr}                                 // Save ISR lr
+    PUSH    {r0, lr}                                // Save return address
     BL      _tx_execution_isr_exit                  // Call the ISR exit function
-    POP     {r0,lr}                                 // Restore ISR lr
-    ENDIF
+    POP     {r0, lr}                                // Recover return address
+#endif
 
-    POP     {lr}
     BX      lr
 // }
     ALIGN

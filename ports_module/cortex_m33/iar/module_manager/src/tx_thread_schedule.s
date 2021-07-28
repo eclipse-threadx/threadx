@@ -41,8 +41,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_schedule                             Cortex-M33/MPU/IAR  */
-/*                                                           6.1.7        */
+/*    _tx_thread_schedule                               Cortex-M33/IAR    */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -87,37 +87,31 @@
 // {
     PUBLIC  _tx_thread_schedule
 _tx_thread_schedule:
-
     /* This function should only ever be called on Cortex-M
        from the first schedule request. Subsequent scheduling occurs
        from the PendSV handling routine below. */
 
     /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
-
     MOV     r0, #0                                  // Build value for TX_FALSE
     LDR     r2, =_tx_thread_preempt_disable         // Build address of preempt disable flag
     STR     r0, [r2, #0]                            // Clear preempt disable flag
 
-    /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
-
 #ifdef __ARMVFP__
+    /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
     MRS     r0, CONTROL                             // Pickup current CONTROL register
     BIC     r0, r0, #4                              // Clear the FPCA bit
     MSR     CONTROL, r0                             // Setup new CONTROL register
 #endif
 
     /* Enable memory fault registers.  */
-
     LDR     r0, =0xE000ED24                         // Build SHCSR address
     LDR     r1, =0x70000                            // Enable Usage, Bus, and MemManage faults
     STR     r1, [r0]                                //
 
     /* Enable interrupts */
-
     CPSIE   i
 
     /* Enter the scheduler for the first time.  */
-
     MOV     r0, #0x10000000                         // Load PENDSVSET bit
     MOV     r1, #0xE000E000                         // Load NVIC base
     STR     r0, [r1, #0xD04]                        // Set PENDSVBIT in ICSR
@@ -234,12 +228,9 @@ BusFault_Handler:
 
     PUBLIC  PendSV_Handler
 PendSV_Handler:
-
-    /* Get current thread value and new thread pointer.  */
-
 __tx_ts_handler:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
@@ -350,7 +341,7 @@ __tx_ts_restore:
 
     STR     r5, [r4]                                // Setup global time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing.  */
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
@@ -413,8 +404,6 @@ _skip_vfp_restore:
     LDMIA   r12!, {r4-r11}                          // Recover thread's registers
     MSR     PSP, r12                                // Setup the thread's stack pointer
 
-    /* Return to thread.  */
-
     BX      lr                                      // Return to thread!
 
 
@@ -435,7 +424,7 @@ SVC_Handler:
 
     CMP     r2, #2                                  // Is it a secure stack free request?
     BEQ     _tx_svc_secure_free                     // Yes, go there
-#endif   // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
+#endif  // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
 
 
     CMP     r2, #3                                  // Is it the entry into ThreadX?
@@ -444,7 +433,7 @@ SVC_Handler:
     /* At this point we have an SVC 3, which means we are entering
        the kernel from a module thread with user mode selected. */
 
-    LDR     r2, =_txm_module_priv                   // Load address of where we should have come from
+    LDR     r2, =_txm_module_priv-1                 // Load address of where we should have come from
     CMP     r1, r2                                  // Did we come from user_mode_entry?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came.
@@ -501,7 +490,7 @@ _tx_skip_kernel_stack_enter:
 
 
 _tx_thread_user_return:
-    LDR     r2, =_txm_module_user_mode_exit         // Load address of where we should have come from
+    LDR     r2, =_txm_module_user_mode_exit-1       // Load address of where we should have come from
     CMP     r1, r2                                  // Did we come from user_mode_exit?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came
@@ -527,6 +516,27 @@ _tx_thread_user_return:
     STR     r1, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
 #endif
+
+    /* If lazy stacking is pending, check if it can be cleared.
+       if(LSPACT && tx_thread_module_stack_start < FPCAR && FPCAR < tx_thread_module_stack_end)
+       then clear LSPACT. */
+    LDR     r3, =0xE000EF34                         // Address of FPCCR
+    LDR     r3, [r3]                                // Load FPCCR
+    TST     r3, #1                                  // Check if LSPACT is set
+    BEQ     _tx_no_lazy_clear                       // if clear, move on
+    LDR     r1, =0xE000EF38                         // Address of FPCAR
+    LDR     r1, [r1]                                // Load FPCAR
+    LDR     r0, [r2, #0xA4]                         // Load kernel stack start
+    CMP     r1, r0                                  // If FPCAR < start, move on
+    BLO     _tx_no_lazy_clear
+    LDR     r0, [r2, #0xA8]                         // Load kernel stack end
+    CMP     r0, r1                                  // If end < FPCAR, move on
+    BLO     _tx_no_lazy_clear
+    BIC     r3, #1                                  // Clear LSPACT
+    LDR     r1, =0xE000EF34                         // Address of FPCCR
+    STR     r3, [r1]                                // Save updated FPCCR
+_tx_no_lazy_clear:
+
     LDR     r0, [r2, #0xB0]                         // Load the module thread stack pointer
     MRS     r3, PSP                                 // Pickup kernel stack pointer
     TST     r0, #1                                  // Is module stack extended?
@@ -536,14 +546,14 @@ _tx_thread_user_return:
     ORREQ   lr, lr, #0x10                           // Else set bit, return with standard frame
 
     /* Copy kernel hardware stack to module thread stack. */
-    LDM     r3!, {r1-r2}
-    STM     r0!, {r1-r2}
-    LDM     r3!, {r1-r2}
-    STM     r0!, {r1-r2}
-    LDM     r3!, {r1-r2}
-    STM     r0!, {r1-r2}
-    LDM     r3!, {r1-r2}
-    STM     r0!, {r1-r2}
+    LDM     r3!, {r1-r2}                            // Get r0, r1 from kernel stack
+    STM     r0!, {r1-r2}                            // Insert r0, r1 into thread stack
+    LDM     r3!, {r1-r2}                            // Get r2, r3 from kernel stack
+    STM     r0!, {r1-r2}                            // Insert r2, r3 into thread stack
+    LDM     r3!, {r1-r2}                            // Get r12, lr from kernel stack
+    STM     r0!, {r1-r2}                            // Insert r12, lr into thread stack
+    LDM     r3!, {r1-r2}                            // Get pc, xpsr from kernel stack
+    STM     r0!, {r1-r2}                            // Insert pc, xpsr into thread stack
     SUB     r0, r0, #32                             // Subtract 32 to get back to top of stack
     MSR     PSP, r0                                 // Set thread stack pointer
 
@@ -560,7 +570,7 @@ _tx_skip_kernel_stack_exit:
 
 #if (!defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE))
 _tx_svc_secure_alloc:
-    LDR     r2, =_tx_alloc_return                   // Load address of where we should have come from
+    LDR     r2, =_tx_alloc_return-1                 // Load address of where we should have come from
     CMP     r1, r2                                  // Did we come from _tx_thread_secure_stack_allocate?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came.
@@ -573,7 +583,7 @@ _tx_svc_secure_alloc:
     BX      lr
     
 _tx_svc_secure_free:
-    LDR     r2, =_tx_free_return                    // Load address of where we should have come from
+    LDR     r2, =_tx_free_return-1                  // Load address of where we should have come from
     CMP     r1, r2                                  // Did we come from _tx_thread_secure_stack_free?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came.
@@ -584,11 +594,11 @@ _tx_svc_secure_free:
     POP     {r12, lr}                               // Restore SP and EXC_RETURN
     STR     r0, [r12]                               // Store function return value
     BX      lr
-#endif   // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
+#endif  // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
 
 
 
-   /* Kernel entry function from user mode.  */
+    /* Kernel entry function from user mode.  */
 
     EXTERN  _txm_module_manager_kernel_dispatch
     SECTION `.text`:CODE:NOROOT(5)
@@ -623,5 +633,4 @@ _txm_module_user_mode_exit:
 _tx_vfp_access:
     VMOV.F32 s0, s0                                 // Simply access the VFP
     BX       lr                                     // Return to caller
-
     END

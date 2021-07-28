@@ -94,18 +94,18 @@ typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
 #define ULONG64_DEFINED
 
+/* This port overrides tx_thread_stack_error_notify with an architecture specific version */
+#define TX_PORT_THREAD_STACK_ERROR_NOTIFY
+
+/* This port overrides tx_thread_stack_error_handler with an architecture specific version */
+#define TX_PORT_THREAD_STACK_ERROR_HANDLER
+
 /* Function prototypes for this port. */
 struct  TX_THREAD_STRUCT;
 UINT    _txe_thread_secure_stack_allocate(struct TX_THREAD_STRUCT *thread_ptr, ULONG stack_size);
 UINT    _txe_thread_secure_stack_free(struct TX_THREAD_STRUCT *thread_ptr);
 UINT    _tx_thread_secure_stack_allocate(struct TX_THREAD_STRUCT *tx_thread, ULONG stack_size);
 UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
-
-/* This port overrides tx_thread_stack_error_notify with an architecture specific version */
-#define TX_PORT_THREAD_STACK_ERROR_NOTIFY
-
-/* This port overrides tx_thread_stack_error_handler with an architecture specific version */
-#define TX_PORT_THREAD_STACK_ERROR_HANDLER
 
 /* This hardware has stack checking that we take advantage of - do NOT define. */
 #ifdef TX_ENABLE_STACK_CHECKING

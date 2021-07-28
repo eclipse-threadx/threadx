@@ -68,11 +68,15 @@
     .thumb_func
 .type _tx_thread_interrupt_control, function
 _tx_thread_interrupt_control:
-
-    /* Pickup current interrupt lockout posture.  */
-    MRS     r1, PRIMASK
-    MSR     PRIMASK, r0
-    MOV     r0, r1
-    BX      lr
+#ifdef TX_PORT_USE_BASEPRI
+    MRS     r1, BASEPRI                         // Pickup current interrupt posture
+    MSR     BASEPRI, r0                         // Apply the new interrupt posture
+    MOV     r0, r1                              // Transfer old to return register
+#else
+    MRS     r1, PRIMASK                         // Pickup current interrupt lockout
+    MSR     PRIMASK, r0                         // Apply the new interrupt lockout
+    MOV     r0, r1                              // Transfer old to return register
+#endif
+    BX      lr                                  // Return to caller
 // }
     .end

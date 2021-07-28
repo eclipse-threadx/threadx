@@ -38,11 +38,11 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    old_posture                           Old interrupt lockout posture */
+/*    None                                                                */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    None                                                                */
+/*    old_posture                           Old interrupt lockout posture */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -59,7 +59,7 @@
 /*  12-31-2020      Scott Larson            Initial Version 6.1.3         */
 /*                                                                        */
 /**************************************************************************/
-// UINT   _tx_thread_interrupt_disable(UINT new_posture)
+// UINT   _tx_thread_interrupt_disable(VOID)
 // {
     .section .text
     .balign 4
@@ -70,8 +70,14 @@
 .type _tx_thread_interrupt_disable, function
 _tx_thread_interrupt_disable:
     /* Return current interrupt lockout posture.  */
+#ifdef TX_PORT_USE_BASEPRI
+    MRS     r0, BASEPRI
+    LDR     r1, =TX_PORT_BASEPRI
+    MSR     BASEPRI, r1
+#else
     MRS     r0, PRIMASK
     CPSID   i
+#endif
     BX      lr
 // }
     .end

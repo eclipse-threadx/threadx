@@ -27,16 +27,15 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_context_restore                        Cortex-M/IAR      */
-/*                                                           6.1.5        */
+/*    _tx_thread_context_restore                        Cortex-M33/IAR    */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function is only needed for legacy applications and it should  */
-/*    not be called in any new development on a Cortex-M.                 */
+/*    This function is not needed for Cortex-M.                           */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -58,7 +57,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021      Scott Larson            Initial Version 6.1.5         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_restore(VOID)
@@ -66,7 +65,7 @@
     PUBLIC  _tx_thread_context_restore
 _tx_thread_context_restore:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the ISR exit function to indicate an ISR is complete.  */
     PUSH    {r0, lr}                                // Save return address
     BL      _tx_execution_isr_exit                  // Call the ISR exit function
@@ -74,6 +73,5 @@ _tx_thread_context_restore:
 #endif
 
     BX      lr
-
 // }
     END

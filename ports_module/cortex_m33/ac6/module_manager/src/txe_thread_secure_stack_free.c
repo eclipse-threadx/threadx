@@ -33,8 +33,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txe_thread_secure_stack_free                       PORTABLE C      */
-/*                                                            6.1.3       */
+/*    _txe_thread_secure_stack_free                       Cortex-M33      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -66,7 +66,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  12-31-2020     Scott Larson             Initial Version 6.1.3         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT    _txe_thread_secure_stack_free(TX_THREAD *thread_ptr)
@@ -118,4 +118,3 @@ UINT    status;
     return(status);
 #endif
 }
-

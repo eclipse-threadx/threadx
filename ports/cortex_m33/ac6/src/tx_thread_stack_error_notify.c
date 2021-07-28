@@ -35,8 +35,8 @@ extern VOID (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr)
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_stack_error_notify                     Cortex-M33/AC6    */
-/*                                                            6.1         */
+/*    _tx_thread_stack_error_notify                       Cortex-M33      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -76,7 +76,6 @@ UINT  _tx_thread_stack_error_notify(VOID (*stack_error_handler)(TX_THREAD *threa
 
 TX_INTERRUPT_SAVE_AREA
 
-
     /* Disable interrupts.  */
     TX_DISABLE
 
@@ -95,4 +94,3 @@ TX_INTERRUPT_SAVE_AREA
     /* Return success to caller.  */
     return(TX_SUCCESS);
 }
-

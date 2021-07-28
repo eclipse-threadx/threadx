@@ -66,7 +66,7 @@
     .balign 4
     .syntax unified
     .eabi_attribute Tag_ABI_align_preserved, 1
-    .global  _tx_thread_secure_stack_allocate
+    .global _tx_thread_secure_stack_allocate
     .thumb_func
 .type _tx_thread_secure_stack_allocate, function
 _tx_thread_secure_stack_allocate:

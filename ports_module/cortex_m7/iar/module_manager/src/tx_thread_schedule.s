@@ -87,7 +87,7 @@ _tx_thread_schedule:
 
     /* This function should only ever be called on Cortex-M
        from the first schedule request. Subsequent scheduling occurs
-       from the PendSV handling routines below. */
+       from the PendSV handling routine below. */
 
     /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
 
@@ -95,9 +95,8 @@ _tx_thread_schedule:
     LDR     r2, =_tx_thread_preempt_disable         // Build address of preempt disable flag
     STR     r0, [r2, #0]                            // Clear preempt disable flag
 
-    /* Clear CONTROL.FPCA bit so FPU registers aren't unnecessarily stacked.  */
-
 #ifdef __ARMVFP__
+    /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
     MRS     r0, CONTROL                             // Pickup current CONTROL register
     BIC     r0, r0, #4                              // Clear the FPCA bit
     MSR     CONTROL, r0                             // Setup new CONTROL register
@@ -110,7 +109,6 @@ _tx_thread_schedule:
     STR     r1, [r0]                                //
 
     /* Enable interrupts */
-
     CPSIE   i
 
     /* Enter the scheduler for the first time.  */
@@ -204,7 +202,7 @@ UsageFault_Handler:
 
     BL      _txm_module_manager_memory_fault_handler    // Call memory manager fault handler
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     BL      _tx_execution_thread_exit               // Call the thread exit function
@@ -236,7 +234,7 @@ __tx_PendSVHandler:
 
 __tx_ts_handler:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
@@ -336,7 +334,7 @@ __tx_ts_restore:
 
     STR     r5, [r4]                                // Setup global time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing.  */
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
@@ -445,6 +443,7 @@ __tx_SVCallHandler:
     STR     r0, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
 #endif
+
     MRS     r3, PSP                                 // Pickup thread stack pointer
     TST     lr, #0x10                               // Test for extended module stack
     ITT     EQ
@@ -498,6 +497,27 @@ _tx_thread_user_return:
     STR     r1, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
 #endif
+
+    /* If lazy stacking is pending, check if it can be cleared.
+       if(LSPACT && tx_thread_module_stack_start < FPCAR && FPCAR < tx_thread_module_stack_end)
+       then clear LSPACT. */
+    LDR     r3, =0xE000EF34                         // Address of FPCCR
+    LDR     r3, [r3]                                // Load FPCCR
+    TST     r3, #1                                  // Check if LSPACT is set
+    BEQ     _tx_no_lazy_clear                       // if clear, move on
+    LDR     r1, =0xE000EF38                         // Address of FPCAR
+    LDR     r1, [r1]                                // Load FPCAR
+    LDR     r0, [r2, #0xA4]                         // Load kernel stack start
+    CMP     r1, r0                                  // If FPCAR < start, move on
+    BLO     _tx_no_lazy_clear
+    LDR     r0, [r2, #0xA8]                         // Load kernel stack end
+    CMP     r0, r1                                  // If end < FPCAR, move on
+    BLO     _tx_no_lazy_clear
+    BIC     r3, #1                                  // Clear LSPACT
+    LDR     r1, =0xE000EF34                         // Address of FPCCR
+    STR     r3, [r1]                                // Save updated FPCCR
+_tx_no_lazy_clear:
+
     LDR     r0, [r2, #0xB0]                         // Load the module thread stack pointer
     MRS     r3, PSP                                 // Pickup kernel stack pointer
     TST     r0, #1                                  // Is module stack extended?
@@ -529,7 +549,7 @@ _tx_skip_kernel_stack_exit:
     BX      lr                                      // Return to thread
 
 
-   /* Kernel entry function from user mode.  */
+    /* Kernel entry function from user mode.  */
 
     EXTERN  _txm_module_manager_kernel_dispatch
     SECTION `.text`:CODE:NOROOT(5)
@@ -559,8 +579,8 @@ _txm_module_user_mode_exit:
     NOP
 // }
 
-
 #ifdef __ARMVFP__
+
     PUBLIC  tx_thread_fpu_enable
 tx_thread_fpu_enable:
     PUBLIC  tx_thread_fpu_disable
@@ -572,5 +592,4 @@ tx_thread_fpu_disable:
     BX      LR                                      // Return to caller
 
 #endif
-
     END

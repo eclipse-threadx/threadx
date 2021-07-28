@@ -20,7 +20,7 @@
 /**************************************************************************/
 /**************************************************************************/
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                        
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     IMPORT  _tx_execution_isr_enter
 #endif
 
@@ -51,7 +51,7 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    None                                                                */
+/*    [_tx_execution_isr_enter]             Execution profiling ISR enter */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -69,7 +69,7 @@
     EXPORT  _tx_thread_context_save
 _tx_thread_context_save
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                                
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the ISR enter function to indicate an ISR is starting.  */
     PUSH    {r0, lr}                                // Save return address
     BL      _tx_execution_isr_enter                 // Call the ISR enter function

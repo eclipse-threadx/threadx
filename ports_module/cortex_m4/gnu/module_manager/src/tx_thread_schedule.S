@@ -20,15 +20,18 @@
 /**************************************************************************/
 /**************************************************************************/
 
-    .global  _tx_thread_current_ptr
-    .global  _tx_thread_execute_ptr
-    .global  _tx_timer_time_slice
-    .global  _tx_execution_thread_enter
-    .global  _tx_execution_thread_exit
-    .global  _tx_thread_preempt_disable
-    .global  _txm_module_manager_memory_fault_handler
-    .global  _txm_module_manager_memory_fault_info
-
+    .global _tx_thread_current_ptr
+    .global _tx_thread_execute_ptr
+    .global _tx_timer_time_slice
+    .global _tx_execution_thread_enter
+    .global _tx_execution_thread_exit
+    .global _tx_thread_preempt_disable
+    .global _txm_module_manager_memory_fault_handler
+    .global _txm_module_manager_memory_fault_info
+#ifdef TX_LOW_POWER
+    .global tx_low_power_enter
+    .global tx_low_power_exit
+#endif
     .text
     .align 4
     .syntax unified
@@ -88,7 +91,7 @@ _tx_thread_schedule:
 
     /* This function should only ever be called on Cortex-M
        from the first schedule request. Subsequent scheduling occurs
-       from the PendSV handling routines below. */
+       from the PendSV handling routine below. */
 
     /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
 
@@ -96,7 +99,7 @@ _tx_thread_schedule:
     LDR     r2, =_tx_thread_preempt_disable         // Build address of preempt disable flag
     STR     r0, [r2, #0]                            // Clear preempt disable flag
 
-    /* Clear CONTROL.FPCA bit so FPU registers aren't unnecessarily stacked.  */
+    /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
 
 #ifdef __ARM_PCS_VFP
     MRS     r0, CONTROL                             // Pickup current CONTROL register
@@ -111,7 +114,6 @@ _tx_thread_schedule:
     STR     r1, [r0]                                //
 
     /* Enable interrupts */
-
     CPSIE   i
 
     /* Enter the scheduler for the first time.  */
@@ -130,7 +132,6 @@ __tx_wait_here:
 
 
     /* Memory Exception Handler.  */
-
     .global  MemManage_Handler
     .global  BusFault_Handler
     .global  UsageFault_Handler
@@ -208,7 +209,7 @@ UsageFault_Handler:
 
     BL      _txm_module_manager_memory_fault_handler    // Call memory manager fault handler
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     BL      _tx_execution_thread_exit               // Call the thread exit function
@@ -243,7 +244,7 @@ __tx_PendSVHandler:
 
 __tx_ts_handler:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
@@ -343,7 +344,7 @@ __tx_ts_restore:
 
     STR     r5, [r4]                                // Setup global time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing.  */
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
@@ -443,6 +444,7 @@ __tx_SVCallHandler:
     STR     r0, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
 #endif
+
     MRS     r3, PSP                                 // Pickup thread stack pointer
     TST     lr, #0x10                               // Test for extended module stack
     ITT     EQ
@@ -450,7 +452,7 @@ __tx_SVCallHandler:
     ORREQ   lr, lr, #0x10                           // Set bit, return with standard frame
     STR     r3, [r2, #0xB0]                         // Save thread stack pointer
     BIC     r3, #1                                  // Clear possibly OR'd bit
-    
+
     /* Build kernel stack by copying thread stack two registers at a time */
     ADD     r3, r3, #32                             // Start at bottom of hardware stack
     LDMDB   r3!, {r1-r2}
@@ -495,6 +497,27 @@ _tx_thread_user_return:
     STR     r1, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
 #endif
+
+    /* If lazy stacking is pending, check if it can be cleared.
+       if(LSPACT && tx_thread_module_stack_start < FPCAR && FPCAR < tx_thread_module_stack_end)
+       then clear LSPACT. */
+    LDR     r3, =0xE000EF34                         // Address of FPCCR
+    LDR     r3, [r3]                                // Load FPCCR
+    TST     r3, #1                                  // Check if LSPACT is set
+    BEQ     _tx_no_lazy_clear                       // if clear, move on
+    LDR     r1, =0xE000EF38                         // Address of FPCAR
+    LDR     r1, [r1]                                // Load FPCAR
+    LDR     r0, [r2, #0xA4]                         // Load kernel stack start
+    CMP     r1, r0                                  // If FPCAR < start, move on
+    BLO     _tx_no_lazy_clear
+    LDR     r0, [r2, #0xA8]                         // Load kernel stack end
+    CMP     r0, r1                                  // If end < FPCAR, move on
+    BLO     _tx_no_lazy_clear
+    BIC     r3, #1                                  // Clear LSPACT
+    LDR     r1, =0xE000EF34                         // Address of FPCCR
+    STR     r3, [r1]                                // Save updated FPCCR
+_tx_no_lazy_clear:
+
     LDR     r0, [r2, #0xB0]                         // Load the module thread stack pointer
     MRS     r3, PSP                                 // Pickup kernel stack pointer
     TST     r0, #1                                  // Is module stack extended?
@@ -557,12 +580,14 @@ _txm_module_user_mode_exit:
 // }
 
 #ifdef __ARM_PCS_VFP
-    .global  tx_thread_fpu_disable
-    .thumb_func
-tx_thread_fpu_disable:
+
     .global  tx_thread_fpu_enable
     .thumb_func
 tx_thread_fpu_enable:
+    .global  tx_thread_fpu_disable
+    .thumb_func
+tx_thread_fpu_disable:
+
     /* Automatic VPF logic is supported, this function is present only for
        backward compatibility purposes and therefore simply returns.  */
 

@@ -117,11 +117,9 @@ _tx_initialize_low_level:
     /* Configure handler priorities.  */
     LDR     r1, =0x00000000                         // Rsrv, UsgF, BusF, MemM
     STR     r1, [r0, #0xD18]                        // Setup System Handlers 4-7 Priority Registers
-
     LDR     r1, =0xFF000000                         // SVCl, Rsrv, Rsrv, Rsrv
     STR     r1, [r0, #0xD1C]                        // Setup System Handlers 8-11 Priority Registers
                                                     // Note: SVC must be lowest priority, which is 0xFF
-
     LDR     r1, =0x40FF0000                         // SysT, PnSV, Rsrv, DbgM
     STR     r1, [r0, #0xD20]                        // Setup System Handlers 12-15 Priority Registers
                                                     // Note: PnSV must be lowest priority, which is 0xFF
@@ -154,12 +152,16 @@ __tx_IntHandler:
 // VOID InterruptHandler (VOID)
 // {
     PUSH    {r0,lr}     // Save LR (and dummy r0 to maintain stack alignment)
-
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_enter             // Call the ISR enter function
+#endif
     /* Do interrupt handler work here */
     /* .... */
-
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_exit              // Call the ISR exit function
+#endif
     POP     {r0,lr}
-    BX      LR
+    BX      lr
 // }
 
 
@@ -174,9 +176,15 @@ SysTick_Handler:
 // VOID TimerInterruptHandler (VOID)
 // {
     PUSH    {r0,lr}     // Save LR (and dummy r0 to maintain stack alignment)
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_enter             // Call the ISR enter function
+#endif
     BL      _tx_timer_interrupt
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_exit              // Call the ISR exit function
+#endif
     POP     {r0,lr}
-    BX      LR
+    BX      lr
 // }
 
 
@@ -223,7 +231,7 @@ _unhandled_usage_loop:
     BL      _tx_thread_stack_error_handler          // Call ThreadX/user handler
     POP     {r0,lr}                                 // Restore LR and dummy reg
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     // Call the thread exit function to indicate the thread is no longer executing.
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
     BL      _tx_execution_thread_exit               // Call the thread exit function

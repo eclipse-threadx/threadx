@@ -150,7 +150,7 @@ Reset_Handler
 ;/*                                                                        */ 
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)

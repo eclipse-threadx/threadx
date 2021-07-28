@@ -20,15 +20,15 @@
 /**************************************************************************/
 /**************************************************************************/
 
-    .global      _tx_timer_time_slice
-    .global      _tx_timer_system_clock
-    .global      _tx_timer_current_ptr
-    .global      _tx_timer_list_start
-    .global      _tx_timer_list_end
-    .global      _tx_timer_expired_time_slice
-    .global      _tx_timer_expired
-    .global      _tx_thread_time_slice
-    .global      _tx_timer_expiration_process
+    .global _tx_timer_time_slice
+    .global _tx_timer_system_clock
+    .global _tx_timer_current_ptr
+    .global _tx_timer_list_start
+    .global _tx_timer_list_end
+    .global _tx_timer_expired_time_slice
+    .global _tx_timer_expired
+    .global _tx_thread_time_slice
+    .global _tx_timer_expiration_process
 
     .text
     .align 4
@@ -37,11 +37,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_timer_interrupt                               Cortex-M4/AC6     */
-/*                                                           6.1.2        */
+/*    _tx_timer_interrupt                              Cortex-Mx/AC6      */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -71,9 +71,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  08-02-2021     Scott Larson             Initial Version 6.1.8         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
@@ -249,5 +247,4 @@ __tx_timer_nothing_expired:
 
     DSB                                             // Complete all memory access
     BX      lr                                      // Return to caller
-
 // }

@@ -38,11 +38,11 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    None                                                                */
+/*    previous_posture                      Previous interrupt posture    */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    previous_posture                      Previous interrupt posture    */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -59,7 +59,7 @@
 /*  12-31-2020      Scott Larson            Initial Version 6.1.3         */
 /*                                                                        */
 /**************************************************************************/
-// VOID   _tx_thread_interrupt_restore(UINT new_posture)
+// VOID   _tx_thread_interrupt_restore(UINT previous_posture)
 // {
     .section .text
     .balign 4
@@ -70,7 +70,11 @@
 .type _tx_thread_interrupt_restore, function
 _tx_thread_interrupt_restore:
     /* Restore previous interrupt lockout posture.  */
+#ifdef TX_PORT_USE_BASEPRI
+    MSR     BASEPRI, r0
+#else
     MSR     PRIMASK, r0
+#endif
     BX      lr
 // }
     .end

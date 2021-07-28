@@ -29,13 +29,12 @@ SYSTICK_CYCLES      =     ((SYSTEM_CLOCK / 100) -1)
 STACK_SIZE          =     0x00000400
 HEAP_SIZE           =     0x00000000
 
-
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                          Cortex-M23/AC6    */
-/*                                                            6.1         */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -88,16 +87,15 @@ _tx_initialize_low_level:
     /* Set base of available memory to end of non-initialised RAM area.  */
     LDR     r0, =_tx_initialize_unused_memory       // Build address of unused memory pointer
     LDR     r1, =Image$$ARM_LIB_STACK$$ZI$$Limit    // Build first free address
-    ADDS    r1, r1, #4                              // 
+    ADDS    r1, r1, #4                              //
     STR     r1, [r0]                                // Setup first unused memory pointer
 
     /* Setup Vector Table Offset Register.  */
     LDR     r0, =0xE000ED08                         // Build address of NVIC registers
     LDR     r1, =__Vectors                          // Pickup address of vector table
-    STR     r1, [r0]                                // Set vector table address   
+    STR     r1, [r0]                                // Set vector table address
 
-//    /* Enable the cycle count register.  */
-//
+    /* Enable the cycle count register.  */
 //    LDR     r0, =0xE0001000                         // Build address of DWT register
 //    LDR     r1, [r0]                                // Pickup the current value
 //    ORR     r1, r1, #1                              // Set the CYCCNTENA bit
@@ -165,10 +163,14 @@ __tx_IntHandler:
 // VOID InterruptHandler (VOID)
 // {
     PUSH    {r0,lr}     // Save LR (and dummy r0 to maintain stack alignment)
-    
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_enter             // Call the ISR enter function
+#endif
     /* Do interrupt handler work here */
     /* .... */
-
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_exit              // Call the ISR exit function
+#endif
     POP     {r0, r1}
     MOV     lr, r1
     BX      lr
@@ -186,7 +188,13 @@ SysTick_Handler:
 // VOID TimerInterruptHandler (VOID)
 // {
     PUSH    {r0,lr}     // Save LR (and dummy r0 to maintain stack alignment)
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_enter             // Call the ISR enter function
+#endif
     BL      _tx_timer_interrupt
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_exit              // Call the ISR exit function
+#endif
     POP     {r0, r1}
     MOV     lr, r1
     BX      lr

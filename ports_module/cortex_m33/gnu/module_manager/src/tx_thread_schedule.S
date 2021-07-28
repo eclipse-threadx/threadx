@@ -80,37 +80,31 @@
     .thumb_func
 .type _tx_thread_schedule, function
 _tx_thread_schedule:
-
     /* This function should only ever be called on Cortex-M
        from the first schedule request. Subsequent scheduling occurs
        from the PendSV handling routine below. */
 
     /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
-
     MOV     r0, #0                                  // Build value for TX_FALSE
     LDR     r2, =_tx_thread_preempt_disable         // Build address of preempt disable flag
     STR     r0, [r2, #0]                            // Clear preempt disable flag
 
-    /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
-
 #ifdef __ARM_PCS_VFP
+    /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
     MRS     r0, CONTROL                             // Pickup current CONTROL register
     BIC     r0, r0, #4                              // Clear the FPCA bit
     MSR     CONTROL, r0                             // Setup new CONTROL register
 #endif
 
     /* Enable memory fault registers.  */
-
     LDR     r0, =0xE000ED24                         // Build SHCSR address
     LDR     r1, =0x70000                            // Enable Usage, Bus, and MemManage faults
     STR     r1, [r0]                                //
 
     /* Enable interrupts */
-
     CPSIE   i
 
     /* Enter the scheduler for the first time.  */
-
     MOV     r0, #0x10000000                         // Load PENDSVSET bit
     MOV     r1, #0xE000E000                         // Load NVIC base
     STR     r0, [r1, #0xD04]                        // Set PENDSVBIT in ICSR
@@ -238,7 +232,7 @@ BusFault_Handler:
 PendSV_Handler:
 __tx_ts_handler:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
@@ -349,7 +343,7 @@ __tx_ts_restore:
 
     STR     r5, [r4]                                // Setup global time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing.  */
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
@@ -412,8 +406,6 @@ _skip_vfp_restore:
     LDMIA   r12!, {r4-r11}                          // Recover thread's registers
     MSR     PSP, r12                                // Setup the thread's stack pointer
 
-    /* Return to thread.  */
-
     BX      lr                                      // Return to thread!
 
 
@@ -428,8 +420,8 @@ _skip_vfp_restore:
 SVC_Handler:
     TST     lr, #0x04                               // Determine return stack from EXC_RETURN bit 2
     ITE     EQ
-    MRSEQ   r0, MSP                                 // Get MSP
-    MRSNE   r0, PSP                                 // Get PSP
+    MRSEQ   r0, MSP                                 // Get MSP if return stack is MSP
+    MRSNE   r0, PSP                                 // Get PSP if return stack is PSP
 
     LDR     r1, [r0,#24]                            // Load saved PC from stack
     LDRB    r2, [r1,#-2]                            // Load SVC number
@@ -440,7 +432,7 @@ SVC_Handler:
 
     CMP     r2, #2                                  // Is it a secure stack free request?
     BEQ     _tx_svc_secure_free                     // Yes, go there
-#endif   // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
+#endif  // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
 
 
     CMP     r2, #3                                  // Is it the entry into ThreadX?
@@ -477,7 +469,6 @@ SVC_Handler:
     STR     r0, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
 #endif
-
     MRS     r3, PSP                                 // Pickup thread stack pointer
     TST     lr, #0x10                               // Test for extended module stack
     ITT     EQ
@@ -533,6 +524,27 @@ _tx_thread_user_return:
     STR     r1, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
 #endif
+
+    /* If lazy stacking is pending, check if it can be cleared.
+       if(LSPACT && tx_thread_module_stack_start < FPCAR && FPCAR < tx_thread_module_stack_end)
+       then clear LSPACT. */
+    LDR     r3, =0xE000EF34                         // Address of FPCCR
+    LDR     r3, [r3]                                // Load FPCCR
+    TST     r3, #1                                  // Check if LSPACT is set
+    BEQ     _tx_no_lazy_clear                       // if clear, move on
+    LDR     r1, =0xE000EF38                         // Address of FPCAR
+    LDR     r1, [r1]                                // Load FPCAR
+    LDR     r0, [r2, #0xA4]                         // Load kernel stack start
+    CMP     r1, r0                                  // If FPCAR < start, move on
+    BLO     _tx_no_lazy_clear
+    LDR     r0, [r2, #0xA8]                         // Load kernel stack end
+    CMP     r0, r1                                  // If end < FPCAR, move on
+    BLO     _tx_no_lazy_clear
+    BIC     r3, #1                                  // Clear LSPACT
+    LDR     r1, =0xE000EF34                         // Address of FPCCR
+    STR     r3, [r1]                                // Save updated FPCCR
+_tx_no_lazy_clear:
+
     LDR     r0, [r2, #0xB0]                         // Load the module thread stack pointer
     MRS     r3, PSP                                 // Pickup kernel stack pointer
     TST     r0, #1                                  // Is module stack extended?
@@ -542,14 +554,14 @@ _tx_thread_user_return:
     ORREQ   lr, lr, #0x10                           // Else set bit, return with standard frame
 
     /* Copy kernel hardware stack to module thread stack. */
-    LDM     r3!, {r1-r2}
-    STM     r0!, {r1-r2}
-    LDM     r3!, {r1-r2}
-    STM     r0!, {r1-r2}
-    LDM     r3!, {r1-r2}
-    STM     r0!, {r1-r2}
-    LDM     r3!, {r1-r2}
-    STM     r0!, {r1-r2}
+    LDM     r3!, {r1-r2}                            // Get r0, r1 from kernel stack
+    STM     r0!, {r1-r2}                            // Insert r0, r1 into thread stack
+    LDM     r3!, {r1-r2}                            // Get r2, r3 from kernel stack
+    STM     r0!, {r1-r2}                            // Insert r2, r3 into thread stack
+    LDM     r3!, {r1-r2}                            // Get r12, lr from kernel stack
+    STM     r0!, {r1-r2}                            // Insert r12, lr into thread stack
+    LDM     r3!, {r1-r2}                            // Get pc, xpsr from kernel stack
+    STM     r0!, {r1-r2}                            // Insert pc, xpsr into thread stack
     SUB     r0, r0, #32                             // Subtract 32 to get back to top of stack
     MSR     PSP, r0                                 // Set thread stack pointer
 
@@ -590,7 +602,7 @@ _tx_svc_secure_free:
     POP     {r12, lr}                               // Restore SP and EXC_RETURN
     STR     r0, [r12]                               // Store function return value
     BX      lr
-#endif   // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
+#endif  // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
 
 
 
@@ -633,6 +645,8 @@ _txm_module_user_mode_exit:
     .thumb_func
 .type _tx_vfp_access, function
 _tx_vfp_access:
+#if TX_ENABLE_FPU_SUPPORT
     VMOV.F32 s0, s0                                 // Simply access the VFP
+#endif
     BX       lr                                     // Return to caller
 .end

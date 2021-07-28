@@ -166,12 +166,12 @@ SysTick_Handler:
 ; {
 ;
     PUSH    {r0, lr}
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-    BL      _tx_execution_isr_enter             ; Call the ISR enter function
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_enter             // Call the ISR enter function
 #endif
     BL      _tx_timer_interrupt
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-    BL      _tx_execution_isr_exit              ; Call the ISR exit function
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_exit              // Call the ISR exit function
 #endif
     POP     {r0, r1}
     MOV     lr, r1

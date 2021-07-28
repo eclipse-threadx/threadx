@@ -153,7 +153,7 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
-xx-xx-xxxx  Release 6.1.7 changes:
+06-02-2021  Release 6.1.7 changes:
             readme_threadx.txt                  Updated instructions on how to use execution profile.
 
 04-02-2021  Release 6.1.6 changes:

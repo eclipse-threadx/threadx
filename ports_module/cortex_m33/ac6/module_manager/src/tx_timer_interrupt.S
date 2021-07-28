@@ -36,8 +36,7 @@
 /*    This function processes the hardware timer interrupt.  This         */
 /*    processing includes incrementing the system clock and checking for  */
 /*    time slice and/or timer expiration.  If either is found, the        */
-/*    interrupt context save/restore functions are called along with the  */
-/*    expiration functions.                                               */
+/*    expiration functions are called.                                    */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -63,8 +62,8 @@
 /*  12-31-2020      Scott Larson            Initial Version 6.1.3         */        
 /*                                                                        */
 /**************************************************************************/
-/* VOID   _tx_timer_interrupt(VOID)
-{ */
+// VOID   _tx_timer_interrupt(VOID)
+// {
     .section .text
     .balign 4
     .syntax unified
@@ -74,8 +73,7 @@
 .type _tx_timer_interrupt, function
 _tx_timer_interrupt:
 
-    /* Upon entry to this routine, it is assumed that context save has already
-       been called, and therefore the compiler scratch registers are available
+    /* Upon entry to this routine, it is assumed that the compiler scratch registers are available
        for use.  */
 
     /* Increment the system clock.  */
@@ -92,22 +90,23 @@ _tx_timer_interrupt:
 
     LDR     r3, =_tx_timer_time_slice               // Pickup address of time-slice
     LDR     r2, [r3, #0]                            // Pickup time-slice
-    CBZ     r2,  __tx_timer_no_time_slice           // Is it non-active?
+    CBZ     r2, __tx_timer_no_time_slice            // Is it non-active?
                                                     // Yes, skip time-slice processing
 
-   /* Decrement the time_slice.  */
-   // _tx_timer_time_slice--;
+       /* Decrement the time_slice.  */
+       // _tx_timer_time_slice--;
 
     SUB     r2, r2, #1                              // Decrement the time-slice
     STR     r2, [r3, #0]                            // Store new time-slice value
 
-   /* Check for expiration.  */
-   // if (__tx_timer_time_slice == 0)
+       /* Check for expiration.  */
+       // if (__tx_timer_time_slice == 0)
 
     CBNZ    r2, __tx_timer_no_time_slice            // Has it expired?
+                                                    // No, skip expiration processing
 
-   /* Set the time-slice expired flag.  */
-   // _tx_timer_expired_time_slice =  TX_TRUE;
+       /* Set the time-slice expired flag.  */
+       // _tx_timer_expired_time_slice =  TX_TRUE;
 
     LDR     r3, =_tx_timer_expired_time_slice       // Pickup address of expired flag
     MOV     r0, #1                                  // Build expired value
@@ -127,8 +126,8 @@ __tx_timer_no_time_slice:
     CBZ     r2, __tx_timer_no_timer                 // Is there anything in the list?
                                                     // No, just increment the timer
 
-    /* Set expiration flag.  */
-    // _tx_timer_expired =  TX_TRUE;
+        /* Set expiration flag.  */
+        // _tx_timer_expired =  TX_TRUE;
 
     LDR     r3, =_tx_timer_expired                  // Pickup expiration flag address
     MOV     r2, #1                                  // Build expired value
@@ -140,21 +139,21 @@ __tx_timer_no_time_slice:
     // {
 __tx_timer_no_timer:
 
-    /* No timer expired, increment the timer pointer.  */
-    // _tx_timer_current_ptr++;
+        /* No timer expired, increment the timer pointer.  */
+        // _tx_timer_current_ptr++;
 
     ADD     r0, r0, #4                              // Move to next timer
 
-    /* Check for wrap-around.  */
-    // if (_tx_timer_current_ptr == _tx_timer_list_end)
+        /* Check for wrap-around.  */
+        // if (_tx_timer_current_ptr == _tx_timer_list_end)
 
     LDR     r3, =_tx_timer_list_end                 // Pickup addr of timer list end
     LDR     r2, [r3, #0]                            // Pickup list end
     CMP     r0, r2                                  // Are we at list end?
     BNE     __tx_timer_skip_wrap                    // No, skip wrap-around logic
 
-        /* Wrap to beginning of list.  */
-        // _tx_timer_current_ptr =  _tx_timer_list_start;
+            /* Wrap to beginning of list.  */
+            // _tx_timer_current_ptr =  _tx_timer_list_start;
 
     LDR     r3, =_tx_timer_list_start               // Pickup addr of timer list start
     LDR     r0, [r3, #0]                            // Set current pointer to list start
@@ -165,7 +164,6 @@ __tx_timer_skip_wrap:
     // }
 
 __tx_timer_done:
-
 
     /* See if anything has expired.  */
     // if ((_tx_timer_expired_time_slice) || (_tx_timer_expired))
@@ -182,7 +180,7 @@ __tx_timer_done:
 
 __tx_something_expired:
 
-    STMDB   sp!, {r0, lr}                           // Save the lr register on the stack
+    PUSH    {r0, lr}                                // Save the lr register on the stack
                                                     //   and save r0 just to keep 8-byte alignment
 
     /* Did a timer expire?  */
@@ -194,8 +192,8 @@ __tx_something_expired:
     CBZ     r0, __tx_timer_dont_activate            // Check for timer expiration
                                                     // If not set, skip timer activation
 
-    /* Process timer expiration.  */
-    // _tx_timer_expiration_process();
+        /* Process timer expiration.  */
+        // _tx_timer_expiration_process();
 
     BL      _tx_timer_expiration_process            // Call the timer expiration handling routine
 
@@ -211,8 +209,8 @@ __tx_timer_dont_activate:
     CBZ     r2, __tx_timer_not_ts_expiration        // See if the flag is set
                                                     // No, skip time-slice processing
 
-    /* Time slice interrupted thread.  */
-    // _tx_thread_time_slice();
+        /* Time slice interrupted thread.  */
+        // _tx_thread_time_slice();
 
     BL      _tx_thread_time_slice                   // Call time-slice processing
     LDR     r0, =_tx_thread_preempt_disable         // Build address of preempt disable flag
@@ -223,17 +221,17 @@ __tx_timer_dont_activate:
     LDR     r2, =_tx_thread_execute_ptr             // Build execute thread pointer address
     LDR     r3, [r2]                                // Pickup the execute thread pointer
     LDR     r0, =0xE000ED04                         // Build address of control register
-    MOV     r2, 0x10000000                          // Build value for PendSV bit
+    LDR     r2, =0x10000000                         // Build value for PendSV bit
     CMP     r1, r3                                  // Are they the same?
     BEQ     __tx_timer_skip_time_slice              // If the same, there was no time-slice performed
     STR     r2, [r0]                                // Not the same, issue the PendSV for preemption
 __tx_timer_skip_time_slice:
-
     // }
 
 __tx_timer_not_ts_expiration:
 
-    LDMIA   sp!, {r0, lr}                           // Recover lr register (r0 is just there for
+    POP     {r0, lr}                                // Recover lr register (r0 is just there for
+                                                    //   the 8-byte stack alignment
 
     // }
 
@@ -241,6 +239,5 @@ __tx_timer_nothing_expired:
 
     DSB                                             // Complete all memory access
     BX      lr                                      // Return to caller
-
 // }
     .end

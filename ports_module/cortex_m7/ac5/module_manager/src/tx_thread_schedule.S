@@ -23,15 +23,15 @@
     IMPORT  _tx_thread_current_ptr
     IMPORT  _tx_thread_execute_ptr
     IMPORT  _tx_timer_time_slice
-    IF :DEF: TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     IMPORT  _tx_execution_thread_enter
     IMPORT  _tx_execution_thread_exit
-    ENDIF
+#endif
     IMPORT  _tx_thread_preempt_disable
     IMPORT  _txm_module_manager_memory_fault_handler
     IMPORT  _txm_module_manager_memory_fault_info
-    IMPORT _txm_module_priv
-    IMPORT _txm_module_user_mode_exit
+    IMPORT  _txm_module_priv
+    IMPORT  _txm_module_user_mode_exit
 
     AREA ||.text||, CODE, READONLY
     THUMB
@@ -91,7 +91,7 @@ _tx_thread_schedule
 
     /* This function should only ever be called on Cortex-M
        from the first schedule request. Subsequent scheduling occurs
-       from the PendSV handling routines below. */
+       from the PendSV handling routine below. */
 
     /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
 
@@ -99,22 +99,19 @@ _tx_thread_schedule
     LDR     r2, =_tx_thread_preempt_disable         // Build address of preempt disable flag
     STR     r0, [r2, #0]                            // Clear preempt disable flag
 
-    /* Clear CONTROL.FPCA bit so FPU registers aren't unnecessarily stacked.  */
-
-    IF {TARGET_FPU_VFP} = {TRUE}
+#ifdef __TARGET_FPU_VFP
+    /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
     MRS     r0, CONTROL                             // Pickup current CONTROL register
     BIC     r0, r0, #4                              // Clear the FPCA bit
     MSR     CONTROL, r0                             // Setup new CONTROL register
-    ENDIF
+#endif
 
     /* Enable memory fault registers.  */
-
     LDR     r0, =0xE000ED24                         // Build SHCSR address
     LDR     r1, =0x70000                            // Enable Usage, Bus, and MemManage faults
     STR     r1, [r0]                                //
 
     /* Enable interrupts */
-
     CPSIE   i
 
     /* Enter the scheduler for the first time.  */
@@ -136,7 +133,6 @@ __tx_wait_here
 
     EXPORT  MemManage_Handler
 MemManage_Handler
-
     CPSID   i                                       // Disable interrupts
 
     /* Now pickup and store all the fault related information.  */
@@ -195,21 +191,21 @@ MemManage_Handler
                                                     //     Bit 7 = 1 -> MMFAR is valid
     STRB    r1, [r0]                                // Clear the MMFSR
 
-    IF {TARGET_FPU_VFP} = {TRUE}
+#ifdef __TARGET_FPU_VFP
     LDR     r0, =0xE000EF34                         // Cleanup FPU context: Load FPCCR address
     LDR     r1, [r0]                                // Load FPCCR
     BIC     r1, r1, #1                              // Clear the lazy preservation active bit
-    STR     r1, [r0]                                // Store the value
-    ENDIF
+    STR     r1, [r0]                                // Save FPCCR
+#endif
 
     BL      _txm_module_manager_memory_fault_handler    // Call memory manager fault handler
 
-    IF :DEF: TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     BL      _tx_execution_thread_exit               // Call the thread exit function
     CPSIE   i                                       // Enable interrupts
-    ENDIF
+#endif
 
     MOV     r1, #0                                  // Build NULL value
     LDR     r0, =_tx_thread_current_ptr             // Pickup address of current thread pointer
@@ -236,14 +232,14 @@ __tx_PendSVHandler
 
 __tx_ts_handler
 
-    IF :DEF: TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
     BL      _tx_execution_thread_exit               // Call the thread exit function
     POP     {r0, lr}                                // Recover LR
     CPSIE   i                                       // Enable interrupts
-    ENDIF
+#endif
 
     LDR     r0, =_tx_thread_current_ptr             // Build current thread pointer address
     LDR     r2, =_tx_thread_execute_ptr             // Build execute thread pointer address
@@ -259,12 +255,12 @@ __tx_ts_handler
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r12, PSP                                // Pickup PSP pointer (thread's stack pointer)
     STMDB   r12!, {r4-r11}                          // Save its remaining registers
-    IF {TARGET_FPU_VFP} = {TRUE}
+#ifdef __TARGET_FPU_VFP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_save
     VSTMDB  r12!,{s16-s31}                          // Yes, save additional VFP registers
 _skip_vfp_save
-    ENDIF
+#endif
     LDR     r4, =_tx_timer_time_slice               // Build address of time-slice variable
     STMDB   r12!, {LR}                              // Save LR on the stack
 
@@ -336,12 +332,12 @@ __tx_ts_restore
 
     STR     r5, [r4]                                // Setup global time-slice
 
-    IF :DEF: TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing.  */
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
     POP     {r0, r1}                                // Recover r0 and r1
-    ENDIF
+#endif
 
     /* Restore the thread context and PSP.  */
 
@@ -384,12 +380,12 @@ __tx_ts_restore
     STR     r1, [r0]                                // Enable MPU
 skip_mpu_setup
     LDMIA   r12!, {LR}                              // Pickup LR
-    IF {TARGET_FPU_VFP} = {TRUE}
+#ifdef __TARGET_FPU_VFP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_restore                       // If not, skip VFP restore
     VLDMIA  r12!, {s16-s31}                         // Yes, restore additional VFP registers
 _skip_vfp_restore
-    ENDIF
+#endif
     LDMIA   r12!, {r4-r11}                          // Recover thread's registers
     MSR     PSP, r12                                // Setup the thread's stack pointer
 
@@ -437,22 +433,26 @@ __tx_SVCallHandler
 
     /* Switch to the module thread's kernel stack */
     LDR     r0, [r2, #0xA8]                         // Load the module kernel stack end
-    IF :LNOT: :DEF: TXM_MODULE_KERNEL_STACK_MAINTENANCE_DISABLE
+#ifndef TXM_MODULE_KERNEL_STACK_MAINTENANCE_DISABLE
     LDR     r1, [r2, #0xA4]                         // Load the module kernel stack start
     LDR     r3, [r2, #0xAC]                         // Load the module kernel stack size
     STR     r1, [r2, #12]                           // Set stack start
     STR     r0, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
-    ENDIF
+#endif
 
     MRS     r3, PSP                                 // Pickup thread stack pointer
+#ifdef __TARGET_FPU_VFP
     TST     lr, #0x10                               // Test for extended module stack
     ITT     EQ
     ORREQ   r3, r3, #1                              // If so, set LSB in thread stack pointer to indicate extended frame
     ORREQ   lr, lr, #0x10                           // Set bit, return with standard frame
+#endif
     STR     r3, [r2, #0xB0]                         // Save thread stack pointer
+#ifdef __TARGET_FPU_VFP
     BIC     r3, #1                                  // Clear possibly OR'd bit
-    
+#endif
+
     /* Build kernel stack by copying thread stack two registers at a time */
     ADD     r3, r3, #32                             // Start at bottom of hardware stack
     LDMDB   r3!, {r1-r2}
@@ -490,21 +490,46 @@ _tx_thread_user_return
     TST     r0, #2                                  // Check if memory protected
     BEQ     _tx_skip_kernel_stack_exit
 
-    IF :LNOT: :DEF: TXM_MODULE_KERNEL_STACK_MAINTENANCE_DISABLE
+#ifndef TXM_MODULE_KERNEL_STACK_MAINTENANCE_DISABLE
     LDR     r0, [r2, #0xB4]                         // Load the module thread stack start
     LDR     r1, [r2, #0xB8]                         // Load the module thread stack end
     LDR     r3, [r2, #0xBC]                         // Load the module thread stack size
     STR     r0, [r2, #12]                           // Set stack start
     STR     r1, [r2, #16]                           // Set stack end
     STR     r3, [r2, #20]                           // Set stack size
-    ENDIF
+#endif
+
+#ifdef __TARGET_FPU_VFP
+    /* If lazy stacking is pending, check if it can be cleared.
+       if(LSPACT && tx_thread_module_stack_start < FPCAR && FPCAR < tx_thread_module_stack_end)
+       then clear LSPACT. */
+    LDR     r3, =0xE000EF34                         // Address of FPCCR
+    LDR     r3, [r3]                                // Load FPCCR
+    TST     r3, #1                                  // Check if LSPACT is set
+    BEQ     _tx_no_lazy_clear                       // if clear, move on
+    LDR     r1, =0xE000EF38                         // Address of FPCAR
+    LDR     r1, [r1]                                // Load FPCAR
+    LDR     r0, [r2, #0xA4]                         // Load kernel stack start
+    CMP     r1, r0                                  // If FPCAR < start, move on
+    BLO     _tx_no_lazy_clear
+    LDR     r0, [r2, #0xA8]                         // Load kernel stack end
+    CMP     r0, r1                                  // If end < FPCAR, move on
+    BLO     _tx_no_lazy_clear
+    BIC     r3, #1                                  // Clear LSPACT
+    LDR     r1, =0xE000EF34                         // Address of FPCCR
+    STR     r3, [r1]                                // Save updated FPCCR
+_tx_no_lazy_clear:
+#endif
+
     LDR     r0, [r2, #0xB0]                         // Load the module thread stack pointer
     MRS     r3, PSP                                 // Pickup kernel stack pointer
+#ifdef __TARGET_FPU_VFP
     TST     r0, #1                                  // Is module stack extended?
     ITTE    NE                                      // If so...
     BICNE   lr, #0x10                               // Clear bit, return with extended frame
     BICNE   r0, #1                                  // Clear bit that indicates extended module frame
     ORREQ   lr, lr, #0x10                           // Else set bit, return with standard frame
+#endif
 
     /* Copy kernel hardware stack to module thread stack. */
     LDM     r3!, {r1-r2}
@@ -528,7 +553,7 @@ _tx_skip_kernel_stack_exit
     MSR     CONTROL, r0                             // Setup new CONTROL register
     BX      lr                                      // Return to thread
 
-    IF {TARGET_FPU_VFP} = {TRUE}
+#ifdef __TARGET_FPU_VFP
     EXPORT  tx_thread_fpu_enable
 tx_thread_fpu_enable
     EXPORT  tx_thread_fpu_disable
@@ -538,13 +563,13 @@ tx_thread_fpu_disable
        backward compatibility purposes and therefore simply returns.  */
 
     BX      LR                                      // Return to caller
-    
+
     EXPORT  _tx_vfp_access
 _tx_vfp_access
     VMOV.F32 s0, s0                                 // Simply access the VFP
     BX       lr                                     // Return to caller
-    
-    ENDIF
+
+#endif
 
     ALIGN 4
     END

@@ -33,8 +33,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_external_memory_enable      Cortex-M33/MPU/GNU  */
-/*                                                           6.1.5        */
+/*    _txm_module_manager_external_memory_enable         Cortex-M33       */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */

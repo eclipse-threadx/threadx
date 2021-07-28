@@ -33,7 +33,7 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txe_thread_secure_stack_allocate                 Cortex-M33/GNU    */
+/*    _tx_thread_secure_stack_allocate                    Cortex-M33      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */

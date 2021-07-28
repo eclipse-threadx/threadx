@@ -32,7 +32,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*  pthread_cond_timedwait                                PORTABLE C      */ 
-/*                                                           6.x          */ 
+/*                                                           6.1.7        */ 
 /*  AUTHOR                                                                */ 
 /*                                                                        */ 
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -91,7 +91,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
-/*  xx-xx-xxxx     William Lamie            Initial Version 6.x           */
+/*  06-02-2021     William Lamie            Initial Version 6.1.7         */
 /*                                                                        */ 
 /**************************************************************************/ 
 INT pthread_cond_timedwait(pthread_cond_t *cond,pthread_mutex_t *mutex,

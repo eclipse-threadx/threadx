@@ -94,6 +94,11 @@ The following extensions must also be defined in tx_port.h:
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 */
 
+
+/* Size of module heap.  */
+#define TXM_MODULE_HEAP_SIZE                    512
+
+
 /* Define the kernel stack size for a module thread.  */
 #ifndef TXM_MODULE_KERNEL_STACK_SIZE
 #define TXM_MODULE_KERNEL_STACK_SIZE            768
@@ -153,9 +158,9 @@ The following extensions must also be defined in tx_port.h:
 
 #define INLINE_DECLARE inline
 
-/* Define the number of MPU entries assigned to the code and data sections. On Cortex-M parts, there can only be 7 total
-   entries, since ThreadX uses one for access to the kernel dispatch function.  */
-
+/* Define the number of MPU entries assigned to the code and data sections.
+   On Cortex-M3 parts, there are 8 total entries. ThreadX uses one for access
+   to the kernel entry function, thus 7 remain for code and data protection.  */
 #define TXM_MODULE_MANAGER_CODE_MPU_ENTRIES     4
 #define TXM_MODULE_MANAGER_DATA_MPU_ENTRIES     3
 #define TXM_MODULE_MANAGER_SHARED_MPU_INDEX     8
@@ -322,7 +327,7 @@ ULONG _txm_module_manager_calculate_srd_bits(ULONG block_size, ULONG length);   
 ULONG _txm_module_manager_region_size_get(ULONG block_size);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
-CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M3/MPU/GNU Version 6.1 *";
+CHAR    _txm_module_manager_version_id[] =  \
+          "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M3/MPU/GNU Version 6.1.8 *";
 
 #endif

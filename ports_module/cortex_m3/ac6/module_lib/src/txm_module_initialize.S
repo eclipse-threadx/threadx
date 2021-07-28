@@ -2,6 +2,7 @@
 /*                                                                        */
 /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
 /*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
 /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
 /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
 /*       and in the root directory of this software.                      */
@@ -19,10 +20,8 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
     .global     __use_two_region_memory
     .global     __scatterload
-
 
     .eabi_attribute Tag_ABI_PCS_RO_data, 1
     .eabi_attribute Tag_ABI_PCS_R9_use,  1

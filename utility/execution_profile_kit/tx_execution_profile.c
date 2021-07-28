@@ -107,7 +107,7 @@ ULONG                                   _tx_execution_isr_nest_counter = 0;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_thread_enter                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -136,7 +136,7 @@ ULONG                                   _tx_execution_isr_nest_counter = 0;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_execution_thread_enter(void)
@@ -209,7 +209,7 @@ EXECUTION_TIME              new_total_time;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_thread_exit                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -238,7 +238,7 @@ EXECUTION_TIME              new_total_time;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_execution_thread_exit(void)
@@ -334,7 +334,7 @@ EXECUTION_TIME              delta_time;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_isr_enter                             PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -363,7 +363,7 @@ EXECUTION_TIME              delta_time;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_execution_isr_enter(void)
@@ -509,7 +509,7 @@ EXECUTION_TIME              delta_time;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_isr_exit                              PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -538,7 +538,7 @@ EXECUTION_TIME              delta_time;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_execution_isr_exit(void)
@@ -635,7 +635,7 @@ EXECUTION_TIME              delta_time;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_thread_time_reset                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -664,7 +664,7 @@ EXECUTION_TIME              delta_time;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_execution_thread_time_reset(TX_THREAD *thread_ptr)
@@ -683,7 +683,7 @@ UINT  _tx_execution_thread_time_reset(TX_THREAD *thread_ptr)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_thread_total_time_reset               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -712,7 +712,7 @@ UINT  _tx_execution_thread_time_reset(TX_THREAD *thread_ptr)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_execution_thread_total_time_reset(void)
@@ -752,7 +752,7 @@ UINT            total_threads;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_isr_time_reset                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -781,7 +781,7 @@ UINT            total_threads;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_execution_isr_time_reset(void)
@@ -800,7 +800,7 @@ UINT  _tx_execution_isr_time_reset(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_idle_time_reset                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -829,7 +829,7 @@ UINT  _tx_execution_isr_time_reset(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_execution_idle_time_reset(void)
@@ -848,7 +848,7 @@ UINT  _tx_execution_idle_time_reset(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_thread_time_get                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -878,7 +878,7 @@ UINT  _tx_execution_idle_time_reset(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_execution_thread_time_get(TX_THREAD *thread_ptr, EXECUTION_TIME *total_time)
@@ -897,7 +897,7 @@ UINT  _tx_execution_thread_time_get(TX_THREAD *thread_ptr, EXECUTION_TIME *total
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_thread_total_time_get                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -926,7 +926,7 @@ UINT  _tx_execution_thread_time_get(TX_THREAD *thread_ptr, EXECUTION_TIME *total
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_execution_thread_total_time_get(EXECUTION_TIME *total_time)
@@ -945,7 +945,7 @@ UINT  _tx_execution_thread_total_time_get(EXECUTION_TIME *total_time)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_isr_time_get                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -974,7 +974,7 @@ UINT  _tx_execution_thread_total_time_get(EXECUTION_TIME *total_time)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_execution_isr_time_get(EXECUTION_TIME *total_time)
@@ -993,7 +993,7 @@ UINT  _tx_execution_isr_time_get(EXECUTION_TIME *total_time)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_execution_idle_time_get                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1022,7 +1022,7 @@ UINT  _tx_execution_isr_time_get(EXECUTION_TIME *total_time)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_execution_idle_time_get(EXECUTION_TIME *total_time)

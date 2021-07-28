@@ -29,7 +29,6 @@ SYSTICK_CYCLES      =     ((SYSTEM_CLOCK / 100) -1)
 STACK_SIZE          =     0x00000400
 HEAP_SIZE           =     0x00000000
 
-
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -96,8 +95,7 @@ _tx_initialize_low_level:
     LDR     r1, =__Vectors                          // Pickup address of vector table
     STR     r1, [r0]                                // Set vector table address   
 
-//    /* Enable the cycle count register.  */
-//
+    /* Enable the cycle count register.  */
 //    LDR     r0, =0xE0001000                         // Build address of DWT register
 //    LDR     r1, [r0]                                // Pickup the current value
 //    ORR     r1, r1, #1                              // Set the CYCCNTENA bit

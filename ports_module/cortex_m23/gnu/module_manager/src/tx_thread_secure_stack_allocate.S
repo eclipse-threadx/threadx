@@ -57,7 +57,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_secure_stack_allocate(TX_THREAD *thread_ptr, ULONG stack_size)
@@ -80,7 +80,6 @@ _tx_alloc_return:
     BEQ     _alloc_return_interrupt_enabled
     CPSID   i               // Otherwise, disable interrupts
 #else
-    // Executing in single mode - this function is not needed.
     MOVS    r0, #0xFF       // Feature not enabled
 #endif
 _alloc_return_interrupt_enabled:

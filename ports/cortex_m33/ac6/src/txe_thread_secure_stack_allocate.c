@@ -33,8 +33,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_secure_stack_allocate                    PORTABLE C      */
-/*                                                            6.1         */
+/*    _tx_thread_secure_stack_allocate                    Cortex-M33      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -84,7 +84,6 @@ UINT    status;
     /* Check for an invalid thread pointer.  */
     if (thread_ptr == TX_NULL)
     {
-
         /* Thread pointer is invalid, return appropriate error code.  */
         status =  TX_THREAD_ERROR;
     }
@@ -92,7 +91,6 @@ UINT    status;
     /* Now check for invalid thread ID.  */
     else if (thread_ptr -> tx_thread_id != TX_THREAD_ID)
     {
-
         /* Thread pointer is invalid, return appropriate error code.  */
         status =  TX_THREAD_ERROR;
     }
@@ -111,7 +109,6 @@ UINT    status;
     /* Determine if everything is okay.  */
     if (status == TX_SUCCESS)
     {
-
         /* Call actual secure stack allocate function.  */
         status =  _tx_thread_secure_stack_allocate(thread_ptr, stack_size);
     }
@@ -120,4 +117,3 @@ UINT    status;
     return(status);
 #endif
 }
-

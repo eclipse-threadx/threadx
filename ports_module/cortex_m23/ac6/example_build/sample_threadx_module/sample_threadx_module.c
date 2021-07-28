@@ -300,8 +300,8 @@ UINT    status;
     while(1)
     {
         /* Test external memory sharing.  */
-        *(ULONG *)EXTERNAL_MEMORY = 0xABABABAB;
-        *(ULONG *)0x20040004 = 0x01010101;
+        // *(ULONG *)EXTERNAL_MEMORY = 0xABABABAB;
+        // *(ULONG *)0x20040004 = 0x01010101;
         
         /* Increment the thread counter.  */
         thread_2_counter++;

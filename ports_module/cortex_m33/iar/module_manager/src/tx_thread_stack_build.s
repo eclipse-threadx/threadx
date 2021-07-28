@@ -26,8 +26,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_stack_build                            Cortex-M/IAR      */
-/*                                                           6.1.5        */
+/*    _tx_thread_stack_build                            Cortex-M33/IAR    */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -59,14 +59,13 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021      Scott Larson            Initial Version 6.1.5         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 // {
     PUBLIC  _tx_thread_stack_build
 _tx_thread_stack_build:
-
     /* Build a fake interrupt frame.  The form of the fake interrupt stack
        on the Cortex-M should look like the following after it is built:
 
@@ -94,7 +93,11 @@ _tx_thread_stack_build:
     LDR     r2, [r0, #16]                           // Pickup end of stack area
     BIC     r2, r2, #0x7                            // Align frame for 8-byte alignment
     SUB     r2, r2, #68                             // Subtract frame size
-    LDR     r3, =0xFFFFFFFD                         // Build initial LR value
+#ifdef TX_SINGLE_MODE_SECURE
+    LDR     r3, =0xFFFFFFFD                         // Build initial LR value for secure mode
+#else
+    LDR     r3, =0xFFFFFFBC                         // Build initial LR value to return to non-secure PSP
+#endif
     STR     r3, [r2, #0]                            // Save on the stack
 
     /* Actually build the stack frame.  */

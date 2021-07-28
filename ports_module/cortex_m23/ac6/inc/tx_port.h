@@ -68,7 +68,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arm_compat.h>
-#include "ARMCM23_TZ.h"             /* For intrinsic functions. */
 
 /* Define ThreadX basic types for this port.  */
 

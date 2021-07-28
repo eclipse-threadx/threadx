@@ -75,14 +75,21 @@ _tx_thread_system_return:
        replaced with in-line assembly in tx_port.h to improved performance.  */
 
     MOV     r0, #0x10000000                         // Load PENDSVSET bit
-    LDR     r1, =0xE000E000                         // Load NVIC base
+    MOV     r1, #0xE000E000                         // Load NVIC base
     STR     r0, [r1, #0xD04]                        // Set PENDSVBIT in ICSR
     MRS     r0, IPSR                                // Pickup IPSR
     CMP     r0, #0                                  // Is it a thread returning?
     BNE     _isr_context                            // If ISR, skip interrupt enable
+#ifdef TX_PORT_USE_BASEPRI
+    MRS     r1, BASEPRI                             // Thread context returning, pickup BASEPRI
+    MOV     r0, #0
+    MSR     BASEPRI, r0                             // Enable interrupts
+    MSR     BASEPRI, r1                             // Restore original interrupt posture
+#else
     MRS     r1, PRIMASK                             // Thread context returning, pickup PRIMASK
     CPSIE   i                                       // Enable interrupts
     MSR     PRIMASK, r1                             // Restore original interrupt posture
+#endif
 _isr_context:
     BX      lr                                      // Return to caller
 // }

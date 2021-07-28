@@ -60,8 +60,8 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  11-09-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/

@@ -59,8 +59,8 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  11-09-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
@@ -73,7 +73,7 @@ _txm_module_manager_thread_stack_build:
        on the Cortex-M should look like the following after it is built:
 
        Stack Top:
-                    LR          Interrupted LR (LR at time of PENDSV)
+                    lr          Interrupted lr (lr at time of PENDSV)
                     r4          Initial value for r4
                     r5          Initial value for r5
                     r6          Initial value for r6

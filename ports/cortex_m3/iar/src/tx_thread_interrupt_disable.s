@@ -67,7 +67,7 @@ _tx_thread_interrupt_disable:
     /* Return current interrupt lockout posture.  */
 #ifdef TX_PORT_USE_BASEPRI
     MRS     r0, BASEPRI
-    LDR     r1, =TX_PORT_USE_BASEPRI
+    LDR     r1, =TX_PORT_BASEPRI
     MSR     BASEPRI, r1
 #else
     MRS     r0, PRIMASK

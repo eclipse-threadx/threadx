@@ -21,7 +21,11 @@ add_library("azrtos::${PROJECT_NAME}" ALIAS ${PROJECT_NAME})
 set(CUSTOM_INC_DIR ${CMAKE_CURRENT_BINARY_DIR}/custom_inc)
 
 # Pick up the port specific variables and apply them
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN})
+if(DEFINED THREADX_CUSTOM_PORT)
+    add_subdirectory(${THREADX_CUSTOM_PORT} threadx_port)
+else()
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN})
+endif()
 
 # Pick up the common stuff
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common)

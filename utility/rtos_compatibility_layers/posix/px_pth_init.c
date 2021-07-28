@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    is_posix_thread                                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -67,7 +67,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static INT is_posix_thread(TX_THREAD *thread_ptr)
@@ -86,7 +86,7 @@ static INT is_posix_thread(TX_THREAD *thread_ptr)
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_pthread_init                                  PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -117,7 +117,7 @@ static INT is_posix_thread(TX_THREAD *thread_ptr)
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  VOID    posix_pthread_init(VOID)
@@ -137,7 +137,7 @@ ULONG  index;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_reset_pthread_t                               PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -166,7 +166,7 @@ ULONG  index;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  VOID posix_reset_pthread_t (POSIX_TCB *ptcb)
@@ -180,7 +180,7 @@ ULONG  index;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_copy_pthread_attr                             PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -211,7 +211,7 @@ ULONG  index;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  VOID posix_copy_pthread_attr(POSIX_TCB *pthread_ptr,pthread_attr_t *attr)
@@ -235,7 +235,7 @@ ULONG  index;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_allocate_pthread_t                            PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -266,7 +266,7 @@ ULONG  index;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  INT posix_allocate_pthread_t(POSIX_TCB **ptcb_ptr)
@@ -318,7 +318,7 @@ ULONG           index;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_thread_wrapper                                PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -352,7 +352,7 @@ ULONG           index;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  VOID posix_thread_wrapper(ULONG pthr_ptr)
@@ -377,7 +377,7 @@ VOID             *value_ptr;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_thread2tcb                                    PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -407,7 +407,7 @@ VOID             *value_ptr;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  POSIX_TCB *posix_thread2tcb(TX_THREAD *thread_ptr)
@@ -441,7 +441,7 @@ POSIX_TCB   *p_tcb;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_tcb2thread                                    PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -471,7 +471,7 @@ POSIX_TCB   *p_tcb;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  TX_THREAD  *posix_tcb2thread (POSIX_TCB *pthread_ptr)
@@ -498,7 +498,7 @@ TX_THREAD   *thread;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_thread2tid                                    PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -528,7 +528,7 @@ TX_THREAD   *thread;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  pthread_t  posix_thread2tid(TX_THREAD *thread_ptr)
@@ -558,7 +558,7 @@ POSIX_TCB          *p_tcb;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_tid2thread                                    PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -587,7 +587,7 @@ POSIX_TCB          *p_tcb;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  TX_THREAD *posix_tid2thread(pthread_t ptid)
@@ -616,7 +616,7 @@ POSIX_TCB   *pthread;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_tid2tcb                                       PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -645,7 +645,7 @@ POSIX_TCB   *pthread;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  POSIX_TCB *posix_tid2tcb(pthread_t ptid)
@@ -668,7 +668,7 @@ POSIX_TCB   *pthread;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_destroy_pthread                               PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -701,7 +701,7 @@ POSIX_TCB   *pthread;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  VOID posix_destroy_pthread(POSIX_TCB *pthread_ptr, VOID *value_ptr)
@@ -736,7 +736,7 @@ INT          status;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_do_pthread_delete                             PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -771,7 +771,7 @@ INT          status;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
  VOID  posix_do_pthread_delete(POSIX_TCB *pthread_ptr, VOID *value_ptr)
@@ -844,7 +844,7 @@ ULONG        status;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_set_pthread_errno                              PORTABLE C     */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -875,7 +875,7 @@ ULONG        status;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 INT  posix_set_pthread_errno(ULONG errno_set)
@@ -900,7 +900,7 @@ POSIX_TCB   *pthread_ptr;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_get_pthread_errno                             PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -932,7 +932,7 @@ POSIX_TCB   *pthread_ptr;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 INT   posix_get_pthread_errno(pthread_t ptid)
