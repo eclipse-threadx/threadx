@@ -38,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_smp_high_level_initialize               PORTABLE SMP     */ 
-/*                                                           6.0.1        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -68,7 +68,11 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  12-31-2020     William E. Lamie         Modified comments, added      */
+/*                                            cast to address a MISRA     */
+/*                                            compliant issue,            */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 void  _tx_thread_smp_high_level_initialize(void)
@@ -95,7 +99,7 @@ void  _tx_thread_smp_high_level_initialize(void)
     TX_MEMSET(&_tx_thread_smp_protect_wait_list[0], 0xff, sizeof(_tx_thread_smp_protect_wait_list));
 
     /* Set the wait list size so we can access it from assembly functions.  */
-    _tx_thread_smp_protect_wait_list_size =  TX_THREAD_SMP_PROTECT_WAIT_LIST_SIZE;
+    _tx_thread_smp_protect_wait_list_size =  ((ULONG) TX_THREAD_SMP_PROTECT_WAIT_LIST_SIZE);
 
 #ifndef TX_THREAD_SMP_DYNAMIC_CORE_MAX
 

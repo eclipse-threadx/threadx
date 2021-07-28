@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M0/IAR     */
-/*                                                           6.0.1        */
+/*                                                           6.1.6        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,7 +47,10 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*                                            macro definition,           */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -187,12 +190,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #else
 #define TX_THREAD_EXTENSION_2          
 #endif
-#ifndef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 #define TX_THREAD_EXTENSION_3          
-#else
-#define TX_THREAD_EXTENSION_3           unsigned long long  tx_thread_execution_time_total; \
-                                        unsigned long long  tx_thread_execution_time_last_start; 
-#endif
 
 
 /* Define the port extensions of the remaining ThreadX objects.  */
@@ -349,7 +347,7 @@ __istate_t interrupt_save;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M0/IAR Version 6.0 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M0/IAR Version 6.1.6 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

@@ -1,0 +1,47 @@
+///////////////////////////////////////////////////////////////////////////////
+// RISC-V ilink configuration file.
+//
+
+define exported symbol _link_file_version_2 = 1;
+define exported symbol _auto_vector_setup = 1;
+define exported symbol _max_vector = 16;
+define exported symbol _CLINT = 1;
+
+define memory mem with size = 4G;
+
+define region RAM_region32 = mem:[from 0x80000000 to 0x8003FFFF];
+define region ROM_region32 = mem:[from 0x20000000 to 0x3FFFFFFF];
+
+initialize by copy { rw };
+do not initialize  { section *.noinit };
+
+define block CSTACK with alignment = 16, size = CSTACK_SIZE { };
+define block HEAP   with alignment = 16, size = HEAP_SIZE   { };
+
+define block MVECTOR with alignment = 128 { ro section .mintvec };
+
+if (isdefinedsymbol(_uses_clic))
+{
+  define block MINTERRUPT with alignment = 128 { ro section .mtext };
+  define block MINTERRUPTS { block MVECTOR,
+                             block MINTERRUPT };
+}
+else
+{
+  define block MINTERRUPTS with maximum size =  64k { ro section .mtext,
+                                                      midway block MVECTOR };
+}
+
+define block RW_DATA with static base GPREL { rw data };
+keep { symbol __iar_cstart_init_gp }; // defined in cstartup.s
+
+"CSTARTUP32" : place at start of ROM_region32 { ro section .cstartup };
+
+"ROM32":place in ROM_region32        { ro,
+                                       block MINTERRUPTS };
+
+"RAM32":place in RAM_region32        { block RW_DATA,
+                                       block HEAP,
+                                       block CSTACK };
+
+"RAM32":place in RAM_region32 { last section FREE_MEM};

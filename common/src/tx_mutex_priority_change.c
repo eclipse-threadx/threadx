@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_mutex_priority_change                           PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -70,7 +70,18 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
+/*  09-30-2020      William E. Lamie        Modified comment(s), and      */
+/*                                            change thread state from    */
+/*                                            TX_SUSPENDED to             */
+/*                                            TX_PRIORITY_CHANGE before   */
+/*                                            calling                     */
+/*                                            _tx_thread_system_suspend,  */
+/*                                            resulting in version 6.1    */
+/*  04-02-2021      Scott Larson            Modified comments, fixed      */
+/*                                            mapping current thread's    */
+/*                                            priority rather than next,  */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_mutex_priority_change(TX_THREAD *thread_ptr, UINT new_priority)
@@ -139,8 +150,8 @@ UINT            map_index;
         /* Increment the preempt disable flag.  */
         _tx_thread_preempt_disable++;
 
-        /* Set the state to suspended.  */
-        thread_ptr -> tx_thread_state =    TX_SUSPENDED;
+        /* Set the state to priority change.  */
+        thread_ptr -> tx_thread_state =    TX_PRIORITY_CHANGE;
 
         /* Call actual non-interruptable thread suspension routine.  */
         _tx_thread_system_ni_suspend(thread_ptr, ((ULONG) 0));
@@ -175,8 +186,8 @@ UINT            map_index;
         /* Increment the preempt disable flag.  */
         _tx_thread_preempt_disable =  _tx_thread_preempt_disable + ((UINT) 2);
 
-        /* Set the state to suspended.  */
-        thread_ptr -> tx_thread_state =    TX_SUSPENDED;
+        /* Set the state to priority change.  */
+        thread_ptr -> tx_thread_state =    TX_PRIORITY_CHANGE;
 
         /* Set the suspending flag. */
         thread_ptr -> tx_thread_suspending =  TX_TRUE;
@@ -301,15 +312,15 @@ UINT            map_index;
 #if TX_MAX_PRIORITIES > 32
 
                             /* Calculate the index into the bit map array.  */
-                            map_index =  (next_execute_ptr -> tx_thread_priority)/ ((UINT) 32);
+                            map_index =  (thread_ptr -> tx_thread_priority)/ ((UINT) 32);
 
                             /* Set the active bit to remember that the preempt map has something set.  */
-                            TX_DIV32_BIT_SET(next_execute_ptr -> tx_thread_priority, priority_bit)
+                            TX_DIV32_BIT_SET(thread_ptr -> tx_thread_priority, priority_bit)
                             _tx_thread_preempted_map_active =  _tx_thread_preempted_map_active | priority_bit;
 #endif
 
                             /* Remember that this thread was preempted by a thread above the thread's threshold.  */
-                            TX_MOD32_BIT_SET(next_execute_ptr -> tx_thread_priority, priority_bit)
+                            TX_MOD32_BIT_SET(thread_ptr -> tx_thread_priority, priority_bit)
                             _tx_thread_preempted_maps[MAP_INDEX] =  _tx_thread_preempted_maps[MAP_INDEX] | priority_bit;
                         }
 #endif

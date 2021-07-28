@@ -34,7 +34,7 @@ HEAP_SIZE           =     0x00000000
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                          Cortex-M33/AC6    */
-/*                                                           6.0.2        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -67,10 +67,7 @@ HEAP_SIZE           =     0x00000000
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
-/*  08-14-2020      Scott Larson            Modified comment(s), clean up */
-/*                                            whitespace, resulting       */
-/*                                            in version 6.0.2            */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_initialize_low_level(VOID)

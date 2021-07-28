@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_relinquish                              PORTABLE SMP     */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -70,7 +70,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_relinquish(VOID)
@@ -197,7 +197,7 @@ UINT            finished;
                this thread to the end of the priority list.  */
 
             /* Set the rebalance flag to true.  */
-            rebalance =  TX_FALSE;
+            rebalance =  TX_TRUE;
         }
      
         /* Determine if preemption-threshold is in force. */

@@ -1,6 +1,6 @@
 LICENSED HARDWARE LIST
 
-Last Updated: 2020-09-22
+Last Updated: 2021-04-01
 
 Microsoft has entered into OEM Agreements with manufacturers of the following
 microprocessors and microcontrollers (the “hardware”) to enable those
@@ -11,16 +11,33 @@ Production Use” rights in Section 2 of the Microsoft Software License Terms fo
 Microsoft Azure RTOS. If hardware is not listed below, you do not have those
 rights.
 
+
+STMicroelectronics:
+
+    STM32 MCUs
+    STM32 MPUs
+
+MediaTek:
+
+    MT3620 MCU (Azure Sphere)
+
 Microchip:
 
     PIC 32-bit MCUs
     SAM 32-bit MCUs
     SAM 32-bit MPUs
 
+NXP:
+
+    i.MX RT10xx and RT116x/7x series crossover MCUs
+    LPC5500 series
+
+
 Renesas:
 
     Synergy Platform
     RX Family of MCUs
+    RA Family of MCUs
     RZ Family of MPUs
 
 --------------------------------------------------------------------------------

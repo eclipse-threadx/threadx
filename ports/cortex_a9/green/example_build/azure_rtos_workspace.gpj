@@ -1,0 +1,12 @@
+#!gbuild
+primaryTarget=arm_standalone.tgt
+[Project]
+	-bsp generic
+	-G
+	-cpu=cortexa9
+	-littleendian
+sample_threadx.gpj		[Program]
+sample_threadx_el.gpj		[Program]
+tx.gpj		[Library]
+txe.gpj		[Library]
+..\readme_threadx.txt

@@ -1,0 +1,12 @@
+#!gbuild
+defineConfig ("Debug" "DBG" "tgt\debug.gpc")
+defineConfig ("Release" "REL" "tgt\release.gpc")
+primaryTarget=arm64_standalone.tgt
+#component top_level_project
+[Project]
+	-bsp generic
+	-cpu=cortexa53
+	:sourceDir=.
+tx\libtx.gpj		[Library]
+sample_threadx\sample_threadx.gpj		[Program]
+tgt\resources.gpj		[Project]

@@ -21,6 +21,9 @@
 @/**************************************************************************/
 @
 @
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                        
+    .global  _tx_execution_isr_exit
+#endif
     .global  _tx_thread_system_state
     .global  _tx_thread_current_ptr
     .global  _tx_thread_system_stack_ptr
@@ -38,7 +41,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_context_restore                        Cortex-M0/AC6     */
-@/*                                                           6.0.2        */
+@/*                                                           6.1          */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -72,10 +75,7 @@
 @/*                                                                        */
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
-@/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
-@/*                                            whitespace, resulting       */
-@/*                                            in version 6.0.2            */
+@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_context_restore(VOID)
@@ -84,6 +84,12 @@
     .thumb_func
 _tx_thread_context_restore:
 @
-@ /* Not needed for this port - just return!  */
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    /* Call the ISR exit function to indicate an ISR is complete.  */
+    PUSH    {r0, lr}                                // Save return address
+    BL      _tx_execution_isr_exit                  // Call the ISR exit function
+    POP     {r0, lr}                                // Recover return address
+#endif
+
     BX      lr
 @}

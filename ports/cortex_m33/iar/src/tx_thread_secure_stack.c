@@ -20,6 +20,7 @@
 /**************************************************************************/
 /**************************************************************************/
 
+
 #include "tx_api.h"
 
 /* If TX_SINGLE_MODE_SECURE or TX_SINGLE_MODE_NON_SECURE is defined, 
@@ -40,6 +41,10 @@
 #define TX_THREAD_SECURE_STACK_MAXIMUM     1024
 #endif
 
+/* 8 bytes added to stack size to "seal" stack. */
+#define TX_THREAD_STACK_SEAL_SIZE           8
+#define TX_THREAD_STACK_SEAL_VALUE          0xFEF5EDA5
+
 /* Secure stack info struct to hold stack start, stack limit, 
    current stack pointer, and pointer to owning thread. 
    This will be allocated for each thread with a secure stack. */
@@ -57,8 +62,8 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_secure_stack_initialize                Cortex-M33/IAR    */
-/*                                                           6.0.1        */
+/*    _tx_thread_secure_mode_stack_initialize           Cortex-M33/IAR    */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -73,7 +78,7 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    None                                                                */
+/*    status                                                              */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -90,22 +95,37 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
+/*                                            resulting in version 6.1.1  */
+/*  06-02-2021      Scott Larson            Change name, execute in       */
+/*                                            handler mode,               */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
-void    _tx_thread_secure_stack_initialize(void)
+UINT    _tx_thread_secure_mode_stack_initialize(void)
 {
-    
-    /* Set secure mode to use PSP. */
-    __set_CONTROL(__get_CONTROL() | 2);
-    
-    /* Set process stack pointer and stack limit to 0 to throw exception when a thread
-       without a secure stack calls a secure function that tries to use secure stack. */
-    __set_PSPLIM(0);
-    __set_PSP(0);
-    
-    return;
+UINT    status;
+
+    /* Make sure function is called from interrupt (threads should not call). */
+    if (__get_IPSR() == 0)
+    {
+        status = TX_CALLER_ERROR;
+    }
+    else
+    {
+        /* Set secure mode to use PSP. */
+        __set_CONTROL(__get_CONTROL() | 2);
+        
+        /* Set process stack pointer and stack limit to 0 to throw exception when a thread
+           without a secure stack calls a secure function that tries to use secure stack. */
+        __set_PSPLIM(0);
+        __set_PSP(0);
+        
+        status = TX_SUCCESS;
+    }
+    return status;
 }
 
 
@@ -114,8 +134,8 @@ void    _tx_thread_secure_stack_initialize(void)
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_secure_mode_stack_allocate               PORTABLE C      */
-/*                                                           6.0.1        */
+/*    _tx_thread_secure_mode_stack_allocate             Cortex-M33/IAR    */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -154,7 +174,10 @@ void    _tx_thread_secure_stack_initialize(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
+/*                                            added stack sealing,        */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -184,14 +207,13 @@ UCHAR   *stack_mem;
     
     else
     {
-    
         /* Allocate space for secure stack info. */
         info_ptr = calloc(1, sizeof(TX_THREAD_SECURE_STACK_INFO));
         
         if(info_ptr != TX_NULL)
         {
-            /* If stack info allocated, allocate a stack. */
-            stack_mem = malloc(stack_size);
+            /* If stack info allocated, allocate a stack & seal. */
+            stack_mem = malloc(stack_size + TX_THREAD_STACK_SEAL_SIZE);
             
             if(stack_mem != TX_NULL)
             {
@@ -200,6 +222,9 @@ UCHAR   *stack_mem;
                 info_ptr -> tx_thread_secure_stack_start = stack_mem + stack_size;
                 info_ptr -> tx_thread_secure_stack_ptr = info_ptr -> tx_thread_secure_stack_start;
                 info_ptr -> tx_thread_ptr = thread_ptr;
+                
+                /* Seal bottom of stack. */
+                *(ULONG*)info_ptr -> tx_thread_secure_stack_start = TX_THREAD_STACK_SEAL_VALUE;
                 
                 /* Save info pointer in thread. */
                 thread_ptr -> tx_thread_secure_stack_context = info_ptr;
@@ -236,8 +261,8 @@ UCHAR   *stack_mem;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_secure_mode_stack_free                   PORTABLE C      */
-/*                                                           6.0.1        */
+/*    _tx_thread_secure_mode_stack_free                 Cortex-M33/IAR    */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -269,7 +294,9 @@ UCHAR   *stack_mem;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -317,8 +344,8 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_secure_stack_context_save                PORTABLE C      */
-/*                                                           6.0.1        */
+/*    _tx_thread_secure_stack_context_save              Cortex-M33/IAR    */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -350,7 +377,11 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
+/*                                            resulting in version 6.1.1  */
+/*  06-02-2021      Scott Larson            Fix stack pointer save,       */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -383,7 +414,7 @@ ULONG   sp;
     }
     
     /* Save stack pointer. */
-    *(ULONG *) info_ptr -> tx_thread_secure_stack_ptr = sp;
+    info_ptr -> tx_thread_secure_stack_ptr = (VOID *) sp;
     
     /* Set process stack pointer and stack limit to 0 to throw exception when a thread
        without a secure stack calls a secure function that tries to use secure stack. */
@@ -399,8 +430,8 @@ ULONG   sp;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_secure_stack_context_restore             PORTABLE C      */
-/*                                                           6.0.1        */
+/*    _tx_thread_secure_stack_context_restore           Cortex-M33/IAR    */
+/*                                                           6.1.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -431,7 +462,9 @@ ULONG   sp;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  10-16-2020      Scott Larson            Modified comment(s),          */
+/*                                            resulting in version 6.1.1  */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))

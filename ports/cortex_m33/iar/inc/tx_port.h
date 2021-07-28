@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M33/IAR    */
-/*                                                           6.0.1        */
+/*                                                           6.1.7        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,7 +47,14 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  03-02-2021      Scott Larson            Modified comment(s), added    */
+/*                                            ULONG64_DEFINED,            */
+/*                                            resulting in version 6.1.5  */
+/*  06-02-2021      Yuxin Zhou              Modified comment(s), and      */
+/*                                            added symbol to enable      */
+/*                                            stack error handler,        */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -85,6 +92,7 @@ typedef unsigned long                           ULONG;
 typedef unsigned long long                      ULONG64;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
+#define ULONG64_DEFINED
 
 /* Function prototypes for this port. */
 struct  TX_THREAD_STRUCT;
@@ -92,6 +100,12 @@ UINT    _txe_thread_secure_stack_allocate(struct TX_THREAD_STRUCT *thread_ptr, U
 UINT    _txe_thread_secure_stack_free(struct TX_THREAD_STRUCT *thread_ptr);
 UINT    _tx_thread_secure_stack_allocate(struct TX_THREAD_STRUCT *tx_thread, ULONG stack_size);
 UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
+
+/* This port overrides tx_thread_stack_error_notify with an architecture specific version */
+#define TX_PORT_THREAD_STACK_ERROR_NOTIFY
+
+/* This port overrides tx_thread_stack_error_handler with an architecture specific version */
+#define TX_PORT_THREAD_STACK_ERROR_HANDLER
 
 /* This hardware has stack checking that we take advantage of - do NOT define. */
 #ifdef TX_ENABLE_STACK_CHECKING
@@ -254,14 +268,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 #endif
 
-
-#ifndef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 #define TX_THREAD_EXTENSION_3
-#else
-#define TX_THREAD_EXTENSION_3           unsigned long long  tx_thread_execution_time_total; \
-                                        unsigned long long  tx_thread_execution_time_last_start; 
-#endif
-
 
 /* Define the port extensions of the remaining ThreadX objects.  */
 
@@ -500,12 +507,6 @@ extern void    _tx_thread_secure_stack_initialize(void);
    is used to define a local function save area for the disable and restore
    macros.  */
 
-/* The embedded assembler blocks are design so as to be inlinable by the
-   armlink linker inlining. This requires them to consist of either a
-   single 32-bit instruction, or either one or two 16-bit instructions
-   followed by a "BX lr". Note that to reduce the critical region size, the
-   16-bit "CPSID i" instruction is preceeded by a 16-bit NOP */
-
 #ifdef TX_DISABLE_INLINE
 
 UINT                                            _tx_thread_interrupt_disable(VOID);
@@ -556,7 +557,7 @@ __istate_t interrupt_save;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M33/IAR Version 6.0.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M33/IAR Version 6.1.7 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];
@@ -565,8 +566,4 @@ extern  CHAR                    _tx_version_id[];
 #endif
 #endif
 
-
 #endif
-
-
-

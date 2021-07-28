@@ -277,7 +277,7 @@ const CHAR _tx_thread_special_string[] =
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_initialize                               PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -308,6 +308,11 @@ const CHAR _tx_thread_special_string[] =
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
+/*  06-02-2021     Yuxin Zhou               Modified comment(s), added    */
+/*                                            Execution Profile support,  */
+/*                                            resulting in version 6.1.7  */   
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_initialize(VOID)
@@ -437,7 +442,7 @@ VOID  _tx_thread_initialize(VOID)
 #ifdef TX_ENABLE_EVENT_TRACE
                             | (((ULONG) 1) << 8)
 #endif
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)
                             | (((ULONG) 1) << 7)
 #endif
 #if TX_PORT_SPECIFIC_BUILD_OPTIONS != 0

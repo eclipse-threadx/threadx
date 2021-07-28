@@ -43,12 +43,12 @@ jobs:
           directory: $HOME/arm-none-eabi-gcc-9-2019-q4
 
     # Get CMake into the environment
-    - name: Install cmake 3.17.1
-      uses: lukka/get-cmake@v3.17.1
+    - name: Install cmake 3.19.1
+      uses: lukka/get-cmake@v3.19.1
 
     # Get Ninja into the environment
     - name: Install ninja-build
-      uses: seanmiddleditch/gha-setup-ninja@v1
+      uses: seanmiddleditch/gha-setup-ninja@v3
 
     # Prepare the build system
     - name: Prepare build system

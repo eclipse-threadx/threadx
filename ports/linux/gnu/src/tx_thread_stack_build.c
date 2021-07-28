@@ -42,7 +42,7 @@ void *_tx_linux_thread_entry(void *ptr);
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_stack_build                              Linux/GNU       */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -80,12 +80,14 @@ void *_tx_linux_thread_entry(void *ptr);
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 {
 struct sched_param sp;
+
+    (VOID)function_ptr;
 
     /* Create the run semaphore for the thread.  This will allow the scheduler
        control over when the thread actually runs.  */

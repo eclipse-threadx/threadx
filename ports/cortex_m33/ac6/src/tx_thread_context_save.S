@@ -21,12 +21,15 @@
 /**************************************************************************/
 
 
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                        
+    .global  _tx_execution_isr_enter
+#endif
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_save                           Cortex-M33/AC6    */
-/*                                                           6.0.2        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -55,10 +58,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020      Scott Larson            Initial Version 6.0.1         */
-/*  08-14-2020      Scott Larson            Modified comment(s), remove   */
-/*                                            EPK, clean up whitespace    */
-/*                                            resulting in version 6.0.2  */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_save(VOID)
@@ -71,7 +71,16 @@
     .thumb_func
 .type _tx_thread_context_save, function
 _tx_thread_context_save:
-    /* Return to interrupt processing.  */
+
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)) 
+    /* Call the ISR enter function to indicate an ISR is starting.  */
+    PUSH    {r0, lr}                                // Save return address
+    BL      _tx_execution_isr_enter                 // Call the ISR enter function
+    POP     {r0, lr}                                // Recover return address
+#endif
+
+    /* Context is already saved - just return.  */
+
     BX      lr
 // }
     .end

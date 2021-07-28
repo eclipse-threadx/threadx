@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _txm_module_manager_object_memory_check             PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -68,7 +68,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_object_memory_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG object_size)
@@ -105,7 +105,7 @@ UINT  _txm_module_manager_object_memory_check(TXM_MODULE_INSTANCE *module_instan
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _txm_module_manager_created_object_check            PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -137,7 +137,7 @@ UINT  _txm_module_manager_object_memory_check(TXM_MODULE_INSTANCE *module_instan
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UCHAR _txm_module_manager_created_object_check(TXM_MODULE_INSTANCE *module_instance, VOID *object_ptr)
@@ -184,7 +184,7 @@ TXM_MODULE_ALLOCATED_OBJECT     *allocated_object_ptr;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _txm_module_manager_object_size_check               PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -216,7 +216,7 @@ TXM_MODULE_ALLOCATED_OBJECT     *allocated_object_ptr;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_object_size_check(ALIGN_TYPE object_ptr, ULONG object_size)
@@ -242,7 +242,7 @@ UINT                        return_value;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _txm_module_manager_name_compare                    PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -275,7 +275,7 @@ UINT                        return_value;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_object_name_compare(CHAR *search_name, UINT search_name_length, CHAR *object_name)
@@ -343,7 +343,7 @@ CHAR    object_name_char;
 /*                                                                        */ 
 /*    _txm_module_manager_util_code_allocation_size_and_alignment_get     */ 
 /*                                                        PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -378,7 +378,7 @@ CHAR    object_name_char;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_util_code_allocation_size_and_alignment_get(TXM_MODULE_PREAMBLE *module_preamble,

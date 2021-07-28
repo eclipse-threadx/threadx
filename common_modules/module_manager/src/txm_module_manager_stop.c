@@ -60,7 +60,7 @@ extern UINT  _txm_module_manager_usbx_stop(TXM_MODULE_INSTANCE *module_instance)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_stop                            PORTABLE C      */
-/*                                                           6.0.1        */
+/*                                                           6.1.5        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -108,7 +108,10 @@ extern UINT  _txm_module_manager_usbx_stop(TXM_MODULE_INSTANCE *module_instance)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  03-02-2021      Scott Larson            Modified comments, fix        */
+/*                                            object delete underflow,    */
+/*                                            resulting in version 6.1.5  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_stop(TXM_MODULE_INSTANCE *module_instance)
@@ -531,9 +534,8 @@ TXM_MODULE_ALLOCATED_OBJECT     *object_ptr;
 #endif
 
     /* Delete the allocated objects for this module.  */
-    while (module_instance -> txm_module_instance_object_list_count--)
+    while (module_instance -> txm_module_instance_object_list_count != 0)
     {
-
         /* Pickup the current object pointer.  */
         object_ptr =  module_instance -> txm_module_instance_object_list_head;
 
@@ -542,6 +544,9 @@ TXM_MODULE_ALLOCATED_OBJECT     *object_ptr;
 
         /* Release the object.  */
         _tx_byte_release((VOID *) object_ptr);
+
+        /* Decrement count.  */
+        module_instance -> txm_module_instance_object_list_count--;
     }
 
     /* Set the allocated list head pointer to NULL.  */

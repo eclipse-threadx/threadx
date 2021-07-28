@@ -26,9 +26,13 @@
     IMPORT  _tx_timer_time_slice
     IMPORT  _tx_thread_system_stack_ptr
     IMPORT  _tx_thread_preempt_disable
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))           
     IMPORT  _tx_execution_thread_enter
     IMPORT  _tx_execution_thread_exit
+#endif
+    IF :DEF:TX_LOW_POWER
+    IMPORT  tx_low_power_enter
+    IMPORT  tx_low_power_exit
     ENDIF
 ;
 ;
@@ -39,7 +43,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                               Cortex-M0/AC5     */
-;/*                                                           6.0.2        */
+;/*                                                           6.1.5        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -72,10 +76,10 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
-;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
-;/*                                            whitespace, resulting       */
-;/*                                            in version 6.0.2            */
+;/*  09-30-2020     William E. Lamie        Initial Version 6.1            */
+;/*  03-02-2021     Scott Larson            Modified comment(s), add       */
+;/*                                           low power code,              */
+;/*                                           resulting in version 6.1.5   */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -123,7 +127,7 @@ __tx_PendSVHandler
 ;
 __tx_ts_handler
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))           
 ;
 ;    /* Call the thread exit function to indicate the thread is no longer executing.  */
 ;
@@ -133,7 +137,7 @@ __tx_ts_handler
     POP     {r0, r1}                                ; Recover LR
     MOV     lr, r1                                  ;
     CPSIE   i                                       ; Enable interrupts
-    ENDIF
+#endif
     LDR     r0, =_tx_thread_current_ptr             ; Build current thread pointer address
     LDR     r2, =_tx_thread_execute_ptr             ; Build execute thread pointer address
     MOVS    r3, #0                                  ; Build NULL value
@@ -207,14 +211,14 @@ __tx_ts_restore
 ;
     STR     r5, [r4]                                ; Setup global time-slice
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))           
 ;
 ;    /* Call the thread entry function to indicate the thread is executing.  */
 ;
     PUSH    {r0, r1}                                ; Save r0/r1
     BL      _tx_execution_thread_enter              ; Call the thread execution enter function
     POP     {r0, r1}                                ; Recover r0/r1
-    ENDIF
+#endif
 ;
 ;    /* Restore the thread context and PSP.  */
 ;
@@ -244,11 +248,25 @@ __tx_ts_wait
     STR     r1, [r0]                                ; Store it in the current pointer
     CMP     r1, #0                                  ; If non-NULL, a new thread is ready!
     BNE     __tx_ts_ready                           ;
+
+    IF :DEF:TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_enter                      ; Possibly enter low power mode
+    POP     {r0-r3}
+    ENDIF
+
     IF :DEF:TX_ENABLE_WFI
     DSB                                             ; Ensure no outstanding memory transactions
     WFI                                             ; Wait for interrupt
     ISB                                             ; Ensure pipeline is flushed
     ENDIF
+
+    IF :DEF:TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_exit                       ; Exit low power mode
+    POP     {r0-r3}
+    ENDIF
+
 __tx_ts_ISB
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_wait                            ; Loop to continue waiting

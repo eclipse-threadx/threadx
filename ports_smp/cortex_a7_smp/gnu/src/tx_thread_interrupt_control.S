@@ -44,7 +44,7 @@ INT_MASK        =           0x80                @ Interrupt bit mask
 @/*  FUNCTION                                               RELEASE        */ 
 @/*                                                                        */ 
 @/*    _tx_thread_interrupt_control                    SMP/Cortex-A7/GNU   */ 
-@/*                                                           6.0.1        */
+@/*                                                            6.1         */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -74,7 +74,7 @@ INT_MASK        =           0x80                @ Interrupt bit mask
 @/*                                                                        */ 
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 @/*                                                                        */
 @/**************************************************************************/
 @UINT   _tx_thread_interrupt_control(UINT new_posture)

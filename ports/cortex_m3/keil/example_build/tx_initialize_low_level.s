@@ -92,8 +92,8 @@ Reset_Handler
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
-;/*    _tx_initialize_low_level                          Cortex-M3/RVDS    */
-;/*                                                           6.0.2        */
+;/*    _tx_initialize_low_level                          Cortex-M3/AC5     */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -126,10 +126,7 @@ Reset_Handler
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
-;/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
-;/*                                            whitespace, resulting       */
-;/*                                            in version 6.0.2            */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)

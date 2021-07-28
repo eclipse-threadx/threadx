@@ -36,7 +36,7 @@ extern VOID (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_stack_error_notify                     Cortex-M33/AC6    */
-/*                                                           6.0.1        */
+/*                                                            6.1         */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -68,7 +68,7 @@ extern VOID (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020     Scott Larson             Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_stack_error_notify(VOID (*stack_error_handler)(TX_THREAD *thread_ptr))

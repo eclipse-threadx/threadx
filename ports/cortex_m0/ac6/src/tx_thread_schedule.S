@@ -25,6 +25,14 @@
     .global  _tx_thread_execute_ptr
     .global  _tx_timer_time_slice
     .global  _tx_thread_system_stack_ptr
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))     
+    .global _tx_execution_thread_enter
+    .global _tx_execution_thread_exit
+#endif
+#ifdef TX_LOW_POWER
+    .global tx_low_power_enter
+    .global tx_low_power_exit
+#endif
 @
 @
     .text
@@ -35,7 +43,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_schedule                               Cortex-M0/AC6     */
-@/*                                                           6.0.2        */
+@/*                                                           6.1.5        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -68,10 +76,10 @@
 @/*                                                                        */
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
-@/*  08-14-2020     Scott Larson             Modified comment(s), clean up */
-@/*                                            whitespace, resulting       */
-@/*                                            in version 6.0.2            */
+@/*  09-30-2020     William E. Lamie        Initial Version 6.1            */
+@/*  03-02-2021     Scott Larson            Modified comment(s), add       */
+@/*                                           low power code,              */
+@/*                                           resulting in version 6.1.5   */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_schedule(VOID)
@@ -127,7 +135,7 @@ __tx_SVCallHandler:
     .thumb_func
 __tx_ts_handler:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))     
 @
 @    /* Call the thread exit function to indicate the thread is no longer executing.  */
 @
@@ -210,7 +218,7 @@ __tx_ts_restore:
 @
     STR     r5, [r4]                                @ Setup global time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))           
 @
 @    /* Call the thread entry function to indicate the thread is executing.  */
 @
@@ -247,11 +255,25 @@ __tx_ts_wait:
     STR     r1, [r0]                                @ Store it in the current pointer
     CMP     r1, #0                                  @ If non-NULL, a new thread is ready!
     BNE     __tx_ts_ready                           @
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_enter                      @ Possibly enter low power mode
+    POP     {r0-r3}
+#endif
+
 #ifdef TX_ENABLE_WFI
     DSB                                             @ Ensure no outstanding memory transactions
     WFI                                             @ Wait for interrupt
     ISB                                             @ Ensure pipeline is flushed
 #endif
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_exit                       @ Exit low power mode
+    POP     {r0-r3}
+#endif
+
     CPSIE   i                                       @ Enable interrupts
     B       __tx_ts_wait                            @ Loop to continue waiting
 @

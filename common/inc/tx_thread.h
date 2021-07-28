@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    tx_thread.h                                         PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -42,6 +42,12 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
+/*  11-09-2020     Yuxin Zhou               Modified comment(s), and      */
+/*                                            moved TX_THREAD_GET_SYSTEM_ */
+/*                                            STATE to tx_api.h,          */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -109,11 +115,11 @@
 
 
 /* Define the get system state macro. By default, it simply maps to the variable _tx_thread_system_state.  */
-   
+/* This symbol is moved to tx_api.h. Therefore removed from this file.     
 #ifndef TX_THREAD_GET_SYSTEM_STATE
 #define TX_THREAD_GET_SYSTEM_STATE()        _tx_thread_system_state
 #endif
-
+*/
 
 /* Define the check for whether or not to call the _tx_thread_system_return function.  A non-zero value
    indicates that _tx_thread_system_return should not be called.  */

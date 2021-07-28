@@ -195,7 +195,10 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
-06/30/2020  Initial ThreadX 6.0.1 for ARC HS using MetaWare tools.
+04-02-2021  Release 6.1.6 changes:
+            tx_port.h                           Updated macro definition
+
+09-30-2020  Initial ThreadX 6.1 for ARC HS using MetaWare tools.
 
 
 Copyright(c) 1996-2020 Microsoft Corporation

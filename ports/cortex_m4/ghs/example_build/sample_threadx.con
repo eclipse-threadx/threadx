@@ -1,0 +1,17 @@
+target_connection {
+     {
+        title = "Simulator"
+        type = "Custom"
+        short_type = "Custom"
+        args = "simarm -cpu=cortexm4 -fpu -rom_use_entry"
+        command = "simarm -cpu=cortexm4 -fpu -rom_use_entry"
+        logfile = ""
+        mode = "download"
+        setup_script = ""
+        run_mode_partner = ""
+        run_mode_policy = ""
+        sane = "yes"
+        log = "no"
+        timestamp = "0"
+    }
+}

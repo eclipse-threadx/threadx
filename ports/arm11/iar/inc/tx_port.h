@@ -1,23 +1,11 @@
-/**************************************************************************/ 
-/*                                                                        */ 
-/*            Copyright (c) 1996-2018 by Express Logic Inc.               */ 
-/*                                                                        */ 
-/*  This software is copyrighted by and is the sole property of Express   */ 
-/*  Logic, Inc.  All rights, title, ownership, or other interests         */ 
-/*  in the software remain the property of Express Logic, Inc.  This      */ 
-/*  software may only be used in accordance with the corresponding        */ 
-/*  license agreement.  Any unauthorized use, duplication, transmission,  */ 
-/*  distribution, or disclosure of this software is expressly forbidden.  */ 
+/**************************************************************************/
 /*                                                                        */
-/*  This Copyright notice may not be removed or modified without prior    */ 
-/*  written consent of Express Logic, Inc.                                */ 
-/*                                                                        */ 
-/*  Express Logic, Inc. reserves the right to modify this software        */ 
-/*  without notice.                                                       */ 
-/*                                                                        */ 
-/*  Express Logic, Inc.                     info@expresslogic.com         */
-/*  11423 West Bernardo Court               http://www.expresslogic.com   */
-/*  San Diego, CA  92127                                                  */
+/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
+/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+/*       and in the root directory of this software.                      */
 /*                                                                        */
 /**************************************************************************/
 
@@ -37,12 +25,12 @@
 /*                                                                        */ 
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
-/*    tx_port.h                                          ARM11/IAR        */ 
-/*                                                           6.0.1        */ 
+/*    tx_port.h                                           ARM11/IAR       */ 
+/*                                                           6.1.6        */ 
 /*                                                                        */
 /*  AUTHOR                                                                */ 
 /*                                                                        */ 
-/*    William E. Lamie, Express Logic, Inc.                               */ 
+/*    William E. Lamie, Microsoft Corporation                             */ 
 /*                                                                        */ 
 /*  DESCRIPTION                                                           */ 
 /*                                                                        */ 
@@ -59,8 +47,10 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
-/*  06-30-2020     William E. Lamie         Initial ARM11 IAR             */ 
-/*                                            Support Version 6.0.1       */ 
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */ 
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */ 
+/*                                            macro definition,           */ 
+/*                                            resulting in version 6.1.6  */ 
 /*                                                                        */ 
 /**************************************************************************/ 
 
@@ -347,9 +337,9 @@ __intrinsic void          __set_CPSR( unsigned long );
 
 
 #if (__VER__ < 8002000)
-#define TX_INTERRUPT_SAVE_AREA      unsigned long interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA      ULONG interrupt_save;
 #else
-#define TX_INTERRUPT_SAVE_AREA      unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA      UINT interrupt_save;
 #endif
 
 #define TX_DISABLE                  interrupt_save =  __get_CPSR(); \
@@ -385,7 +375,7 @@ void  _tx_thread_interrupt_restore(UINT old_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARM11/IAR Version 6.0.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARM11/IAR Version 6.1.6 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

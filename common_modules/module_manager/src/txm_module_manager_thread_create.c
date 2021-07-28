@@ -21,11 +21,15 @@
 /**************************************************************************/
 
 #define TX_SOURCE_CODE
+#define TX_THREAD_SMP_SOURCE_CODE
+
+
+/* Include necessary system files.  */
 
 #include "tx_api.h"
 #include "tx_trace.h"
-#include "tx_initialize.h"
 #include "tx_thread.h"
+#include "tx_initialize.h"
 #include "tx_timer.h"
 #include "txm_module.h"
 
@@ -35,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_thread_create                   PORTABLE C      */
-/*                                                           6.0.1        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -47,22 +51,22 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    thread_ptr                        Thread control block pointer      */
-/*    name                              Pointer to thread name string     */
-/*    shell_function                    Shell function of the thread      */
-/*    entry_function                    Entry function of the thread      */
-/*    entry_input                       32-bit input value to thread      */
-/*    stack_start                       Pointer to start of stack         */
-/*    stack_size                        Stack size in bytes               */
-/*    priority                          Priority of thread                */
-/*                                        (default 0-31)                  */
-/*    preempt_threshold                 Preemption threshold              */
-/*    time_slice                        Thread time-slice value           */
-/*    auto_start                        Automatic start selection         */
+/*    thread_ptr                            Thread control block pointer  */
+/*    name                                  Pointer to thread name string */
+/*    shell_function                        Shell function of the thread  */
+/*    entry_function                        Entry function of the thread  */
+/*    entry_input                           32-bit input value to thread  */
+/*    stack_start                           Pointer to start of stack     */
+/*    stack_size                            Stack size in bytes           */
+/*    priority                              Priority of thread            */
+/*                                            (default 0-31)              */
+/*    preempt_threshold                     Preemption threshold          */
+/*    time_slice                            Thread time-slice value       */
+/*    auto_start                            Automatic start selection     */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    status                            Completion status                 */
+/*    return status                         Thread create return status   */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -81,35 +85,39 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  12-31-2020      Scott Larson            Modified comment(s),          */
+/*                                            fix stack overlap checking, */
+/*                                            added 64-bit support,       */
+/*                                            added SMP support,          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name, VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *), 
-                               VOID (*entry_function)(ULONG), ULONG entry_input,
-                               VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
-                               ULONG time_slice, UINT auto_start, UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance)
+UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+                            VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
+                            VOID (*entry_function)(ULONG id), ULONG entry_input,
+                            VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                            ULONG time_slice, UINT auto_start,
+                            UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance)
 {
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD                       *next_thread;
-TX_THREAD                       *previous_thread;
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
-TX_THREAD                       *saved_thread_ptr;
-UINT                            saved_threshold =  0;
+#ifdef TX_THREAD_SMP
+UINT                    core_index;
 #endif
+TX_THREAD               *next_thread;
+TX_THREAD               *previous_thread;
+TX_THREAD               *saved_thread_ptr;
+UINT                    saved_threshold =  ((UINT) 0);
+UCHAR                   *temp_ptr;
 #ifdef TX_ENABLE_STACK_CHECKING
-ULONG                           new_stack_start;
+ALIGN_TYPE              new_stack_start;
+ALIGN_TYPE              updated_stack_start;
 #endif
-TXM_MODULE_THREAD_ENTRY_INFO    *thread_entry_info;
-VOID                            *stack_end;
-ULONG                           i;
-#ifndef TX_TIMER_PROCESS_IN_ISR
-TX_THREAD                       *current_thread;
-#endif
-#if TXM_MODULE_MEMORY_PROTECTION
-ULONG                           status;
-#endif
+TXM_MODULE_THREAD_ENTRY_INFO *thread_entry_info;
+VOID                    *stack_end;
+ULONG                   i;
 
     /* First, check for an invalid thread pointer.  */
     if (thread_ptr == TX_NULL)
@@ -145,42 +153,17 @@ ULONG                           status;
         /* Determine if this thread matches the thread in the list.  */
         if (thread_ptr == next_thread)
         {
-        
+
             break;
         }
 
         /* Check the stack pointer to see if it overlaps with this thread's stack.  */
- 
-        /*lint -e{946} suppress pointer comparison, since this is necessary. */
-        if (((UCHAR *) ((VOID *) stack_start)) >= ((UCHAR *) ((VOID *) next_thread -> tx_thread_stack_start)))
+        if ((((UCHAR *) ((VOID *) stack_start)) <= ((UCHAR *) ((VOID *) next_thread -> tx_thread_stack_end))) &&
+            (((UCHAR *) ((VOID *) stack_end)) >= ((UCHAR *) ((VOID *) next_thread -> tx_thread_stack_start))))
         {
-
-            /*lint -e{946} suppress pointer comparison, since this is necessary. */
-            if (((UCHAR *) ((VOID *) stack_start)) < ((UCHAR *) ((VOID *) next_thread -> tx_thread_stack_end)))
-            {
-        
-                /* This stack overlaps with an existing thread, clear the stack pointer to 
-                   force a stack error below.  */
-                stack_start =  TX_NULL;
-                break;
-            }
-        }
-
-        /* Check the end of the stack to see if it is inside this thread's stack area as well.  */
-
-        /*lint -e{946} suppress pointer comparison, since this is necessary. */
-        if (((UCHAR *) ((VOID *) stack_end)) >= ((UCHAR *) ((VOID *) next_thread -> tx_thread_stack_start)))
-        {
-
-            /*lint -e{946} suppress pointer comparison, since this is necessary. */
-            if (((UCHAR *) ((VOID *) stack_end)) < ((UCHAR *) ((VOID *) next_thread -> tx_thread_stack_end)))
-            {
-        
-                /* This stack overlaps with an existing thread, clear the stack pointer to 
-                   force a stack error below.  */
-                stack_start =  TX_NULL;
-                break;
-            }
+            /* Stacks overlap, clear the stack pointer to force a stack error below.  */
+            stack_start =  TX_NULL;
+            break;
         }
 
         /* Move to the next thread.  */
@@ -192,7 +175,7 @@ ULONG                           status;
 
     /* Decrement the preempt disable flag.  */
     _tx_thread_preempt_disable--;
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 
@@ -256,27 +239,30 @@ ULONG                           status;
     }
 
 #ifndef TX_TIMER_PROCESS_IN_ISR
-
-    /* Pickup thread pointer.  */
-    TX_THREAD_GET_CURRENT(current_thread)
-
-    /* Check for invalid caller of this function.  First check for a calling thread.  */
-    if (current_thread == &_tx_timer_thread)
     {
+        TX_THREAD *current_thread;
 
-        /* Invalid caller of this function, return appropriate error code.  */
-        return(TX_CALLER_ERROR);
+        /* Pickup thread pointer.  */
+        TX_THREAD_GET_CURRENT(current_thread)
+
+        /* Check for invalid caller of this function.  First check for a calling thread.  */
+        if (current_thread == &_tx_timer_thread)
+        {
+
+            /* Invalid caller of this function, return appropriate error code.  */
+            return(TX_CALLER_ERROR);
+        }
     }
 #endif
 
     /* Check for interrupt call.  */
     if (TX_THREAD_GET_SYSTEM_STATE() != 0)
     {
-    
+
         /* Now, make sure the call is from an interrupt and not initialization.  */
         if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
         {
-            
+
             /* Invalid caller of this function, return appropriate error code.  */
             return(TX_CALLER_ERROR);
         }
@@ -292,27 +278,28 @@ ULONG                           status;
 
 #ifdef TX_ENABLE_STACK_CHECKING
 
-    /* Ensure that there are two ULONG of 0xEF patterns at the top and 
+    /* Ensure that there are two ULONG of 0xEF patterns at the top and
        bottom of the thread's stack. This will be used to check for stack
        overflow conditions during run-time.  */
-    stack_size =  ((stack_size/sizeof(ULONG)) * sizeof(ULONG)) - sizeof(ULONG);
+    stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
 
     /* Ensure the starting stack address is evenly aligned.  */
-    new_stack_start =  ((((ULONG) stack_start) + (sizeof(ULONG) - 1) ) & (~(sizeof(ULONG) - 1)));
+    new_stack_start =  TX_POINTER_TO_ALIGN_TYPE_CONVERT(stack_start);
+    updated_stack_start =  ((((ULONG) new_stack_start) + ((sizeof(ULONG)) - ((ULONG) 1)) ) & (~((sizeof(ULONG)) - ((ULONG) 1))));
 
     /* Determine if the starting stack address is different.  */
-    if (new_stack_start != ((ULONG) stack_start))
+    if (new_stack_start != updated_stack_start)
     {
-    
+
         /* Yes, subtract another ULONG from the size to avoid going past the stack area.  */
-        stack_size =  stack_size - sizeof(ULONG);
+        stack_size =  stack_size - (sizeof(ULONG));
     }
 
     /* Update the starting stack pointer.  */
-    stack_start =  (VOID *) new_stack_start;
+    stack_start =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(updated_stack_start);
 #endif
 
-    /* Allocate the thread entry information at the top of thread's stack - Leaving one 
+    /* Allocate the thread entry information at the top of thread's stack - Leaving one
        ULONG worth of 0xEF pattern between the actual stack and the entry info structure.  */
     stack_size =  stack_size - (sizeof(TXM_MODULE_THREAD_ENTRY_INFO) + (3*sizeof(ULONG)));
 
@@ -321,53 +308,81 @@ ULONG                           status;
 
     /* Initialize thread control block to all zeros.  */
     TX_MEMSET(thread_ptr, 0, sizeof(TX_THREAD));
-    
+
 #if TXM_MODULE_MEMORY_PROTECTION
     /* If this is a memory protected module, allocate a kernel stack.  */
     if((module_instance -> txm_module_instance_property_flags) & TXM_MODULE_MEMORY_PROTECTION)
     {
+        ULONG status;
+
         /* Allocate kernel stack space. */
         status = _txm_module_manager_object_allocate((VOID **) &(thread_ptr -> tx_thread_module_kernel_stack_start), TXM_MODULE_KERNEL_STACK_SIZE, module_instance);
         if(status)
         {
             return(status);
         }
-        
+
 #ifndef TX_DISABLE_STACK_FILLING
         /* Set the thread stack to a pattern prior to creating the initial
            stack frame.  This pattern is used by the stack checking routines
            to see how much has been used.  */
         TX_MEMSET(thread_ptr -> tx_thread_module_kernel_stack_start, ((UCHAR) TX_STACK_FILL), TXM_MODULE_KERNEL_STACK_SIZE);
 #endif
-        
+
         /* Align kernel stack pointer.  */
         thread_ptr -> tx_thread_module_kernel_stack_end = (VOID *) (((ALIGN_TYPE)(thread_ptr -> tx_thread_module_kernel_stack_start) + TXM_MODULE_KERNEL_STACK_SIZE) & ~0x07);
 
         /* Set kernel stack size.  */
         thread_ptr -> tx_thread_module_kernel_stack_size = TXM_MODULE_KERNEL_STACK_SIZE;
     }
-    
+
     /* Place the stack parameters into the thread's control block.  */
-    thread_ptr -> tx_thread_module_stack_start =    stack_start;
-    thread_ptr -> tx_thread_module_stack_size =     stack_size;
+    thread_ptr -> tx_thread_module_stack_start =  stack_start;
+    thread_ptr -> tx_thread_module_stack_size =   stack_size;
 #endif
 
     /* Place the supplied parameters into the thread's control block.  */
-    thread_ptr -> tx_thread_name =              name;
-    thread_ptr -> tx_thread_entry =             entry_function;
-    thread_ptr -> tx_thread_entry_parameter =   entry_input;
-    thread_ptr -> tx_thread_stack_start =       stack_start;
-    thread_ptr -> tx_thread_stack_size =        stack_size;
-    thread_ptr -> tx_thread_stack_end =         (VOID *) (((UCHAR *) stack_start) + (stack_size-1));
+    thread_ptr -> tx_thread_name =                name_ptr;
+    thread_ptr -> tx_thread_entry =               entry_function;
+    thread_ptr -> tx_thread_entry_parameter =     entry_input;
+    thread_ptr -> tx_thread_stack_start =         stack_start;
+    thread_ptr -> tx_thread_stack_size =          stack_size;
+    thread_ptr -> tx_thread_priority =            priority;
+    thread_ptr -> tx_thread_user_priority =       priority;
+    thread_ptr -> tx_thread_time_slice =          time_slice;
+    thread_ptr -> tx_thread_new_time_slice =      time_slice;
+    thread_ptr -> tx_thread_inherit_priority =    ((UINT) TX_MAX_PRIORITIES);
+#ifdef TX_THREAD_SMP
+    thread_ptr -> tx_thread_smp_core_executing =  ((UINT) TX_THREAD_SMP_MAX_CORES);
+    thread_ptr -> tx_thread_smp_cores_excluded =  ((ULONG) 0);
+#ifndef TX_THREAD_SMP_DYNAMIC_CORE_MAX
+    thread_ptr -> tx_thread_smp_cores_allowed =   ((ULONG) TX_THREAD_SMP_CORE_MASK);
+#else
+    thread_ptr -> tx_thread_smp_cores_allowed =   (((ULONG) 1) << _tx_thread_smp_max_cores) - 1;
+#endif
+
+#ifdef TX_THREAD_SMP_ONLY_CORE_0_DEFAULT
+
+    /* Default thread creation such that core0 is the only allowed core for execution, i.e., bit 1 is set to exclude core1.  */
+    thread_ptr -> tx_thread_smp_cores_excluded =  (TX_THREAD_SMP_CORE_MASK & 0xFFFFFFFE);
+    thread_ptr -> tx_thread_smp_cores_allowed  =  1;
+
+    /* Default the timers to run on core 0 as well.  */
+    thread_ptr -> tx_thread_timer.tx_timer_internal_smp_cores_excluded =  (TX_THREAD_SMP_CORE_MASK & 0xFFFFFFFE);
+
+    /* Default the mapped to 0 too.  */
+    thread_ptr -> tx_thread_smp_core_mapped =  0;
+#endif
+#endif
+
+    /* Calculate the end of the thread's stack area.  */
+    temp_ptr =  TX_VOID_TO_UCHAR_POINTER_CONVERT(stack_start);
+    temp_ptr =  (TX_UCHAR_POINTER_ADD(temp_ptr, (stack_size - ((ULONG) 1))));
+    thread_ptr -> tx_thread_stack_end =         TX_UCHAR_TO_VOID_POINTER_CONVERT(temp_ptr);
 #if TXM_MODULE_MEMORY_PROTECTION
     thread_ptr -> tx_thread_module_stack_end =  thread_ptr -> tx_thread_stack_end;
-#endif
-    thread_ptr -> tx_thread_priority =          priority;
-    thread_ptr -> tx_thread_user_priority =     priority;
-    thread_ptr -> tx_thread_time_slice =        time_slice;
-    thread_ptr -> tx_thread_new_time_slice =    time_slice;
-    thread_ptr -> tx_thread_inherit_priority =  TX_MAX_PRIORITIES;
-    
+#endif /* TXM_MODULE_MEMORY_PROTECTION */
+
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
     /* Preemption-threshold is enabled, setup accordingly.  */
@@ -381,9 +396,9 @@ ULONG                           status;
 
         /* Preemption-threshold specified. Since specific preemption-threshold is not supported,
            disable all preemption.  */
-        thread_ptr -> tx_thread_preempt_threshold =       0;
-        thread_ptr -> tx_thread_user_preempt_threshold =  0;
-    } 
+        thread_ptr -> tx_thread_preempt_threshold =       ((UINT) 0);
+        thread_ptr -> tx_thread_user_preempt_threshold =  ((UINT) 0);
+    }
     else
     {
 
@@ -399,12 +414,15 @@ ULONG                           status;
     /* Setup the necessary fields in the thread timer block.  */
     TX_THREAD_CREATE_TIMEOUT_SETUP(thread_ptr)
 
+    /* Perform any additional thread setup activities for tool or user purpose.  */
+    TX_THREAD_CREATE_INTERNAL_EXTENSION(thread_ptr)
+
     /* Setup pointer to the thread entry information structure, which will live at the top of each
-       module thread's stack. This will allow the module thread entry function to avoid direct 
+       module thread's stack. This will allow the module thread entry function to avoid direct
        access to the actual thread control block.  */
     thread_entry_info =  (TXM_MODULE_THREAD_ENTRY_INFO *) (((UCHAR *) thread_ptr -> tx_thread_stack_end) + (2*sizeof(ULONG)) + 1);
     thread_entry_info =  (TXM_MODULE_THREAD_ENTRY_INFO *) (((ALIGN_TYPE)(thread_entry_info)) & (~0x3));
-    
+
     /* Build the thread entry information structure.  */
     thread_entry_info -> txm_module_thread_entry_info_thread =                   thread_ptr;
     thread_entry_info -> txm_module_thread_entry_info_module =                   module_instance;
@@ -420,9 +438,9 @@ ULONG                           status;
 
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
     thread_entry_info ->  txm_module_thread_entry_info_exit_notify =        thread_ptr -> tx_thread_entry_exit_notify;
-#else
+#else /* TX_DISABLE_NOTIFY_CALLBACKS */
     thread_entry_info ->  txm_module_thread_entry_info_exit_notify =        TX_NULL;
-#endif
+#endif /* TX_DISABLE_NOTIFY_CALLBACKS */
     if (thread_ptr -> tx_thread_entry == module_instance -> txm_module_instance_start_thread_entry)
         thread_entry_info ->  txm_module_thread_entry_info_start_thread =   TX_TRUE;
     else
@@ -438,7 +456,7 @@ ULONG                           status;
        with the actual stack pointer at the end of stack build.  */
     thread_ptr -> tx_thread_stack_ptr =  (VOID *) thread_entry_info;
 
-    /* Call the target specific stack frame building routine to build the 
+    /* Call the target specific stack frame building routine to build the
        thread's initial stack and to setup the actual stack pointer in the
        control block.  */
     _txm_module_manager_thread_stack_build(thread_ptr, shell_function);
@@ -457,7 +475,7 @@ ULONG                           status;
 
     /* Place the thread on the list of created threads.  First,
        check for an empty list.  */
-    if (_tx_thread_created_count++ == 0)
+    if (_tx_thread_created_count == TX_EMPTY)
     {
 
         /* The created thread list is empty.  Add thread to empty list.  */
@@ -478,14 +496,17 @@ ULONG                           status;
 
         /* Setup this thread's created links.  */
         thread_ptr -> tx_thread_created_previous =  previous_thread;
-        thread_ptr -> tx_thread_created_next =      next_thread;    
+        thread_ptr -> tx_thread_created_next =      next_thread;
     }
 
+    /* Increment the thread created count.  */
+    _tx_thread_created_count++;
+
     /* If trace is enabled, register this object.  */
-    TX_TRACE_OBJECT_REGISTER(TX_TRACE_OBJECT_TYPE_THREAD, thread_ptr, name, stack_start, stack_size)
+    TX_TRACE_OBJECT_REGISTER(TX_TRACE_OBJECT_TYPE_THREAD, thread_ptr, name_ptr, TX_POINTER_TO_ULONG_CONVERT(stack_start), stack_size)
 
     /* If trace is enabled, insert this event into the trace buffer.  */
-    TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_CREATE, thread_ptr, priority, stack_start, stack_size, TX_TRACE_THREAD_EVENTS)
+    TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_CREATE, thread_ptr, priority, TX_POINTER_TO_ULONG_CONVERT(stack_start), stack_size, TX_TRACE_THREAD_EVENTS)
 
     /* Register thread in the thread array structure.  */
     TX_EL_THREAD_REGISTER(thread_ptr)
@@ -493,12 +514,130 @@ ULONG                           status;
     /* Log this kernel call.  */
     TX_EL_THREAD_CREATE_INSERT
 
+#ifdef TX_THREAD_SMP
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+    /* Temporarily disable preemption.  */
+    _tx_thread_preempt_disable++;
+#endif
+
     /* Determine if an automatic start was requested.  If so, call the resume
        thread function and then check for a preemption condition.  */
     if (auto_start == TX_AUTO_START)
     {
 
+#ifdef TX_NOT_INTERRUPTABLE
+
+        /* Perform any additional activities for tool or user purpose.  */
+        TX_THREAD_CREATE_EXTENSION(thread_ptr)
+
+        /* Resume the thread!  */
+        _tx_thread_system_ni_resume(thread_ptr);
+
+#else
+
+        /* Restore previous interrupt posture.  */
+        TX_RESTORE
+
+        /* Perform any additional activities for tool or user purpose.  */
+        TX_THREAD_CREATE_EXTENSION(thread_ptr)
+
+        /* Call the resume thread function to make this thread ready.  */
+        _tx_thread_system_resume(thread_ptr);
+
+        /* Disable interrupts again.  */
+        TX_DISABLE
+#endif
+
+        /* Determine if the execution list needs to be re-evaluated.  */
+        if (_tx_thread_smp_current_state_get() >= TX_INITIALIZE_IN_PROGRESS)
+        {
+
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
+
+            /* Clear the preemption bit maps, since nothing has yet run during initialization.  */
+            TX_MEMSET(_tx_thread_preempted_maps, 0, sizeof(_tx_thread_preempted_maps));
+#if TX_MAX_PRIORITIES > 32
+            _tx_thread_preempted_map_active =  ((ULONG) 0);
+#endif
+
+            /* Clear the entry in the preempted thread list.  */
+            _tx_thread_preemption_threshold_list[priority] =  TX_NULL;
+#endif
+
+            /* Set the pointer to the thread currently with preemption-threshold set to NULL.  */
+            _tx_thread_preemption__threshold_scheduled =  TX_NULL;
+
+#ifdef TX_THREAD_SMP_DEBUG_ENABLE
+
+            /* Debug entry.  */
+            _tx_thread_smp_debug_entry_insert(12, 0, thread_ptr);
+#endif
+
+            /* Get the core index.  */
+            core_index =  TX_SMP_CORE_ID;
+
+            /* Call the rebalance routine. This routine maps cores and ready threads.  */
+            _tx_thread_smp_rebalance_execute_list(core_index);
+
+#ifdef TX_THREAD_SMP_DEBUG_ENABLE
+
+            /* Debug entry.  */
+            _tx_thread_smp_debug_entry_insert(13, 0, thread_ptr);
+#endif
+        }
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+#endif
+    }
+    else
+    {
+
+#ifdef TX_NOT_INTERRUPTABLE
+
+        /* Perform any additional activities for tool or user purpose.  */
+        TX_THREAD_CREATE_EXTENSION(thread_ptr)
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+#else
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+
+        /* Perform any additional activities for tool or user purpose.  */
+        TX_THREAD_CREATE_EXTENSION(thread_ptr)
+
+        /* Disable interrupts.  */
+        TX_DISABLE
+
+        /* Re-enable preemption.  */
+        _tx_thread_preempt_disable--;
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+
+        /* Check for preemption.  */
+        _tx_thread_system_preempt_check();
+#endif
+    }
+
+#else /* TX_THREAD_SMP */
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+    /* Temporarily disable preemption.  */
+    _tx_thread_preempt_disable++;
+#endif
+
+    /* Determine if an automatic start was requested.  If so, call the resume
+       thread function and then check for a preemption condition.  */
+    if (auto_start == TX_AUTO_START)
+    {
 
         /* Determine if the create call is being called from initialization.  */
         if (TX_THREAD_GET_SYSTEM_STATE() >= TX_INITIALIZE_IN_PROGRESS)
@@ -507,33 +646,32 @@ ULONG                           status;
             /* Yes, this create call was made from initialization.  */
 
             /* Pickup the current thread execute pointer, which corresponds to the
-               highest priority thread ready to execute.  Interrupt lockout is 
-               not required, since interrupts are assumed to be disabled during 
+               highest priority thread ready to execute.  Interrupt lockout is
+               not required, since interrupts are assumed to be disabled during
                initialization.  */
             saved_thread_ptr =  _tx_thread_execute_ptr;
 
             /* Determine if there is thread ready for execution.  */
             if (saved_thread_ptr != TX_NULL)
             {
-                
+
                 /* Yes, a thread is ready for execution when initialization completes.  */
 
                 /* Save the current preemption-threshold.  */
                 saved_threshold =  saved_thread_ptr -> tx_thread_preempt_threshold;
 
-                /* For initialization, temporarily set the preemption-threshold to the 
-                   priority level to make sure the highest-priority thread runs once 
+                /* For initialization, temporarily set the preemption-threshold to the
+                   priority level to make sure the highest-priority thread runs once
                    initialization is complete.  */
                 saved_thread_ptr -> tx_thread_preempt_threshold =  saved_thread_ptr -> tx_thread_priority;
             }
-        } 
+        }
         else
         {
 
             /* Simply set the saved thread pointer to NULL.  */
             saved_thread_ptr =  TX_NULL;
         }
-#endif
 
 #ifdef TX_NOT_INTERRUPTABLE
 
@@ -547,20 +685,15 @@ ULONG                           status;
         TX_RESTORE
 #else
 
-        /* Temporarily disable preemption.  */
-        _tx_thread_preempt_disable++;
-
         /* Restore previous interrupt posture.  */
         TX_RESTORE
 
         /* Perform any additional activities for tool or user purpose.  */
         TX_THREAD_CREATE_EXTENSION(thread_ptr)
 
-        /* Call the resume thread function to make this thread ready.  */ 
+        /* Call the resume thread function to make this thread ready.  */
         _tx_thread_system_resume(thread_ptr);
 #endif
- 
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
         /* Determine if the thread's preemption-threshold needs to be restored.  */
         if (saved_thread_ptr != TX_NULL)
@@ -569,15 +702,41 @@ ULONG                           status;
             /* Yes, restore the previous highest-priority thread's preemption-threshold. This
                can only happen if this routine is called from initialization.  */
             saved_thread_ptr -> tx_thread_preempt_threshold =  saved_threshold;
-        } 
-#endif
+        }
+    }
+    else
+    {
 
-        /* Interrupts are already restored, simply return success.  */
-        return(TX_SUCCESS);
+#ifdef TX_NOT_INTERRUPTABLE
+
+        /* Perform any additional activities for tool or user purpose.  */
+        TX_THREAD_CREATE_EXTENSION(thread_ptr)
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+#else
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+
+        /* Perform any additional activities for tool or user purpose.  */
+        TX_THREAD_CREATE_EXTENSION(thread_ptr)
+
+        /* Disable interrupts.  */
+        TX_DISABLE
+
+        /* Re-enable preemption.  */
+        _tx_thread_preempt_disable--;
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+
+        /* Check for preemption.  */
+        _tx_thread_system_preempt_check();
+#endif
     }
 
-    /* Restore interrupts.  */
-    TX_RESTORE
+#endif /* TX_THREAD_SMP */
 
     /* Return success.  */
     return(TX_SUCCESS);

@@ -41,7 +41,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_smp_initialize_wait                   Cortex-A5x-SMP/GNU */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -72,7 +72,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_initialize_wait
@@ -86,10 +86,17 @@ _tx_thread_smp_initialize_wait:
     /* Pickup the Core ID.   */
 
     MRS     x2, MPIDR_EL1                       // Pickup the core ID
+#ifdef TX_ARMV8_2
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x3, x2, #16, #8                     // Isolate cluster ID
+#endif
+    UBFX    x2, x2, #8, #8                      // Isolate core ID
+#else
 #if TX_THREAD_SMP_CLUSTERS > 1
     UBFX    x3, x2, #8, #8                      // Isolate cluster ID
 #endif
     UBFX    x2, x2, #0, #8                      // Isolate core ID
+#endif
 #if TX_THREAD_SMP_CLUSTERS > 1
     ADDS    x2, x2, x3, LSL #2                  // Calculate CPU ID
 #endif

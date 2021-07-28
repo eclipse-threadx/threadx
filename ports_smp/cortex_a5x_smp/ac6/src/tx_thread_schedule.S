@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                              Cortex-A5x-SMP/AC6 */
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -72,7 +72,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_schedule(VOID)
@@ -88,10 +88,17 @@ _tx_thread_schedule:
     /* Pickup the CPU ID.   */
 
     MRS     x20, MPIDR_EL1                      // Pickup the core ID
+#ifdef TX_ARMV8_2
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x1, x20, #16, #8                    // Isolate cluster ID
+#endif
+    UBFX    x20, x20, #8, #8                    // Isolate core ID
+#else
 #if TX_THREAD_SMP_CLUSTERS > 1
     UBFX    x1, x20, #8, #8                     // Isolate cluster ID
 #endif
     UBFX    x20, x20, #0, #8                    // Isolate core ID
+#endif
 #if TX_THREAD_SMP_CLUSTERS > 1
     ADDS    x20, x20, x1, LSL #2                // Calculate CPU ID
 #endif

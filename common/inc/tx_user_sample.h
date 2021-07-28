@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_user.h                                           PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1.5        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -44,7 +44,13 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
+/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
+/*                                            resulting in version 6.1    */
+/*  03-02-2021      Scott Larson            Modified comment(s),          */
+/*                                            added option to remove      */
+/*                                            FileX pointer,              */
+/*                                            resulting in version 6.1.5  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -74,6 +80,7 @@
         TX_DISABLE_PREEMPTION_THRESHOLD
         TX_DISABLE_REDUNDANT_CLEARING
         TX_DISABLE_NOTIFY_CALLBACKS
+        TX_NO_FILEX_POINTER
         TX_NOT_INTERRUPTABLE
         TX_TIMER_PROCESS_IN_ISR
    
@@ -94,6 +101,16 @@
 #define TX_THREAD_USER_EXTENSION                ????
 #define TX_TIMER_THREAD_STACK_SIZE              ????
 #define TX_TIMER_THREAD_PRIORITY                ????
+*/
+
+/* Determine if there is a FileX pointer in the thread control block.
+   By default, the pointer is there for legacy/backwards compatibility. 
+   The pointer must also be there for applications using FileX.
+   Define this to save space in the thread control block. 
+*/
+
+/*
+#define TX_NO_FILEX_POINTER
 */
 
 /* Determine if timer expirations (application timers, timeouts, and tx_thread_sleep calls 
@@ -153,7 +170,7 @@
    processing when not needed. The user will also have to comment out the call to 
    tx_timer_interrupt, which is typically made from assembly language in 
    tx_initialize_low_level. Note: if TX_NO_TIMER is used, the define TX_TIMER_PROCESS_IN_ISR
-   must also be used.  */
+   must also be used and tx_timer_initialize must be removed from ThreadX library.  */
 
 /*
 #define TX_NO_TIMER

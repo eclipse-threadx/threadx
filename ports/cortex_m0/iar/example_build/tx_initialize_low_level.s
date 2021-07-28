@@ -46,7 +46,7 @@ __tx_free_memory_start
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_initialize_low_level                          Cortex-M0/IAR     */
-;/*                                                           6.0.2        */
+;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -79,11 +79,7 @@ __tx_free_memory_start
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
-;/*  08-14-2020     Scott Larson             Modified comment(s), and      */
-;/*                                            commented out code for      */
-;/*                                            enabling DWT,               */
-;/*                                            resulting in version 6.0.2  */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)

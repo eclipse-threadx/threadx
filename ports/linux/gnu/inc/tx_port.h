@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                           Linux/GNU       */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,7 +47,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 
@@ -510,7 +510,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 #define tx_linux_mutex_lock(p)              pthread_mutex_lock(&p)
 #define tx_linux_mutex_unlock(p)            pthread_mutex_unlock(&p)
 #define tx_linux_mutex_recursive_unlock(p)  {\
-                                                int _recursive_count = tx_linux_mutex_recursive_count;\
+                                                int _recursive_count = (int)tx_linux_mutex_recursive_count;\
                                                 while(_recursive_count)\
                                                 {\
                                                     pthread_mutex_unlock(&p);\
@@ -539,7 +539,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation * ThreadX Linux/gcc Version 6.0 *";
+                                    "Copyright (c) Microsoft Corporation * ThreadX Linux/gcc Version 6.1 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

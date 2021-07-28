@@ -1,0 +1,45 @@
+#
+#
+#/* Define the Cortex-R7 vector area.  This should be located or copied to 0.  */
+#
+
+    .section    ".reset", .text
+    .globl  __vectors
+__vectors:
+    B       __entry                         # Reset goes to the entry function
+    LDR     pc,UNDEFINED                    # Undefined handler
+    LDR     pc,SWI                          # Software interrupt handler
+    LDR     pc,PREFETCH                     # Prefetch exception handler
+    LDR     pc,ABORT                        # Abort exception handler
+    LDR     pc,RESERVED                     # Reserved exception handler
+    LDR     pc,IRQ                          # IRQ interrupt handler
+    LDR     pc,FIQ                          # FIQ interrupt handler
+#
+#
+__entry:
+    LDR     sp,STACK                        # Setup stack pointer
+    LDR     pc,START                        # Jump to Green Hills startup
+#
+#
+STACK:
+    .data.w __ghsend_stack
+START:
+    .data.w _start                          # Reset goes to startup function
+UNDEFINED:
+    .data.w __tx_undefined                  # Undefined handler
+SWI:
+    .data.w __tx_swi_interrupt              # Software interrupt handler
+PREFETCH:
+    .data.w __tx_prefetch_handler           # Prefetch exception handler
+ABORT:
+    .data.w __tx_abort_handler              # Abort exception handler
+RESERVED:
+    .data.w __tx_reserved_handler           # Reserved exception handler
+IRQ:
+    .data.w __tx_irq_handler                # IRQ interrupt handler
+FIQ:
+    .data.w __tx_fiq_handler                # FIQ interrupt handler
+#
+#
+    .type __vectors,$function
+    .size __vectors,.-__vectors

@@ -10,37 +10,40 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Interface (API)                                              */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Interface (API)                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
-/*                                                                        */ 
-/*    txm_module.h                                        PORTABLE C      */ 
-/*                                                           6.0.1        */
+/**************************************************************************/
+/*                                                                        */
+/*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
+/*                                                                        */
+/*    txm_module.h                                        PORTABLE C      */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This file defines the basic module constants, interface structures, */ 
-/*    and function prototypes.                                            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This file defines the basic module constants, interface structures, */
+/*    and function prototypes.                                            */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     Scott Larson             Initial Version 6.0.1         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  12-31-2020      Scott Larson            Modified comment(s), added    */
+/*                                            port-specific extension,    */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -329,6 +332,8 @@ extern   "C" {
 #define TXM_MODULE_OBJECT_ALLOCATE_CALL                     95
 #define TXM_MODULE_OBJECT_DEALLOCATE_CALL                   96
 
+#define TXM_MODULE_PORT_EXTENSION_API_ID_START              500
+#define TXM_MODULE_PORT_EXTENSION_API_ID_END                999
 
 /* Determine the API call IDs for other components.  */
 
@@ -508,7 +513,7 @@ typedef struct TXM_MODULE_ALLOCATED_OBJECT_STRUCT
                         *txm_module_allocated_object_next,
                         *txm_module_allocated_object_previous;
     ULONG               txm_module_object_size;
-} TXM_MODULE_ALLOCATED_OBJECT;                  
+} TXM_MODULE_ALLOCATED_OBJECT;
 
 
 /*  Determine if module code is being compiled. If so, remap the ThreadX API to 
@@ -571,6 +576,7 @@ VOID  _txm_module_usbx_duo_callback_request(TXM_MODULE_CALLBACK_MESSAGE *callbac
    resident portion of the application.  */
    
 #define txm_module_manager_initialize                   _txm_module_manager_initialize
+#define txm_module_manager_absolute_load                _txm_module_manager_absolute_load
 #define txm_module_manager_in_place_load                _txm_module_manager_in_place_load
 #define txm_module_manager_file_load                    _txm_module_manager_file_load
 #define txm_module_manager_memory_load                  _txm_module_manager_memory_load
@@ -607,6 +613,7 @@ UINT  _txm_module_manager_application_request(ULONG request, ALIGN_TYPE param_1,
 UINT  _txm_module_manager_file_load(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, FX_MEDIA *media_ptr, CHAR *file_name);
 #endif
 UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_memory_size);
+UINT  _txm_module_manager_absolute_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location);
 UINT  _txm_module_manager_in_place_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location);
 UINT  _txm_module_manager_internal_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location, 
                                         ULONG code_size, VOID *code_allocation_ptr, ULONG code_allocation_size);

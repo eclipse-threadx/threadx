@@ -35,7 +35,7 @@
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_timer_interrupt                               ARC_HS/MetaWare   */
-;/*                                                           6.0.1        */
+;/*                                                           6.1.3        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -71,7 +71,11 @@
 ;/*                                                                        */ 
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  12-31-2020     Scott Larson             Modified comment(s), remove   */
+;/*                                            unneeded load of            */
+;/*                                            _tx_thread_preempt_disable, */
+;/*                                            resulting in version 6.1.3  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_timer_interrupt(VOID)
@@ -187,7 +191,6 @@ __tx_something_expired:
 ;    {
 ;
     ld      r2, [gp, _tx_timer_expired@sda]             ; Pickup timer expired flag
-    ld      r4, [gp, _tx_thread_preempt_disable@sda]    ; Pickup preempt disable
     breq    r2, 0, __tx_timer_dont_activate             ; If not set, skip expiration processing
 ;
 ;        /* Process the timer expiration.  */

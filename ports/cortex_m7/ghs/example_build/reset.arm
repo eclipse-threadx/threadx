@@ -1,0 +1,40 @@
+#
+#
+#/* Define the Cortex-M7 vector area.  */
+#
+
+    .section    ".reset", .text
+    .globl  __vectors
+__vectors:
+    .data.w __ghsend_stack                      # Reset and system stack ptr
+    .data.w __Reset_Handler                     # Reset goes to Reset Handler
+    .data.w __tx_NMIHandler                     # NMI
+    .data.w __tx_BadHandler                     # HardFault
+    .data.w 0                                   # MemManage
+    .data.w 0                                   # BusFault
+    .data.w 0                                   # UsageFault
+    .data.w 0                                   # 7
+    .data.w 0                                   # 8
+    .data.w 0                                   # 9
+    .data.w 0                                   # 10
+    .data.w __tx_SVCallHandler                  # SVCall
+    .data.w __tx_DBGHandler                     # Monitor
+    .data.w 0                                   # 13
+    .data.w __tx_PendSVHandler                  # PendSV
+    .data.w __tx_SysTickHandler                 # SysTick
+    .data.w __tx_IntHandler                     # Int 0
+    .data.w __tx_IntHandler                     # Int 1
+    .data.w __tx_IntHandler                     # Int 2
+    .data.w __tx_IntHandler                     # Int 3
+    .type __vectors,$object
+    .size __vectors,.-__vectors
+#
+#
+    .globl  __Reset_Handler
+__Reset_Handler:
+    CPSID   i                                   # Disable interrupts
+    LDR     r0,=_start                          # Build address of GHS startup code
+    BX      r0                                  # Enter GHS startup
+
+    .type __Reset_Handler,$function
+    .size __Reset_Handler,.-__Reset_Handler

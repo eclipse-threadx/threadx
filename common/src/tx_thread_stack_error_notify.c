@@ -26,6 +26,7 @@
 /* Include necessary system files.  */
 
 #include "tx_api.h"
+#ifndef TX_PORT_THREAD_STACK_ERROR_NOTIFY
 #include "tx_thread.h"
 #ifdef TX_ENABLE_STACK_CHECKING
 #include "tx_trace.h"
@@ -37,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_stack_error_notify                       PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -72,6 +73,12 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
+/*  06-02-2021     Yuxin Zhou               Modified comment(s), added    */
+/*                                            conditional compilation     */
+/*                                            for ARMv8-M (Cortex M23/33) */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_stack_error_notify(VOID (*stack_error_handler)(TX_THREAD *thread_ptr))
@@ -123,3 +130,4 @@ TX_INTERRUPT_SAVE_AREA
 #endif
 }
 
+#endif /* TX_PORT_THREAD_STACK_ERROR_NOTIFY */
