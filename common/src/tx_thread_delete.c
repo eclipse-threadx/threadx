@@ -83,7 +83,7 @@ UINT            status;
 
     /* Default status to success.  */
     status =  TX_SUCCESS;
-    
+
     /* Lockout interrupts while the thread is being deleted.  */
     TX_DISABLE
 
@@ -106,7 +106,7 @@ UINT            status;
     /* Determine if the delete operation is okay.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Yes, continue with deleting the thread.  */
 
         /* Perform any additional activities for tool or user purpose.  */
@@ -129,7 +129,7 @@ UINT            status;
 
         /* Decrement the number of created threads.  */
         _tx_thread_created_count--;
-        
+
         /* See if the thread is the only one on the list.  */
         if (_tx_thread_created_count == TX_EMPTY)
         {
@@ -149,7 +149,7 @@ UINT            status;
             /* See if we have to update the created list head pointer.  */
             if (_tx_thread_created_ptr == thread_ptr)
             {
-                        
+
                 /* Yes, move the head pointer to the next link. */
                 _tx_thread_created_ptr =  next_thread;
             }

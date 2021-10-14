@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Queue                                                               */
 /**                                                                       */
@@ -30,56 +30,58 @@
 #include "tx_queue.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_queue_create                                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_queue_create                                    PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates a message queue.  The message size and depth  */ 
-/*    of the queue is specified by the caller.                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    queue_ptr                         Pointer to queue control block    */ 
-/*    name_ptr                          Pointer to queue name             */ 
-/*    message_size                      Size of each queue message        */ 
-/*    queue_start                       Starting address of the queue area*/ 
-/*    queue_size                        Number of bytes in the queue      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SUCCESS                        Successful completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function creates a message queue.  The message size and depth  */
+/*    of the queue is specified by the caller.                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    queue_ptr                         Pointer to queue control block    */
+/*    name_ptr                          Pointer to queue name             */
+/*    message_size                      Size of each queue message        */
+/*    queue_start                       Starting address of the queue area*/
+/*    queue_size                        Number of bytes in the queue      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Successful completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size, 
+UINT  _tx_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size,
                         VOID *queue_start, ULONG queue_size)
 {
 
 TX_INTERRUPT_SAVE_AREA
 
-UINT            capacity;                       
-UINT            used_words;                     
+UINT            capacity;
+UINT            used_words;
 TX_QUEUE        *next_queue;
 TX_QUEUE        *previous_queue;
 
@@ -89,7 +91,7 @@ TX_QUEUE        *previous_queue;
 
     /* Setup the basic queue fields.  */
     queue_ptr -> tx_queue_name =             name_ptr;
-    
+
     /* Save the message size in the control block.  */
     queue_ptr -> tx_queue_message_size =  message_size;
 
@@ -98,7 +100,7 @@ TX_QUEUE        *previous_queue;
     capacity =    (UINT) (queue_size / ((ULONG) (((ULONG) message_size) * (sizeof(ULONG)))));
     used_words =  capacity * message_size;
 
-    /* Save the starting address and calculate the ending address of 
+    /* Save the starting address and calculate the ending address of
        the queue.  Note that the ending address is really one past the
        end!  */
     queue_ptr -> tx_queue_start =  TX_VOID_TO_ULONG_POINTER_CONVERT(queue_start);
@@ -143,7 +145,7 @@ TX_QUEUE        *previous_queue;
 
         /* Setup this queues's created links.  */
         queue_ptr -> tx_queue_created_previous =  previous_queue;
-        queue_ptr -> tx_queue_created_next =      next_queue;    
+        queue_ptr -> tx_queue_created_next =      next_queue;
     }
 
     /* Increment the created queue count.  */

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Initialize                                                          */
 /**                                                                       */
@@ -42,49 +42,49 @@ TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter                        PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter                        PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the first ThreadX function called during           */ 
-/*    initialization.  It is called from the application's "main()"       */ 
-/*    function.  It is important to note that this routine never          */ 
-/*    returns.  The processing of this function is relatively simple:     */ 
-/*    it calls several ThreadX initialization functions (if needed),      */ 
-/*    calls the application define function, and then invokes the         */ 
-/*    scheduler.                                                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_high_level_initialize  SMP initialization            */ 
-/*    _tx_thread_smp_current_state_set  Set system state for all cores    */ 
-/*    _tx_initialize_low_level          Low-level initialization          */ 
-/*    _tx_initialize_high_level         High-level initialization         */ 
-/*    tx_application_define             Application define function       */ 
-/*    _tx_thread_scheduler              ThreadX scheduling loop           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    main                              Application main program          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is the first ThreadX function called during           */
+/*    initialization.  It is called from the application's "main()"       */
+/*    function.  It is important to note that this routine never          */
+/*    returns.  The processing of this function is relatively simple:     */
+/*    it calls several ThreadX initialization functions (if needed),      */
+/*    calls the application define function, and then invokes the         */
+/*    scheduler.                                                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_high_level_initialize  SMP initialization            */
+/*    _tx_thread_smp_current_state_set  Set system state for all cores    */
+/*    _tx_initialize_low_level          Low-level initialization          */
+/*    _tx_initialize_high_level         High-level initialization         */
+/*    tx_application_define             Application define function       */
+/*    _tx_thread_scheduler              ThreadX scheduling loop           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    main                              Application main program          */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -102,8 +102,8 @@ ULONG   other_core_status, i;
 
         /* No, the initialization still needs to take place.  */
 
-        /* Ensure that the system state variable is set to indicate 
-           initialization is in progress.  Note that this variable is 
+        /* Ensure that the system state variable is set to indicate
+           initialization is in progress.  Note that this variable is
            later used to represent interrupt nesting.  */
         _tx_thread_smp_current_state_set(TX_INITIALIZE_IN_PROGRESS);
 
@@ -116,9 +116,9 @@ ULONG   other_core_status, i;
 
         /* Call the high-level SMP  Initialization.  */
         _tx_thread_smp_high_level_initialize();
-    
-        /* Invoke the high-level initialization to exercise all of the 
-           ThreadX components and the application's initialization 
+
+        /* Invoke the high-level initialization to exercise all of the
+           ThreadX components and the application's initialization
            function.  */
         _tx_initialize_high_level();
 
@@ -129,8 +129,8 @@ ULONG   other_core_status, i;
     /* Optional processing extension.  */
     TX_INITIALIZE_KERNEL_ENTER_EXTENSION
 
-    /* Ensure that the system state variable is set to indicate 
-       initialization is in progress.  Note that this variable is 
+    /* Ensure that the system state variable is set to indicate
+       initialization is in progress.  Note that this variable is
        later used to represent interrupt nesting.  */
     _tx_thread_system_state[0] =  TX_INITIALIZE_IN_PROGRESS;
 
@@ -147,7 +147,7 @@ ULONG   other_core_status, i;
 
         /* Release the other cores from initialization.  */
         _tx_thread_smp_release_cores_flag =  TX_TRUE;
-    
+
         /* Add all the status together...  Other cores must clear their system
            state before they they are released.  */
         other_core_status =  ((ULONG) 0);
@@ -158,7 +158,7 @@ ULONG   other_core_status, i;
         for (i = ((ULONG) 1); i < _tx_thread_smp_max_cores; i++)
 #endif
         {
-        
+
 
             /* Call port-specific memory synchronization primitive.  */
             TX_PORT_SPECIFIC_MEMORY_SYNCHRONIZATION
@@ -166,10 +166,10 @@ ULONG   other_core_status, i;
             /* Add the states of each subsequent core.  */
             other_core_status =  other_core_status + _tx_thread_system_state[i];
         }
-    
+
     } while (other_core_status != ((ULONG) 0));
-    
-    /* Set the system state in preparation for entering the thread 
+
+    /* Set the system state in preparation for entering the thread
        scheduler.  */
     _tx_thread_system_state[0] =  TX_INITIALIZE_IS_FINISHED;
 

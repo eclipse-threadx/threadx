@@ -83,7 +83,7 @@ UINT        status;
     TX_DISABLE
 
 #ifdef TX_ENABLE_EVENT_TRACE
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     TX_TRACE_IN_LINE_INSERT(TX_TRACE_TIMER_ACTIVATE, timer_ptr, 0, 0, 0, TX_TRACE_TIMER_EVENTS)
 #endif

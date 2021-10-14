@@ -90,7 +90,7 @@ UINT        status;
         /* Event flags group pointer is invalid, return appropriate error code.  */
         status =  TX_GROUP_ERROR;
     }
-    
+
     /* Now check for invalid event flag group ID.  */
     else if (group_ptr -> tx_event_flags_group_id != TX_EVENT_FLAGS_ID)
     {
@@ -107,7 +107,7 @@ UINT        status;
 
             if (set_option != TX_OR)
             {
-        
+
                 /* Invalid set events option, return appropriate error.  */
                 status =  TX_OPTION_ERROR;
             }

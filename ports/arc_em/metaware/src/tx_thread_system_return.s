@@ -28,7 +28,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_system_return                        ARCv2_EM/MetaWare   */
-;/*                                                           6.1.6        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -50,7 +50,7 @@
 ;/*                                                                        */
 ;/*  CALLS                                                                 */
 ;/*                                                                        */
-;/*    _tx_thread_schedule                   Thread scheduling loop        */
+;/*    _tx_thread_schedule_reenter           Thread scheduling loop        */
 ;/*                                                                        */
 ;/*  CALLED BY                                                             */
 ;/*                                                                        */
@@ -63,6 +63,9 @@
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 ;/*  04-02-2021     Andres Mlinar            Modified comments,            */
 ;/*                                            resulting in version 6.1.6  */
+;/*  10-15-2021     Andres Mlinar            Modified comments,            */
+;/*                                            use schedule reenter,       */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
@@ -121,7 +124,7 @@ _tx_thread_system_return:
     and     r2, r2, ~STATUS32_SC                        ; Clear the hardware stack checking enable bit (SC)
     kflag   r2                                          ; Disable hardware stack checking
     mov     r1, _tx_system_stack_top_address            ; Pickup top of system stack (lowest memory address)
-    sr		r1, [KSTACK_TOP]                            ; Setup KSTACK_TOP
+    sr      r1, [KSTACK_TOP]                            ; Setup KSTACK_TOP
     mov     r1, _tx_system_stack_base_address           ; Pickup base of system stack (highest memory address)
     sr      r1, [KSTACK_BASE]                           ; Setup KSTACK_BASE
     .endif
@@ -152,7 +155,7 @@ __tx_thread_dont_save_ts:
 ;    /* Clear the current thread pointer.  */
 ;    _tx_thread_current_ptr =  TX_NULL;
 ;
-    b.d     _tx_thread_schedule                         ; Return to scheduler..
+    b.d     _tx_thread_schedule_reenter                 ; Return to the scheduler
     st      r3, [gp, _tx_thread_current_ptr@sda]        ; ..clearing current thread pointer
 ;
 ;}

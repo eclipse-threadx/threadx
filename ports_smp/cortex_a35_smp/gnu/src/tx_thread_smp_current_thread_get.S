@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread - Low Level SMP Support                                      */
 /**                                                                       */
@@ -21,56 +21,46 @@
 /**************************************************************************/
 
 
-/*
-#define TX_SOURCE_CODE
-#define TX_THREAD_SMP_SOURCE_CODE
-*/
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_thread.h"
-#include "tx_timer.h"
-*/
-
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_current_thread_get                Cortex-A35-SMP/GNU */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_smp_current_thread_get                Cortex-A35-SMP/GCC */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function is gets the current thread of the calling core.       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function is gets the current thread of the calling core.       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX Components                                                  */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX Components                                                  */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*                                             added ARMv8.2-A support,   */
+/*                                             resulting in version 6.1.9 */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_current_thread_get
@@ -80,10 +70,17 @@ _tx_thread_smp_current_thread_get:
     MRS     x1, DAIF                            // Pickup current interrupt posture
     MSR     DAIFSet, 0x3                        // Lockout interrupts
     MRS     x2, MPIDR_EL1                       // Pickup the core ID
+#ifdef TX_ARMV8_2
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x3, x2, #16, #8                     // Isolate cluster ID
+#endif
+    UBFX    x2, x2, #8, #8                      // Isolate core ID
+#else
 #if TX_THREAD_SMP_CLUSTERS > 1
     UBFX    x3, x2, #8, #8                      // Isolate cluster ID
 #endif
     UBFX    x2, x2, #0, #8                      // Isolate core ID
+#endif
 #if TX_THREAD_SMP_CLUSTERS > 1
     ADDS    x2, x2, x3, LSL #2                  // Calculate CPU ID
 #endif
@@ -91,4 +88,3 @@ _tx_thread_smp_current_thread_get:
     LDR     x0, [x3, x2, LSL #3]                // Pickup the current thread pointer for this core
     MSR     DAIF, x1                            // Restore interrupt posture
     RET
-

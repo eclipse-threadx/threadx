@@ -62,7 +62,7 @@ $_tx_thread_schedule:
 @/*  FUNCTION                                               RELEASE        */ 
 @/*                                                                        */ 
 @/*    _tx_thread_schedule                               Cortex-A5/GNU     */ 
-@/*                                                           6.1          */
+@/*                                                           6.1.9        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -96,6 +96,9 @@ $_tx_thread_schedule:
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
+@/*                                            execution profile support,  */
+@/*                                            resulting in version 6.1.9  */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_schedule(VOID)
@@ -160,7 +163,7 @@ __tx_thread_schedule_loop:
 @    /* Switch to the thread's stack.  */
 @    sp =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;
 @
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 @
 @    /* Call the thread entry function to indicate the thread is executing.  */
 @

@@ -1,14 +1,14 @@
 del tx.a
-armasm -g --cpu=cortex-m7 --apcs=interwork tx_initialize_low_level.s
-armasm -g --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_stack_build.s
-armasm -g --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_schedule.s
-armasm -g --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_system_return.s
-armasm -g --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_context_save.s
-armasm -g --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_context_restore.s
-armasm -g --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_interrupt_control.s
-armasm -g --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_interrupt_disable.s
-armasm -g --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_interrupt_restore.s
-armasm -g --cpu=cortex-m7 --apcs=interwork ../src/tx_timer_interrupt.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork tx_initialize_low_level.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_stack_build.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_schedule.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_system_return.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_context_save.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_context_restore.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_interrupt_control.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_interrupt_disable.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork ../src/tx_thread_interrupt_restore.s
+armasm -g --cpreproc --cpu=cortex-m7 --apcs=interwork ../src/tx_timer_interrupt.s
 armcc -g --cpu=cortex-m7 -Otime -O2 -Odiv -c --data_reorder -I../../../../common/inc -I../inc ../../../../common/src/tx_block_allocate.c
 armcc -g --cpu=cortex-m7 -Otime -O2 -Odiv -c --data_reorder -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_cleanup.c
 armcc -g --cpu=cortex-m7 -Otime -O2 -Odiv -c --data_reorder -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_create.c

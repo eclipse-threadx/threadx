@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Queue                                                               */
 /**                                                                       */
@@ -31,50 +31,52 @@
 #include "tx_queue.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_queue_receive                                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_queue_receive                                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function receives a message from the specified queue. If there */ 
-/*    are no messages in the queue, this function waits according to the  */ 
-/*    option specified.                                                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    queue_ptr                         Pointer to queue control block    */ 
-/*    destination_ptr                   Pointer to message destination    */ 
-/*                                        **** MUST BE LARGE ENOUGH TO    */ 
-/*                                             HOLD MESSAGE ****          */ 
-/*    wait_option                       Suspension option                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_resume          Resume thread routine             */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*    _tx_thread_system_suspend         Suspend thread routine            */ 
-/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function receives a message from the specified queue. If there */
+/*    are no messages in the queue, this function waits according to the  */
+/*    option specified.                                                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    queue_ptr                         Pointer to queue control block    */
+/*    destination_ptr                   Pointer to message destination    */
+/*                                        **** MUST BE LARGE ENOUGH TO    */
+/*                                             HOLD MESSAGE ****          */
+/*    wait_option                       Suspension option                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_resume          Resume thread routine             */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*    _tx_thread_system_suspend         Suspend thread routine            */
+/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_queue_receive(TX_QUEUE *queue_ptr, VOID *destination_ptr, ULONG wait_option)
@@ -82,9 +84,9 @@ UINT  _tx_queue_receive(TX_QUEUE *queue_ptr, VOID *destination_ptr, ULONG wait_o
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *thread_ptr;    
-ULONG           *source;         
-ULONG           *destination;            
+TX_THREAD       *thread_ptr;
+ULONG           *source;
+ULONG           *destination;
 UINT            size;
 UINT            suspended_count;
 TX_THREAD       *next_thread;
@@ -116,7 +118,7 @@ UINT            status;
 
     /* Pickup the thread suspension count.  */
     suspended_count =  queue_ptr -> tx_queue_suspended_count;
-    
+
     /* Determine if there is anything in the queue.  */
     if (queue_ptr -> tx_queue_enqueued != TX_NO_MESSAGES)
     {
@@ -126,13 +128,13 @@ UINT            status;
         {
 
             /* There is a message waiting in the queue and there are no suspensi.  */
-            
+
             /* Setup source and destination pointers.  */
             source =       queue_ptr -> tx_queue_read;
             destination =  TX_VOID_TO_ULONG_POINTER_CONVERT(destination_ptr);
-            size =         queue_ptr -> tx_queue_message_size; 
+            size =         queue_ptr -> tx_queue_message_size;
 
-            /* Copy message. Note that the source and destination pointers are 
+            /* Copy message. Note that the source and destination pointers are
                incremented by the macro.  */
             TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
@@ -143,10 +145,10 @@ UINT            status;
                 /* Yes, wrap around to the beginning.  */
                 source =  queue_ptr -> tx_queue_start;
             }
-        
+
             /* Setup the queue read pointer.   */
             queue_ptr -> tx_queue_read =  source;
-        
+
             /* Increase the amount of available storage.  */
             queue_ptr -> tx_queue_available_storage++;
 
@@ -158,18 +160,18 @@ UINT            status;
         }
         else
         {
-        
+
             /* At this point we know the queue is full.  */
 
             /* Pickup thread suspension list head pointer.  */
             thread_ptr =  queue_ptr -> tx_queue_suspension_list;
 
             /* Now determine if there is a queue front suspension active.   */
-    
+
             /* Is the front suspension flag set?  */
             if (thread_ptr -> tx_thread_suspend_option == TX_TRUE)
             {
-        
+
                 /* Yes, a queue front suspension is present.  */
 
                 /* Return the message associated with this suspension.  */
@@ -177,13 +179,13 @@ UINT            status;
                 /* Setup source and destination pointers.  */
                 source =       TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_additional_suspend_info);
                 destination =  TX_VOID_TO_ULONG_POINTER_CONVERT(destination_ptr);
-                size =         queue_ptr -> tx_queue_message_size; 
+                size =         queue_ptr -> tx_queue_message_size;
 
-                /* Copy message. Note that the source and destination pointers are 
+                /* Copy message. Note that the source and destination pointers are
                    incremented by the macro.  */
                 TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
-                /* Message is now in the caller's destination. See if this is the only suspended thread 
+                /* Message is now in the caller's destination. See if this is the only suspended thread
                    on the list.  */
                 suspended_count--;
                 if (suspended_count == TX_NO_SUSPENSIONS)
@@ -207,8 +209,8 @@ UINT            status;
                     previous_thread =                              thread_ptr -> tx_thread_suspended_previous;
                     next_thread -> tx_thread_suspended_previous =  previous_thread;
                     previous_thread -> tx_thread_suspended_next =  next_thread;
-                } 
- 
+                }
+
                 /* Decrement the suspension count.  */
                 queue_ptr -> tx_queue_suspended_count =  suspended_count;
 
@@ -218,7 +220,7 @@ UINT            status;
                 thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 
                 /* Put return status into the thread control block.  */
-                thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;        
+                thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;
 
 #ifdef TX_NOT_INTERRUPTABLE
 
@@ -242,16 +244,16 @@ UINT            status;
             else
             {
 
-                /* At this point, we know that the queue is full and there 
+                /* At this point, we know that the queue is full and there
                    are one or more threads suspended trying to send another
                    message to this queue.  */
 
                 /* Setup source and destination pointers.  */
                 source =       queue_ptr -> tx_queue_read;
                 destination =  TX_VOID_TO_ULONG_POINTER_CONVERT(destination_ptr);
-                size =         queue_ptr -> tx_queue_message_size; 
+                size =         queue_ptr -> tx_queue_message_size;
 
-                /* Copy message. Note that the source and destination pointers are 
+                /* Copy message. Note that the source and destination pointers are
                    incremented by the macro.  */
                 TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
@@ -265,7 +267,7 @@ UINT            status;
 
                 /* Setup the queue read pointer.   */
                 queue_ptr -> tx_queue_read =  source;
-  
+
                 /* Disable preemption.  */
                 _tx_thread_preempt_disable++;
 
@@ -287,16 +289,16 @@ UINT            status;
                 /* Setup source and destination pointers.  */
                 source =       TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_additional_suspend_info);
                 destination =  queue_ptr -> tx_queue_write;
-                size =         queue_ptr -> tx_queue_message_size; 
+                size =         queue_ptr -> tx_queue_message_size;
 
-                /* Copy message. Note that the source and destination pointers are 
+                /* Copy message. Note that the source and destination pointers are
                    incremented by the macro.  */
                 TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
                 /* Determine if we are at the end.  */
                 if (destination == queue_ptr -> tx_queue_end)
                 {
-            
+
                     /* Yes, wrap around to the beginning.  */
                     destination =  queue_ptr -> tx_queue_start;
                 }
@@ -307,7 +309,7 @@ UINT            status;
                 /* Pickup thread pointer.  */
                 thread_ptr =  queue_ptr -> tx_queue_suspension_list;
 
-                /* Message is now in the queue.  See if this is the only suspended thread 
+                /* Message is now in the queue.  See if this is the only suspended thread
                    on the list.  */
                 suspended_count--;
                 if (suspended_count == TX_NO_SUSPENSIONS)
@@ -331,8 +333,8 @@ UINT            status;
                     previous_thread =                               thread_ptr -> tx_thread_suspended_previous;
                     next_thread -> tx_thread_suspended_previous =   previous_thread;
                     previous_thread -> tx_thread_suspended_next =   next_thread;
-                }    
- 
+                }
+
                 /* Decrement the suspension count.  */
                 queue_ptr -> tx_queue_suspended_count =  suspended_count;
 
@@ -342,7 +344,7 @@ UINT            status;
                 thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 
                 /* Put return status into the thread control block.  */
-                thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;        
+                thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;
 
 #ifdef TX_NOT_INTERRUPTABLE
 
@@ -376,7 +378,7 @@ UINT            status;
 
             /* Restore interrupts.  */
             TX_RESTORE
-           
+
             /* Suspension is not allowed if the preempt disable flag is non-zero at this point - return error completion.  */
             status =  TX_QUEUE_EMPTY;
         }
@@ -393,7 +395,7 @@ UINT            status;
             /* Increment the number of empty suspensions on this queue.  */
             queue_ptr -> tx_queue_performance_empty_suspension_count++;
 #endif
-            
+
             /* Pickup thread pointer.  */
             TX_THREAD_GET_CURRENT(thread_ptr)
 
@@ -475,7 +477,7 @@ UINT            status;
 
         /* Restore interrupts.  */
         TX_RESTORE
-           
+
         /* Immediate return, return error completion.  */
         status =  TX_QUEUE_EMPTY;
     }

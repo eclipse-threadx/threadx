@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Block Pool                                                          */
 /**                                                                       */
@@ -30,46 +30,48 @@
 #include "tx_block_pool.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_block_pool_create                               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_block_pool_create                               PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates a pool of fixed-size memory blocks in the     */ 
-/*    specified memory area.                                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pool_ptr                          Pointer to pool control block     */ 
-/*    name_ptr                          Pointer to block pool name        */ 
-/*    block_size                        Number of bytes in each block     */ 
-/*    pool_start                        Address of beginning of pool area */ 
-/*    pool_size                         Number of bytes in the block pool */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SUCCESS                        Successful completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function creates a pool of fixed-size memory blocks in the     */
+/*    specified memory area.                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pool_ptr                          Pointer to pool control block     */
+/*    name_ptr                          Pointer to block pool name        */
+/*    block_size                        Number of bytes in each block     */
+/*    pool_start                        Address of beginning of pool area */
+/*    pool_size                         Number of bytes in the block pool */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Successful completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG block_size,
@@ -78,12 +80,12 @@ UINT  _tx_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG block
 
 TX_INTERRUPT_SAVE_AREA
 
-UINT                blocks;                     
+UINT                blocks;
 UINT                status;
 ULONG               total_blocks;
-UCHAR               *block_ptr;                  
+UCHAR               *block_ptr;
 UCHAR               **block_link_ptr;
-UCHAR               *next_block_ptr;             
+UCHAR               *next_block_ptr;
 TX_BLOCK_POOL       *next_pool;
 TX_BLOCK_POOL       *previous_pool;
 
@@ -95,7 +97,7 @@ TX_BLOCK_POOL       *previous_pool;
        an ALIGN_TYPE (typically this is a 32-bit ULONG). This helps guarantee proper alignment.  */
     block_size =  (((block_size + (sizeof(ALIGN_TYPE))) - ((ALIGN_TYPE) 1))/(sizeof(ALIGN_TYPE))) * (sizeof(ALIGN_TYPE));
 
-    /* Round the pool size down to something that is evenly divisible by 
+    /* Round the pool size down to something that is evenly divisible by
        an ALIGN_TYPE (typically this is a 32-bit ULONG).  */
     pool_size =   (pool_size/(sizeof(ALIGN_TYPE))) * (sizeof(ALIGN_TYPE));
 
@@ -104,7 +106,7 @@ TX_BLOCK_POOL       *previous_pool;
     pool_ptr -> tx_block_pool_start =            TX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
     pool_ptr -> tx_block_pool_size =             pool_size;
     pool_ptr -> tx_block_pool_block_size =       (UINT) block_size;
-    
+
     /* Calculate the total number of blocks.  */
     total_blocks =  pool_size/(block_size + (sizeof(UCHAR *)));
 
@@ -143,7 +145,7 @@ TX_BLOCK_POOL       *previous_pool;
         /* Set the last block's forward pointer to NULL.  */
         block_link_ptr =  TX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(block_ptr);
         *block_link_ptr =  TX_NULL;
-        
+
         /* Setup the starting pool address.  */
         pool_ptr -> tx_block_pool_available_list =  TX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
 
@@ -178,7 +180,7 @@ TX_BLOCK_POOL       *previous_pool;
             pool_ptr -> tx_block_pool_created_previous =  previous_pool;
             pool_ptr -> tx_block_pool_created_next =      next_pool;
         }
-        
+
         /* Increment the created count.  */
         _tx_block_pool_created_count++;
 
@@ -206,7 +208,7 @@ TX_BLOCK_POOL       *previous_pool;
         /* Not enough memory for one block, return appropriate error.  */
         status =  TX_SIZE_ERROR;
     }
-    
+
     /* Return completion status.  */
     return(status);
 }

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -32,43 +32,43 @@
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_stack_error_notify                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_stack_error_notify                       PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function registers an application stack error handler. If      */ 
-/*    ThreadX detects a stack error, this application handler is called.  */ 
-/*                                                                        */ 
-/*    Note: stack checking must be enabled for this routine to serve any  */ 
-/*    purpose via the TX_ENABLE_STACK_CHECKING define.                    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    stack_error_handler                   Pointer to stack error        */ 
-/*                                            handler, TX_NULL to disable */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                                Service return status         */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function registers an application stack error handler. If      */
+/*    ThreadX detects a stack error, this application handler is called.  */
+/*                                                                        */
+/*    Note: stack checking must be enabled for this routine to serve any  */
+/*    purpose via the TX_ENABLE_STACK_CHECKING define.                    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    stack_error_handler                   Pointer to stack error        */
+/*                                            handler, TX_NULL to disable */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                Service return status         */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -91,7 +91,7 @@ UINT        status;
     }
     else
     {
-    
+
         /* Stack checking is not enabled, just return an error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }

@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                        Cortex-A35-SMP/AC6 */
-/*                                                           6.1.3        */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  12-31-2020     Andres Mlinar            Initial Version 6.1.3         */
+/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
+/*                                            symbol ULONG64_DEFINED,     */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -152,7 +155,7 @@ typedef unsigned int                            ULONG;
 typedef unsigned long long                      ULONG64;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
-
+#define ULONG64_DEFINED
 
 /* Override the alignment type to use 64-bit alignment and storage for pointers.  */
 
@@ -441,7 +444,7 @@ VOID    tx_thread_fp_disable(VOID);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Modules Cortex-A35-SMP/AC6 Version 6.1.3 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Modules Cortex-A35-SMP/AC6 Version 6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

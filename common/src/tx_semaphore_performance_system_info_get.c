@@ -101,37 +101,37 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the total number of semaphore puts.  */
     if (puts != TX_NULL)
     {
-    
+
         *puts =  _tx_semaphore_performance_put_count;
     }
-    
+
     /* Retrieve the total number of semaphore gets.  */
     if (gets != TX_NULL)
     {
-    
+
         *gets =  _tx_semaphore_performance_get_count;
     }
-    
+
     /* Retrieve the total number of semaphore suspensions.  */
     if (suspensions != TX_NULL)
     {
-    
+
         *suspensions =  _tx_semaphore_performance_suspension_count;
     }
-    
+
     /* Retrieve the total number of semaphore timeouts.  */
     if (timeouts != TX_NULL)
     {
-    
+
         *timeouts =  _tx_semaphore_performance_timeout_count;
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 
     /* Return completion status.  */
     return(TX_SUCCESS);
-    
+
 #else
 
 UINT        status;
@@ -140,31 +140,31 @@ UINT        status;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (puts != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (gets != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (suspensions != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (timeouts != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }

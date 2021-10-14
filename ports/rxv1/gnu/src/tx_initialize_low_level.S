@@ -29,7 +29,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_initialize_low_level                             RXv1/GNURX     */
-;/*                                                           6.1.8        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -63,6 +63,8 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  08-02-2021     William E. Lamie         Initial Version 6.1.8         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
     .global __tx_initialize_low_level
@@ -72,9 +74,9 @@ __tx_initialize_low_level:
 ;    /* Save the first available memory address.  */
 ;    _tx_initialize_unused_memory =  (VOID_PTR) &free_mem_start;
 ;
-    MOV.L    #_end, R1                ; Pickup unused memory address
+    MOV.L    #_end, R1                           ; Pickup unused memory address
     MOV.L    #__tx_initialize_unused_memory, R2
-    MOV.L    R1,[R2]                            ; Save first free memory address
+    MOV.L    R1,[R2]                             ; Save first free memory address
 
 ;   /* Set priority of SWINT to 1. */
     MOV.L    #0x87303, r1
@@ -88,6 +90,5 @@ __tx_initialize_low_level:
     MOV.B    r2, [r1]
 
     RTS
-
 
     .end

@@ -101,7 +101,7 @@ TX_THREAD       *thread_ptr;
     }
     else
     {
-    
+
         /* Check for invalid caller of this function.  */
 
         /* Is the caller an ISR or Initialization?  */
@@ -115,7 +115,7 @@ TX_THREAD       *thread_ptr;
 #ifndef TX_TIMER_PROCESS_IN_ISR
         else
         {
-        
+
             /* Pickup thread pointer.  */
             TX_THREAD_GET_CURRENT(thread_ptr)
 

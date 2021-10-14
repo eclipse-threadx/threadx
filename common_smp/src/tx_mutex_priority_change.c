@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Mutex                                                               */
 /**                                                                       */
@@ -31,49 +31,49 @@
 #include "tx_mutex.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_mutex_priority_change                          PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_mutex_priority_change                          PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function changes the priority of the specified thread for the  */ 
-/*    priority inheritance option of the mutex service.                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                            Pointer to thread to suspend  */ 
-/*    new_priority                          New thread priority           */ 
-/*    new_threshold                         New preemption-threshold      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_rebalance_execute_list                               */ 
-/*                                      Rebalance the execution list      */ 
-/*    _tx_thread_smp_simple_priority_change                               */ 
-/*                                      Change priority                   */ 
-/*    _tx_thread_system_resume          Resume thread                     */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*    _tx_thread_system_suspend         Suspend thread                    */ 
-/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_mutex_get                     Inherit priority                  */ 
-/*    _tx_mutex_put                     Restore previous priority         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function changes the priority of the specified thread for the  */
+/*    priority inheritance option of the mutex service.                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Pointer to thread to suspend  */
+/*    new_priority                          New thread priority           */
+/*    new_threshold                         New preemption-threshold      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_rebalance_execute_list                               */
+/*                                      Rebalance the execution list      */
+/*    _tx_thread_smp_simple_priority_change                               */
+/*                                      Change priority                   */
+/*    _tx_thread_system_resume          Resume thread                     */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*    _tx_thread_system_suspend         Suspend thread                    */
+/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_mutex_get                     Inherit priority                  */
+/*    _tx_mutex_put                     Restore previous priority         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -115,7 +115,7 @@ UINT            finished;
     /* Determine if there is anything to do.  */
     if (thread_ptr -> tx_thread_priority == new_priority)
     {
-    
+
         if (thread_ptr -> tx_thread_preempt_threshold == new_priority)
         {
 
@@ -125,9 +125,9 @@ UINT            finished;
     }
 
     /* Determine if there is still more to do.  */
-    if (finished == TX_FALSE)  
+    if (finished == TX_FALSE)
     {
-      
+
         /* Default the execute pointer to NULL.  */
         execute_ptr =  TX_NULL;
 
@@ -137,17 +137,17 @@ UINT            finished;
 
             /* Change thread priority to the new mutex priority-inheritance priority.  */
             thread_ptr -> tx_thread_priority =  new_priority;
-            
+
             /* Determine how to setup the thread's preemption-threshold.  */
             if (thread_ptr -> tx_thread_user_preempt_threshold < new_priority)
             {
-        
+
                 /* Change thread preemption-threshold to the user's preemption-threshold.  */
                 thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_user_preempt_threshold;
             }
             else
             {
-        
+
                 /* Change the thread preemption-threshold to the new threshold.  */
                 thread_ptr -> tx_thread_preempt_threshold =  new_priority;
             }
@@ -171,16 +171,16 @@ UINT            finished;
                 /* Remember this thread as the currently executing thread.  */
                 execute_ptr =  thread_ptr;
 
-                /* Determine if the thread is being set to a higher-priority and it does't have 
+                /* Determine if the thread is being set to a higher-priority and it does't have
                    preemption-threshold set.  */
                 if (new_priority < thread_ptr -> tx_thread_priority)
                 {
-                
+
                     /* Check for preemption-threshold.  */
                     if (thread_ptr -> tx_thread_user_priority == thread_ptr -> tx_thread_user_preempt_threshold)
                     {
 
-                        /* Simple case, remove the thread from the current priority list and place in 
+                        /* Simple case, remove the thread from the current priority list and place in
                            the higher priority list.   */
                         _tx_thread_smp_simple_priority_change(thread_ptr, new_priority);
 
@@ -194,20 +194,20 @@ UINT            finished;
 
                 /* Thread is not currently executing, so it can just be moved to the lower priority in the list.  */
 
-                /* Determine if the thread is being set to a lower-priority and it does't have 
+                /* Determine if the thread is being set to a lower-priority and it does't have
                    preemption-threshold set.  */
-                if (new_priority > thread_ptr -> tx_thread_priority) 
+                if (new_priority > thread_ptr -> tx_thread_priority)
                 {
-                
+
                     /* Check for preemption-threshold.  */
                     if (thread_ptr -> tx_thread_user_priority == thread_ptr -> tx_thread_user_preempt_threshold)
                     {
 
-                        /* Simple case, remove the thread from the current priority list and place in 
+                        /* Simple case, remove the thread from the current priority list and place in
                            the lower priority list.   */
                         if (new_priority < thread_ptr -> tx_thread_user_priority)
                         {
-                
+
                             /* Use the new priority.  */
                             _tx_thread_smp_simple_priority_change(thread_ptr, new_priority);
                         }
@@ -219,11 +219,11 @@ UINT            finished;
                         }
 
                         /* Set the finished flag to true.  */
-                        finished =  TX_TRUE;                       
+                        finished =  TX_TRUE;
                     }
                 }
             }
-            
+
             /* Now determine if we are finished.  */
             if (finished == TX_FALSE)
             {
@@ -242,33 +242,33 @@ UINT            finished;
                 /* Call actual non-interruptable thread suspension routine.  */
                 _tx_thread_system_ni_suspend(thread_ptr, ((ULONG) 0));
 
-                /* At this point, the preempt disable flag is still set, so we still have 
+                /* At this point, the preempt disable flag is still set, so we still have
                    protection against all preemption.  */
 
                 /* Determine how to setup the thread's priority.  */
                 if (thread_ptr -> tx_thread_user_priority < new_priority)
                 {
-        
+
                     /* Change thread priority to the user's priority.  */
                     thread_ptr -> tx_thread_priority =  thread_ptr -> tx_thread_user_priority;
                 }
                 else
                 {
-        
+
                     /* Change thread priority to the new mutex priority-inheritance priority.  */
                     thread_ptr -> tx_thread_priority =  new_priority;
                 }
-            
+
                 /* Determine how to setup the thread's preemption-threshold.  */
                 if (thread_ptr -> tx_thread_user_preempt_threshold < new_priority)
                 {
-        
+
                     /* Change thread preemption-threshold to the user's preemption-threshold.  */
                     thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_user_preempt_threshold;
                 }
                 else
                 {
-        
+
                     /* Change the thread preemption-threshold to the new threshold.  */
                     thread_ptr -> tx_thread_preempt_threshold =  new_priority;
                 }
@@ -293,42 +293,42 @@ UINT            finished;
                 thread_ptr -> tx_thread_timer.tx_timer_internal_remaining_ticks =  ((UINT) 0);
 
                 /* Restore interrupts.  */
-                TX_RESTORE 
+                TX_RESTORE
 
-                /* The thread is ready and must first be removed from the list.  Call the 
+                /* The thread is ready and must first be removed from the list.  Call the
                    system suspend function to accomplish this.  */
                 _tx_thread_system_suspend(thread_ptr);
 
                 /* Lockout interrupts again.  */
                 TX_DISABLE
 
-                /* At this point, the preempt disable flag is still set, so we still have 
+                /* At this point, the preempt disable flag is still set, so we still have
                    protection against all preemption.  */
 
                 /* Determine how to setup the thread's priority.  */
                 if (thread_ptr -> tx_thread_user_priority < new_priority)
                 {
-        
+
                     /* Change thread priority to the user's priority.  */
                     thread_ptr -> tx_thread_priority =  thread_ptr -> tx_thread_user_priority;
                 }
                 else
                 {
-        
+
                     /* Change thread priority to the new mutex priority-inheritance priority.  */
                     thread_ptr -> tx_thread_priority =  new_priority;
                 }
-                
+
                 /* Determine how to setup the thread's preemption-threshold.  */
                 if (thread_ptr -> tx_thread_user_preempt_threshold < new_priority)
                 {
-        
+
                     /* Change thread preemption-threshold to the user's preemption-threshold.  */
                     thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_user_preempt_threshold;
                 }
                 else
                 {
-        
+
                     /* Change the thread preemption-threshold to the new threshold.  */
                     thread_ptr -> tx_thread_preempt_threshold =  new_priority;
                 }
@@ -348,7 +348,7 @@ UINT            finished;
                 /* Disable interrupts.  */
                 TX_DISABLE
 #endif
-        
+
                 /* Determine if the thread was previously executing.  */
                 if (thread_ptr == execute_ptr)
                 {
@@ -390,7 +390,7 @@ UINT            finished;
                     /* Determine if this thread is not the next thread to execute.  */
                     if (thread_ptr != _tx_thread_execute_ptr[core_index])
                     {
-        
+
                         /* Now determine if this thread was previously executing thread.  */
                         if (thread_ptr == execute_ptr)
                         {
@@ -406,32 +406,32 @@ UINT            finished;
                                     /* Determine the lowest priority scheduled thread.  */
                                     lowest_priority =  _tx_thread_smp_lowest_priority_get();
 
-                                    /* Determine if this thread has a higher or same priority as the lowest priority 
+                                    /* Determine if this thread has a higher or same priority as the lowest priority
                                        in the list.  */
                                     if (thread_ptr -> tx_thread_priority <= lowest_priority)
                                     {
 
                                         /* Yes, we need to rebalance to make it possible for this thread to execute.  */
 
-                                        /* Determine if the thread with preemption-threshold thread has changed... and is 
+                                        /* Determine if the thread with preemption-threshold thread has changed... and is
                                            not the scheduled thread.   */
                                         if ((original_pt_thread != _tx_thread_preemption__threshold_scheduled) &&
                                             (original_pt_thread != thread_ptr))
                                         {
-                                
+
                                             /* Yes, preemption-threshold has changed.  Determine if it can or should
                                                be reversed.  */
-                    
+
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
                                             /* Pickup the preemption-threshold thread.  */
                                             new_pt_thread =  _tx_thread_preemption__threshold_scheduled;
 #endif
-                                
+
                                             /* Restore the original preemption-threshold thread.  */
                                             _tx_thread_preemption__threshold_scheduled =  original_pt_thread;
-                                
-                                
+
+
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
                                             /* Determine if there is a new preemption-threshold thread to reverse.  */
@@ -465,7 +465,7 @@ UINT            finished;
                                                 }
 #endif
                                             }
-#endif                   
+#endif
                                         }
 
                                         /* Pickup the index.  */
@@ -484,7 +484,7 @@ UINT            finished;
     }
 
 #ifndef TX_NOT_INTERRUPTABLE
-        
+
     /* Restore interrupts.  */
     TX_RESTORE
 #endif

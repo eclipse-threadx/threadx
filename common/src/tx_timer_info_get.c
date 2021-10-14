@@ -76,7 +76,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_timer_info_get(TX_TIMER *timer_ptr, CHAR **name, UINT *active, ULONG *remaining_ticks, 
+UINT  _tx_timer_info_get(TX_TIMER *timer_ptr, CHAR **name, UINT *active, ULONG *remaining_ticks,
                 ULONG *reschedule_ticks, TX_TIMER **next_timer)
 {
 
@@ -101,10 +101,10 @@ UINT                active_timer_list;
     /* Retrieve the name of the timer.  */
     if (name != TX_NULL)
     {
-    
+
         *name =  timer_ptr -> tx_timer_name;
     }
-    
+
     /* Pickup address of internal timer structure.  */
     internal_ptr =  &(timer_ptr -> tx_timer_internal);
 
@@ -113,7 +113,7 @@ UINT                active_timer_list;
 
     /* Default active to false.  */
     timer_active =  TX_FALSE;
-    
+
     /* Default the ticks left to the remaining ticks.  */
     ticks_left =  internal_ptr -> tx_timer_internal_remaining_ticks;
 
@@ -146,7 +146,7 @@ UINT                active_timer_list;
 
             /* Calculate the amount of time that has elapsed since the timer
                was activated.  */
-          
+
             /* Setup the list head pointer.  */
             list_head =  internal_ptr -> tx_timer_internal_list_head;
 
@@ -154,7 +154,7 @@ UINT                active_timer_list;
             if (internal_ptr -> tx_timer_internal_list_head >= _tx_timer_current_ptr)
             {
 
-                /* Calculate ticks left to expiration - just the difference between this 
+                /* Calculate ticks left to expiration - just the difference between this
                    timer's entry and the current timer pointer.  */
                 ticks_left =  ((TX_TIMER_POINTER_DIF(list_head, _tx_timer_current_ptr)) + ((ULONG) 1));
             }
@@ -170,7 +170,7 @@ UINT                active_timer_list;
             /* Adjust the remaining ticks accordingly.  */
             if (internal_ptr -> tx_timer_internal_remaining_ticks > TX_TIMER_ENTRIES)
             {
-            
+
                 /* Subtract off the last full pass through the timer list and add the
                    time left.  */
                 ticks_left =  (internal_ptr -> tx_timer_internal_remaining_ticks - TX_TIMER_ENTRIES) + ticks_left;
@@ -179,14 +179,14 @@ UINT                active_timer_list;
         }
         else
         {
-    
+
             /* The timer is not on the actual timer list so it must either be being processed
                or on a temporary list to be processed.   */
 
             /* Check to see if this timer is the timer currently being processed.  */
             if (_tx_timer_expired_timer_ptr == internal_ptr)
             {
-            
+
                 /* Timer dispatch routine is executing, waiting to execute, or just finishing. No more remaining ticks for this expiration.  */
                 ticks_left =  ((ULONG) 0);
             }
@@ -195,17 +195,17 @@ UINT                active_timer_list;
 
                 /* Timer is not the one being processed, which means it must be on the temporary expiration list
                    waiting to be processed.  */
-            
+
                 /* Calculate the remaining ticks for a timer in the process of expiring.  */
                 if (ticks_left > TX_TIMER_ENTRIES)
                 {
-                    
+
                     /* Calculate the number of ticks remaining.  */
                     ticks_left =  internal_ptr -> tx_timer_internal_remaining_ticks - TX_TIMER_ENTRIES;
                 }
                 else
                 {
-                
+
                     /* Timer dispatch routine is waiting to execute, no more remaining ticks for this expiration.  */
                     ticks_left =  ((ULONG) 0);
                 }
@@ -216,13 +216,13 @@ UINT                active_timer_list;
     /* Setup return values for an inactive timer.  */
     if (active != TX_NULL)
     {
-        
+
        /* Setup the timer active indication.  */
        *active =  timer_active;
     }
     if (remaining_ticks != TX_NULL)
     {
-        
+
         /* Setup the default remaining ticks value.  */
         *remaining_ticks =  ticks_left;
     }
@@ -230,17 +230,17 @@ UINT                active_timer_list;
     /* Pickup the reschedule ticks value.  */
     if (reschedule_ticks != TX_NULL)
     {
-    
+
         *reschedule_ticks =  internal_ptr -> tx_timer_internal_re_initialize_ticks;
     }
-    
+
     /* Pickup the next created application timer.  */
     if (next_timer != TX_NULL)
     {
-    
+
         *next_timer =  timer_ptr -> tx_timer_created_next;
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 

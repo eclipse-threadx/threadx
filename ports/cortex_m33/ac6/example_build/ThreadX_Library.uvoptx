@@ -2386,30 +2386,6 @@
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>185</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\tx_thread_stack_error_handler.c</PathWithFileName>
-      <FilenameWithoutPath>tx_thread_stack_error_handler.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>1</GroupNumber>
-      <FileNumber>186</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\tx_thread_stack_error_notify.c</PathWithFileName>
-      <FilenameWithoutPath>tx_thread_stack_error_notify.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>1</GroupNumber>
-      <FileNumber>187</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2421,7 +2397,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>188</FileNumber>
+      <FileNumber>186</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2433,7 +2409,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>189</FileNumber>
+      <FileNumber>187</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2445,7 +2421,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>190</FileNumber>
+      <FileNumber>188</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2457,7 +2433,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>191</FileNumber>
+      <FileNumber>189</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2469,7 +2445,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>192</FileNumber>
+      <FileNumber>190</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2481,7 +2457,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>193</FileNumber>
+      <FileNumber>191</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2493,7 +2469,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>194</FileNumber>
+      <FileNumber>192</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2505,7 +2481,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>195</FileNumber>
+      <FileNumber>193</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2517,7 +2493,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>196</FileNumber>
+      <FileNumber>194</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2529,7 +2505,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>197</FileNumber>
+      <FileNumber>195</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2541,7 +2517,7 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>198</FileNumber>
+      <FileNumber>196</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2553,13 +2529,37 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>199</FileNumber>
+      <FileNumber>197</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\tx_thread_secure_stack_initialize.S</PathWithFileName>
       <FilenameWithoutPath>tx_thread_secure_stack_initialize.S</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>1</GroupNumber>
+      <FileNumber>198</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\common\src\tx_thread_stack_error_handler.c</PathWithFileName>
+      <FilenameWithoutPath>tx_thread_stack_error_handler.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>1</GroupNumber>
+      <FileNumber>199</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\common\src\tx_thread_stack_error_notify.c</PathWithFileName>
+      <FilenameWithoutPath>tx_thread_stack_error_notify.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

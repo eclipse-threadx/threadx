@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Semaphore                                                           */
 /**                                                                       */
@@ -30,44 +30,46 @@
 #include "tx_semaphore.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_semaphore_create                                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_semaphore_create                                PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates a counting semaphore with the initial count   */ 
-/*    specified in this call.                                             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    semaphore_ptr                     Pointer to semaphore control block*/ 
-/*    name_ptr                          Pointer to semaphore name         */ 
-/*    initial_count                     Initial semaphore count           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SUCCESS                        Successful completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function creates a counting semaphore with the initial count   */
+/*    specified in this call.                                             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    semaphore_ptr                     Pointer to semaphore control block*/
+/*    name_ptr                          Pointer to semaphore name         */
+/*    initial_count                     Initial semaphore count           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Successful completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_semaphore_create(TX_SEMAPHORE *semaphore_ptr, CHAR *name_ptr, ULONG initial_count)
@@ -85,7 +87,7 @@ TX_SEMAPHORE    *previous_semaphore;
     /* Setup the basic semaphore fields.  */
     semaphore_ptr -> tx_semaphore_name =             name_ptr;
     semaphore_ptr -> tx_semaphore_count =            initial_count;
-    
+
     /* Disable interrupts to place the semaphore on the created list.  */
     TX_DISABLE
 
@@ -115,9 +117,9 @@ TX_SEMAPHORE    *previous_semaphore;
 
         /* Setup this semaphore's next and previous created links.  */
         semaphore_ptr -> tx_semaphore_created_previous =  previous_semaphore;
-        semaphore_ptr -> tx_semaphore_created_next =      next_semaphore;    
+        semaphore_ptr -> tx_semaphore_created_next =      next_semaphore;
     }
-    
+
     /* Increment the created count.  */
     _tx_semaphore_created_count++;
 

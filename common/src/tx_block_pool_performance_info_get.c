@@ -93,7 +93,7 @@ UINT                    status;
     /* Determine if this is a legal request.  */
     if (pool_ptr == TX_NULL)
     {
-        
+
         /* Block pool pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
@@ -101,13 +101,13 @@ UINT                    status;
     /* Determine if the pool ID is invalid.  */
     else if (pool_ptr -> tx_block_pool_id != TX_BLOCK_POOL_ID)
     {
-    
+
         /* Block pool pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
     else
     {
-    
+
         /* Disable interrupts.  */
         TX_DISABLE
 
@@ -123,28 +123,28 @@ UINT                    status;
         /* Retrieve the number of allocations from this block pool.  */
         if (allocates != TX_NULL)
         {
-    
+
             *allocates =  pool_ptr -> tx_block_pool_performance_allocate_count;
         }
 
         /* Retrieve the number of blocks released to this block pool.  */
         if (releases != TX_NULL)
         {
-    
+
             *releases =  pool_ptr -> tx_block_pool_performance_release_count;
         }
 
         /* Retrieve the number of thread suspensions on this block pool.  */
         if (suspensions != TX_NULL)
         {
-    
+
             *suspensions =  pool_ptr -> tx_block_pool_performance_suspension_count;
         }
 
         /* Retrieve the number of thread timeouts on this block pool.  */
         if (timeouts != TX_NULL)
         {
-    
+
             *timeouts =  pool_ptr -> tx_block_pool_performance_timeout_count;
         }
 
@@ -157,7 +157,7 @@ UINT                    status;
 #else
 UINT                    status;
 
-    
+
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (pool_ptr != TX_NULL)
     {
@@ -191,7 +191,7 @@ UINT                    status;
     }
     else
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }

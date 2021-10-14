@@ -119,7 +119,7 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
     if (_tx_thread_mutex_release != TX_NULL)
     {
 
-        /* Yes, call the mutex release function via a function pointer that 
+        /* Yes, call the mutex release function via a function pointer that
            is setup during mutex initialization.  */
         (_tx_thread_mutex_release)(thread_ptr);
     }

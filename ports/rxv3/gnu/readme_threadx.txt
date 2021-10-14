@@ -53,37 +53,91 @@ state of the CPU registers at the time of a context switch is saved on the runni
 thread's stack The top of the suspended thread's stack is pointed to by 
 tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
-    Offset        Interrupted Stack Frame
+    Offset        Stack Frame without DFPU Register
 
-     0x00                   1
-     0x04                   ACC0
-     0x08                   ACC1
-     0x0C                   R6
-     0x10                   R7
-     0x14                   R8
-     0x18                   R9
-     0x1C                   R10
-     0x20                   R11
-     0x24                   R12
-     0x28                   R13
-     0x2C                   FPSW
-     0x30                   R14
-     0x34                   R15
-     0x38                   R3
-     0x3C                   R4
-     0x40                   R5
-     0x44                   R1
-     0x48                   R2
-     0x4C                   PC - return address
-     0x50                   PSW
+     0x00                   ACC0
+     0x04                   ACC1
+     0x08                   R6
+     0x0C                   R7
+     0x10                   R8
+     0x14                   R9
+     0x18                   R10
+     0x1C                   R11
+     0x20                   R12
+     0x24                   R13
+     0x28                   FPSW
+     0x2C                   R14
+     0x30                   R15
+     0x34                   R3
+     0x38                   R4
+     0x3C                   R5
+     0x40                   R1
+     0x44                   R2
+     0x48                   PC - return address
+     0x4C                   PSW
+     
+    Offset        Stack Frame with DFPU Register
+
+     0x00                   DPSW
+     0x04                   DCMR
+     0x08                   DECNT
+     0x0C                   DEPC
+     0x10                   DR0
+     0x14                   DR1
+     0x18                   DR2
+     0x1C                   DR3
+     0x20                   DR4
+     0x24                   DR5
+     0x28                   DR6
+     0x2C                   DR7
+     0x30                   DR8
+     0x34                   DR9
+     0x38                   DR10
+     0x3C                   DR11
+     0x40                   DR12
+     0x44                   DR13
+     0x48                   DR14
+     0x4C                   DR15
+     0x50                   ACC0
+     0x54                   ACC1
+     0x58                   R6
+     0x5C                   R7
+     0x60                   R8
+     0x64                   R9
+     0x68                   R10
+     0x6C                   R11
+     0x70                   R12
+     0x74                   R13
+     0x78                   FPSW
+     0x7C                   R14
+     0x80                   R15
+     0x84                   R3
+     0x88                   R4
+     0x8C                   R5
+     0x90                   R1
+     0x94                   R2
+     0x98                   PC - return address
+     0x9C                   PSW
      
 Note: By default GNURX does not save the state of the accumulator registers ACC0 and ACC1
 when entering an ISR. This means that if the ISR uses any of the DSP instructions the
-content of those registers could be corrupted. Saving and restoring of the acummulators
+content of those registers could be corrupted. Saving and restoring of the accumulators
 can be enabled by adding the -msave-acc-in-interrupts command line option.
 
+5. Double Precision FPU Instructions Support
+
+The RXv3 architecture supports an optional set of double precision instructions which 
+makes use of a new set of registers that must be saved and restored during context 
+switches. This feature can be accessed by adding the -mdfpu -m64bit-doubles compiler switches. 
+To reduce the overhead of saving and restoring the FPU registers for all threads
+the RXv3 port allows each thread to enable and disable saving and restoring the DFPU 
+registers. By default the feature is disabled for new threads. To enable the feature 
+tx_thread_fpu_enable() must be called within the context of every thread that will 
+perform FPU operation. The saving and restoring of DFPU registers can be disabled
+again by calling tx_thread_fpu_disable(). This can be useful if a thread only makes
+occasional use of the FPU.
      
-5.  Improving Performance
+6.  Improving Performance
 
 The distribution version of ThreadX is built without any compiler optimizations.  This 
 makes it easy to debug because you can trace or set breakpoints inside of ThreadX itself.  
@@ -95,24 +149,24 @@ application code with the symbol TX_DISABLE_ERROR_CHECKING defined before tx_api
 is included. 
 
 
-6. Timer Processing
+7. Timer Processing
 
-Timer processign is performed by calling __tx_timer_interrupt(). This should usually be done
-from within the callback of a periodic timer with a period of 100Hz. In the sample projects
+Timer processing is performed by calling __tx_timer_interrupt(). This should usually be done
+from within the callback of a periodic timer with a period of 100Hz. In the sample projects,
 a Renesas Fit CMT periodic timer module (rx_cmt) is used as the timer source.
 
 
-7.  Interrupt Handling
+8.  Interrupt Handling
 
 Interrupt handling is unaffected by the ThreadX port as such user interrupts can be 
 written according to the toolchain's documentation. It is recommended not to use interrupt
 priority 15 as this is the priority of the context switch interrupt. However using interrupt
-priority 15 won't cause any negative side effectd but doing so may may slightly reduce 
+priority 15 won't cause any negative side effects but doing so may slightly reduce 
 performance. Please refer to the toolchain documentation for additional details on how to
-define interupt service routines.
+define interrupt service routines.
 
 
-8. Execution Profiling
+9. Execution Profiling
 
 The RX port adds support for the Execution Profiling Kit (EPK). The EPK consists 
 of the files tx_execution_profile.c and tx_execution_profile.h. See the documentation 
@@ -143,11 +197,17 @@ Rebuild the Threadx library and the application.
 Refer to the EPK documentation how to interpret the results.
 
 
-9.  Revision History
+10.  Revision History
 
 For generic code revision information, please refer to the readme_threadx_generic.txt
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
+
+10-15-2021  Release 6.1.9 changes:
+            tx_port.h                           Added FPU support
+            tx_thread_context_restore.s         Added FPU support
+            tx_thread_schedule.s                Added FPU support
+            tx_thread_system_return.s           Added FPU support
 
 06-02-2021  Initial ThreadX release for the RXv3 using GNURX tools, version 6.1.7
 

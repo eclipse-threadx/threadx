@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -33,58 +33,58 @@
 #include "tx_trace.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_system_suspend                          PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_system_suspend                          PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function suspends the specified thread and changes the thread  */ 
-/*    state to the value specified.  Note: delayed suspension processing  */ 
+/*                                                                        */
+/*    This function suspends the specified thread and changes the thread  */
+/*    state to the value specified.  Note: delayed suspension processing  */
 /*    is handled outside of this routine.                                 */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                            Pointer to thread to suspend  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_available_cores_get    Get available cores bitmap    */ 
-/*    _tx_thread_smp_core_preempt           Preempt core for new thread   */ 
-/*    _tx_thread_smp_execute_list_clear     Clear the thread execute list */ 
-/*    _tx_thread_smp_execute_list_setup     Setup the thread execute list */ 
-/*    _tx_thread_smp_next_priority_find     Find next priority with one   */ 
-/*                                            or more ready threads       */ 
-/*    _tx_thread_smp_possible_cores_get     Get possible cores bitmap     */ 
-/*    [_tx_thread_smp_protect]              Get protection                */ 
-/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */ 
-/*    _tx_thread_smp_remap_solution_find    Attempt to remap threads to   */ 
-/*                                            schedule another thread     */ 
-/*    _tx_thread_smp_schedule_list_setup    Inherit schedule list from    */ 
-/*                                            execute list                */ 
-/*    _tx_thread_system_return              Return to system              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_priority_change            Thread priority change        */ 
-/*    _tx_thread_shell_entry                Thread shell function         */ 
-/*    _tx_thread_sleep                      Thread sleep                  */ 
-/*    _tx_thread_suspend                    Application thread suspend    */ 
-/*    _tx_thread_terminate                  Thread terminate              */ 
-/*    Other ThreadX Components                                            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Pointer to thread to suspend  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_available_cores_get    Get available cores bitmap    */
+/*    _tx_thread_smp_core_preempt           Preempt core for new thread   */
+/*    _tx_thread_smp_execute_list_clear     Clear the thread execute list */
+/*    _tx_thread_smp_execute_list_setup     Setup the thread execute list */
+/*    _tx_thread_smp_next_priority_find     Find next priority with one   */
+/*                                            or more ready threads       */
+/*    _tx_thread_smp_possible_cores_get     Get possible cores bitmap     */
+/*    [_tx_thread_smp_protect]              Get protection                */
+/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */
+/*    _tx_thread_smp_remap_solution_find    Attempt to remap threads to   */
+/*                                            schedule another thread     */
+/*    _tx_thread_smp_schedule_list_setup    Inherit schedule list from    */
+/*                                            execute list                */
+/*    _tx_thread_system_return              Return to system              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_priority_change            Thread priority change        */
+/*    _tx_thread_shell_entry                Thread shell function         */
+/*    _tx_thread_sleep                      Thread sleep                  */
+/*    _tx_thread_suspend                    Application thread suspend    */
+/*    _tx_thread_terminate                  Thread terminate              */
+/*    Other ThreadX Components                                            */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -97,15 +97,15 @@ VOID  _tx_thread_system_suspend(TX_THREAD *thread_ptr)
 
 TX_INTERRUPT_SAVE_AREA
 #endif
- 
-UINT                        priority; 
+
+UINT                        priority;
 UINT                        i;
-ULONG                       priority_bit;                    
+ULONG                       priority_bit;
 ULONG                       combined_flags;
-ULONG                       priority_map;               
+ULONG                       priority_map;
 UINT                        core_index;
 #ifndef TX_THREAD_SMP_EQUAL_PRIORITY
-ULONG                       complex_path_possible;   
+ULONG                       complex_path_possible;
 UINT                        core;
 ULONG                       possible_cores;
 ULONG                       thread_possible_cores;
@@ -159,7 +159,7 @@ UINT                        processing_complete;
     /* Debug entry.  */
     _tx_thread_smp_debug_entry_insert(6, 1, thread_ptr);
 #endif
-    
+
 #ifndef TX_NO_TIMER
 
     /* Determine if a timeout needs to be activated.  */
@@ -180,14 +180,14 @@ UINT                        processing_complete;
             if (timeout != TX_WAIT_FOREVER)
             {
 
-                /* Activate the thread timer with the timeout value setup in the caller. This is now done in-line 
+                /* Activate the thread timer with the timeout value setup in the caller. This is now done in-line
                    for ThreadX SMP so the additional protection logic can be avoided.  */
 
                 /* Activate the thread's timeout timer.  */
 
                 /* Setup pointer to internal timer.  */
                 timer_ptr =  &(thread_ptr -> tx_thread_timer);
-    
+
                 /* Calculate the amount of time remaining for the timer.  */
                 if (timeout > TX_TIMER_ENTRIES)
                 {
@@ -206,7 +206,7 @@ UINT                        processing_complete;
 
                 /* At this point, we are ready to put the timer on one of
                    the timer lists.  */
-    
+
                 /* Calculate the proper place for the timer.  */
                 timer_list =  TX_TIMER_POINTER_ADD(_tx_timer_current_ptr, expiration_time);
                 if (TX_TIMER_INDIRECT_TO_VOID_POINTER_CONVERT(timer_list) >= TX_TIMER_INDIRECT_TO_VOID_POINTER_CONVERT(_tx_timer_list_end))
@@ -220,7 +220,7 @@ UINT                        processing_complete;
                 /* Now put the timer on this list.  */
                 if ((*timer_list) == TX_NULL)
                 {
-                
+
                     /* This list is NULL, just put the new timer on it.  */
 
                     /* Setup the links in this timer.  */
@@ -229,7 +229,7 @@ UINT                        processing_complete;
 
                     /* Setup the list head pointer.  */
                     *timer_list =  timer_ptr;
-                }                
+                }
                 else
                 {
 
@@ -250,7 +250,7 @@ UINT                        processing_complete;
 #endif
 
 
-#ifdef TX_ENABLE_STACK_CHECKING 
+#ifdef TX_ENABLE_STACK_CHECKING
 
     /* Check this thread's stack.  */
     TX_THREAD_STACK_CHECK(thread_ptr)
@@ -296,7 +296,7 @@ UINT                        processing_complete;
         TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_SUSPEND, thread_ptr, thread_ptr -> tx_thread_state, TX_POINTER_TO_ULONG_CONVERT(&priority), TX_POINTER_TO_ULONG_CONVERT(_tx_thread_execute_ptr[core_index]), TX_TRACE_INTERNAL_EVENTS)
 
         /* Save the time stamp for later comparison to verify that
-           the event hasn't been overwritten by the time we have 
+           the event hasn't been overwritten by the time we have
            computed the next thread to execute.  */
         if (entry_ptr != TX_NULL)
         {
@@ -319,15 +319,15 @@ UINT                        processing_complete;
         /* Calculate the index into the bit map array.  */
         map_index =  priority/((UINT) 32);
 #endif
-    
+
         /* Determine if this thread has preemption-threshold set.  */
-        if (thread_ptr -> tx_thread_preempt_threshold < priority) 
+        if (thread_ptr -> tx_thread_preempt_threshold < priority)
         {
 
             /* Was this thread with preemption-threshold set actually preempted with preemption-threshold set?  */
             if (_tx_thread_preemption_threshold_list[priority] == thread_ptr)
             {
-           
+
                 /* Clear the preempted list entry.  */
                 _tx_thread_preemption_threshold_list[priority] =  TX_NULL;
 
@@ -353,10 +353,10 @@ UINT                        processing_complete;
         /* Determine if this thread has global preemption disabled.  */
         if (thread_ptr == _tx_thread_preemption__threshold_scheduled)
         {
-        
+
             /* Clear the global preemption disable flag.  */
             _tx_thread_preemption__threshold_scheduled =  TX_NULL;
-            
+
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
             /* Clear the entry in the preempted list.  */
@@ -367,7 +367,7 @@ UINT                        processing_complete;
             if (_tx_thread_preempted_map_active != ((ULONG) 0))
 #else
             if (_tx_thread_preempted_maps[0] != ((ULONG) 0))
-#endif    
+#endif
             {
 #if TX_MAX_PRIORITIES > 32
 
@@ -395,11 +395,11 @@ UINT                        processing_complete;
                 priority_bit =  (ULONG) priority_bit_set;
 
                 /* Setup the highest priority preempted thread.  */
-                next_preempted =  base_priority + priority_bit;       
+                next_preempted =  base_priority + priority_bit;
 
                 /* Pickup the next preempted thread.  */
                 preempted_thread =  _tx_thread_preemption_threshold_list[next_preempted];
-               
+
                 /* Setup the preempted thread.  */
                 _tx_thread_preemption__threshold_scheduled =  preempted_thread;
             }
@@ -431,7 +431,7 @@ UINT                        processing_complete;
                 _tx_thread_priority_list[priority] =  thread_ptr -> tx_thread_ready_next;
 
 #ifndef TX_THREAD_SMP_EQUAL_PRIORITY
-                
+
                 /* Update the next pointer as well.  */
                 next_thread =  thread_ptr -> tx_thread_ready_next;
 #endif
@@ -446,7 +446,7 @@ UINT                        processing_complete;
             next_thread =  thread_ptr;
 #endif
 
-            /* This is the only thread at this priority ready to run.  Set the head 
+            /* This is the only thread at this priority ready to run.  Set the head
                pointer to NULL.  */
             _tx_thread_priority_list[priority] =    TX_NULL;
 
@@ -477,7 +477,7 @@ UINT                        processing_complete;
 
         /* Calculate the index to find the next highest priority thread ready for execution.  */
         priority_map =    _tx_thread_priority_map_active;
-       
+
         /* Determine if there is anything.   */
         if (priority_map != ((ULONG) 0))
         {
@@ -504,7 +504,7 @@ UINT                        processing_complete;
 
                 /* Timestamp is the same, set the "next thread pointer" to NULL. This can
                    be used by the trace analysis tool to show idle system conditions.  */
-#ifdef TX_MISRA_ENABLE             
+#ifdef TX_MISRA_ENABLE
                 entry_ptr -> tx_trace_buffer_entry_info_4 =  ((ULONG) 0);
 #else
                 entry_ptr -> tx_trace_buffer_entry_information_field_4 =  ((ULONG) 0);
@@ -543,22 +543,22 @@ UINT                        processing_complete;
                 TX_THREAD_SMP_WAKEUP(i);
             }
 #endif
-            
+
 #ifdef TX_THREAD_SMP_DEBUG_ENABLE
 
             /* Debug entry.  */
             _tx_thread_smp_debug_entry_insert(7, 1, thread_ptr);
 #endif
-            
+
 #ifdef TX_ENABLE_EVENT_TRACE
-    
+
             /* Check that the event time stamp is unchanged.  A different
                timestamp means that a later event wrote over the system suspend
                event.  In that case, do nothing here.  */
             if ((entry_ptr != TX_NULL) && (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp))
             {
 
-                /* Timestamp is the same, set the "next thread pointer" to the next thread scheduled 
+                /* Timestamp is the same, set the "next thread pointer" to the next thread scheduled
                    for this core.  */
 #ifdef TX_MISRA_ENABLE
                 entry_ptr -> tx_trace_buffer_entry_info_4 =  TX_POINTER_TO_ULONG_CONVERT(_tx_thread_execute_ptr[core_index]);
@@ -586,7 +586,7 @@ UINT                        processing_complete;
 
                 /* Increment the preempt disable flag in order to keep the protection.  */
                 _tx_thread_preempt_disable++;
-        
+
                 /* Restore interrupts.  */
                 TX_RESTORE
 #endif
@@ -613,7 +613,7 @@ UINT                        processing_complete;
             i =  thread_ptr -> tx_thread_smp_core_mapped;
             if (_tx_thread_execute_ptr[i] == thread_ptr)
             {
-        
+
                 /* Clear the entry in the thread execution list.  */
                 _tx_thread_execute_ptr[i] =  TX_NULL;
 
@@ -621,14 +621,14 @@ UINT                        processing_complete;
                    thread.  */
                 if ((_tx_thread_preemption__threshold_scheduled != TX_NULL) || (thread_ptr -> tx_thread_preempt_threshold < thread_ptr -> tx_thread_priority))
                 {
-               
+
                     /* Call the rebalance routine. This routine maps cores and ready threads.  */
                     _tx_thread_smp_rebalance_execute_list(core_index);
                 }
 #ifdef TX_THREAD_SMP_EQUAL_PRIORITY
                 else
                 {
- 
+
                     /* For equal priority SMP, we simply use the rebalance list function.  */
 
                     /* Call the rebalance routine. This routine maps cores and ready threads.  */
@@ -650,7 +650,7 @@ UINT                        processing_complete;
 
                         /* No more threads at this priority level.  */
 
-                        /* Start at the priority after that of the thread suspending, since we know there are no 
+                        /* Start at the priority after that of the thread suspending, since we know there are no
                            other threads at the suspending thread's priority ready to execute.  */
                         next_priority++;
 
@@ -663,7 +663,7 @@ UINT                        processing_complete;
 
                     /* Setup the available cores bit map. In the suspend case, this is simply the core that is now available. */
                     available_cores =  (((ULONG) 1) << i);
-                    
+
                     /* Calculate the possible complex path.  */
                     complex_path_possible =  possible_cores & available_cores;
 
@@ -682,13 +682,13 @@ UINT                        processing_complete;
                             /* Determine if there are no more threads to execute.  */
                             if (next_priority == ((UINT) TX_MAX_PRIORITIES))
                             {
-        
+
                                 /* Break out of loop.  */
                                 loop_finished =  TX_TRUE;
                             }
                             else
                             {
-       
+
                                 /* Pickup the next thread to schedule.  */
                                 next_thread =  _tx_thread_priority_list[next_priority];
                             }
@@ -697,30 +697,30 @@ UINT                        processing_complete;
                         /* Determine if the processing is not complete.  */
                         if (loop_finished == TX_FALSE)
                         {
-                        
+
                             /* Is the this thread already in the execute list?  */
                             if (next_thread != _tx_thread_execute_ptr[next_thread -> tx_thread_smp_core_mapped])
                             {
-                        
+
                                 /* No, not already on the execute list.   */
-                            
+
                                 /* Check to see if the thread has preemption-threshold set.  */
                                 if (next_thread -> tx_thread_preempt_threshold != next_thread -> tx_thread_priority)
                                 {
-                            
+
                                     /* Call the rebalance routine. This routine maps cores and ready threads.  */
                                     _tx_thread_smp_rebalance_execute_list(core_index);
-                            
+
                                     /* Get out of the loop.  */
-                                    loop_finished =  TX_TRUE;        
+                                    loop_finished =  TX_TRUE;
                                 }
                                 else
                                 {
-                                
+
                                     /* Now determine if this thread is allowed to run on this core.  */
                                     if ((((next_thread -> tx_thread_smp_cores_allowed >> i) & ((ULONG) 1))) != ((ULONG) 0))
                                     {
-                            
+
                                         /* Remember this index in the thread control block.  */
                                         next_thread -> tx_thread_smp_core_mapped =  i;
 
@@ -730,42 +730,42 @@ UINT                        processing_complete;
                                         /* Found the thread to execute.  */
                                         loop_finished =  TX_TRUE;
                                     }
-                                    else 
+                                    else
                                     {
 
                                         /* Determine if nontrivial scheduling is possible.  */
                                         if (complex_path_possible != ((ULONG) 0))
                                         {
-                                
-                                            /* Check for nontrivial scheduling, i.e., can other threads be remapped to allow this thread to be 
+
+                                            /* Check for nontrivial scheduling, i.e., can other threads be remapped to allow this thread to be
                                                scheduled.  */
 
                                             /* Determine what the possible cores are for this thread.  */
                                             thread_possible_cores =  next_thread -> tx_thread_smp_cores_allowed;
-        
+
                                             /* Apply the current possible cores.  */
                                             thread_possible_cores =  thread_possible_cores & possible_cores;
                                             if (thread_possible_cores != ((ULONG) 0))
                                             {
 
-                                                /* Note that we know that the thread must have the target core excluded at this point, 
+                                                /* Note that we know that the thread must have the target core excluded at this point,
                                                    since we failed the test above.  */
-  
-                                                /* Now we need to see if one of the other threads in the non-excluded cores can be moved to make room 
+
+                                                /* Now we need to see if one of the other threads in the non-excluded cores can be moved to make room
                                                    for this thread.  */
 
                                                 /* Default the schedule list to the current execution list.  */
                                                 _tx_thread_smp_schedule_list_setup();
-    
+
                                                 /* Determine the possible core mapping.  */
                                                 test_possible_cores =  possible_cores & ~(thread_possible_cores);
 
                                                 /* Attempt to remap the cores in order to schedule this thread.  */
-                                                core =  _tx_thread_smp_remap_solution_find(next_thread, available_cores, thread_possible_cores, test_possible_cores);   
-                    
+                                                core =  _tx_thread_smp_remap_solution_find(next_thread, available_cores, thread_possible_cores, test_possible_cores);
+
                                                 /* Determine if remapping was successful.  */
-                                                if (core != ((UINT) TX_THREAD_SMP_MAX_CORES)) 
-                                                {                   
+                                                if (core != ((UINT) TX_THREAD_SMP_MAX_CORES))
+                                                {
 
                                                     /* Clear the execute list.  */
                                                     _tx_thread_smp_execute_list_clear();
@@ -779,7 +779,7 @@ UINT                        processing_complete;
                                                 else
                                                 {
 
-                                                    /* We couldn't assign the thread to any of the cores possible for the thread so update the possible cores for the 
+                                                    /* We couldn't assign the thread to any of the cores possible for the thread so update the possible cores for the
                                                        next pass so we don't waste time looking at them again!  */
                                                     possible_cores =  possible_cores & (~thread_possible_cores);
                                                 }
@@ -796,24 +796,24 @@ UINT                        processing_complete;
 
                             /* Move to the next thread.  */
                             next_thread =  next_thread -> tx_thread_ready_next;
-                            
+
                             /* Determine if we are at the head of the list.  */
                             if (next_thread == _tx_thread_priority_list[next_priority])
                             {
-                            
+
                                 /* Yes, set the next thread pointer to NULL, increment the priority, and continue.  */
                                 next_thread =  TX_NULL;
                                 next_priority++;
-                            
+
                                 /* Determine if there are no more threads to execute.  */
                                 if (next_priority == ((UINT) TX_MAX_PRIORITIES))
                                 {
-        
+
                                     /* Break out of loop.  */
                                     loop_finished =  TX_TRUE;
                                 }
                             }
-                        }                       
+                        }
                     } while (loop_finished == TX_FALSE);
 
 #ifdef TX_THREAD_SMP_INTER_CORE_INTERRUPT
@@ -825,7 +825,7 @@ UINT                        processing_complete;
                         /* Make sure thread execution has started.  */
                         if (_tx_thread_system_state[i] < ((ULONG) TX_INITIALIZE_IN_PROGRESS))
                         {
-                        
+
                             /* Preempt the mapped thread.  */
                             _tx_thread_smp_core_preempt(i);
                         }
@@ -835,7 +835,7 @@ UINT                        processing_complete;
 #ifdef TX_THREAD_SMP_WAKEUP_LOGIC
 
                     /* Does this need to be waked up?  */
-                    if (i != core_index) 
+                    if (i != core_index)
                     {
 
                         /* Check to make sure there a thread to execute for this core.  */
@@ -847,7 +847,7 @@ UINT                        processing_complete;
                         }
                     }
 #endif
-                } 
+                }
 #endif
             }
         }
@@ -860,13 +860,13 @@ UINT                        processing_complete;
     /* Check to see if the processing is complete.  */
     if (processing_complete == TX_FALSE)
     {
-    
+
 #ifdef TX_THREAD_SMP_DEBUG_ENABLE
 
         /* Debug entry.  */
         _tx_thread_smp_debug_entry_insert(7, 1, thread_ptr);
 #endif
-    
+
 #ifdef TX_ENABLE_EVENT_TRACE
 
         /* Check that the event time stamp is unchanged.  A different
@@ -875,7 +875,7 @@ UINT                        processing_complete;
         if ((entry_ptr != TX_NULL) && (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp))
         {
 
-            /* Timestamp is the same, set the "next thread pointer" to the next thread scheduled 
+            /* Timestamp is the same, set the "next thread pointer" to the next thread scheduled
                for this core.  */
 #ifdef TX_MISRA_ENABLE
             entry_ptr -> tx_trace_buffer_entry_info_4 =  TX_POINTER_TO_ULONG_CONVERT(_tx_thread_execute_ptr[core_index]);
@@ -886,10 +886,10 @@ UINT                        processing_complete;
 #endif
 
         /* Determine if a preemption condition is present.  */
-        if (_tx_thread_current_ptr[core_index] != _tx_thread_execute_ptr[core_index]) 
+        if (_tx_thread_current_ptr[core_index] != _tx_thread_execute_ptr[core_index])
         {
 
-#ifdef TX_ENABLE_STACK_CHECKING 
+#ifdef TX_ENABLE_STACK_CHECKING
 
             /* Pickup the next execute pointer.  */
             thread_ptr =  _tx_thread_execute_ptr[core_index];
@@ -907,7 +907,7 @@ UINT                        processing_complete;
                not the same as the execute thread pointer AND the system state and preempt disable flags are clear.  */
             if (_tx_thread_system_state[core_index] == ((ULONG) 0))
             {
-        
+
                 /* Check the preempt disable flag.  */
                 if (_tx_thread_preempt_disable == ((UINT) 0))
                 {
@@ -934,7 +934,7 @@ UINT                        processing_complete;
 
                     /* Increment the preempt disable flag in order to keep the protection.  */
                     _tx_thread_preempt_disable++;
-        
+
                     /* Restore interrupts.  */
                     TX_RESTORE
 #endif
@@ -962,7 +962,7 @@ UINT                        processing_complete;
         /* Determine if processing is complete.  If so, no need to restore interrupts.  */
         if (processing_complete == TX_FALSE)
         {
-    
+
             /* Restore interrupts.  */
             TX_RESTORE
         }

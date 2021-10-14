@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
@@ -32,50 +32,52 @@
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_timer_performance_system_info_get               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_performance_system_info_get               PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function retrieves timer performance information.              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    activates                         Destination for total number of   */ 
-/*                                        activations                     */ 
-/*    reactivates                       Destination for total number of   */ 
-/*                                        reactivations                   */ 
-/*    deactivates                       Destination for total number of   */ 
-/*                                        deactivations                   */ 
-/*    expirations                       Destination for total number of   */ 
-/*                                        expirations                     */ 
-/*    expiration_adjusts                Destination for total number of   */ 
-/*                                        expiration adjustments          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function retrieves timer performance information.              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    activates                         Destination for total number of   */
+/*                                        activations                     */
+/*    reactivates                       Destination for total number of   */
+/*                                        reactivations                   */
+/*    deactivates                       Destination for total number of   */
+/*                                        deactivations                   */
+/*    expirations                       Destination for total number of   */
+/*                                        expirations                     */
+/*    expiration_adjusts                Destination for total number of   */
+/*                                        expiration adjustments          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_timer_performance_system_info_get(ULONG *activates, ULONG *reactivates,
@@ -99,35 +101,35 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the total number of timer activations.  */
     if (activates != TX_NULL)
     {
-    
+
         *activates =  _tx_timer_performance_activate_count;
     }
 
     /* Retrieve the total number of timer reactivations.  */
     if (reactivates != TX_NULL)
     {
-    
+
         *reactivates =  _tx_timer_performance_reactivate_count;
     }
 
     /* Retrieve the total number of timer deactivations.  */
     if (deactivates != TX_NULL)
     {
-    
+
         *deactivates =  _tx_timer_performance_deactivate_count;
     }
 
     /* Retrieve the total number of timer expirations.  */
     if (expirations != TX_NULL)
     {
-    
+
         *expirations =  _tx_timer_performance_expiration_count;
     }
 
     /* Retrieve the total number of timer expiration adjustments.  */
     if (expiration_adjusts != TX_NULL)
     {
-    
+
         *expiration_adjusts =  _tx_timer_performance__expiration_adjust_count;
     }
 
@@ -136,7 +138,7 @@ TX_INTERRUPT_SAVE_AREA
 
     /* Return completion status.  */
     return(TX_SUCCESS);
-    
+
 #else
 
 UINT        status;
@@ -145,37 +147,37 @@ UINT        status;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (activates != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (reactivates != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (deactivates != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (expirations != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (expiration_adjusts != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }

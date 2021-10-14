@@ -3,7 +3,6 @@
 	<name>txm</name>
 	<comment></comment>
 	<projects>
-		<project>tx</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

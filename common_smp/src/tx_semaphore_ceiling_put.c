@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Semaphore                                                           */
 /**                                                                       */
@@ -31,45 +31,47 @@
 #include "tx_semaphore.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_semaphore_ceiling_put                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_semaphore_ceiling_put                           PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function puts an instance into the specified counting          */ 
-/*    semaphore up to the specified semaphore ceiling.                    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    semaphore_ptr                         Pointer to semaphore          */ 
-/*    ceiling                               Maximum value of semaphore    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                                Completion status             */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_resume              Resume thread service         */ 
-/*    _tx_thread_system_ni_resume           Non-interruptable resume      */ 
-/*                                            thread                      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function puts an instance into the specified counting          */
+/*    semaphore up to the specified semaphore ceiling.                    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    semaphore_ptr                         Pointer to semaphore          */
+/*    ceiling                               Maximum value of semaphore    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                Completion status             */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_resume              Resume thread service         */
+/*    _tx_thread_system_ni_resume           Non-interruptable resume      */
+/*                                            thread                      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_semaphore_ceiling_put(TX_SEMAPHORE *semaphore_ptr, ULONG ceiling)
@@ -81,7 +83,7 @@ TX_INTERRUPT_SAVE_AREA
 VOID            (*semaphore_put_notify)(struct TX_SEMAPHORE_STRUCT *notify_semaphore_ptr);
 #endif
 
-TX_THREAD       *thread_ptr;            
+TX_THREAD       *thread_ptr;
 UINT            suspended_count;
 TX_THREAD       *next_thread;
 TX_THREAD       *previous_thread;
@@ -187,8 +189,8 @@ UINT            status;
             previous_thread =                               thread_ptr -> tx_thread_suspended_previous;
             next_thread -> tx_thread_suspended_previous =   previous_thread;
             previous_thread -> tx_thread_suspended_next =   next_thread;
-        } 
- 
+        }
+
         /* Decrement the suspension count.  */
         semaphore_ptr -> tx_semaphore_suspended_count =  suspended_count;
 
@@ -198,7 +200,7 @@ UINT            status;
         thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 
         /* Put return status into the thread control block.  */
-        thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;        
+        thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;
 
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 

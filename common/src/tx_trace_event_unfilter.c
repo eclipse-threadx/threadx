@@ -81,7 +81,7 @@ UINT  _tx_trace_event_unfilter(ULONG event_unfilter_bits)
 
     /* Return success.  */
     return(TX_SUCCESS);
-    
+
 #else
 
 UINT        status;

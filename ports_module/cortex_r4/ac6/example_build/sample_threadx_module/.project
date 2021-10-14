@@ -3,8 +3,6 @@
 	<name>sample_threadx_module</name>
 	<comment></comment>
 	<projects>
-		<project>tx</project>
-		<project>txm</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

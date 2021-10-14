@@ -128,7 +128,7 @@ ULONG           suspension_sequence;
         /* Increment the number of timeouts for this thread.  */
         thread_ptr -> tx_thread_performance_timeout_count++;
 #endif
-    
+
         /* Pickup the cleanup routine address.  */
         suspend_cleanup =  thread_ptr -> tx_thread_suspend_cleanup;
 
@@ -152,6 +152,7 @@ ULONG           suspension_sequence;
         /* Call any cleanup routines.  */
         if (suspend_cleanup != TX_NULL)
         {
+
             /* Yes, there is a function to call.  */
             (suspend_cleanup)(thread_ptr, suspension_sequence);
         }

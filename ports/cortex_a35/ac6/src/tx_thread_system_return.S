@@ -40,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _tx_thread_system_return                          Cortex-A35/AC6    */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -73,6 +73,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
+/*                                            execution profile support,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_system_return(VOID)
@@ -111,7 +114,7 @@ _skip_fp_save:
     MOV     x1, #0                              // Clear x1
     STP     x0, x1, [sp, #-16]!                 // Save DAIF and clear value for ELR_EK1
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 
     /* Call the thread exit function to indicate the thread is no longer executing.  */
 

@@ -98,7 +98,7 @@ UCHAR               **suspend_info_ptr;
 
     /* Default to successful status.  */
     status =  TX_SUCCESS;
-    
+
     /* Set the pool pointer to NULL.  */
     pool_ptr =  TX_NULL;
 
@@ -109,7 +109,7 @@ UCHAR               **suspend_info_ptr;
     work_ptr =  TX_VOID_TO_UCHAR_POINTER_CONVERT(memory_ptr);
     if (work_ptr != TX_NULL)
     {
-        
+
         /* Back off the memory pointer to pickup its header.  */
         work_ptr =  TX_UCHAR_POINTER_SUB(work_ptr, ((sizeof(UCHAR *)) + (sizeof(ALIGN_TYPE))));
 
@@ -127,7 +127,7 @@ UCHAR               **suspend_info_ptr;
             /* See if we have a valid pool pointer.  */
             if (pool_ptr == TX_NULL)
             {
-                
+
                 /* Return pointer error.  */
                 status =  TX_PTR_ERROR;
             }
@@ -137,10 +137,10 @@ UCHAR               **suspend_info_ptr;
                 /* See if we have a valid pool.  */
                 if (pool_ptr -> tx_byte_pool_id != TX_BYTE_POOL_ID)
                 {
-                
+
                     /* Return pointer error.  */
                     status =  TX_PTR_ERROR;
-                    
+
                     /* Reset the pool pointer is NULL.  */
                     pool_ptr =  TX_NULL;
                 }
@@ -163,13 +163,13 @@ UCHAR               **suspend_info_ptr;
     /* Determine if the pointer is valid.  */
     if (pool_ptr == TX_NULL)
     {
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
     }
     else
     {
-    
+
         /* At this point, we know that the pointer is valid.  */
 
         /* Pickup thread pointer.  */
@@ -201,7 +201,7 @@ UCHAR               **suspend_info_ptr;
         /* Update the number of available bytes in the pool.  */
         block_link_ptr =  TX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(work_ptr);
         next_block_ptr =  *block_link_ptr;
-        pool_ptr -> tx_byte_pool_available =  
+        pool_ptr -> tx_byte_pool_available =
             pool_ptr -> tx_byte_pool_available + TX_UCHAR_POINTER_DIF(next_block_ptr, work_ptr);
 
         /* Determine if the free block is prior to current search pointer.  */
@@ -215,8 +215,8 @@ UCHAR               **suspend_info_ptr;
         /* Determine if there are threads suspended on this byte pool.  */
         if (pool_ptr -> tx_byte_pool_suspended_count != TX_NO_SUSPENSIONS)
         {
-                
-            /* Now examine the suspension list to find threads waiting for 
+
+            /* Now examine the suspension list to find threads waiting for
                memory.  Maybe it is now available!  */
             while (pool_ptr -> tx_byte_pool_suspended_count != TX_NO_SUSPENSIONS)
             {
@@ -245,7 +245,7 @@ UCHAR               **suspend_info_ptr;
                 /* If there is not enough memory, break this loop!  */
                 if (work_ptr == TX_NULL)
                 {
-          
+
                   /* Break out of the loop.  */
                     break;
                 }
@@ -257,7 +257,7 @@ UCHAR               **suspend_info_ptr;
                     /* Also, makes sure the memory size is the same.  */
                     if (susp_thread_ptr -> tx_thread_suspend_info == memory_size)
                     {
-                  
+
                         /* Remove the suspended thread from the list.  */
 
                         /* Decrement the number of threads suspended.  */
@@ -302,7 +302,7 @@ UCHAR               **suspend_info_ptr;
 
                         /* Clear the memory pointer to indicate that it was given to the suspended thread.  */
                         work_ptr =  TX_NULL;
-                        
+
                         /* Put return status into the thread control block.  */
                         susp_thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;
 
@@ -328,11 +328,11 @@ UCHAR               **suspend_info_ptr;
                         TX_DISABLE
                     }
                 }
-                    
+
                 /* Determine if the memory was given to the suspended thread.  */
                 if (work_ptr != TX_NULL)
                 {
-                
+
                     /* No, it wasn't given to the suspended thread.  */
 
                     /* Put the memory back on the available list since this thread is no longer
@@ -345,7 +345,7 @@ UCHAR               **suspend_info_ptr;
                     /* Update the number of available bytes in the pool.  */
                     block_link_ptr =  TX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(work_ptr);
                     next_block_ptr =  *block_link_ptr;
-                    pool_ptr -> tx_byte_pool_available =  
+                    pool_ptr -> tx_byte_pool_available =
                         pool_ptr -> tx_byte_pool_available + TX_UCHAR_POINTER_DIF(next_block_ptr, work_ptr);
 
                     /* Determine if the current pointer is before the search pointer.  */
@@ -357,7 +357,7 @@ UCHAR               **suspend_info_ptr;
                     }
                 }
             }
-            
+
             /* Restore interrupts.  */
             TX_RESTORE
 
@@ -366,7 +366,7 @@ UCHAR               **suspend_info_ptr;
         }
         else
         {
-        
+
             /* No, threads suspended, restore interrupts.  */
             TX_RESTORE
         }

@@ -88,7 +88,7 @@ TX_MUTEX        *previous_mutex;
     /* Setup the basic mutex fields.  */
     mutex_ptr -> tx_mutex_name =             name_ptr;
     mutex_ptr -> tx_mutex_inherit =          inherit;
-    
+
     /* Disable interrupts to place the mutex on the created list.  */
     TX_DISABLE
 
@@ -126,7 +126,7 @@ TX_MUTEX        *previous_mutex;
 
     /* Increment the ownership count.  */
     _tx_mutex_created_count++;
-    
+
     /* Optional mutex create extended processing.  */
     TX_MUTEX_CREATE_EXTENSION(mutex_ptr)
 

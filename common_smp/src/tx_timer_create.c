@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
@@ -31,50 +31,50 @@
 #include "tx_timer.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_timer_create                                   PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_create                                   PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates an application timer from the specified       */ 
-/*    input.                                                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    timer_ptr                         Pointer to timer control block    */ 
-/*    name_ptr                          Pointer to timer name             */ 
-/*    expiration_function               Application expiration function   */ 
-/*    initial_ticks                     Initial expiration ticks          */ 
-/*    reschedule_ticks                  Reschedule ticks                  */ 
-/*    auto_activate                     Automatic activation flag         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SUCCESS                        Successful completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_timer_system_activate         Timer activation function         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function creates an application timer from the specified       */
+/*    input.                                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                         Pointer to timer control block    */
+/*    name_ptr                          Pointer to timer name             */
+/*    expiration_function               Application expiration function   */
+/*    initial_ticks                     Initial expiration ticks          */
+/*    reschedule_ticks                  Reschedule ticks                  */
+/*    auto_activate                     Automatic activation flag         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Successful completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_timer_system_activate         Timer activation function         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr, 
+UINT  _tx_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr,
             VOID (*expiration_function)(ULONG id), ULONG expiration_input,
             ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
 {
@@ -96,11 +96,11 @@ TX_TIMER        *previous_timer;
     timer_ptr -> tx_timer_internal.tx_timer_internal_timeout_param =        expiration_input;
 
 #ifdef TX_THREAD_SMP_ONLY_CORE_0_DEFAULT
-    
+
     /* Default the timers to run on core 0.  */
     timer_ptr -> tx_timer_internal.tx_timer_internal_smp_cores_excluded =  (TX_THREAD_SMP_CORE_MASK & 0xFFFFFFFE);
 #endif
-    
+
     /* Disable interrupts to put the timer on the created list.  */
     TX_DISABLE
 
@@ -130,7 +130,7 @@ TX_TIMER        *previous_timer;
 
         /* Setup this timer's created links.  */
         timer_ptr -> tx_timer_created_previous =  previous_timer;
-        timer_ptr -> tx_timer_created_next =      next_timer;    
+        timer_ptr -> tx_timer_created_next =      next_timer;
     }
 
     /* Increment the number of created timers.  */

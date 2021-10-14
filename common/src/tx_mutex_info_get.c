@@ -79,7 +79,7 @@
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_mutex_info_get(TX_MUTEX *mutex_ptr, CHAR **name, ULONG *count, TX_THREAD **owner,
-                    TX_THREAD **first_suspended, ULONG *suspended_count, 
+                    TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_MUTEX **next_mutex)
 {
 
@@ -101,45 +101,45 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the name of the mutex.  */
     if (name != TX_NULL)
     {
-    
+
         *name =  mutex_ptr -> tx_mutex_name;
     }
-    
+
     /* Retrieve the current ownership count of the mutex.  */
     if (count != TX_NULL)
     {
-    
+
         *count =  ((ULONG) mutex_ptr -> tx_mutex_ownership_count);
     }
-    
+
     /* Retrieve the current owner of the mutex.  */
     if (owner != TX_NULL)
     {
-    
+
         *owner =  mutex_ptr -> tx_mutex_owner;
     }
-    
+
     /* Retrieve the first thread suspended on this mutex.  */
     if (first_suspended != TX_NULL)
     {
-    
+
         *first_suspended =  mutex_ptr -> tx_mutex_suspension_list;
     }
-    
+
     /* Retrieve the number of threads suspended on this mutex.  */
     if (suspended_count != TX_NULL)
     {
-    
+
         *suspended_count =  (ULONG) mutex_ptr -> tx_mutex_suspended_count;
     }
-    
+
     /* Retrieve the pointer to the next mutex created.  */
     if (next_mutex != TX_NULL)
     {
-    
+
         *next_mutex =  mutex_ptr -> tx_mutex_created_next;
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 

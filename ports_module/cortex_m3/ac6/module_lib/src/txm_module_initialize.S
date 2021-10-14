@@ -32,8 +32,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_initialize                          Cortex-M4/MPU/AC6   */
-/*                                                           6.1          */
+/*    _txm_module_initialize                            Cortex-M3/AC6     */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -62,7 +62,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Andres Mlinar            Initial Version 6.1           */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_initialize(VOID)

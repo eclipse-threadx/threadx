@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -32,44 +32,44 @@
 #include "tx_thread.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_preemption_change                       PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_preemption_change                       PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function processes preemption-threshold change requests.  The  */ 
-/*    previous preemption is returned to the caller.  If the new request  */ 
-/*    allows a higher priority thread to execute, preemption takes place  */ 
-/*    inside of this function.                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                            Pointer to thread             */ 
-/*    new_threshold                         New preemption-threshold      */ 
-/*    old_threshold                         Old preemption-threshold      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                                Service return status         */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */ 
-/*    _tx_thread_system_preempt_check       Check for preemption          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function processes preemption-threshold change requests.  The  */
+/*    previous preemption is returned to the caller.  If the new request  */
+/*    allows a higher priority thread to execute, preemption takes place  */
+/*    inside of this function.                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Pointer to thread             */
+/*    new_threshold                         New preemption-threshold      */
+/*    old_threshold                         Old preemption-threshold      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                Service return status         */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */
+/*    _tx_thread_system_preempt_check       Check for preemption          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -86,7 +86,7 @@ UINT        core_index;
 ULONG       priority_bit;
 UINT        base_priority;
 UINT        priority_bit_set;
-ULONG       priority_map;                  
+ULONG       priority_map;
 UINT        next_preempted;
 TX_THREAD   *preempted_thread;
 #if TX_MAX_PRIORITIES > 32
@@ -98,16 +98,16 @@ UINT        status;
 
 #ifdef TX_DISABLE_PREEMPTION_THRESHOLD
 
-    /* Only allow 0 (disable all preemption) and returning preemption-threshold to the 
+    /* Only allow 0 (disable all preemption) and returning preemption-threshold to the
        current thread priority if preemption-threshold is disabled. All other threshold
        values are converted to 0.  */
     if (new_threshold < thread_ptr -> tx_thread_user_priority)
     {
-    
+
         /* Is the new threshold zero?  */
         if (new_threshold != ((UINT) 0))
         {
-        
+
             /* Convert the new threshold to disable all preemption, since preemption-threshold is
                not supported.  */
             new_threshold =  ((UINT) 0);
@@ -130,10 +130,10 @@ UINT        status;
     /* Determine if the new threshold is greater than the current user priority.  */
     if (new_threshold > thread_ptr -> tx_thread_user_priority)
     {
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
-            
+
         /* Return error.  */
         status =  TX_THRESH_ERROR;
     }
@@ -149,13 +149,13 @@ UINT        status;
         /* Determine if the new threshold represents a higher priority than the priority inheritance threshold.  */
         if (new_threshold < thread_ptr -> tx_thread_inherit_priority)
         {
-    
+
             /* Update the actual preemption-threshold with the new threshold.  */
             thread_ptr -> tx_thread_preempt_threshold =  new_threshold;
         }
         else
         {
-    
+
             /* Update the actual preemption-threshold with the priority inheritance.  */
             thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_inherit_priority;
         }
@@ -163,7 +163,7 @@ UINT        status;
         /* Determine if the thread is ready and scheduled.  */
         if (thread_ptr -> tx_thread_state == TX_READY)
         {
-        
+
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
             /* Determine if the new threshold is the same as the priority.  */
@@ -208,7 +208,7 @@ UINT        status;
             /* Determine if this thread has global preemption disabled.  */
             if (thread_ptr == _tx_thread_preemption__threshold_scheduled)
             {
-      
+
                 /* Clear the global preemption disable flag.  */
                 _tx_thread_preemption__threshold_scheduled =  TX_NULL;
 
@@ -219,7 +219,7 @@ UINT        status;
                 if (_tx_thread_preempted_map_active != ((ULONG) 0))
 #else
                 if (_tx_thread_preempted_maps[0] != ((ULONG) 0))
-#endif    
+#endif
                 {
 #if TX_MAX_PRIORITIES > 32
 
@@ -247,11 +247,11 @@ UINT        status;
                     priority_bit =  (ULONG) priority_bit_set;
 
                     /* Setup the highest priority preempted thread.  */
-                    next_preempted =  base_priority + priority_bit;       
+                    next_preempted =  base_priority + priority_bit;
 
                     /* Pickup the previously preempted thread.  */
                     preempted_thread =  _tx_thread_preemption_threshold_list[next_preempted];
-                
+
                     /* Pickup the preempted thread.  */
                     _tx_thread_preemption__threshold_scheduled =  preempted_thread;
                 }
@@ -265,7 +265,7 @@ UINT        status;
             /* Debug entry.  */
             _tx_thread_smp_debug_entry_insert(12, 0, thread_ptr);
 #endif
-        
+
             /* Pickup the index.  */
             core_index =  TX_SMP_CORE_ID;
 
@@ -277,7 +277,7 @@ UINT        status;
             /* Debug entry.  */
             _tx_thread_smp_debug_entry_insert(13, 0, thread_ptr);
 #endif
-        
+
             /* Restore interrupts.  */
             TX_RESTORE
 
@@ -286,7 +286,7 @@ UINT        status;
         }
         else
         {
-    
+
             /* Restore interrupts.  */
             TX_RESTORE
         }

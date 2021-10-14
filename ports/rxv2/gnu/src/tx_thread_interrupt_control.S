@@ -19,14 +19,23 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-
+;
+;#define TX_SOURCE_CODE
+;
+;
+;/* Include necessary system files.  */
+;
+;#include "tx_api.h"
+;#include "tx_thread.h"
+;
+;
     .text
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_interrupt_control                         RXv2/GNURX     */
-;/*                                                           6.1.3        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -56,7 +65,9 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
+;/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;UINT   _tx_thread_interrupt_control(UINT new_posture)
@@ -75,13 +86,12 @@ __tx_thread_interrupt_control:
 ;    /* Apply the new interrupt posture.  */
 ;
 
-    BTST    #16, R1             ; test I bit of PSW of "new posture"
-    BMNE    #16, R2             ; conditionally set I bit of intermediate posture
+    BTST    #16, R1             ; Test I bit of PSW of "new posture"
+    BMNE    #16, R2             ; Conditionally set I bit of intermediate posture
 
-    MVTC    R2, PSW             ; save intermediate posture to PSW
+    MVTC    R2, PSW             ; Save intermediate posture to PSW
 
     MOV.L   R3,R1               ; Get original SR
     RTS                         ; Return to caller
 ;}
     .end
-

@@ -123,79 +123,11 @@
                 			
             </storageModule>
             			
-            <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
-            		
-        </cconfiguration>
-        		
-        <cconfiguration id="com.arm.eclipse.build.config.v6.exe.release.base.1700101495">
-            			
-            <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.arm.eclipse.build.config.v6.exe.release.base.1700101495" moduleId="org.eclipse.cdt.core.settings" name="Release">
+            <storageModule moduleId="org.eclipse.cdt.core.externalSettings">
                 				
-                <externalSettings/>
-                				
-                <extensions>
-                    					
-                    <extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-                    					
-                    <extension id="com.arm.eclipse.builder.armcc.error" point="org.eclipse.cdt.core.ErrorParser"/>
-                    					
-                    <extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
-                    				
-                </extensions>
+                <externalSettings containerId="tx;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
                 			
             </storageModule>
-            			
-            <storageModule moduleId="cdtBuildSystem" version="4.0.0">
-                				
-                <configuration artifactExtension="axf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="clean" description="" id="com.arm.eclipse.build.config.v6.exe.release.base.1700101495" name="Release" parent="com.arm.eclipse.build.config.v6.exe.release.base">
-                    					
-                    <folderInfo id="com.arm.eclipse.build.config.v6.exe.release.base.1700101495." name="/" resourcePath="">
-                        						
-                        <toolChain id="com.arm.toolchain.v6.exe.release.base.var.arm_compiler_6-6.93780758" name="Arm Compiler 6" superClass="com.arm.toolchain.v6.exe.release.base.var.arm_compiler_6-6">
-                            							
-                            <targetPlatform id="com.arm.toolchain.v6.exe.release.base.var.arm_compiler_6-6.93780758.1638782686" name=""/>
-                            							
-                            <builder autoBuildTarget="all" buildPath="${workspace_loc:/sample_threadx}/Release" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="com.arm.toolchain.v6.builder.387488755" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="false" superClass="com.arm.toolchain.v6.builder"/>
-                            							
-                            <tool id="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.1160612426" name="Arm C Compiler 6" superClass="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6">
-                                								
-                                <option id="com.arm.tool.c.compiler.v6.base.option.optlevel.1619513859" name="Optimization level" superClass="com.arm.tool.c.compiler.v6.base.option.optlevel" useByScannerDiscovery="true" value="com.arm.tool.c.compiler.v6.base.option.optlevel.high" valueType="enumerated"/>
-                                								
-                                <inputType id="com.arm.tool.c.compiler.v6.base.input.1399251123" superClass="com.arm.tool.c.compiler.v6.base.input"/>
-                                							
-                            </tool>
-                            							
-                            <tool id="com.arm.tool.cpp.compiler.v6.base.var.arm_compiler_6-6.980720404" name="Arm C++ Compiler 6" superClass="com.arm.tool.cpp.compiler.v6.base.var.arm_compiler_6-6">
-                                								
-                                <option id="com.arm.tool.c.compiler.v6.base.option.optlevel.1556967535" name="Optimization level" superClass="com.arm.tool.c.compiler.v6.base.option.optlevel" useByScannerDiscovery="true" value="com.arm.tool.c.compiler.v6.base.option.optlevel.high" valueType="enumerated"/>
-                                							
-                            </tool>
-                            							
-                            <tool id="com.arm.tool.assembler.v6.base.var.arm_compiler_6-6.1952449360" name="Arm Assembler 6" superClass="com.arm.tool.assembler.v6.base.var.arm_compiler_6-6">
-                                								
-                                <inputType id="com.arm.tool.assembler.v6.base.input.623890739" superClass="com.arm.tool.assembler.v6.base.input"/>
-                                							
-                            </tool>
-                            							
-                            <tool id="com.arm.tool.c.linker.v6.base.var.arm_compiler_6-6.892368789" name="Arm Linker 6" superClass="com.arm.tool.c.linker.v6.base.var.arm_compiler_6-6"/>
-                            							
-                            <tool id="com.arm.tool.librarian.v6.base.var.arm_compiler_6-6.2131111372" name="Arm Librarian 6" superClass="com.arm.tool.librarian.v6.base.var.arm_compiler_6-6"/>
-                            						
-                        </toolChain>
-                        					
-                    </folderInfo>
-                    					
-                    <sourceEntries>
-                        						
-                        <entry excluding="exceptions_old.c|reset.S|crt0.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-                        					
-                    </sourceEntries>
-                    				
-                </configuration>
-                			
-            </storageModule>
-            			
-            <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
             		
         </cconfiguration>
         	

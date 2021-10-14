@@ -118,7 +118,7 @@ UINT            status;
 
     /* Pickup the thread suspension count.  */
     suspended_count =  queue_ptr -> tx_queue_suspended_count;
-    
+
     /* Determine if there is anything in the queue.  */
     if (queue_ptr -> tx_queue_enqueued != TX_NO_MESSAGES)
     {
@@ -128,13 +128,13 @@ UINT            status;
         {
 
             /* There is a message waiting in the queue and there are no suspensi.  */
-            
+
             /* Setup source and destination pointers.  */
             source =       queue_ptr -> tx_queue_read;
             destination =  TX_VOID_TO_ULONG_POINTER_CONVERT(destination_ptr);
             size =         queue_ptr -> tx_queue_message_size;
 
-            /* Copy message. Note that the source and destination pointers are 
+            /* Copy message. Note that the source and destination pointers are
                incremented by the macro.  */
             TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
@@ -145,10 +145,10 @@ UINT            status;
                 /* Yes, wrap around to the beginning.  */
                 source =  queue_ptr -> tx_queue_start;
             }
-        
+
             /* Setup the queue read pointer.   */
             queue_ptr -> tx_queue_read =  source;
-        
+
             /* Increase the amount of available storage.  */
             queue_ptr -> tx_queue_available_storage++;
 
@@ -160,18 +160,18 @@ UINT            status;
         }
         else
         {
-        
+
             /* At this point we know the queue is full.  */
 
             /* Pickup thread suspension list head pointer.  */
             thread_ptr =  queue_ptr -> tx_queue_suspension_list;
 
             /* Now determine if there is a queue front suspension active.   */
-    
+
             /* Is the front suspension flag set?  */
             if (thread_ptr -> tx_thread_suspend_option == TX_TRUE)
             {
-        
+
                 /* Yes, a queue front suspension is present.  */
 
                 /* Return the message associated with this suspension.  */
@@ -181,11 +181,11 @@ UINT            status;
                 destination =  TX_VOID_TO_ULONG_POINTER_CONVERT(destination_ptr);
                 size =         queue_ptr -> tx_queue_message_size;
 
-                /* Copy message. Note that the source and destination pointers are 
+                /* Copy message. Note that the source and destination pointers are
                    incremented by the macro.  */
                 TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
-                /* Message is now in the caller's destination. See if this is the only suspended thread 
+                /* Message is now in the caller's destination. See if this is the only suspended thread
                    on the list.  */
                 suspended_count--;
                 if (suspended_count == TX_NO_SUSPENSIONS)
@@ -244,7 +244,7 @@ UINT            status;
             else
             {
 
-                /* At this point, we know that the queue is full and there 
+                /* At this point, we know that the queue is full and there
                    are one or more threads suspended trying to send another
                    message to this queue.  */
 
@@ -253,7 +253,7 @@ UINT            status;
                 destination =  TX_VOID_TO_ULONG_POINTER_CONVERT(destination_ptr);
                 size =         queue_ptr -> tx_queue_message_size;
 
-                /* Copy message. Note that the source and destination pointers are 
+                /* Copy message. Note that the source and destination pointers are
                    incremented by the macro.  */
                 TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
@@ -267,7 +267,7 @@ UINT            status;
 
                 /* Setup the queue read pointer.   */
                 queue_ptr -> tx_queue_read =  source;
-  
+
                 /* Disable preemption.  */
                 _tx_thread_preempt_disable++;
 
@@ -291,14 +291,14 @@ UINT            status;
                 destination =  queue_ptr -> tx_queue_write;
                 size =         queue_ptr -> tx_queue_message_size;
 
-                /* Copy message. Note that the source and destination pointers are 
+                /* Copy message. Note that the source and destination pointers are
                    incremented by the macro.  */
                 TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
                 /* Determine if we are at the end.  */
                 if (destination == queue_ptr -> tx_queue_end)
                 {
-            
+
                     /* Yes, wrap around to the beginning.  */
                     destination =  queue_ptr -> tx_queue_start;
                 }
@@ -309,7 +309,7 @@ UINT            status;
                 /* Pickup thread pointer.  */
                 thread_ptr =  queue_ptr -> tx_queue_suspension_list;
 
-                /* Message is now in the queue.  See if this is the only suspended thread 
+                /* Message is now in the queue.  See if this is the only suspended thread
                    on the list.  */
                 suspended_count--;
                 if (suspended_count == TX_NO_SUSPENSIONS)
@@ -378,7 +378,7 @@ UINT            status;
 
             /* Restore interrupts.  */
             TX_RESTORE
-           
+
             /* Suspension is not allowed if the preempt disable flag is non-zero at this point - return error completion.  */
             status =  TX_QUEUE_EMPTY;
         }
@@ -395,7 +395,7 @@ UINT            status;
             /* Increment the number of empty suspensions on this queue.  */
             queue_ptr -> tx_queue_performance_empty_suspension_count++;
 #endif
-            
+
             /* Pickup thread pointer.  */
             TX_THREAD_GET_CURRENT(thread_ptr)
 
@@ -477,7 +477,7 @@ UINT            status;
 
         /* Restore interrupts.  */
         TX_RESTORE
-           
+
         /* Immediate return, return error completion.  */
         status =  TX_QUEUE_EMPTY;
     }

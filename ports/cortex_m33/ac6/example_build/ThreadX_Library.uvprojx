@@ -1304,16 +1304,6 @@
               <FilePath>..\src\txe_thread_secure_stack_free.c</FilePath>
             </File>
             <File>
-              <FileName>tx_thread_stack_error_handler.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\tx_thread_stack_error_handler.c</FilePath>
-            </File>
-            <File>
-              <FileName>tx_thread_stack_error_notify.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\tx_thread_stack_error_notify.c</FilePath>
-            </File>
-            <File>
               <FileName>tx_thread_context_restore.S</FileName>
               <FileType>2</FileType>
               <FilePath>..\src\tx_thread_context_restore.S</FilePath>
@@ -1377,6 +1367,16 @@
               <FileName>tx_thread_secure_stack_initialize.S</FileName>
               <FileType>2</FileType>
               <FilePath>..\src\tx_thread_secure_stack_initialize.S</FilePath>
+            </File>
+            <File>
+              <FileName>tx_thread_stack_error_handler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\common\src\tx_thread_stack_error_handler.c</FilePath>
+            </File>
+            <File>
+              <FileName>tx_thread_stack_error_notify.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\common\src\tx_thread_stack_error_notify.c</FilePath>
             </File>
           </Files>
         </Group>

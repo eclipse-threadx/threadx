@@ -12,7 +12,7 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   Byte Memory                                                         */
@@ -21,27 +21,29 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    tx_byte_pool.h                                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    tx_byte_pool.h                                      PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file defines the ThreadX byte memory management component,     */ 
-/*    including all data types and external references.  It is assumed    */ 
-/*    that tx_api.h and tx_port.h have already been included.             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This file defines the ThreadX byte memory management component,     */
+/*    including all data types and external references.  It is assumed    */
+/*    that tx_api.h and tx_port.h have already been included.             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -66,12 +68,12 @@
 #endif
 
 
-/* Determine if in-line component initialization is supported by the 
+/* Determine if in-line component initialization is supported by the
    caller.  */
 
 #ifdef TX_INVOKE_INLINE_INITIALIZATION
 
-/* Yes, in-line initialization is supported, remap the byte memory pool 
+/* Yes, in-line initialization is supported, remap the byte memory pool
    initialization function.  */
 
 #ifndef TX_BYTE_POOL_ENABLE_PERFORMANCE_INFO
@@ -111,7 +113,7 @@ VOID        _tx_byte_pool_cleanup(TX_THREAD *thread_ptr, ULONG suspension_sequen
    make them extern so other functions in the component can access them.  */
 
 #ifdef TX_BYTE_POOL_INIT
-#define BYTE_POOL_DECLARE 
+#define BYTE_POOL_DECLARE
 #else
 #define BYTE_POOL_DECLARE extern
 #endif

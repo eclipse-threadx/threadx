@@ -1,10 +1,10 @@
 /*
  * GICv3_gicr.c - generic driver code for GICv3 redistributor
  *
- * Copyright (c) 2014-2017 Arm Limited (or its affiliates). All rights reserved.
- * Use, modification and redistribution of this file is subject to your
- * possession of a valid DS-5 end user licence agreement and your compliance
- * with all applicable terms and conditions of such licence agreement.
+ * Copyright (c) 2014-2018 Arm Limited (or its affiliates). All rights reserved.
+ * Use, modification and redistribution of this file is subject to your possession of a
+ * valid End User License Agreement for the Arm Product of which these examples are part of
+ * and your compliance with all applicable terms and conditions of such licence agreement.
  */
 #include "GICv3.h"
 
@@ -19,8 +19,14 @@ typedef struct
         volatile uint32_t GICR_STATUSR;          // +0x0010 - RW - Error Reporting Status Register, optional
         volatile uint32_t GICR_WAKER;            // +0x0014 - RW - Redistributor Wake Register
   const volatile uint32_t padding1[2];           // +0x0018 - RESERVED
-        volatile uint32_t IMPDEF1   ;            // +0x0020 - ?? - IMPLEMENTATION DEFINED
-  const volatile uint32_t padding2[7];           // +0x0024 - RESERVED
+#ifndef USE_GIC600
+        volatile uint32_t IMPDEF1[8];            // +0x0020 - ?? - IMPLEMENTATION DEFINED
+#else
+        volatile uint32_t GICR_FCTLR;            // +0x0020 - RW - Function Control Register
+        volatile uint32_t GICR_PWRR;             // +0x0024 - RW - Power Management Control Register
+        volatile uint32_t GICR_CLASS;            // +0x0028 - RW - Class Register
+  const volatile uint32_t padding2[5];           // +0x002C - RESERVED
+#endif
         volatile uint64_t GICR_SETLPIR;          // +0x0040 - WO - Set LPI Pending Register
         volatile uint64_t GICR_CLRLPIR;          // +0x0048 - WO - Clear LPI Pending Register
   const volatile uint32_t padding3[8];           // +0x0050 - RESERVED
@@ -63,9 +69,9 @@ typedef struct
         volatile uint8_t  GICR_IPRIORITYR[32];   // +0x0400 - RW - Interrupt Priority Registers
   const volatile uint32_t padding9[504];         // +0x0420 - RESERVED
         volatile uint32_t GICR_ICnoFGR[2];       // +0x0C00 - RW - Interrupt Configuration Registers
-  const volatile uint32_t padding10[62];	 // +0x0C08 - RESERVED
+  const volatile uint32_t padding10[62];         // +0x0C08 - RESERVED
         volatile uint32_t GICR_IGRPMODR0;        // +0x0D00 - RW - ????
-  const volatile uint32_t padding11[63];	 // +0x0D04 - RESERVED
+  const volatile uint32_t padding11[63];         // +0x0D04 - RESERVED
         volatile uint32_t GICR_NSACR;            // +0x0E00 - RW - Non-Secure Access Control Register
 } GICv3_redistributor_SGI;
 
@@ -79,14 +85,14 @@ typedef struct
 {
     union
     {
-	GICv3_redistributor_RD RD_base;
-	uint8_t padding[64 * 1024];
+        GICv3_redistributor_RD RD_base;
+        uint8_t padding[64 * 1024];
     } RDblock;
 
     union
     {
-	GICv3_redistributor_SGI SGI_base;
-	uint8_t padding[64 * 1024];
+        GICv3_redistributor_SGI SGI_base;
+        uint8_t padding[64 * 1024];
     } SGIblock;
 } GICv3_GICR;
 
@@ -126,6 +132,10 @@ static inline GICv3_redistributor_SGI *const getgicrSGI(uint32_t gicr)
 void WakeupGICR(uint32_t gicr)
 {
     GICv3_redistributor_RD *const gicrRD = getgicrRD(gicr);
+#ifdef USE_GIC600
+    //Power up Re-distributor for GIC-600
+    gicrRD->GICR_PWRR = 0x2;
+#endif
 
     /*
      * step 1 - ensure GICR_WAKER.ProcessorSleep is off
@@ -136,7 +146,7 @@ void WakeupGICR(uint32_t gicr)
      * step 2 - wait for children asleep to be cleared
      */
     while ((gicrRD->GICR_WAKER & gicrwaker_ChildrenAsleep) != 0)
-	continue;
+        continue;
 
     /*
      * OK, GICR is go
@@ -244,17 +254,17 @@ void SetPrivateIntSecurity(uint32_t gicr, uint32_t id, GICIGROUPRBits_t group)
      * either set or clear the Group bit for the interrupt as appropriate
      */
     if (group)
-	gicrSGI->GICR_IGROUPR0 |= 1 << id;
+        gicrSGI->GICR_IGROUPR0 |= 1 << id;
     else
-	gicrSGI->GICR_IGROUPR0 &= ~(1 << id);
+        gicrSGI->GICR_IGROUPR0 &= ~(1 << id);
 
     /*
      * now deal with groupmod
      */
     if (groupmod)
-	gicrSGI->GICR_IGRPMODR0 |= 1 << id;
+        gicrSGI->GICR_IGRPMODR0 |= 1 << id;
     else
-	gicrSGI->GICR_IGRPMODR0 &= ~(1 << id);
+        gicrSGI->GICR_IGRPMODR0 &= ~(1 << id);
 }
 
 void SetPrivateIntSecurityBlock(uint32_t gicr, GICIGROUPRBits_t group)

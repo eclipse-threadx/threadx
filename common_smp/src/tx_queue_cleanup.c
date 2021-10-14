@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Queue                                                               */
 /**                                                                       */
@@ -30,47 +30,49 @@
 #include "tx_queue.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_queue_cleanup                                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_queue_cleanup                                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function processes queue timeout and thread terminate          */ 
-/*    actions that require the queue data structures to be cleaned        */ 
-/*    up.                                                                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                        Pointer to suspended thread's     */ 
-/*                                        control block                   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_resume          Resume thread service             */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_timeout                Thread timeout processing         */ 
-/*    _tx_thread_terminate              Thread terminate processing       */ 
-/*    _tx_thread_wait_abort             Thread wait abort processing      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function processes queue timeout and thread terminate          */
+/*    actions that require the queue data structures to be cleaned        */
+/*    up.                                                                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                        Pointer to suspended thread's     */
+/*                                        control block                   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_resume          Resume thread service             */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_timeout                Thread timeout processing         */
+/*    _tx_thread_terminate              Thread terminate processing       */
+/*    _tx_thread_wait_abort             Thread wait abort processing      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_queue_cleanup(TX_THREAD  *thread_ptr, ULONG suspension_sequence)
@@ -80,12 +82,12 @@ VOID  _tx_queue_cleanup(TX_THREAD  *thread_ptr, ULONG suspension_sequence)
 TX_INTERRUPT_SAVE_AREA
 #endif
 
-TX_QUEUE            *queue_ptr;                
+TX_QUEUE            *queue_ptr;
 UINT                suspended_count;
 TX_THREAD           *next_thread;
 TX_THREAD           *previous_thread;
 
-    
+
 #ifndef TX_NOT_INTERRUPTABLE
 
     /* Disable interrupts to remove the suspended thread from the queue.  */
@@ -94,7 +96,7 @@ TX_THREAD           *previous_thread;
     /* Determine if the cleanup is still required.  */
     if (thread_ptr -> tx_thread_suspend_cleanup == &(_tx_queue_cleanup))
     {
-    
+
         /* Check for valid suspension sequence.  */
         if (suspension_sequence == thread_ptr -> tx_thread_suspension_sequence)
         {
@@ -120,7 +122,7 @@ TX_THREAD           *previous_thread;
 #endif
 
                         /* Yes, we still have thread suspension!  */
-    
+
                         /* Clear the suspension cleanup flag.  */
                         thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 
@@ -159,14 +161,14 @@ TX_THREAD           *previous_thread;
                                 /* Update the list head pointer.  */
                                 queue_ptr -> tx_queue_suspension_list =         next_thread;
                             }
-                        } 
- 
+                        }
+
                         /* Now we need to determine if this cleanup is from a terminate, timeout,
                            or from a wait abort.  */
                         if (thread_ptr -> tx_thread_state == TX_QUEUE_SUSP)
                         {
 
-                            /* Timeout condition and the thread still suspended on the queue.  
+                            /* Timeout condition and the thread still suspended on the queue.
                                Setup return error status and resume the thread.  */
 
 #ifdef TX_QUEUE_ENABLE_PERFORMANCE_INFO
@@ -181,17 +183,17 @@ TX_THREAD           *previous_thread;
                             /* Setup return status.  */
                             if (queue_ptr -> tx_queue_enqueued != TX_NO_MESSAGES)
                             {
-            
+
                                 /* Queue full timeout!  */
                                 thread_ptr -> tx_thread_suspend_status =  TX_QUEUE_FULL;
                             }
                             else
                             {
-            
+
                                 /* Queue empty timeout!  */
                                 thread_ptr -> tx_thread_suspend_status =  TX_QUEUE_EMPTY;
                             }
-            
+
 #ifdef TX_NOT_INTERRUPTABLE
 
                             /* Resume the thread!  */

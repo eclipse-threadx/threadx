@@ -59,7 +59,7 @@ IRQ_MODE_BITS   =       0x12                    @ IRQ mode bits
 @/*  FUNCTION                                               RELEASE        */ 
 @/*                                                                        */ 
 @/*    _tx_thread_fiq_context_restore                    Cortex-A5/GNU     */ 
-@/*                                                           6.1          */
+@/*                                                           6.1.9        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -92,6 +92,9 @@ IRQ_MODE_BITS   =       0x12                    @ IRQ mode bits
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
+@/*                                            execution profile support,  */
+@/*                                            resulting in version 6.1.9  */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_fiq_context_restore(VOID)
@@ -104,7 +107,7 @@ _tx_thread_fiq_context_restore:
 @
     CPSID   if                                  @ Disable IRQ and FIQ interrupts
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 @
 @    /* Call the ISR exit function to indicate an ISR is complete.  */
 @

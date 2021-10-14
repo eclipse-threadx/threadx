@@ -58,11 +58,11 @@
 #define TX_EVENT_FLAGS_CLEAR_MASK               ((UINT) 0x1)
 
 
-/* Determine if in-line component initialization is supported by the 
+/* Determine if in-line component initialization is supported by the
    caller.  */
 #ifdef TX_INVOKE_INLINE_INITIALIZATION
 
-/* Yes, in-line initialization is supported, remap the event flag initialization 
+/* Yes, in-line initialization is supported, remap the event flag initialization
    function.  */
 
 #ifndef TX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO

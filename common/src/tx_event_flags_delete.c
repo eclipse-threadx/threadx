@@ -106,7 +106,7 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
 
     /* Decrement the number of created event flag groups.  */
     _tx_event_flags_created_count--;
-    
+
     /* See if this group is the only one on the list.  */
     if (_tx_event_flags_created_count == TX_EMPTY)
     {
@@ -126,7 +126,7 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
         /* See if we have to update the created list head pointer.  */
         if (_tx_event_flags_created_ptr == group_ptr)
         {
-                    
+
             /* Yes, move the head pointer to the next link. */
             _tx_event_flags_created_ptr =  next_group;
         }
@@ -144,18 +144,18 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
     /* Restore interrupts.  */
     TX_RESTORE
 
-    /* Walk through the event flag suspension list to resume any and all threads 
+    /* Walk through the event flag suspension list to resume any and all threads
        suspended on this group.  */
     while (suspended_count != TX_NO_SUSPENSIONS)
     {
-      
+
         /* Decrement the number of suspended threads.  */
         suspended_count--;
-      
+
         /* Lockout interrupts.  */
         TX_DISABLE
 
-        /* Clear the cleanup pointer, this prevents the timeout from doing 
+        /* Clear the cleanup pointer, this prevents the timeout from doing
            anything.  */
         thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 

@@ -82,7 +82,7 @@ UINT        status;
         /* Byte pool pointer is invalid, return appropriate error code.  */
         status =  TX_POOL_ERROR;
     }
-    
+
     /* Now check for invalid pool ID.  */
     else if (pool_ptr -> tx_byte_pool_id != TX_BYTE_POOL_ID)
     {

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -31,41 +31,41 @@
 #include "tx_thread.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_suspend                                 PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_suspend                                 PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function handles application suspend requests.  If the suspend */ 
-/*    requires actual processing, this function calls the actual suspend  */ 
-/*    thread routine.                                                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                            Pointer to thread to suspend  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                                Return completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_suspend         Actual thread suspension          */ 
-/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function handles application suspend requests.  If the suspend */
+/*    requires actual processing, this function calls the actual suspend  */
+/*    thread routine.                                                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Pointer to thread to suspend  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                Return completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_suspend         Actual thread suspension          */
+/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -77,7 +77,7 @@ UINT  _tx_thread_suspend(TX_THREAD *thread_ptr)
 TX_INTERRUPT_SAVE_AREA
 
 TX_THREAD  *current_thread;
-UINT        status;                         
+UINT        status;
 UINT        core_index;
 
 
@@ -106,13 +106,13 @@ UINT        core_index;
         /* Determine if we are in a thread context.  */
         if (_tx_thread_system_state[core_index] == ((ULONG) 0))
         {
-        
+
             /* Yes, we are in a thread context.  */
 
             /* Determine if the current thread is also the suspending thread.  */
             if (current_thread == thread_ptr)
             {
-        
+
                 /* Determine if the preempt disable flag is non-zero.  */
                 if (_tx_thread_preempt_disable != ((UINT) 0))
                 {
@@ -125,7 +125,7 @@ UINT        core_index;
 
         /* Determine if the status is still successful.  */
         if (status == TX_SUCCESS)
-        {           
+        {
 
             /* Set the state to suspended.  */
             thread_ptr -> tx_thread_state =    TX_SUSPENDED;
@@ -159,14 +159,14 @@ UINT        core_index;
 
             /* Disable interrupts.  */
             TX_DISABLE
-        
+
             /* Return success.  */
             status =  TX_SUCCESS;
 #else
 
             /* If MISRA is not enabled, return directly.  */
             return(TX_SUCCESS);
-#endif            
+#endif
         }
     }
     else if (thread_ptr -> tx_thread_state == TX_TERMINATED)
@@ -200,7 +200,7 @@ UINT        core_index;
     /* Restore interrupts.  */
     TX_RESTORE
 
-    /* Always return success, since this function does not perform error 
+    /* Always return success, since this function does not perform error
        checking.  */
     return(status);
 }

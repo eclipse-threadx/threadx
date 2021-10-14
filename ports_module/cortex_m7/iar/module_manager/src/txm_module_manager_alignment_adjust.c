@@ -30,8 +30,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_power_of_two_block_size                    Cortex-M7/MPU/IAR   */
-/*                                                           6.1          */
+/*    _txm_power_of_two_block_size                        Cortex-M7       */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -61,7 +61,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_power_of_two_block_size(ULONG size)
@@ -93,8 +93,8 @@ ULONG  _txm_power_of_two_block_size(ULONG size)
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_alignment_adjust            Cortex-M7/MPU/IAR   */
-/*                                                           6.1.7        */
+/*    _txm_module_manager_alignment_adjust                Cortex-M7       */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -128,9 +128,7 @@ ULONG  _txm_power_of_two_block_size(ULONG size)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  06-02-2021      Scott Larson            Added support for 8 MPU,      */
-/*                                            resulting in version 6.1.7  */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,
@@ -139,7 +137,7 @@ VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,
                                            ULONG *data_size,
                                            ULONG *data_alignment)
 {
-#ifndef TXM_MODULE_MANAGER_8_MPU
+#ifdef TXM_MODULE_MANAGER_16_MPU
 ULONG   local_code_size;
 ULONG   local_code_alignment;
 ULONG   local_data_size;

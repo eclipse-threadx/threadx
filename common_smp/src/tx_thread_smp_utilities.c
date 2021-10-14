@@ -12,7 +12,7 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
@@ -39,122 +39,122 @@ UINT  _tx_thread_lowest_set_bit_calculate(ULONG map)
 UINT    bit_set;
 
     if ((map & ((ULONG) 0x1)) != ((ULONG) 0))
-    {                                       
-        bit_set = ((UINT) 0);                              
-    }                                       
-    else                                    
-    {                                       
-        map =  map & (ULONG) ((~map) + ((ULONG) 1));      
-        if (map < ((ULONG) 0x100))              
-        {                                   
-            bit_set = ((UINT) 1);                          
-        }                                   
-        else if (map < ((ULONG) 0x10000))       
-        {                                   
-            bit_set =  ((UINT) 9);                         
-            map =  map >> ((UINT) 8);                    
-        }                                   
-        else if (map < ((ULONG) 0x01000000))    
-        {                                   
-            bit_set = ((UINT) 17);                         
-            map = map >> ((UINT) 16);                    
-        }                                   
-        else                                
-        {                                   
-            bit_set = ((UINT) 25);                         
-            map = map >> ((UINT) 24);                    
-        }                                   
-        if (map >= ((ULONG) 0x10))                      
-        {                                   
-            map = map >> ((UINT) 4);                     
-            bit_set = bit_set + ((UINT) 4);                      
-        }                                   
-        if (map >= ((ULONG) 0x4))                       
-        {                                   
-            map = map >> ((UINT) 2);                     
-            bit_set = bit_set + ((UINT) 2);                      
-        }                                   
-        bit_set = bit_set - (UINT) (map & (ULONG) 0x1);           
+    {
+        bit_set = ((UINT) 0);
     }
-    
+    else
+    {
+        map =  map & (ULONG) ((~map) + ((ULONG) 1));
+        if (map < ((ULONG) 0x100))
+        {
+            bit_set = ((UINT) 1);
+        }
+        else if (map < ((ULONG) 0x10000))
+        {
+            bit_set =  ((UINT) 9);
+            map =  map >> ((UINT) 8);
+        }
+        else if (map < ((ULONG) 0x01000000))
+        {
+            bit_set = ((UINT) 17);
+            map = map >> ((UINT) 16);
+        }
+        else
+        {
+            bit_set = ((UINT) 25);
+            map = map >> ((UINT) 24);
+        }
+        if (map >= ((ULONG) 0x10))
+        {
+            map = map >> ((UINT) 4);
+            bit_set = bit_set + ((UINT) 4);
+        }
+        if (map >= ((ULONG) 0x4))
+        {
+            map = map >> ((UINT) 2);
+            bit_set = bit_set + ((UINT) 2);
+        }
+        bit_set = bit_set - (UINT) (map & (ULONG) 0x1);
+    }
+
     return(bit_set);
 }
 
 
-/* Define the next priority macro. Note, that this may be overridden 
+/* Define the next priority macro. Note, that this may be overridden
    by a port specific definition.  */
-   
+
 #if TX_MAX_PRIORITIES > 32
 
-UINT _tx_thread_smp_next_priority_find(UINT priority)                                            
-{                                                                                                   
-ULONG           map_index;                                                                          
-ULONG           local_priority_map_active;                                                          
-ULONG           local_priority_map;                                                                 
-ULONG           priority_bit;                                                                       
-ULONG           first_bit_set;                                                                      
-ULONG           found_priority;                                                                     
+UINT _tx_thread_smp_next_priority_find(UINT priority)
+{
+ULONG           map_index;
+ULONG           local_priority_map_active;
+ULONG           local_priority_map;
+ULONG           priority_bit;
+ULONG           first_bit_set;
+ULONG           found_priority;
 
-    found_priority =  ((UINT) TX_MAX_PRIORITIES);                                                            
-    if (priority < ((UINT) TX_MAX_PRIORITIES))                                                                      
-    {                                                                                               
-        map_index =  priority/((UINT) 32);                                                                          
-        local_priority_map =  _tx_thread_priority_maps[map_index];                                  
-        priority_bit =        (((ULONG) 1) << (priority % ((UINT) 32)));                                            
-        local_priority_map =  local_priority_map & ~(priority_bit - ((UINT)1));                             
-        if (local_priority_map != ((ULONG) 0))                                                                     
-        {                                                                                           
-            TX_LOWEST_SET_BIT_CALCULATE(local_priority_map, first_bit_set)                          
-            found_priority =  (map_index * ((UINT) 32)) + first_bit_set;                                     
-        }                                                                                           
-        else                                                                                        
-        {                                                                                           
+    found_priority =  ((UINT) TX_MAX_PRIORITIES);
+    if (priority < ((UINT) TX_MAX_PRIORITIES))
+    {
+        map_index =  priority/((UINT) 32);
+        local_priority_map =  _tx_thread_priority_maps[map_index];
+        priority_bit =        (((ULONG) 1) << (priority % ((UINT) 32)));
+        local_priority_map =  local_priority_map & ~(priority_bit - ((UINT)1));
+        if (local_priority_map != ((ULONG) 0))
+        {
+            TX_LOWEST_SET_BIT_CALCULATE(local_priority_map, first_bit_set)
+            found_priority =  (map_index * ((UINT) 32)) + first_bit_set;
+        }
+        else
+        {
             /* Move to next map index.  */
-            map_index++;                                                                            
-            if (map_index < (((UINT) TX_MAX_PRIORITIES)/((UINT) 32)))                                                 
-            {                                                                                       
-                priority_bit =               (((ULONG) 1) << (map_index));                          
-                local_priority_map_active =  _tx_thread_priority_map_active & ~(priority_bit - ((UINT) 1));  
-                if (local_priority_map_active != ((ULONG) 0))                                                      
-                {                                                                                   
-                    TX_LOWEST_SET_BIT_CALCULATE(local_priority_map_active, map_index)               
-                    local_priority_map =  _tx_thread_priority_maps[map_index];                      
-                    TX_LOWEST_SET_BIT_CALCULATE(local_priority_map, first_bit_set)                  
-                    found_priority =  (map_index * ((UINT) 32)) + first_bit_set;                             
-                }                                                                                   
-            }                                                                                       
-        }                                                                                           
-    }                                                                                                                                                          
+            map_index++;
+            if (map_index < (((UINT) TX_MAX_PRIORITIES)/((UINT) 32)))
+            {
+                priority_bit =               (((ULONG) 1) << (map_index));
+                local_priority_map_active =  _tx_thread_priority_map_active & ~(priority_bit - ((UINT) 1));
+                if (local_priority_map_active != ((ULONG) 0))
+                {
+                    TX_LOWEST_SET_BIT_CALCULATE(local_priority_map_active, map_index)
+                    local_priority_map =  _tx_thread_priority_maps[map_index];
+                    TX_LOWEST_SET_BIT_CALCULATE(local_priority_map, first_bit_set)
+                    found_priority =  (map_index * ((UINT) 32)) + first_bit_set;
+                }
+            }
+        }
+    }
     return(found_priority);
 }
 #else
 
-UINT _tx_thread_smp_next_priority_find(UINT priority)                                            
-{                                                                                                   
-UINT            first_bit_set;                                                                      
-ULONG           local_priority_map;                                                                 
+UINT _tx_thread_smp_next_priority_find(UINT priority)
+{
+UINT            first_bit_set;
+ULONG           local_priority_map;
 UINT            next_priority;
 
-    local_priority_map =  _tx_thread_priority_maps[0];                                              
-    local_priority_map =  local_priority_map >> priority;                                                  
+    local_priority_map =  _tx_thread_priority_maps[0];
+    local_priority_map =  local_priority_map >> priority;
     next_priority =  priority;
-    if (local_priority_map == ((ULONG) 0))                                                                    
-    {                                                                                               
-        next_priority =  ((UINT) TX_MAX_PRIORITIES);                                                                     
-    }                                                                                               
-    else                                                                                            
-    {                                                                                               
-        if (next_priority >= ((UINT) TX_MAX_PRIORITIES))                                                                 
-        {                                                                                           
-            next_priority =  ((UINT) TX_MAX_PRIORITIES);                                                                 
-        }                                                                                           
-        else                                                                                        
-        {                                                                                           
-            TX_LOWEST_SET_BIT_CALCULATE(local_priority_map, first_bit_set)                          
-            next_priority =  priority + first_bit_set;                                                                 
-        }                                                                                           
-    }                                                                                               
-    
+    if (local_priority_map == ((ULONG) 0))
+    {
+        next_priority =  ((UINT) TX_MAX_PRIORITIES);
+    }
+    else
+    {
+        if (next_priority >= ((UINT) TX_MAX_PRIORITIES))
+        {
+            next_priority =  ((UINT) TX_MAX_PRIORITIES);
+        }
+        else
+        {
+            TX_LOWEST_SET_BIT_CALCULATE(local_priority_map, first_bit_set)
+            next_priority =  priority + first_bit_set;
+        }
+    }
+
     return(next_priority);
 }
 #endif
@@ -180,7 +180,7 @@ UINT    i;
 #if TX_THREAD_SMP_MAX_CORES > 5
     _tx_thread_smp_schedule_list[5] =  TX_NULL;
 #if TX_THREAD_SMP_MAX_CORES > 6
-   
+
     /* Loop to clear the remainder of the schedule list.  */
     i =  ((UINT) 6);
 
@@ -194,7 +194,7 @@ UINT    i;
     {
         /* Clear entry in schedule list.  */
         _tx_thread_smp_schedule_list[i] =  TX_NULL;
-        
+
         /* Move to next index.  */
         i++;
     }
@@ -225,7 +225,7 @@ UINT    j;
 #if TX_THREAD_SMP_MAX_CORES > 5
     _tx_thread_execute_ptr[5] =  TX_NULL;
 #if TX_THREAD_SMP_MAX_CORES > 6
-   
+
     /* Loop to clear the remainder of the execute list.  */
     j =  ((UINT) 6);
 
@@ -237,10 +237,10 @@ UINT    j;
     while (j < _tx_thread_smp_max_cores)
 #endif
     {
-    
+
         /* Clear entry in execute list.  */
         _tx_thread_execute_ptr[j] =  TX_NULL;
-        
+
         /* Move to next index.  */
         j++;
     }
@@ -271,7 +271,7 @@ UINT    j;
 #if TX_THREAD_SMP_MAX_CORES > 5
     _tx_thread_smp_schedule_list[5] =  _tx_thread_execute_ptr[5];
 #if TX_THREAD_SMP_MAX_CORES > 6
-   
+
     /* Loop to setup the remainder of the schedule list.  */
     j =  ((UINT) 6);
 
@@ -282,10 +282,10 @@ UINT    j;
     while (j < _tx_thread_smp_max_cores)
 #endif
     {
-    
+
         /* Setup entry in schedule list.  */
         _tx_thread_smp_schedule_list[j] =  _tx_thread_execute_ptr[j];
-        
+
         /* Move to next index.  */
         j++;
     }
@@ -336,7 +336,7 @@ TX_THREAD   *current_thread;
 VOID  _tx_thread_smp_core_wakeup(UINT current_core, UINT target_core)
 {
 
-    /* Determine if the core specified is not the current core - no need to wakeup the 
+    /* Determine if the core specified is not the current core - no need to wakeup the
        current core.  */
     if (target_core != current_core)
     {
@@ -345,7 +345,7 @@ VOID  _tx_thread_smp_core_wakeup(UINT current_core, UINT target_core)
         TX_THREAD_SMP_WAKEUP(target_core);
     }
 }
-#endif                      
+#endif
 
 
 VOID  _tx_thread_smp_execute_list_setup(UINT core_index)
@@ -430,7 +430,7 @@ ULONG   available_cores;
         available_cores =  available_cores | ((ULONG) 0x20);
     }
 #if TX_THREAD_SMP_MAX_CORES > 6
-   
+
     /* Loop to setup the remainder of the schedule list.  */
     j =  ((UINT) 6);
 
@@ -441,13 +441,13 @@ ULONG   available_cores;
     while (j < _tx_thread_smp_max_cores)
 #endif
     {
-    
+
         /* Determine if this core is available.  */
         if (_tx_thread_execute_ptr[j] == TX_NULL)
         {
             available_cores =  available_cores | (((ULONG) 1) << j);
         }
-        
+
         /* Move to next core.  */
         j++;
     }
@@ -507,7 +507,7 @@ TX_THREAD   *thread_ptr;
         possible_cores =  possible_cores | thread_ptr -> tx_thread_smp_cores_allowed;
     }
 #if TX_THREAD_SMP_MAX_CORES > 6
-   
+
     /* Loop to setup the remainder of the schedule list.  */
     j =  ((UINT) 6);
 
@@ -518,14 +518,14 @@ TX_THREAD   *thread_ptr;
     while (j < _tx_thread_smp_max_cores)
 #endif
     {
-    
+
         /* Determine if this core is available.  */
         thread_ptr =  _tx_thread_execute_ptr[j];
         if (thread_ptr != TX_NULL)
         {
             possible_cores =  possible_cores | thread_ptr -> tx_thread_smp_cores_allowed;
         }
-        
+
         /* Move to next core.  */
         j++;
     }
@@ -603,7 +603,7 @@ UINT        lowest_priority;
         }
     }
 #if TX_THREAD_SMP_MAX_CORES > 6
-   
+
     /* Loop to setup the remainder of the schedule list.  */
     j =  ((UINT) 6);
 
@@ -614,19 +614,19 @@ UINT        lowest_priority;
     while (j < _tx_thread_smp_max_cores)
 #endif
     {
-    
+
         /* Determine if this core has a thread scheduled.  */
         thread_ptr =  _tx_thread_execute_ptr[j];
         if (thread_ptr != TX_NULL)
         {
-        
+
             /* Is this the new lowest priority?  */
             if (thread_ptr -> tx_thread_priority > lowest_priority)
             {
                 lowest_priority =  thread_ptr -> tx_thread_priority;
             }
         }
-        
+
         /* Move to next core.  */
         j++;
     }
@@ -652,31 +652,31 @@ UINT            core_queue[TX_THREAD_SMP_MAX_CORES-1];
 TX_THREAD       *thread_ptr;
 TX_THREAD       *last_thread;
 TX_THREAD       *thread_remap_list[TX_THREAD_SMP_MAX_CORES];
-                   
+
 
     /* Clear the last thread cores in the search.  */
     last_thread_cores =  ((ULONG) 0);
-    
+
     /* Set the last thread pointer to NULL.  */
     last_thread =  TX_NULL;
-    
+
     /* Setup the core queue indices.  */
     queue_first =  ((UINT) 0);
     queue_last =   ((UINT) 0);
-                
-    /* Build a list of possible cores for this thread to execute on, starting 
+
+    /* Build a list of possible cores for this thread to execute on, starting
        with the previously mapped core.  */
     core =  schedule_thread -> tx_thread_smp_core_mapped;
     if ((thread_possible_cores & (((ULONG) 1) << core)) != ((ULONG) 0))
     {
-                
+
         /* Remember this potential mapping.  */
         thread_remap_list[core] =   schedule_thread;
         core_queue[queue_last] =    core;
-        
+
         /* Move to next slot.  */
         queue_last++;
-                   
+
         /* Clear this core.  */
         thread_possible_cores =  thread_possible_cores & ~(((ULONG) 1) << core);
     }
@@ -688,96 +688,96 @@ TX_THREAD       *thread_remap_list[TX_THREAD_SMP_MAX_CORES];
         /* Determine the first possible core.  */
         test_cores =  thread_possible_cores;
         TX_LOWEST_SET_BIT_CALCULATE(test_cores, core)
-           
+
         /* Clear this core.  */
         thread_possible_cores =  thread_possible_cores & ~(((ULONG) 1) << core);
-           
+
         /* Remember this potential mapping.  */
         thread_remap_list[core] =  schedule_thread;
         core_queue[queue_last] =   core;
-        
+
         /* Move to next slot.  */
         queue_last++;
-    } 
+    }
 
     /* Loop to evaluate the potential thread mappings, against what is already mapped.  */
-    do 
+    do
     {
 
         /* Pickup the next entry.  */
         core = core_queue[queue_first];
-        
+
         /* Move to next slot.  */
         queue_first++;
-            
+
         /* Retrieve the thread from the current mapping.  */
         thread_ptr =  _tx_thread_smp_schedule_list[core];
 
         /* Determine if there is a thread currently mapped to this core.  */
         if (thread_ptr != TX_NULL)
         {
-            
+
             /* Determine the cores available for this thread.  */
             thread_possible_cores =  thread_ptr -> tx_thread_smp_cores_allowed;
             thread_possible_cores =  test_possible_cores & thread_possible_cores;
-        
+
             /* Are there any possible cores for this thread?  */
-            if (thread_possible_cores != ((ULONG) 0)) 
+            if (thread_possible_cores != ((ULONG) 0))
             {
-         
+
                 /* Determine if there are cores available for this thread.  */
                 if ((thread_possible_cores & available_cores) != ((ULONG) 0))
                 {
-        
+
                     /* Yes, remember the final thread and cores that are valid for this thread.  */
                     last_thread_cores =  thread_possible_cores & available_cores;
                     last_thread =        thread_ptr;
-                    
+
                     /* We are done - get out of the loop!  */
                     break;
                 }
                 else
                 {
-                  
+
                     /* Remove cores that will be added to the list.  */
                     test_possible_cores =  test_possible_cores & ~(thread_possible_cores);
-                    
+
                     /* Loop to add this thread to the potential mapping list.  */
-                    do 
+                    do
                     {
-                      
+
                         /* Calculate the core.  */
                         test_cores =  thread_possible_cores;
                         TX_LOWEST_SET_BIT_CALCULATE(test_cores, core)
-                        
+
                         /* Clear this core.  */
                         thread_possible_cores =  thread_possible_cores & ~(((ULONG) 1) << core);
-                        
+
                         /* Remember this thread for remapping.  */
                         thread_remap_list[core] =  thread_ptr;
-                        
+
                         /* Remember this core.  */
                         core_queue[queue_last] =  core;
-                        
+
                         /* Move to next slot.  */
                         queue_last++;
-                        
+
                     } while (thread_possible_cores != ((ULONG) 0));
                 }
             }
         }
     } while (queue_first != queue_last);
-        
+
     /* Was a remapping solution found?  */
     if (last_thread != TX_NULL)
     {
-          
+
         /* Pickup the core of the last thread to remap.  */
         core =  last_thread -> tx_thread_smp_core_mapped;
-            
+
         /* Pickup the thread from the remapping list.  */
         thread_ptr =  thread_remap_list[core];
-          
+
         /* Loop until we arrive at the thread we have been trying to map.  */
         while (thread_ptr != schedule_thread)
         {
@@ -787,40 +787,40 @@ TX_THREAD       *thread_remap_list[TX_THREAD_SMP_MAX_CORES];
 
             /* Remember the previous core.  */
             previous_core =  core;
-                
-            /* Pickup the core of thread to remap.  */ 
+
+            /* Pickup the core of thread to remap.  */
             core =  thread_ptr -> tx_thread_smp_core_mapped;
-                
+
             /* Save the new core mapping for this thread.  */
             thread_ptr -> tx_thread_smp_core_mapped =  previous_core;
-                
+
             /* Move the next thread.  */
             thread_ptr =  thread_remap_list[core];
         }
-          
+
         /* Save the remaining thread in the updated schedule list.  */
         _tx_thread_smp_schedule_list[core] =  thread_ptr;
 
         /* Update this thread's core mapping.  */
         thread_ptr -> tx_thread_smp_core_mapped =  core;
-          
+
         /* Finally, setup the last thread in the remapping solution.  */
         test_cores =  last_thread_cores;
         TX_LOWEST_SET_BIT_CALCULATE(test_cores, core)
-              
+
         /* Setup the last thread.  */
         _tx_thread_smp_schedule_list[core] =     last_thread;
-              
+
         /* Remember the core mapping for this thread.  */
         last_thread -> tx_thread_smp_core_mapped =  core;
     }
     else
     {
-    
+
         /* Set core to the maximum value in order to signal a remapping solution was not found.  */
         core =  ((UINT) TX_THREAD_SMP_MAX_CORES);
     }
-    
+
     /* Return core to the caller.  */
     return(core);
 }
@@ -850,7 +850,7 @@ ULONG       possible_cores =  ((ULONG) 0);
 #if TX_THREAD_SMP_MAX_CORES > 5
     possible_preemption_list[5] =  TX_NULL;
 #if TX_THREAD_SMP_MAX_CORES > 6
-   
+
     /* Loop to clear the remainder of the possible preemption list.  */
     j =  ((UINT) 6);
 
@@ -862,10 +862,10 @@ ULONG       possible_cores =  ((ULONG) 0);
     while (j < _tx_thread_smp_max_cores)
 #endif
     {
-    
+
         /* Clear entry in possible preemption list.  */
         possible_preemption_list[j] =  TX_NULL;
-        
+
         /* Move to next core.  */
         j++;
     }
@@ -889,18 +889,18 @@ ULONG       possible_cores =  ((ULONG) 0);
 
         /* Pickup the currently mapped thread.  */
         thread_ptr =  _tx_thread_execute_ptr[i];
-        
+
         /* Is there a thread scheduled for this core?  */
         if (thread_ptr != TX_NULL)
         {
-        
+
             /* Update the possible cores bit map.  */
             possible_cores =  possible_cores | thread_ptr -> tx_thread_smp_cores_allowed;
 
             /* Can this thread be preempted?  */
             if (priority < thread_ptr -> tx_thread_priority)
             {
-            
+
                 /* Thread that can be added to the preemption possible list.  */
 
                 /* Yes, this scheduled thread is lower priority, so add it to the preemption possible list.  */
@@ -910,7 +910,7 @@ ULONG       possible_cores =  ((ULONG) 0);
                 j++;
             }
         }
-        
+
         /* Move to next core.  */
         i++;
     }
@@ -923,7 +923,7 @@ ULONG       possible_cores =  ((ULONG) 0);
         i =  ((UINT) 0);
         do
         {
-        
+
             /* Pickup preemptable thread.  */
             thread_ptr =  possible_preemption_list[i];
 
@@ -933,47 +933,47 @@ ULONG       possible_cores =  ((ULONG) 0);
             /* Loop to get the lowest priority thread at the front of the list.  */
             while (k < j)
             {
-    
+
                 /* Pickup the next thread to evaluate.  */
                 next_thread =  possible_preemption_list[k];
-                
+
                 /* Is this thread lower priority?  */
                 if (next_thread -> tx_thread_priority > thread_ptr -> tx_thread_priority)
                 {
-                
+
                     /* Yes, swap the threads.  */
                     possible_preemption_list[i] =  next_thread;
                     possible_preemption_list[k] =  thread_ptr;
                     thread_ptr =  next_thread;
                 }
-                else 
+                else
                 {
 
                     /* Compare the thread priorities.  */
                     if (next_thread -> tx_thread_priority == thread_ptr -> tx_thread_priority)
                     {
-                
+
                         /* Equal priority threads...  see which is in the ready list first.  */
                         search_thread =   thread_ptr -> tx_thread_ready_next;
-                     
+
                         /* Pickup the list head.  */
                         list_head =  _tx_thread_priority_list[thread_ptr -> tx_thread_priority];
-                    
+
                         /* Now loop to see if the next thread is after the current thread preemption.  */
                         while (search_thread != list_head)
                         {
-                    
+
                             /* Have we found the next thread?  */
                             if (search_thread == next_thread)
                             {
-                    
+
                                 /* Yes, swap the threads.  */
                                 possible_preemption_list[i] =  next_thread;
                                 possible_preemption_list[k] =  thread_ptr;
                                 thread_ptr =  next_thread;
                                 break;
                             }
-                        
+
                             /* Move to the next thread.  */
                             search_thread =  search_thread -> tx_thread_ready_next;
                         }
@@ -983,7 +983,7 @@ ULONG       possible_cores =  ((ULONG) 0);
                     k++;
                 }
             }
-            
+
             /* We have found the lowest priority thread to preempt, now find the next lowest.  */
             i++;
         }
@@ -999,15 +999,15 @@ VOID  _tx_thread_smp_simple_priority_change(TX_THREAD *thread_ptr, UINT new_prio
 
 UINT            priority;
 ULONG           priority_bit;
-TX_THREAD       *head_ptr; 
-TX_THREAD       *tail_ptr; 
+TX_THREAD       *head_ptr;
+TX_THREAD       *tail_ptr;
 #if TX_MAX_PRIORITIES > 32
 UINT            map_index;
 #endif
 
     /* Pickup the priority.  */
     priority =  thread_ptr -> tx_thread_priority;
-                
+
     /* Determine if there are other threads at this priority that are
        ready.  */
     if (thread_ptr -> tx_thread_ready_next != thread_ptr)
@@ -1030,7 +1030,7 @@ UINT            map_index;
     else
     {
 
-        /* This is the only thread at this priority ready to run.  Set the head 
+        /* This is the only thread at this priority ready to run.  Set the head
            pointer to NULL.  */
         _tx_thread_priority_list[priority] =    TX_NULL;
 
@@ -1061,21 +1061,21 @@ UINT            map_index;
        case if the new priority is higher than the priority inheritance.  */
     if (new_priority < thread_ptr -> tx_thread_inherit_priority)
     {
-        
+
         /* Change thread priority to the new user's priority.  */
         thread_ptr -> tx_thread_priority =           new_priority;
         thread_ptr -> tx_thread_preempt_threshold =  new_priority;
     }
     else
     {
-        
+
         /* Change thread priority to the priority inheritance.  */
         thread_ptr -> tx_thread_priority =           thread_ptr -> tx_thread_inherit_priority;
         thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_inherit_priority;
     }
 
     /* Now, place the thread at the new priority level.  */
-                
+
     /* Determine if there are other threads at this priority that are
        ready.  */
     head_ptr =  _tx_thread_priority_list[new_priority];
@@ -1090,7 +1090,7 @@ UINT            map_index;
         head_ptr -> tx_thread_ready_previous =     thread_ptr;
         thread_ptr -> tx_thread_ready_previous =   tail_ptr;
         thread_ptr -> tx_thread_ready_next =       head_ptr;
-    }   
+    }
     else
     {
 

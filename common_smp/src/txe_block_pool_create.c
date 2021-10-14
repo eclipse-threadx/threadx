@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Block Pool                                                          */
 /**                                                                       */
@@ -32,52 +32,54 @@
 #include "tx_block_pool.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txe_block_pool_create                              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_block_pool_create                              PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function checks for errors in the create block memory pool     */ 
-/*    function call.                                                      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pool_ptr                          Pointer to pool control block     */ 
-/*    name_ptr                          Pointer to block pool name        */ 
-/*    block_size                        Number of bytes in each block     */ 
-/*    pool_start                        Address of beginning of pool area */ 
-/*    pool_size                         Number of bytes in the block pool */ 
-/*    pool_control_block_size           Size of block pool control block  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_POOL_ERROR                     Invalid pool pointer              */ 
-/*    TX_PTR_ERROR                      Invalid starting address          */ 
-/*    TX_SIZE_ERROR                     Invalid pool size                 */ 
-/*    TX_CALLER_ERROR                   Invalid caller of pool            */ 
-/*    status                            Actual completion status          */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_block_pool_create             Actual block pool create function */ 
-/*    _tx_thread_system_preempt_check   Check for preemption              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function checks for errors in the create block memory pool     */
+/*    function call.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pool_ptr                          Pointer to pool control block     */
+/*    name_ptr                          Pointer to block pool name        */
+/*    block_size                        Number of bytes in each block     */
+/*    pool_start                        Address of beginning of pool area */
+/*    pool_size                         Number of bytes in the block pool */
+/*    pool_control_block_size           Size of block pool control block  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_POOL_ERROR                     Invalid pool pointer              */
+/*    TX_PTR_ERROR                      Invalid starting address          */
+/*    TX_SIZE_ERROR                     Invalid pool size                 */
+/*    TX_CALLER_ERROR                   Invalid caller of pool            */
+/*    status                            Actual completion status          */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_block_pool_create             Actual block pool create function */
+/*    _tx_thread_system_preempt_check   Check for preemption              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG block_size,
@@ -86,7 +88,7 @@ UINT  _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG bloc
 
 TX_INTERRUPT_SAVE_AREA
 
-UINT            status;                 
+UINT            status;
 ULONG           i;
 TX_BLOCK_POOL   *next_pool;
 #ifndef TX_TIMER_PROCESS_IN_ISR
@@ -147,7 +149,7 @@ TX_THREAD       *thread_ptr;
 
         /* Decrement the preempt disable flag.  */
         _tx_thread_preempt_disable--;
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
 
@@ -173,7 +175,7 @@ TX_THREAD       *thread_ptr;
         {
 
             /* Check for invalid pool size.  */
-            if ((((block_size/(sizeof(void *)))*(sizeof(void *))) + (sizeof(void *))) > 
+            if ((((block_size/(sizeof(void *)))*(sizeof(void *))) + (sizeof(void *))) >
                                             ((pool_size/(sizeof(void *)))*(sizeof(void *))))
             {
 
@@ -200,11 +202,11 @@ TX_THREAD       *thread_ptr;
                 /* Check for interrupt call.  */
                 if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
                 {
-    
+
                     /* Now, make sure the call is from an interrupt and not initialization.  */
                     if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
                     {
-        
+
                         /* Invalid caller of this function, return appropriate error code.  */
                         status =  TX_CALLER_ERROR;
                     }

@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
 # Set up the project
 project(threadx
-    VERSION 6.0.0 
     LANGUAGES C ASM
 )
 
@@ -12,6 +11,8 @@ endif()
 if(NOT DEFINED THREADX_TOOLCHAIN)
     message(FATAL_ERROR "Error: THREADX_TOOLCHAIN not defined")
 endif()
+message(STATUS "THREADX_ARCH: ${THREADX_ARCH}")
+message(STATUS "THREADX_TOOLCHAIN: ${THREADX_TOOLCHAIN}")
 
 # Define our target library and an alias for consumers
 add_library(${PROJECT_NAME})

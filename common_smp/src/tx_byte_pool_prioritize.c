@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Byte Memory                                                         */
 /**                                                                       */
@@ -31,43 +31,45 @@
 #include "tx_byte_pool.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_byte_pool_prioritize                           PORTABLE C       */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_byte_pool_prioritize                           PORTABLE C       */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function places the highest priority suspended thread at the   */ 
-/*    front of the suspension list.  All other threads remain in the same */ 
-/*    FIFO suspension order.                                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pool_ptr                          Pointer to pool control block     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_preempt_check   Check for preemption              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function places the highest priority suspended thread at the   */
+/*    front of the suspension list.  All other threads remain in the same */
+/*    FIFO suspension order.                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pool_ptr                          Pointer to pool control block     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_preempt_check   Check for preemption              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_byte_pool_prioritize(TX_BYTE_POOL *pool_ptr)
@@ -75,8 +77,8 @@ UINT  _tx_byte_pool_prioritize(TX_BYTE_POOL *pool_ptr)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *thread_ptr;            
-TX_THREAD       *priority_thread_ptr;    
+TX_THREAD       *thread_ptr;
+TX_THREAD       *priority_thread_ptr;
 TX_THREAD       *head_ptr;
 UINT            suspended_count;
 TX_THREAD       *next_thread;
@@ -123,7 +125,7 @@ UINT            list_changed;
         /* Restore interrupts.  */
         TX_RESTORE
     }
-    else 
+    else
     {
 
         /* Remember the suspension count and head pointer.  */
@@ -159,19 +161,19 @@ UINT            list_changed;
             /* Disable interrupts again.  */
             TX_DISABLE
 
-            /* Determine if any changes to the list have occurred while 
+            /* Determine if any changes to the list have occurred while
                interrupts were enabled.  */
-              
+
             /* Is the list head the same?  */
             if (head_ptr != pool_ptr -> tx_byte_pool_suspension_list)
             {
-            
+
                 /* The list head has changed, set the list changed flag.  */
                 list_changed =  TX_TRUE;
             }
             else
             {
-            
+
                 /* Is the suspended count the same?  */
                 if (suspended_count != pool_ptr -> tx_byte_pool_suspended_count)
                 {
@@ -210,12 +212,12 @@ UINT            list_changed;
         /* Release preemption.  */
         _tx_thread_preempt_disable--;
 
-        /* Now determine if the highest priority thread is at the front 
+        /* Now determine if the highest priority thread is at the front
            of the list.  */
         if (priority_thread_ptr != head_ptr)
         {
 
-            /* No, we need to move the highest priority suspended thread to the 
+            /* No, we need to move the highest priority suspended thread to the
                front of the list.  */
 
             /* First, remove the highest priority thread by updating the

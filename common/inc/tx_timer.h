@@ -79,7 +79,7 @@ VOID        _tx_timer_thread_entry(ULONG timer_thread_input);
 #endif
 
 
-/* Define the system clock value that is continually incremented by the 
+/* Define the system clock value that is continually incremented by the
    periodic timer interrupt processing.  */
 
 TIMER_DECLARE volatile ULONG    _tx_timer_system_clock;
@@ -116,7 +116,7 @@ TIMER_DECLARE TX_TIMER_INTERNAL **_tx_timer_list_end;
 TIMER_DECLARE TX_TIMER_INTERNAL **_tx_timer_current_ptr;
 
 
-/* Define the timer expiration flag.  This is used to indicate that a timer 
+/* Define the timer expiration flag.  This is used to indicate that a timer
    has expired.  */
 
 TIMER_DECLARE UINT              _tx_timer_expired;
@@ -195,8 +195,8 @@ TIMER_DECLARE  ULONG            _tx_timer_performance_expiration_count;
 
 
 /* Define the total number of timer expiration adjustments. These are required
-   if the expiration time is greater than the size of the timer list. In such 
-   cases, the timer is placed at the end of the list and then reactivated 
+   if the expiration time is greater than the size of the timer list. In such
+   cases, the timer is placed at the end of the list and then reactivated
    as many times as necessary to finally achieve the resulting timeout. */
 
 TIMER_DECLARE  ULONG            _tx_timer_performance__expiration_adjust_count;

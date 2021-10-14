@@ -105,7 +105,7 @@ TX_TIMER                    *timer_ptr;
 
 #ifndef TX_TIMER_PROCESS_IN_ISR
 
-    /* Don't process in the ISR, wakeup the system timer thread to process the 
+    /* Don't process in the ISR, wakeup the system timer thread to process the
        timer expiration.  */
 
     /* Disable interrupts.  */
@@ -132,8 +132,8 @@ TX_TIMER                    *timer_ptr;
 
 #else
 
-    /* Process the timer expiration directly in the ISR. This increases the interrupt 
-       processing, however, it eliminates the need for a system timer thread and associated 
+    /* Process the timer expiration directly in the ISR. This increases the interrupt
+       processing, however, it eliminates the need for a system timer thread and associated
        resources.  */
 
     /* Disable interrupts.  */
@@ -151,7 +151,7 @@ TX_TIMER                    *timer_ptr;
         {
 
             /* Proceed with timer processing.  */
-            
+
             /* Set the timer interrupt processing active flag.  */
             _tx_timer_processing_active =  TX_TRUE;
 
@@ -159,7 +159,7 @@ TX_TIMER                    *timer_ptr;
             do
             {
 
-                /* First, move the current list pointer and clear the timer 
+                /* First, move the current list pointer and clear the timer
                    expired value.  This allows the interrupt handling portion
                    to continue looking for timer expirations.  */
 
@@ -170,19 +170,19 @@ TX_TIMER                    *timer_ptr;
                    is one!  */
                 if (expired_timers != TX_NULL)
                 {
-        
+
                     expired_timers -> tx_timer_internal_list_head =  &expired_timers;
                 }
 
                 /* Set the current list pointer to NULL.  */
                 *_tx_timer_current_ptr =  TX_NULL;
 
-                /* Move the current pointer up one timer entry wrap if we get to 
+                /* Move the current pointer up one timer entry wrap if we get to
                    the end of the list.  */
                 _tx_timer_current_ptr =  TX_TIMER_POINTER_ADD(_tx_timer_current_ptr, 1);
                 if (_tx_timer_current_ptr == _tx_timer_list_end)
                 {
-        
+
                     _tx_timer_current_ptr =  _tx_timer_list_start;
                 }
 
@@ -202,10 +202,10 @@ TX_TIMER                    *timer_ptr;
 
                     /* Something is on the list.  Remove it and process the expiration.  */
                     current_timer =  expired_timers;
-            
+
                     /* Pickup the next timer.  */
                     next_timer =  expired_timers -> tx_timer_internal_active_next;
-            
+
                     /* Set the reactivate timer to NULL.  */
                     reactivate_timer =  TX_NULL;
 
@@ -214,7 +214,7 @@ TX_TIMER                    *timer_ptr;
                     {
 
                         /* Yes, this is the only timer in the list.  */
-    
+
                         /* Set the head pointer to NULL.  */
                         expired_timers =  TX_NULL;
                     }
@@ -222,7 +222,7 @@ TX_TIMER                    *timer_ptr;
                     {
 
                         /* No, not the only expired timer.  */
-            
+
                         /* Remove this timer from the expired list.  */
                         previous_timer =                                   current_timer -> tx_timer_internal_active_previous;
                         next_timer -> tx_timer_internal_active_previous =  previous_timer;
@@ -237,7 +237,7 @@ TX_TIMER                    *timer_ptr;
 
                     /* In any case, the timer is now off of the expired list.  */
 
-                    /* Determine if the timer has expired or if it is just a really 
+                    /* Determine if the timer has expired or if it is just a really
                        big timer that needs to be placed in the list again.  */
                     if (current_timer -> tx_timer_internal_remaining_ticks > TX_TIMER_ENTRIES)
                     {
@@ -253,25 +253,25 @@ TX_TIMER                    *timer_ptr;
                         /* Determine if this is an application timer.  */
                         if (current_timer -> tx_timer_internal_timeout_function != &_tx_thread_timeout)
                         {
-            
+
                             /* Derive the application timer pointer.  */
-                    
+
                             /* Pickup the application timer pointer.  */
                             TX_USER_TIMER_POINTER_GET(current_timer, timer_ptr)
 
                             /* Increment the number of expiration adjustments on this timer.  */
                             if (timer_ptr -> tx_timer_id == TX_TIMER_ID)
                             {
-                    
+
                                 timer_ptr -> tx_timer_performance__expiration_adjust_count++;
                             }
                         }
 #endif
 
                         /* Decrement the remaining ticks of the timer.  */
-                        current_timer -> tx_timer_internal_remaining_ticks =  
+                        current_timer -> tx_timer_internal_remaining_ticks =
                                 current_timer -> tx_timer_internal_remaining_ticks - TX_TIMER_ENTRIES;
-                
+
                         /* Set the timeout function to NULL in order to bypass the
                            expiration.  */
                         timeout_function =  TX_NULL;
@@ -289,7 +289,7 @@ TX_TIMER                    *timer_ptr;
                     {
 
                         /* Timer did expire.  */
-                
+
 #ifdef TX_TIMER_ENABLE_PERFORMANCE_INFO
 
                         /* Increment the total expirations counter.  */
@@ -298,22 +298,22 @@ TX_TIMER                    *timer_ptr;
                         /* Determine if this is an application timer.  */
                         if (current_timer -> tx_timer_internal_timeout_function != &_tx_thread_timeout)
                         {
-            
+
                             /* Derive the application timer pointer.  */
-                    
+
                             /* Pickup the application timer pointer.  */
                             TX_USER_TIMER_POINTER_GET(current_timer, timer_ptr)
 
                             /* Increment the number of expirations on this timer.  */
                             if (timer_ptr -> tx_timer_id == TX_TIMER_ID)
                             {
-                    
+
                                 timer_ptr -> tx_timer_performance_expiration_count++;
                             }
                         }
 #endif
 
-                        /* Copy the calling function and ID into local variables before interrupts 
+                        /* Copy the calling function and ID into local variables before interrupts
                            are re-enabled.  */
                         timeout_function =  current_timer -> tx_timer_internal_timeout_function;
                         timeout_param =     current_timer -> tx_timer_internal_timeout_param;
@@ -326,7 +326,7 @@ TX_TIMER                    *timer_ptr;
                         {
 
                             /* Make the timer appear that it is still active while processing
-                               the expiration routine and with interrupts enabled.  This will 
+                               the expiration routine and with interrupts enabled.  This will
                                permit proper processing of a timer deactivate from both the
                                expiration routine and an ISR.  */
                             current_timer -> tx_timer_internal_list_head =    &reactivate_timer;
@@ -353,7 +353,7 @@ TX_TIMER                    *timer_ptr;
                     /* Call the timer-expiration function, if non-NULL.  */
                     if (timeout_function != TX_NULL)
                     {
-            
+
                         (timeout_function) (timeout_param);
                     }
 
@@ -381,16 +381,16 @@ TX_TIMER                    *timer_ptr;
                             /* Determine if this is an application timer.  */
                             if (current_timer -> tx_timer_internal_timeout_function != &_tx_thread_timeout)
                             {
-            
+
                                 /* Derive the application timer pointer.  */
-                        
+
                                 /* Pickup the application timer pointer.  */
                                 TX_USER_TIMER_POINTER_GET(current_timer, timer_ptr)
 
                                 /* Increment the number of expirations on this timer.  */
                                 if (timer_ptr -> tx_timer_id == TX_TIMER_ID)
                                 {
-                        
+
                                     timer_ptr -> tx_timer_performance_reactivate_count++;
                                 }
                             }
@@ -418,7 +418,7 @@ TX_TIMER                    *timer_ptr;
 
                         /* At this point, we are ready to put the timer back on one of
                            the timer lists.  */
-    
+
                         /* Calculate the proper place for the timer.  */
                         timer_list =  TX_TIMER_POINTER_ADD(_tx_timer_current_ptr, expiration_time);
                         if (TX_TIMER_INDIRECT_TO_VOID_POINTER_CONVERT(timer_list) >= TX_TIMER_INDIRECT_TO_VOID_POINTER_CONVERT(_tx_timer_list_end))
@@ -432,13 +432,13 @@ TX_TIMER                    *timer_ptr;
                         /* Now put the timer on this list.  */
                         if ((*timer_list) == TX_NULL)
                         {
-                
+
                             /* This list is NULL, just put the new timer on it.  */
 
                             /* Setup the links in this timer.  */
                             current_timer -> tx_timer_internal_active_next =      current_timer;
                             current_timer -> tx_timer_internal_active_previous =  current_timer;
-    
+
                             /* Setup the list head pointer.  */
                             *timer_list =  current_timer;
                         }
@@ -474,7 +474,7 @@ TX_TIMER                    *timer_ptr;
             _tx_timer_processing_active =  TX_FALSE;
         }
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 #endif

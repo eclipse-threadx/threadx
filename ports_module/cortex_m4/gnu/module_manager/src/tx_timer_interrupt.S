@@ -37,8 +37,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_timer_interrupt                              Cortex-Mx/GNU      */
-/*                                                           6.1.8        */
+/*    _tx_timer_interrupt                              Cortex-M4/GNU      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -71,7 +71,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  08-02-2021     Scott Larson             Initial Version 6.1.8         */
+/*  06-02-2021     Scott Larson             Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)

@@ -85,7 +85,7 @@ TX_THREAD   *current_thread;
         /* Now make sure the call is not from an ISR or Initialization.  */
         if (TX_THREAD_GET_SYSTEM_STATE() == ((ULONG) 0))
         {
-        
+
             /* Okay to call the real relinquish function.  */
             _tx_thread_relinquish();
         }

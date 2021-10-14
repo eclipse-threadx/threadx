@@ -12,7 +12,7 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
@@ -21,24 +21,24 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    tx_timer.h                                         PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    tx_timer.h                                         PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file defines the ThreadX timer management component, including */ 
+/*                                                                        */
+/*    This file defines the ThreadX timer management component, including */
 /*    data types and external references.  It is assumed that tx_api.h    */
 /*    and tx_port.h have already been included.                           */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -73,14 +73,14 @@ VOID        _tx_timer_thread_entry(ULONG timer_thread_input);
 #define TIMER_DECLARE extern
 
 
-/* Define the system clock value that is continually incremented by the 
+/* Define the system clock value that is continually incremented by the
    periodic timer interrupt processing.  */
 
 TIMER_DECLARE volatile ULONG    _tx_timer_system_clock;
 
 
 /* Define the current time slice value.  If non-zero, a time-slice is active.
-   Otherwise, the time_slice is not active.  There is one of these entries 
+   Otherwise, the time_slice is not active.  There is one of these entries
    per core.  */
 
 TIMER_DECLARE ULONG             _tx_timer_time_slice[TX_THREAD_SMP_MAX_CORES];
@@ -116,7 +116,7 @@ TIMER_DECLARE TX_TIMER_INTERNAL **_tx_timer_list_end;
 TIMER_DECLARE TX_TIMER_INTERNAL **_tx_timer_current_ptr;
 
 
-/* Define the timer expiration flag.  This is used to indicate that a timer 
+/* Define the timer expiration flag.  This is used to indicate that a timer
    has expired.  */
 
 TIMER_DECLARE UINT              _tx_timer_expired;
@@ -195,13 +195,15 @@ TIMER_DECLARE  ULONG            _tx_timer_performance_expiration_count;
 
 
 /* Define the total number of timer expiration adjustments. These are required
-   if the expiration time is greater than the size of the timer list. In such 
-   cases, the timer is placed at the end of the list and then reactivated 
+   if the expiration time is greater than the size of the timer list. In such
+   cases, the timer is placed at the end of the list and then reactivated
    as many times as necessary to finally achieve the resulting timeout. */
 
 TIMER_DECLARE  ULONG            _tx_timer_performance__expiration_adjust_count;
 
+
 #endif
+
 
 /* Define default post timer delete macro to whitespace, if it hasn't been defined previously (typically in tx_port.h).  */
 
@@ -211,4 +213,3 @@ TIMER_DECLARE  ULONG            _tx_timer_performance__expiration_adjust_count;
 
 
 #endif
-

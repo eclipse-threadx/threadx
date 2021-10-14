@@ -88,7 +88,7 @@ UINT            status;
     /* Determine if trace is disabled.  */
     if (_tx_trace_buffer_current_ptr == TX_NULL)
     {
-    
+
         /* Yes, trace is already disabled.  */
         status =  TX_NOT_DONE;
     }
@@ -101,7 +101,7 @@ UINT            status;
 #else
         TX_TRACE_IN_LINE_INSERT(event_id, info_field_1, info_field_2, info_field_3, info_field_4, TX_TRACE_USER_EVENTS)
 #endif
-        
+
         /* Return successful status.  */
         status =  TX_SUCCESS;
     }
@@ -111,7 +111,7 @@ UINT            status;
 
     /* Return completion status.  */
     return(status);
-    
+
 #else
 
 UINT        status;

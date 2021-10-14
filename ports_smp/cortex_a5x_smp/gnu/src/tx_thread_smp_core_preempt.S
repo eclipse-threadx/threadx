@@ -12,70 +12,61 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread - Low Level SMP Support                                      */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
-/*
-#define TX_SOURCE_CODE
-#define TX_THREAD_SMP_SOURCE_CODE
-*/
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_thread.h"
-#include "tx_timer.h"
-*/
 
 #define ICC_SGI1R_EL1 S3_0_C12_C11_5
 
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_core_preempt                      Cortex-A5x-SMP/GNU */  
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_smp_core_preempt                      Cortex-A5x-SMP/GCC */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function preempts the specified core in situations where the   */ 
-/*    thread corresponding to this core is no longer ready or when the    */ 
-/*    core must be used for a higher-priority thread. If the specified is */ 
-/*    the current core, this processing is skipped since the will give up */ 
-/*    control subsequently on its own.                                    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    core                                  The core to preempt           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function preempts the specified core in situations where the   */
+/*    thread corresponding to this core is no longer ready or when the    */
+/*    core must be used for a higher-priority thread. If the specified is */
+/*    the current core, this processing is skipped since the will give up */
+/*    control subsequently on its own.                                    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    core                                  The core to preempt           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    ThreadX Source                                                      */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*                                             added ARMv8.2-A support,   */
+/*                                             resulting in version 6.1.9 */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_core_preempt
@@ -92,4 +83,3 @@ _tx_thread_smp_core_preempt:
 #endif
     MSR ICC_SGI1R_EL1, x2                       // Issue inter-core interrupt
     RET
-

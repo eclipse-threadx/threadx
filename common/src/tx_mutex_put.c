@@ -131,8 +131,8 @@ UINT            inheritance_priority;
         /* Check to see if the mutex is owned by the calling thread.  */
         if (mutex_ptr -> tx_mutex_owner != current_thread)
         {
-        
-            /* Determine if the preempt disable flag is set, indicating that 
+
+            /* Determine if the preempt disable flag is set, indicating that
                the caller is not the application but from ThreadX. In such
                cases, the thread mutex owner does not need to match.  */
             if (_tx_thread_preempt_disable == ((UINT) 0))
@@ -147,11 +147,11 @@ UINT            inheritance_priority;
                 status =  TX_NOT_OWNED;
             }
         }
-        
+
         /* Determine if we should continue.  */
         if (status == TX_NOT_DONE)
         {
-    
+
             /* Decrement the mutex ownership count.  */
             mutex_ptr -> tx_mutex_ownership_count--;
 
@@ -182,9 +182,9 @@ UINT            inheritance_priority;
                 {
 
                     /* The mutex is now available.   */
-            
+
                     /* Remove this mutex from the owned mutex list.  */
-                    
+
                     /* Decrement the ownership count.  */
                     thread_ptr -> tx_thread_owned_mutex_count--;
 
@@ -218,14 +218,14 @@ UINT            inheritance_priority;
                     /* Determine if the simple, non-suspension, non-priority inheritance case is present.  */
                     if (mutex_ptr -> tx_mutex_suspension_list == TX_NULL)
                     {
-                    
+
                         /* Is this a priority inheritance mutex?  */
                         if (mutex_ptr -> tx_mutex_inherit == TX_FALSE)
                         {
 
                             /* Yes, we are done - set the mutex owner to NULL.   */
                             mutex_ptr -> tx_mutex_owner =  TX_NULL;
-                            
+
                             /* Restore interrupts.  */
                             TX_RESTORE
 
@@ -233,11 +233,11 @@ UINT            inheritance_priority;
                             status =  TX_SUCCESS;
                         }
                     }
-                     
+
                     /* Determine if the processing is complete.  */
                     if (status == TX_NOT_DONE)
                     {
-   
+
                         /* Initialize original owner and thread priority.  */
                         old_owner =      TX_NULL;
                         old_priority =   thread_ptr -> tx_thread_user_priority;
@@ -257,8 +257,8 @@ UINT            inheritance_priority;
 
                             /* Default the inheritance priority to disabled.  */
                             inheritance_priority =  ((UINT) TX_MAX_PRIORITIES);
-                            
-                            /* Search the owned mutexes for this thread to determine the highest priority for this 
+
+                            /* Search the owned mutexes for this thread to determine the highest priority for this
                                former mutex owner to return to.  */
                             next_mutex =  thread_ptr -> tx_thread_owned_mutex_list;
                             while (next_mutex != TX_NULL)
@@ -267,8 +267,8 @@ UINT            inheritance_priority;
                                 /* Does this mutex support priority inheritance?  */
                                 if (next_mutex -> tx_mutex_inherit == TX_TRUE)
                                 {
-                            
-                                    /* Determine if highest priority field of the mutex is higher than the priority to 
+
+                                    /* Determine if highest priority field of the mutex is higher than the priority to
                                        restore.  */
                                     if (next_mutex -> tx_mutex_highest_priority_waiting < inheritance_priority)
                                     {
@@ -284,7 +284,7 @@ UINT            inheritance_priority;
                                 /* Are we at the end of the list?  */
                                 if (next_mutex == thread_ptr -> tx_thread_owned_mutex_list)
                                 {
-                            
+
                                     /* Yes, set the next mutex to NULL.  */
                                     next_mutex =  TX_NULL;
                                 }
@@ -298,14 +298,14 @@ UINT            inheritance_priority;
                             /* Undo the temporarily preemption disable.  */
                             _tx_thread_preempt_disable--;
 #endif
-                       
+
                             /* Set the inherit priority to that of the highest priority thread waiting on the mutex.  */
                             thread_ptr -> tx_thread_inherit_priority =  inheritance_priority;
-                                
+
                             /* Determine if the inheritance priority is less than the default old priority.  */
                             if (inheritance_priority < old_priority)
                             {
-                            
+
                                 /* Yes, update the old priority.  */
                                 old_priority =  inheritance_priority;
                             }
@@ -332,7 +332,7 @@ UINT            inheritance_priority;
                                 TX_RESTORE
 #endif
 
-                                /* Call the mutex prioritize processing to ensure the 
+                                /* Call the mutex prioritize processing to ensure the
                                    highest priority thread is resumed.  */
 #ifdef TX_MISRA_ENABLE
                                 do
@@ -375,17 +375,17 @@ UINT            inheritance_priority;
                             TX_RESTORE
 #endif
 
-                            /* Mutex is not owned, but it is possible that a thread that 
+                            /* Mutex is not owned, but it is possible that a thread that
                                caused a priority inheritance to occur is no longer waiting
                                on the mutex.  */
 
                             /* Setup the highest priority waiting thread.  */
                             mutex_ptr -> tx_mutex_highest_priority_waiting =  (UINT) TX_MAX_PRIORITIES;
-  
+
                             /* Determine if we need to restore priority.  */
                             if ((mutex_ptr -> tx_mutex_owner) -> tx_thread_priority != old_priority)
                             {
-                      
+
                                 /* Yes, restore the priority of thread.  */
                                 _tx_mutex_priority_change(mutex_ptr -> tx_mutex_owner, old_priority);
                             }
@@ -424,7 +424,7 @@ UINT            inheritance_priority;
 
                                 /* Remember the old mutex owner.  */
                                 old_owner =  mutex_ptr -> tx_mutex_owner;
-        
+
                                 /* Setup owner thread priority information.  */
                                 mutex_ptr -> tx_mutex_original_priority =   thread_ptr -> tx_thread_priority;
 
@@ -473,7 +473,7 @@ UINT            inheritance_priority;
 
                             /* Decrement the suspension count.  */
                             mutex_ptr -> tx_mutex_suspended_count--;
-                
+
                             /* Pickup the suspended count.  */
                             suspended_count =  mutex_ptr -> tx_mutex_suspended_count;
 
@@ -482,7 +482,7 @@ UINT            inheritance_priority;
                             {
 
                                 /* Yes, the only suspended thread.  */
-    
+
                                 /* Update the head pointer.  */
                                 mutex_ptr -> tx_mutex_suspension_list =  TX_NULL;
                             }
@@ -536,7 +536,7 @@ UINT            inheritance_priority;
                                         _tx_mutex_prioritize(mutex_ptr);
 #endif
                                     }
-    
+
                                     /* Now, pickup the list head and set the priority.  */
 
                                     /* Determine if there still are threads suspended for this mutex.  */
@@ -551,11 +551,11 @@ UINT            inheritance_priority;
 
                                 /* Restore previous priority needs to be restored after priority
                                    inheritance.  */
-                    
+
                                 /* Determine if we need to restore priority.  */
                                 if (old_owner -> tx_thread_priority != old_priority)
                                 {
-    
+
                                     /* Restore priority of thread.  */
                                     _tx_mutex_priority_change(old_owner, old_priority);
                                 }
@@ -579,7 +579,7 @@ UINT            inheritance_priority;
                             {
 
                                 /* Yes, priority inheritance is requested.  */
-        
+
                                 /* Determine if there are any more threads still suspended on the mutex.  */
                                 if (mutex_ptr -> tx_mutex_suspended_count != TX_NO_SUSPENSIONS)
                                 {
@@ -594,7 +594,7 @@ UINT            inheritance_priority;
 #else
                                     _tx_mutex_prioritize(mutex_ptr);
 #endif
-                            
+
                                     /* Now, pickup the list head and set the priority.  */
 
                                     /* Optional processing extension.  */
@@ -618,11 +618,11 @@ UINT            inheritance_priority;
 
                                 /* Restore previous priority needs to be restored after priority
                                    inheritance.  */
-                    
+
                                 /* Is the priority different?  */
                                 if (old_owner -> tx_thread_priority != old_priority)
                                 {
-        
+
                                     /* Restore the priority of thread.  */
                                     _tx_mutex_priority_change(old_owner, old_priority);
                                 }
@@ -631,7 +631,7 @@ UINT            inheritance_priority;
                             /* Resume thread.  */
                             _tx_thread_system_resume(thread_ptr);
 #endif
-                     
+
                             /* Return a successful status.  */
                             status =  TX_SUCCESS;
                         }
@@ -645,7 +645,7 @@ UINT            inheritance_priority;
 
         /* Restore interrupts.  */
         TX_RESTORE
-    
+
         /* Caller does not own the mutex.  */
         status =  TX_NOT_OWNED;
     }

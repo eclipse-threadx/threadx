@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
@@ -31,43 +31,43 @@
 #include "tx_thread.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_timer_thread_entry                             PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_thread_entry                             PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function manages thread and application timer expirations.     */ 
-/*    Actually, from this thread's point of view, there is no difference. */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    timer_thread_input                Used just for verification        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    Timer Expiration Function                                           */ 
-/*    _tx_thread_system_suspend         Thread suspension                 */ 
-/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */ 
-/*    _tx_timer_system_activate         Timer reactivate processing       */ 
-/*    _tx_thread_smp_core_exclude       Exclude core from timer execution */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX Scheduler                                                   */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function manages thread and application timer expirations.     */
+/*    Actually, from this thread's point of view, there is no difference. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_thread_input                Used just for verification        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    Timer Expiration Function                                           */
+/*    _tx_thread_system_suspend         Thread suspension                 */
+/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*    _tx_timer_system_activate         Timer reactivate processing       */
+/*    _tx_thread_smp_core_exclude       Exclude core from timer execution */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX Scheduler                                                   */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -79,13 +79,13 @@ VOID  _tx_timer_thread_entry(ULONG timer_thread_input)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_TIMER_INTERNAL           *expired_timers;            
-TX_TIMER_INTERNAL           *reactivate_timer;          
+TX_TIMER_INTERNAL           *expired_timers;
+TX_TIMER_INTERNAL           *reactivate_timer;
 TX_TIMER_INTERNAL           *next_timer;
 TX_TIMER_INTERNAL           *previous_timer;
-TX_TIMER_INTERNAL           *current_timer;              
-VOID                        (*timeout_function)(ULONG id); 
-ULONG                       timeout_param =  ((ULONG) 0); 
+TX_TIMER_INTERNAL           *current_timer;
+VOID                        (*timeout_function)(ULONG id);
+ULONG                       timeout_param =  ((ULONG) 0);
 TX_THREAD                   *thread_ptr;
 #ifdef TX_REACTIVATE_INLINE
 TX_TIMER_INTERNAL           **timer_list;               /* Timer list pointer           */
@@ -113,7 +113,7 @@ UINT                         status;
         while (TX_LOOP_FOREVER)
         {
 
-            /* First, move the current list pointer and clear the timer 
+            /* First, move the current list pointer and clear the timer
                expired value.  This allows the interrupt handling portion
                to continue looking for timer expirations.  */
             TX_DISABLE
@@ -125,7 +125,7 @@ UINT                         status;
                is one!  */
             if (expired_timers != TX_NULL)
             {
-        
+
                 expired_timers -> tx_timer_internal_list_head =  &expired_timers;
 
                 /* Pickup the current core exclusion bit map for this timer.  */
@@ -141,12 +141,12 @@ UINT                         status;
             /* Set the current list pointer to NULL.  */
             *_tx_timer_current_ptr =  TX_NULL;
 
-            /* Move the current pointer up one timer entry wrap if we get to 
+            /* Move the current pointer up one timer entry wrap if we get to
                the end of the list.  */
             _tx_timer_current_ptr =  TX_TIMER_POINTER_ADD(_tx_timer_current_ptr, 1);
             if (_tx_timer_current_ptr == _tx_timer_list_end)
             {
-        
+
                 _tx_timer_current_ptr =  _tx_timer_list_start;
             }
 
@@ -159,7 +159,7 @@ UINT                         status;
             /* Determine if we need to change the processor exclusion setting.  */
             if ((_tx_timer_thread.tx_thread_smp_cores_excluded & ((ULONG) TX_THREAD_SMP_CORE_MASK)) != core_exclusion)
             {
-        
+
 #ifdef TX_MISRA_ENABLE
                 do
                 {
@@ -171,7 +171,7 @@ UINT                         status;
                /* Setup the new core exclusion for execution this timer.  */
                 _tx_thread_smp_core_exclude(&_tx_timer_thread, core_exclusion);
 #endif
-                
+
                 /* When we get to this point, the system timer thread is executing on one of the allowed cores.  */
             }
 
@@ -188,7 +188,7 @@ UINT                         status;
 
                 /* Pickup the next timer.  */
                 next_timer =  expired_timers -> tx_timer_internal_active_next;
-            
+
                 /* Set the reactivate_timer to NULL.  */
                 reactivate_timer =  TX_NULL;
 
@@ -208,7 +208,7 @@ UINT                         status;
                 {
 
                     /* No, not the only expired timer.  */
-            
+
                     /* Remove this timer from the expired list.  */
                     previous_timer =                                   current_timer -> tx_timer_internal_active_previous;
                     next_timer -> tx_timer_internal_active_previous =  previous_timer;
@@ -226,7 +226,7 @@ UINT                         status;
 
                 /* In any case, the timer is now off of the expired list.  */
 
-                /* Determine if the timer has expired or if it is just a really 
+                /* Determine if the timer has expired or if it is just a really
                    big timer that needs to be placed in the list again.  */
                 if (current_timer -> tx_timer_internal_remaining_ticks > TX_TIMER_ENTRIES)
                 {
@@ -242,25 +242,25 @@ UINT                         status;
                     /* Determine if this is an application timer.  */
                     if (current_timer -> tx_timer_internal_timeout_function != &_tx_thread_timeout)
                     {
-            
+
                         /* Derive the application timer pointer.  */
-                    
+
                         /* Pickup the application timer pointer.  */
                         TX_USER_TIMER_POINTER_GET(current_timer, timer_ptr)
 
                         /* Increment the number of expiration adjustments on this timer.  */
                         if (timer_ptr -> tx_timer_id == TX_TIMER_ID)
                         {
-                    
+
                             timer_ptr -> tx_timer_performance__expiration_adjust_count++;
                         }
                     }
 #endif
 
                     /* Decrement the remaining ticks of the timer.  */
-                    current_timer -> tx_timer_internal_remaining_ticks =  
+                    current_timer -> tx_timer_internal_remaining_ticks =
                             current_timer -> tx_timer_internal_remaining_ticks - TX_TIMER_ENTRIES;
-                
+
                     /* Set the timeout function to NULL in order to bypass the
                        expiration.  */
                     timeout_function =  TX_NULL;
@@ -287,22 +287,22 @@ UINT                         status;
                     /* Determine if this is an application timer.  */
                     if (current_timer -> tx_timer_internal_timeout_function != &_tx_thread_timeout)
                     {
-            
+
                         /* Derive the application timer pointer.  */
-                    
+
                         /* Pickup the application timer pointer.  */
                         TX_USER_TIMER_POINTER_GET(current_timer, timer_ptr)
 
                         /* Increment the number of expirations on this timer.  */
                         if (timer_ptr -> tx_timer_id == TX_TIMER_ID)
                         {
-                    
+
                             timer_ptr -> tx_timer_performance_expiration_count++;
                         }
                     }
 #endif
-                  
-                    /* Copy the calling function and ID into local variables before interrupts 
+
+                    /* Copy the calling function and ID into local variables before interrupts
                        are re-enabled.  */
                     timeout_function =  current_timer -> tx_timer_internal_timeout_function;
                     timeout_param =     current_timer -> tx_timer_internal_timeout_param;
@@ -315,7 +315,7 @@ UINT                         status;
                     {
 
                         /* Make the timer appear that it is still active while processing
-                           the expiration routine and with interrupts enabled.  This will 
+                           the expiration routine and with interrupts enabled.  This will
                            permit proper processing of a timer deactivate from both the
                            expiration routine and an ISR.  */
                         current_timer -> tx_timer_internal_list_head =    &reactivate_timer;
@@ -345,7 +345,7 @@ UINT                         status;
                 /* Call the timer-expiration function, if non-NULL.  */
                 if (timeout_function != TX_NULL)
                 {
-            
+
                     (timeout_function) (timeout_param);
                 }
 
@@ -376,16 +376,16 @@ UINT                         status;
                         /* Determine if this is an application timer.  */
                         if (current_timer -> tx_timer_internal_timeout_function != &_tx_thread_timeout)
                         {
-            
+
                             /* Derive the application timer pointer.  */
-                    
+
                            /* Pickup the application timer pointer.  */
                             TX_USER_TIMER_POINTER_GET(current_timer, timer_ptr)
 
                             /* Increment the number of expirations on this timer.  */
                             if (timer_ptr -> tx_timer_id == TX_TIMER_ID)
                             {
-                            
+
                                 timer_ptr -> tx_timer_performance_reactivate_count++;
                             }
                         }
@@ -412,7 +412,7 @@ UINT                         status;
 
                     /* At this point, we are ready to put the timer back on one of
                        the timer lists.  */
-    
+
                     /* Calculate the proper place for the timer.  */
                     timer_list =  TX_TIMER_POINTER_ADD(_tx_timer_current_ptr, expiration_time);
                     if (TX_TIMER_INDIRECT_TO_VOID_POINTER_CONVERT(timer_list) >= TX_TIMER_INDIRECT_TO_VOID_POINTER_CONVERT(_tx_timer_list_end))
@@ -420,13 +420,13 @@ UINT                         status;
 
                         /* Wrap from the beginning of the list.  */
                         delta =  TX_TIMER_POINTER_DIF(timer_list, _tx_timer_list_end);
-                        timer_list =  TX_TIMER_POINTER_ADD(_tx_timer_list_start, delta);                    
+                        timer_list =  TX_TIMER_POINTER_ADD(_tx_timer_list_start, delta);
                     }
 
                     /* Now put the timer on this list.  */
                     if ((*timer_list) == TX_NULL)
                     {
-                
+
                         /* This list is NULL, just put the new timer on it.  */
 
                         /* Setup the links in this timer.  */
@@ -468,7 +468,7 @@ UINT                         status;
                 /* Determine if we need to change the core exclusion setting.  */
                 if (_tx_timer_thread.tx_thread_smp_cores_excluded != core_exclusion)
                 {
-            
+
 #ifdef TX_MISRA_ENABLE
                 do
                 {
@@ -477,11 +477,11 @@ UINT                         status;
                     status =  _tx_thread_smp_core_exclude(&_tx_timer_thread, core_exclusion);
                 } while (status != TX_SUCCESS);
 #else
-                  
+
                     /* Setup the new core exclusion for execution this timer.  */
                     _tx_thread_smp_core_exclude(&_tx_timer_thread, core_exclusion);
 #endif
-                
+
                     /* When we get to this point, the system timer thread is executing on one of the allowed cores.  */
                 }
 
@@ -501,7 +501,7 @@ UINT                         status;
                 /* Build pointer to the timer thread.  */
                 thread_ptr =  &_tx_timer_thread;
 
-                /* Set the status to suspending, in order to indicate the 
+                /* Set the status to suspending, in order to indicate the
                    suspension is in progress.  */
                 thread_ptr -> tx_thread_state =  TX_SUSPENDED;
 
@@ -533,7 +533,7 @@ UINT                         status;
                 /* Restore interrupts.  */
                 TX_RESTORE
             }
-        } 
+        }
     }
 
 #ifdef TX_SAFETY_CRITICAL

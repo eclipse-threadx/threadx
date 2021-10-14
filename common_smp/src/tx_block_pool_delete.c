@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Block Pool                                                          */
 /**                                                                       */
@@ -31,45 +31,47 @@
 #include "tx_block_pool.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_block_pool_delete                               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_block_pool_delete                               PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function deletes the specified block pool.  All threads        */ 
-/*    suspended on the block pool are resumed with the TX_DELETED status  */ 
-/*    code.                                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pool_ptr                          Pointer to pool control block     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SUCCESS                        Successful completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_preempt_check   Check for preemption              */ 
-/*    _tx_thread_system_resume          Resume thread service             */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function deletes the specified block pool.  All threads        */
+/*    suspended on the block pool are resumed with the TX_DELETED status  */
+/*    code.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pool_ptr                          Pointer to pool control block     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Successful completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_preempt_check   Check for preemption              */
+/*    _tx_thread_system_resume          Resume thread service             */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_block_pool_delete(TX_BLOCK_POOL *pool_ptr)
@@ -77,7 +79,7 @@ UINT  _tx_block_pool_delete(TX_BLOCK_POOL *pool_ptr)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *thread_ptr;                
+TX_THREAD       *thread_ptr;
 TX_THREAD       *next_thread;
 UINT            suspended_count;
 TX_BLOCK_POOL   *next_pool;
@@ -124,9 +126,9 @@ TX_BLOCK_POOL   *previous_pool;
         /* See if we have to update the created list head pointer.  */
         if (_tx_block_pool_created_ptr == pool_ptr)
         {
-                    
+
             /* Yes, move the head pointer to the next link. */
-            _tx_block_pool_created_ptr =  next_pool; 
+            _tx_block_pool_created_ptr =  next_pool;
         }
     }
 
@@ -134,7 +136,7 @@ TX_BLOCK_POOL   *previous_pool;
     _tx_thread_preempt_disable++;
 
     /* Pickup the suspension information.  */
-    thread_ptr =                                 pool_ptr -> tx_block_pool_suspension_list;    
+    thread_ptr =                                 pool_ptr -> tx_block_pool_suspension_list;
     pool_ptr -> tx_block_pool_suspension_list =  TX_NULL;
     suspended_count =                            pool_ptr -> tx_block_pool_suspended_count;
     pool_ptr -> tx_block_pool_suspended_count =  TX_NO_SUSPENSIONS;
@@ -146,14 +148,14 @@ TX_BLOCK_POOL   *previous_pool;
        on this block pool.  */
     while (suspended_count != TX_NO_SUSPENSIONS)
     {
-      
+
         /* Decrement the suspension count.  */
         suspended_count--;
-        
+
         /* Lockout interrupts.  */
         TX_DISABLE
 
-        /* Clear the cleanup pointer, this prevents the timeout from doing 
+        /* Clear the cleanup pointer, this prevents the timeout from doing
            anything.  */
         thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 

@@ -6,14 +6,14 @@
 // Exits in EL1 AArch64
 //
 // Copyright (c) 2014-2017 Arm Limited (or its affiliates). All rights reserved.
-// Use, modification and redistribution of this file is subject to your
-// possession of a valid DS-5 end user licence agreement and your compliance
-// with all applicable terms and conditions of such licence agreement.
+// Use, modification and redistribution of this file is subject to your possession of a
+// valid End User License Agreement for the Arm Product of which these examples are part of
+// and your compliance with all applicable terms and conditions of such licence agreement.
 // ------------------------------------------------------------
 
 #include "v8_mmu.h"
 #include "v8_system.h"
-
+#include "GICv3_aliases.h"
 
     .section StartUp, "ax"
     .balign 4
@@ -328,7 +328,7 @@ el1_entry_aarch64:
     //
     // Cortex-A processors automatically invalidate their caches on reset
     // (unless suppressed with the DBGL1RSTDISABLE or L2RSTDISABLE pins).
-    // It is therefore not necessary for software to invalidate the caches 
+    // It is therefore not necessary for software to invalidate the caches
     // on startup, however, this is done here in case of a warm reset.
     bl  InvalidateUDCaches
     tlbi VMALLE1
@@ -761,7 +761,7 @@ wait_for_mmu_ready:
     msr SCTLR_EL1, x1
     isb
 
-	/* EL: Secondary core entrance.  */
+    /* EL: Secondary core entrance.  */
     B       _tx_thread_smp_initialize_wait
 
 loop_wfi:
@@ -800,4 +800,4 @@ __user_setup_stackheap:
     ADRP    X0, Image$$ARM_LIB_HEAP$$ZI$$Base
     ADRP    X2, Image$$ARM_LIB_HEAP$$ZI$$Limit
     RET
-    
+

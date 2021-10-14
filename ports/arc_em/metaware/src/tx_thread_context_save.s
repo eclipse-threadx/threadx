@@ -201,7 +201,7 @@ __tx_thread_not_nested_save:
     and     r2, r2, ~STATUS32_SC                        ; Clear the hardware stack checking enable bit (SC)
     kflag   r2                                          ; Disable hardware stack checking
     mov     r1, _tx_system_stack_top_address            ; Pickup top of system stack (lowest memory address)
-    sr		r1, [KSTACK_TOP]                            ; Setup KSTACK_TOP
+    sr      r1, [KSTACK_TOP]                            ; Setup KSTACK_TOP
     mov     r1, _tx_system_stack_base_address           ; Pickup base of system stack (highest memory address)
     sr      r1, [KSTACK_BASE]                           ; Setup KSTACK_BASE
     ld      sp, [gp, _tx_thread_system_stack_ptr@sda]   ; Switch to system stack

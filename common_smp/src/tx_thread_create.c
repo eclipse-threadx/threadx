@@ -115,7 +115,7 @@ ALIGN_TYPE              updated_stack_start;
 
 #ifdef TX_ENABLE_STACK_CHECKING
 
-    /* Ensure that there are two ULONG of 0xEF patterns at the top and 
+    /* Ensure that there are two ULONG of 0xEF patterns at the top and
        bottom of the thread's stack. This will be used to check for stack
        overflow conditions during run-time.  */
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
@@ -127,7 +127,7 @@ ALIGN_TYPE              updated_stack_start;
     /* Determine if the starting stack address is different.  */
     if (new_stack_start != updated_stack_start)
     {
-    
+
         /* Yes, subtract another ULONG from the size to avoid going past the stack area.  */
         stack_size =  stack_size - (sizeof(ULONG));
     }
@@ -166,7 +166,7 @@ ALIGN_TYPE              updated_stack_start;
     /* Default thread creation such that core0 is the only allowed core for execution, i.e., bit 1 is set to exclude core1.  */
     thread_ptr -> tx_thread_smp_cores_excluded =  (TX_THREAD_SMP_CORE_MASK & 0xFFFFFFFE);
     thread_ptr -> tx_thread_smp_cores_allowed  =  1;
-    
+
     /* Default the timers to run on core 0 as well.  */
     thread_ptr -> tx_thread_timer.tx_timer_internal_smp_cores_excluded =  (TX_THREAD_SMP_CORE_MASK & 0xFFFFFFFE);
 
@@ -214,7 +214,7 @@ ALIGN_TYPE              updated_stack_start;
     /* Perform any additional thread setup activities for tool or user purpose.  */
     TX_THREAD_CREATE_INTERNAL_EXTENSION(thread_ptr)
 
-    /* Call the target specific stack frame building routine to build the 
+    /* Call the target specific stack frame building routine to build the
        thread's initial stack and to setup the actual stack pointer in the
        control block.  */
     _tx_thread_stack_build(thread_ptr, _tx_thread_shell_entry);

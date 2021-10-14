@@ -137,7 +137,7 @@
                                     								
                                 </option>
                                 								
-                                <option id="com.arm.tool.assembler.v6.base.option.force.preproc.2015328324" superClass="com.arm.tool.assembler.v6.base.option.force.preproc" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                <option id="com.arm.tool.assembler.v6.base.option.force.preproc.2015328324" name="Preprocess input files (-x assembler-with-cpp)" superClass="com.arm.tool.assembler.v6.base.option.force.preproc" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
                                 <inputType id="com.arm.tool.assembler.v6.base.input.1847017761" superClass="com.arm.tool.assembler.v6.base.input"/>
                                 							

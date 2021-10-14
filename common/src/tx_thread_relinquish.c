@@ -112,7 +112,7 @@ TX_THREAD       *thread_ptr;
         /* Yes, there is another thread at this priority, make it the highest at
            this priority level.  */
         _tx_thread_priority_list[priority] =  thread_ptr -> tx_thread_ready_next;
-    
+
         /* Mark the new thread as the one to execute.  */
         _tx_thread_execute_ptr = thread_ptr -> tx_thread_ready_next;
     }

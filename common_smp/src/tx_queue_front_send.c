@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Queue                                                               */
 /**                                                                       */
@@ -31,48 +31,50 @@
 #include "tx_queue.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_queue_front_send                                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_queue_front_send                                PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function places a message at the front of the specified queue. */ 
-/*    If there is no room in the queue, this function returns the         */ 
-/*    queue full status.                                                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    queue_ptr                         Pointer to queue control block    */ 
-/*    source_ptr                        Pointer to message source         */ 
-/*    wait_option                       Suspension option                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_resume          Resume thread routine             */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*    _tx_thread_system_suspend         Suspend thread routine            */ 
-/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function places a message at the front of the specified queue. */
+/*    If there is no room in the queue, this function returns the         */
+/*    queue full status.                                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    queue_ptr                         Pointer to queue control block    */
+/*    source_ptr                        Pointer to message source         */
+/*    wait_option                       Suspension option                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_resume          Resume thread routine             */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*    _tx_thread_system_suspend         Suspend thread routine            */
+/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_queue_front_send(TX_QUEUE *queue_ptr, VOID *source_ptr, ULONG wait_option)
@@ -80,9 +82,9 @@ UINT  _tx_queue_front_send(TX_QUEUE *queue_ptr, VOID *source_ptr, ULONG wait_opt
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *thread_ptr;            
-ULONG           *source;                 
-ULONG           *destination;            
+TX_THREAD       *thread_ptr;
+ULONG           *source;
+ULONG           *destination;
 UINT            size;
 UINT            suspended_count;
 TX_THREAD       *next_thread;
@@ -121,7 +123,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
     if (queue_ptr -> tx_queue_available_storage != ((UINT) 0))
     {
 
-        /* Yes there is room in the queue. Now determine if there is a thread waiting 
+        /* Yes there is room in the queue. Now determine if there is a thread waiting
            for a message.  */
         if (suspended_count == TX_NO_SUSPENSIONS)
         {
@@ -135,20 +137,20 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
             /* See if the read pointer is at the beginning of the queue area.  */
             if (queue_ptr -> tx_queue_read == queue_ptr -> tx_queue_start)
             {
-            
+
                 /* Adjust the read pointer to the last message at the end of the
                    queue.  */
                 queue_ptr -> tx_queue_read =  TX_ULONG_POINTER_SUB(queue_ptr -> tx_queue_end, queue_ptr -> tx_queue_message_size);
             }
             else
             {
-            
+
                 /* Not at the beginning of the queue, just move back one message.  */
                 queue_ptr -> tx_queue_read =  TX_ULONG_POINTER_SUB(queue_ptr -> tx_queue_read, queue_ptr -> tx_queue_message_size);
             }
 
             /* Simply place the message in the queue.  */
-            
+
             /* Reduce the amount of available storage.  */
             queue_ptr -> tx_queue_available_storage--;
 
@@ -158,9 +160,9 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
             /* Setup source and destination pointers.  */
             source =       TX_VOID_TO_ULONG_POINTER_CONVERT(source_ptr);
             destination =  queue_ptr -> tx_queue_read;
-            size =         queue_ptr -> tx_queue_message_size; 
+            size =         queue_ptr -> tx_queue_message_size;
 
-            /* Copy message. Note that the source and destination pointers are 
+            /* Copy message. Note that the source and destination pointers are
                incremented by the macro.  */
             TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
@@ -183,7 +185,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
                 (queue_send_notify)(queue_ptr);
             }
 #endif
-        }              
+        }
         else
         {
 
@@ -217,8 +219,8 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
                 previous_thread =                               thread_ptr -> tx_thread_suspended_previous;
                 next_thread -> tx_thread_suspended_previous =   previous_thread;
                 previous_thread -> tx_thread_suspended_next =   next_thread;
-            } 
- 
+            }
+
             /* Decrement the suspension count.  */
             queue_ptr -> tx_queue_suspended_count =  suspended_count;
 
@@ -237,14 +239,14 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
             /* Setup source and destination pointers.  */
             source =       TX_VOID_TO_ULONG_POINTER_CONVERT(source_ptr);
             destination =  TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_additional_suspend_info);
-            size =         queue_ptr -> tx_queue_message_size; 
+            size =         queue_ptr -> tx_queue_message_size;
 
-            /* Copy message. Note that the source and destination pointers are 
+            /* Copy message. Note that the source and destination pointers are
                incremented by the macro.  */
             TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
             /* Put return status into the thread control block.  */
-            thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;        
+            thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;
 
 #ifdef TX_NOT_INTERRUPTABLE
 
@@ -264,7 +266,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
             /* Resume thread.  */
             _tx_thread_system_resume(thread_ptr);
 #endif
- 
+
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 
             /* Determine if a notify callback is required.  */
@@ -298,7 +300,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
             /* Yes, suspension is requested.  */
 
             /* Prepare for suspension of this thread.  */
-            
+
             /* Pickup thread pointer.  */
             TX_THREAD_GET_CURRENT(thread_ptr)
 
@@ -343,7 +345,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
                 next_thread -> tx_thread_suspended_previous =   thread_ptr;
 
                 /* Update the suspension list to put this thread in front, which will put
-                   the message that was removed in the proper relative order when room is 
+                   the message that was removed in the proper relative order when room is
                    made in the queue.  */
                 queue_ptr -> tx_queue_suspension_list =         thread_ptr;
             }

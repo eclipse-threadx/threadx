@@ -88,7 +88,7 @@ UCHAR               *work_ptr;
     else
     {
 
-        /* Pickup the pool pointer which is just previous to the starting 
+        /* Pickup the pool pointer which is just previous to the starting
            address of block that the caller sees.  */
         work_ptr =      TX_VOID_TO_UCHAR_POINTER_CONVERT(block_ptr);
         work_ptr =      TX_UCHAR_POINTER_SUB(work_ptr, (sizeof(UCHAR *)));
@@ -103,7 +103,7 @@ UCHAR               *work_ptr;
             /* Pool pointer is invalid, return appropriate error code.  */
             status =  TX_PTR_ERROR;
         }
-    
+
         /* Now check for invalid pool ID.  */
         else if  (pool_ptr -> tx_block_pool_id != TX_BLOCK_POOL_ID)
         {

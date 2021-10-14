@@ -27,8 +27,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_interrupt_control                     Cortex-Mx/AC6      */
-/*                                                           6.1.8        */
+/*    _tx_thread_interrupt_control                     Cortex-M7/AC6      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -58,7 +58,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_interrupt_control(UINT new_posture)

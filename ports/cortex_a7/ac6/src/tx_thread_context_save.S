@@ -47,7 +47,7 @@
 @/*  FUNCTION                                               RELEASE        */ 
 @/*                                                                        */ 
 @/*    _tx_thread_context_save                           Cortex-A7/AC6     */ 
-@/*                                                            6.1         */
+@/*                                                            6.1.9       */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -79,6 +79,9 @@
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
+@/*                                            execution profile support,  */
+@/*                                            resulting in version 6.1.9  */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_context_save(VOID)
@@ -119,7 +122,7 @@ _tx_thread_context_save:
 @
     MOV     r10, #0                         @ Clear stack limit
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 @
 @    /* Call the ISR enter function to indicate an ISR is executing.  */
 @
@@ -159,7 +162,7 @@ __tx_thread_not_nested_save:
 @
     MOV     r10, #0                         @ Clear stack limit
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 @
 @    /* Call the ISR enter function to indicate an ISR is executing.  */
 @
@@ -183,7 +186,7 @@ __tx_thread_idle_system_save:
 @
     MOV     r10, #0                         @ Clear stack limit
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 @
 @    /* Call the ISR enter function to indicate an ISR is executing.  */
 @

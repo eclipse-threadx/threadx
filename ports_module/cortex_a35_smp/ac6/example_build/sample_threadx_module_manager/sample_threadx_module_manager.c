@@ -115,7 +115,7 @@ void module_manager_entry(ULONG thread_input)
 
     /* Load the module with absolute address linkage, in this example it is placed there by the multiple image download.  */
     txm_module_manager_absolute_load(&my_module, "my module", (void *) MODULE_CODE);
-    
+
     /* Start the module.  */
     txm_module_manager_start(&my_module);
 
@@ -127,10 +127,10 @@ void module_manager_entry(ULONG thread_input)
             tx_thread_sleep(10);
         }
     }
-    
+
     /* Stop the module.  */
     txm_module_manager_stop(&my_module);
-    
+
     /* Unload the module.  */
     txm_module_manager_unload(&my_module);
 
@@ -139,11 +139,11 @@ void module_manager_entry(ULONG thread_input)
 
     /* Start the module again.  */
     txm_module_manager_start(&my_module);
-    
+
     /* Now just spin...  */
     while(1)
     {
-    
+
         tx_thread_sleep(10);
     }
 }

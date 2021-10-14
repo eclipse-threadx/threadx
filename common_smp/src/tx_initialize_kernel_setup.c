@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Initialize                                                          */
 /**                                                                       */
@@ -31,44 +31,44 @@
 #include "tx_thread.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_setup                        PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_initialize_kernel_setup                        PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is called by the compiler's startup code to make      */ 
-/*    ThreadX objects accessible to the compiler's library.  If this      */ 
-/*    function is not called by the compiler, all ThreadX initialization  */ 
-/*    takes place from the kernel enter function defined previously.      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_high_level_initialize  SMP initialization            */ 
-/*    _tx_thread_smp_current_state_set  Set system state for all cores    */ 
-/*    _tx_initialize_low_level          Low-level initialization          */ 
-/*    _tx_initialize_high_level         High-level initialization         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    startup code                      Compiler startup code             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is called by the compiler's startup code to make      */
+/*    ThreadX objects accessible to the compiler's library.  If this      */
+/*    function is not called by the compiler, all ThreadX initialization  */
+/*    takes place from the kernel enter function defined previously.      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_high_level_initialize  SMP initialization            */
+/*    _tx_thread_smp_current_state_set  Set system state for all cores    */
+/*    _tx_initialize_low_level          Low-level initialization          */
+/*    _tx_initialize_high_level         High-level initialization         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    startup code                      Compiler startup code             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -77,8 +77,8 @@
 VOID  _tx_initialize_kernel_setup(VOID)
 {
 
-    /* Ensure that the system state variable is set to indicate 
-       initialization is in progress.  Note that this variable is 
+    /* Ensure that the system state variable is set to indicate
+       initialization is in progress.  Note that this variable is
        later used to represent interrupt nesting.  */
     _tx_thread_smp_current_state_set(TX_INITIALIZE_IN_PROGRESS);
 
@@ -88,12 +88,12 @@ VOID  _tx_initialize_kernel_setup(VOID)
     /* Invoke the low-level initialization to handle all processor specific
        initialization issues.  */
     _tx_initialize_low_level();
-    
+
     /* Call the high-level SMP  Initialization.  */
     _tx_thread_smp_high_level_initialize();
 
-    /* Invoke the high-level initialization to exercise all of the 
-       ThreadX components and the application's initialization 
+    /* Invoke the high-level initialization to exercise all of the
+       ThreadX components and the application's initialization
        function.  */
     _tx_initialize_high_level();
 

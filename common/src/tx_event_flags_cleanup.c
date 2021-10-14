@@ -104,11 +104,11 @@ TX_THREAD                   *previous_thread;
 
             /* Setup pointer to event flags control block.  */
             group_ptr =  TX_VOID_TO_EVENT_FLAGS_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
-    
+
             /* Check for a NULL event flags control block pointer.  */
             if (group_ptr != TX_NULL)
             {
-                
+
                 /* Is the group pointer ID valid?  */
                 if (group_ptr -> tx_event_flags_group_id == TX_EVENT_FLAGS_ID)
                 {
@@ -133,9 +133,9 @@ TX_THREAD                   *previous_thread;
                         /* Pickup the suspension head.  */
                         suspension_head =  group_ptr -> tx_event_flags_group_suspension_list;
 
-                        /* Determine if the cleanup is being done while a set operation was interrupted.  If the 
+                        /* Determine if the cleanup is being done while a set operation was interrupted.  If the
                            suspended count is non-zero and the suspension head is NULL, the list is being processed
-                           and cannot be touched from here. The suspension list removal will instead take place 
+                           and cannot be touched from here. The suspension list removal will instead take place
                            inside the event flag set code.  */
                         if (suspension_head != TX_NULL)
                         {
@@ -144,7 +144,7 @@ TX_THREAD                   *previous_thread;
 
                             /* Decrement the local suspension count.  */
                             suspended_count--;
-              
+
                             /* Store the updated suspended count.  */
                             group_ptr -> tx_event_flags_group_suspended_count =  suspended_count;
 
@@ -153,7 +153,7 @@ TX_THREAD                   *previous_thread;
                             {
 
                                 /* Yes, the only suspended thread.  */
-        
+
                                 /* Update the head pointer.  */
                                 group_ptr -> tx_event_flags_group_suspension_list =  TX_NULL;
                             }
@@ -161,17 +161,17 @@ TX_THREAD                   *previous_thread;
                             {
 
                                 /* At least one more thread is on the same suspension list.  */
-    
+
                                 /* Update the links of the adjacent threads.  */
                                 next_thread =                                  thread_ptr -> tx_thread_suspended_next;
                                 previous_thread =                              thread_ptr -> tx_thread_suspended_previous;
                                 next_thread -> tx_thread_suspended_previous =  previous_thread;
                                 previous_thread -> tx_thread_suspended_next =  next_thread;
-                
+
                                 /* Determine if we need to update the head pointer.  */
                                 if (suspension_head == thread_ptr)
                                 {
-                
+
                                     /* Update the list head pointer.  */
                                     group_ptr -> tx_event_flags_group_suspension_list =  next_thread;
                                 }
@@ -179,7 +179,7 @@ TX_THREAD                   *previous_thread;
                         }
                         else
                         {
-                        
+
                             /* In this case, the search pointer in an interrupted event flag set must be reset.  */
                             group_ptr -> tx_event_flags_group_reset_search =  TX_TRUE;
                         }
@@ -189,7 +189,7 @@ TX_THREAD                   *previous_thread;
                         if (thread_ptr -> tx_thread_state == TX_EVENT_FLAG)
                         {
 
-                            /* Timeout condition and the thread still suspended on the event flags group.  
+                            /* Timeout condition and the thread still suspended on the event flags group.
                                Setup return error status and resume the thread.  */
 
 #ifdef TX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO
@@ -216,8 +216,8 @@ TX_THREAD                   *previous_thread;
                             /* Restore interrupts.  */
                             TX_RESTORE
 
-                            /* Resume the thread!  Check for preemption even though we are executing 
-                               from the system timer thread right now which normally executes at the 
+                            /* Resume the thread!  Check for preemption even though we are executing
+                               from the system timer thread right now which normally executes at the
                                highest priority.  */
                             _tx_thread_system_resume(thread_ptr);
 

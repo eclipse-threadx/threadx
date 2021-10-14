@@ -8,9 +8,6 @@ In order to build the ThreadX SMP library and the ThreadX SMP demonstration, fir
 the 'tx' and 'sample_threadx' projects (located in the "example_build" directory) 
 into your DS workspace.
 
-Note: the projects were made using DS-5, so DS will prompt you to migrate the projects.
-This is expected, so please do so.
-
 
 2.  Building the ThreadX SMP run-time Library
 

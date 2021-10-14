@@ -101,7 +101,7 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
             if (entry_ptr -> tx_trace_object_entry_thread_pointer == TX_POINTER_TO_ULONG_CONVERT(object_ptr))
             {
 
-                /* Mark this entry as available, but leave the other information so that old trace entries can 
+                /* Mark this entry as available, but leave the other information so that old trace entries can
                    still find it - if necessary!  */
                 entry_ptr -> tx_trace_object_entry_available =  ((UCHAR) TX_TRUE);
 
@@ -123,7 +123,7 @@ TX_INTERRUPT_SAVE_AREA
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (object_ptr != TX_NULL)
     {
-        
+
         /* NOP code.  */
         TX_DISABLE
         TX_RESTORE

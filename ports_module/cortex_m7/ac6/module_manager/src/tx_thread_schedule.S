@@ -41,8 +41,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_schedule                             Cortex-M7/MPU/AC6   */
-/*                                                           6.1.7        */
+/*    _tx_thread_schedule                               Cortex-M7/AC6     */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -75,15 +75,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  11-09-2020      Scott Larson            Modified comment(s), arrange  */
-/*                                            code to fix link error when */
-/*                                            VFP is enabled, resulting   */
-/*                                            in version 6.1.2            */
-/*  06-02-2021      Scott Larson            Fixed extended stack handling */
-/*                                            when calling kernel APIs,   */
-/*                                            added support for 8 MPU,    */
-/*                                            resulting in version 6.1.7  */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -110,7 +102,6 @@ _tx_thread_schedule:
 #endif
 
     /* Enable memory fault registers.  */
-
     LDR     r0, =0xE000ED24                         // Build SHCSR address
     LDR     r1, =0x70000                            // Enable Usage, Bus, and MemManage faults
     STR     r1, [r0]                                //
@@ -374,7 +365,7 @@ __tx_ts_restore:
 
     // Use alias registers to quickly load MPU
     ADD     r0, r0, #100                            // Build address of MPU register start in thread control block
-#ifndef TXM_MODULE_MANAGER_8_MPU
+#ifdef TXM_MODULE_MANAGER_16_MPU
     LDM     r0!,{r2-r9}                             // Load MPU regions 0-3
     STM     r1,{r2-r9}                              // Store MPU regions 0-3
     LDM     r0!,{r2-r9}                             // Load MPU regions 4-7
@@ -458,13 +449,17 @@ __tx_SVCallHandler:
 #endif
 
     MRS     r3, PSP                                 // Pickup thread stack pointer
+#ifdef __ARM_FP
     TST     lr, #0x10                               // Test for extended module stack
     ITT     EQ
     ORREQ   r3, r3, #1                              // If so, set LSB in thread stack pointer to indicate extended frame
     ORREQ   lr, lr, #0x10                           // Set bit, return with standard frame
+#endif
     STR     r3, [r2, #0xB0]                         // Save thread stack pointer
+#ifdef __ARM_FP
     BIC     r3, #1                                  // Clear possibly OR'd bit
-    
+#endif
+
     /* Build kernel stack by copying thread stack two registers at a time */
     ADD     r3, r3, #32                             // Start at bottom of hardware stack
     LDMDB   r3!, {r1-r2}
@@ -534,11 +529,13 @@ _tx_no_lazy_clear:
 
     LDR     r0, [r2, #0xB0]                         // Load the module thread stack pointer
     MRS     r3, PSP                                 // Pickup kernel stack pointer
+#ifdef __ARM_FP
     TST     r0, #1                                  // Is module stack extended?
     ITTE    NE                                      // If so...
     BICNE   lr, #0x10                               // Clear bit, return with extended frame
     BICNE   r0, #1                                  // Clear bit that indicates extended module frame
     ORREQ   lr, lr, #0x10                           // Else set bit, return with standard frame
+#endif
 
     /* Copy kernel hardware stack to module thread stack. */
     LDM     r3!, {r1-r2}
@@ -563,7 +560,7 @@ _tx_skip_kernel_stack_exit:
     BX      lr                                      // Return to thread
 
 
-   /* Kernel entry function from user mode.  */
+    /* Kernel entry function from user mode.  */
 
     .global  _txm_module_manager_kernel_dispatch
     .align  5

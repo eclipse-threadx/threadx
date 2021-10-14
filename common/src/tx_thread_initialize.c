@@ -175,7 +175,7 @@ VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
 ULONG           _tx_build_options;
 
 
-#ifdef TX_ENABLE_STACK_CHECKING
+#if defined(TX_ENABLE_STACK_CHECKING) || defined(TX_PORT_THREAD_STACK_ERROR_HANDLING)
 
 /* Define the global function pointer for stack error handling. If a stack error is 
    detected and the application has registered a stack error handler, it will be 
@@ -277,7 +277,7 @@ const CHAR _tx_thread_special_string[] =
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_initialize                               PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -312,7 +312,10 @@ const CHAR _tx_thread_special_string[] =
 /*                                            resulting in version 6.1    */
 /*  06-02-2021     Yuxin Zhou               Modified comment(s), added    */
 /*                                            Execution Profile support,  */
-/*                                            resulting in version 6.1.7  */   
+/*                                            resulting in version 6.1.7  */
+/*  10-15-2021     Yuxin Zhou               Modified comment(s), improved */
+/*                                            stack check error handling, */
+/*                                            resulting in version 6.1.9  */   
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_initialize(VOID)

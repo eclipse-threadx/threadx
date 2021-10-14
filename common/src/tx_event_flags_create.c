@@ -86,7 +86,7 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
 
     /* Setup the basic event flags group fields.  */
     group_ptr -> tx_event_flags_group_name =             name_ptr;
-    
+
     /* Disable interrupts to put the event flags group on the created list.  */
     TX_DISABLE
 
@@ -121,7 +121,7 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
 
     /* Increment the number of created event flag groups.  */
     _tx_event_flags_created_count++;
-    
+
     /* Optional event flag group create extended processing.  */
     TX_EVENT_FLAGS_GROUP_CREATE_EXTENSION(group_ptr)
 

@@ -54,25 +54,24 @@ tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
     Offset        Interrupted Stack Frame
 
-     0x00                   1
-     0x04                   ACC0
-     0x0C                   R6
-     0x10                   R7
-     0x14                   R8
-     0x18                   R9
-     0x1C                   R10
-     0x20                   R11
-     0x24                   R12
-     0x28                   R13
-     0x30                   R14
-     0x34                   R15
-     0x38                   R3
-     0x3C                   R4
-     0x40                   R5
-     0x44                   R1
-     0x48                   R2
-     0x4C                   PC - return address
-     0x50                   PSW
+     0x00                   ACC0
+     0x04                   R6
+     0x0C                   R7
+     0x10                   R8
+     0x14                   R9
+     0x18                   R10
+     0x1C                   R11
+     0x20                   R12
+     0x24                   R13
+     0x28                   R14
+     0x30                   R15
+     0x34                   R3
+     0x38                   R4
+     0x3C                   R5
+     0x40                   R1
+     0x44                   R2
+     0x48                   PC - return address
+     0x4C                   PSW
      
 Note: By default ccrx does not save the state of the accumulator register ACC0
 when entering an ISR. This means that if the ISR uses any of the DSP instructions the
@@ -150,6 +149,11 @@ information associated with this specific port of ThreadX:
 For generic code revision information, please refer to the readme_threadx_generic.txt
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
+
+10-15-2021  Release 6.1.9 changes:
+            tx_thread_context_restore.src       Removed unnecessary stack type placement 
+            tx_thread_schedule.src              Removed unnecessary stack type checking
+            tx_thread_stack_build.src           Removed unnecessary stack type placement 
 
 08-02-2021  Initial ThreadX release for the RXv1 using CC-RXX tools, version 6.1.8
 

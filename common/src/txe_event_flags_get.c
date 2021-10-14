@@ -102,7 +102,7 @@ TX_THREAD       *current_thread;
         /* Event flags group pointer is invalid, return appropriate error code.  */
         status =  TX_GROUP_ERROR;
     }
-    
+
     /* Now check for invalid event group ID.  */
     else if (group_ptr -> tx_event_flags_group_id != TX_EVENT_FLAGS_ID)
     {
@@ -121,7 +121,7 @@ TX_THREAD       *current_thread;
     else
     {
 
-        /* Check for a wait option error.  Only threads are allowed any form of 
+        /* Check for a wait option error.  Only threads are allowed any form of
            suspension.  */
         if (wait_option != TX_NO_WAIT)
         {
@@ -136,7 +136,7 @@ TX_THREAD       *current_thread;
 #ifndef TX_TIMER_PROCESS_IN_ISR
             else
             {
-            
+
                 /* Pickup thread pointer.  */
                 TX_THREAD_GET_CURRENT(current_thread)
 
@@ -155,7 +155,7 @@ TX_THREAD       *current_thread;
     /* Is everything still okay?  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Check for invalid get option.  */
         if (get_option > TX_AND_CLEAR)
         {

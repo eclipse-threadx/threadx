@@ -160,7 +160,7 @@ _tx_interrupt_x:
     b       _tx_thread_context_restore      ; Restore interrupt context
 
 
-The application handle interrupts directly, which necessitates all register 
+The application handles interrupts directly, which necessitates all register 
 preservation by the application's ISR. ISRs that do not use the ThreadX
 _tx_thread_context_save and _tx_thread_context_restore routines are not
 allowed access to the ThreadX API. In addition, custom application ISRs
@@ -224,7 +224,7 @@ information associated with this specific port of ThreadX:
 09-30-2020  Initial ThreadX 6.1 for ARCv2 EM using MetaWare tools.
 
 
-Copyright(c) 1996-2020 Microsoft Corporation
+Copyright(c) 1996-2021 Microsoft Corporation
 
 
 https://azure.com/rtos

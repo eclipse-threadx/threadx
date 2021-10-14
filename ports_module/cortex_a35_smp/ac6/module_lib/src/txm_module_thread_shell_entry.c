@@ -121,7 +121,7 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
                An error here typically indicates the resident portion of _tx_thread_schedule
                is not supporting the trap to obtain the function pointer.   */
         }
-        
+
         /* Resume the module's callback thread, already created in the manager.  */
         _txe_thread_resume(thread_info -> txm_module_thread_entry_info_callback_request_thread);
     }

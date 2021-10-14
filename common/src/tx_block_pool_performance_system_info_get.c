@@ -100,28 +100,28 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the total number of block allocations.  */
     if (allocates != TX_NULL)
     {
-    
+
         *allocates =  _tx_block_pool_performance_allocate_count;
     }
 
     /* Retrieve the total number of blocks released.  */
     if (releases != TX_NULL)
     {
-    
+
         *releases =  _tx_block_pool_performance_release_count;
     }
 
     /* Retrieve the total number of block pool thread suspensions.  */
     if (suspensions != TX_NULL)
     {
-    
+
         *suspensions =  _tx_block_pool_performance_suspension_count;
     }
 
     /* Retrieve the total number of block pool thread timeouts.  */
     if (timeouts != TX_NULL)
     {
-    
+
         *timeouts =  _tx_block_pool_performance_timeout_count;
     }
 
@@ -139,35 +139,35 @@ UINT        status;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (allocates != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (releases != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (suspensions != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (timeouts != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
-    
+
     /* Return completion status.  */
     return(status);
 #endif

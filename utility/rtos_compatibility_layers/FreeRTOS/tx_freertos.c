@@ -23,6 +23,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
+/*                                            fixed compiler warnings,    */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -405,7 +408,7 @@ BaseType_t xTaskCreate(TaskFunction_t pvTaskCode,
         txfr_free(p_stack);
         txfr_free(p_task);
         TX_FREERTOS_ASSERT_FAIL();
-        return NULL;
+        return (BaseType_t)NULL;
     }
 
     prio = txfr_prio_fr_to_tx(uxPriority);
@@ -417,7 +420,7 @@ BaseType_t xTaskCreate(TaskFunction_t pvTaskCode,
         txfr_free(p_stack);
         txfr_free(p_task);
         TX_FREERTOS_ASSERT_FAIL();
-        return NULL;
+        return (BaseType_t)NULL;
     }
 
     p_task->thread.txfr_thread_ptr = p_task;

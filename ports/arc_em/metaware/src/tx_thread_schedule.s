@@ -29,7 +29,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                             ARCv2_EM/MetaWare   */
-;/*                                                           6.1.6        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -69,6 +69,11 @@
 ;/*                                            fixed hardware stack checker*/
 ;/*                                            disable and reenable logic, */
 ;/*                                            resulting in version 6.1.6  */
+;/*  10-15-2021     Andres Mlinar            Modified comment(s), added    */
+;/*                                            support for disabling the   */
+;/*                                            loop control feature,       */
+;/*                                            improved internal logic,    */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -76,16 +81,18 @@
     .global _tx_thread_schedule
     .type   _tx_thread_schedule, @function
 _tx_thread_schedule:
+
+    mov     sp, _estack
+
+    .global _tx_thread_schedule_reenter
+    .type   _tx_thread_schedule_reenter, @function
+_tx_thread_schedule_reenter:
+
 ;
 ;    /* Enable interrupts.  */
 ;
     seti    0                                           ; Enable interrupts without changing threshold level
 
-    .ifdef  TX_ENABLE_HW_STACK_CHECKING
-    lr      r2, [status32]                              ; Pickup current STATUS32
-    and     r2, r2, ~STATUS32_SC                        ; Clear the hardware stack checking enable bit (SC)
-    kflag   r2                                          ; Disable hardware stack checking
-    .endif
 ;
 ;    /* Wait for a thread to execute.  */
 ;    do
@@ -121,6 +128,26 @@ __tx_thread_schedule_loop:
 ;    /* Setup time-slice, if present.  */
 ;    _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;
 ;
+    st      r4, [gp, _tx_timer_time_slice@sda]          ; Setup time-slice
+;
+    .ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+;
+;    /* Call the thread entry function to indicate the thread is executing.  */
+;
+    bl.d    _tx_execution_thread_enter                  ; Call the thread execution enter function
+    sub     sp, sp, 16                                  ; ..allocating some space on the stack
+    add     sp, sp, 16                                  ; Recover the stack space
+    .endif
+;
+;    /* Switch to the thread's stack.  */
+;    sp =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;
+;
+    .ifdef  TX_ENABLE_HW_STACK_CHECKING
+    lr      r2, [status32]                              ; Pickup current STATUS32
+    and     r2, r2, ~STATUS32_SC                        ; Clear the hardware stack checking enable bit (SC)
+    kflag   r2                                          ; Disable hardware stack checking
+    .endif
+
     ld      sp, [r0, 8]                                 ; Switch to thread's stack
 
     .ifdef  TX_ENABLE_HW_STACK_CHECKING
@@ -132,20 +159,6 @@ __tx_thread_schedule_loop:
     kflag   r2                                          ; Enable hardware stack checking
     .endif
 
-    st      r4, [gp, _tx_timer_time_slice@sda]          ; Setup time-slice
-;
-;    /* Switch to the thread's stack.  */
-;    sp =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;
-;
-    .ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-;
-;    /* Call the thread entry function to indicate the thread is executing.  */
-;
-    bl.d    _tx_execution_thread_enter                  ; Call the thread execution enter function
-    sub     sp, sp, 16                                  ; ..allocating some space on the stack
-    add     sp, sp, 16                                  ; Recover the stack space
-    .endif
-;
 ;    /* Determine if an interrupt frame or a synchronous task suspension frame
 ;       is present.  */
 ;
@@ -167,7 +180,7 @@ __tx_thread_schedule_loop:
     ld      r15, [sp, 56]                               ; Recover r15
     ld      r14, [sp, 60]                               ; Recover r14
     ld      r13, [sp, 64]                               ; Recover r13
-    ld      r1,  [sp, 68]                               ; Pickup status32
+    ld      r1,  [sp, 68]                               ; Pickup STATUS32
     ld      r30, [sp, 72]                               ; Recover r30
     add     sp, sp, 76                                  ; Recover solicited stack frame
     j_s.d   [blink]                                     ; Return to thread and restore flags
@@ -175,15 +188,18 @@ __tx_thread_schedule_loop:
 ;
 __tx_thread_schedule_int_ret:
 ;
-    mov     r0, 0x2 									; Pretend level 1 interrupt is returning
-    sr      r0, [AUX_IRQ_ACT]							;
+    mov     r0, 0x2                                     ; Pretend level 1 interrupt is returning
+    sr      r0, [AUX_IRQ_ACT]                           ;
 
+    .ifndef  TX_DISABLE_LP
     ld      r0, [sp, 4]                                 ; Recover LP_START
     sr      r0, [LP_START]                              ; Restore LP_START
     ld      r1, [sp, 8]                                 ; Recover LP_END
     sr      r1, [LP_END]                                ; Restore LP_END
     ld      r2, [sp, 12]                                ; Recover LP_COUNT
     mov     LP_COUNT, r2
+    .endif
+
     ld      r0, [sp, 156]                               ; Pickup saved BTA
     sr      r0, [BTA]                                   ; Recover BTA
     ld      blink, [sp, 16]                             ; Recover blink
@@ -223,7 +239,6 @@ __tx_thread_schedule_int_ret:
     .endif
     add     sp, sp, 160                                 ; Recover interrupt stack frame
     rtie                                                ; Return to point of interrupt
-
 ;
 ;}
 ;

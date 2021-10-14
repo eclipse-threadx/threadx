@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Block Memory                                                        */
 /**                                                                       */
@@ -31,48 +31,50 @@
 #include "tx_trace.h"
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_block_pool_performance_system_info_get          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_block_pool_performance_system_info_get          PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function retrieves block pool performance information.         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    allocates                         Destination for the total number  */ 
-/*                                        of block allocations            */ 
-/*    releases                          Destination for the total number  */ 
-/*                                        of blocks released              */ 
-/*    suspensions                       Destination for the total number  */ 
-/*                                        of suspensions                  */ 
-/*    timeouts                          Destination for total number of   */ 
-/*                                        timeouts                        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function retrieves block pool performance information.         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    allocates                         Destination for the total number  */
+/*                                        of block allocations            */
+/*    releases                          Destination for the total number  */
+/*                                        of blocks released              */
+/*    suspensions                       Destination for the total number  */
+/*                                        of suspensions                  */
+/*    timeouts                          Destination for total number of   */
+/*                                        timeouts                        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_block_pool_performance_system_info_get(ULONG *allocates, ULONG *releases, ULONG *suspensions, ULONG *timeouts)
@@ -98,28 +100,28 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the total number of block allocations.  */
     if (allocates != TX_NULL)
     {
-    
+
         *allocates =  _tx_block_pool_performance_allocate_count;
     }
 
     /* Retrieve the total number of blocks released.  */
     if (releases != TX_NULL)
     {
-    
+
         *releases =  _tx_block_pool_performance_release_count;
     }
 
     /* Retrieve the total number of block pool thread suspensions.  */
     if (suspensions != TX_NULL)
     {
-    
+
         *suspensions =  _tx_block_pool_performance_suspension_count;
     }
 
     /* Retrieve the total number of block pool thread timeouts.  */
     if (timeouts != TX_NULL)
     {
-    
+
         *timeouts =  _tx_block_pool_performance_timeout_count;
     }
 
@@ -137,35 +139,35 @@ UINT        status;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (allocates != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (releases != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (suspensions != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (timeouts != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
-    
+
     /* Return completion status.  */
     return(status);
 #endif

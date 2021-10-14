@@ -17,7 +17,7 @@ _gcc_setup:
     ldr     x9, =__RAM_segment_start__
 
     /* Copy GOT table. */
-  
+
     ldr     x0, =__got_load_start__
     sub     x0 ,x0, x3
     add     x0, x0, x5
@@ -51,7 +51,7 @@ got_setup_done:
 
 
     /* Copy initialised sections into RAM if required. */
-  
+
     ldr     x0, =__data_load_start__
     sub     x0, x0, x3
     add     x0, x0, x5
@@ -62,9 +62,9 @@ got_setup_done:
     sub     x2, x2, x4
     add     x2, x2, x9
     bl      crt0_memory_copy
-  
+
     /* Zero bss. */
-    
+
     ldr     x0, =__bss_start__
     sub     x0, x0, x4
     add     x0, x0, x9
@@ -88,12 +88,12 @@ got_setup_done:
     str     x2, [x0]
     add     x0, x0, #4
     str     x1, [x0]
-    
+
 	ldr 	x30, [sp]		// Restore other preserved registers
 	add 	sp, sp, 16
 
     ret	                    // Return to caller
-  
+
 
   /* Startup helper functions. */
 
@@ -126,4 +126,4 @@ memory_set_done:
 
     /* Setup attibutes of heap section so it doesn't take up room in the elf file */
     .section .heap, "wa", %nobits
-  
+

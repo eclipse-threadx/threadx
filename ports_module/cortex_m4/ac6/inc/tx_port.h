@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M4/AC6     */
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,10 +47,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
-/*                                            macro definition,           */
-/*                                            resulting in version 6.1.6  */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -142,7 +139,7 @@ typedef unsigned short                          USHORT;
 /* Define the port specific options for the _tx_build_options variable. This variable indicates
    how the ThreadX library was built.  */
 
-#define TX_PORT_SPECIFIC_BUILD_OPTIONS          0
+#define TX_PORT_SPECIFIC_BUILD_OPTIONS          (0)
 
 
 /* Define the in-line initialization constant so that modules with in-line
@@ -405,6 +402,7 @@ ULONG   _tx_misra_ipsr_get(VOID);
 #define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
 #endif
 
+
 /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to 
    prevent early scheduling on Cortex-M parts.  */
    
@@ -499,7 +497,7 @@ unsigned int interrupt_save;
 #endif
 
 
-/* Define FPU extension for the Cortex-M4.  Each is assumed to be called in the context of the executing
+/* Define FPU extension for the Cortex-M7.  Each is assumed to be called in the context of the executing
    thread. These are no longer needed, but are preserved for backward compatibility only.  */
 
 void    tx_thread_fpu_enable(void);
@@ -510,7 +508,7 @@ void    tx_thread_fpu_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M4/AC6 Version 6.1.6 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M4/AC6 Version 6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

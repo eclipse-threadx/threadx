@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -21,69 +21,59 @@
 /**************************************************************************/
 
 
-/* #define TX_SOURCE_CODE  */
-
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_thread.h"
-*/
-
-
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_stack_build                           Cortex-A35-SMP/AC6 */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_stack_build                           Cortex-A35-SMP/AC6 */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function builds a stack frame on the supplied thread's stack.  */
 /*    The stack frame results in a fake interrupt return to the supplied  */
-/*    function pointer.                                                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                            Pointer to thread control blk */
-/*    function_ptr                          Pointer to return function    */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*    function pointer.                                                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Pointer to thread             */
+/*    function_ptr                          Pointer to entry function     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    _tx_thread_create                     Create thread service         */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*                                             resulting in version 6.1.9 */
 /*                                                                        */
 /**************************************************************************/
-/* VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
-{  */
+// VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
+// {
     .global _tx_thread_stack_build
     .type   _tx_thread_stack_build, @function
 _tx_thread_stack_build:
 
-       
-    /* Build a fake interrupt frame.  The form of the fake interrupt stack
-       on the Cortex-A35 should look like the following after it is built:
-       
+
+    /* Build an interrupt frame.  On Cortex-A35 it should look like this:
+
        Stack Top:      SSPR        Initial SSPR
                        ELR         Point of interrupt
                        x28         Initial value for x28
@@ -129,7 +119,7 @@ _tx_thread_stack_build:
 
     MOV     x2, #0                              // Build clear value
     MOV     x3, #0                              //
-    
+
     STP     x2, x3, [x4, #-16]!                 // Set backtrace to 0
     STP     x2, x3, [x4, #-16]!                 // Set initial x29, x30
     STP     x2, x3, [x4, #-16]!                 // Set initial x0, x1
@@ -160,13 +150,11 @@ _tx_thread_stack_build:
     STP     x2, x3, [x4, #-16]!                 // Set initial SPSR & ELR
 
     /* Setup stack pointer.  */
-    /* thread_ptr -> tx_thread_stack_ptr =  x2;  */
+    // thread_ptr -> tx_thread_stack_ptr =  x2;
 
     STR     x4, [x0, #8]                        // Save stack pointer in thread's
     MOV     x3, #1                              // Build ready flag
-    STR     w3, [x0, #260]                      // Set ready flag   
+    STR     w3, [x0, #260]                      // Set ready flag
     RET                                         // Return to caller
 
-/* }  */
-
-
+// }

@@ -93,15 +93,15 @@ UINT                    status;
     /* Determine if this is a legal request.  */
     if (semaphore_ptr == TX_NULL)
     {
-        
+
         /* Semaphore pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
-    
+
     /* Determine if the semaphore ID is invalid.  */
     else if (semaphore_ptr -> tx_semaphore_id != TX_SEMAPHORE_ID)
     {
-        
+
         /* Semaphore pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
@@ -123,31 +123,31 @@ UINT                    status;
         /* Retrieve the number of puts on this semaphore.  */
         if (puts != TX_NULL)
         {
-    
+
             *puts =  semaphore_ptr -> tx_semaphore_performance_put_count;
         }
-    
+
         /* Retrieve the number of gets on this semaphore.  */
         if (gets != TX_NULL)
         {
-    
+
             *gets =  semaphore_ptr -> tx_semaphore_performance_get_count;
         }
-    
+
         /* Retrieve the number of suspensions on this semaphore.  */
         if (suspensions != TX_NULL)
         {
-    
+
             *suspensions =  semaphore_ptr -> tx_semaphore_performance_suspension_count;
         }
-    
+
         /* Retrieve the number of timeouts on this semaphore.  */
         if (timeouts != TX_NULL)
         {
-    
+
             *timeouts =  semaphore_ptr -> tx_semaphore_performance_timeout_count;
         }
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
 
@@ -161,37 +161,37 @@ UINT                    status;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (semaphore_ptr != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (puts != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (gets != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (suspensions != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (timeouts != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }

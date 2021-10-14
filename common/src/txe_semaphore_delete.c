@@ -116,7 +116,7 @@ TX_THREAD       *thread_ptr;
 #ifndef TX_TIMER_PROCESS_IN_ISR
         else
         {
-        
+
             /* Pickup thread pointer.  */
             TX_THREAD_GET_CURRENT(thread_ptr)
 

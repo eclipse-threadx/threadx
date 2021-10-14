@@ -27,8 +27,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_thread_stack_build          Cortex-M4/MPU/AC6   */
-/*                                                           6.1.2        */
+/*    _txm_module_manager_thread_stack_build            Cortex-M4/AC6     */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -60,9 +60,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  11-09-2020      Scott Larson            Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_manager_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(TX_THREAD *, TXM_MODULE_INSTANCE *))
@@ -112,7 +110,7 @@ _txm_module_manager_thread_stack_build:
     STR     r3, [r2, #28]                       // Store initial r10
     STR     r3, [r2, #32]                       // Store initial r11
 
-    /* Hardware stack follows. */
+    /* Hardware stack follows.  */
 
     STR     r0, [r2, #36]                       // Store initial r0, which is the thread control block
 

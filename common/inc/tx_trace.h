@@ -78,8 +78,8 @@
 #endif
 
 
-/* Define the default clock source for trace event entry time stamp. The following two item are port specific.  
-   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
+/* Define the default clock source for trace event entry time stamp. The following two item are port specific.
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
 #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
@@ -101,8 +101,8 @@
 
 
 /* ThreadX Trace Description.  The ThreadX Trace feature is designed to capture
-   events in real-time in a circular event buffer. This buffer may be analyzed by other 
-   tools.  The high-level format of the Trace structure is:  
+   events in real-time in a circular event buffer. This buffer may be analyzed by other
+   tools.  The high-level format of the Trace structure is:
 
             [Trace Control Header              ]
             [Trace Object Registry - Entry 0   ]
@@ -115,23 +115,23 @@
 */
 
 
-/* Trace Control Header. The Trace Control Header contains information that 
-   defines the format of the Trace Object Registry as well as the location and 
-   current entry of the Trace Buffer itself.  The high-level format of the 
+/* Trace Control Header. The Trace Control Header contains information that
+   defines the format of the Trace Object Registry as well as the location and
+   current entry of the Trace Buffer itself.  The high-level format of the
    Trace Control Header is:
 
                 Entry                               Size                     Description
 
             [Trace ID]                              4       This 4-byte field contains the ThreadX Trace
                                                             Identification. If the trace buffer is valid, the
-                                                            contents are 0x54585442 (TXTB). Since it is written as 
+                                                            contents are 0x54585442 (TXTB). Since it is written as
                                                             a 32-bit unsigned word, this value is also used to
-                                                            determine if the event trace information is in 
+                                                            determine if the event trace information is in
                                                             little or big endian format.
-            [Timer Valid Mask]                      4       Mask of valid bits in the 32-bit time stamp. This 
+            [Timer Valid Mask]                      4       Mask of valid bits in the 32-bit time stamp. This
                                                             enables use of 32, 24, 16, or event 8-bit timers.
-                                                            If the time source is 32-bits, the mask is 
-                                                            0xFFFFFFFF. If the time source is 16-bits, the 
+                                                            If the time source is 32-bits, the mask is
+                                                            0xFFFFFFFF. If the time source is 16-bits, the
                                                             mask is 0x0000FFFF.
             [Trace Base Address]                    4       The base address for all trace pointer. Subtracting
                                                             the pointer and this address will yield the proper
@@ -143,7 +143,7 @@
             [Trace Buffer Start Pointer]            4       Pointer to the start of the Trace Buffer Area
             [Trace Buffer End Pointer]              4       Pointer to the end of the Trace Buffer Area
             [Trace Buffer Current Pointer]          4       Pointer to the oldest entry in the Trace Buffer.
-                                                            This entry will be overwritten on the next event and 
+                                                            This entry will be overwritten on the next event and
                                                             incremented to the next event (wrapping to the top
                                                             if the buffer end pointer is exceeded).
             [Reserved]                              4       Reserved 4 bytes, should be 0xAAAAAAAA
@@ -173,7 +173,7 @@ typedef struct TX_TRACE_HEADER_STRUCT
 } TX_TRACE_HEADER;
 
 
-/* Trace Object Registry. The Trace Object Registry is used to map the object pointer in the trace buffer to 
+/* Trace Object Registry. The Trace Object Registry is used to map the object pointer in the trace buffer to
    the application's name for the object (defined during object creation in ThreadX).  */
 
 #ifndef TX_TRACE_OBJECT_REGISTRY_NAME
@@ -181,7 +181,7 @@ typedef struct TX_TRACE_HEADER_STRUCT
 #endif
 
 
-/* Define the object name types as well as the contents of any additional parameters that might be useful in 
+/* Define the object name types as well as the contents of any additional parameters that might be useful in
    trace analysis.  */
 
 #define TX_TRACE_OBJECT_TYPE_NOT_VALID                      ((UCHAR) 0)     /* Object is not valid                               */
@@ -214,27 +214,27 @@ typedef struct TX_TRACE_OBJECT_ENTRY_STRUCT
 
                 Entry                  Size                     Description
 
-            [Thread Pointer]            4           This 4-byte field contains the pointer to the 
-                                                    ThreadX thread running that caused the event. 
+            [Thread Pointer]            4           This 4-byte field contains the pointer to the
+                                                    ThreadX thread running that caused the event.
                                                     If this field is NULL, the entry hasn't been used
                                                     yet. If this field is 0xFFFFFFFF, the event occurred
-                                                    from within an ISR. If this entry is 0xF0F0F0F0, the 
+                                                    from within an ISR. If this entry is 0xF0F0F0F0, the
                                                     event occurred during initialization.
             [Thread Priority or         4           This 4-byte field contains the current thread pointer for interrupt
              Current Thread                         events or the thread preemption-threshold/priority for thread events.
              Preemption-Threshold/
              Priority]
-            [Event ID]                  4           This 4-byte field contains the Event ID of the event. A value of 
+            [Event ID]                  4           This 4-byte field contains the Event ID of the event. A value of
                                                     0xFFFFFFFF indicates the event is invalid. All events are marked
                                                     as invalid during initialization.
             [Time Stamp]                4           This 4-byte field contains the time stamp of the event.
-            [Information Field 1]       4           This 4-byte field contains the first 4-bytes of information 
+            [Information Field 1]       4           This 4-byte field contains the first 4-bytes of information
                                                     specific to the event.
-            [Information Field 2]       4           This 4-byte field contains the second 4-bytes of information 
+            [Information Field 2]       4           This 4-byte field contains the second 4-bytes of information
                                                     specific to the event.
-            [Information Field 3]       4           This 4-byte field contains the third 4-bytes of information 
+            [Information Field 3]       4           This 4-byte field contains the third 4-bytes of information
                                                     specific to the event.
-            [Information Field 4]       4           This 4-byte field contains the fourth 4-bytes of information 
+            [Information Field 4]       4           This 4-byte field contains the fourth 4-bytes of information
                                                     specific to the event.
 */
 
@@ -244,15 +244,15 @@ typedef struct TX_TRACE_OBJECT_ENTRY_STRUCT
 /* Define ThreadX Trace Events, along with a brief description of the additional information fields,
    where I1 -> Information Field 1, I2 -> Information Field 2, etc.  */
 
-/* Event numbers 0 through 4095 are reserved by Azure RTOS. Specific event assignments are: 
-                                
-                                ThreadX events:     1-199 
+/* Event numbers 0 through 4095 are reserved by Azure RTOS. Specific event assignments are:
+
+                                ThreadX events:     1-199
                                 FileX events:       200-299
                                 NetX events:        300-599
                                 USBX events:        600-999
-   
-   User-defined event numbers start at 4096 and continue through 65535, as defined by the constants 
-   TX_TRACE_USER_EVENT_START and TX_TRACE_USER_EVENT_END, respectively. User events should be based 
+
+   User-defined event numbers start at 4096 and continue through 65535, as defined by the constants
+   TX_TRACE_USER_EVENT_START and TX_TRACE_USER_EVENT_END, respectively. User events should be based
    on these constants in case the user event number assignment is changed in future releases.  */
 
 /* Define the basic ThreadX thread scheduling events first.  */
@@ -417,7 +417,7 @@ TRACE_DECLARE  TX_TRACE_BUFFER_ENTRY             *_tx_trace_buffer_end_ptr;
 TRACE_DECLARE  TX_TRACE_BUFFER_ENTRY             *_tx_trace_buffer_current_ptr;
 
 
-/* Define the trace event enable bits, where each bit represents a type of event that can be enabled 
+/* Define the trace event enable bits, where each bit represents a type of event that can be enabled
    or disabled dynamically by the application.  */
 
 TRACE_DECLARE  ULONG                            _tx_trace_event_enable_bits;
@@ -429,9 +429,9 @@ TRACE_DECLARE  ULONG                            _tx_trace_event_enable_bits;
 TRACE_DECLARE  ULONG                             _tx_trace_simulated_time;
 
 
-/* Define the function pointer used to call the application when the trace buffer wraps. If NULL, 
+/* Define the function pointer used to call the application when the trace buffer wraps. If NULL,
    the application has not registered a callback function.  */
-   
+
 TRACE_DECLARE  VOID                             (*_tx_trace_full_notify_function)(VOID *buffer);
 
 

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Queue                                                               */
 /**                                                                       */
@@ -31,45 +31,47 @@
 #include "tx_queue.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_queue_flush                                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_queue_flush                                     PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function resets the specified queue, if there are any messages */ 
-/*    in it.  Messages waiting to be placed on the queue are also thrown  */ 
-/*    out.                                                                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    queue_ptr                         Pointer to queue control block    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SUCCESS                        Successful completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_preempt_check   Check for preemption              */ 
-/*    _tx_thread_system_resume          Resume thread service             */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function resets the specified queue, if there are any messages */
+/*    in it.  Messages waiting to be placed on the queue are also thrown  */
+/*    out.                                                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    queue_ptr                         Pointer to queue control block    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Successful completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_preempt_check   Check for preemption              */
+/*    _tx_thread_system_resume          Resume thread service             */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_queue_flush(TX_QUEUE *queue_ptr)
@@ -77,9 +79,9 @@ UINT  _tx_queue_flush(TX_QUEUE *queue_ptr)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *suspension_list;           
-UINT            suspended_count;            
-TX_THREAD       *thread_ptr;                
+TX_THREAD       *suspension_list;
+UINT            suspended_count;
+TX_THREAD       *thread_ptr;
 
 
     /* Initialize the suspended count and list.  */
@@ -111,7 +113,7 @@ TX_THREAD       *thread_ptr;
         if (queue_ptr -> tx_queue_suspended_count != TX_NO_SUSPENSIONS)
         {
 
-            /* Yes, there are threads suspended on this queue, they must be 
+            /* Yes, there are threads suspended on this queue, they must be
                resumed!  */
 
             /* Copy the information into temporary variables.  */
@@ -139,24 +141,24 @@ TX_THREAD       *thread_ptr;
         thread_ptr =  suspension_list;
         while (suspended_count != ((ULONG) 0))
         {
-        
+
             /* Decrement the suspension count.  */
             suspended_count--;
 
             /* Check for a NULL thread pointer.  */
             if (thread_ptr == TX_NULL)
             {
-            
+
                 /* Get out of the loop.  */
                 break;
             }
 
             /* Resume the next suspended thread.  */
-            
+
             /* Lockout interrupts.  */
             TX_DISABLE
 
-            /* Clear the cleanup pointer, this prevents the timeout from doing 
+            /* Clear the cleanup pointer, this prevents the timeout from doing
                anything.  */
             thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 
@@ -180,11 +182,11 @@ TX_THREAD       *thread_ptr;
 
             /* Restore interrupts.  */
             TX_RESTORE
-    
+
             /* Resume the thread.  */
             _tx_thread_system_resume(thread_ptr -> tx_thread_suspended_previous);
 #endif
-        } 
+        }
 
         /* Disable interrupts.  */
         TX_DISABLE

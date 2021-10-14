@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
@@ -32,53 +32,55 @@
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_timer_performance_info_get                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_performance_info_get                      PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function retrieves performance information from the specified  */ 
-/*    timer.                                                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    timer_ptr                         Pointer to timer control block    */ 
-/*    activates                         Destination for the number of     */ 
-/*                                        activations of this timer       */ 
-/*    reactivates                       Destination for the number of     */ 
-/*                                        reactivations of this timer     */ 
-/*    deactivates                       Destination for the number of     */ 
-/*                                        deactivations of this timer     */ 
-/*    expirations                       Destination for the number of     */ 
-/*                                        expirations of this timer       */ 
-/*    expiration_adjusts                Destination for the number of     */ 
-/*                                        expiration adjustments of this  */ 
-/*                                        timer                           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function retrieves performance information from the specified  */
+/*    timer.                                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                         Pointer to timer control block    */
+/*    activates                         Destination for the number of     */
+/*                                        activations of this timer       */
+/*    reactivates                       Destination for the number of     */
+/*                                        reactivations of this timer     */
+/*    deactivates                       Destination for the number of     */
+/*                                        deactivations of this timer     */
+/*    expirations                       Destination for the number of     */
+/*                                        expirations of this timer       */
+/*    expiration_adjusts                Destination for the number of     */
+/*                                        expiration adjustments of this  */
+/*                                        timer                           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_timer_performance_info_get(TX_TIMER *timer_ptr, ULONG *activates, ULONG *reactivates,
@@ -94,15 +96,15 @@ UINT                    status;
     /* Determine if this is a legal request.  */
     if (timer_ptr == TX_NULL)
     {
-        
+
         /* Timer pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
-    
+
     /* Determine if the timer ID is invalid.  */
     else if (timer_ptr -> tx_timer_id != TX_TIMER_ID)
     {
-        
+
         /* Timer pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
@@ -121,44 +123,44 @@ UINT                    status;
         /* Retrieve the number of activations of this timer.  */
         if (activates != TX_NULL)
         {
-    
+
             *activates =  timer_ptr -> tx_timer_performance_activate_count;
         }
-    
+
         /* Retrieve the number of reactivations of this timer.  */
         if (reactivates != TX_NULL)
         {
-    
+
             *reactivates =  timer_ptr -> tx_timer_performance_reactivate_count;
         }
-    
+
         /* Retrieve the number of deactivations of this timer.  */
         if (deactivates != TX_NULL)
         {
-    
+
             *deactivates =  timer_ptr -> tx_timer_performance_deactivate_count;
         }
-    
+
         /* Retrieve the number of expirations of this timer.  */
         if (expirations != TX_NULL)
         {
-    
+
             *expirations =  timer_ptr -> tx_timer_performance_expiration_count;
         }
-    
+
         /* Retrieve the number of expiration adjustments of this timer.  */
         if (expiration_adjusts != TX_NULL)
         {
-    
+
             *expiration_adjusts =  timer_ptr -> tx_timer_performance__expiration_adjust_count;
         }
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
 
         /* Return successful completion.  */
         status =  TX_SUCCESS;
-    }    
+    }
 #else
 UINT                    status;
 

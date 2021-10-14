@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Initialization                                                      */
 /**                                                                       */
@@ -33,39 +33,39 @@
 
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_high_level_initialize               PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_smp_high_level_initialize               PORTABLE SMP     */
 /*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function initializes the ThreadX SMP data structures and       */ 
-/*    CPU registers.                                                      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function initializes the ThreadX SMP data structures and       */
+/*    CPU registers.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter           ThreadX entry                 */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter           ThreadX entry                 */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -81,8 +81,8 @@ void  _tx_thread_smp_high_level_initialize(void)
     /* Clear the system error flag.  */
     _tx_thread_smp_system_error =  TX_FALSE;
 
-    /* Ensure that the system state variable is set to indicate 
-       initialization is in progress.  Note that this variable is 
+    /* Ensure that the system state variable is set to indicate
+       initialization is in progress.  Note that this variable is
        later used to represent interrupt nesting.  */
     _tx_thread_smp_current_state_set(TX_INITIALIZE_IN_PROGRESS);
 
@@ -93,7 +93,7 @@ void  _tx_thread_smp_high_level_initialize(void)
     _tx_thread_smp_protection.tx_thread_smp_protect_core =  ((ULONG) 0xFFFFFFFFUL);
 
     /* Clear the thread schedule list.  */
-    TX_MEMSET(&_tx_thread_smp_schedule_list[0], 0, sizeof(_tx_thread_smp_schedule_list)); 
+    TX_MEMSET(&_tx_thread_smp_schedule_list[0], 0, sizeof(_tx_thread_smp_schedule_list));
 
     /* Initialize core list.  */
     TX_MEMSET(&_tx_thread_smp_protect_wait_list[0], 0xff, sizeof(_tx_thread_smp_protect_wait_list));
@@ -111,7 +111,7 @@ void  _tx_thread_smp_high_level_initialize(void)
        to the compile-time maximum.  */
     if (_tx_thread_smp_max_cores == 0)
     {
-    
+
         /* Default to the compile-time maximum.  */
         _tx_thread_smp_max_cores =  TX_THREAD_SMP_MAX_CORES;
     }

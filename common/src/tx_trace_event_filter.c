@@ -90,17 +90,17 @@ UINT        status;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (event_filter_bits != ((ULONG) 0))
     {
-    
+
         /* Trace not enabled, return an error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else
     {
-    
+
         /* Trace not enabled, return an error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
-    
+
     /* Return completion status.  */
     return(status);
 #endif

@@ -99,45 +99,45 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the name of the queue.  */
     if (name != TX_NULL)
     {
-    
+
         *name =  queue_ptr -> tx_queue_name;
     }
-    
+
     /* Retrieve the number of messages currently in the queue.  */
     if (enqueued != TX_NULL)
     {
-    
+
         *enqueued =  (ULONG) queue_ptr -> tx_queue_enqueued;
     }
-    
+
     /* Retrieve the number of messages that will still fit in the queue.  */
     if (available_storage != TX_NULL)
     {
-    
+
         *available_storage =  (ULONG) queue_ptr -> tx_queue_available_storage;
     }
-    
+
     /* Retrieve the first thread suspended on this queue.  */
     if (first_suspended != TX_NULL)
     {
-    
+
         *first_suspended =  queue_ptr -> tx_queue_suspension_list;
     }
-    
+
     /* Retrieve the number of threads suspended on this queue.  */
     if (suspended_count != TX_NULL)
     {
-    
+
         *suspended_count =  (ULONG) queue_ptr -> tx_queue_suspended_count;
     }
-    
+
     /* Retrieve the pointer to the next queue created.  */
     if (next_queue != TX_NULL)
     {
-    
+
         *next_queue =  queue_ptr -> tx_queue_created_next;
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 

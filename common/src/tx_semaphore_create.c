@@ -87,7 +87,7 @@ TX_SEMAPHORE    *previous_semaphore;
     /* Setup the basic semaphore fields.  */
     semaphore_ptr -> tx_semaphore_name =             name_ptr;
     semaphore_ptr -> tx_semaphore_count =            initial_count;
-    
+
     /* Disable interrupts to place the semaphore on the created list.  */
     TX_DISABLE
 
@@ -119,7 +119,7 @@ TX_SEMAPHORE    *previous_semaphore;
         semaphore_ptr -> tx_semaphore_created_previous =  previous_semaphore;
         semaphore_ptr -> tx_semaphore_created_next =      next_semaphore;
     }
-    
+
     /* Increment the created count.  */
     _tx_semaphore_created_count++;
 

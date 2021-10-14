@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M4/AC5     */
-/*                                                           6.1.6        */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,10 +47,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
-/*                                            macro definition,           */
-/*                                            resulting in version 6.1.6  */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -142,7 +139,7 @@ typedef unsigned short                          USHORT;
 /* Define the port specific options for the _tx_build_options variable. This variable indicates
    how the ThreadX library was built.  */
 
-#define TX_PORT_SPECIFIC_BUILD_OPTIONS          0
+#define TX_PORT_SPECIFIC_BUILD_OPTIONS          (0)
 
 
 /* Define the in-line initialization constant so that modules with in-line
@@ -344,8 +341,6 @@ void _tx_vfp_access(void);
 #endif
 
 
-
-
 /* Define the ThreadX object creation extensions for the remaining objects.  */
 
 #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
@@ -386,7 +381,7 @@ ULONG   _tx_misra_ipsr_get(VOID);
    zero after initialization for Cortex-M ports. */
 
 #ifndef TX_THREAD_SYSTEM_RETURN_CHECK
-#define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable); 
+#define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
 #endif
 
 
@@ -452,7 +447,7 @@ unsigned int          was_masked;
 #endif
 
 
-/* Define FPU extension for the Cortex-M4.  Each is assumed to be called in the context of the executing
+/* Define FPU extension for the Cortex-M4. Each is assumed to be called in the context of the executing
    thread. These are no longer needed, but are preserved for backward compatibility only.  */
 
 void    tx_thread_fpu_enable(void);
@@ -463,7 +458,7 @@ void    tx_thread_fpu_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M4/AC5 Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M4/AC5 Version 6.1.9 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];
@@ -474,7 +469,3 @@ extern  CHAR                    _tx_version_id[];
 
 
 #endif
-
-
-
-

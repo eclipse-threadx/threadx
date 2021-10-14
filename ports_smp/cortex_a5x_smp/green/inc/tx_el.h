@@ -12,7 +12,7 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   ThreadX/GHS Event Log (EL)                                          */
@@ -21,24 +21,24 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    tx_el.h                                            PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    tx_el.h                                            PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file defines the ThreadX event log functions for the GHS MULTI */ 
-/*    EventAnalyzer.  It is assumed that tx_api.h and tx_port.h have      */ 
+/*                                                                        */
+/*    This file defines the ThreadX event log functions for the GHS MULTI */
+/*    EventAnalyzer.  It is assumed that tx_api.h and tx_port.h have      */
 /*    already been included.                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -54,16 +54,16 @@
 #define TX_EL_VERSION_ID                                    2           /* Event log version ID             */
 #define TX_EL_HEADER_SIZE                                   24          /* Event log header size            */
 #define TX_EL_TNIS                                          16          /* Number of thread names supported */
-                                                                        /*   If the application needs to    */ 
-                                                                        /*   track more thread names, just  */ 
-                                                                        /*   increase this number and re-   */ 
-                                                                        /*   build the ThreadX library.     */ 
+                                                                        /*   If the application needs to    */
+                                                                        /*   track more thread names, just  */
+                                                                        /*   increase this number and re-   */
+                                                                        /*   build the ThreadX library.     */
 #define TX_EL_TNI_ENTRY_SIZE                                44          /* Thread name entries are 44 bytes */
 #define TX_EL_TNI_NAME_SIZE                                 34          /* Thread name size in TNI          */
 #define TX_EL_NO_MORE_TNI_ROOM                              1           /* Error return from thread register*/
-#define TX_EL_NAME_NOT_FOUND                                2           /* Error return from un-register    */ 
+#define TX_EL_NAME_NOT_FOUND                                2           /* Error return from un-register    */
 #define TX_EL_EVENT_SIZE                                    32          /* Number of bytes in each event    */
-#define TX_EL_VALID_ENTRY                                   1           /* Valid log entry                  */ 
+#define TX_EL_VALID_ENTRY                                   1           /* Valid log entry                  */
 #define TX_EL_INVALID_ENTRY                                 0           /* Invalid log entry                */
 
 
@@ -296,7 +296,7 @@
 
 /* Define filter macros that are inserted in-line with the other macros below.  */
 
-#ifdef TX_ENABLE_EVENT_FILTERS     
+#ifdef TX_ENABLE_EVENT_FILTERS
 #define TX_EL_NO_STATUS_EVENTS      if (!(_tx_el_event_filter & TX_EL_FILTER_STATUS_CHANGE)) {
 #define TX_EL_NO_INTERRUPT_EVENTS   if (!(_tx_el_event_filter & TX_EL_FILTER_INTERRUPTS)) {
 #define TX_EL_NO_THREAD_EVENTS      if (!(_tx_el_event_filter & TX_EL_FILTER_THREAD_CALLS)) {
@@ -430,7 +430,7 @@ extern ULONG            _tx_el_time_base_lower;
 VOID        _tx_el_initialize(VOID);
 UINT        _tx_el_thread_register(TX_THREAD *thread_ptr);
 UINT        _tx_el_thread_unregister(TX_THREAD *thread_ptr);
-VOID        _tx_el_user_event_insert(UINT sub_type, ULONG info_1, ULONG info_2, 
+VOID        _tx_el_user_event_insert(UINT sub_type, ULONG info_1, ULONG info_2,
                                                     ULONG info_3, ULONG info_4);
 VOID        _tx_el_thread_running(TX_THREAD *thread_ptr);
 VOID        _tx_el_thread_preempted(TX_THREAD *thread_ptr);
@@ -747,7 +747,7 @@ VOID        _tx_el_event_filter_set(UINT filter);
 #define TX_EL_THREAD_UNREGISTER(a) \
                                 _tx_el_thread_unregister(a);
 #define TX_EL_INITIALIZE        _tx_el_initialize();
-#endif            
+#endif
 #else
 #define TX_EL_KERNEL_CALL_EVENT_INSERT_INFO4(a, b, c, d, e)
 #define TX_EL_KERNEL_CALL_EVENT_INSERT_INFO3(a, b, c, d)

@@ -24,7 +24,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_timer_interrupt                             ARCv2_EM/MetaWare   */
-;/*                                                           6.1.3        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -65,6 +65,10 @@
 ;/*                                            unneeded load of            */
 ;/*                                            _tx_thread_preempt_disable, */
 ;/*                                            resulting in version 6.1.3  */
+;/*  10-15-2021     Andres Mlinar            Modified comment(s), and      */
+;/*                                            fixed possible race         */
+;/*                                            condition on preemption     */ 
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_timer_interrupt(VOID)
@@ -164,6 +168,10 @@ __tx_timer_done:
 ;    /* See if anything has expired.  */
 ;    if ((_tx_timer_expired_time_slice) || (_tx_timer_expired))
 ;    {
+;
+    ld      r0, [gp, _tx_thread_current_ptr@sda]
+    ld      r2, [gp, _tx_thread_execute_ptr@sda]
+    brne    r0, r2, __tx_something_expired
 ;
     breq    r1, 0, __tx_timer_nothing_expired           ; If 0, nothing has expired
 ;

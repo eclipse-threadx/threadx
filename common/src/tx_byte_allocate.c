@@ -181,17 +181,17 @@ ULONG                       lower_tbu;
         /* Determine if we are finished.  */
         if (work_ptr != TX_NULL)
         {
-        
+
             /* Yes, we have found a block the search is finished.  */
             finished =  TX_TRUE;
         }
         else
         {
-        
+
             /* No block was found, does this thread still own the pool?  */
             if (pool_ptr -> tx_byte_pool_owner == thread_ptr)
             {
-            
+
                 /* Yes, then we have looked through the entire pool and haven't found the memory.  */
                 finished =  TX_TRUE;
             }
@@ -217,7 +217,7 @@ ULONG                       lower_tbu;
             /* Is the timestamp the same?  */
             if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
             {
-            
+
                 /* Timestamp is the same, update the entry with the address.  */
 #ifdef TX_MISRA_ENABLE
                 entry_ptr -> tx_trace_buffer_entry_info_2 =  TX_POINTER_TO_ULONG_CONVERT(*memory_ptr);
@@ -242,7 +242,7 @@ ULONG                       lower_tbu;
 
         /* Restore interrupts.  */
         TX_RESTORE
-        
+
         /* Set the status to success.  */
         status =  TX_SUCCESS;
     }
@@ -304,7 +304,7 @@ ULONG                       lower_tbu;
 
                 /* Increment the suspension count.  */
                 (pool_ptr -> tx_byte_pool_suspended_count)++;
-            
+
                 /* Setup suspension list.  */
                 if (suspended_count == TX_NO_SUSPENSIONS)
                 {
@@ -366,7 +366,7 @@ ULONG                       lower_tbu;
                     /* Is the timestamp the same?  */
                     if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
                     {
-                
+
                         /* Timestamp is the same, update the entry with the address.  */
 #ifdef TX_MISRA_ENABLE
                         entry_ptr -> tx_trace_buffer_entry_info_2 =  TX_POINTER_TO_ULONG_CONVERT(*memory_ptr);
@@ -396,7 +396,7 @@ ULONG                       lower_tbu;
         }
         else
         {
-    
+
             /* Restore interrupts.  */
             TX_RESTORE
 

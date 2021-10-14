@@ -116,19 +116,19 @@ UINT            original_priority;
            block.  */
         thread_ptr -> tx_thread_user_priority =               new_priority;
         thread_ptr -> tx_thread_user_preempt_threshold =      new_priority;
-        
+
         /* Determine if the actual thread priority should be setup, which is the
            case if the new priority is higher than the priority inheritance.  */
         if (new_priority < thread_ptr -> tx_thread_inherit_priority)
         {
-        
+
             /* Change thread priority to the new user's priority.  */
             thread_ptr -> tx_thread_priority =           new_priority;
             thread_ptr -> tx_thread_preempt_threshold =  new_priority;
         }
         else
         {
-        
+
             /* Change thread priority to the priority inheritance.  */
             thread_ptr -> tx_thread_priority =           thread_ptr -> tx_thread_inherit_priority;
             thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_inherit_priority;
@@ -157,7 +157,7 @@ UINT            original_priority;
         /* Call actual non-interruptable thread suspension routine.  */
         _tx_thread_system_ni_suspend(thread_ptr, ((ULONG) 0));
 
-        /* At this point, the preempt disable flag is still set, so we still have 
+        /* At this point, the preempt disable flag is still set, so we still have
            protection against all preemption.  */
 
         /* Setup the new priority for this thread.  */
@@ -168,14 +168,14 @@ UINT            original_priority;
            case if the new priority is higher than the priority inheritance.  */
         if (new_priority < thread_ptr -> tx_thread_inherit_priority)
         {
-        
+
             /* Change thread priority to the new user's priority.  */
             thread_ptr -> tx_thread_priority =           new_priority;
             thread_ptr -> tx_thread_preempt_threshold =  new_priority;
         }
         else
         {
-        
+
             /* Change thread priority to the priority inheritance.  */
             thread_ptr -> tx_thread_priority =           thread_ptr -> tx_thread_inherit_priority;
             thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_inherit_priority;
@@ -186,7 +186,7 @@ UINT            original_priority;
 
 #else
 
-        /* Increment the preempt disable flag by 2 to prevent system suspend from 
+        /* Increment the preempt disable flag by 2 to prevent system suspend from
            returning to the system.  */
         _tx_thread_preempt_disable =  _tx_thread_preempt_disable + ((UINT) 3);
 
@@ -199,11 +199,11 @@ UINT            original_priority;
         /* Restore interrupts.  */
         TX_RESTORE
 
-        /* The thread is ready and must first be removed from the list.  Call the 
+        /* The thread is ready and must first be removed from the list.  Call the
            system suspend function to accomplish this.  */
         _tx_thread_system_suspend(thread_ptr);
 
-        /* At this point, the preempt disable flag is still set, so we still have 
+        /* At this point, the preempt disable flag is still set, so we still have
            protection against all preemption.  */
 
         /* Setup the new priority for this thread.  */
@@ -214,14 +214,14 @@ UINT            original_priority;
            case if the new priority is higher than the priority inheritance.  */
         if (new_priority < thread_ptr -> tx_thread_inherit_priority)
         {
-        
+
             /* Change thread priority to the new user's priority.  */
             thread_ptr -> tx_thread_priority =           new_priority;
             thread_ptr -> tx_thread_preempt_threshold =  new_priority;
         }
         else
         {
-        
+
             /* Change thread priority to the priority inheritance.  */
             thread_ptr -> tx_thread_priority =           thread_ptr -> tx_thread_inherit_priority;
             thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_inherit_priority;
@@ -236,26 +236,26 @@ UINT            original_priority;
 
         /* Decrement the preempt disable flag.  */
         _tx_thread_preempt_disable--;
-        
+
         /* Pickup the next thread to execute.  */
         next_execute_ptr =  _tx_thread_execute_ptr;
 
         /* Determine if this thread is not the next thread to execute.  */
         if (thread_ptr != next_execute_ptr)
         {
-        
+
             /* Make sure the thread is still ready.  */
             if (thread_ptr -> tx_thread_state == TX_READY)
             {
-        
+
                 /* Now check and see if this thread has an equal or higher priority.  */
                 if (thread_ptr -> tx_thread_priority <= next_execute_ptr -> tx_thread_priority)
                 {
-            
+
                     /* Now determine if this thread was the previously executing thread.  */
                     if (thread_ptr == execute_ptr)
                     {
-                
+
                         /* Yes, this thread was previously executing before we temporarily suspended and resumed
                            it in order to change the priority. A lower or same priority thread cannot be the next thread
                            to execute in this case since this thread really didn't suspend.  Simply reset the execute
@@ -265,7 +265,7 @@ UINT            original_priority;
                         /* Determine if we moved to a lower priority. If so, move the thread to the front of its priority list.  */
                         if (original_priority < new_priority)
                         {
-                        
+
                             /* Ensure that this thread is placed at the front of the priority list.  */
                             _tx_thread_priority_list[thread_ptr -> tx_thread_priority] =  thread_ptr;
                         }
@@ -273,7 +273,7 @@ UINT            original_priority;
                 }
             }
         }
-        
+
         /* Restore interrupts.  */
         TX_RESTORE
 

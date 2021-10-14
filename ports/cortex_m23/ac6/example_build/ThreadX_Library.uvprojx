@@ -1279,9 +1279,29 @@
               <FilePath>..\..\..\..\common\src\txe_timer_info_get.c</FilePath>
             </File>
             <File>
-              <FileName>tx_timer_interrupt.S</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\src\tx_timer_interrupt.S</FilePath>
+              <FileName>tx_trace_buffer_full_notify.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\common\src\tx_trace_buffer_full_notify.c</FilePath>
+            </File>
+            <File>
+              <FileName>tx_trace_event_filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\common\src\tx_trace_event_filter.c</FilePath>
+            </File>
+            <File>
+              <FileName>tx_trace_event_unfilter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\common\src\tx_trace_event_unfilter.c</FilePath>
+            </File>
+            <File>
+              <FileName>txe_thread_secure_stack_allocate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\txe_thread_secure_stack_allocate.c</FilePath>
+            </File>
+            <File>
+              <FileName>txe_thread_secure_stack_free.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\txe_thread_secure_stack_free.c</FilePath>
             </File>
             <File>
               <FileName>tx_thread_context_restore.S</FileName>
@@ -1299,36 +1319,6 @@
               <FilePath>..\src\tx_thread_interrupt_control.S</FilePath>
             </File>
             <File>
-              <FileName>tx_thread_schedule.S</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\src\tx_thread_schedule.S</FilePath>
-            </File>
-            <File>
-              <FileName>tx_thread_stack_build.S</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\src\tx_thread_stack_build.S</FilePath>
-            </File>
-            <File>
-              <FileName>tx_thread_system_return.S</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\src\tx_thread_system_return.S</FilePath>
-            </File>
-            <File>
-              <FileName>tx_trace_buffer_full_notify.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\common\src\tx_trace_buffer_full_notify.c</FilePath>
-            </File>
-            <File>
-              <FileName>tx_trace_event_filter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\common\src\tx_trace_event_filter.c</FilePath>
-            </File>
-            <File>
-              <FileName>tx_trace_event_unfilter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\common\src\tx_trace_event_unfilter.c</FilePath>
-            </File>
-            <File>
               <FileName>tx_thread_interrupt_disable.S</FileName>
               <FileType>2</FileType>
               <FilePath>..\src\tx_thread_interrupt_disable.S</FilePath>
@@ -1339,14 +1329,9 @@
               <FilePath>..\src\tx_thread_interrupt_restore.S</FilePath>
             </File>
             <File>
-              <FileName>txe_thread_secure_stack_allocate.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\txe_thread_secure_stack_allocate.c</FilePath>
-            </File>
-            <File>
-              <FileName>txe_thread_secure_stack_free.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\txe_thread_secure_stack_free.c</FilePath>
+              <FileName>tx_thread_schedule.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\src\tx_thread_schedule.S</FilePath>
             </File>
             <File>
               <FileName>tx_thread_secure_stack_allocate.S</FileName>
@@ -1359,24 +1344,39 @@
               <FilePath>..\src\tx_thread_secure_stack_free.S</FilePath>
             </File>
             <File>
+              <FileName>tx_thread_stack_build.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\src\tx_thread_stack_build.S</FilePath>
+            </File>
+            <File>
+              <FileName>tx_thread_system_return.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\src\tx_thread_system_return.S</FilePath>
+            </File>
+            <File>
+              <FileName>tx_timer_interrupt.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\src\tx_timer_interrupt.S</FilePath>
+            </File>
+            <File>
               <FileName>tx_initialize_low_level.S</FileName>
               <FileType>2</FileType>
               <FilePath>.\tx_initialize_low_level.S</FilePath>
             </File>
             <File>
+              <FileName>tx_thread_secure_stack_initialize.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\src\tx_thread_secure_stack_initialize.S</FilePath>
+            </File>
+            <File>
               <FileName>tx_thread_stack_error_handler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\tx_thread_stack_error_handler.c</FilePath>
+              <FilePath>..\..\..\..\common\src\tx_thread_stack_error_handler.c</FilePath>
             </File>
             <File>
               <FileName>tx_thread_stack_error_notify.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\tx_thread_stack_error_notify.c</FilePath>
-            </File>
-            <File>
-              <FileName>tx_thread_secure_stack_initialize.S</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\src\tx_thread_secure_stack_initialize.S</FilePath>
+              <FilePath>..\..\..\..\common\src\tx_thread_stack_error_notify.c</FilePath>
             </File>
           </Files>
         </Group>

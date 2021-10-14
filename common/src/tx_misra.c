@@ -92,7 +92,7 @@ ULONG  _tx_misra_uchar_pointer_dif(UCHAR *ptr1, UCHAR *ptr2)
 {
 
 ULONG   value;
-    
+
     value =  (ULONG)(ptr1 - ptr2);
     return(value);
 }
@@ -150,7 +150,7 @@ ULONG  *_tx_misra_ulong_pointer_sub(ULONG *ptr, ULONG amount)
 ULONG   _tx_misra_ulong_pointer_dif(ULONG *ptr1, ULONG *ptr2)
 {
 ULONG   value;
-    
+
     value =  (ULONG)(ptr1 - ptr2);
     return(value);
 }
@@ -362,7 +362,7 @@ TX_THREAD                 *trace_thread_ptr;
 #endif
         trace_event_ptr++;
         if (trace_event_ptr >= _tx_trace_buffer_end_ptr)
-        { 
+        {
             trace_event_ptr =  _tx_trace_buffer_start_ptr;
             _tx_trace_buffer_current_ptr =  trace_event_ptr;
             _tx_trace_header_ptr -> tx_trace_header_buffer_current_pointer =  (ULONG) trace_event_ptr;
@@ -813,7 +813,7 @@ UCHAR  *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer)
     /* Return a UCHAR pointer.  */
     return((UCHAR *) ((VOID *) pointer));
 }
-               
+
 #endif
 
 

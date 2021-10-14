@@ -80,7 +80,7 @@
 /*                                                                        */
 /**************************************************************************/
 UINT  _txe_mutex_info_get(TX_MUTEX *mutex_ptr, CHAR **name, ULONG *count, TX_THREAD **owner,
-                    TX_THREAD **first_suspended, ULONG *suspended_count, 
+                    TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_MUTEX **next_mutex)
 {
 
@@ -94,7 +94,7 @@ UINT        status;
         /* Mutex pointer is invalid, return appropriate error code.  */
         status =  TX_MUTEX_ERROR;
     }
-    
+
     /* Now check for invalid mutex ID.  */
     else if (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID)
     {
@@ -106,7 +106,7 @@ UINT        status;
     {
 
         /* Otherwise, call the actual mutex information get service.  */
-        status =  _tx_mutex_info_get(mutex_ptr, name, count, owner, first_suspended, 
+        status =  _tx_mutex_info_get(mutex_ptr, name, count, owner, first_suspended,
                                                             suspended_count, next_mutex);
     }
 

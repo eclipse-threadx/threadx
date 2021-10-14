@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                            RXv1/GNURX     */
-/*                                                           6.1.8        */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  08-02-2021     William E. Lamie         Initial Version 6.1.8         */
+/*  10-15-2021     William E. Lamie         Modified comment(s),          */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -255,7 +257,7 @@ static void _tx_thread_system_return_inline(void)
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv1/GNURX Version 6.1.8 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv1/GNURX Version 6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

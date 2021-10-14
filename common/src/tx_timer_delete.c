@@ -106,7 +106,7 @@ TX_TIMER        *previous_timer;
 
     /* Decrement the number of created timers.  */
     _tx_timer_created_count--;
-    
+
     /* See if the timer is the only one on the list.  */
     if (_tx_timer_created_count == TX_EMPTY)
     {
@@ -126,7 +126,7 @@ TX_TIMER        *previous_timer;
         /* See if we have to update the created list head pointer.  */
         if (_tx_timer_created_ptr == timer_ptr)
         {
-                    
+
             /* Yes, move the head pointer to the next link. */
             _tx_timer_created_ptr =  next_timer;
         }

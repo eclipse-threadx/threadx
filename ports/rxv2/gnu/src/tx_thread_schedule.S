@@ -19,7 +19,18 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-
+;
+;
+;#define TX_SOURCE_CODE
+;
+;
+;/* Include necessary system files.  */
+;
+;#include "tx_api.h"
+;#include "tx_thread.h"
+;#include "tx_timer.h"
+;
+;
     .global     __tx_thread_execute_ptr
     .global     __tx_thread_current_ptr
     .global     __tx_timer_time_slice
@@ -31,7 +42,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                                  RXv2/GNURX     */
-;/*                                                           6.1.3        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -64,7 +75,11 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
+;/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
+;/*                                            removed unnecessary stack   */
+;/*                                            type checking,              */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -79,11 +94,11 @@ __tx_thread_schedule:
 ;    /* Wait for a thread to execute.  */
 ;    do
 ;    {
-    MOV.L    #__tx_thread_execute_ptr, R1     ; Address of thread to executer ptr
+    MOV.L    #__tx_thread_execute_ptr, R1        ; Address of thread to executer ptr
 __tx_thread_schedule_loop:
-    MOV.L    [R1],R2                          ; Pickup next thread to execute
-    CMP      #0,R2                            ; Is it NULL?
-    BEQ      __tx_thread_schedule_loop        ; Yes, idle system, keep checking
+    MOV.L    [R1],R2                             ; Pickup next thread to execute
+    CMP      #0,R2                               ; Is it NULL?
+    BEQ      __tx_thread_schedule_loop           ; Yes, idle system, keep checking
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr == TX_NULL);
@@ -91,41 +106,34 @@ __tx_thread_schedule_loop:
 ;    /* Yes! We have a thread to execute.  Lockout interrupts and
 ;       transfer control to it.  */
 ;
-    CLRPSW I                                  ; disable interrupts
+    CLRPSW I                                     ; Disable interrupts
 ;
 ;    /* Setup the current thread pointer.  */
 ;    _tx_thread_current_ptr =  _tx_thread_execute_ptr;
 ;
     MOV.L    #__tx_thread_current_ptr, R3
-    MOV.L    R2,[R3]                          ; Setup current thread pointer
+    MOV.L    R2,[R3]                             ; Setup current thread pointer
 ;
 ;    /* Increment the run count for this thread.  */
 ;    _tx_thread_current_ptr -> tx_thread_run_count++;
 ;
-    MOV.L    4[R2],R3                      ; Pickup run count
-    ADD      #1,R3                         ; Increment run counter
-    MOV.L    R3,4[R2]                      ; Store it back in control block
+    MOV.L    4[R2],R3                            ; Pickup run count
+    ADD      #1,R3                               ; Increment run counter
+    MOV.L    R3,4[R2]                            ; Store it back in control block
 ;
 ;    /* Setup time-slice, if present.  */
 ;    _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;
 ;
-    MOV.L    24[R2],R3                     ; Pickup thread time-slice
-    MOV.L    #__tx_timer_time_slice,R4     ; Pickup pointer to time-slice
-    MOV.L    R3, [R4]                      ; Setup time-slice
+    MOV.L    24[R2],R3                           ; Pickup thread time-slice
+    MOV.L    #__tx_timer_time_slice,R4           ; Pickup pointer to time-slice
+    MOV.L    R3, [R4]                            ; Setup time-slice
 ;
 ;    /* Switch to the thread's stack.  */
 ;    SP =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;
-    SETPSW U                               ; user stack mode
-    MOV.L   8[R2],R0                       ; Pickup stack pointer
-;
-;    /* Determine if an interrupt frame or a synchronous task suspension frame
-;   is present.  */
-;
-    POP    R1                               ; Pickup stack type
-    CMP    #1, R1                           ; Is it an interrupt stack?
-    BNE    __tx_thread_synch_return         ; No, a synchronous return frame is present.
+    SETPSW U                                     ; User stack mode
+    MOV.L   8[R2],R0                             ; Pickup stack pointer
 
-    POPM    R1-R3                           ; Restore accumulators.
+    POPM    R1-R3                                ; Restore accumulators.
     MVTACLO R3, A0
     MVTACHI R2, A0
     MVTACGU R1, A0
@@ -134,18 +142,13 @@ __tx_thread_schedule_loop:
     MVTACHI R2, A1
     MVTACGU R1, A1
 
-    POPM   R6-R13                           ; Recover interrupt stack frame
+    POPM   R6-R13                                ; Recover interrupt stack frame
     POPC   FPSW
     POPM   R14-R15
     POPM   R3-R5
     POPM   R1-R2
-    RTE                                     ; return to point of interrupt, this restores PC and PSW
+    RTE                                          ; Return to point of interrupt, this restores PC and PSW
 
-__tx_thread_synch_return:
-   POPC    PSW
-   POPM    R6-R13                           ; Recover solicited stack frame
-   RTS
-;
 ;}
 
 

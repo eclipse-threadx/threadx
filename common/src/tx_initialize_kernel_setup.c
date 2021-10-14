@@ -76,8 +76,8 @@
 VOID  _tx_initialize_kernel_setup(VOID)
 {
 
-    /* Ensure that the system state variable is set to indicate 
-       initialization is in progress.  Note that this variable is 
+    /* Ensure that the system state variable is set to indicate
+       initialization is in progress.  Note that this variable is
        later used to represent interrupt nesting.  */
     _tx_thread_system_state =  TX_INITIALIZE_IN_PROGRESS;
 
@@ -87,9 +87,9 @@ VOID  _tx_initialize_kernel_setup(VOID)
     /* Invoke the low-level initialization to handle all processor specific
        initialization issues.  */
     _tx_initialize_low_level();
-    
-    /* Invoke the high-level initialization to exercise all of the 
-       ThreadX components and the application's initialization 
+
+    /* Invoke the high-level initialization to exercise all of the
+       ThreadX components and the application's initialization
        function.  */
     _tx_initialize_high_level();
 

@@ -31,7 +31,7 @@
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_initialize_low_level                             RXv3/IAR       */
-;/*                                                           6.1.7        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */ 
 ;/*                                                                        */ 
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -65,6 +65,8 @@
 ;/*    DATE              NAME                      DESCRIPTION             */ 
 ;/*                                                                        */ 
 ;/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s),          */ 
+;/*                                            resulting in version 6.1.9  */ 
 ;/*                                                                        */ 
 ;/**************************************************************************/ 
     public __tx_initialize_low_level
@@ -97,3 +99,4 @@ __tx_free_memory_start
     DS32    4
 
     END
+
