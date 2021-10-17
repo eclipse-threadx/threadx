@@ -27,7 +27,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_system_return                             RXv3/IAR       */
-;/*                                                           6.x          */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -59,7 +59,9 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+;/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s),          */ 
+;/*                                            resulting in version 6.1.9  */ 
 ;/*                                                                        */
 ;/**************************************************************************/
 
