@@ -30,8 +30,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_region_size_get             Cortex-M4/MPU/AC5   */
-/*                                                           6.1          */
+/*    _txm_module_manager_region_size_get                 Cortex-M4       */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -61,7 +61,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_module_manager_region_size_get(ULONG block_size)
@@ -152,8 +152,8 @@ ULONG   return_value;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_calculate_srd_bits          Cortex-M4/MPU/AC5   */
-/*                                                           6.1          */
+/*    _txm_module_manager_calculate_srd_bits              Cortex-M4       */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -184,7 +184,7 @@ ULONG   return_value;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_module_manager_calculate_srd_bits(ULONG block_size, ULONG length)
@@ -230,16 +230,48 @@ UINT    srd_bit_index;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_mm_register_setup           Cortex-M4/MPU/AC5   */
-/*                                                           6.1          */
+/*    _txm_module_manager_mm_register_setup               Cortex-M4       */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function sets up the Cortex-M4 MPU register definitions based  */
-/*    on the module's memory characteristics.                             */
+/*    This function sets up the MPU register definitions based on the     */
+/*    module's memory characteristics.                                    */
+/*                                                                        */
+/*    Default MPU layout:                                                 */
+/*    Entry     Description                                               */
+/*      0       Kernel mode entry                                         */
+/*      1       Module code region                                        */
+/*      2       Module code region                                        */
+/*      3       Module code region                                        */
+/*      4       Module code region                                        */
+/*      5       Module data region                                        */
+/*      6       Module data region                                        */
+/*      7       Module data region                                        */
+/*                                                                        */
+/*    If TXM_MODULE_MANAGER_16_MPU is defined, there are 16 MPU slots.    */
+/*    MPU layout for the Cortex-M7:                                       */
+/*    Entry     Description                                               */
+/*      0       Kernel mode entry                                         */
+/*      1       Module code region                                        */
+/*      2       Module code region                                        */
+/*      3       Module code region                                        */
+/*      4       Module code region                                        */
+/*      5       Module data region                                        */
+/*      6       Module data region                                        */
+/*      7       Module data region                                        */
+/*      8       Module data region                                        */
+/*      9       Module shared memory region                               */
+/*      10      Module shared memory region                               */
+/*      11      Module shared memory region                               */
+/*      12      Unused region                                             */
+/*      13      Unused region                                             */
+/*      14      Unused region                                             */
+/*      15      Unused region                                             */
+/*                                                                        */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -261,11 +293,181 @@ UINT    srd_bit_index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance)
 {
+#ifdef TXM_MODULE_MANAGER_16_MPU
+
+ULONG   code_address;
+ULONG   code_size;
+ULONG   data_address;
+ULONG   data_size;
+ULONG   start_stop_stack_size;
+ULONG   callback_stack_size;
+ULONG   block_size;
+ULONG   region_size;
+ULONG   srd_bits = 0;
+UINT    mpu_table_index;
+UINT    i;
+
+
+    /* Setup the first MPU region for kernel mode entry.  */
+    /* Set address register to user mode entry function address, which is guaranteed to be at least 32-byte aligned.
+       Mask address to proper range, region 0, set Valid bit. */
+    module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MPU_KERNEL_ENTRY_INDEX].txm_module_mpu_region_address = ((ULONG) _txm_module_manager_user_mode_entry & 0xFFFFFFE0) | 0x10;
+    /* Set the attributes, size (32 bytes) and enable bit.  */
+    module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MPU_KERNEL_ENTRY_INDEX].txm_module_mpu_region_attribute_size = TXM_MODULE_MPU_CODE_ACCESS_CONTROL | (_txm_module_manager_region_size_get(32) << 1) | TXM_ENABLE_REGION;
+    /* End of kernel mode entry setup.  */
+    
+    /* Setup code protection.  */
+    
+    /* Initialize the MPU table index.  */
+    mpu_table_index = 1;
+
+    /* Pickup code starting address and actual size.  */
+    code_address =  (ULONG) module_instance -> txm_module_instance_code_start;
+    code_size =     module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_code_size;
+    
+    /* Determine code block sizes. Minimize the alignment requirement.
+       There are 4 MPU code entries available. The following is how the code size
+       will be distributed:
+       1. 1/4 of the largest power of two that is greater than or equal to code size.
+       2. 1/4 of the largest power of two that is greater than or equal to code size.
+       3. Largest power of 2 that fits in the remaining space.
+       4. Smallest power of 2 that exceeds the remaining space, minimum 32. */
+    
+    /* Now loop through to setup MPU protection for the code area.  */
+    for (i = 0; i < TXM_MODULE_MPU_CODE_ENTRIES; i++)
+    {
+        /* First two MPU blocks are 1/4 of the largest power of two
+           that is greater than or equal to code size.  */
+        if (i < 2)
+        {
+            block_size = _txm_power_of_two_block_size(code_size) >> 2;
+        }
+        
+        /* Third MPU block is the largest power of 2 that fits in the remaining space. */
+        else if (i == 2)
+        {
+            /* Subtract (block_size*2) from code_size to calculate remaining space.  */
+            code_size = code_size - (block_size << 1);
+            block_size = _txm_power_of_two_block_size(code_size) >> 1;
+        }
+        
+        /* Last MPU block is the smallest power of 2 that exceeds the remaining space, minimum 32.  */
+        else
+        {
+            /* Calculate remaining space.  */
+            code_size =  code_size - block_size;
+            block_size = _txm_power_of_two_block_size(code_size);
+            srd_bits = _txm_module_manager_calculate_srd_bits(block_size, code_size);
+        }
+        
+        /* Calculate the region size information.  */
+        region_size = (_txm_module_manager_region_size_get(block_size) << 1);
+        
+        /* Build the base address register with address, MPU region, set Valid bit.  */
+        module_instance -> txm_module_instance_mpu_registers[mpu_table_index].txm_module_mpu_region_address = (code_address & ~(block_size - 1)) | mpu_table_index | 0x10;
+        /* Build the attribute-size register with permissions, SRD, size, enable.  */
+        module_instance -> txm_module_instance_mpu_registers[mpu_table_index].txm_module_mpu_region_attribute_size = TXM_MODULE_MPU_CODE_ACCESS_CONTROL | srd_bits | region_size | TXM_ENABLE_REGION;
+
+        /* Adjust the code address.  */
+        code_address = code_address + block_size;
+        
+        /* Increment MPU table index.  */
+        mpu_table_index++;
+    }
+    /* End of code protection.  */
+    
+    /* Setup data protection.  */
+    
+    /* Reset SRD bitfield.  */
+    srd_bits = 0;
+    
+    /* Pickup data starting address and actual size.  */
+    data_address =  (ULONG) module_instance -> txm_module_instance_data_start;
+    
+    /* Adjust the size of the module elements to be aligned to the default alignment. We do this
+       so that when we partition the allocated memory, we can simply place these regions right beside
+       each other without having to align their pointers. Note this only works when they all have
+       the same alignment.  */
+    
+    data_size =             module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_data_size;
+    start_stop_stack_size = module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_start_stop_stack_size;
+    callback_stack_size =   module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_callback_stack_size;
+    
+    data_size =              ((data_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+
+    start_stop_stack_size =  ((start_stop_stack_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+
+    callback_stack_size =    ((callback_stack_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+
+    /* Update the data size to include thread stacks.  */
+    data_size = data_size + start_stop_stack_size + callback_stack_size;
+    
+    /* Determine data block sizes. Minimize the alignment requirement.
+       There are 4 MPU data entries available. The following is how the data size
+       will be distributed:
+       1. 1/4 of the largest power of two that is greater than or equal to data size.
+       2. 1/4 of the largest power of two that is greater than or equal to data size.
+       3. Largest power of 2 that fits in the remaining space.
+       4. Smallest power of 2 that exceeds the remaining space, minimum 32. */
+    
+    /* Now loop through to setup MPU protection for the data area.  */
+    for (i = 0; i < TXM_MODULE_MPU_DATA_ENTRIES; i++)
+    {
+        /* First two MPU blocks are 1/4 of the largest power of two
+           that is greater than or equal to data size.  */
+        if (i < 2)
+        {
+            block_size = _txm_power_of_two_block_size(data_size) >> 2;
+        }
+        
+        /* Third MPU block is the largest power of 2 that fits in the remaining space.  */
+        else if (i == 2)
+        {
+            /* Subtract (block_size*2) from data_size to calculate remaining space.  */
+            data_size = data_size - (block_size << 1);
+            block_size = _txm_power_of_two_block_size(data_size) >> 1;
+        }
+        
+        /* Last MPU block is the smallest power of 2 that exceeds the remaining space, minimum 32.  */
+        else
+        {
+            /* Calculate remaining space.  */
+            data_size =  data_size - block_size;
+            block_size = _txm_power_of_two_block_size(data_size);
+            srd_bits = _txm_module_manager_calculate_srd_bits(block_size, data_size);
+        }
+        
+        /* Calculate the region size information.  */
+        region_size = (_txm_module_manager_region_size_get(block_size) << 1);
+        
+        /* Build the base address register with address, MPU region, set Valid bit.  */
+        module_instance -> txm_module_instance_mpu_registers[mpu_table_index].txm_module_mpu_region_address = (data_address & ~(block_size - 1)) | mpu_table_index | 0x10;
+        /* Build the attribute-size register with permissions, SRD, size, enable.  */
+        module_instance -> txm_module_instance_mpu_registers[mpu_table_index].txm_module_mpu_region_attribute_size = TXM_MODULE_MPU_DATA_ACCESS_CONTROL | srd_bits | region_size | TXM_ENABLE_REGION;
+
+        /* Adjust the data address.  */
+        data_address =  data_address + block_size;
+        
+        /* Increment MPU table index.  */
+        mpu_table_index++;
+    }
+    
+    /* Setup MPU for the remaining regions.  */
+    while (mpu_table_index < TXM_MODULE_MPU_TOTAL_ENTRIES)
+    {
+        /* Build the base address register with address, MPU region, set Valid bit.  */
+        module_instance -> txm_module_instance_mpu_registers[mpu_table_index].txm_module_mpu_region_address = mpu_table_index | 0x10;
+        
+        /* Increment MPU table index.  */
+        mpu_table_index++;
+    }
+
+#else
 
 ULONG   code_address;
 ULONG   code_size;
@@ -382,7 +584,7 @@ UINT    i;
         for (i = 0; i < TXM_MODULE_MANAGER_CODE_MPU_ENTRIES - 1; i++)
         {
             /* Build the base address register.  */
-            base_address_register =  code_address & ~(block_size - 1) | mpu_register | 0x10;
+            base_address_register = (code_address & ~(block_size - 1)) | mpu_register | 0x10;
             
             /* Check if SRD bits need to be set.  */
             if (code_size < block_size)
@@ -509,4 +711,87 @@ UINT    i;
         /* Increment the MPU register index.  */
         mpu_register++;
     }
+
+#endif
 }
+
+#ifdef TXM_MODULE_MANAGER_16_MPU
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_inside_data_check               Cortex-M4       */
+/*                                                           6.1.9        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Scott Larson, Microsoft Corporation                                 */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks if the specified object is inside shared       */
+/*    memory.                                                             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_instance                   Pointer to module instance        */
+/*    obj_ptr                           Pointer to the object             */
+/*    obj_size                          Size of the object                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Whether the object is inside the shared memory region.              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module dispatch check functions                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
+/*                                                                        */
+/**************************************************************************/
+UINT _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, UINT obj_size)
+{
+
+UINT shared_memory_index;
+UINT num_shared_memory_mpu_entries;
+ALIGN_TYPE shared_memory_address_start;
+ALIGN_TYPE shared_memory_address_end;
+
+    /* Check for overflow. */
+    if ((obj_ptr) > ((obj_ptr) + (obj_size)))
+    {
+        return(TX_FALSE);
+    }
+    
+    /* Check if the object is inside the module data.  */
+    if ((obj_ptr >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) &&
+        ((obj_ptr + obj_size) <= ((ALIGN_TYPE) module_instance -> txm_module_instance_data_end + 1)))
+    {
+        return(TX_TRUE);
+    }
+
+    /* Check if the object is inside the shared memory.  */
+    num_shared_memory_mpu_entries = module_instance -> txm_module_instance_shared_memory_count;
+    for (shared_memory_index = 0; shared_memory_index < num_shared_memory_mpu_entries; shared_memory_index++)
+    {
+
+        shared_memory_address_start = (ALIGN_TYPE) module_instance -> txm_module_instance_shared_memory_address[shared_memory_index];
+        shared_memory_address_end = shared_memory_address_start + module_instance -> txm_module_instance_shared_memory_length[shared_memory_index];
+
+        if ((obj_ptr >= (ALIGN_TYPE) shared_memory_address_start) &&
+            ((obj_ptr + obj_size) <= (ALIGN_TYPE) shared_memory_address_end))
+        {
+            return(TX_TRUE);
+        }
+    }
+
+    return(TX_FALSE);
+}
+#endif

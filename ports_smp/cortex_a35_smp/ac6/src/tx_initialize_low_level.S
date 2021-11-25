@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Initialize                                                          */
 /**                                                                       */
@@ -21,63 +21,53 @@
 /**************************************************************************/
 
 
-/* #define TX_SOURCE_CODE  */
-
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_initialize.h"
-#include "tx_thread.h"
-#include "tx_timer.h"
-*/
-
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_initialize_low_level                         Cortex-A35-SMP/AC6 */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_initialize_low_level                         Cortex-A35-SMP/AC6 */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is responsible for any low-level processor            */ 
-/*    initialization, including setting up interrupt vectors, setting     */ 
-/*    up a periodic timer interrupt source, saving the system stack       */ 
-/*    pointer for use in ISR processing later, and finding the first      */ 
-/*    available RAM memory address for tx_application_define.             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is responsible for any low-level processor            */
+/*    initialization, including setting up interrupt vectors, setting     */
+/*    up a periodic timer interrupt source, saving the system stack       */
+/*    pointer for use in ISR processing later, and finding the first      */
+/*    available RAM memory address for tx_application_define.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter           ThreadX entry function        */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*                                             resulting in version 6.1.9 */
 /*                                                                        */
 /**************************************************************************/
-/* VOID   _tx_initialize_low_level(VOID)
-{ */
+// VOID   _tx_initialize_low_level(VOID)
+// {
     .global  _tx_initialize_low_level
     .type    _tx_initialize_low_level, @function
 _tx_initialize_low_level:
@@ -86,7 +76,7 @@ _tx_initialize_low_level:
 
 
     /* Save the system stack pointer.  */
-    /* _tx_thread_system_stack_ptr = (VOID_PTR) (sp);  */
+    // _tx_thread_system_stack_ptr = (VOID_PTR) (sp);
 
     LDR     x0, =_tx_thread_system_stack_ptr    // Pickup address of system stack ptr
     MOV     x1, sp                              // Pickup SP
@@ -95,7 +85,7 @@ _tx_initialize_low_level:
     STR     x1, [x0]                            // Store system stack
 
     /* Save the first available memory address.  */
-    /* _tx_initialize_unused_memory =  (VOID_PTR) Image$$HEAP$$ZI$$Limit;  */
+    // _tx_initialize_unused_memory =  (VOID_PTR) Image$$HEAP$$ZI$$Limit;
 
     LDR     x0, =_tx_initialize_unused_memory   // Pickup address of unused memory ptr
     LDR     x1, =heap_limit                     // Pickup unused memory address - A free
@@ -106,7 +96,7 @@ _tx_initialize_low_level:
     /* Done, return to caller.  */
 
     RET                                         // Return to caller
-/* } */
+// }
 
     .align 3
 heap_limit:

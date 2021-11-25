@@ -77,8 +77,8 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_semaphore_info_get(TX_SEMAPHORE *semaphore_ptr, CHAR **name, ULONG *current_value, 
-                    TX_THREAD **first_suspended, ULONG *suspended_count, 
+UINT  _tx_semaphore_info_get(TX_SEMAPHORE *semaphore_ptr, CHAR **name, ULONG *current_value,
+                    TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_SEMAPHORE **next_semaphore)
 {
 
@@ -100,38 +100,38 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the name of the semaphore.  */
     if (name != TX_NULL)
     {
-    
+
         *name =  semaphore_ptr -> tx_semaphore_name;
     }
-    
+
     /* Retrieve the current value of the semaphore.  */
     if (current_value != TX_NULL)
     {
-    
+
         *current_value =  semaphore_ptr -> tx_semaphore_count;
     }
-    
+
     /* Retrieve the first thread suspended on this semaphore.  */
     if (first_suspended != TX_NULL)
     {
-    
+
         *first_suspended =  semaphore_ptr -> tx_semaphore_suspension_list;
     }
-    
+
     /* Retrieve the number of threads suspended on this semaphore.  */
     if (suspended_count != TX_NULL)
     {
-    
+
         *suspended_count =  (ULONG) semaphore_ptr -> tx_semaphore_suspended_count;
     }
-    
+
     /* Retrieve the pointer to the next semaphore created.  */
     if (next_semaphore != TX_NULL)
     {
-    
+
         *next_semaphore =  semaphore_ptr -> tx_semaphore_created_next;
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 

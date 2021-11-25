@@ -38,11 +38,11 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    None                                                                */
+/*    previous_posture                      Previous interrupt posture    */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    previous_posture                      Previous interrupt posture    */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -59,7 +59,7 @@
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
-// VOID   _tx_thread_interrupt_restore(UINT new_posture)
+// VOID   _tx_thread_interrupt_restore(UINT previous_posture)
 // {
     .section .text
     .balign 4

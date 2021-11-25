@@ -140,7 +140,7 @@ UINT            map_index;
 #ifdef TX_ENABLE_EVENT_TRACE
 
     /* Save the time stamp for later comparison to verify that
-       the event hasn't been overwritten by the time we have 
+       the event hasn't been overwritten by the time we have
        computed the next thread to execute.  */
     if (entry_ptr != TX_NULL)
     {
@@ -158,7 +158,7 @@ UINT            map_index;
     if (thread_ptr -> tx_thread_suspending == TX_FALSE)
     {
 
-        /* Thread is not in the process of suspending. Now check to make sure the thread 
+        /* Thread is not in the process of suspending. Now check to make sure the thread
            has not already been resumed.  */
         if (thread_ptr -> tx_thread_state != TX_READY)
         {
@@ -166,9 +166,9 @@ UINT            map_index;
             /* No, now check to see if the delayed suspension flag is set.  */
             if (thread_ptr -> tx_thread_delayed_suspend == TX_FALSE)
             {
-    
+
                 /* Resume the thread!  */
-                
+
                 /* Make this thread ready.  */
 
                 /* Change the state to ready.  */
@@ -229,7 +229,7 @@ UINT            map_index;
                         /* Pickup the execute pointer. Since it is going to be referenced multiple
                            times, it is placed in a local variable.  */
                         execute_ptr =  _tx_thread_execute_ptr;
-                        
+
                         /* Determine if no thread is currently executing.  */
                         if (execute_ptr == TX_NULL)
                         {
@@ -239,9 +239,9 @@ UINT            map_index;
                         }
                         else
                         {
-                        
+
                             /* Another thread has been scheduled for execution.  */
-               
+
                             /* Check to see if this is a higher priority thread and determine if preemption is allowed.  */
                             if (priority < execute_ptr -> tx_thread_preempt_threshold)
                             {
@@ -282,7 +282,7 @@ UINT            map_index;
                                 }
                                 else
                                 {
-                                  
+
                                     if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
                                     {
 
@@ -301,7 +301,7 @@ UINT            map_index;
 
                                 /* Yes, modify the execute thread pointer.  */
                                 _tx_thread_execute_ptr =  thread_ptr;
-                                
+
 #ifndef TX_MISRA_ENABLE
 
                                 /* If MISRA is not-enabled, insert a preemption and return in-line for performance.  */
@@ -311,18 +311,18 @@ UINT            map_index;
                                 /* Is the execute pointer different?  */
                                 if (_tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] != _tx_thread_execute_ptr)
                                 {
-                     
+
                                     /* Move to next entry.  */
                                     _tx_thread_performance__execute_log_index++;
-            
+
                                     /* Check for wrap condition.  */
                                     if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_SIZE)
                                     {
-          
+
                                         /* Set the index to the beginning.  */
                                         _tx_thread_performance__execute_log_index =  ((UINT) 0);
                                     }
-            
+
                                     /* Log the new execute pointer.  */
                                     _tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] =  _tx_thread_execute_ptr;
                                 }
@@ -335,11 +335,11 @@ UINT            map_index;
                                    resume event. In that case, do nothing here.  */
                                 if (entry_ptr != TX_NULL)
                                 {
-    
+
                                     /* Is the timestamp the same?  */
                                     if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
                                     {
-        
+
                                         /* Timestamp is the same, set the "next thread pointer" to NULL. This can
                                            be used by the trace analysis tool to show idle system conditions.  */
                                         entry_ptr -> tx_trace_buffer_entry_information_field_4 =  TX_POINTER_TO_ULONG_CONVERT(_tx_thread_execute_ptr);
@@ -408,15 +408,15 @@ UINT            map_index;
     }
     else
     {
-    
+
         /* A resumption occurred in the middle of a previous thread suspension.  */
-        
+
         /* Make sure the type of suspension under way is not a terminate or
-           thread completion.  In either of these cases, do not void the 
+           thread completion.  In either of these cases, do not void the
            interrupted suspension processing.  */
         if (thread_ptr -> tx_thread_state != TX_COMPLETED)
         {
-            
+
             /* Make sure the thread isn't terminated.  */
             if (thread_ptr -> tx_thread_state != TX_TERMINATED)
             {
@@ -439,7 +439,7 @@ UINT            map_index;
                 }
                 else
                 {
-                
+
                     /* Clear the delayed suspend flag and change the state.  */
                     thread_ptr -> tx_thread_delayed_suspend =  TX_FALSE;
                     thread_ptr -> tx_thread_state =            TX_SUSPENDED;
@@ -462,18 +462,18 @@ UINT            map_index;
     /* Is the execute pointer different?  */
     if (_tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] != _tx_thread_execute_ptr)
     {
-                     
+
         /* Move to next entry.  */
         _tx_thread_performance__execute_log_index++;
-            
+
         /* Check for wrap condition.  */
         if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_SIZE)
         {
-          
+
             /* Set the index to the beginning.  */
             _tx_thread_performance__execute_log_index =  ((UINT) 0);
         }
-            
+
         /* Log the new execute pointer.  */
         _tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] =  _tx_thread_execute_ptr;
     }
@@ -486,11 +486,11 @@ UINT            map_index;
        resume event. In that case, do nothing here.  */
     if (entry_ptr != TX_NULL)
     {
-    
+
         /* Is the timestamp the same?  */
         if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
         {
-        
+
             /* Timestamp is the same, set the "next thread pointer" to NULL. This can
                be used by the trace analysis tool to show idle system conditions.  */
 #ifdef TX_MISRA_ENABLE
@@ -564,7 +564,7 @@ UINT            state;
     }
     else
     {
-    
+
         /* A resumption occurred in the middle of a previous thread suspension.  */
 
         /* Pickup the current thread state.  */
@@ -575,20 +575,20 @@ UINT            state;
         /* Move the state into a different variable for MISRA compliance.  */
         temp_state =  state;
 #endif
-        
+
         /* Log the thread status change.  */
         TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_RESUME, thread_ptr, ((ULONG) state), TX_POINTER_TO_ULONG_CONVERT(&temp_state), TX_POINTER_TO_ULONG_CONVERT(_tx_thread_execute_ptr), TX_TRACE_INTERNAL_EVENTS)
-        
+
         /* Make sure the type of suspension under way is not a terminate or
-           thread completion.  In either of these cases, do not void the 
+           thread completion.  In either of these cases, do not void the
            interrupted suspension processing.  */
         if (state != TX_COMPLETED)
         {
-        
+
             /* Check for terminated thread.  */
             if (state != TX_TERMINATED)
             {
-    
+
                 /* Clear the suspending flag.  */
                 thread_ptr -> tx_thread_suspending =   TX_FALSE;
 
@@ -653,7 +653,7 @@ UINT            map_index;
 #ifdef TX_ENABLE_EVENT_TRACE
 
     /* Save the time stamp for later comparison to verify that
-       the event hasn't been overwritten by the time we have 
+       the event hasn't been overwritten by the time we have
        computed the next thread to execute.  */
     if (entry_ptr != TX_NULL)
     {
@@ -681,7 +681,7 @@ UINT            map_index;
     TX_THREAD_STACK_CHECK(thread_ptr)
 #endif
 
-    /* Thread is not in the process of suspending. Now check to make sure the thread 
+    /* Thread is not in the process of suspending. Now check to make sure the thread
        has not already been resumed.  */
     if (thread_ptr -> tx_thread_state != TX_READY)
     {
@@ -752,7 +752,7 @@ UINT            map_index;
                     /* Pickup the execute pointer. Since it is going to be referenced multiple
                        times, it is placed in a local variable.  */
                     execute_ptr =  _tx_thread_execute_ptr;
-                        
+
                     /* Determine if no thread is currently executing.  */
                     if (execute_ptr == TX_NULL)
                     {
@@ -762,7 +762,7 @@ UINT            map_index;
                     }
                     else
                     {
-                        
+
                         /* Check to see if this is a higher priority thread and determine if preemption is allowed.  */
                         if (priority < execute_ptr -> tx_thread_preempt_threshold)
                         {
@@ -803,7 +803,7 @@ UINT            map_index;
                             }
                             else
                             {
-                            
+
                                 if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
                                 {
 
@@ -831,18 +831,18 @@ UINT            map_index;
                             /* Is the execute pointer different?  */
                             if (_tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] != _tx_thread_execute_ptr)
                             {
-                     
+
                                 /* Move to next entry.  */
                                 _tx_thread_performance__execute_log_index++;
-            
+
                                 /* Check for wrap condition.  */
                                 if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_SIZE)
                                 {
-          
+
                                     /* Set the index to the beginning.  */
                                     _tx_thread_performance__execute_log_index =  ((UINT) 0);
                                 }
-            
+
                                 /* Log the new execute pointer.  */
                                 _tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] =  _tx_thread_execute_ptr;
                             }
@@ -855,11 +855,11 @@ UINT            map_index;
                                resume event. In that case, do nothing here.  */
                             if (entry_ptr != TX_NULL)
                             {
-    
+
                                 /* Is the timestamp the same?  */
                                 if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
                                 {
-        
+
                                     /* Timestamp is the same, set the "next thread pointer" to NULL. This can
                                        be used by the trace analysis tool to show idle system conditions.  */
                                     entry_ptr -> tx_trace_buffer_entry_information_field_4 =  TX_POINTER_TO_ULONG_CONVERT(_tx_thread_execute_ptr);
@@ -903,7 +903,7 @@ UINT            map_index;
             {
 
                 /* No, there are other threads at this priority already ready.  */
-    
+
                 /* Just add this thread to the priority list.  */
                 tail_ptr =                                 head_ptr -> tx_thread_ready_previous;
                 tail_ptr -> tx_thread_ready_next =         thread_ptr;
@@ -928,18 +928,18 @@ UINT            map_index;
     /* Is the execute pointer different?  */
     if (_tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] != _tx_thread_execute_ptr)
     {
-                     
+
         /* Move to next entry.  */
         _tx_thread_performance__execute_log_index++;
-            
+
         /* Check for wrap condition.  */
         if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_SIZE)
         {
-        
+
             /* Set the index to the beginning.  */
             _tx_thread_performance__execute_log_index =  ((UINT) 0);
         }
-            
+
         /* Log the new execute pointer.  */
         _tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] =  _tx_thread_execute_ptr;
     }
@@ -952,11 +952,11 @@ UINT            map_index;
        resume event. In that case, do nothing here.  */
     if (entry_ptr != TX_NULL)
     {
-                        
+
         /* Does the timestamp match?  */
         if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
         {
-            
+
             /* Timestamp is the same, set the "next thread pointer" to NULL. This can
                be used by the trace analysis tool to show idle system conditions.  */
 #ifdef TX_MISRA_ENABLE

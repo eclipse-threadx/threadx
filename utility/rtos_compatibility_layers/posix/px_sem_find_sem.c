@@ -22,9 +22,9 @@
 
 /* Include necessary system files.  */
 
-#include "tx_api.h"    /* Threadx API */
-#include "pthread.h"  /* Posix API */
-#include "px_int.h"    /* Posix helper functions */
+#include "tx_api.h"     /* Threadx API */
+#include "pthread.h"    /* Posix API */
+#include "px_int.h"     /* Posix helper functions */
 
 
 /**************************************************************************/
@@ -32,7 +32,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    posix_find_sem                                      PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -49,7 +49,7 @@
 /*  OUTPUT                                                                */
 /*                                                                        */
 /*    sem                      If successful                              */
-/*    ERROR                    IF fails                                   */
+/*    ERROR                    If fails                                   */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -63,7 +63,9 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
+/*  08-02-2021      Scott Larson            Removed unneeded semicolon,   */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 sem_t* posix_find_sem(const CHAR * name)
@@ -91,7 +93,7 @@ ULONG                   namelength;
             if(* dummy_name == * dummy_sem_name)
             {
                 /* End of the string.  */
-                if(* dummy_name == '\0');
+                if(* dummy_name == '\0')
                 {
                     match = TX_TRUE;
                     break;

@@ -66,7 +66,9 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_delete(TX_THREAD *thread_ptr)
@@ -81,7 +83,7 @@ UINT            status;
 
     /* Default status to success.  */
     status =  TX_SUCCESS;
-    
+
     /* Lockout interrupts while the thread is being deleted.  */
     TX_DISABLE
 
@@ -104,7 +106,7 @@ UINT            status;
     /* Determine if the delete operation is okay.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Yes, continue with deleting the thread.  */
 
         /* Perform any additional activities for tool or user purpose.  */
@@ -127,7 +129,7 @@ UINT            status;
 
         /* Decrement the number of created threads.  */
         _tx_thread_created_count--;
-        
+
         /* See if the thread is the only one on the list.  */
         if (_tx_thread_created_count == TX_EMPTY)
         {
@@ -147,7 +149,7 @@ UINT            status;
             /* See if we have to update the created list head pointer.  */
             if (_tx_thread_created_ptr == thread_ptr)
             {
-                        
+
                 /* Yes, move the head pointer to the next link. */
                 _tx_thread_created_ptr =  next_thread;
             }

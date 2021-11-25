@@ -1,5 +1,5 @@
-/* This is a small demo of the high-performance ThreadX kernel running as a module. It includes 
-   examples of eight threads of different priorities, using a message queue, semaphore, mutex, 
+/* This is a small demo of the high-performance ThreadX kernel running as a module. It includes
+   examples of eight threads of different priorities, using a message queue, semaphore, mutex,
    event flags group, byte pool, and block pool.  */
 
 /* Specify that this is a module!  */
@@ -20,7 +20,7 @@
 #define DEMO_QUEUE_SIZE         100
 
 
-/* Define the pool space in the bss section of the module. ULONG is used to 
+/* Define the pool space in the bss section of the module. ULONG is used to
    get the word alignment.  */
 
 ULONG                   demo_module_pool_space[DEMO_BYTE_POOL_SIZE / sizeof(ULONG)];
@@ -103,7 +103,7 @@ CHAR    *pointer;
 
 
     /* Allocate all the objects. In MMU mode, modules cannot allocate control blocks within
-       their own memory area so they cannot corrupt the resident portion of ThreadX by overwriting 
+       their own memory area so they cannot corrupt the resident portion of ThreadX by overwriting
        the control block(s).  */
     status = txm_module_object_allocate((void*)&thread_0, sizeof(TX_THREAD));
     while (status != TX_SUCCESS);
@@ -133,7 +133,7 @@ CHAR    *pointer;
     while (status != TX_SUCCESS);
     status = txm_module_object_allocate((void*)&block_pool_0, sizeof(TX_BLOCK_POOL));
     while (status != TX_SUCCESS);
-                               
+
 
     /* Create a byte memory pool from which to allocate the thread stacks.  */
     status = tx_byte_pool_create(byte_pool_0, "module byte pool 0", demo_module_pool_space, DEMO_BYTE_POOL_SIZE);
@@ -193,7 +193,7 @@ CHAR    *pointer;
 
     /* Create the main thread.  */
     status = tx_thread_create(thread_0, "module thread 0", thread_0_entry, 0,
-            pointer, DEMO_STACK_SIZE, 
+            pointer, DEMO_STACK_SIZE,
             1, 1, TX_NO_TIME_SLICE, TX_AUTO_START);
     while (status != TX_SUCCESS);
 
@@ -201,11 +201,11 @@ CHAR    *pointer;
     status = tx_byte_allocate(byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
     while (status != TX_SUCCESS);
 
-    /* Create threads 1 and 2. These threads pass information through a ThreadX 
+    /* Create threads 1 and 2. These threads pass information through a ThreadX
        message queue.  It is also interesting to note that these threads have a time
        slice.  */
     status = tx_thread_create(thread_1, "module thread 1", thread_1_entry, 1,
-            pointer, DEMO_STACK_SIZE, 
+            pointer, DEMO_STACK_SIZE,
             16, 16, 4, TX_AUTO_START);
     while (status != TX_SUCCESS);
 
@@ -214,7 +214,7 @@ CHAR    *pointer;
     while (status != TX_SUCCESS);
 
     status = tx_thread_create(thread_2, "module thread 2", thread_2_entry, 2,
-            pointer, DEMO_STACK_SIZE, 
+            pointer, DEMO_STACK_SIZE,
             16, 16, 4, TX_AUTO_START);
     while (status != TX_SUCCESS);
 
@@ -222,10 +222,10 @@ CHAR    *pointer;
     status = tx_byte_allocate(byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
     while (status != TX_SUCCESS);
 
-    /* Create threads 3 and 4.  These threads compete for a ThreadX counting semaphore.  
+    /* Create threads 3 and 4.  These threads compete for a ThreadX counting semaphore.
        An interesting thing here is that both threads share the same instruction area.  */
     status = tx_thread_create(thread_3, "module thread 3", thread_3_and_4_entry, 3,
-            pointer, DEMO_STACK_SIZE, 
+            pointer, DEMO_STACK_SIZE,
             8, 8, TX_NO_TIME_SLICE, TX_AUTO_START);
     while (status != TX_SUCCESS);
 
@@ -234,7 +234,7 @@ CHAR    *pointer;
     while (status != TX_SUCCESS);
 
     status = tx_thread_create(thread_4, "module thread 4", thread_3_and_4_entry, 4,
-            pointer, DEMO_STACK_SIZE, 
+            pointer, DEMO_STACK_SIZE,
             8, 8, TX_NO_TIME_SLICE, TX_AUTO_START);
     while (status != TX_SUCCESS);
 
@@ -245,7 +245,7 @@ CHAR    *pointer;
     /* Create thread 5.  This thread simply pends on an event flag which will be set
        by thread_0.  */
     status = tx_thread_create(thread_5, "module thread 5", thread_5_entry, 5,
-            pointer, DEMO_STACK_SIZE, 
+            pointer, DEMO_STACK_SIZE,
             4, 4, TX_NO_TIME_SLICE, TX_AUTO_START);
     while (status != TX_SUCCESS);
 
@@ -255,7 +255,7 @@ CHAR    *pointer;
 
     /* Create threads 6 and 7.  These threads compete for a ThreadX mutex.  */
     status = tx_thread_create(thread_6, "module thread 6", thread_6_and_7_entry, 6,
-            pointer, DEMO_STACK_SIZE, 
+            pointer, DEMO_STACK_SIZE,
             8, 8, TX_NO_TIME_SLICE, TX_AUTO_START);
     while (status != TX_SUCCESS);
 
@@ -264,7 +264,7 @@ CHAR    *pointer;
     while (status != TX_SUCCESS);
 
     status = tx_thread_create(thread_7, "module thread 7", thread_6_and_7_entry, 7,
-            pointer, DEMO_STACK_SIZE, 
+            pointer, DEMO_STACK_SIZE,
             8, 8, TX_NO_TIME_SLICE, TX_AUTO_START);
     while (status != TX_SUCCESS);
 }
@@ -276,7 +276,7 @@ void    thread_0_entry(ULONG thread_input)
 {
 
 UINT    status;
-    
+
     /* This thread simply sits in while-forever-sleep loop.  */
     while(1)
     {
@@ -286,7 +286,7 @@ UINT    status;
 
         /* Sleep for 10 ticks.  */
         tx_thread_sleep(10);
-       
+
         /* Set event flag 0 to wakeup thread 5.  */
         status =  tx_event_flags_set(event_flags_0, 0x1, TX_OR);
 
@@ -338,11 +338,11 @@ UINT    status;
         /* Retrieve a message from the queue.  */
         status = tx_queue_receive(queue_0, &received_message, TX_WAIT_FOREVER);
 
-        /* Check completion status and make sure the message is what we 
+        /* Check completion status and make sure the message is what we
            expected.  */
         if ((status != TX_SUCCESS) || (received_message != thread_2_messages_received))
             break;
-        
+
         /* Otherwise, all is okay.  Increment the received message count.  */
         thread_2_messages_received++;
     }
@@ -401,7 +401,7 @@ ULONG   actual_flags;
         thread_5_counter++;
 
         /* Wait for event flag 0.  */
-        status =  tx_event_flags_get(event_flags_0, 0x1, TX_OR_CLEAR, 
+        status =  tx_event_flags_get(event_flags_0, 0x1, TX_OR_CLEAR,
                                                 &actual_flags, TX_WAIT_FOREVER);
 
         /* Check status.  */
@@ -454,7 +454,7 @@ UINT    status;
         if (status != TX_SUCCESS)
             break;
 
-        /* Release the mutex again.  This will actually 
+        /* Release the mutex again.  This will actually
            release ownership since it was obtained twice.  */
         status =  tx_mutex_put(mutex_0);
 

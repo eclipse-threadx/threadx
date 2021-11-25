@@ -80,7 +80,7 @@ TX_THREAD       *thread_ptr;
 
 TX_INTERRUPT_SAVE_AREA
 
-    
+
     /* Disable interrupts to put the timer on the created list.  */
     TX_DISABLE
 

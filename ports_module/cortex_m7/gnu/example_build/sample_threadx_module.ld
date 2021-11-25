@@ -9,8 +9,8 @@ SECTIONS
 {
   __FLASH_segment_start__ = 0x00030000;
   __FLASH_segment_end__   = 0x00040000;
-  __RAM_segment_start__   = 0;
-  __RAM_segment_end__     = 0x8000;
+  __RAM_segment_start__   = 0x10000000;
+  __RAM_segment_end__     = 0x10008000;
 
   __HEAPSIZE__ = 128;
 
@@ -136,7 +136,7 @@ SECTIONS
   }
   __rodata_end__ = __rodata_start__ + SIZEOF(.rodata);
  
-  __code_size__ =  __rodata_end__ - __FLASH_segment_start__;
+  __code_size__ =  SIZEOF(.data) + __rodata_end__ - __FLASH_segment_start__;
 
   __fast_load_start__ = ALIGN(__rodata_end__ , 4);
 

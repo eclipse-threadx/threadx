@@ -83,7 +83,7 @@ UINT    status;
         /* Timer pointer is invalid, return appropriate error code.  */
         status =  TX_TIMER_ERROR;
     }
-    
+
     /* Now check for invalid timer ID.  */
     else if (timer_ptr -> tx_timer_id != TX_TIMER_ID)
     {

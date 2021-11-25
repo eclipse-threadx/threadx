@@ -73,7 +73,7 @@
                                 								
                                 <option id="com.arm.tool.c.linker.option.entry.1473530747" name="Image entry point (--entry)" superClass="com.arm.tool.c.linker.option.entry" useByScannerDiscovery="false" value="start64" valueType="string"/>
                                 								
-                                <option id="com.arm.tool.c.linker.option.scatter.1215444221" name="Scatter file (--scatter)" superClass="com.arm.tool.c.linker.option.scatter" useByScannerDiscovery="false" value="..\sample_threadx.sct" valueType="string"/>
+                                <option id="com.arm.tool.c.linker.option.scatter.1215444221" name="Scatter file (--scatter)" superClass="com.arm.tool.c.linker.option.scatter" useByScannerDiscovery="false" value="..\sample_threadx.scat" valueType="string"/>
                                 								
                                 <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.arm.tool.c.linker.libs.473662930" name="User library files" superClass="com.arm.tool.c.linker.libs" useByScannerDiscovery="false" valueType="libs">
                                     									

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -30,43 +30,45 @@
 #include "tx_thread.h"
 #include "tx_timer.h"
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_sleep                                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_sleep                                    PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function handles application thread sleep requests.  If the    */ 
-/*    sleep request was called from a non-thread, an error is returned.   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    timer_ticks                           Number of timer ticks to sleep*/ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                                Return completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_suspend         Actual thread suspension          */ 
-/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function handles application thread sleep requests.  If the    */
+/*    sleep request was called from a non-thread, an error is returned.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ticks                           Number of timer ticks to sleep*/
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                Return completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_suspend         Actual thread suspension          */
+/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_sleep(ULONG timer_ticks)
@@ -92,18 +94,18 @@ TX_THREAD       *thread_ptr;
 
         /* Restore interrupts.  */
         TX_RESTORE
-        
+
         /* Illegal caller of this service.  */
         status =  TX_CALLER_ERROR;
     }
-    
+
     /* Is the caller an ISR or Initialization?  */
     else if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
     {
 
         /* Restore interrupts.  */
         TX_RESTORE
-        
+
         /* Illegal caller of this service.  */
         status =  TX_CALLER_ERROR;
     }
@@ -116,7 +118,7 @@ TX_THREAD       *thread_ptr;
 
         /* Restore interrupts.  */
         TX_RESTORE
-        
+
         /* Illegal caller of this service.  */
         status =  TX_CALLER_ERROR;
     }
@@ -124,11 +126,11 @@ TX_THREAD       *thread_ptr;
 
     /* Determine if the requested number of ticks is zero.  */
     else if (timer_ticks == ((ULONG) 0))
-    { 
+    {
 
         /* Restore interrupts.  */
         TX_RESTORE
-      
+
         /* Just return with a successful status.  */
         status =  TX_SUCCESS;
     }
@@ -141,13 +143,13 @@ TX_THREAD       *thread_ptr;
 
             /* Restore interrupts.  */
             TX_RESTORE
-        
+
             /* Suspension is not allowed if the preempt disable flag is non-zero at this point - return error completion.  */
             status =  TX_CALLER_ERROR;
         }
         else
         {
-        
+
             /* If trace is enabled, insert this event into the trace buffer.  */
             TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_SLEEP, TX_ULONG_TO_POINTER_CONVERT(timer_ticks), thread_ptr -> tx_thread_state, TX_POINTER_TO_ULONG_CONVERT(&status), 0, TX_TRACE_THREAD_EVENTS)
 
@@ -191,7 +193,7 @@ TX_THREAD       *thread_ptr;
             status =  thread_ptr -> tx_thread_suspend_status;
         }
     }
-    
+
     /* Return completion status.  */
     return(status);
 }

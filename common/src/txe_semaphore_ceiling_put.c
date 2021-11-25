@@ -86,7 +86,7 @@ UINT        status;
         /* Semaphore pointer is invalid, return appropriate error code.  */
         status =  TX_SEMAPHORE_ERROR;
     }
-    
+
     /* Now check for a valid semaphore ID.  */
     else if (semaphore_ptr -> tx_semaphore_id != TX_SEMAPHORE_ID)
     {

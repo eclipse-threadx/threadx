@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -29,46 +29,48 @@
 #include "tx_thread.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_shell_entry                              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_shell_entry                              PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function calls the specified entry function of the thread.  It */ 
-/*    also provides a place for the thread's entry function to return.    */ 
-/*    If the thread returns, this function places the thread in a         */ 
-/*    "COMPLETED" state.                                                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    thread_entry                      Thread's entry function           */ 
-/*    _tx_thread_system_suspend         Thread suspension routine         */ 
-/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Initial thread stack frame                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function calls the specified entry function of the thread.  It */
+/*    also provides a place for the thread's entry function to return.    */
+/*    If the thread returns, this function places the thread in a         */
+/*    "COMPLETED" state.                                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    thread_entry                      Thread's entry function           */
+/*    _tx_thread_system_suspend         Thread suspension routine         */
+/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Initial thread stack frame                                          */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_shell_entry(VOID)
@@ -117,7 +119,7 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
     if (_tx_thread_mutex_release != TX_NULL)
     {
 
-        /* Yes, call the mutex release function via a function pointer that 
+        /* Yes, call the mutex release function via a function pointer that
            is setup during mutex initialization.  */
         (_tx_thread_mutex_release)(thread_ptr);
     }

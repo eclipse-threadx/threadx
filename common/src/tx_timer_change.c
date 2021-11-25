@@ -77,7 +77,7 @@ UINT  _tx_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG reschedul
 
 TX_INTERRUPT_SAVE_AREA
 
-    
+
     /* Disable interrupts to put the timer on the created list.  */
     TX_DISABLE
 
@@ -90,7 +90,7 @@ TX_INTERRUPT_SAVE_AREA
     /* Determine if the timer is active.  */
     if (timer_ptr -> tx_timer_internal.tx_timer_internal_list_head == TX_NULL)
     {
-    
+
         /* Setup the new expiration fields.  */
         timer_ptr -> tx_timer_internal.tx_timer_internal_remaining_ticks =      initial_ticks;
         timer_ptr -> tx_timer_internal.tx_timer_internal_re_initialize_ticks =  reschedule_ticks;

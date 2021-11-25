@@ -137,7 +137,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
            set request.  */
         if (group_ptr -> tx_event_flags_group_suspended_count != TX_NO_SUSPENSIONS)
         {
-            
+
             if (group_ptr -> tx_event_flags_group_suspension_list == TX_NULL)
             {
 
@@ -154,15 +154,15 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                event clearing until the set operation is complete.  */
 
             /* Remember the events to clear.  */
-            group_ptr -> tx_event_flags_group_delayed_clear =  
+            group_ptr -> tx_event_flags_group_delayed_clear =
                                         group_ptr -> tx_event_flags_group_delayed_clear | ~flags_to_set;
         }
         else
         {
 #endif
 
-            /* Previous set operation was not interrupted, simply clear the 
-               specified flags by "ANDing" the flags into the current events 
+            /* Previous set operation was not interrupted, simply clear the
+               specified flags by "ANDing" the flags into the current events
                of the group.  */
             group_ptr -> tx_event_flags_group_current =
                 group_ptr -> tx_event_flags_group_current & flags_to_set;
@@ -195,7 +195,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
         {
 
             /* Yes, we need to neutralize the delayed clearing as well.  */
-            group_ptr -> tx_event_flags_group_delayed_clear =  
+            group_ptr -> tx_event_flags_group_delayed_clear =
                                         group_ptr -> tx_event_flags_group_delayed_clear & ~flags_to_set;
         }
 #endif
@@ -210,7 +210,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
         if (group_ptr -> tx_event_flags_group_suspension_list != TX_NULL)
         {
 
-            /* Determine if there is just a single thread waiting on the event 
+            /* Determine if there is just a single thread waiting on the event
                flag group.  */
             if (suspended_count == ((UINT) 1))
             {
@@ -223,7 +223,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
 
                 /* Pickup the current event flags.  */
                 current_event_flags =  group_ptr -> tx_event_flags_group_current;
-            
+
                 /* Pickup the suspend information.  */
                 requested_flags =  thread_ptr -> tx_thread_suspend_info;
 
@@ -236,16 +236,16 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                 /* Check for AND condition. All flags must be present to satisfy request.  */
                 if (and_request == TX_AND)
                 {
-    
+
                     /* AND request is present.  */
-        
+
                     /* Calculate the flags present.  */
                     flags_satisfied =  (current_event_flags & requested_flags);
-        
+
                     /* Determine if they satisfy the AND request.  */
                     if (flags_satisfied != requested_flags)
                     {
-        
+
                         /* No, not all the requested flags are present. Clear the flags present variable.  */
                         flags_satisfied =  ((ULONG) 0);
                     }
@@ -256,7 +256,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                     /* OR request is present. Simply or the requested flags and the current flags.  */
                     flags_satisfied =  (current_event_flags & requested_flags);
                 }
-    
+
                 /* Determine if the request is satisfied.  */
                 if (flags_satisfied != ((ULONG) 0))
                 {
@@ -315,7 +315,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
             else
             {
 
-                /* Otherwise, the event flag requests of multiple threads must be 
+                /* Otherwise, the event flag requests of multiple threads must be
                    examined.  */
 
                 /* Setup thread pointer, keep a local copy of the head pointer.  */
@@ -325,7 +325,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                 /* Clear the suspended list head pointer to thwart manipulation of
                    the list in ISR's while we are processing here.  */
                 group_ptr -> tx_event_flags_group_suspension_list =  TX_NULL;
-        
+
                 /* Setup the satisfied thread pointers.  */
                 satisfied_list =  TX_NULL;
                 last_satisfied =  TX_NULL;
@@ -382,16 +382,16 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                     /* Check for AND condition. All flags must be present to satisfy request.  */
                     if (and_request == TX_AND)
                     {
-    
+
                         /* AND request is present.  */
-        
+
                         /* Calculate the flags present.  */
                         flags_satisfied =  (current_event_flags & requested_flags);
-        
+
                         /* Determine if they satisfy the AND request.  */
                         if (flags_satisfied != requested_flags)
                         {
-        
+
                             /* No, not all the requested flags are present. Clear the flags present variable.  */
                             flags_satisfied =  ((ULONG) 0);
                         }
@@ -402,13 +402,13 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                         /* OR request is present. Simply or the requested flags and the current flags.  */
                         flags_satisfied =  (current_event_flags & requested_flags);
                     }
-    
-                    /* Check to see if the thread had a timeout or wait abort during the event search processing.  
-                       If so, just set the flags satisfied to ensure the processing here removes the thread from 
+
+                    /* Check to see if the thread had a timeout or wait abort during the event search processing.
+                       If so, just set the flags satisfied to ensure the processing here removes the thread from
                        the suspension list.  */
                     if (thread_ptr -> tx_thread_state != TX_EVENT_FLAG)
                     {
-            
+
                        /* Simply set the satisfied flags to 1 in order to remove the thread from the suspension list.  */
                         flags_satisfied =  ((ULONG) 1);
                     }
@@ -421,7 +421,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
 
                         /* Set the preempt check flag.  */
                         preempt_check =  TX_TRUE;
-    
+
                         /* Determine if the thread is still suspended on the event flag group. If not, a wait
                            abort must have been done from an ISR.  */
                         if (thread_ptr -> tx_thread_state == TX_EVENT_FLAG)
@@ -437,11 +437,11 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                             /* Determine whether or not clearing needs to take place.  */
                             if (clear_request == TX_TRUE)
                             {
-                
+
                                 /* Yes, clear the flags that satisfied this request.  */
                                 group_ptr -> tx_event_flags_group_current =  group_ptr -> tx_event_flags_group_current & ~requested_flags;
                             }
-            
+
                             /* Prepare for resumption of the first thread.  */
 
                             /* Clear cleanup routine to avoid timeout.  */
@@ -478,7 +478,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                                list.  */
                             if (suspended_list == thread_ptr)
                             {
-                                
+
                                 /* Yes, head pointer needs to be updated.  */
                                 suspended_list =  thread_ptr -> tx_thread_suspended_next;
                             }
@@ -494,7 +494,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                             /* First thread on the satisfied list.  */
                             satisfied_list =  thread_ptr;
                             last_satisfied =  thread_ptr;
-    
+
                             /* Setup initial next pointer.  */
                             thread_ptr -> tx_thread_suspended_next =  TX_NULL;
                         }
@@ -502,7 +502,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                         {
 
                             /* Not the first thread on the satisfied list.  */
-                
+
                             /* Link it up at the end.  */
                             last_satisfied -> tx_thread_suspended_next =  thread_ptr;
                             thread_ptr -> tx_thread_suspended_next =      TX_NULL;
@@ -515,7 +515,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
 
                     /* Decrement the suspension count.  */
                     suspended_count--;
-            
+
                 } while (suspended_count != TX_NO_SUSPENSIONS);
 
                 /* Setup the group's suspension list head again.  */
@@ -543,7 +543,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                 thread_ptr =  satisfied_list;
                 while(thread_ptr != TX_NULL)
                 {
-    
+
                     /* Get next pointer first.  */
                     next_thread_ptr =  thread_ptr -> tx_thread_suspended_next;
 
@@ -586,7 +586,7 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
             /* Determine if we need to set the reset search field.  */
             if (group_ptr -> tx_event_flags_group_suspended_count != TX_NO_SUSPENSIONS)
             {
-                    
+
                 /* We interrupted a search of an event flag group suspension
                    list.  Make sure we reset the search.  */
                 group_ptr -> tx_event_flags_group_reset_search =  TX_TRUE;

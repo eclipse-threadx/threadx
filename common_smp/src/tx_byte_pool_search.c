@@ -259,23 +259,23 @@ UINT            blocks_searched =  ((UINT) 0);
 
 #ifdef TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH
 
-            /* When this is enabled, multiple blocks are searched while holding the protection.  */ 
+            /* When this is enabled, multiple blocks are searched while holding the protection.  */
 
             /* Increment the number of blocks searched.  */
             blocks_searched =  blocks_searched + ((UINT) 1);
-        
+
             /* Have we reached the maximum number of blocks to search while holding the protection?  */
-            if (blocks_searched >= ((UINT) TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH)) 
+            if (blocks_searched >= ((UINT) TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH))
             {
 
                 /* Yes, we have exceeded the multiple block search limit.  */
-        
+
                 /* Restore interrupts temporarily.  */
                 TX_RESTORE
-            
+
                 /* Disable interrupts.  */
                 TX_DISABLE
-            
+
                 /* Reset the number of blocks searched counter.  */
                 blocks_searched =  ((UINT) 0);
             }
@@ -295,10 +295,10 @@ UINT            blocks_searched =  ((UINT) 0);
                 {
                     /* Restore interrupts temporarily.  */
                     TX_RESTORE
-                    
+
                     /* Increment the delay counter.  */
                     delay_count++;
-                    
+
                     /* Disable interrupts.  */
                     TX_DISABLE
                 } while (delay_count < ((ULONG) TX_BYTE_POOL_DELAY_VALUE));

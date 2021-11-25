@@ -82,7 +82,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_mutex_performance_system_info_get(ULONG *puts, ULONG *gets, ULONG *suspensions, 
+UINT  _tx_mutex_performance_system_info_get(ULONG *puts, ULONG *gets, ULONG *suspensions,
                                 ULONG *timeouts, ULONG *inversions, ULONG *inheritances)
 {
 
@@ -106,51 +106,51 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the total number of mutex puts.  */
     if (puts != TX_NULL)
     {
-    
+
         *puts =  _tx_mutex_performance_put_count;
     }
-    
+
     /* Retrieve the total number of mutex gets.  */
     if (gets != TX_NULL)
     {
-    
+
         *gets =  _tx_mutex_performance_get_count;
     }
-    
+
     /* Retrieve the total number of mutex suspensions.  */
     if (suspensions != TX_NULL)
     {
-    
+
         *suspensions =  _tx_mutex_performance_suspension_count;
     }
-    
+
     /* Retrieve the total number of mutex timeouts.  */
     if (timeouts != TX_NULL)
     {
-    
+
         *timeouts =  _tx_mutex_performance_timeout_count;
     }
-    
+
     /* Retrieve the total number of mutex priority inversions.  */
     if (inversions != TX_NULL)
     {
-    
+
         *inversions =  _tx_mutex_performance_priority_inversion_count;
     }
-    
+
     /* Retrieve the total number of mutex priority inheritances.  */
     if (inheritances != TX_NULL)
     {
-    
+
         *inheritances =  _tx_mutex_performance__priority_inheritance_count;
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 
     /* Return completion status.  */
     return(TX_SUCCESS);
-    
+
 #else
 
 UINT        status;
@@ -159,43 +159,43 @@ UINT        status;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (puts != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (gets != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (suspensions != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (timeouts != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (inversions != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (inheritances != TX_NULL)
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else
     {
-    
+
         /* Not enabled, return error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }

@@ -1,0 +1,142 @@
+/**************************************************************************/
+/*                                                                        */
+/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
+/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+/*       and in the root directory of this software.                      */
+/*                                                                        */
+/**************************************************************************/
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Thread - Low Level SMP Support                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+
+/*
+#define TX_SOURCE_CODE
+#define TX_THREAD_SMP_SOURCE_CODE
+*/
+
+/* Include necessary system files.  */
+
+/*
+#include "tx_api.h"
+#include "tx_thread.h"
+#include "tx_timer.h"
+*/
+
+    EXTERN     _tx_thread_current_ptr
+    EXTERN     _tx_thread_smp_protection
+    EXTERN     _tx_thread_preempt_disable
+    EXTERN     _tx_thread_smp_protect_wait_counts
+
+    SECTION `.text`:CODE:NOROOT(3)
+    CODE
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_smp_unprotect                         Cortex-A5x-SMP/IAR */
+/*                                                           6.1.9        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function releases previously obtained protection. The supplied */
+/*    previous SR is restored. If the value of _tx_thread_system_state    */
+/*    and _tx_thread_preempt_disable are both zero, then multithreading   */
+/*    is enabled as well.                                                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    Previous Status Register                                            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX Source                                                      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  10-15-2021      William E. Lamie        Initial Version 6.1.9         */
+/*                                                                        */
+/**************************************************************************/
+    PUBLIC   _tx_thread_smp_unprotect
+_tx_thread_smp_unprotect:
+    MSR     DAIFSet, 0x3                        // Lockout interrupts
+
+    MRS     x1, MPIDR_EL1                       // Pickup the core ID
+#ifdef TX_ARMV8_2
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x2, x1, #16, #8                     // Isolate cluster ID
+#endif
+    UBFX    x1, x1, #8, #8                      // Isolate core ID
+#else
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x2, x1, #8, #8                      // Isolate cluster ID
+#endif
+    UBFX    x1, x1, #0, #8                      // Isolate core ID
+#endif
+#if TX_THREAD_SMP_CLUSTERS > 1
+    ADDS    x1, x1, x2, LSL #2                  // Calculate CPU ID
+#endif
+
+    LDR     x2,=_tx_thread_smp_protection       // Build address of protection structure
+    LDR     w3, [x2, #4]                        // Pickup the owning core
+    CMP     w1, w3                              // Is it this core?
+    B.NE    _still_protected                    // If this is not the owning core, protection is in force elsewhere
+
+    LDR     w3, [x2, #8]                        // Pickup the protection count
+    CMP     w3, #0                              // Check to see if the protection is still active
+    B.EQ    _still_protected                    // If the protection count is zero, protection has already been cleared
+
+    SUB     w3, w3, #1                          // Decrement the protection count
+    STR     w3, [x2, #8]                        // Store the new count back
+    CMP     w3, #0                              // Check to see if the protection is still active
+    B.NE    _still_protected                    // If the protection count is non-zero, protection is still in force
+    LDR     x2,=_tx_thread_preempt_disable      // Build address of preempt disable flag
+    LDR     w3, [x2]                            // Pickup preempt disable flag
+    CMP     w3, #0                              // Is the preempt disable flag set?
+    B.NE    _still_protected                    // Yes, skip the protection release
+
+    LDR     x2,=_tx_thread_smp_protect_wait_counts // Build build address of wait counts
+    LDR     w3, [x2, x1, LSL #2]                // Pickup wait list value
+    CMP     w3, #0                              // Are any entities on this core waiting?
+    B.NE    _still_protected                    // Yes, skip the protection release
+
+    LDR     x2,=_tx_thread_smp_protection       // Build address of protection structure
+    MOV     w3, #0xFFFFFFFF                     // Build invalid value
+    STR     w3, [x2, #4]                        // Mark the protected core as invalid
+    DMB     ISH                                 // Ensure that accesses to shared resource have completed
+    MOV     w3, #0                              // Build release protection value
+    STR     w3, [x2, #0]                        // Release the protection
+    DSB     ISH                                 // To ensure update of the protection occurs before other CPUs awake
+
+_still_protected:
+#ifdef TX_ENABLE_WFE
+    SEV                                         // Send event to other CPUs, wakes anyone waiting on the protection (using WFE)
+#endif
+    MSR     DAIF, x0                            // Restore interrupt posture
+    RET
+
+    END

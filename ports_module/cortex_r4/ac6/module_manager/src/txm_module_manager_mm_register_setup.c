@@ -60,7 +60,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_module_manager_region_size_get(ULONG block_size)
@@ -186,7 +186,7 @@ ULONG   return_value;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_module_manager_calculate_srd_bits(ULONG block_size, ULONG length)
@@ -280,7 +280,7 @@ UINT    srd_bit_index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance)

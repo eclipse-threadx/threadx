@@ -33,8 +33,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_external_memory_enable      Cortex-M7/MPU/AC6   */
-/*                                                           6.1.7        */
+/*    _txm_module_manager_external_memory_enable          Cortex-M7       */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -60,6 +60,7 @@
 /*    _tx_mutex_get                     Get protection mutex              */
 /*    _tx_mutex_put                     Release protection mutex          */
 /*    _txm_power_of_two_block_size      Round length to power of two      */
+/*    _txm_module_manager_mm_register_setup    Reconfigure MPU registers  */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -69,9 +70,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  06-02-2021      Scott Larson            Added support for 8 MPU,      */
-/*                                            resulting in verison 6.1.7  */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_external_memory_enable(TXM_MODULE_INSTANCE *module_instance,
@@ -79,7 +78,7 @@ UINT  _txm_module_manager_external_memory_enable(TXM_MODULE_INSTANCE *module_ins
                                                  ULONG length,
                                                  UINT attributes)
 {
-#ifndef TXM_MODULE_MANAGER_8_MPU
+#ifdef TXM_MODULE_MANAGER_16_MPU
 ULONG   block_size;
 ULONG   region_size;
 ULONG   srd_bits;

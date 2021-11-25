@@ -26,8 +26,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_interrupt_control                      Cortex-M/IAR      */
-/*                                                           6.1.5        */
+/*    _tx_thread_interrupt_control                      Cortex-M33/IAR    */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -57,17 +57,22 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021      Scott Larson            Initial Version 6.1.5         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_interrupt_control(UINT new_posture)
 // {
     PUBLIC  _tx_thread_interrupt_control
 _tx_thread_interrupt_control:
+#ifdef TX_PORT_USE_BASEPRI
+    MRS     r1, BASEPRI                         // Pickup current interrupt posture
+    MSR     BASEPRI, r0                         // Apply the new interrupt posture
+    MOV     r0, r1                              // Transfer old to return register
+#else
     MRS     r1, PRIMASK                         // Pickup current interrupt lockout
     MSR     PRIMASK, r0                         // Apply the new interrupt lockout
     MOV     r0, r1                              // Transfer old to return register
+#endif
     BX      lr                                  // Return to caller
-
 // }
     END

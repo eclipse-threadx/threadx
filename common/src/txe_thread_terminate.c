@@ -85,7 +85,7 @@ UINT        status;
         /* Thread pointer is invalid, return appropriate error code.  */
         status =  TX_THREAD_ERROR;
     }
-    
+
     /* Now check for invalid thread ID.  */
     else if (thread_ptr -> tx_thread_id != TX_THREAD_ID)
     {

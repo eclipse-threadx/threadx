@@ -25,8 +25,8 @@
 /*                                                                        */
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
-/*    txm_module_port.h                               Cortex-M3/MPU/AC5   */
-/*                                                           6.1.6        */
+/*    txm_module_port.h                                 Cortex-M3/AC5     */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -40,10 +40,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  04-02-2021      Scott Larson            Modified comment(s) and       */
-/*                                            added check for overflow,   */
-/*                                            resulting in version 6.1.6  */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -94,11 +91,6 @@ The following extensions must also be defined in tx_port.h:
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 */
 
-
-/* Size of module heap.  */
-#define TXM_MODULE_HEAP_SIZE                    512
-
-
 /* Define the kernel stack size for a module thread.  */
 #ifndef TXM_MODULE_KERNEL_STACK_SIZE
 #define TXM_MODULE_KERNEL_STACK_SIZE            768
@@ -107,12 +99,17 @@ The following extensions must also be defined in tx_port.h:
 /* For the following 3 access control settings, change TEX and C, B, S (bits 21 through 16 of MPU_RASR)
  * to reflect your system memory attributes (cache, shareable, memory type).  */
 /* Code region access control: privileged read-only, outer & inner write-back, normal memory, shareable.  */
+#ifndef TXM_MODULE_MPU_CODE_ACCESS_CONTROL
 #define TXM_MODULE_MPU_CODE_ACCESS_CONTROL      0x06070000
+#endif
 /* Data region access control: execute never, read/write, outer & inner write-back, normal memory, shareable.  */
+#ifndef TXM_MODULE_MPU_DATA_ACCESS_CONTROL
 #define TXM_MODULE_MPU_DATA_ACCESS_CONTROL      0x13070000
+#endif
 /* Shared region access control: execute never, read-only, outer & inner write-back, normal memory, shareable.  */
+#ifndef TXM_MODULE_MPU_SHARED_ACCESS_CONTROL
 #define TXM_MODULE_MPU_SHARED_ACCESS_CONTROL    0x12070000
-
+#endif
 
 /* Define constants specific to the tools the module can be built with for this particular modules port.  */
 
@@ -168,9 +165,44 @@ The following extensions must also be defined in tx_port.h:
 
 #define INLINE_DECLARE inline
 
-/* Define the number of MPU entries assigned to the code and data sections. On Cortex-M parts, there can only be 7 total
-   entries, since ThreadX uses one for access to the kernel dispatch function.  */
+#ifdef TXM_MODULE_MANAGER_16_MPU
 
+/* Define the number of MPU entries assigned to the code and data sections.
+   On some Cortex-M7 parts, there are 16 total entries. ThreadX uses one for access
+   to the kernel entry function, thus 15 remain for code and data protection.  */
+#define TXM_MODULE_MPU_TOTAL_ENTRIES        16
+#define TXM_MODULE_MPU_CODE_ENTRIES         4
+#define TXM_MODULE_MPU_DATA_ENTRIES         4
+#define TXM_MODULE_MPU_SHARED_ENTRIES       3
+
+#define TXM_MODULE_MPU_KERNEL_ENTRY_INDEX   0
+#define TXM_MODULE_MPU_SHARED_INDEX         9
+
+#define TXM_ENABLE_REGION                   0x01
+
+/* There are 2 registers to set up each MPU region: MPU_RBAR, MPU_RASR.  */
+typedef struct TXM_MODULE_MPU_INFO_STRUCT
+{
+    ULONG   txm_module_mpu_region_address;
+    ULONG   txm_module_mpu_region_attribute_size;
+} TXM_MODULE_MPU_INFO;
+/* Shared memory region attributes.  */
+#define TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE   1
+#define TXM_MODULE_MANAGER_ATTRIBUTE_WRITE_MPU_BIT  0x01000000
+
+/* Define the port-extensions to the module manager instance structure.  */
+
+#define TXM_MODULE_MANAGER_PORT_EXTENSION                                                               \
+    TXM_MODULE_MPU_INFO     txm_module_instance_mpu_registers[TXM_MODULE_MPU_TOTAL_ENTRIES];            \
+    ULONG                   txm_module_instance_shared_memory_count;                                    \
+    ULONG                   txm_module_instance_shared_memory_address[TXM_MODULE_MPU_SHARED_ENTRIES];   \
+    ULONG                   txm_module_instance_shared_memory_length[TXM_MODULE_MPU_SHARED_ENTRIES];
+
+#else   /* TXM_MODULE_MANAGER_16_MPU is not defined */
+
+/* Define the number of MPU entries assigned to the code and data sections.
+   On Cortex-M3, M4, and some M7 parts, there are 8 total entries. ThreadX uses one for access
+   to the kernel entry function, thus 7 remain for code and data protection.  */
 #define TXM_MODULE_MANAGER_CODE_MPU_ENTRIES     4
 #define TXM_MODULE_MANAGER_DATA_MPU_ENTRIES     3
 #define TXM_MODULE_MANAGER_SHARED_MPU_INDEX     8
@@ -187,6 +219,7 @@ The following extensions must also be defined in tx_port.h:
     ULONG               txm_module_instance_shared_memory_address;                  \
     ULONG               txm_module_instance_shared_memory_length;
 
+#endif  /* TXM_MODULE_MANAGER_16_MPU */
 
 /* Define the memory fault information structure that is populated when a memory fault occurs.  */
 
@@ -309,6 +342,10 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 /* Define the macros to perform port-specific checks when passing pointers to the kernel.  */
 
 /* Define macro to make sure object is inside the module's data.  */
+#ifdef TXM_MODULE_MANAGER_16_MPU
+#define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size) \
+    _txm_module_manager_inside_data_check(module_instance, obj_ptr, obj_size)
+#else
 #define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size) \
     /* Check for overflow. */   \
     (((obj_ptr) < ((obj_ptr) + (obj_size))) && \
@@ -318,7 +355,7 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
     /* Check if it's inside shared memory.  */ \
      (((obj_ptr) >= (ALIGN_TYPE) module_instance -> txm_module_instance_shared_memory_address) && \
      (((obj_ptr) + (obj_size)) <= (ALIGN_TYPE) (module_instance -> txm_module_instance_shared_memory_address + module_instance -> txm_module_instance_shared_memory_length)))))
-
+#endif
 
 /* Define some internal prototypes to this module port.  */
 
@@ -334,10 +371,11 @@ UINT  _txm_module_manager_memory_fault_notify(VOID (*notify_function)(TX_THREAD 
 VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance);                                              \
 ULONG _txm_power_of_two_block_size(ULONG size);                                                                                 \
 ULONG _txm_module_manager_calculate_srd_bits(ULONG block_size, ULONG length);                                                   \
-ULONG _txm_module_manager_region_size_get(ULONG block_size);
+ULONG _txm_module_manager_region_size_get(ULONG block_size);                                                                    \
+UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, UINT obj_size);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M3/MPU/AC5 Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M3/AC5 Version 6.1.9 *";
 
 #endif

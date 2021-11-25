@@ -105,6 +105,7 @@ UINT    _tx_thread_secure_mode_stack_initialize(void)
 {
 UINT    status;
 ULONG   control;
+ULONG   ipsr;
 
     /* Make sure function is called from interrupt (threads should not call). */
     asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */

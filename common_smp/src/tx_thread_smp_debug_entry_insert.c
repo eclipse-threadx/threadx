@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -85,42 +85,42 @@ TX_THREAD_SMP_DEBUG_ENTRY_INFO  _tx_thread_smp_debug_info_array[TX_THREAD_SMP_MA
 ULONG                           _tx_thread_smp_debug_info_current_index;
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_debug_entry_insert                  PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_smp_debug_entry_insert                  PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is responsible for making an entry in the circular    */ 
-/*    debug log.                                                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    id                                    ID of event                   */ 
-/*    suspend                               Flag set to true for suspend  */ 
-/*                                            events                      */ 
-/*    thread_ptr                            Specified thread              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is responsible for making an entry in the circular    */
+/*    debug log.                                                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    id                                    ID of event                   */
+/*    suspend                               Flag set to true for suspend  */
+/*                                            events                      */
+/*    thread_ptr                            Specified thread              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_time_get               Get global time stamp         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Internal routines                                                   */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_time_get               Get global time stamp         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Internal routines                                                   */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -138,35 +138,35 @@ TX_THREAD                   *thread_ptr;
     /* Spin, if an error is detected. No sense in populating the debug after the error occurs.  */
     while (_tx_thread_smp_system_error)
     {
-    
+
         /* Spin here!  */
     }
 
     /* Check for a bad current index.  */
     while (_tx_thread_smp_debug_info_current_index >= TX_THREAD_SMP_MAX_DEBUG_ENTRIES)
     {
-    
+
         /* Spin here!  */
     }
 
     thread_ptr =  (TX_THREAD *) thread_void_ptr;
 
     /* It is assumed that interrupts are locked out at this point.  */
-    
+
     /* Setup pointer to debug entry.  */
     entry_ptr =  &_tx_thread_smp_debug_info_array[_tx_thread_smp_debug_info_current_index++];
-    
+
     /* Check for wrap on the index.  */
     if (_tx_thread_smp_debug_info_current_index >= TX_THREAD_SMP_MAX_DEBUG_ENTRIES)
     {
-    
+
         /* Wrap back to 0. */
         _tx_thread_smp_debug_info_current_index =  0;
     }
-    
+
     /* Get the index.  */
     core_index =  TX_SMP_CORE_ID;
-    
+
     /* We know at this point that multithreading and interrupts are disabled...  so start populating the array.  */
     entry_ptr -> tx_thread_smp_debug_entry_id =                         id;
     entry_ptr -> tx_thread_smp_debug_entry_suspend =                    suspend;
@@ -175,21 +175,21 @@ TX_THREAD                   *thread_ptr;
     entry_ptr -> tx_thread_smp_debug_entry_timer_clock =                _tx_timer_system_clock;
     entry_ptr -> tx_thread_smp_debug_entry_core_index =                  core_index;
     entry_ptr -> tx_thread_smp_debug_entry_current_thread =             _tx_thread_current_ptr[core_index];
-    if (entry_ptr -> tx_thread_smp_debug_entry_current_thread)    
+    if (entry_ptr -> tx_thread_smp_debug_entry_current_thread)
     {
-    
+
         entry_ptr -> tx_thread_smp_debug_entry_thread_priority =     (entry_ptr -> tx_thread_smp_debug_entry_current_thread) -> tx_thread_priority;
         entry_ptr -> tx_thread_smp_debug_entry_thread_threshold =    (entry_ptr -> tx_thread_smp_debug_entry_current_thread) -> tx_thread_preempt_threshold;
         entry_ptr -> tx_thread_smp_debug_entry_thread_core_control =  (entry_ptr -> tx_thread_smp_debug_entry_current_thread) -> tx_thread_smp_core_control;
     }
     else
     {
-    
+
         entry_ptr -> tx_thread_smp_debug_entry_thread_priority =     0;
         entry_ptr -> tx_thread_smp_debug_entry_thread_threshold =    0;
         entry_ptr -> tx_thread_smp_debug_entry_thread_core_control =  0;
     }
-    
+
     entry_ptr -> tx_thread_smp_debug_protection =                       _tx_thread_smp_protection;
     entry_ptr -> tx_thread_smp_debug_entry_preempt_disable  =           _tx_thread_preempt_disable;
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
@@ -208,7 +208,7 @@ TX_THREAD                   *thread_ptr;
     for (i = 0; i < _tx_thread_smp_max_cores; i++)
 #endif
     {
-    
+
         /* Save the pointers.  */
         entry_ptr -> tx_thread_smp_debug_entry_current_threads[i] =     _tx_thread_current_ptr[i];
         entry_ptr -> tx_thread_smp_debug_entry_execute_threads[i] =     _tx_thread_execute_ptr[i];

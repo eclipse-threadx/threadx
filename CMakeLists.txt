@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
 # Set up the project
 project(threadx
-    VERSION 6.0.0 
     LANGUAGES C ASM
 )
 
@@ -12,6 +11,8 @@ endif()
 if(NOT DEFINED THREADX_TOOLCHAIN)
     message(FATAL_ERROR "Error: THREADX_TOOLCHAIN not defined")
 endif()
+message(STATUS "THREADX_ARCH: ${THREADX_ARCH}")
+message(STATUS "THREADX_TOOLCHAIN: ${THREADX_TOOLCHAIN}")
 
 # Define our target library and an alias for consumers
 add_library(${PROJECT_NAME})
@@ -21,7 +22,11 @@ add_library("azrtos::${PROJECT_NAME}" ALIAS ${PROJECT_NAME})
 set(CUSTOM_INC_DIR ${CMAKE_CURRENT_BINARY_DIR}/custom_inc)
 
 # Pick up the port specific variables and apply them
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN})
+if(DEFINED THREADX_CUSTOM_PORT)
+    add_subdirectory(${THREADX_CUSTOM_PORT} threadx_port)
+else()
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN})
+endif()
 
 # Pick up the common stuff
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common)

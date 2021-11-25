@@ -95,14 +95,14 @@ ULONG           suspension_sequence;
     /* Determine if the thread is currently suspended.  */
     if (thread_ptr -> tx_thread_state < TX_SLEEP)
     {
-    
-        /* Thread is either ready, completed, terminated, or in a pure 
+
+        /* Thread is either ready, completed, terminated, or in a pure
            suspension condition.  */
 
         /* Restore interrupts.  */
         TX_RESTORE
 
-        /* Just return with an error message to indicate that 
+        /* Just return with an error message to indicate that
            nothing was done.  */
         status =  TX_WAIT_ABORT_ERROR;
     }
@@ -136,7 +136,7 @@ ULONG           suspension_sequence;
         {
 
             /* Process all other suspension timeouts.  */
-    
+
             /* Set the state to suspended.  */
             thread_ptr -> tx_thread_state =    TX_SUSPENDED;
 
@@ -217,7 +217,7 @@ ULONG           suspension_sequence;
 
             /* Disable interrupts.  */
             TX_DISABLE
-        
+
             /* Decrement the disable preemption flag.  */
             _tx_thread_preempt_disable--;
 
@@ -225,7 +225,7 @@ ULONG           suspension_sequence;
             TX_RESTORE
 #endif
 
-            /* Return with an error message to indicate that 
+            /* Return with an error message to indicate that
                nothing was done.  */
             status =  TX_WAIT_ABORT_ERROR;
         }

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Semaphore                                                           */
 /**                                                                       */
@@ -31,45 +31,47 @@
 #include "tx_semaphore.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_semaphore_delete                                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_semaphore_delete                                PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function deletes the specified semaphore.  All threads         */ 
-/*    suspended on the semaphore are resumed with the TX_DELETED status   */ 
-/*    code.                                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    semaphore_ptr                     Pointer to semaphore control block*/ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SUCCESS                        Successful completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_preempt_check   Check for preemption              */ 
-/*    _tx_thread_system_resume          Resume thread service             */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function deletes the specified semaphore.  All threads         */
+/*    suspended on the semaphore are resumed with the TX_DELETED status   */
+/*    code.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    semaphore_ptr                     Pointer to semaphore control block*/
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Successful completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_preempt_check   Check for preemption              */
+/*    _tx_thread_system_resume          Resume thread service             */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_semaphore_delete(TX_SEMAPHORE *semaphore_ptr)
@@ -77,7 +79,7 @@ UINT  _tx_semaphore_delete(TX_SEMAPHORE *semaphore_ptr)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *thread_ptr;                
+TX_THREAD       *thread_ptr;
 TX_THREAD       *next_thread;
 UINT            suspended_count;
 TX_SEMAPHORE    *next_semaphore;
@@ -124,9 +126,9 @@ TX_SEMAPHORE    *previous_semaphore;
         /* See if we have to update the created list head pointer.  */
         if (_tx_semaphore_created_ptr == semaphore_ptr)
         {
-                    
+
             /* Yes, move the head pointer to the next link. */
-            _tx_semaphore_created_ptr =  next_semaphore; 
+            _tx_semaphore_created_ptr =  next_semaphore;
         }
     }
 
@@ -137,7 +139,7 @@ TX_SEMAPHORE    *previous_semaphore;
     thread_ptr =                                     semaphore_ptr -> tx_semaphore_suspension_list;
     semaphore_ptr -> tx_semaphore_suspension_list =  TX_NULL;
     suspended_count =                                semaphore_ptr -> tx_semaphore_suspended_count;
-    semaphore_ptr -> tx_semaphore_suspended_count =  TX_NO_SUSPENSIONS;   
+    semaphore_ptr -> tx_semaphore_suspended_count =  TX_NO_SUSPENSIONS;
 
     /* Restore interrupts.  */
     TX_RESTORE
@@ -146,14 +148,14 @@ TX_SEMAPHORE    *previous_semaphore;
        on this semaphore.  */
     while (suspended_count != TX_NO_SUSPENSIONS)
     {
-    
+
         /* Decrement the suspension count.  */
         suspended_count--;
 
         /* Lockout interrupts.  */
         TX_DISABLE
 
-        /* Clear the cleanup pointer, this prevents the timeout from doing 
+        /* Clear the cleanup pointer, this prevents the timeout from doing
            anything.  */
         thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 
@@ -177,7 +179,7 @@ TX_SEMAPHORE    *previous_semaphore;
 
         /* Restore interrupts.  */
         TX_RESTORE
-    
+
         /* Resume the thread.  */
         _tx_thread_system_resume(thread_ptr);
 #endif

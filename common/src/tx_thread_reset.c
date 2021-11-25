@@ -135,7 +135,7 @@ UINT            status;
         TX_MEMSET(thread_ptr -> tx_thread_stack_start, ((UCHAR) TX_STACK_FILL), thread_ptr -> tx_thread_stack_size);
 #endif
 
-        /* Call the target specific stack frame building routine to build the 
+        /* Call the target specific stack frame building routine to build the
            thread's initial stack and to setup the actual stack pointer in the
            control block.  */
         _tx_thread_stack_build(thread_ptr, _tx_thread_shell_entry);

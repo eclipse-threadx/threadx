@@ -77,7 +77,7 @@ UINT  _tx_semaphore_get(TX_SEMAPHORE *semaphore_ptr, ULONG wait_option)
 {
 
 TX_INTERRUPT_SAVE_AREA
-            
+
 TX_THREAD       *thread_ptr;
 TX_THREAD       *next_thread;
 TX_THREAD       *previous_thread;
@@ -123,7 +123,7 @@ UINT            status;
         /* Determine if the preempt disable flag is non-zero.  */
         if (_tx_thread_preempt_disable != ((UINT) 0))
         {
-    
+
             /* Restore interrupts.  */
             TX_RESTORE
 
@@ -143,7 +143,7 @@ UINT            status;
             /* Increment the number of suspensions on this semaphore.  */
             semaphore_ptr -> tx_semaphore_performance_suspension_count++;
 #endif
-            
+
             /* Pickup thread pointer.  */
             TX_THREAD_GET_CURRENT(thread_ptr)
 

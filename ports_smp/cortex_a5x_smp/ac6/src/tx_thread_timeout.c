@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -30,48 +30,50 @@
 #include "tx_timer.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_timeout                                Cortex-A5x-SMP    */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_timeout                                Cortex-A5x-SMP    */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function handles thread timeout processing.  Timeouts occur in */ 
-/*    two flavors, namely the thread sleep timeout and all other service  */ 
-/*    call timeouts.  Thread sleep timeouts are processed locally, while  */ 
-/*    the others are processed by the appropriate suspension clean-up     */ 
-/*    service.                                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    timeout_input                         Contains the thread pointer   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    Suspension Cleanup Functions                                        */ 
-/*    _tx_thread_system_resume          Resume thread                     */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_timer_expiration_process          Timer expiration function     */ 
-/*    _tx_timer_thread_entry                Timer thread function         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function handles thread timeout processing.  Timeouts occur in */
+/*    two flavors, namely the thread sleep timeout and all other service  */
+/*    call timeouts.  Thread sleep timeouts are processed locally, while  */
+/*    the others are processed by the appropriate suspension clean-up     */
+/*    service.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timeout_input                         Contains the thread pointer   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    Suspension Cleanup Functions                                        */
+/*    _tx_thread_system_resume          Resume thread                     */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_timer_expiration_process          Timer expiration function     */
+/*    _tx_timer_thread_entry                Timer thread function         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*                                             resulting in version 6.1.9 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_timeout(ULONG timeout_input)
@@ -79,7 +81,7 @@ VOID  _tx_thread_timeout(ULONG timeout_input)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *thread_ptr;                
+TX_THREAD       *thread_ptr;
 VOID            (*suspend_cleanup)(struct TX_THREAD_STRUCT *suspend_thread_ptr, ULONG suspension_sequence);
 ULONG           suspension_sequence;
 
@@ -126,7 +128,7 @@ ULONG           suspension_sequence;
         /* Increment the number of timeouts for this thread.  */
         thread_ptr -> tx_thread_performance_timeout_count++;
 #endif
-    
+
         /* Pickup the cleanup routine address.  */
         suspend_cleanup =  thread_ptr -> tx_thread_suspend_cleanup;
 
@@ -162,4 +164,3 @@ ULONG           suspension_sequence;
 #endif
     }
 }
-

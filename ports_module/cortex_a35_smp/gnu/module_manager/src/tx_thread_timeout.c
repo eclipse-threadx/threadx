@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -79,7 +79,7 @@ VOID  _tx_thread_timeout(ULONG timeout_input)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *thread_ptr;                
+TX_THREAD       *thread_ptr;
 VOID            (*suspend_cleanup)(struct TX_THREAD_STRUCT *suspend_thread_ptr, ULONG suspension_sequence);
 ULONG           suspension_sequence;
 
@@ -126,7 +126,7 @@ ULONG           suspension_sequence;
         /* Increment the number of timeouts for this thread.  */
         thread_ptr -> tx_thread_performance_timeout_count++;
 #endif
-    
+
         /* Pickup the cleanup routine address.  */
         suspend_cleanup =  thread_ptr -> tx_thread_suspend_cleanup;
 
@@ -162,4 +162,3 @@ ULONG           suspension_sequence;
 #endif
     }
 }
-

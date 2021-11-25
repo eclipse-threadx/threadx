@@ -309,7 +309,7 @@ unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARM11/GNU Version 6.1.6 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARM11/GNU Version 6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

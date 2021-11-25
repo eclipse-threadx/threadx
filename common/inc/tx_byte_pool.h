@@ -68,12 +68,12 @@
 #endif
 
 
-/* Determine if in-line component initialization is supported by the 
+/* Determine if in-line component initialization is supported by the
    caller.  */
 
 #ifdef TX_INVOKE_INLINE_INITIALIZATION
 
-/* Yes, in-line initialization is supported, remap the byte memory pool 
+/* Yes, in-line initialization is supported, remap the byte memory pool
    initialization function.  */
 
 #ifndef TX_BYTE_POOL_ENABLE_PERFORMANCE_INFO

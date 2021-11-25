@@ -31,8 +31,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_protect                           Cortex-A35-SMP/GNU */
-/*                                                           6.1          */
+/*    _tx_thread_smp_protect                           Cortex-A35-SMP/GCC */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -64,6 +64,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*                                             added ARMv8.2-A support,   */
+/*                                             improved SMP code,         */
+/*                                             resulting in version 6.1.9 */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_protect
@@ -78,10 +82,17 @@ _tx_thread_smp_protect:
     /* Pickup the CPU ID.   */
 
     MRS     x1, MPIDR_EL1                       // Pickup the core ID
+#ifdef TX_ARMV8_2
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x7, x1, #16, #8                     // Isolate cluster ID
+#endif
+    UBFX    x1, x1, #8, #8                      // Isolate core ID
+#else
 #if TX_THREAD_SMP_CLUSTERS > 1
     UBFX    x7, x1, #8, #8                      // Isolate cluster ID
 #endif
     UBFX    x1, x1, #0, #8                      // Isolate core ID
+#endif
 #if TX_THREAD_SMP_CLUSTERS > 1
     ADDS    x1, x1, x7, LSL #2                  // Calculate CPU ID
 #endif
@@ -163,7 +174,7 @@ _list_not_empty:
     // if (_tx_thread_smp_protection.tx_thread_smp_protect_in_force == 0)
     // {
 
-    LDR     w3, [x2, #0]                        // Pickup the protection flag
+    LDAXR   w3, [x2, #0]                        // Pickup the protection flag
     CMP     w3, #0
     BNE     _start_waiting                      // No, protection not available
 
@@ -171,7 +182,9 @@ _list_not_empty:
     // _tx_thread_smp_protection.tx_thread_smp_protect_in_force = 1;
 
     MOV     w3, #1                              // Build lock value
-    STR     w3, [x2, #0]                        // Store lock value
+    STXR    w4, w3, [x2, #0]                    // Attempt to get the protection
+    CMP     w4, #0
+    BNE     _start_waiting                      // Did it fail?
     DMB     ISH                                 //
 
     /* Got the lock.  */
@@ -217,7 +230,7 @@ _already_in_list0:
     /* Restore interrupts. */
 
     MSR     DAIF, x0                            // Restore interrupts
-    ISB                                         // 
+    ISB                                         //
 #ifdef TX_ENABLE_WFE
     WFE                                         // Go into standby
 #endif
@@ -236,10 +249,17 @@ _try_to_get_lock:
     /* Pickup the CPU ID.   */
 
     MRS     x1, MPIDR_EL1                       // Pickup the core ID
+#ifdef TX_ARMV8_2
+#if TX_THREAD_SMP_CLUSTERS > 1
+    UBFX    x7, x1, #16, #8                     // Isolate cluster ID
+#endif
+    UBFX    x1, x1, #8, #8                      // Isolate core ID
+#else
 #if TX_THREAD_SMP_CLUSTERS > 1
     UBFX    x7, x1, #8, #8                      // Isolate cluster ID
 #endif
     UBFX    x1, x1, #0, #8                      // Isolate core ID
+#endif
 #if TX_THREAD_SMP_CLUSTERS > 1
     ADDS    x1, x1, x7, LSL #2                  // Calculate CPU ID
 #endif
@@ -257,7 +277,7 @@ _try_to_get_lock:
 
     /* Are we at the front of the list?  */
     // if (this_core == _tx_thread_smp_protect_wait_list[_tx_thread_smp_protect_wait_list_head])
-    // {/
+    // {
 
     LDR     x3, =_tx_thread_smp_protect_wait_list_head // Get the address of the head
     LDR     w3, [x3]                            // Get the value of the head
@@ -271,7 +291,7 @@ _try_to_get_lock:
     // if (_tx_thread_smp_protection.tx_thread_smp_protect_in_force == 0)
     // {
 
-    LDR     w3, [x2, #0]                        // Pickup the protection flag
+    LDAXR   w3, [x2, #0]                        // Pickup the protection flag
     CMP     w3, #0
     BNE     _did_not_get_lock                   // No, protection not available
 
@@ -279,7 +299,9 @@ _try_to_get_lock:
     // _tx_thread_smp_protection.tx_thread_smp_protect_in_force = 1;
 
     MOV     w3, #1                              // Build lock value
-    STR     w3, [x2, #0]                        // Store lock value
+    STXR    w4, w3, [x2, #0]                    // Attempt to get the protection
+    CMP     w4, #0
+    BNE     _did_not_get_lock                   // Did it fail?
     DMB     ISH                                 //
 
     /* Got the lock.  */
@@ -328,7 +350,7 @@ _already_in_list1:
     /* Restore interrupts and try again.  */
 
     MSR     DAIF, x0                            // Restore interrupts
-    ISB                                         // 
+    ISB                                         //
 #ifdef TX_ENABLE_WFE
     WFE                                         // Go into standby
 #endif
@@ -349,4 +371,3 @@ _got_lock_after_waiting:
 _return:
 
     RET
-

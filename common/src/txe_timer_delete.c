@@ -86,14 +86,14 @@ TX_THREAD       *thread_ptr;
     /* Default status to success.  */
     status =  TX_SUCCESS;
 #endif
-    
+
     /* Check for an invalid timer pointer.  */
     if (timer_ptr == TX_NULL)
     {
         /* Timer pointer is invalid, return appropriate error code.  */
         status =  TX_TIMER_ERROR;
     }
-    
+
     /* Now check for invalid timer ID.  */
     else if (timer_ptr -> tx_timer_id != TX_TIMER_ID)
     {
@@ -121,7 +121,7 @@ TX_THREAD       *thread_ptr;
         /* Is the caller the system timer thread?  */
         if (thread_ptr == &_tx_timer_thread)
         {
-        
+
             /* Invalid caller of this function, return appropriate error code.  */
             status =  TX_CALLER_ERROR;
         }

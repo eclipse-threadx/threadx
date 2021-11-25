@@ -84,7 +84,7 @@ UINT  _tx_trace_buffer_full_notify(VOID (*full_buffer_callback)(VOID *buffer))
 
     /* Return success.  */
     return(TX_SUCCESS);
-    
+
 #else
 
 UINT    status;
@@ -93,13 +93,13 @@ UINT    status;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (full_buffer_callback != TX_NULL)
     {
- 
+
         /* Trace not enabled, return an error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else
     {
- 
+
         /* Trace not enabled, return an error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }

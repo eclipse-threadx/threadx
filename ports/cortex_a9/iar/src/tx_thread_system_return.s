@@ -48,7 +48,7 @@ DISABLE_INTS    DEFINE  0x80                ; IRQ interrupts disabled
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_system_return                           Cortex-A9/IAR    */ 
-;/*                                                           6.1          */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -81,6 +81,9 @@ DISABLE_INTS    DEFINE  0x80                ; IRQ interrupts disabled
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
+;/*                                            execution profile support,  */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
@@ -121,7 +124,7 @@ _tx_skip_solicited_vfp_save:
     STMDB   sp!, {r0-r1}                        ; Save type and CPSR
 ;   
 ;
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 ;
 ;    /* Call the thread exit function to indicate the thread is no longer executing.  */
 ;

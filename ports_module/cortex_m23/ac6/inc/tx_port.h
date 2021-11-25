@@ -68,7 +68,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arm_compat.h>
-#include "ARMCM23_TZ.h"             /* For intrinsic functions. */
 
 /* Define ThreadX basic types for this port.  */
 
@@ -574,7 +573,7 @@ unsigned int          was_masked;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M23/AC6 Version 6.1.6 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M23/AC6 Version 6.1.9 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

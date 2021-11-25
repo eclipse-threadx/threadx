@@ -26,8 +26,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_thread_stack_build          Cortex-M4/MPU/IAR   */
-/*                                                           6.1.2        */
+/*    _txm_module_manager_thread_stack_build            Cortex-M4/IAR     */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -59,9 +59,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_manager_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(TX_THREAD *, TXM_MODULE_INSTANCE *))
@@ -73,7 +71,7 @@ _txm_module_manager_thread_stack_build:
        on the Cortex-M should look like the following after it is built:
 
        Stack Top:
-                    LR          Interrupted LR (LR at time of PENDSV)
+                    lr          Interrupted lr (lr at time of PENDSV)
                     r4          Initial value for r4
                     r5          Initial value for r5
                     r6          Initial value for r6

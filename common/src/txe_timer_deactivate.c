@@ -93,7 +93,7 @@ UINT    status;
     }
     else
     {
-    
+
         /* Call actual application timer deactivate function.  */
         status =  _tx_timer_deactivate(timer_ptr);
     }

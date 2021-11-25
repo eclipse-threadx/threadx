@@ -106,7 +106,7 @@ ULONG                           i;
 UINT                            status;
 
 
-    /* First, see if there is enough room for the control header, the registry entries, and at least one event in 
+    /* First, see if there is enough room for the control header, the registry entries, and at least one event in
        memory supplied to this call.  */
     if (trace_buffer_size < ((sizeof(TX_TRACE_HEADER)) + ((sizeof(TX_TRACE_OBJECT_ENTRY)) * registry_entries) + (sizeof(TX_TRACE_BUFFER_ENTRY))))
     {
@@ -118,7 +118,7 @@ UINT                            status;
     /* Determine if trace is already enabled.  */
     else if (_tx_trace_buffer_current_ptr != TX_NULL)
     {
-    
+
         /* Yes, trace is already enabled.  */
         status =  TX_NOT_DONE;
     }
@@ -154,7 +154,7 @@ UINT                            status;
 
             /* Convert to a registry entry pointer.  */
             entry_ptr =  TX_UCHAR_TO_OBJECT_POINTER_CONVERT(work_ptr);
-            
+
             /* Initialize object registry entry.  */
             entry_ptr -> tx_trace_object_entry_available =         (UCHAR) TX_TRUE;
             entry_ptr -> tx_trace_object_entry_type =              (UCHAR) TX_TRACE_OBJECT_TYPE_NOT_VALID;
@@ -165,10 +165,10 @@ UINT                            status;
 
         /* Setup the total number of registry entries.  */
         _tx_trace_total_registry_entries =  registry_entries;
-     
+
         /* Setup the object registry available count to the total number of registry entries.  */
         _tx_trace_available_registry_entries =  registry_entries;
-    
+
         /* Setup the search starting index to the first entry.  */
         _tx_trace_registry_search_start =  ((ULONG) 0);
 
@@ -180,7 +180,7 @@ UINT                            status;
 
         /* Setup pointer to the start of the actual event trace log.  */
         _tx_trace_buffer_start_ptr =      TX_UCHAR_TO_ENTRY_POINTER_CONVERT(work_ptr);
-        
+
         /* Save the event trace log start address.  */
         event_start_ptr =  work_ptr;
 
@@ -197,7 +197,7 @@ UINT                            status;
 
             /* Convert to a trace event pointer.  */
             event_ptr =  TX_UCHAR_TO_ENTRY_POINTER_CONVERT(work_ptr);
-          
+
             /* Mark this trace event as invalid.  */
             event_ptr -> tx_trace_buffer_entry_thread_pointer =  ((ULONG) 0);
         }
@@ -238,9 +238,9 @@ UINT                            status;
 
             /* Decrement the counter.  */
             i--;
-          
+
             /* Register this thread.  */
-            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_THREAD, thread_ptr, thread_ptr -> tx_thread_name, 
+            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_THREAD, thread_ptr, thread_ptr -> tx_thread_name,
                                         TX_POINTER_TO_ULONG_CONVERT(thread_ptr -> tx_thread_stack_start), (ULONG) thread_ptr -> tx_thread_stack_size);
 
             /* Move to the next thread.  */
@@ -259,7 +259,7 @@ UINT                            status;
             i--;
 
             /* Register this timer.  */
-            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_TIMER, timer_ptr, timer_ptr -> tx_timer_name, 
+            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_TIMER, timer_ptr, timer_ptr -> tx_timer_name,
                                                        ((ULONG) 0), timer_ptr -> tx_timer_internal.tx_timer_internal_re_initialize_ticks);
 
             /* Move to the next timer.  */
@@ -297,7 +297,7 @@ UINT                            status;
             i--;
 
             /* Register this queue.  */
-            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_QUEUE, queue_ptr, queue_ptr -> tx_queue_name, 
+            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_QUEUE, queue_ptr, queue_ptr -> tx_queue_name,
                                                                     (queue_ptr -> tx_queue_capacity * (sizeof(ULONG))), ((ULONG) 0));
 
             /* Move to the next queue.  */
@@ -334,7 +334,7 @@ UINT                            status;
             i--;
 
             /* Register this mutex.  */
-            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_MUTEX, mutex_ptr, mutex_ptr -> tx_mutex_name, 
+            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_MUTEX, mutex_ptr, mutex_ptr -> tx_mutex_name,
                                                                         (ULONG) mutex_ptr -> tx_mutex_inherit, ((ULONG) 0));
 
             /* Move to the next mutex.  */
@@ -353,7 +353,7 @@ UINT                            status;
             i--;
 
             /* Register this block pool.  */
-            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_BLOCK_POOL, block_pool_ptr, block_pool_ptr -> tx_block_pool_name, 
+            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_BLOCK_POOL, block_pool_ptr, block_pool_ptr -> tx_block_pool_name,
                                                                             block_pool_ptr -> tx_block_pool_size, ((ULONG) 0));
 
             /* Move to the next block pool.  */
@@ -372,7 +372,7 @@ UINT                            status;
             i--;
 
             /* Register this byte pool.  */
-            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_BYTE_POOL, byte_pool_ptr, byte_pool_ptr -> tx_byte_pool_name, 
+            _tx_trace_object_register(TX_TRACE_OBJECT_TYPE_BYTE_POOL, byte_pool_ptr, byte_pool_ptr -> tx_byte_pool_name,
                                                                             byte_pool_ptr -> tx_byte_pool_size, ((ULONG) 0));
 
             /* Move to the next byte pool.  */
@@ -401,7 +401,7 @@ UINT                            status;
         /* Return successful completion.  */
         status =  TX_SUCCESS;
     }
-    
+
     /* Return completion status.  */
     return(status);
 #else
@@ -412,25 +412,25 @@ UINT        status;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (trace_buffer_start != TX_NULL)
     {
-    
+
         /* Trace not enabled, return an error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (trace_buffer_size == ((ULONG) 0))
     {
-    
+
         /* Trace not enabled, return an error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else if (registry_entries == ((ULONG) 0))
     {
-    
+
         /* Trace not enabled, return an error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }
     else
     {
-    
+
         /* Trace not enabled, return an error.  */
         status =  TX_FEATURE_NOT_ENABLED;
     }

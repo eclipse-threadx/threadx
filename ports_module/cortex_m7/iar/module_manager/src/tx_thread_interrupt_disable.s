@@ -26,11 +26,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_interrupt_restore                      Cortex-M7/IAR     */
-/*                                                           6.1.2        */
+/*    _tx_thread_interrupt_disable                     Cortex-M7/IAR      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -39,11 +39,11 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    old_posture                           Old interrupt lockout posture */
+/*    None                                                                */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    None                                                                */
+/*    old_posture                           Old interrupt lockout posture */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -57,21 +57,22 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
-// UINT   _tx_thread_interrupt_disable(UINT new_posture)
+// UINT   _tx_thread_interrupt_disable(VOID)
 // {
     PUBLIC  _tx_thread_interrupt_disable
 _tx_thread_interrupt_disable:
-
     /* Return current interrupt lockout posture.  */
-
+#ifdef TX_PORT_USE_BASEPRI
+    MRS     r0, BASEPRI
+    LDR     r1, =TX_PORT_BASEPRI
+    MSR     BASEPRI, r1
+#else
     MRS     r0, PRIMASK
     CPSID   i
+#endif
     BX      lr
-
 // }
     END

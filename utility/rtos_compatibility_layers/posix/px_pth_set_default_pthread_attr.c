@@ -31,7 +31,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    set_default_pthread_attr                            PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -60,7 +60,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 VOID set_default_pthread_attr(pthread_attr_t *attr)

@@ -9,7 +9,6 @@
 ;/*                                                                        */
 ;/**************************************************************************/
 
-
 ;/**************************************************************************/
 ;/**************************************************************************/
 ;/**                                                                       */
@@ -30,7 +29,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_context_restore                      ARCv2_EM/MetaWare   */
-;/*                                                           6.1.6        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -66,6 +65,10 @@
 ;/*  04-02-2021     Andres Mlinar            Modified comment(s), and      */
 ;/*                                            r25/r30 are caller saved,   */
 ;/*                                            resulting in version 6.1.6  */
+;/*  10-15-2021     Andres Mlinar            Modified comment(s), added    */
+;/*                                            support for disabling the   */
+;/*                                            loop control feature,       */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)
@@ -108,12 +111,15 @@ _tx_thread_context_restore:
 
 __tx_thread_nested_restore:
 
+    .ifndef  TX_DISABLE_LP
     ld      r0, [sp, 4]                                 ; Recover LP_START
     sr      r0, [LP_START]                              ; Restore LP_START
     ld      r1, [sp, 8]                                 ; Recover LP_END
     sr      r1, [LP_END]                                ; Restore LP_END
     ld      r2, [sp, 12]                                ; Recover LP_COUNT
     mov     LP_COUNT, r2
+    .endif
+
     ld      r2, [sp, 156]                               ; Pickup BTA
     sr      r2, [BTA]                                   ; Recover BTA
     .ifdef  TX_ENABLE_ACC
@@ -177,7 +183,7 @@ __tx_thread_no_preempt_restore:
     and     r2, r2, ~STATUS32_SC                        ; Clear the hardware stack checking enable bit (SC)
     kflag   r2                                          ; Disable hardware stack checking
     ld      r3, [r0, 12]                                ; Pickup the top of the thread's stack (lowest address)
-    sr		r3, [KSTACK_TOP]                            ; Setup KSTACK_TOP
+    sr      r3, [KSTACK_TOP]                            ; Setup KSTACK_TOP
     ld      r3, [r0, 16]                                ; Pickup the base of the thread's stack (highest address)
     sr      r3, [KSTACK_BASE]                           ; Setup KSTACK_BASE
     .endif
@@ -189,12 +195,15 @@ __tx_thread_no_preempt_restore:
     kflag   r2                                          ; Enable hardware stack checking
     .endif
 
+    .ifndef  TX_DISABLE_LP
     ld      r0, [sp, 4]                                 ; Recover LP_START
     sr      r0, [LP_START]                              ; Restore LP_START
     ld      r1, [sp, 8]                                 ; Recover LP_END
     sr      r1, [LP_END]                                ; Restore LP_END
     ld      r2, [sp, 12]                                ; Recover LP_COUNT
     mov     LP_COUNT, r2
+    .endif
+
     ld      r2, [sp, 156]                               ; Pickup BTA
     sr      r2, [BTA]                                   ; Recover BTA
     .ifdef  TX_ENABLE_ACC
@@ -230,7 +239,6 @@ __tx_thread_preempt_restore:
     st      r6,  [r7, 0]                                ; Setup interrupt stack type
     st      fp,  [r7, 24]                               ; Save fp
     st      gp,  [r7, 28]                               ; Save gp
-    st      r25, [r7, 32]                               ; Save r25
     st      r24, [r7, 36]                               ; Save r24
     st      r23, [r7, 40]                               ; Save r23
     st      r22, [r7, 44]                               ; Save r22
@@ -243,7 +251,6 @@ __tx_thread_preempt_restore:
     st      r15, [r7, 72]                               ; Save r15
     st      r14, [r7, 76]                               ; Save r14
     st      r13, [r7, 80]                               ; Save r13
-    st      r30, [r7, 136]                              ; Save r30
 ;
 ;    /* Save the remaining time-slice and disable it.  */
 ;    if (_tx_timer_time_slice)
@@ -271,7 +278,7 @@ __tx_thread_dont_save_ts:
     sub     sp, sp, 8                                   ; Allocate a small stack frame on the system stack
     lr      r0, [STATUS32]                              ; Pickup STATUS32
     st      r0, [sp, 4]                                 ; Place on stack
-    mov     r0, _tx_thread_schedule                     ; Build address of scheduler
+    mov     r0, _tx_thread_schedule_reenter             ; Build address of scheduler
     st      r0, [sp, 0]                                 ; Write over the point of interrupt
     rtie                                                ; Return from interrupt to scheduler
 ;

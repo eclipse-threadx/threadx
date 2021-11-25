@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Byte Pool                                                           */
 /**                                                                       */
@@ -30,45 +30,47 @@
 #include "tx_byte_pool.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_byte_pool_create                                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_byte_pool_create                                PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates a pool of memory bytes in the specified       */ 
-/*    memory area.                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pool_ptr                          Pointer to pool control block     */ 
-/*    name_ptr                          Pointer to byte pool name         */ 
-/*    pool_start                        Address of beginning of pool area */ 
-/*    pool_size                         Number of bytes in the byte pool  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SUCCESS                        Successful completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function creates a pool of memory bytes in the specified       */
+/*    memory area.                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pool_ptr                          Pointer to pool control block     */
+/*    name_ptr                          Pointer to byte pool name         */
+/*    pool_start                        Address of beginning of pool area */
+/*    pool_size                         Number of bytes in the byte pool  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Successful completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_byte_pool_create(TX_BYTE_POOL *pool_ptr, CHAR *name_ptr, VOID *pool_start, ULONG pool_size)
@@ -76,7 +78,7 @@ UINT  _tx_byte_pool_create(TX_BYTE_POOL *pool_ptr, CHAR *name_ptr, VOID *pool_st
 
 TX_INTERRUPT_SAVE_AREA
 
-UCHAR               *block_ptr;                  
+UCHAR               *block_ptr;
 UCHAR               **block_indirect_ptr;
 UCHAR               *temp_ptr;
 TX_BYTE_POOL        *next_pool;
@@ -87,7 +89,7 @@ ALIGN_TYPE          *free_ptr;
     /* Initialize the byte pool control block to all zeros.  */
     TX_MEMSET(pool_ptr, 0, (sizeof(TX_BYTE_POOL)));
 
-    /* Round the pool size down to something that is evenly divisible by 
+    /* Round the pool size down to something that is evenly divisible by
        an ULONG.  */
     pool_size =   (pool_size/(sizeof(ALIGN_TYPE))) * (sizeof(ALIGN_TYPE));
 
@@ -102,17 +104,17 @@ ALIGN_TYPE          *free_ptr;
     pool_ptr -> tx_byte_pool_list =    TX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
     pool_ptr -> tx_byte_pool_search =  TX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
 
-    /* Initially, the pool will have two blocks.  One large block at the 
+    /* Initially, the pool will have two blocks.  One large block at the
        beginning that is available and a small allocated block at the end
        of the pool that is there just for the algorithm.  Be sure to count
        the available block's header in the available bytes count.  */
     pool_ptr -> tx_byte_pool_available =   pool_size - ((sizeof(VOID *)) + (sizeof(ALIGN_TYPE)));
     pool_ptr -> tx_byte_pool_fragments =   ((UINT) 2);
-    
+
     /* Each block contains a "next" pointer that points to the next block in the pool followed by a ALIGN_TYPE
        field that contains either the constant TX_BYTE_BLOCK_FREE (if the block is free) or a pointer to the
        owning pool (if the block is allocated).  */
-    
+
     /* Calculate the end of the pool's memory area.  */
     block_ptr =  TX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
     block_ptr =  TX_UCHAR_POINTER_ADD(block_ptr, pool_size);
@@ -120,7 +122,7 @@ ALIGN_TYPE          *free_ptr;
     /* Backup the end of the pool pointer and build the pre-allocated block.  */
     block_ptr =  TX_UCHAR_POINTER_SUB(block_ptr, (sizeof(ALIGN_TYPE)));
 
-    /* Cast the pool pointer into a ULONG.  */ 
+    /* Cast the pool pointer into a ULONG.  */
     temp_ptr =             TX_BYTE_POOL_TO_UCHAR_POINTER_CONVERT(pool_ptr);
     block_indirect_ptr =   TX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(block_ptr);
     *block_indirect_ptr =  temp_ptr;
@@ -170,12 +172,12 @@ ALIGN_TYPE          *free_ptr;
 
         /* Setup this byte pool's created links.  */
         pool_ptr -> tx_byte_pool_created_previous =  previous_pool;
-        pool_ptr -> tx_byte_pool_created_next =      next_pool; 
+        pool_ptr -> tx_byte_pool_created_next =      next_pool;
     }
 
     /* Increment the number of created byte pools.  */
     _tx_byte_pool_created_count++;
-    
+
     /* Optional byte pool create extended processing.  */
     TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
 

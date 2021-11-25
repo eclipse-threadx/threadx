@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -32,41 +32,41 @@
 #include "tx_initialize.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_resume                                  PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_resume                                  PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function processes application resume thread services.  Actual */ 
-/*    thread resumption is performed in the core service.                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                            Pointer to thread to resume   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                                Service return status         */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */ 
-/*    _tx_thread_system_resume              Resume thread                 */ 
-/*    _tx_thread_system_ni_resume           Non-interruptable resume      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function processes application resume thread services.  Actual */
+/*    thread resumption is performed in the core service.                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Pointer to thread to resume   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                Service return status         */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */
+/*    _tx_thread_system_resume              Resume thread                 */
+/*    _tx_thread_system_ni_resume           Non-interruptable resume      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -77,7 +77,7 @@ UINT  _tx_thread_resume(TX_THREAD *thread_ptr)
 
 TX_INTERRUPT_SAVE_AREA
 
-UINT        status;                         
+UINT        status;
 UINT        core_index;
 
 
@@ -92,7 +92,7 @@ UINT        core_index;
 
     /* Determine if the thread is suspended or in the process of suspending.
        If so, call the thread resume processing.  */
-    if (thread_ptr -> tx_thread_state == TX_SUSPENDED) 
+    if (thread_ptr -> tx_thread_state == TX_SUSPENDED)
     {
 
 #ifdef TX_NOT_INTERRUPTABLE
@@ -136,7 +136,7 @@ UINT        core_index;
             /* Debug entry.  */
             _tx_thread_smp_debug_entry_insert(14, 0, thread_ptr);
 #endif
-	   
+
             /* Get the core index.  */
             core_index =  TX_SMP_CORE_ID;
 
@@ -148,7 +148,7 @@ UINT        core_index;
             /* Debug entry.  */
             _tx_thread_smp_debug_entry_insert(15, 0, thread_ptr);
 #endif
-        } 
+        }
 
         /* Setup successful return status.  */
         status =  TX_SUCCESS;

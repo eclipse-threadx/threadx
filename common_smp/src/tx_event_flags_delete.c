@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Event Flags                                                         */
 /**                                                                       */
@@ -31,45 +31,47 @@
 #include "tx_event_flags.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_event_flags_delete                              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_event_flags_delete                              PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function deletes the specified event flag group.  All threads  */ 
-/*    suspended on the group are resumed with the TX_DELETED status       */ 
-/*    code.                                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    group_ptr                         Pointer to group control block    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SUCCESS                        Successful completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_preempt_check   Check for preemption              */ 
-/*    _tx_thread_system_resume          Resume thread service             */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function deletes the specified event flag group.  All threads  */
+/*    suspended on the group are resumed with the TX_DELETED status       */
+/*    code.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    group_ptr                         Pointer to group control block    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Successful completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_preempt_check   Check for preemption              */
+/*    _tx_thread_system_resume          Resume thread service             */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_event_flags_delete(TX_EVENT_FLAGS_GROUP *group_ptr)
@@ -77,7 +79,7 @@ UINT  _tx_event_flags_delete(TX_EVENT_FLAGS_GROUP *group_ptr)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD               *thread_ptr;                
+TX_THREAD               *thread_ptr;
 TX_THREAD               *next_thread;
 UINT                    suspended_count;
 TX_EVENT_FLAGS_GROUP    *next_group;
@@ -104,7 +106,7 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
 
     /* Decrement the number of created event flag groups.  */
     _tx_event_flags_created_count--;
-    
+
     /* See if this group is the only one on the list.  */
     if (_tx_event_flags_created_count == TX_EMPTY)
     {
@@ -124,9 +126,9 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
         /* See if we have to update the created list head pointer.  */
         if (_tx_event_flags_created_ptr == group_ptr)
         {
-                    
+
             /* Yes, move the head pointer to the next link. */
-            _tx_event_flags_created_ptr =  next_group; 
+            _tx_event_flags_created_ptr =  next_group;
         }
     }
 
@@ -134,7 +136,7 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
     _tx_thread_preempt_disable++;
 
     /* Pickup the suspension information.  */
-    thread_ptr =                                         group_ptr -> tx_event_flags_group_suspension_list;    
+    thread_ptr =                                         group_ptr -> tx_event_flags_group_suspension_list;
     group_ptr -> tx_event_flags_group_suspension_list =  TX_NULL;
     suspended_count =                                    group_ptr -> tx_event_flags_group_suspended_count;
     group_ptr -> tx_event_flags_group_suspended_count =  TX_NO_SUSPENSIONS;
@@ -142,18 +144,18 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
     /* Restore interrupts.  */
     TX_RESTORE
 
-    /* Walk through the event flag suspension list to resume any and all threads 
+    /* Walk through the event flag suspension list to resume any and all threads
        suspended on this group.  */
     while (suspended_count != TX_NO_SUSPENSIONS)
     {
-      
+
         /* Decrement the number of suspended threads.  */
         suspended_count--;
-      
+
         /* Lockout interrupts.  */
         TX_DISABLE
 
-        /* Clear the cleanup pointer, this prevents the timeout from doing 
+        /* Clear the cleanup pointer, this prevents the timeout from doing
            anything.  */
         thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 

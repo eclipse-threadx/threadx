@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer - High Level SMP Support                                      */
 /**                                                                       */
@@ -32,43 +32,43 @@
 #include "tx_thread.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_timer_smp_core_exclude                         PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_smp_core_exclude                         PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function allows the application to exclude one or more cores   */ 
-/*    from executing the specified timer.                                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    timer_ptr                             Pointer to the timer          */ 
-/*    exclusion_map                         Bit map of exclusion list,    */ 
-/*                                            where bit 0 set means that  */ 
-/*                                            this thread cannot run on   */ 
-/*                                            core0, etc.                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Status                                                              */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function allows the application to exclude one or more cores   */
+/*    from executing the specified timer.                                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                             Pointer to the timer          */
+/*    exclusion_map                         Bit map of exclusion list,    */
+/*                                            where bit 0 set means that  */
+/*                                            this thread cannot run on   */
+/*                                            core0, etc.                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -85,7 +85,7 @@ UINT    status;
     /* First, make sure the timer pointer is valid.  */
     if (timer_ptr == TX_NULL)
     {
-    
+
         /* Return pointer error.  */
         status =  TX_TIMER_ERROR;
     }
@@ -93,7 +93,7 @@ UINT    status;
     /* Check for valid ID.  */
     else if (timer_ptr -> tx_timer_id != TX_TIMER_ID)
     {
-    
+
         /* Return pointer error.  */
         status =  TX_TIMER_ERROR;
     }
@@ -104,16 +104,16 @@ UINT    status;
         TX_DISABLE
 
         /* Now store in the core exclusion information.  */
-        timer_ptr -> tx_timer_internal.tx_timer_internal_smp_cores_excluded =  (timer_ptr -> tx_timer_internal.tx_timer_internal_smp_cores_excluded & ~(((ULONG) TX_THREAD_SMP_CORE_MASK))) | 
+        timer_ptr -> tx_timer_internal.tx_timer_internal_smp_cores_excluded =  (timer_ptr -> tx_timer_internal.tx_timer_internal_smp_cores_excluded & ~(((ULONG) TX_THREAD_SMP_CORE_MASK))) |
                                                                                    (exclusion_map & ((ULONG) TX_THREAD_SMP_CORE_MASK));
 
         /* Restore interrupts.  */
         TX_RESTORE
-        
+
         /* Return success.  */
         status =  TX_SUCCESS;
     }
-    
+
     /* Return success.  */
     return(status);
 }

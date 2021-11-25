@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
@@ -31,53 +31,55 @@
 #include "tx_timer.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txe_timer_change                                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_timer_change                                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function checks for errors in the application timer change     */ 
-/*    function call.                                                      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    timer_ptr                         Pointer to timer control block    */ 
-/*    initial_ticks                     Initial expiration ticks          */ 
-/*    reschedule_ticks                  Reschedule ticks                  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_TIMER_ERROR                    Invalid application timer pointer */ 
-/*    TX_TICK_ERROR                     Invalid initial tick value of 0   */ 
-/*    TX_CALLER_ERROR                   Invalid caller of this function   */ 
-/*    status                            Actual completion status          */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_timer_change                  Actual timer change function      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function checks for errors in the application timer change     */
+/*    function call.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                         Pointer to timer control block    */
+/*    initial_ticks                     Initial expiration ticks          */
+/*    reschedule_ticks                  Reschedule ticks                  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_TIMER_ERROR                    Invalid application timer pointer */
+/*    TX_TICK_ERROR                     Invalid initial tick value of 0   */
+/*    TX_CALLER_ERROR                   Invalid caller of this function   */
+/*    status                            Actual completion status          */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_timer_change                  Actual timer change function      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txe_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG reschedule_ticks)
 {
 
-UINT    status; 
+UINT    status;
 
 
     /* Check for an invalid timer pointer.  */
@@ -87,7 +89,7 @@ UINT    status;
         /* Timer pointer is invalid, return appropriate error code.  */
         status =  TX_TIMER_ERROR;
     }
-    
+
     /* Now check for invalid timer ID.  */
     else if (timer_ptr -> tx_timer_id != TX_TIMER_ID)
     {
@@ -117,7 +119,7 @@ UINT    status;
         /* Call actual application timer function.  */
         status =  _tx_timer_change(timer_ptr, initial_ticks, reschedule_ticks);
     }
-    
+
     /* Return completion status.  */
     return(status);
 }

@@ -40,7 +40,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 
@@ -407,7 +407,7 @@ UINT  _txm_module_manager_inside_data_check(ULONG pointer);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-A7/MMU/AC5 Version 6.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-A7/MMU/AC5 Version 6.1.9 *";
 
 #endif
 

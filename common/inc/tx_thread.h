@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    tx_thread.h                                         PORTABLE C      */
-/*                                                           6.1.2        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -48,6 +48,9 @@
 /*                                            moved TX_THREAD_GET_SYSTEM_ */
 /*                                            STATE to tx_api.h,          */
 /*                                            resulting in version 6.1.2  */
+/*  10-15-2021     Scott Larson             Modified comment(s), improved */
+/*                                            stack check error handling, */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -90,32 +93,33 @@
 
 /* Define state change macro that can be used by run-mode debug agents to keep track of thread
    state changes. By default, it is mapped to white space.  */
-   
+
 #ifndef TX_THREAD_STATE_CHANGE
 #define TX_THREAD_STATE_CHANGE(a, b)
 #endif
 
 
-/* Define the macro to get the current thread pointer. This is particularly useful in SMP 
+/* Define the macro to get the current thread pointer. This is particularly useful in SMP
    versions of ThreadX to add additional processing.  The default implementation is to simply
    access the global current thread pointer directly.  */
-   
+
 #ifndef TX_THREAD_GET_CURRENT
 #define TX_THREAD_GET_CURRENT(a)            (a) =  _tx_thread_current_ptr;
 #endif
 
 
-/* Define the macro to set the current thread pointer. This is particularly useful in SMP 
+/* Define the macro to set the current thread pointer. This is particularly useful in SMP
    versions of ThreadX to add additional processing.  The default implementation is to simply
    access the global current thread pointer directly.  */
-   
+
 #ifndef TX_THREAD_SET_CURRENT
 #define TX_THREAD_SET_CURRENT(a)            _tx_thread_current_ptr =  (a);
 #endif
 
 
+
 /* Define the get system state macro. By default, it simply maps to the variable _tx_thread_system_state.  */
-/* This symbol is moved to tx_api.h. Therefore removed from this file.     
+/* This symbol is moved to tx_api.h. Therefore removed from this file.
 #ifndef TX_THREAD_GET_SYSTEM_STATE
 #define TX_THREAD_GET_SYSTEM_STATE()        _tx_thread_system_state
 #endif
@@ -144,10 +148,10 @@
 #endif
 
 
-/* Define the lowest bit set macro. Note, that this may be overridden 
+/* Define the lowest bit set macro. Note, that this may be overridden
    by a port specific definition if there is supporting assembly language
    instructions in the architecture.  */
-   
+
 #ifndef TX_LOWEST_SET_BIT_CALCULATE
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       \
     (b) =  ((ULONG) 0);                         \
@@ -212,9 +216,9 @@
 #endif
 
 
-/* Define the default thread stack checking. This can be overridden by 
-   a particular port, which is necessary if the stack growth is from 
-   low address to high address (the default logic is for stacks that 
+/* Define the default thread stack checking. This can be overridden by
+   a particular port, which is necessary if the stack growth is from
+   low address to high address (the default logic is for stacks that
    grow from high address to low address.  */
 
 #ifndef TX_THREAD_STACK_CHECK
@@ -311,7 +315,7 @@ THREAD_DECLARE  TX_THREAD *     _tx_thread_current_ptr;
 
 
 /* Define the variable that holds the next thread to execute.  It is important
-   to remember that this is not necessarily equal to the current thread 
+   to remember that this is not necessarily equal to the current thread
    pointer.  */
 
 THREAD_DECLARE  TX_THREAD *     _tx_thread_execute_ptr;
@@ -328,7 +332,7 @@ THREAD_DECLARE  ULONG           _tx_thread_created_count;
 
 
 /* Define the current state variable.  When this value is 0, a thread
-   is executing or the system is idle.  Other values indicate that 
+   is executing or the system is idle.  Other values indicate that
    interrupt or initialization processing is active.  This variable is
    initialized to TX_INITIALIZE_IN_PROGRESS to indicate initialization is
    active.  */
@@ -337,15 +341,15 @@ THREAD_DECLARE  volatile ULONG  _tx_thread_system_state;
 
 
 /* Define the 32-bit priority bit-maps. There is one priority bit map for each
-   32 priority levels supported. If only 32 priorities are supported there is 
-   only one bit map. Each bit within a priority bit map represents that one 
+   32 priority levels supported. If only 32 priorities are supported there is
+   only one bit map. Each bit within a priority bit map represents that one
    or more threads at the associated thread priority are ready.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_priority_maps[TX_MAX_PRIORITIES/32];
 
 
-/* Define the priority map active bit map that specifies which of the previously 
-   defined priority maps have something set. This is only necessary if more than 
+/* Define the priority map active bit map that specifies which of the previously
+   defined priority maps have something set. This is only necessary if more than
    32 priorities are supported.  */
 
 #if TX_MAX_PRIORITIES > 32
@@ -355,17 +359,17 @@ THREAD_DECLARE  ULONG           _tx_thread_priority_map_active;
 
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
-/* Define the 32-bit preempt priority bit maps.  There is one preempt bit map 
-   for each 32 priority levels supported. If only 32 priorities are supported 
-   there is only one bit map. Each set set bit corresponds to a preempted priority 
-   level that had preemption-threshold active to protect against preemption of a 
+/* Define the 32-bit preempt priority bit maps.  There is one preempt bit map
+   for each 32 priority levels supported. If only 32 priorities are supported
+   there is only one bit map. Each set set bit corresponds to a preempted priority
+   level that had preemption-threshold active to protect against preemption of a
    range of relatively higher priority threads.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_preempted_maps[TX_MAX_PRIORITIES/32];
 
 
-/* Define the preempt map active bit map that specifies which of the previously 
-   defined preempt maps have something set. This is only necessary if more than 
+/* Define the preempt map active bit map that specifies which of the previously
+   defined preempt maps have something set. This is only necessary if more than
    32 priorities are supported.  */
 
 #if TX_MAX_PRIORITIES > 32
@@ -373,7 +377,7 @@ THREAD_DECLARE  ULONG           _tx_thread_preempted_map_active;
 #endif
 #endif
 
-/* Define the variable that holds the highest priority group ready for 
+/* Define the variable that holds the highest priority group ready for
    execution.  It is important to note that this is not necessarily the same
    as the priority of the thread pointed to by _tx_execute_thread.  */
 
@@ -389,13 +393,13 @@ THREAD_DECLARE  TX_THREAD *     _tx_thread_priority_list[TX_MAX_PRIORITIES];
 
 
 /* Define the global preempt disable variable.  If this is non-zero, preemption is
-   disabled.  It is used internally by ThreadX to prevent preemption of a thread in 
+   disabled.  It is used internally by ThreadX to prevent preemption of a thread in
    the middle of a service that is resuming or suspending another thread.  */
 
 THREAD_DECLARE  volatile UINT   _tx_thread_preempt_disable;
 
 
-/* Define the global function pointer for mutex cleanup on thread completion or 
+/* Define the global function pointer for mutex cleanup on thread completion or
    termination. This pointer is setup during mutex initialization.  */
 
 THREAD_DECLARE  VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
@@ -407,7 +411,7 @@ THREAD_DECLARE  VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_pt
                     Bit(s)                   Meaning
 
                     31                  TX_NOT_INTERRUPTABLE defined
-                    30                  TX_INLINE_THREAD_RESUME_SUSPEND define 
+                    30                  TX_INLINE_THREAD_RESUME_SUSPEND define
                     29-24               Priority groups 1  -> 32 priorities
                                                         2  -> 64 priorities
                                                         3  -> 96 priorities
@@ -437,10 +441,10 @@ THREAD_DECLARE  VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_pt
 THREAD_DECLARE  ULONG           _tx_build_options;
 
 
-#ifdef TX_ENABLE_STACK_CHECKING
+#if defined(TX_ENABLE_STACK_CHECKING) || defined(TX_PORT_THREAD_STACK_ERROR_HANDLING)
 
-/* Define the global function pointer for stack error handling. If a stack error is 
-   detected and the application has registered a stack error handler, it will be 
+/* Define the global function pointer for stack error handling. If a stack error is
+   detected and the application has registered a stack error handler, it will be
    called via this function pointer.  */
 
 THREAD_DECLARE  VOID            (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr);
@@ -455,20 +459,20 @@ THREAD_DECLARE  VOID            (*_tx_thread_application_stack_error_handler)(TX
 THREAD_DECLARE  ULONG           _tx_thread_performance_resume_count;
 
 
-/* Define the total number of thread suspensions. Each time a thread enters a 
+/* Define the total number of thread suspensions. Each time a thread enters a
    suspended state this variable is incremented.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance_suspend_count;
 
 
-/* Define the total number of solicited thread preemptions. Each time a thread is 
+/* Define the total number of solicited thread preemptions. Each time a thread is
    preempted by directly calling a ThreadX service, this variable is incremented.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance_solicited_preemption_count;
 
 
-/* Define the total number of interrupt thread preemptions. Each time a thread is 
-   preempted as a result of an ISR calling a ThreadX service, this variable is 
+/* Define the total number of interrupt thread preemptions. Each time a thread is
+   preempted as a result of an ISR calling a ThreadX service, this variable is
    incremented.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance_interrupt_preemption_count;
@@ -480,45 +484,45 @@ THREAD_DECLARE  ULONG           _tx_thread_performance_interrupt_preemption_coun
 THREAD_DECLARE  ULONG           _tx_thread_performance_priority_inversion_count;
 
 
-/* Define the total number of time-slices.  Each time a time-slice operation is 
-   actually performed (another thread is setup for running) this variable is 
+/* Define the total number of time-slices.  Each time a time-slice operation is
+   actually performed (another thread is setup for running) this variable is
    incremented.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance_time_slice_count;
 
 
-/* Define the total number of thread relinquish operations.  Each time a thread 
+/* Define the total number of thread relinquish operations.  Each time a thread
    relinquish operation is actually performed (another thread is setup for running)
    this variable is incremented.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance_relinquish_count;
 
 
-/* Define the total number of thread timeouts. Each time a thread has a 
+/* Define the total number of thread timeouts. Each time a thread has a
    timeout this variable is incremented.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance_timeout_count;
 
 
-/* Define the total number of thread wait aborts. Each time a thread's suspension 
+/* Define the total number of thread wait aborts. Each time a thread's suspension
    is lifted by the tx_thread_wait_abort call this variable is incremented.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance_wait_abort_count;
 
 
-/* Define the total number of idle system thread returns. Each time a thread returns to 
+/* Define the total number of idle system thread returns. Each time a thread returns to
    an idle system (no other thread is ready to run) this variable is incremented.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance_idle_return_count;
 
 
-/* Define the total number of non-idle system thread returns. Each time a thread returns to 
+/* Define the total number of non-idle system thread returns. Each time a thread returns to
    a non-idle system (another thread is ready to run) this variable is incremented.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance_non_idle_return_count;
 
 
-/* Define the last TX_THREAD_EXECUTE_LOG_SIZE threads scheduled in ThreadX. This 
+/* Define the last TX_THREAD_EXECUTE_LOG_SIZE threads scheduled in ThreadX. This
    is a circular list, where the index points to the oldest entry.  */
 
 THREAD_DECLARE  ULONG           _tx_thread_performance__execute_log_index;

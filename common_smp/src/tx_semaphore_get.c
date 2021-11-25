@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Semaphore                                                           */
 /**                                                                       */
@@ -31,52 +31,54 @@
 #include "tx_semaphore.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_semaphore_get                                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_semaphore_get                                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function gets an instance from the specified counting          */ 
-/*    semaphore.                                                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    semaphore_ptr                     Pointer to semaphore control block*/ 
-/*    wait_option                       Suspension option                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_suspend         Suspend thread service            */ 
-/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function gets an instance from the specified counting          */
+/*    semaphore.                                                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    semaphore_ptr                     Pointer to semaphore control block*/
+/*    wait_option                       Suspension option                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_suspend         Suspend thread service            */
+/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_semaphore_get(TX_SEMAPHORE *semaphore_ptr, ULONG wait_option)
 {
 
 TX_INTERRUPT_SAVE_AREA
-            
-TX_THREAD       *thread_ptr;            
+
+TX_THREAD       *thread_ptr;
 TX_THREAD       *next_thread;
 TX_THREAD       *previous_thread;
 UINT            status;
@@ -121,7 +123,7 @@ UINT            status;
         /* Determine if the preempt disable flag is non-zero.  */
         if (_tx_thread_preempt_disable != ((UINT) 0))
         {
-    
+
             /* Restore interrupts.  */
             TX_RESTORE
 
@@ -141,7 +143,7 @@ UINT            status;
             /* Increment the number of suspensions on this semaphore.  */
             semaphore_ptr -> tx_semaphore_performance_suspension_count++;
 #endif
-            
+
             /* Pickup thread pointer.  */
             TX_THREAD_GET_CURRENT(thread_ptr)
 

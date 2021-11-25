@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_time_get                                        PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -68,6 +68,8 @@
 /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
 /*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Andres Mlinar            Modified comment(s),          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _tx_time_get(VOID)

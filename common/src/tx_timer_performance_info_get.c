@@ -96,15 +96,15 @@ UINT                    status;
     /* Determine if this is a legal request.  */
     if (timer_ptr == TX_NULL)
     {
-        
+
         /* Timer pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
-    
+
     /* Determine if the timer ID is invalid.  */
     else if (timer_ptr -> tx_timer_id != TX_TIMER_ID)
     {
-        
+
         /* Timer pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
@@ -123,38 +123,38 @@ UINT                    status;
         /* Retrieve the number of activations of this timer.  */
         if (activates != TX_NULL)
         {
-    
+
             *activates =  timer_ptr -> tx_timer_performance_activate_count;
         }
-    
+
         /* Retrieve the number of reactivations of this timer.  */
         if (reactivates != TX_NULL)
         {
-    
+
             *reactivates =  timer_ptr -> tx_timer_performance_reactivate_count;
         }
-    
+
         /* Retrieve the number of deactivations of this timer.  */
         if (deactivates != TX_NULL)
         {
-    
+
             *deactivates =  timer_ptr -> tx_timer_performance_deactivate_count;
         }
-    
+
         /* Retrieve the number of expirations of this timer.  */
         if (expirations != TX_NULL)
         {
-    
+
             *expirations =  timer_ptr -> tx_timer_performance_expiration_count;
         }
-    
+
         /* Retrieve the number of expiration adjustments of this timer.  */
         if (expiration_adjusts != TX_NULL)
         {
-    
+
             *expiration_adjusts =  timer_ptr -> tx_timer_performance__expiration_adjust_count;
         }
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
 

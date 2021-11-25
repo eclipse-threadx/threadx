@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_user.h                                           PORTABLE C      */
-/*                                                           6.1.5        */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,6 +51,13 @@
 /*                                            added option to remove      */
 /*                                            FileX pointer,              */
 /*                                            resulting in version 6.1.5  */
+/*  06-02-2021      Scott Larson            Added options for multiple    */
+/*                                            block pool search & delay,  */
+/*                                            resulting in version 6.1.7  */
+/*  10-15-2021      Yuxin Zhou              Modified comment(s), added    */
+/*                                            user-configurable symbol    */
+/*                                            TX_TIMER_TICKS_PER_SECOND   */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -59,9 +66,9 @@
 
 
 /* Define various build options for the ThreadX port.  The application should either make changes
-   here by commenting or un-commenting the conditional compilation defined OR supply the defines 
-   though the compiler's equivalent of the -D option.  
-   
+   here by commenting or un-commenting the conditional compilation defined OR supply the defines
+   though the compiler's equivalent of the -D option.
+
    For maximum speed, the following should be defined:
 
         TX_MAX_PRIORITIES                       32
@@ -73,9 +80,9 @@
         TX_REACTIVATE_INLINE
         TX_DISABLE_STACK_FILLING
         TX_INLINE_THREAD_RESUME_SUSPEND
-   
+
    For minimum size, the following should be defined:
-   
+
         TX_MAX_PRIORITIES                       32
         TX_DISABLE_PREEMPTION_THRESHOLD
         TX_DISABLE_REDUNDANT_CLEARING
@@ -83,12 +90,12 @@
         TX_NO_FILEX_POINTER
         TX_NOT_INTERRUPTABLE
         TX_TIMER_PROCESS_IN_ISR
-   
+
    Of course, many of these defines reduce functionality and/or change the behavior of the
    system in ways that may not be worth the trade-off. For example, the TX_TIMER_PROCESS_IN_ISR
    results in faster and smaller code, however, it increases the amount of processing in the ISR.
    In addition, some services that are available in timers are not available from ISRs and will
-   therefore return an error if this option is used. This may or may not be desirable for a 
+   therefore return an error if this option is used. This may or may not be desirable for a
    given application.  */
 
 
@@ -103,19 +110,28 @@
 #define TX_TIMER_THREAD_PRIORITY                ????
 */
 
+/* Define the common timer tick reference for use by other middleware components. The default
+   value is 10ms (i.e. 100 ticks, defined in tx_api.h), but may be replaced by a port-specific
+   version in tx_port.h or here.
+   Note: the actual hardware timer value may need to be changed (usually in tx_initialize_low_level).  */
+
+/*
+#define TX_TIMER_TICKS_PER_SECOND       ((ULONG) 100)
+*/
+
 /* Determine if there is a FileX pointer in the thread control block.
-   By default, the pointer is there for legacy/backwards compatibility. 
+   By default, the pointer is there for legacy/backwards compatibility.
    The pointer must also be there for applications using FileX.
-   Define this to save space in the thread control block. 
+   Define this to save space in the thread control block.
 */
 
 /*
 #define TX_NO_FILEX_POINTER
 */
 
-/* Determine if timer expirations (application timers, timeouts, and tx_thread_sleep calls 
-   should be processed within the a system timer thread or directly in the timer ISR. 
-   By default, the timer thread is used. When the following is defined, the timer expiration 
+/* Determine if timer expirations (application timers, timeouts, and tx_thread_sleep calls
+   should be processed within the a system timer thread or directly in the timer ISR.
+   By default, the timer thread is used. When the following is defined, the timer expiration
    processing is done directly from the timer ISR, thereby eliminating the timer thread control
    block, stack, and context switching to activate it.  */
 
@@ -140,7 +156,7 @@
 #define TX_DISABLE_STACK_FILLING
 */
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -150,7 +166,7 @@
 #define TX_ENABLE_STACK_CHECKING
 */
 
-/* Determine if preemption-threshold should be disabled. By default, preemption-threshold is 
+/* Determine if preemption-threshold should be disabled. By default, preemption-threshold is
    enabled. If the application does not use preemption-threshold, it may be disabled to reduce
    code size and improve performance.  */
 
@@ -158,7 +174,7 @@
 #define TX_DISABLE_PREEMPTION_THRESHOLD
 */
 
-/* Determine if global ThreadX variables should be cleared. If the compiler startup code clears 
+/* Determine if global ThreadX variables should be cleared. If the compiler startup code clears
    the .bss section prior to ThreadX running, the define can be used to eliminate unnecessary
    clearing of ThreadX global variables.  */
 
@@ -166,9 +182,9 @@
 #define TX_DISABLE_REDUNDANT_CLEARING
 */
 
-/* Determine if no timer processing is required. This option will help eliminate the timer 
-   processing when not needed. The user will also have to comment out the call to 
-   tx_timer_interrupt, which is typically made from assembly language in 
+/* Determine if no timer processing is required. This option will help eliminate the timer
+   processing when not needed. The user will also have to comment out the call to
+   tx_timer_interrupt, which is typically made from assembly language in
    tx_initialize_low_level. Note: if TX_NO_TIMER is used, the define TX_TIMER_PROCESS_IN_ISR
    must also be used and tx_timer_initialize must be removed from ThreadX library.  */
 
@@ -188,8 +204,8 @@
 */
 
 
-/* Determine if the tx_thread_resume and tx_thread_suspend services should have their internal 
-   code in-line. This results in a larger image, but improves the performance of the thread 
+/* Determine if the tx_thread_resume and tx_thread_suspend services should have their internal
+   code in-line. This results in a larger image, but improves the performance of the thread
    resume and suspend services.  */
 
 /*
@@ -197,7 +213,7 @@
 */
 
 
-/* Determine if the internal ThreadX code is non-interruptable. This results in smaller code 
+/* Determine if the internal ThreadX code is non-interruptable. This results in smaller code
    size and less processing overhead, but increases the interrupt lockout time.  */
 
 /*
@@ -205,8 +221,8 @@
 */
 
 
-/* Determine if the trace event logging code should be enabled. This causes slight increases in 
-   code size and overhead, but provides the ability to generate system trace information which 
+/* Determine if the trace event logging code should be enabled. This causes slight increases in
+   code size and overhead, but provides the ability to generate system trace information which
    is available for viewing in TraceX.  */
 
 /*
@@ -268,6 +284,18 @@
 
 /*
 #define TX_TIMER_ENABLE_PERFORMANCE_INFO
+*/
+
+/*  Override options for byte pool searches of multiple blocks. */
+
+/*
+#define TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH    20
+*/
+
+/*  Override options for byte pool search delay to avoid thrashing. */
+
+/*
+#define TX_BYTE_POOL_DELAY_VALUE              3
 */
 
 #endif

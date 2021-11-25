@@ -23,15 +23,18 @@
     .text
     .align 4
     .syntax unified
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    .global  _tx_execution_isr_enter
+#endif
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_context_save                           Cortex-M4/AC6     */
-/*                                                           6.1.2        */
+/*    _tx_thread_context_save                          Cortex-M4/AC6      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -48,7 +51,7 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    None                                                                */
+/*    [_tx_execution_isr_enter]             Execution profiling ISR enter */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -58,9 +61,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_save(VOID)
@@ -68,6 +69,15 @@
     .global  _tx_thread_context_save
     .thumb_func
 _tx_thread_context_save:
-    /* Not needed for this port - just return!  */
+
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    /* Call the ISR enter function to indicate an ISR is starting.  */
+    PUSH    {r0, lr}                                // Save return address
+    BL      _tx_execution_isr_enter                 // Call the ISR enter function
+    POP     {r0, lr}                                // Recover return address
+#endif
+
+    /* Context is already saved - just return.  */
+
     BX      lr
 // }

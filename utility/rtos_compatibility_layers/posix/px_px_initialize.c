@@ -50,7 +50,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    posix_memory_init                                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -82,7 +82,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static VOID posix_memory_init(VOID * posix_heap_ptr)
@@ -112,7 +112,7 @@ INT    retval;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    posix_semaphore_init                                PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -141,7 +141,7 @@ INT    retval;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 static VOID posix_semaphore_init(VOID)
@@ -172,7 +172,7 @@ sem_t      *sem_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    posix_initialize                                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -212,7 +212,7 @@ sem_t      *sem_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 VOID *posix_initialize(VOID * posix_memory)

@@ -12,35 +12,37 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Trace                                                               */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    tx_trace.h                                         PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    tx_trace.h                                         PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file defines the ThreadX trace component, including constants  */ 
-/*    and structure definitions as well as external references.  It is    */ 
+/*                                                                        */
+/*    This file defines the ThreadX trace component, including constants  */
+/*    and structure definitions as well as external references.  It is    */
 /*    assumed that tx_api.h and tx_port.h have already been included.     */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -55,10 +57,10 @@
    macros to whitespace.  */
 
 #ifndef TX_ENABLE_EVENT_TRACE
-#define TX_TRACE_INITIALIZE                                     
-#define TX_TRACE_OBJECT_REGISTER(t,p,n,a,b)                   
-#define TX_TRACE_OBJECT_UNREGISTER(o)                   
-#define TX_TRACE_IN_LINE_INSERT(i,a,b,c,d,f) 
+#define TX_TRACE_INITIALIZE
+#define TX_TRACE_OBJECT_REGISTER(t,p,n,a,b)
+#define TX_TRACE_OBJECT_UNREGISTER(o)
+#define TX_TRACE_IN_LINE_INSERT(i,a,b,c,d,f)
 #else
 
 /* Event tracing is enabled.  */
@@ -76,8 +78,8 @@
 #endif
 
 
-/* Define the default clock source for trace event entry time stamp. The following two item are port specific.  
-   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
+/* Define the default clock source for trace event entry time stamp. The following two item are port specific.
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
 #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
@@ -99,8 +101,8 @@
 
 
 /* ThreadX Trace Description.  The ThreadX Trace feature is designed to capture
-   events in real-time in a circular event buffer. This buffer may be analyzed by other 
-   tools.  The high-level format of the Trace structure is:  
+   events in real-time in a circular event buffer. This buffer may be analyzed by other
+   tools.  The high-level format of the Trace structure is:
 
             [Trace Control Header              ]
             [Trace Object Registry - Entry 0   ]
@@ -113,23 +115,23 @@
 */
 
 
-/* Trace Control Header. The Trace Control Header contains information that 
-   defines the format of the Trace Object Registry as well as the location and 
-   current entry of the Trace Buffer itself.  The high-level format of the 
+/* Trace Control Header. The Trace Control Header contains information that
+   defines the format of the Trace Object Registry as well as the location and
+   current entry of the Trace Buffer itself.  The high-level format of the
    Trace Control Header is:
 
                 Entry                               Size                     Description
 
             [Trace ID]                              4       This 4-byte field contains the ThreadX Trace
                                                             Identification. If the trace buffer is valid, the
-                                                            contents are 0x54585442 (TXTB). Since it is written as 
+                                                            contents are 0x54585442 (TXTB). Since it is written as
                                                             a 32-bit unsigned word, this value is also used to
-                                                            determine if the event trace information is in 
+                                                            determine if the event trace information is in
                                                             little or big endian format.
-            [Timer Valid Mask]                      4       Mask of valid bits in the 32-bit time stamp. This 
+            [Timer Valid Mask]                      4       Mask of valid bits in the 32-bit time stamp. This
                                                             enables use of 32, 24, 16, or event 8-bit timers.
-                                                            If the time source is 32-bits, the mask is 
-                                                            0xFFFFFFFF. If the time source is 16-bits, the 
+                                                            If the time source is 32-bits, the mask is
+                                                            0xFFFFFFFF. If the time source is 16-bits, the
                                                             mask is 0x0000FFFF.
             [Trace Base Address]                    4       The base address for all trace pointer. Subtracting
                                                             the pointer and this address will yield the proper
@@ -141,7 +143,7 @@
             [Trace Buffer Start Pointer]            4       Pointer to the start of the Trace Buffer Area
             [Trace Buffer End Pointer]              4       Pointer to the end of the Trace Buffer Area
             [Trace Buffer Current Pointer]          4       Pointer to the oldest entry in the Trace Buffer.
-                                                            This entry will be overwritten on the next event and 
+                                                            This entry will be overwritten on the next event and
                                                             incremented to the next event (wrapping to the top
                                                             if the buffer end pointer is exceeded).
             [Reserved]                              4       Reserved 4 bytes, should be 0xAAAAAAAA
@@ -171,7 +173,7 @@ typedef struct TX_TRACE_HEADER_STRUCT
 } TX_TRACE_HEADER;
 
 
-/* Trace Object Registry. The Trace Object Registry is used to map the object pointer in the trace buffer to 
+/* Trace Object Registry. The Trace Object Registry is used to map the object pointer in the trace buffer to
    the application's name for the object (defined during object creation in ThreadX).  */
 
 #ifndef TX_TRACE_OBJECT_REGISTRY_NAME
@@ -179,31 +181,31 @@ typedef struct TX_TRACE_HEADER_STRUCT
 #endif
 
 
-/* Define the object name types as well as the contents of any additional parameters that might be useful in 
+/* Define the object name types as well as the contents of any additional parameters that might be useful in
    trace analysis.  */
 
-#define TX_TRACE_OBJECT_TYPE_NOT_VALID                      ((UCHAR) 0)     /* Object is not valid                               */ 
+#define TX_TRACE_OBJECT_TYPE_NOT_VALID                      ((UCHAR) 0)     /* Object is not valid                               */
 #define TX_TRACE_OBJECT_TYPE_THREAD                         ((UCHAR) 1)     /* P1 = stack start address, P2 = stack size         */
-#define TX_TRACE_OBJECT_TYPE_TIMER                          ((UCHAR) 2)     /* P1 = initial ticks, P2 = reschedule ticks         */ 
-#define TX_TRACE_OBJECT_TYPE_QUEUE                          ((UCHAR) 3)     /* P1 = queue size, P2 = message size                */ 
-#define TX_TRACE_OBJECT_TYPE_SEMAPHORE                      ((UCHAR) 4)     /* P1 = initial instances                            */ 
-#define TX_TRACE_OBJECT_TYPE_MUTEX                          ((UCHAR) 5)     /* P1 = priority inheritance flag                    */ 
-#define TX_TRACE_OBJECT_TYPE_EVENT_FLAGS                    ((UCHAR) 6)     /* none                                              */ 
-#define TX_TRACE_OBJECT_TYPE_BLOCK_POOL                     ((UCHAR) 7)     /* P1 = total blocks, P2 = block size                */ 
-#define TX_TRACE_OBJECT_TYPE_BYTE_POOL                      ((UCHAR) 8)     /* P1 = total bytes                                  */ 
+#define TX_TRACE_OBJECT_TYPE_TIMER                          ((UCHAR) 2)     /* P1 = initial ticks, P2 = reschedule ticks         */
+#define TX_TRACE_OBJECT_TYPE_QUEUE                          ((UCHAR) 3)     /* P1 = queue size, P2 = message size                */
+#define TX_TRACE_OBJECT_TYPE_SEMAPHORE                      ((UCHAR) 4)     /* P1 = initial instances                            */
+#define TX_TRACE_OBJECT_TYPE_MUTEX                          ((UCHAR) 5)     /* P1 = priority inheritance flag                    */
+#define TX_TRACE_OBJECT_TYPE_EVENT_FLAGS                    ((UCHAR) 6)     /* none                                              */
+#define TX_TRACE_OBJECT_TYPE_BLOCK_POOL                     ((UCHAR) 7)     /* P1 = total blocks, P2 = block size                */
+#define TX_TRACE_OBJECT_TYPE_BYTE_POOL                      ((UCHAR) 8)     /* P1 = total bytes                                  */
 
 
 typedef struct TX_TRACE_OBJECT_ENTRY_STRUCT
 {
 
     UCHAR                                                   tx_trace_object_entry_available;                            /* TX_TRUE -> available                 */
-    UCHAR                                                   tx_trace_object_entry_type;                                 /* Types defined above                  */ 
-    UCHAR                                                   tx_trace_object_entry_reserved1;                            /* Should be zero - except for thread   */ 
-    UCHAR                                                   tx_trace_object_entry_reserved2;                            /* Should be zero - except for thread   */ 
+    UCHAR                                                   tx_trace_object_entry_type;                                 /* Types defined above                  */
+    UCHAR                                                   tx_trace_object_entry_reserved1;                            /* Should be zero - except for thread   */
+    UCHAR                                                   tx_trace_object_entry_reserved2;                            /* Should be zero - except for thread   */
     ULONG                                                   tx_trace_object_entry_thread_pointer;                       /* ThreadX object pointer               */
-    ULONG                                                   tx_trace_object_entry_param_1;                              /* Parameter value defined              */ 
-    ULONG                                                   tx_trace_object_entry_param_2;                              /*   according to type above            */ 
-    UCHAR                                                   tx_trace_object_entry_name[TX_TRACE_OBJECT_REGISTRY_NAME];  /* Object name                          */ 
+    ULONG                                                   tx_trace_object_entry_param_1;                              /* Parameter value defined              */
+    ULONG                                                   tx_trace_object_entry_param_2;                              /*   according to type above            */
+    UCHAR                                                   tx_trace_object_entry_name[TX_TRACE_OBJECT_REGISTRY_NAME];  /* Object name                          */
 } TX_TRACE_OBJECT_ENTRY;
 
 
@@ -212,27 +214,27 @@ typedef struct TX_TRACE_OBJECT_ENTRY_STRUCT
 
                 Entry                  Size                     Description
 
-            [Thread Pointer]            4           This 4-byte field contains the pointer to the 
-                                                    ThreadX thread running that caused the event. 
+            [Thread Pointer]            4           This 4-byte field contains the pointer to the
+                                                    ThreadX thread running that caused the event.
                                                     If this field is NULL, the entry hasn't been used
                                                     yet. If this field is 0xFFFFFFFF, the event occurred
-                                                    from within an ISR. If this entry is 0xF0F0F0F0, the 
+                                                    from within an ISR. If this entry is 0xF0F0F0F0, the
                                                     event occurred during initialization.
             [Thread Priority or         4           This 4-byte field contains the current thread pointer for interrupt
              Current Thread                         events or the thread preemption-threshold/priority for thread events.
              Preemption-Threshold/
              Priority]
-            [Event ID]                  4           This 4-byte field contains the Event ID of the event. A value of 
+            [Event ID]                  4           This 4-byte field contains the Event ID of the event. A value of
                                                     0xFFFFFFFF indicates the event is invalid. All events are marked
                                                     as invalid during initialization.
             [Time Stamp]                4           This 4-byte field contains the time stamp of the event.
-            [Information Field 1]       4           This 4-byte field contains the first 4-bytes of information 
+            [Information Field 1]       4           This 4-byte field contains the first 4-bytes of information
                                                     specific to the event.
-            [Information Field 2]       4           This 4-byte field contains the second 4-bytes of information 
+            [Information Field 2]       4           This 4-byte field contains the second 4-bytes of information
                                                     specific to the event.
-            [Information Field 3]       4           This 4-byte field contains the third 4-bytes of information 
+            [Information Field 3]       4           This 4-byte field contains the third 4-bytes of information
                                                     specific to the event.
-            [Information Field 4]       4           This 4-byte field contains the fourth 4-bytes of information 
+            [Information Field 4]       4           This 4-byte field contains the fourth 4-bytes of information
                                                     specific to the event.
 */
 
@@ -242,48 +244,48 @@ typedef struct TX_TRACE_OBJECT_ENTRY_STRUCT
 /* Define ThreadX Trace Events, along with a brief description of the additional information fields,
    where I1 -> Information Field 1, I2 -> Information Field 2, etc.  */
 
-/* Event numbers 0 through 4095 are reserved by Azure RTOS. Specific event assignments are: 
-                                
-                                ThreadX events:     1-199 
+/* Event numbers 0 through 4095 are reserved by Azure RTOS. Specific event assignments are:
+
+                                ThreadX events:     1-199
                                 FileX events:       200-299
                                 NetX events:        300-599
                                 USBX events:        600-999
-   
-   User-defined event numbers start at 4096 and continue through 65535, as defined by the constants 
-   TX_TRACE_USER_EVENT_START and TX_TRACE_USER_EVENT_END, respectively. User events should be based 
+
+   User-defined event numbers start at 4096 and continue through 65535, as defined by the constants
+   TX_TRACE_USER_EVENT_START and TX_TRACE_USER_EVENT_END, respectively. User events should be based
    on these constants in case the user event number assignment is changed in future releases.  */
 
 /* Define the basic ThreadX thread scheduling events first.  */
 
-#define TX_TRACE_THREAD_RESUME                              1           /* I1 = thread ptr, I2 = previous_state, I3 = stack ptr, I4 = next thread   */ 
-#define TX_TRACE_THREAD_SUSPEND                             2           /* I1 = thread ptr, I2 = new_state, I3 = stack ptr  I4 = next thread        */ 
-#define TX_TRACE_ISR_ENTER                                  3           /* I1 = stack_ptr, I2 = ISR number, I3 = system state, I4 = preempt disable */ 
-#define TX_TRACE_ISR_EXIT                                   4           /* I1 = stack_ptr, I2 = ISR number, I3 = system state, I4 = preempt disable */ 
-#define TX_TRACE_TIME_SLICE                                 5           /* I1 = next thread ptr, I2 = system state, I3 = preempt disable, I4 = stack*/ 
-#define TX_TRACE_RUNNING                                    6           /* None                                                                     */ 
+#define TX_TRACE_THREAD_RESUME                              1           /* I1 = thread ptr, I2 = previous_state, I3 = stack ptr, I4 = next thread   */
+#define TX_TRACE_THREAD_SUSPEND                             2           /* I1 = thread ptr, I2 = new_state, I3 = stack ptr  I4 = next thread        */
+#define TX_TRACE_ISR_ENTER                                  3           /* I1 = stack_ptr, I2 = ISR number, I3 = system state, I4 = preempt disable */
+#define TX_TRACE_ISR_EXIT                                   4           /* I1 = stack_ptr, I2 = ISR number, I3 = system state, I4 = preempt disable */
+#define TX_TRACE_TIME_SLICE                                 5           /* I1 = next thread ptr, I2 = system state, I3 = preempt disable, I4 = stack*/
+#define TX_TRACE_RUNNING                                    6           /* None                                                                     */
 
 
 /* Define the rest of the ThreadX system events.  */
 
-#define TX_TRACE_BLOCK_ALLOCATE                             10          /* I1 = pool ptr, I2 = memory ptr, I3 = wait option, I4 = remaining blocks  */ 
-#define TX_TRACE_BLOCK_POOL_CREATE                          11          /* I1 = pool ptr, I2 = pool_start, I3 = total blocks, I4 = block size       */ 
-#define TX_TRACE_BLOCK_POOL_DELETE                          12          /* I1 = pool ptr, I2 = stack ptr                                            */ 
+#define TX_TRACE_BLOCK_ALLOCATE                             10          /* I1 = pool ptr, I2 = memory ptr, I3 = wait option, I4 = remaining blocks  */
+#define TX_TRACE_BLOCK_POOL_CREATE                          11          /* I1 = pool ptr, I2 = pool_start, I3 = total blocks, I4 = block size       */
+#define TX_TRACE_BLOCK_POOL_DELETE                          12          /* I1 = pool ptr, I2 = stack ptr                                            */
 #define TX_TRACE_BLOCK_POOL_INFO_GET                        13          /* I1 = pool ptr                                                            */
-#define TX_TRACE_BLOCK_POOL_PERFORMANCE_INFO_GET            14          /* I1 = pool ptr                                                            */ 
-#define TX_TRACE_BLOCK_POOL__PERFORMANCE_SYSTEM_INFO_GET    15          /* None                                                                     */ 
+#define TX_TRACE_BLOCK_POOL_PERFORMANCE_INFO_GET            14          /* I1 = pool ptr                                                            */
+#define TX_TRACE_BLOCK_POOL__PERFORMANCE_SYSTEM_INFO_GET    15          /* None                                                                     */
 #define TX_TRACE_BLOCK_POOL_PRIORITIZE                      16          /* I1 = pool ptr, I2 = suspended count, I3 = stack ptr                      */
-#define TX_TRACE_BLOCK_RELEASE                              17          /* I1 = pool ptr, I2 = memory ptr, I3 = suspended, I4 = stack ptr           */ 
-#define TX_TRACE_BYTE_ALLOCATE                              20          /* I1 = pool ptr, I2 = memory ptr, I3 = size requested, I4 = wait option    */ 
-#define TX_TRACE_BYTE_POOL_CREATE                           21          /* I1 = pool ptr, I2 = start ptr, I3 = pool size, I4 = stack ptr            */ 
-#define TX_TRACE_BYTE_POOL_DELETE                           22          /* I1 = pool ptr, I2 = stack ptr                                            */ 
+#define TX_TRACE_BLOCK_RELEASE                              17          /* I1 = pool ptr, I2 = memory ptr, I3 = suspended, I4 = stack ptr           */
+#define TX_TRACE_BYTE_ALLOCATE                              20          /* I1 = pool ptr, I2 = memory ptr, I3 = size requested, I4 = wait option    */
+#define TX_TRACE_BYTE_POOL_CREATE                           21          /* I1 = pool ptr, I2 = start ptr, I3 = pool size, I4 = stack ptr            */
+#define TX_TRACE_BYTE_POOL_DELETE                           22          /* I1 = pool ptr, I2 = stack ptr                                            */
 #define TX_TRACE_BYTE_POOL_INFO_GET                         23          /* I1 = pool ptr                                                            */
 #define TX_TRACE_BYTE_POOL_PERFORMANCE_INFO_GET             24          /* I1 = pool ptr                                                            */
 #define TX_TRACE_BYTE_POOL__PERFORMANCE_SYSTEM_INFO_GET     25          /* None                                                                     */
 #define TX_TRACE_BYTE_POOL_PRIORITIZE                       26          /* I1 = pool ptr, I2 = suspended count, I3 = stack ptr                      */
-#define TX_TRACE_BYTE_RELEASE                               27          /* I1 = pool ptr, I2 = memory ptr, I3 = suspended, I4 = available bytes     */ 
-#define TX_TRACE_EVENT_FLAGS_CREATE                         30          /* I1 = group ptr, I2 = stack ptr                                           */ 
-#define TX_TRACE_EVENT_FLAGS_DELETE                         31          /* I1 = group ptr, I2 = stack ptr                                           */ 
-#define TX_TRACE_EVENT_FLAGS_GET                            32          /* I1 = group ptr, I2 = requested flags, I3 = current flags, I4 = get option*/ 
+#define TX_TRACE_BYTE_RELEASE                               27          /* I1 = pool ptr, I2 = memory ptr, I3 = suspended, I4 = available bytes     */
+#define TX_TRACE_EVENT_FLAGS_CREATE                         30          /* I1 = group ptr, I2 = stack ptr                                           */
+#define TX_TRACE_EVENT_FLAGS_DELETE                         31          /* I1 = group ptr, I2 = stack ptr                                           */
+#define TX_TRACE_EVENT_FLAGS_GET                            32          /* I1 = group ptr, I2 = requested flags, I3 = current flags, I4 = get option*/
 #define TX_TRACE_EVENT_FLAGS_INFO_GET                       33          /* I1 = group ptr                                                           */
 #define TX_TRACE_EVENT_FLAGS_PERFORMANCE_INFO_GET           34          /* I1 = group ptr                                                           */
 #define TX_TRACE_EVENT_FLAGS__PERFORMANCE_SYSTEM_INFO_GET   35          /* None                                                                     */
@@ -340,7 +342,7 @@ typedef struct TX_TRACE_OBJECT_ENTRY_STRUCT
 #define TX_TRACE_TIME_GET                                   120         /* I1 = current time, I2 = stack ptr                                        */
 #define TX_TRACE_TIME_SET                                   121         /* I1 = new time                                                            */
 #define TX_TRACE_TIMER_ACTIVATE                             122         /* I1 = timer ptr                                                           */
-#define TX_TRACE_TIMER_CHANGE                               123         /* I1 = timer ptr, I2 = initial ticks, I3= reschedule ticks                 */ 
+#define TX_TRACE_TIMER_CHANGE                               123         /* I1 = timer ptr, I2 = initial ticks, I3= reschedule ticks                 */
 #define TX_TRACE_TIMER_CREATE                               124         /* I1 = timer ptr, I2 = initial ticks, I3= reschedule ticks, I4 = enable    */
 #define TX_TRACE_TIMER_DEACTIVATE                           125         /* I1 = timer ptr, I2 = stack ptr                                           */
 #define TX_TRACE_TIMER_DELETE                               126         /* I1 = timer ptr                                                           */
@@ -379,7 +381,7 @@ typedef struct TX_TRACE_BUFFER_ENTRY_STRUCT
    make them extern so other functions in the component can access them.  */
 
 #ifdef TX_TRACE_INIT
-#define TRACE_DECLARE 
+#define TRACE_DECLARE
 #else
 #define TRACE_DECLARE extern
 #endif
@@ -387,7 +389,7 @@ typedef struct TX_TRACE_BUFFER_ENTRY_STRUCT
 
 /* Define the pointer to the start of the trace buffer control structure.   */
 
-TRACE_DECLARE  TX_TRACE_HEADER           *_tx_trace_header_ptr;
+TRACE_DECLARE  TX_TRACE_HEADER                  *_tx_trace_header_ptr;
 
 
 /* Define the pointer to the start of the trace object registry area in the trace buffer.  */
@@ -415,8 +417,8 @@ TRACE_DECLARE  TX_TRACE_BUFFER_ENTRY             *_tx_trace_buffer_end_ptr;
 TRACE_DECLARE  TX_TRACE_BUFFER_ENTRY             *_tx_trace_buffer_current_ptr;
 
 
-/* Define the trace event enable bits, where each bit represents a type of event that can be enabled 
-   or disabled dynamically by the application.  */ 
+/* Define the trace event enable bits, where each bit represents a type of event that can be enabled
+   or disabled dynamically by the application.  */
 
 TRACE_DECLARE  ULONG                            _tx_trace_event_enable_bits;
 
@@ -427,9 +429,9 @@ TRACE_DECLARE  ULONG                            _tx_trace_event_enable_bits;
 TRACE_DECLARE  ULONG                             _tx_trace_simulated_time;
 
 
-/* Define the function pointer used to call the application when the trace buffer wraps. If NULL, 
+/* Define the function pointer used to call the application when the trace buffer wraps. If NULL,
    the application has not registered a callback function.  */
-   
+
 TRACE_DECLARE  VOID                             (*_tx_trace_full_notify_function)(VOID *buffer);
 
 
@@ -451,9 +453,9 @@ TRACE_DECLARE  ULONG                             _tx_trace_registry_search_start
 /* Define the event trace macros that are expanded in-line when event tracing is enabled.  */
 
 #ifdef TX_MISRA_ENABLE
-#define TX_TRACE_INFO_FIELD_ASSIGNMENT(a,b,c,d)  trace_event_ptr -> tx_trace_buffer_entry_info_1 =  (ULONG) (a); trace_event_ptr -> tx_trace_buffer_entry_info_2 =  (ULONG) (b); trace_event_ptr -> tx_trace_buffer_entry_info_3 =  (ULONG) (c); trace_event_ptr -> tx_trace_buffer_entry_info_4 =  (ULONG) (d); 
+#define TX_TRACE_INFO_FIELD_ASSIGNMENT(a,b,c,d)  trace_event_ptr -> tx_trace_buffer_entry_info_1 =  (ULONG) (a); trace_event_ptr -> tx_trace_buffer_entry_info_2 =  (ULONG) (b); trace_event_ptr -> tx_trace_buffer_entry_info_3 =  (ULONG) (c); trace_event_ptr -> tx_trace_buffer_entry_info_4 =  (ULONG) (d);
 #else
-#define TX_TRACE_INFO_FIELD_ASSIGNMENT(a,b,c,d)  trace_event_ptr -> tx_trace_buffer_entry_information_field_1 =  (ULONG) (a); trace_event_ptr -> tx_trace_buffer_entry_information_field_2 =  (ULONG) (b); trace_event_ptr -> tx_trace_buffer_entry_information_field_3 =  (ULONG) (c); trace_event_ptr -> tx_trace_buffer_entry_information_field_4 =  (ULONG) (d); 
+#define TX_TRACE_INFO_FIELD_ASSIGNMENT(a,b,c,d)  trace_event_ptr -> tx_trace_buffer_entry_information_field_1 =  (ULONG) (a); trace_event_ptr -> tx_trace_buffer_entry_information_field_2 =  (ULONG) (b); trace_event_ptr -> tx_trace_buffer_entry_information_field_3 =  (ULONG) (c); trace_event_ptr -> tx_trace_buffer_entry_information_field_4 =  (ULONG) (d);
 #endif
 
 
@@ -524,6 +526,7 @@ VOID    _tx_trace_initialize(VOID);
 VOID    _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, CHAR *object_name, ULONG parameter_1, ULONG parameter_2);
 VOID    _tx_trace_object_unregister(VOID *object_ptr);
 
+
 #ifdef TX_ENABLE_EVENT_TRACE
 
 /* Check for MISRA compliance requirements.  */
@@ -535,7 +538,7 @@ VOID    _tx_trace_object_unregister(VOID *object_ptr);
 UCHAR                   *_tx_misra_object_to_uchar_pointer_convert(TX_TRACE_OBJECT_ENTRY *pointer);
 TX_TRACE_OBJECT_ENTRY   *_tx_misra_uchar_to_object_pointer_convert(UCHAR *pointer);
 TX_TRACE_HEADER         *_tx_misra_uchar_to_header_pointer_convert(UCHAR *pointer);
-TX_TRACE_BUFFER_ENTRY   *_tx_misra_uchar_to_entry_pointer_convert(UCHAR *pointer); 
+TX_TRACE_BUFFER_ENTRY   *_tx_misra_uchar_to_entry_pointer_convert(UCHAR *pointer);
 UCHAR                   *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer);
 
 
@@ -556,6 +559,5 @@ UCHAR                   *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFE
 #endif
 #endif
 #endif
-
 #endif
 

@@ -80,6 +80,6 @@ ALIGN_TYPE return_value = TX_NOT_AVAILABLE;
             break;
         }
     }
-    
+
     return(return_value);
 }

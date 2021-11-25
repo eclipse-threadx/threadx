@@ -45,8 +45,8 @@ TXM_MODULE_MANAGER_FAULT_INFO
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_memory_fault_handler        Cortex-M33/MPU/AC6  */
-/*                                                           6.1.3        */
+/*    _txm_module_manager_memory_fault_handler           Cortex-M33       */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -76,7 +76,7 @@ TXM_MODULE_MANAGER_FAULT_INFO
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  12-31-2020     Scott Larson             Initial Version 6.1.3         */
+/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_memory_fault_handler(VOID)

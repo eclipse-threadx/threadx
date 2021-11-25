@@ -1,6 +1,6 @@
     .section .txm_module_preamble
     .align 4
-    
+
     // External references
     .global  _txm_module_thread_shell_entry
     .global  _txm_module_callback_request_thread_entry

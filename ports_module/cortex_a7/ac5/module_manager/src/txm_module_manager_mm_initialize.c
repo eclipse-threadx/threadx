@@ -93,7 +93,7 @@ __align(1024) ULONG _txm_level2_external_page_pool[TXM_LEVEL2_EXTERNAL_POOL_PAGE
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_mm_initialize(VOID)

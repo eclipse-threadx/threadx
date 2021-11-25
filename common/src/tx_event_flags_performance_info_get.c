@@ -94,15 +94,15 @@ UINT                    status;
     /* Determine if this is a legal request.  */
     if (group_ptr == TX_NULL)
     {
-        
+
         /* Event flags group pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
-    
+
     /* Determine if the event group ID is invalid.  */
     else if (group_ptr -> tx_event_flags_group_id != TX_EVENT_FLAGS_ID)
     {
-        
+
         /* Event flags group pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
@@ -124,34 +124,34 @@ UINT                    status;
         /* Retrieve the number of set operations on this event flag group.  */
         if (sets != TX_NULL)
         {
-    
+
             *sets =  group_ptr -> tx_event_flags_group_performance_set_count;
         }
-    
+
         /* Retrieve the number of get operations on this event flag group.  */
         if (gets != TX_NULL)
         {
-    
+
             *gets =  group_ptr -> tx_event_flags_group__performance_get_count;
         }
-    
+
         /* Retrieve the number of thread suspensions on this event flag group.  */
         if (suspensions != TX_NULL)
         {
-    
+
             *suspensions =  group_ptr -> tx_event_flags_group___performance_suspension_count;
         }
-    
+
         /* Retrieve the number of thread timeouts on this event flag group.  */
         if (timeouts != TX_NULL)
         {
-    
+
             *timeouts =  group_ptr -> tx_event_flags_group____performance_timeout_count;
         }
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
-        
+
         /* Return successful completion.  */
         status =  TX_SUCCESS;
     }

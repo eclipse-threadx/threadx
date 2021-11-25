@@ -65,7 +65,9 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*  12-31-2020     Andres Mlinar            Modified comment(s),          */
 /*                                            resulting in version 6.1.3  */
 /*                                                                        */

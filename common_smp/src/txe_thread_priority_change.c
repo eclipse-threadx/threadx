@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -29,48 +29,50 @@
 #include "tx_thread.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txe_thread_priority_change                         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_thread_priority_change                         PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function checks for errors in the change priority function     */ 
-/*    call.                                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                            Pointer to thread to suspend  */ 
-/*    new_priority                          New thread priority           */ 
-/*    old_priority                          Old thread priority           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_THREAD_ERROR                       Invalid thread pointer        */ 
-/*    TX_PTR_ERROR                          Invalid old priority pointer  */ 
-/*    TX_CALLER_ERROR                       Invalid caller of function    */ 
-/*    status                                Actual completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_priority_change            Actual priority change        */ 
-/*                                            function                    */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function checks for errors in the change priority function     */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Pointer to thread to suspend  */
+/*    new_priority                          New thread priority           */
+/*    old_priority                          Old thread priority           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_THREAD_ERROR                       Invalid thread pointer        */
+/*    TX_PTR_ERROR                          Invalid old priority pointer  */
+/*    TX_CALLER_ERROR                       Invalid caller of function    */
+/*    status                                Actual completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_priority_change            Actual priority change        */
+/*                                            function                    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txe_thread_priority_change(TX_THREAD *thread_ptr, UINT new_priority, UINT *old_priority)
@@ -86,7 +88,7 @@ UINT        status;
         /* Thread pointer is invalid, return appropriate error code.  */
         status =  TX_THREAD_ERROR;
     }
-    
+
     /* Now check for invalid thread ID.  */
     else if (thread_ptr -> tx_thread_id != TX_THREAD_ID)
     {
@@ -106,7 +108,7 @@ UINT        status;
     /* Determine if the priority is legal.  */
     else if (new_priority >= ((UINT) TX_MAX_PRIORITIES))
     {
-      
+
         /* Return an error status.  */
         status =  TX_PRIORITY_ERROR;
     }

@@ -30,8 +30,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_port_dispatch                 Cortex-M33/IAR    */
-/*                                                           6.1.5        */
+/*    _txm_module_manager_port_dispatch                  Cortex-M33       */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -65,7 +65,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021     Scott Larson             Initial Version 6.1.5         */
+/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
 /*                                                                        */
 /**************************************************************************/
 ALIGN_TYPE _txm_module_manager_port_dispatch(TXM_MODULE_INSTANCE *module_instance, ULONG kernel_request, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2)

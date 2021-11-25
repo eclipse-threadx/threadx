@@ -7,7 +7,7 @@
 //
 // Copyright (c) 2014-2017 Arm Limited (or its affiliates). All rights reserved.
 // Use, modification and redistribution of this file is subject to your possession of a
-// valid End User License Agreement for the Arm Product of which these examples are part of 
+// valid End User License Agreement for the Arm Product of which these examples are part of
 // and your compliance with all applicable terms and conditions of such licence agreement.
 // ------------------------------------------------------------
 
@@ -326,7 +326,7 @@ el1_entry_aarch64:
     //
     // Cortex-A processors automatically invalidate their caches on reset
     // (unless suppressed with the DBGL1RSTDISABLE or L2RSTDISABLE pins).
-    // It is therefore not necessary for software to invalidate the caches 
+    // It is therefore not necessary for software to invalidate the caches
     // on startup, however, this is done here in case of a warm reset.
     bl  InvalidateUDCaches
     tlbi VMALLE1
@@ -685,7 +685,7 @@ nol2setup:
     bic x1, x1, #SCTLR_ELx_A // Disable alignment fault checking.  To enable, change bic to orr
     msr SCTLR_EL1, x1
     isb
-    
+
     //
     // The Arm Architecture Reference Manual for Armv8-A states:
     //
@@ -740,7 +740,7 @@ arg0:
     bl main
 
     b exit // Will not return
-    
+
 // ------------------------------------------------------------
 // EL1 - secondary CPU init code
 //
@@ -795,4 +795,4 @@ loop_wfi:
     // Branch to thread start
     //
     //B  MainApp
-    
+

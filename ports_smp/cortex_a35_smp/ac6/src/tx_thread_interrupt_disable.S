@@ -12,65 +12,58 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
-/* #define TX_SOURCE_CODE  */
-
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_thread.h"
-*/
 
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_interrupt_disable                     Cortex-A35-SMP/AC6 */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_interrupt_disable                     Cortex-A35-SMP/AC6 */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is responsible for disabling interrupts               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    old_posture                           Old interrupt lockout posture */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is responsible for disabling interrupts               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    old_posture                           Old interrupt lockout posture */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*                                             resulting in version 6.1.9 */
 /*                                                                        */
 /**************************************************************************/
-/* UINT   _tx_thread_interrupt_disable(void)
-{ */
+// UINT   _tx_thread_interrupt_disable(void)
+// {
     .global _tx_thread_interrupt_disable
     .type   _tx_thread_interrupt_disable, @function
 _tx_thread_interrupt_disable:
@@ -83,5 +76,4 @@ _tx_thread_interrupt_disable:
 
     MSR     DAIFSet, 0x3                        // Lockout interrupts
     RET                                         // Return to caller
-/* } */
-
+// }

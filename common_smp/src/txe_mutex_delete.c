@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Mutex                                                               */
 /**                                                                       */
@@ -31,61 +31,63 @@
 #include "tx_mutex.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txe_mutex_delete                                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_mutex_delete                                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function checks for errors in the mutex delete function        */ 
-/*    call.                                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    mutex_ptr                         Pointer to mutex control block    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_MUTEX_ERROR                    Invalid mutex pointer             */ 
-/*    TX_CALLER_ERROR                   Invalid caller of this function   */ 
-/*    status                            Actual completion status          */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_mutex_delete                  Actual delete mutex function      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function checks for errors in the mutex delete function        */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    mutex_ptr                         Pointer to mutex control block    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_MUTEX_ERROR                    Invalid mutex pointer             */
+/*    TX_CALLER_ERROR                   Invalid caller of this function   */
+/*    status                            Actual completion status          */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_mutex_delete                  Actual delete mutex function      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txe_mutex_delete(TX_MUTEX *mutex_ptr)
 {
 
-UINT            status;                 
+UINT            status;
 #ifndef TX_TIMER_PROCESS_IN_ISR
 TX_THREAD       *thread_ptr;
 #endif
 
 
-#ifndef TX_TIMER_PROCESS_IN_ISR 
+#ifndef TX_TIMER_PROCESS_IN_ISR
 
     /* Default status to success.  */
     status =  TX_SUCCESS;
 #endif
-    
+
     /* Check for an invalid mutex pointer.  */
     if (mutex_ptr == TX_NULL)
     {
@@ -93,7 +95,7 @@ TX_THREAD       *thread_ptr;
         /* Mutex pointer is invalid, return appropriate error code.  */
         status =  TX_MUTEX_ERROR;
     }
-    
+
     /* Now check for a valid mutex ID.  */
     else if (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID)
     {
@@ -129,7 +131,7 @@ TX_THREAD       *thread_ptr;
 
         /* Determine if everything is okay.  */
         if (status == TX_SUCCESS)
-        {   
+        {
 #endif
 
             /* Call actual mutex delete function.  */

@@ -126,7 +126,7 @@ TX_BLOCK_POOL   *previous_pool;
         /* See if we have to update the created list head pointer.  */
         if (_tx_block_pool_created_ptr == pool_ptr)
         {
-                    
+
             /* Yes, move the head pointer to the next link. */
             _tx_block_pool_created_ptr =  next_pool;
         }
@@ -148,14 +148,14 @@ TX_BLOCK_POOL   *previous_pool;
        on this block pool.  */
     while (suspended_count != TX_NO_SUSPENSIONS)
     {
-      
+
         /* Decrement the suspension count.  */
         suspended_count--;
-        
+
         /* Lockout interrupts.  */
         TX_DISABLE
 
-        /* Clear the cleanup pointer, this prevents the timeout from doing 
+        /* Clear the cleanup pointer, this prevents the timeout from doing
            anything.  */
         thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 

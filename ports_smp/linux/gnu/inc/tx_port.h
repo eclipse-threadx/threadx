@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         SMP/Linux/GCC     */
-/*                                                           6.1.6        */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,6 +51,9 @@
 /*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
 /*                                            macro definition,           */
 /*                                            resulting in version 6.1.6  */
+/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
+/*                                            symbol ULONG64_DEFINED,     */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -168,7 +171,7 @@ typedef unsigned long                           ULONG;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
 typedef uint64_t                                ULONG64;
-
+#define ULONG64_DEFINED
 
 
 /* Define automated coverage test extensions...  These are required for the 
@@ -631,7 +634,7 @@ void                        _tx_thread_smp_debug_entry_insert(ULONG id, ULONG su
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX SMP/Linux/gcc Version 6.1.6 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX SMP/Linux/gcc Version 6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

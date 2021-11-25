@@ -88,7 +88,7 @@ UINT        status;
         /* Thread pointer is invalid, return appropriate error code.  */
         status =  TX_THREAD_ERROR;
     }
-    
+
     /* Now check for invalid thread ID.  */
     else if (thread_ptr -> tx_thread_id != TX_THREAD_ID)
     {
@@ -108,7 +108,7 @@ UINT        status;
     /* Determine if the priority is legal.  */
     else if (new_priority >= ((UINT) TX_MAX_PRIORITIES))
     {
-      
+
         /* Return an error status.  */
         status =  TX_PRIORITY_ERROR;
     }

@@ -129,12 +129,12 @@ TX_THREAD                   *thread_ptr;
             /* Determine if this group matches the event flags group in the list.  */
             if (group_ptr == next_group)
             {
-        
+
                 break;
             }
             else
             {
-        
+
                 /* Move to the next group.  */
                 next_group =  next_group -> tx_event_flags_group_created_next;
             }
@@ -145,7 +145,7 @@ TX_THREAD                   *thread_ptr;
 
         /* Decrement the preempt disable flag.  */
         _tx_thread_preempt_disable--;
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
 
@@ -179,11 +179,11 @@ TX_THREAD                   *thread_ptr;
             /* Check for interrupt call.  */
             if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
             {
-    
+
                 /* Now, make sure the call is from an interrupt and not initialization.  */
                 if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
                 {
-        
+
                     /* Invalid caller of this function, return appropriate error code.  */
                     status =  TX_CALLER_ERROR;
                 }

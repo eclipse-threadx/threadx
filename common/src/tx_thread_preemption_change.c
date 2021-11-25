@@ -93,16 +93,16 @@ UINT        status;
 
 #ifdef TX_DISABLE_PREEMPTION_THRESHOLD
 
-    /* Only allow 0 (disable all preemption) and returning preemption-threshold to the 
+    /* Only allow 0 (disable all preemption) and returning preemption-threshold to the
        current thread priority if preemption-threshold is disabled. All other threshold
        values are converted to 0.  */
     if (thread_ptr -> tx_thread_user_priority != new_threshold)
     {
-    
+
         /* Is the new threshold zero?  */
         if (new_threshold != ((UINT) 0))
         {
-        
+
             /* Convert the new threshold to disable all preemption, since preemption-threshold is
                not supported.  */
             new_threshold =  ((UINT) 0);
@@ -122,7 +122,7 @@ UINT        status;
     /* Determine if the new threshold is greater than the current user priority.  */
     if (new_threshold > thread_ptr -> tx_thread_user_priority)
     {
-            
+
         /* Return error.  */
         status =  TX_THRESH_ERROR;
     }
@@ -174,13 +174,13 @@ UINT        status;
         /* Determine if the new threshold represents a higher priority than the priority inheritance threshold.  */
         if (new_threshold < thread_ptr -> tx_thread_inherit_priority)
         {
-    
+
             /* Update the actual preemption-threshold with the new threshold.  */
             thread_ptr -> tx_thread_preempt_threshold =  new_threshold;
         }
         else
         {
-    
+
             /* Update the actual preemption-threshold with the priority inheritance.  */
             thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_inherit_priority;
         }
@@ -240,18 +240,18 @@ UINT        status;
                     /* Is the execute pointer different?  */
                     if (_tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] != _tx_thread_execute_ptr)
                     {
-                     
+
                         /* Move to next entry.  */
                         _tx_thread_performance__execute_log_index++;
-            
+
                         /* Check for wrap condition.  */
                         if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_SIZE)
                         {
-          
+
                             /* Set the index to the beginning.  */
                             _tx_thread_performance__execute_log_index =  ((UINT) 0);
                         }
-            
+
                         /* Log the new execute pointer.  */
                         _tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] =  _tx_thread_execute_ptr;
                     }
@@ -265,7 +265,7 @@ UINT        status;
 
                     /* Check for preemption.  */
                     _tx_thread_system_preempt_check();
-                    
+
                     /* Disable interrupts.  */
                     TX_DISABLE
                 }
@@ -275,7 +275,7 @@ UINT        status;
 
     /* Restore interrupts.  */
     TX_RESTORE
-    
+
     /* Return completion status.  */
     return(status);
 }

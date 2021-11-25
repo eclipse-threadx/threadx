@@ -56,12 +56,12 @@
 #define TX_BLOCK_POOL_ID                        ((ULONG) 0x424C4F43)
 
 
-/* Determine if in-line component initialization is supported by the 
+/* Determine if in-line component initialization is supported by the
    caller.  */
 
 #ifdef TX_INVOKE_INLINE_INITIALIZATION
 
-/* Yes, in-line initialization is supported, remap the block memory pool 
+/* Yes, in-line initialization is supported, remap the block memory pool
    initialization function.  */
 
 #ifndef TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO

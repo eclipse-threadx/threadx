@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Queue                                                               */
 /**                                                                       */
@@ -31,54 +31,56 @@
 #include "tx_queue.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txe_queue_receive                                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_queue_receive                                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function checks for errors in the queue receive function call. */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    queue_ptr                         Pointer to queue control block    */ 
-/*    destination_ptr                   Pointer to message destination    */ 
-/*                                        **** MUST BE LARGE ENOUGH TO    */ 
-/*                                             HOLD MESSAGE ****          */ 
-/*    wait_option                       Suspension option                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_QUEUE_ERROR                    Invalid queue pointer             */ 
-/*    TX_PTR_ERROR                      Invalid destination pointer (NULL)*/ 
-/*    TX_WAIT_ERROR                     Invalid wait option               */ 
-/*    status                            Actual completion status          */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_queue_receive                 Actual queue receive function     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function checks for errors in the queue receive function call. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    queue_ptr                         Pointer to queue control block    */
+/*    destination_ptr                   Pointer to message destination    */
+/*                                        **** MUST BE LARGE ENOUGH TO    */
+/*                                             HOLD MESSAGE ****          */
+/*    wait_option                       Suspension option                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_QUEUE_ERROR                    Invalid queue pointer             */
+/*    TX_PTR_ERROR                      Invalid destination pointer (NULL)*/
+/*    TX_WAIT_ERROR                     Invalid wait option               */
+/*    status                            Actual completion status          */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_queue_receive                 Actual queue receive function     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txe_queue_receive(TX_QUEUE *queue_ptr, VOID *destination_ptr, ULONG wait_option)
 {
 
-UINT        status;  
+UINT        status;
 
 #ifndef TX_TIMER_PROCESS_IN_ISR
 TX_THREAD   *current_thread;
@@ -95,7 +97,7 @@ TX_THREAD   *current_thread;
         /* Queue pointer is invalid, return appropriate error code.  */
         status =  TX_QUEUE_ERROR;
     }
-    
+
     /* Now check for invalid queue ID.  */
     else if (queue_ptr -> tx_queue_id != TX_QUEUE_ID)
     {
@@ -114,7 +116,7 @@ TX_THREAD   *current_thread;
     else
     {
 
-        /* Check for a wait option error.  Only threads are allowed any form of 
+        /* Check for a wait option error.  Only threads are allowed any form of
            suspension.  */
         if (wait_option != TX_NO_WAIT)
         {
@@ -126,7 +128,7 @@ TX_THREAD   *current_thread;
                 /* A non-thread is trying to suspend, return appropriate error code.  */
                 status =  TX_WAIT_ERROR;
             }
-       
+
 #ifndef TX_TIMER_PROCESS_IN_ISR
             else
             {

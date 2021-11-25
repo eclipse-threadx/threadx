@@ -39,7 +39,7 @@
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_context_save                              RXv3/IAR       */
-;/*                                                           6.1.7        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */ 
 ;/*                                                                        */ 
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -71,6 +71,8 @@
 ;/*    DATE              NAME                      DESCRIPTION             */ 
 ;/*                                                                        */ 
 ;/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s),          */ 
+;/*                                            resulting in version 6.1.9  */ 
 ;/*                                                                        */ 
 ;/**************************************************************************/ 
 ;VOID   _tx_thread_context_save(VOID)
@@ -93,24 +95,24 @@ __tx_thread_context_save:
 ;    {
 ;
 
-    MOV.L   #__tx_thread_system_state, R1     ; pick up address of system state
-    MOV.L   [R1], R2                           ; pick up system state
-    CMP     #0, R2                             ; 0 -> no nesting
+    MOV.L   #__tx_thread_system_state, R1       ; Pick up address of system state
+    MOV.L   [R1], R2                            ; Pick up system state
+    CMP     #0, R2                              ; 0 -> no nesting
     BEQ     __tx_thread_not_nested_save
 ;
 ;    /* Nested interrupt condition.  */
 ;   
-    ADD   #1, r2                             ; _tx_thread_system_state++
+    ADD   #1, r2                                ; _tx_thread_system_state++
     MOV.L   r2, [r1]
 
 ;
 ;   /* Save the rest of the scratch registers on the interrupt stack and return to the
 ;       calling ISR.  */
-    POP R1                                      ; recuperate return address from stack
+    POP R1                                      ; Recuperate return address from stack
     PUSHM   R3-R5
     PUSHM   R14-R15
     PUSHC   FPSW                                ; (top) FPSW, R14, R15, R3, R4, R5, R1, R2, PC, PSW (bottom)
-    JMP     R1                                  ; return address was preserved in R1
+    JMP     R1                                  ; Return address was preserved in R1
 
 ;
 __tx_thread_not_nested_save:
@@ -120,38 +122,38 @@ __tx_thread_not_nested_save:
 ;    else if (_tx_thread_current_ptr)
 ;    {
 ;
-    ADD     #1, R2                                ; _tx_thread_system_state++
+    ADD     #1, R2                              ; _tx_thread_system_state++
     MOV.L   R2, [R1]
 
-    MOV.L   #__tx_thread_current_ptr, R2         ; Pickup current thread pointer
+    MOV.L   #__tx_thread_current_ptr, R2        ; Pickup current thread pointer
     MOV.L   [R2], R2
-    CMP     #0,R2                                ; Is it NULL?  
-    BEQ      __tx_thread_idle_system_save        ; Yes, idle system is running - idle restore
+    CMP     #0,R2                               ; Is it NULL?  
+    BEQ      __tx_thread_idle_system_save       ; Yes, idle system is running - idle restore
 ;
 ;    /* Move stack frame over to the current threads stack.  */
 ;    /* complete stack frame with registers not saved yet (R3-R5, R14-R15, FPSW)   */
 ;
-    MVFC    USP, R1                               ; pick up user stack pointer
+    MVFC    USP, R1                             ; Pick up user stack pointer
     MOV.L   16[R0], R2
-    MOV.L   R2, [-R1]                             ; save PSW on thread stack
+    MOV.L   R2, [-R1]                           ; Save PSW on thread stack
     MOV.L   12[R0], R2
-    MOV.L   R2, [-R1]                             ; save PC on thread stack
+    MOV.L   R2, [-R1]                           ; Save PC on thread stack
     MOV.L   8[R0], R2
-    MOV.L   R2, [-R1]                             ; save R2 on thread stack 
+    MOV.L   R2, [-R1]                           ; Save R2 on thread stack 
     MOV.L   4[R0], R2
-    MOV.L   R2, [-R1]                             ; save R1 on thread stack 
-    MOV.L   R5, [-R1]                             ; save R5 on thread stack
-    MOV.L   R4, [-R1]                             ; save R4 on thread stack
-    MOV.L   R3, [-R1]                             ; save R3 on thread stack
-    MOV.L   R15, [-R1]                            ; save R15 on thread stack
-    MOV.L   R14, [-R1]                            ; save R14 on thread stack
+    MOV.L   R2, [-R1]                           ; Save R1 on thread stack 
+    MOV.L   R5, [-R1]                           ; Save R5 on thread stack
+    MOV.L   R4, [-R1]                           ; Save R4 on thread stack
+    MOV.L   R3, [-R1]                           ; Save R3 on thread stack
+    MOV.L   R15, [-R1]                          ; Save R15 on thread stack
+    MOV.L   R14, [-R1]                          ; Save R14 on thread stack
     MVFC    FPSW, R3
-    MOV.L   R3, [-R1]                             ; save FPSW on thread stack
-	
-    POP     R2                                    ; pick up return address from interrupt stack
-    ADD     #16, R0, R0                           ; correct interrupt stack pointer back to the bottom   
-    MVTC    R1, USP                               ; set user/thread stack pointer
-    JMP     R2                                    ; return to ISR
+    MOV.L   R3, [-R1]                           ; Save FPSW on thread stack
+    
+    POP     R2                                  ; Pick up return address from interrupt stack
+    ADD     #16, R0, R0                         ; Correct interrupt stack pointer back to the bottom   
+    MVTC    R1, USP                             ; Set user/thread stack pointer
+    JMP     R2                                  ; Return to ISR
 
 ;    }
 ;    else
@@ -161,10 +163,11 @@ __tx_thread_idle_system_save:
 ;
 ;        /* Interrupt occurred in the scheduling loop.  */
 ;
-    POP     R1                                   ; pick up return address
-    ADD     #16, R0, R0                          ; correct interrupt stack pointer back to the bottom (PC), don't care about saved registers
-    JMP     R1                                   ; return to caller
+    POP     R1                                  ; Pick up return address
+    ADD     #16, R0, R0                         ; Correct interrupt stack pointer back to the bottom (PC), don't care about saved registers
+    JMP     R1                                  ; Return to caller
 ;
 ;    }
 ;}    
     END
+

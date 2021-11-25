@@ -65,6 +65,7 @@
     .syntax unified
     .eabi_attribute Tag_ABI_align_preserved, 1
     .global  _tx_thread_secure_stack_free
+    .global _tx_free_return
     .thumb_func
 .type _tx_thread_secure_stack_free, function
 _tx_thread_secure_stack_free:
@@ -72,6 +73,7 @@ _tx_thread_secure_stack_free:
     MRS     r3, PRIMASK     // Save interrupt mask
     CPSIE   i               // Enable interrupts for SVC call
     SVC     2
+_tx_free_return:
     CMP     r3, #0          // If interrupts enabled, just return
     BEQ     _free_return_interrupt_enabled
     CPSID   i               // Otherwise, disable interrupts

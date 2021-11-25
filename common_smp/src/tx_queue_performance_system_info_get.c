@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Queue                                                               */
 /**                                                                       */
@@ -32,52 +32,54 @@
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_queue_performance_system_info_get               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_queue_performance_system_info_get               PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function retrieves queue system performance information.       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    messages_sent                     Destination for total messages    */ 
-/*                                        sent                            */ 
-/*    messages_received                 Destination for total messages    */ 
-/*                                        received                        */ 
-/*    empty_suspensions                 Destination for total empty       */ 
-/*                                        queue suspensions               */ 
-/*    full_suspensions                  Destination for total full        */ 
-/*                                        queue suspensions               */ 
-/*    full_errors                       Destination for total queue full  */ 
-/*                                        errors returned - no suspension */ 
-/*    timeouts                          Destination for total number of   */ 
-/*                                        timeouts                        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function retrieves queue system performance information.       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    messages_sent                     Destination for total messages    */
+/*                                        sent                            */
+/*    messages_received                 Destination for total messages    */
+/*                                        received                        */
+/*    empty_suspensions                 Destination for total empty       */
+/*                                        queue suspensions               */
+/*    full_suspensions                  Destination for total full        */
+/*                                        queue suspensions               */
+/*    full_errors                       Destination for total queue full  */
+/*                                        errors returned - no suspension */
+/*    timeouts                          Destination for total number of   */
+/*                                        timeouts                        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_queue_performance_system_info_get(ULONG *messages_sent, ULONG *messages_received,
@@ -104,51 +106,51 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the total number of queue messages sent.  */
     if (messages_sent != TX_NULL)
     {
-    
+
         *messages_sent =  _tx_queue_performance_messages_sent_count;
     }
-    
+
     /* Retrieve the total number of queue messages received.  */
     if (messages_received != TX_NULL)
     {
-    
+
         *messages_received =  _tx_queue_performance__messages_received_count;
     }
-    
+
     /* Retrieve the total number of empty queue suspensions.  */
     if (empty_suspensions != TX_NULL)
     {
-    
+
         *empty_suspensions =  _tx_queue_performance_empty_suspension_count;
     }
-    
+
     /* Retrieve the total number of full queue suspensions.  */
     if (full_suspensions != TX_NULL)
     {
-    
+
         *full_suspensions =  _tx_queue_performance_full_suspension_count;
     }
-    
+
     /* Retrieve the total number of full errors.  */
     if (full_errors != TX_NULL)
     {
-    
+
         *full_errors =  _tx_queue_performance_full_error_count;
     }
-    
+
     /* Retrieve the total number of queue timeouts.  */
     if (timeouts != TX_NULL)
     {
-    
+
         *timeouts =  _tx_queue_performance_timeout_count;
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 
     /* Return completion status.  */
     return(TX_SUCCESS);
-    
+
 #else
 
 UINT        status;

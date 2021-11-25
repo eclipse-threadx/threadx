@@ -45,8 +45,8 @@ TXM_MODULE_MANAGER_FAULT_INFO
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_memory_fault_handler        Cortex-M7/MPU/AC5   */
-/*                                                           6.1          */
+/*    _txm_module_manager_memory_fault_handler            Cortex-M7       */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -76,7 +76,7 @@ TXM_MODULE_MANAGER_FAULT_INFO
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_memory_fault_handler(VOID)

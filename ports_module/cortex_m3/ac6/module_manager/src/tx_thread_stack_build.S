@@ -20,7 +20,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
     .text
     .align 4
     .syntax unified
@@ -28,11 +27,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_stack_build                            Cortex-M3/AC6     */
-/*                                                           6.1          */
+/*    _tx_thread_stack_build                           Cortex-M3/AC6      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -61,7 +60,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -69,7 +68,6 @@
     .global  _tx_thread_stack_build
     .thumb_func
 _tx_thread_stack_build:
-
 
     /* Build a fake interrupt frame.  The form of the fake interrupt stack
        on the Cortex-M should look like the following after it is built:
@@ -96,7 +94,7 @@ _tx_thread_stack_build:
     Stack Bottom: (higher memory address)  */
 
     LDR     r2, [r0, #16]                           // Pickup end of stack area
-    BIC     r2, r2, #0x7                            // Align frame
+    BIC     r2, r2, #0x7                            // Align frame for 8-byte alignment
     SUB     r2, r2, #68                             // Subtract frame size
     LDR     r3, =0xFFFFFFFD                         // Build initial LR value
     STR     r3, [r2, #0]                            // Save on the stack

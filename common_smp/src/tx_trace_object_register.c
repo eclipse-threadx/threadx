@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Trace                                                               */
 /**                                                                       */
@@ -29,47 +29,49 @@
 #include "tx_trace.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_trace_object_register                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_trace_object_register                           PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function registers a ThreadX system object in the trace        */ 
-/*    registry area. This provides a mapping between the object pointers  */ 
-/*    stored in each trace event to the actual ThreadX objects.           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    object_type                           Type of system object         */ 
-/*    object_ptr                            Address of system object      */ 
-/*    object_name                           Name of system object         */ 
-/*    parameter_1                           Supplemental parameter 1      */ 
-/*    parameter_2                           Supplemental parameter 2      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function registers a ThreadX system object in the trace        */
+/*    registry area. This provides a mapping between the object pointers  */
+/*    stored in each trace event to the actual ThreadX objects.           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    object_type                           Type of system object         */
+/*    object_ptr                            Address of system object      */
+/*    object_name                           Name of system object         */
+/*    parameter_1                           Supplemental parameter 1      */
+/*    parameter_2                           Supplemental parameter 2      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, CHAR *object_name, ULONG parameter_1, ULONG parameter_2)
@@ -96,7 +98,7 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
         /* Determine if there are available entries in the registry.  */
         if (_tx_trace_available_registry_entries != ((ULONG) 0))
         {
-    
+
             /* There are more available entries, proceed.  */
 
             /* Initialize found to the max entries... indicating no space was found.  */
@@ -123,7 +125,7 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
                     loop_break =  TX_TRUE;
                 }
 
-                /* Determine if this entry matches the object pointer... we must reuse old entries left in the 
+                /* Determine if this entry matches the object pointer... we must reuse old entries left in the
                    registry.  */
                 if (entry_ptr -> tx_trace_object_entry_thread_pointer == TX_POINTER_TO_ULONG_CONVERT(object_ptr))
                 {
@@ -132,11 +134,11 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
                     found =  i;
                     loop_break =  TX_TRUE;
                 }
-                
+
                 /* Determine if we should break out of the loop.  */
                 if (loop_break == TX_TRUE)
                 {
-                
+
                     /* Yes, break out of the loop.  */
                     break;
                 }
@@ -152,30 +154,30 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
                     }
                     else
                     {
-                    
+
                         /* Setup a pointer to the found entry.  */
                         work_ptr =   TX_OBJECT_TO_UCHAR_POINTER_CONVERT(_tx_trace_registry_start_ptr);
                         work_ptr =   TX_UCHAR_POINTER_ADD(work_ptr, ((sizeof(TX_TRACE_OBJECT_ENTRY))*found));
                         entry_ptr =  TX_UCHAR_TO_OBJECT_POINTER_CONVERT(work_ptr);
-                
+
                          if (entry_ptr -> tx_trace_object_entry_type != ((UCHAR) 0))
                          {
                             found =  i;
                          }
                     }
                 }
-        
+
                 /* Move to the next entry.  */
                 i++;
-        
+
                 /* Determine if we have wrapped the list.  */
                 if (i >= entries)
                 {
-        
+
                     /* Yes, wrap to the beginning of the list.  */
                     i =  ((ULONG) 0);
                 }
-        
+
             } while (i != _tx_trace_registry_search_start);
 
             /* Now determine if an empty or reuse entry has been found.  */
@@ -188,24 +190,24 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
                 /* Adjust the search index to the next entry.  */
                 if ((found + ((ULONG) 1)) < entries)
                 {
-                    
+
                     /* Start searching from the next index.  */
                     _tx_trace_registry_search_start =  found + ((ULONG) 1);
                 }
                 else
                 {
-                
+
                     /* Reset the search to the beginning of the list. */
                     _tx_trace_registry_search_start =  ((ULONG) 0);
                 }
-        
+
                 /* Yes, an entry has been found...  */
-                
+
                 /* Build a pointer to the found entry.  */
                 work_ptr =   TX_OBJECT_TO_UCHAR_POINTER_CONVERT(_tx_trace_registry_start_ptr);
                 work_ptr =   TX_UCHAR_POINTER_ADD(work_ptr, ((sizeof(TX_TRACE_OBJECT_ENTRY))*found));
                 entry_ptr =  TX_UCHAR_TO_OBJECT_POINTER_CONVERT(work_ptr);
-                
+
                 /* Populate the found entry!  */
                 entry_ptr -> tx_trace_object_entry_available =       ((UCHAR) TX_FALSE);
                 entry_ptr -> tx_trace_object_entry_type =            object_type;
@@ -220,7 +222,7 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
                     /* Setup work pointer to the object name character.  */
                     work_ptr =  TX_CHAR_TO_UCHAR_POINTER_CONVERT(object_name);
                     work_ptr =  TX_UCHAR_POINTER_ADD(work_ptr, i);
-                  
+
                     /* Copy a character of the name.  */
                     entry_ptr -> tx_trace_object_entry_name[i] =  (UCHAR) *work_ptr;
 
@@ -239,17 +241,17 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
                 {
 
                     /* Yes, a thread object is present.  */
-            
+
                     /* Setup a pointer to the thread.  */
                     thread_ptr =  TX_VOID_TO_THREAD_POINTER_CONVERT(object_ptr);
-            
+
                     /* Store the thread's priority in the reserved bits.  */
                     entry_ptr -> tx_trace_object_entry_reserved1 =  ((UCHAR) 0x80) | ((UCHAR) (thread_ptr -> tx_thread_priority >> ((UCHAR) 8)));
                     entry_ptr -> tx_trace_object_entry_reserved2 =  (UCHAR) (thread_ptr -> tx_thread_priority & ((UCHAR) 0xFF));
                 }
                 else
                 {
-        
+
                     /* For all other objects, set the reserved bytes to 0.  */
                     entry_ptr -> tx_trace_object_entry_reserved1 =  ((UCHAR) 0);
                     entry_ptr -> tx_trace_object_entry_reserved2 =  ((UCHAR) 0);
@@ -265,19 +267,19 @@ TX_INTERRUPT_SAVE_AREA
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (object_type != ((UCHAR) 0))
     {
-    
+
         if (object_ptr != TX_NULL)
         {
-        
+
             if (object_name != TX_NULL)
             {
-            
+
                 if (parameter_1 != ((ULONG) 0))
                 {
-                
+
                     if (parameter_2 != ((ULONG) 0))
                     {
-                    
+
                         /* NOP code.  */
                         TX_DISABLE
                         TX_RESTORE

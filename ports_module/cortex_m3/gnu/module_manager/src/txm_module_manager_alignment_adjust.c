@@ -30,8 +30,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_power_of_two_block_size                    Cortex-M3/MPU/GNU   */
-/*                                                           6.1          */
+/*    _txm_power_of_two_block_size                        Cortex-M3       */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -61,7 +61,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_power_of_two_block_size(ULONG size)
@@ -93,8 +93,8 @@ ULONG  _txm_power_of_two_block_size(ULONG size)
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_alignment_adjust            Cortex-M3/MPU/GNU   */
-/*                                                           6.1          */
+/*    _txm_module_manager_alignment_adjust                Cortex-M3       */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -128,7 +128,7 @@ ULONG  _txm_power_of_two_block_size(ULONG size)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,
@@ -137,6 +137,53 @@ VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,
                                            ULONG *data_size,
                                            ULONG *data_alignment)
 {
+#ifdef TXM_MODULE_MANAGER_16_MPU
+ULONG   local_code_size;
+ULONG   local_code_alignment;
+ULONG   local_data_size;
+ULONG   local_data_alignment;
+ULONG   code_size_accum;
+ULONG   data_size_accum;
+
+    /* Copy the input parameters into local variables for ease of use.  */
+    local_code_size =       *code_size;
+    local_code_alignment =  *code_alignment;
+    local_data_size =       *data_size;
+    local_data_alignment =  *data_alignment;
+
+    /* Determine code block sizes. Minimize the alignment requirement.
+       There are 4 MPU code entries available. The following is how the code size
+       will be distributed:
+       1. 1/4 of the largest power of two that is greater than or equal to code size.
+       2. 1/4 of the largest power of two that is greater than or equal to code size.
+       3. Largest power of 2 that fits in the remaining space.
+       4. Smallest power of 2 that exceeds the remaining space, minimum 32.  */
+    local_code_alignment =  _txm_power_of_two_block_size(local_code_size) >> 2;
+    code_size_accum =  local_code_alignment + local_code_alignment;
+    code_size_accum =  code_size_accum + (_txm_power_of_two_block_size(local_code_size - code_size_accum) >> 1);
+    code_size_accum =  code_size_accum + _txm_power_of_two_block_size(local_code_size - code_size_accum);
+    local_code_size =  code_size_accum;
+    
+    /* Determine data block sizes. Minimize the alignment requirement.
+       There are 4 MPU data entries available. The following is how the data size
+       will be distributed:
+       1. 1/4 of the largest power of two that is greater than or equal to data size.
+       2. 1/4 of the largest power of two that is greater than or equal to data size.
+       3. Largest power of 2 that fits in the remaining space.
+       4. Smallest power of 2 that exceeds the remaining space, minimum 32.  */
+    local_data_alignment =  _txm_power_of_two_block_size(local_data_size) >> 2;
+    data_size_accum =  local_data_alignment + local_data_alignment;
+    data_size_accum =  data_size_accum + (_txm_power_of_two_block_size(local_data_size - data_size_accum) >> 1);
+    data_size_accum =  data_size_accum + _txm_power_of_two_block_size(local_data_size - data_size_accum);
+    local_data_size =  data_size_accum;
+    
+    /* Return all the information to the caller.  */
+    *code_size =        local_code_size;
+    *code_alignment =   local_code_alignment;
+    *data_size =        local_data_size;
+    *data_alignment =   local_data_alignment;
+
+#else
 
 ULONG   local_code_size;
 ULONG   local_code_alignment;
@@ -396,4 +443,6 @@ ULONG   data_size_accum;
     *code_alignment =   local_code_alignment;
     *data_size =        local_data_size;
     *data_alignment =   local_data_alignment;
+
+#endif
 }

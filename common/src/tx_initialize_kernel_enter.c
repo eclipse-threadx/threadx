@@ -98,8 +98,8 @@ VOID  _tx_initialize_kernel_enter(VOID)
 
         /* No, the initialization still needs to take place.  */
 
-        /* Ensure that the system state variable is set to indicate 
-           initialization is in progress.  Note that this variable is 
+        /* Ensure that the system state variable is set to indicate
+           initialization is in progress.  Note that this variable is
            later used to represent interrupt nesting.  */
         _tx_thread_system_state =  TX_INITIALIZE_IN_PROGRESS;
 
@@ -109,9 +109,9 @@ VOID  _tx_initialize_kernel_enter(VOID)
         /* Invoke the low-level initialization to handle all processor specific
            initialization issues.  */
         _tx_initialize_low_level();
-    
-        /* Invoke the high-level initialization to exercise all of the 
-           ThreadX components and the application's initialization 
+
+        /* Invoke the high-level initialization to exercise all of the
+           ThreadX components and the application's initialization
            function.  */
         _tx_initialize_high_level();
 
@@ -122,8 +122,8 @@ VOID  _tx_initialize_kernel_enter(VOID)
     /* Optional processing extension.  */
     TX_INITIALIZE_KERNEL_ENTER_EXTENSION
 
-    /* Ensure that the system state variable is set to indicate 
-       initialization is in progress.  Note that this variable is 
+    /* Ensure that the system state variable is set to indicate
+       initialization is in progress.  Note that this variable is
        later used to represent interrupt nesting.  */
     _tx_thread_system_state =  TX_INITIALIZE_IN_PROGRESS;
 
@@ -131,7 +131,7 @@ VOID  _tx_initialize_kernel_enter(VOID)
        first available memory address to it.  */
     tx_application_define(_tx_initialize_unused_memory);
 
-    /* Set the system state in preparation for entering the thread 
+    /* Set the system state in preparation for entering the thread
        scheduler.  */
     _tx_thread_system_state =  TX_INITIALIZE_IS_FINISHED;
 

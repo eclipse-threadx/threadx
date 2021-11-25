@@ -84,7 +84,7 @@ TX_THREAD       *thread_ptr;
     /* Determine if we are in a system state (ISR or Initialization) or internal preemption is disabled.  */
     if (combined_flags == ((ULONG) 0))
     {
-    
+
         /* No, at thread execution level so continue checking for preemption.  */
 
         /* Pickup thread pointer.  */

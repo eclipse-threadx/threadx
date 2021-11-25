@@ -12,65 +12,55 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread - Low Level SMP Support                                      */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
-/*
-#define TX_SOURCE_CODE
-#define TX_THREAD_SMP_SOURCE_CODE
-*/
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_thread.h"
-#include "tx_timer.h"
-*/
 
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_low_level_initialize              Cortex-A5x-SMP/AC6 */ 
-/*                                                            6.1         */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_smp_low_level_initialize              Cortex-A5x-SMP/AC6 */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs low-level initialization of the booting      */ 
-/*    core.                                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    number_of_cores                       Number of cores               */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function performs low-level initialization of the booting      */
+/*    core.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    number_of_cores                       Number of cores               */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_high_level            ThreadX high-level init        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_high_level            ThreadX high-level init        */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*                                             resulting in version 6.1.9 */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_low_level_initialize

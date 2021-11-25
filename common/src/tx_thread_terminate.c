@@ -201,7 +201,7 @@ ULONG       suspension_sequence;
             /* Thread state change.  */
             TX_THREAD_STATE_CHANGE(thread_ptr, TX_TERMINATED)
 
-            /* Set the suspending flag.  This prevents the thread from being 
+            /* Set the suspending flag.  This prevents the thread from being
                resumed before the cleanup routine is executed.  */
             thread_ptr -> tx_thread_suspending =  TX_TRUE;
 
@@ -279,7 +279,7 @@ ULONG       suspension_sequence;
         if (_tx_thread_mutex_release != TX_NULL)
         {
 
-            /* Yes, call the mutex release function via a function pointer that 
+            /* Yes, call the mutex release function via a function pointer that
                is setup during initialization.  */
             (_tx_thread_mutex_release)(thread_ptr);
         }

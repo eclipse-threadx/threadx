@@ -51,7 +51,7 @@
 /*  OUTPUT                                                                */
 /*                                                                        */
 /*    TX_THREAD_ERROR                       Invalid thread pointer        */
-/*    TX_CALLER_ERROR                       Invalid caller of function    */  
+/*    TX_CALLER_ERROR                       Invalid caller of function    */
 /*    status                                Service return status         */
 /*                                                                        */
 /*  CALLS                                                                 */
@@ -90,7 +90,7 @@ TX_THREAD   *current_thread;
         /* Thread pointer is invalid, return appropriate error code.  */
         status =  TX_THREAD_ERROR;
     }
-    
+
     /* Now check for an invalid thread ID.  */
     else if (thread_ptr -> tx_thread_id != TX_THREAD_ID)
     {
@@ -118,12 +118,12 @@ TX_THREAD   *current_thread;
         /* Check for interrupt or initialization call.  */
         if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
         {
-    
+
             /* Invalid caller of this function, return appropriate error code.  */
             status =  TX_CALLER_ERROR;
         }
     }
-    
+
     /* Determine if everything is okay.  */
     if (status == TX_SUCCESS)
     {

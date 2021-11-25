@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -31,63 +31,65 @@
 #include "tx_timer.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txe_thread_create                                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_thread_create                                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function checks for errors in the thread create function call. */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                            Thread control block pointer  */ 
-/*    name                                  Pointer to thread name string */ 
-/*    entry_function                        Entry function of the thread  */ 
-/*    entry_input                           32-bit input value to thread  */ 
-/*    stack_start                           Pointer to start of stack     */ 
-/*    stack_size                            Stack size in bytes           */ 
-/*    priority                              Priority of thread (0-31)     */ 
+/*                                                                        */
+/*    This function checks for errors in the thread create function call. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Thread control block pointer  */
+/*    name                                  Pointer to thread name string */
+/*    entry_function                        Entry function of the thread  */
+/*    entry_input                           32-bit input value to thread  */
+/*    stack_start                           Pointer to start of stack     */
+/*    stack_size                            Stack size in bytes           */
+/*    priority                              Priority of thread (0-31)     */
 /*    preempt_threshold                     Preemption threshold          */
-/*    time_slice                            Thread time-slice value       */ 
-/*    auto_start                            Automatic start selection     */ 
+/*    time_slice                            Thread time-slice value       */
+/*    auto_start                            Automatic start selection     */
 /*    thread_control_block_size             Size of thread control block  */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_THREAD_ERROR                       Invalid thread pointer        */ 
-/*    TX_PTR_ERROR                          Invalid entry point or stack  */ 
-/*                                            address                     */ 
-/*    TX_SIZE_ERROR                         Invalid stack size -too small */ 
-/*    TX_PRIORITY_ERROR                     Invalid thread priority       */ 
-/*    TX_THRESH_ERROR                       Invalid preemption threshold  */ 
-/*    status                                Actual completion status      */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_create                     Actual thread create function */ 
-/*    _tx_thread_system_preempt_check       Check for preemption          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_THREAD_ERROR                       Invalid thread pointer        */
+/*    TX_PTR_ERROR                          Invalid entry point or stack  */
+/*                                            address                     */
+/*    TX_SIZE_ERROR                         Invalid stack size -too small */
+/*    TX_PRIORITY_ERROR                     Invalid thread priority       */
+/*    TX_THRESH_ERROR                       Invalid preemption threshold  */
+/*    status                                Actual completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_create                     Actual thread create function */
+/*    _tx_thread_system_preempt_check       Check for preemption          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT    _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, 
+UINT    _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
                 VOID (*entry_function)(ULONG id), ULONG entry_input,
-                VOID *stack_start, ULONG stack_size, 
+                VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start, UINT thread_control_block_size)
 {
@@ -143,19 +145,19 @@ TX_THREAD       *current_thread;
         stack_end =    TX_UCHAR_TO_VOID_POINTER_CONVERT(work_ptr);
         for (i = ((ULONG) 0); i < _tx_thread_created_count; i++)
         {
-        
+
             /* Determine if this thread matches the thread in the list.  */
             if (thread_ptr == next_thread)
             {
-        
+
                 /* Set the break flag.  */
                 break_flag =  TX_TRUE;
             }
-            
+
             /* Determine if we need to break the loop.  */
             if (break_flag == TX_TRUE)
             {
-            
+
                 /* Yes, break out of the loop.  */
                 break;
             }
@@ -166,11 +168,11 @@ TX_THREAD       *current_thread;
 
                 if (stack_start < next_thread -> tx_thread_stack_end)
                 {
-        
-                    /* This stack overlaps with an existing thread, clear the stack pointer to 
+
+                    /* This stack overlaps with an existing thread, clear the stack pointer to
                        force a stack error below.  */
                     stack_start =  TX_NULL;
-                    
+
                     /* Set the break flag.  */
                     break_flag =  TX_TRUE;
                 }
@@ -182,11 +184,11 @@ TX_THREAD       *current_thread;
 
                 if (stack_end < next_thread -> tx_thread_stack_end)
                 {
-        
-                    /* This stack overlaps with an existing thread, clear the stack pointer to 
+
+                    /* This stack overlaps with an existing thread, clear the stack pointer to
                        force a stack error below.  */
                     stack_start =  TX_NULL;
-                    
+
                     /* Set the break flag.  */
                     break_flag =  TX_TRUE;
                 }
@@ -201,7 +203,7 @@ TX_THREAD       *current_thread;
 
         /* Decrement the preempt disable flag.  */
         _tx_thread_preempt_disable--;
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
 
@@ -283,11 +285,11 @@ TX_THREAD       *current_thread;
             /* Check for interrupt call.  */
             if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
             {
-    
+
                 /* Now, make sure the call is from an interrupt and not initialization.  */
                 if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
                 {
-            
+
                     /* Invalid caller of this function, return appropriate error code.  */
                     status =  TX_CALLER_ERROR;
                 }

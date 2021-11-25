@@ -26,8 +26,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_thread_stack_build          Cortex-M33/MPU/IAR  */
-/*                                                           6.1.5        */
+/*    _txm_module_manager_thread_stack_build            Cortex-M33/IAR    */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -59,7 +59,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021     Scott Larson             Initial Version 6.1.5         */
+/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_manager_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(TX_THREAD *, TXM_MODULE_INSTANCE *))

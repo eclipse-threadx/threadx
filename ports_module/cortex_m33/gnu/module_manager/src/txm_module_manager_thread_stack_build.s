@@ -27,8 +27,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_thread_stack_build          Cortex-M33/MPU/GNU  */
-/*                                                           6.1.5        */
+/*    _txm_module_manager_thread_stack_build            Cortex-M33/GNU    */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */

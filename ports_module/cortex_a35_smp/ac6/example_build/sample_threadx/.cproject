@@ -31,7 +31,7 @@
                             							
                             <option id="com.arm.toolchain.v6.base.options.target.cpu_fpu.1337922098" superClass="com.arm.toolchain.v6.base.options.target.cpu_fpu" useByScannerDiscovery="false" value="Cortex-A35.AArch64.ARMv8.Neon.Crypto" valueType="string"/>
                             							
-                            <option id="com.arm.toolchain.v6.base.options.debug.level.1596377417" superClass="com.arm.toolchain.v6.base.options.debug.level" value="com.arm.tool.c.compiler.v6.base.options.debug.level.std" valueType="enumerated"/>
+                            <option id="com.arm.toolchain.v6.base.options.debug.level.1596377417" name="Debug Level" superClass="com.arm.toolchain.v6.base.options.debug.level" value="com.arm.tool.c.compiler.v6.base.options.debug.level.std" valueType="enumerated"/>
                             							
                             <targetPlatform id="com.arm.toolchain.v6.base.var.arm_compiler_6-6.1592753597.2060144338" name=""/>
                             							

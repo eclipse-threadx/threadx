@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread - High Level SMP Support                                     */
 /**                                                                       */
@@ -33,38 +33,38 @@
 
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_current_state_set                   PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_smp_current_state_set                   PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is sets the current state to all of the cores.        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    new_state                             New per-system state          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is sets the current state to all of the cores.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    new_state                             New per-system state          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter           ThreadX entry                 */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter           ThreadX entry                 */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -72,15 +72,15 @@
 /**************************************************************************/
 void  _tx_thread_smp_current_state_set(ULONG new_state)
 {
-    
+
 UINT    i;
-    
+
     /* Initialize the state for each to initialization.  */
     i =  ((UINT) (TX_THREAD_SMP_MAX_CORES-1));
     do
     {
 
-        /* Set this core's state.  */   
+        /* Set this core's state.  */
         _tx_thread_system_state[i] =  new_state;
 
         if (i == ((UINT) 0))
@@ -91,7 +91,7 @@ UINT    i;
         }
         else
         {
-          
+
             /* Decrement the index.  */
             i--;
         }

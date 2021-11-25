@@ -21,6 +21,10 @@
 /**************************************************************************/
 
 
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    .global _tx_execution_thread_enter
+    .global _tx_execution_thread_exit
+#endif
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -71,29 +75,24 @@
     .thumb_func
 .type _tx_thread_schedule, function
 _tx_thread_schedule:
-
     /* This function should only ever be called on Cortex-M
        from the first schedule request. Subsequent scheduling occurs
        from the PendSV handling routine below. */
 
     /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
-
     MOVW    r0, #0                                  // Build value for TX_FALSE
     LDR     r2, =_tx_thread_preempt_disable         // Build address of preempt disable flag
     STR     r0, [r2, #0]                            // Clear preempt disable flag
 
     /* Enable memory fault registers.  */
-
     LDR     r0, =0xE000ED24                         // Build SHCSR address
     LDR     r1, =0x70000                            // Enable Usage, Bus, and MemManage faults
     STR     r1, [r0]                                //
 
     /* Enable interrupts */
-
     CPSIE   i
 
     /* Enter the scheduler for the first time.  */
-
     LDR     r0, =0x10000000                         // Load PENDSVSET bit
     LDR     r1, =0xE000ED04                         // Load ICSR address
     STR     r0, [r1]                                // Set PENDSVBIT in ICSR
@@ -221,19 +220,18 @@ BusFault_Handler:
 PendSV_Handler:
 __tx_ts_handler:
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
     BL      _tx_execution_thread_exit               // Call the thread exit function
     POP     {r0, r1}                                // Recover LR
-    MOV     lr, r1
+    MOV     lr, r1                                  //
     CPSIE   i                                       // Enable interrupts
 #endif
-    
+
     LDR     r0, =_tx_thread_current_ptr             // Build current thread pointer address
     LDR     r2, =_tx_thread_execute_ptr             // Build execute thread pointer address
-    
     MOVW    r3, #0                                  // Build NULL value
     LDR     r1, [r0]                                // Pickup current thread pointer
 
@@ -246,18 +244,18 @@ __tx_ts_handler:
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r3, PSP                                 // Pickup PSP pointer (thread's stack pointer)
     SUBS    r3, r3, #16                             // Allocate stack space
-    STM     r3!, {r4-r7}                            // Save its remaining registers (M3 Instruction: STMDB r12!, {r4-r11})
-    MOV     r4, r8                                  // 
-    MOV     r5, r9                                  // 
-    MOV     r6, r10                                 // 
-    MOV     r7, r11                                 // 
+    STM     r3!, {r4-r7}                            // Save r4-r7 (M4 Instruction: STMDB r12!, {r4-r11})
+    MOV     r4, r8                                  // Copy r8-r11 to multisave registers
+    MOV     r5, r9
+    MOV     r6, r10
+    MOV     r7, r11
     SUBS    r3, r3, #32                             // Allocate stack space
-    STM     r3!, {r4-r7}                            // 
+    STM     r3!, {r4-r7}                            // Save r8-r11
     SUBS    r3, r3, #20                             // Allocate stack space
-    MOV     r5, lr                                  // 
-    STR     r5, [r3]                                // Save LR on the stack
+    MOV     r5, lr                                  // Copy lr to saveable register
+    STR     r5, [r3]                                // Save lr on the stack
     STR     r3, [r1, #8]                            // Save the thread stack pointer
-    
+
 #if (!defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE))
     // Save secure context
     LDR     r5, =0xC4                               // Secure stack index offset
@@ -339,7 +337,7 @@ __tx_ts_restore:
 
     STR     r5, [r4]                                // Setup global time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing.  */
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
@@ -379,6 +377,8 @@ _skip_secure_restore:
     CBZ     r1, skip_mpu_setup                      // Is protection required for this module? No, skip MPU setup
 
     // Initialize loop to configure MPU registers
+    // Order doesn't matter, so txm_module_instance_mpu_registers[0] 
+    // will be in region 7 and txm_module_instance_mpu_registers[7] will be in region 0.
     MOVS    r3, #0x64                               // Index of MPU register settings in thread control block
     ADD     r0, r0, r3                              // Build address of MPU register start in thread control block
     MOVS    r5, #0                                  // Select region 0
@@ -416,7 +416,6 @@ skip_mpu_setup:
     BX      lr                                      // Return to thread!
 
 
-
     /* SVC Handler.  */
     .section .text
     .balign 4
@@ -430,10 +429,10 @@ SVC_Handler:
     MOVS    r1, #0x04
     TST     r1, r0                                  // Determine return stack from EXC_RETURN bit 2
     BEQ     _tx_load_msp
-    MRS     r0, PSP                                 // Get PSP
+    MRS     r0, PSP                                 // Get PSP if return stack is PSP
     B       _tx_get_svc
 _tx_load_msp:
-    MRS     r0, MSP                                 // Get MSP
+    MRS     r0, MSP                                 // Get MSP if return stack is MSP
 _tx_get_svc:
     LDR     r1, [r0,#24]                            // Load saved PC from stack
     LDR     r3, =-2
@@ -554,14 +553,14 @@ _tx_exit_continue:
     MRS     r3, PSP                                 // Pickup kernel stack pointer
 
     /* Copy kernel hardware stack to module thread stack. */
-    LDM     r3!,{r1-r2}                             // Get r0, r1 from kernel stack
-    STM     r0!,{r1-r2}                             // Insert r0, r1 into thread stack
-    LDM     r3!,{r1-r2}                             // Get r2, r3 from kernel stack
-    STM     r0!,{r1-r2}                             // Insert r2, r3 into thread stack
-    LDM     r3!,{r1-r2}                             // Get r12, lr from kernel stack
-    STM     r0!,{r1-r2}                             // Insert r12, lr into thread stack
-    LDM     r3!,{r1-r2}                             // Get pc, xpsr from kernel stack
-    STM     r0!,{r1-r2}                             // Insert pc, xpsr into thread stack
+    LDM     r3!, {r1-r2}                            // Get r0, r1 from kernel stack
+    STM     r0!, {r1-r2}                            // Insert r0, r1 into thread stack
+    LDM     r3!, {r1-r2}                            // Get r2, r3 from kernel stack
+    STM     r0!, {r1-r2}                            // Insert r2, r3 into thread stack
+    LDM     r3!, {r1-r2}                            // Get r12, lr from kernel stack
+    STM     r0!, {r1-r2}                            // Insert r12, lr into thread stack
+    LDM     r3!, {r1-r2}                            // Get pc, xpsr from kernel stack
+    STM     r0!, {r1-r2}                            // Insert pc, xpsr into thread stack
     SUBS    r0, r0, #32                             // Subtract 32 to get back to top of stack
     MSR     PSP, r0                                 // Set thread stack pointer
 
@@ -605,7 +604,7 @@ _tx_free_continue:
     STR     r0, [r1]                                // Store function return value
     MOV     lr, r2
     BX      lr
-#endif   // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
+#endif  // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
 
 
 

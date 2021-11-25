@@ -33,8 +33,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txe_thread_secure_stack_free                       PORTABLE C      */
-/*                                                            6.1         */
+/*    _txe_thread_secure_stack_free                       Cortex-M33      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -118,4 +118,3 @@ UINT    status;
     return(status);
 #endif
 }
-

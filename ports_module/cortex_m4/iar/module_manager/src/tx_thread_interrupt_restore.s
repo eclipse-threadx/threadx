@@ -26,11 +26,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_interrupt_restore                      Cortex-M4/IAR     */
-/*                                                           6.1.2        */
+/*    _tx_thread_interrupt_restore                     Cortex-M4/IAR      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -39,11 +39,11 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    None                                                                */
+/*    previous_posture                      Previous interrupt posture    */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    previous_posture                      Previous interrupt posture    */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -57,20 +57,19 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
-// VOID   _tx_thread_interrupt_restore(UINT new_posture)
+// VOID   _tx_thread_interrupt_restore(UINT previous_posture)
 // {
     PUBLIC  _tx_thread_interrupt_restore
 _tx_thread_interrupt_restore:
-
     /* Restore previous interrupt lockout posture.  */
-
+#ifdef TX_PORT_USE_BASEPRI
+    MSR     BASEPRI, r0
+#else
     MSR     PRIMASK, r0
+#endif
     BX      lr
-
 // }
     END

@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M3/AC6     */
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,10 +47,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
-/*                                            macro definition,           */
-/*                                            resulting in version 6.1.6  */
+/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -142,7 +139,7 @@ typedef unsigned short                          USHORT;
 /* Define the port specific options for the _tx_build_options variable. This variable indicates
    how the ThreadX library was built.  */
 
-#define TX_PORT_SPECIFIC_BUILD_OPTIONS          0
+#define TX_PORT_SPECIFIC_BUILD_OPTIONS          (0)
 
 
 /* Define the in-line initialization constant so that modules with in-line
@@ -218,8 +215,139 @@ typedef unsigned short                          USHORT;
 #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                                  
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  
 
+#ifdef TX_ENABLE_FPU_SUPPORT
+
+
+#ifdef TX_MISRA_ENABLE
+
+ULONG  _tx_misra_control_get(void);
+void   _tx_misra_control_set(ULONG value);
+ULONG  _tx_misra_fpccr_get(void);
+void   _tx_misra_vfp_touch(void);
+
+#else
+
+__attribute__( ( always_inline ) ) static inline ULONG __get_control(void)
+{
+
+ULONG  control_value;
+
+    __asm__ volatile (" MRS  %0,CONTROL ": "=r" (control_value) );
+    return(control_value);
+}
+
+
+__attribute__( ( always_inline ) ) static inline void __set_control(ULONG control_value)
+{
+
+    __asm__ volatile (" MSR  CONTROL,%0": : "r" (control_value): "memory" );
+}
+
+
+#endif
+
+
+/* A completed thread falls into _thread_shell_entry and we can simply deactivate the FPU via CONTROL.FPCA
+   in order to ensure no lazy stacking will occur. */
+
+#ifndef TX_MISRA_ENABLE
+
+#define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)                   {                                                                                             \
+                                                                    ULONG  _tx_vfp_state;                                                                         \
+                                                                        _tx_vfp_state =  __get_control();                                                         \
+                                                                        _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                                          \
+                                                                        __set_control(_tx_vfp_state);                                                             \
+                                                                    }
+#else
+
+#define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)                   {                                                                                             \
+                                                                    ULONG  _tx_vfp_state;                                                                         \
+                                                                        _tx_vfp_state =  _tx_misra_control_get();                                                 \
+                                                                        _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                                          \
+                                                                        _tx_misra_control_set(_tx_vfp_state);                                                     \
+                                                                    }
+                                                                    
+#endif
+
+
+/* A thread can be terminated by another thread, so we first check if it's self-terminating and not in an ISR.
+   If so, deactivate the FPU via CONTROL.FPCA. Otherwise we are in an interrupt or another thread is terminating
+   this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the FPU to flush 
+   the lazy FPU save, then restore the CONTROL.FPCA state. */
+
+#ifndef TX_MISRA_ENABLE
+
+
+#define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)                  {                                                                                             \
+                                                                    ULONG  _tx_system_state;                                                                      \
+                                                                        _tx_system_state =  TX_THREAD_GET_SYSTEM_STATE();                                         \
+                                                                        if ((_tx_system_state == ((ULONG) 0)) && ((thread_ptr) == _tx_thread_current_ptr))        \
+                                                                        {                                                                                         \
+                                                                        ULONG  _tx_vfp_state;                                                                     \
+                                                                            _tx_vfp_state =  __get_control();                                                     \
+                                                                            _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                                      \
+                                                                            __set_control(_tx_vfp_state);                                                         \
+                                                                        }                                                                                         \
+                                                                        else                                                                                      \
+                                                                        {                                                                                         \
+                                                                        ULONG  _tx_fpccr;                                                                         \
+                                                                            _tx_fpccr =  *((ULONG *) 0xE000EF34);                                                 \
+                                                                            _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01);                                              \
+                                                                            if (_tx_fpccr == ((ULONG) 0x01))                                                      \
+                                                                            {                                                                                     \
+                                                                            ULONG _tx_vfp_state;                                                                  \
+                                                                                _tx_vfp_state = __get_control();                                                  \
+                                                                                _tx_vfp_state =  _tx_vfp_state & ((ULONG) 0x4);                                   \
+                                                                                __asm__ volatile ("vmov.f32 s0, s0");                                             \
+                                                                                if (_tx_vfp_state == ((ULONG) 0))                                                 \
+                                                                                {                                                                                 \
+                                                                                    _tx_vfp_state =  __get_control();                                             \
+                                                                                    _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                              \
+                                                                                    __set_control(_tx_vfp_state);                                                 \
+                                                                                }                                                                                 \
+                                                                            }                                                                                     \
+                                                                        }                                                                                         \
+                                                                    }
+#else
+
+#define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)                  {                                                                                             \
+                                                                    ULONG  _tx_system_state;                                                                      \
+                                                                        _tx_system_state =  TX_THREAD_GET_SYSTEM_STATE();                                         \
+                                                                        if ((_tx_system_state == ((ULONG) 0)) && ((thread_ptr) == _tx_thread_current_ptr))        \
+                                                                        {                                                                                         \
+                                                                        ULONG  _tx_vfp_state;                                                                     \
+                                                                            _tx_vfp_state =  _tx_misra_control_get();                                             \
+                                                                            _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                                      \
+                                                                            _tx_misra_control_set(_tx_vfp_state);                                                 \
+                                                                        }                                                                                         \
+                                                                        else                                                                                      \
+                                                                        {                                                                                         \
+                                                                        ULONG  _tx_fpccr;                                                                         \
+                                                                            _tx_fpccr =  _tx_misra_fpccr_get();                                                   \
+                                                                            _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01);                                              \
+                                                                            if (_tx_fpccr == ((ULONG) 0x01))                                                      \
+                                                                            {                                                                                     \
+                                                                            ULONG _tx_vfp_state;                                                                  \
+                                                                                _tx_vfp_state = _tx_misra_control_get();                                          \
+                                                                                _tx_vfp_state =  _tx_vfp_state & ((ULONG) 0x4);                                   \
+                                                                                _tx_misra_vfp_touch();                                                            \
+                                                                                if (_tx_vfp_state == ((ULONG) 0))                                                 \
+                                                                                {                                                                                 \
+                                                                                    _tx_vfp_state =  _tx_misra_control_get();                                     \
+                                                                                    _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                              \
+                                                                                    _tx_misra_control_set(_tx_vfp_state);                                         \
+                                                                                }                                                                                 \
+                                                                            }                                                                                     \
+                                                                        }                                                                                         \
+                                                                    }
+#endif
+
+#else
+
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
 #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)                  
+
+#endif
 
 
 /* Define the ThreadX object creation extensions for the remaining objects.  */
@@ -273,6 +401,7 @@ ULONG   _tx_misra_ipsr_get(VOID);
 #ifndef TX_THREAD_SYSTEM_RETURN_CHECK
 #define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
 #endif
+
 
 /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to 
    prevent early scheduling on Cortex-M parts.  */
@@ -368,11 +497,18 @@ unsigned int interrupt_save;
 #endif
 
 
+/* Define FPU extension for the Cortex-M7.  Each is assumed to be called in the context of the executing
+   thread. These are no longer needed, but are preserved for backward compatibility only.  */
+
+void    tx_thread_fpu_enable(void);
+void    tx_thread_fpu_disable(void);
+
+
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M3/AC6 Version 6.1.6 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M3/AC6 Version 6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

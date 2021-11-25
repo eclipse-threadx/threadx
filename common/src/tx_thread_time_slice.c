@@ -97,7 +97,7 @@ UINT            preempt_disable;
 
     /* Check this thread's stack.  */
     TX_THREAD_STACK_CHECK(thread_ptr)
-    
+
     /* Set the next thread pointer to NULL.  */
     next_thread_ptr =  TX_NULL;
 #endif
@@ -130,15 +130,15 @@ UINT            preempt_disable;
                 /* Check to see if preemption-threshold is not being used.  */
                 if (thread_ptr -> tx_thread_priority == thread_ptr -> tx_thread_preempt_threshold)
                 {
-                
+
                     /* Preemption-threshold is not being used by this thread.  */
-        
+
                     /* There is another thread at this priority, make it the highest at
                        this priority level.  */
                     _tx_thread_priority_list[thread_ptr -> tx_thread_priority] =  thread_ptr -> tx_thread_ready_next;
-    
-                    /* Designate the highest priority thread as the one to execute.  Don't use this 
-                       thread's priority as an index just in case a higher priority thread is now 
+
+                    /* Designate the highest priority thread as the one to execute.  Don't use this
+                       thread's priority as an index just in case a higher priority thread is now
                        ready!  */
                     _tx_thread_execute_ptr =  _tx_thread_priority_list[_tx_thread_highest_priority];
 
@@ -167,11 +167,11 @@ UINT            preempt_disable;
     /* Pickup the volatile information.  */
     system_state =  TX_THREAD_GET_SYSTEM_STATE();
     preempt_disable =  _tx_thread_preempt_disable;
-   
+
     /* Insert this event into the trace buffer.  */
     TX_TRACE_IN_LINE_INSERT(TX_TRACE_TIME_SLICE, _tx_thread_execute_ptr, system_state, preempt_disable, TX_POINTER_TO_ULONG_CONVERT(&thread_ptr), TX_TRACE_INTERNAL_EVENTS)
 #endif
-    
+
     /* Restore previous interrupt posture.  */
     TX_RESTORE
 

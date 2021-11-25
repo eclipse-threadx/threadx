@@ -81,10 +81,7 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_CONTROL                         Intrinsic to get CONTROL      */
-/*    __set_CONTROL                         Intrinsic to set CONTROL      */
-/*    __set_PSPLIM                          Intrinsic to set PSP limit    */
-/*    __set_PSP                             Intrinsic to set PSP          */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -163,12 +160,9 @@ ULONG   ipsr;
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_IPSR                            Intrinsic to get IPSR         */
 /*    calloc                                Compiler's calloc function    */
 /*    malloc                                Compiler's malloc function    */
 /*    free                                  Compiler's free() function    */
-/*    __set_PSPLIM                          Intrinsic to set PSP limit    */
-/*    __set_PSP                             Intrinsic to set PSP          */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -291,7 +285,6 @@ ULONG   psplim_ns;
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_IPSR                            Intrinsic to get IPSR         */
 /*    free                                  Compiler's free() function    */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -374,10 +367,7 @@ ULONG   ipsr;
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_IPSR                            Intrinsic to get IPSR         */
-/*    __get_PSP                             Intrinsic to get PSP          */
-/*    __set_PSPLIM                          Intrinsic to set PSP limit    */
-/*    __set_PSP                             Intrinsic to set PSP          */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -462,9 +452,7 @@ ULONG   ipsr;
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    __get_IPSR                            Intrinsic to get IPSR         */
-/*    __set_PSPLIM                          Intrinsic to set PSP limit    */
-/*    __set_PSP                             Intrinsic to set PSP          */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */

@@ -27,11 +27,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_interrupt_control                      Cortex-M4/AC6     */
-/*                                                           6.1.2        */
+/*    _tx_thread_interrupt_control                     Cortex-M4/AC6      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -58,9 +58,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_interrupt_control(UINT new_posture)
@@ -68,9 +66,14 @@
     .global  _tx_thread_interrupt_control
     .thumb_func
 _tx_thread_interrupt_control:
+#ifdef TX_PORT_USE_BASEPRI
+    MRS     r1, BASEPRI                         // Pickup current interrupt posture
+    MSR     BASEPRI, r0                         // Apply the new interrupt posture
+    MOV     r0, r1                              // Transfer old to return register
+#else
     MRS     r1, PRIMASK                         // Pickup current interrupt lockout
     MSR     PRIMASK, r0                         // Apply the new interrupt lockout
     MOV     r0, r1                              // Transfer old to return register
+#endif
     BX      lr                                  // Return to caller
-
 // }

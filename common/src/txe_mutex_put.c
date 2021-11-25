@@ -87,7 +87,7 @@ UINT            status;
         /* Mutex pointer is invalid, return appropriate error code.  */
         status =  TX_MUTEX_ERROR;
     }
-    
+
     /* Now check for invalid mutex ID.  */
     else if (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID)
     {
@@ -101,11 +101,11 @@ UINT            status;
         /* Check for interrupt call.  */
         if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
         {
-    
+
             /* Now, make sure the call is from an interrupt and not initialization.  */
             if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
             {
-        
+
                 /* Invalid caller of this function, return appropriate error code.  */
                 status =  TX_CALLER_ERROR;
             }

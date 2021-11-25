@@ -56,12 +56,12 @@
 #define TX_MUTEX_ID                             ((ULONG) 0x4D555445)
 
 
-/* Determine if in-line component initialization is supported by the 
+/* Determine if in-line component initialization is supported by the
    caller.  */
 
 #ifdef TX_INVOKE_INLINE_INITIALIZATION
 
-/* Yes, in-line initialization is supported, remap the mutex initialization 
+/* Yes, in-line initialization is supported, remap the mutex initialization
    function.  */
 
 #ifndef TX_MUTEX_ENABLE_PERFORMANCE_INFO

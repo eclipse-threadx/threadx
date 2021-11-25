@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread - Low Level SMP Support                                      */
 /**                                                                       */
@@ -21,56 +21,45 @@
 /**************************************************************************/
 
 
-/*
-#define TX_SOURCE_CODE
-#define TX_THREAD_SMP_SOURCE_CODE
-*/
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_thread.h"
-#include "tx_timer.h"
-*/
-
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_current_state_get                 Cortex-A5x-SMP/GNU */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_smp_current_state_get                 Cortex-A5x-SMP/GCC */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function is gets the current state of the calling core.        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function is gets the current state of the calling core.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX Components                                                  */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX Components                                                  */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*                                             resulting in version 6.1.9 */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_current_state_get
@@ -98,5 +87,3 @@ _tx_thread_smp_current_state_get:
     LDR     w0, [x3, x2, LSL #2]                // Pickup the current system state for this core
     MSR     DAIF, x1                            // Restore interrupt posture
     RET
-
-

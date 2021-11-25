@@ -55,7 +55,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_secure_stack_free(TX_THREAD *thread_ptr)
@@ -64,7 +64,7 @@
     .balign 4
     .syntax unified
     .eabi_attribute Tag_ABI_align_preserved, 1
-    .global  _tx_thread_secure_stack_free
+    .global _tx_thread_secure_stack_free
     .global _tx_free_return
     .thumb_func
 .type _tx_thread_secure_stack_free, function
@@ -78,7 +78,6 @@ _tx_free_return:
     BEQ     _free_return_interrupt_enabled
     CPSID   i               // Otherwise, disable interrupts
 #else
-    // Executing in single mode - this function is not needed.
     MOVS    r0, #0xFF       // Feature not enabled
 #endif
 _free_return_interrupt_enabled:

@@ -38,7 +38,7 @@ VOID    (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr);
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_stack_error_handler                    Cortex-M33/GNU    */
+/*    _tx_thread_stack_error_handler                      Cortex-M33      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -70,7 +70,7 @@ VOID    (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr);
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_stack_error_handler(TX_THREAD *thread_ptr)

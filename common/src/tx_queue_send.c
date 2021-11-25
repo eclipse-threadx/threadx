@@ -81,7 +81,7 @@ UINT  _tx_queue_send(TX_QUEUE *queue_ptr, VOID *source_ptr, ULONG wait_option)
 {
 
 TX_INTERRUPT_SAVE_AREA
-   
+
 TX_THREAD       *thread_ptr;
 ULONG           *source;
 ULONG           *destination;
@@ -128,9 +128,9 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
         /* Determine if there are suspended on this queue.  */
         if (suspended_count == TX_NO_SUSPENSIONS)
         {
-        
+
             /* No suspended threads, simply place the message in the queue.  */
-            
+
             /* Reduce the amount of available storage.  */
             queue_ptr -> tx_queue_available_storage--;
 
@@ -142,7 +142,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
             destination =  queue_ptr -> tx_queue_write;
             size =         queue_ptr -> tx_queue_message_size;
 
-            /* Copy message. Note that the source and destination pointers are 
+            /* Copy message. Note that the source and destination pointers are
                incremented by the macro.  */
             TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
@@ -182,7 +182,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
         else
         {
 
-            /* There is a thread suspended on an empty queue. Simply 
+            /* There is a thread suspended on an empty queue. Simply
                copy the message to the suspended thread's destination
                pointer.  */
 
@@ -230,7 +230,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
             destination =  TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_additional_suspend_info);
             size =         queue_ptr -> tx_queue_message_size;
 
-            /* Copy message. Note that the source and destination pointers are 
+            /* Copy message. Note that the source and destination pointers are
                incremented by the macro.  */
             TX_QUEUE_MESSAGE_COPY(source, destination, size)
 
@@ -274,7 +274,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
 #endif
         }
     }
-    
+
     /* At this point, the queue is full. Determine if suspension is requested.  */
     else if (wait_option != TX_NO_WAIT)
     {
@@ -302,7 +302,7 @@ VOID            (*queue_send_notify)(struct TX_QUEUE_STRUCT *notify_queue_ptr);
             /* Increment the number of full suspensions on this queue.  */
             queue_ptr -> tx_queue_performance_full_suspension_count++;
 #endif
-            
+
             /* Pickup thread pointer.  */
             TX_THREAD_GET_CURRENT(thread_ptr)
 

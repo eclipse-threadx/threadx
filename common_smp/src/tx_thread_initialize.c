@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -50,7 +50,7 @@ TX_THREAD *                 _tx_thread_current_ptr[TX_THREAD_SMP_MAX_CORES];
 
 
 /* Define the variable that holds the next thread to execute.  It is important
-   to remember that this is not necessarily equal to the current thread 
+   to remember that this is not necessarily equal to the current thread
    pointer.  */
 
 TX_THREAD *                 _tx_thread_execute_ptr[TX_THREAD_SMP_MAX_CORES];
@@ -95,7 +95,7 @@ ULONG                       _tx_thread_created_count;
 
 
 /* Define the current state variable.  When this value is 0, a thread
-   is executing or the system is idle.  Other values indicate that 
+   is executing or the system is idle.  Other values indicate that
    interrupt or initialization processing is active.  This variable is
    initialized to TX_INITIALIZE_IN_PROGRESS to indicate initialization is
    active.  */
@@ -104,15 +104,15 @@ volatile ULONG              _tx_thread_system_state[TX_THREAD_SMP_MAX_CORES];
 
 
 /* Define the 32-bit priority bit-maps. There is one priority bit map for each
-   32 priority levels supported. If only 32 priorities are supported there is 
-   only one bit map. Each bit within a priority bit map represents that one 
-   or more threads at the associated thread priority are ready.  */ 
+   32 priority levels supported. If only 32 priorities are supported there is
+   only one bit map. Each bit within a priority bit map represents that one
+   or more threads at the associated thread priority are ready.  */
 
 ULONG                       _tx_thread_priority_maps[TX_MAX_PRIORITIES/32];
 
 
-/* Define the priority map active bit map that specifies which of the previously 
-   defined priority maps have something set. This is only necessary if more than 
+/* Define the priority map active bit map that specifies which of the previously
+   defined priority maps have something set. This is only necessary if more than
    32 priorities are supported.  */
 
 #if TX_MAX_PRIORITIES > 32
@@ -122,17 +122,17 @@ ULONG                       _tx_thread_priority_map_active;
 
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
-/* Define the 32-bit preempt priority bit maps.  There is one preempt bit map 
-   for each 32 priority levels supported. If only 32 priorities are supported 
-   there is only one bit map. Each set set bit corresponds to a preempted priority 
-   level that had preemption-threshold active to protect against preemption of a 
+/* Define the 32-bit preempt priority bit maps.  There is one preempt bit map
+   for each 32 priority levels supported. If only 32 priorities are supported
+   there is only one bit map. Each set set bit corresponds to a preempted priority
+   level that had preemption-threshold active to protect against preemption of a
    range of relatively higher priority threads.  */
 
 ULONG                       _tx_thread_preempted_maps[TX_MAX_PRIORITIES/32];
 
 
-/* Define the preempt map active bit map that specifies which of the previously 
-   defined preempt maps have something set. This is only necessary if more than 
+/* Define the preempt map active bit map that specifies which of the previously
+   defined preempt maps have something set. This is only necessary if more than
    32 priorities are supported.  */
 
 #if TX_MAX_PRIORITIES > 32
@@ -141,7 +141,7 @@ ULONG                       _tx_thread_preempted_map_active;
 
 
 /* Define the array that contains the thread at each priority level that was scheduled with
-   preemption-threshold enabled. This will be useful when returning from a nested 
+   preemption-threshold enabled. This will be useful when returning from a nested
    preemption-threshold condition.  */
 
 TX_THREAD                   *_tx_thread_preemption_threshold_list[TX_MAX_PRIORITIES];
@@ -151,9 +151,9 @@ TX_THREAD                   *_tx_thread_preemption_threshold_list[TX_MAX_PRIORIT
 
 
 /* Define the last thread scheduled with preemption-threshold. When preemption-threshold is
-   disabled, a thread with preemption-threshold set disables all other threads from running.  
+   disabled, a thread with preemption-threshold set disables all other threads from running.
    Effectively, its preemption-threshold is 0.  */
-   
+
 TX_THREAD                   *_tx_thread_preemption__threshold_scheduled;
 
 
@@ -166,13 +166,13 @@ TX_THREAD *                 _tx_thread_priority_list[TX_MAX_PRIORITIES];
 
 
 /* Define the global preempt disable variable.  If this is non-zero, preemption is
-   disabled.  It is used internally by ThreadX to prevent preemption of a thread in 
+   disabled.  It is used internally by ThreadX to prevent preemption of a thread in
    the middle of a service that is resuming or suspending another thread.  */
 
 volatile UINT               _tx_thread_preempt_disable;
 
 
-/* Define the global function pointer for mutex cleanup on thread completion or 
+/* Define the global function pointer for mutex cleanup on thread completion or
    termination. This pointer is setup during mutex initialization.  */
 
 VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
@@ -222,8 +222,8 @@ ULONG                       _tx_build_options;
 
 #ifdef TX_ENABLE_STACK_CHECKING
 
-/* Define the global function pointer for stack error handling. If a stack error is 
-   detected and the application has registered a stack error handler, it will be 
+/* Define the global function pointer for stack error handling. If a stack error is
+   detected and the application has registered a stack error handler, it will be
    called via this function pointer.  */
 
 VOID                        (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr);
@@ -238,20 +238,20 @@ VOID                        (*_tx_thread_application_stack_error_handler)(TX_THR
 ULONG                       _tx_thread_performance_resume_count;
 
 
-/* Define the total number of thread suspensions. Each time a thread enters a 
+/* Define the total number of thread suspensions. Each time a thread enters a
    suspended state this variable is incremented.  */
 
 ULONG                       _tx_thread_performance_suspend_count;
 
 
-/* Define the total number of solicited thread preemptions. Each time a thread is 
+/* Define the total number of solicited thread preemptions. Each time a thread is
    preempted by directly calling a ThreadX service, this variable is incremented.  */
 
 ULONG                       _tx_thread_performance_solicited_preemption_count;
 
 
-/* Define the total number of interrupt thread preemptions. Each time a thread is 
-   preempted as a result of an ISR calling a ThreadX service, this variable is 
+/* Define the total number of interrupt thread preemptions. Each time a thread is
+   preempted as a result of an ISR calling a ThreadX service, this variable is
    incremented.  */
 
 ULONG                       _tx_thread_performance_interrupt_preemption_count;
@@ -263,39 +263,39 @@ ULONG                       _tx_thread_performance_interrupt_preemption_count;
 ULONG                       _tx_thread_performance_priority_inversion_count;
 
 
-/* Define the total number of time-slices.  Each time a time-slice operation is 
-   actually performed (another thread is setup for running) this variable is 
+/* Define the total number of time-slices.  Each time a time-slice operation is
+   actually performed (another thread is setup for running) this variable is
    incremented.  */
 
 ULONG                       _tx_thread_performance_time_slice_count;
 
 
-/* Define the total number of thread relinquish operations.  Each time a thread 
+/* Define the total number of thread relinquish operations.  Each time a thread
    relinquish operation is actually performed (another thread is setup for running)
    this variable is incremented.  */
 
 ULONG                       _tx_thread_performance_relinquish_count;
 
 
-/* Define the total number of thread timeouts. Each time a thread has a 
+/* Define the total number of thread timeouts. Each time a thread has a
    timeout this variable is incremented.  */
 
 ULONG                       _tx_thread_performance_timeout_count;
 
 
-/* Define the total number of thread wait aborts. Each time a thread's suspension 
+/* Define the total number of thread wait aborts. Each time a thread's suspension
    is lifted by the tx_thread_wait_abort call this variable is incremented.  */
 
 ULONG                       _tx_thread_performance_wait_abort_count;
 
 
-/* Define the total number of idle system thread returns. Each time a thread returns to 
+/* Define the total number of idle system thread returns. Each time a thread returns to
    an idle system (no other thread is ready to run) this variable is incremented.  */
 
 ULONG                       _tx_thread_performance_idle_return_count;
 
 
-/* Define the total number of non-idle system thread returns. Each time a thread returns to 
+/* Define the total number of non-idle system thread returns. Each time a thread returns to
    a non-idle system (another thread is ready to run) this variable is incremented.  */
 
 ULONG                       _tx_thread_performance_non_idle_return_count;
@@ -306,44 +306,44 @@ ULONG                       _tx_thread_performance_non_idle_return_count;
 /* Define special string.  */
 
 #ifndef TX_MISRA_ENABLE
-const CHAR _tx_thread_special_string[] = 
+const CHAR _tx_thread_special_string[] =
   "G-ML-EL-ML-BL-DL-BL-GB-GL-M-D-DL-GZ-KH-EL-CM-NH-HA-GF-DD-JC-YZ-CT-AT-DW-USA-CA-SD-SDSU";
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_initialize                              PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_initialize                              PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function initializes the various control data structures for   */ 
-/*    the thread control component.                                       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function initializes the various control data structures for   */
+/*    the thread control component.                                       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_high_level         High level initialization         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_high_level         High level initialization         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -352,7 +352,7 @@ const CHAR _tx_thread_special_string[] =
 VOID  _tx_thread_initialize(VOID)
 {
 
-    /* Note: the system stack pointer and the system state variables are 
+    /* Note: the system stack pointer and the system state variables are
        initialized by the low and high-level initialization functions,
        respectively.  */
 
@@ -362,7 +362,7 @@ VOID  _tx_thread_initialize(VOID)
     TX_THREAD_SET_CURRENT(0)
 
     /* Clear the execute thread list.  */
-    TX_MEMSET(&_tx_thread_execute_ptr[0], 0, (sizeof(_tx_thread_execute_ptr))); 
+    TX_MEMSET(&_tx_thread_execute_ptr[0], 0, (sizeof(_tx_thread_execute_ptr)));
 
     /* Initialize the priority information.  */
     TX_MEMSET(&_tx_thread_priority_maps[0], 0, (sizeof(_tx_thread_priority_maps)));
@@ -416,8 +416,8 @@ VOID  _tx_thread_initialize(VOID)
 #endif
 
     /* Setup the build options flag. This is used to identify how the ThreadX library was constructed.  */
-    _tx_build_options =  _tx_build_options 
-                            | (((ULONG) (TX_MAX_PRIORITIES/32)) << 24) 
+    _tx_build_options =  _tx_build_options
+                            | (((ULONG) (TX_MAX_PRIORITIES/32)) << 24)
 #ifdef TX_NOT_INTERRUPTABLE
                             | (((ULONG) 1) << 31)
 #endif
@@ -469,14 +469,14 @@ VOID  _tx_thread_initialize(VOID)
 #ifdef TX_TIMER_ENABLE_PERFORMANCE_INFO
                             | (((ULONG) 1) << 9)
 #endif
-#ifdef TX_ENABLE_EVENT_TRACE 
+#ifdef TX_ENABLE_EVENT_TRACE
                             | (((ULONG) 1) << 8)
 #endif
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
                             | (((ULONG) 1) << 7)
 #endif
 #if TX_PORT_SPECIFIC_BUILD_OPTIONS != 0
-                            | TX_PORT_SPECIFIC_BUILD_OPTIONS 
+                            | TX_PORT_SPECIFIC_BUILD_OPTIONS
 #endif
                             ;
 }

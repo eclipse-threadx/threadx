@@ -100,7 +100,7 @@ UINT            preempt_disable;
     /* Access input arguments just for the sake of lint, MISRA, etc.  */
     if (isr_id != ((ULONG) 0))
     {
-        
+
         /* NOP code.  */
         TX_DISABLE
         TX_RESTORE

@@ -46,7 +46,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_context_restore                           RXv2/GNURX     */
-;/*                                                           6.1.3        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -78,7 +78,11 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
+;/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
+;/*                                            removed unnecessary stack   */
+;/*                                            type placement,             */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)
@@ -88,7 +92,7 @@ __tx_thread_context_restore:
 ;
 ;    /* Lockout interrupts.  */
 
-     CLRPSW I                                 ; disable interrupts
+     CLRPSW I                                    ; Disable interrupts
 
 ;    /* Determine if interrupts are nested.  */
 ;    if (--_tx_thread_system_state)
@@ -107,11 +111,11 @@ __tx_thread_context_restore:
 ;       and return to the point of interrupt.  */
 ;
 __tx_thread_nested_restore:
-     POPC    FPSW                                ; restore FPU status
-     POPM    R14-R15             ; restore R14-R15
-     POPM    R3-R5               ; restore R3-R5
-     POPM    R1-R2               ; restore R1-R2
-     RTE                         ; return to point of interrupt, restore PSW including IPL
+     POPC    FPSW                                ; Restore FPU status
+     POPM    R14-R15                             ; Restore R14-R15
+     POPM    R3-R5                               ; Restore R3-R5
+     POPM    R1-R2                               ; Restore R1-R2
+     RTE                                         ; Return to point of interrupt, restore PSW including IPL
 ;    }
 
 __tx_thread_not_nested_restore:
@@ -126,22 +130,22 @@ __tx_thread_not_nested_restore:
      CMP      #0, R2
      BEQ      __tx_thread_idle_system_restore
 
-     MOV.L    #__tx_thread_preempt_disable, R3   ; pick up preempt disable flag
+     MOV.L    #__tx_thread_preempt_disable, R3   ; Pick up preempt disable flag
      MOV.L    [R3], R3
      CMP      #0, R3
-     BNE      __tx_thread_no_preempt_restore     ; if pre-empt disable flag set, we simply return to the original point of interrupt regardless
+     BNE      __tx_thread_no_preempt_restore     ; If pre-empt disable flag set, we simply return to the original point of interrupt regardless
 
      MOV.L    #__tx_thread_execute_ptr, R3       ; (_tx_thread_current_ptr != _tx_thread_execute_ptr)
      CMP      [R3], R2
-     BNE      __tx_thread_preempt_restore        ; jump to pre-empt restoring
+     BNE      __tx_thread_preempt_restore        ; Jump to pre-empt restoring
 ;
 __tx_thread_no_preempt_restore:
-     SETPSW  U                   ; user stack
-     POPC    FPSW                ; restore FPU status
-     POPM    R14-R15             ; restore R14-R15
-     POPM    R3-R5               ; restore R3-R5
-     POPM    R1-R2               ; restore R1-R2
-     RTE                         ; return to point of interrupt, restore PSW including IPL
+     SETPSW  U                                   ; User stack
+     POPC    FPSW                                ; Restore FPU status
+     POPM    R14-R15                             ; Restore R14-R15
+     POPM    R3-R5                               ; Restore R3-R5
+     POPM    R1-R2                               ; Restore R1-R2
+     RTE                                         ; Return to point of interrupt, restore PSW including IPL
 
 ;    }
 ;    else
@@ -153,26 +157,26 @@ __tx_thread_preempt_restore:
 ;    if (_tx_timer_time_slice)
 ;    {
 
-     MOV.L    #__tx_timer_time_slice, R3        ; Pickup time-slice address
-     MOV.L    [R3],R4                           ; Pickup actual time-slice
+     MOV.L    #__tx_timer_time_slice, R3         ; Pickup time-slice address
+     MOV.L    [R3],R4                            ; Pickup actual time-slice
      CMP      #0, R4
-     BEQ      __tx_thread_dont_save_ts          ; no time slice to save
+     BEQ      __tx_thread_dont_save_ts           ; No time slice to save
 ;
 ;        _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
 ;        _tx_timer_time_slice =  0;
 ;
-     MOV.L    R4,24[R2]                         ; Save thread's time slice
-     MOV.L    #0,R4                             ; Clear value
-     MOV.L    R4,[R3]                           ; Disable global time slice flag
+     MOV.L    R4,24[R2]                          ; Save thread's time slice
+     MOV.L    #0,R4                              ; Clear value
+     MOV.L    R4,[R3]                            ; Disable global time slice flag
 ;    }
 __tx_thread_dont_save_ts:
 ;
 ;   /* Now store the remaining registers!   */
 
-     SETPSW   U                                 ; user stack
+     SETPSW   U                                  ; User stack
      PUSHM    R6-R13
 
-     MVFACGU   #0, A1, R4                       ; Save accumulators.
+     MVFACGU   #0, A1, R4                        ; Save accumulators.
      MVFACHI   #0, A1, R5
      MVFACLO   #0, A1, R6
      PUSHM     R4-R6
@@ -181,25 +185,22 @@ __tx_thread_dont_save_ts:
      MVFACLO   #0, A0, R6
      PUSHM     R4-R6
 
-     MOV.L    #1, R3                            ; indicate interrupt stack frame
-     PUSH.L   R3
-
 ;
 ;    /* Clear the current task pointer.  */
 ;    _tx_thread_current_ptr =  TX_NULL;
 ;    R1 ->  _tx_thread_current_ptr
 ;    R2 -> *_tx_thread_current_ptr
 
-     MOV.L   R0,8[R2]                        ; Save thread's stack pointer in thread control block
-     MOV.L   #0,R2                           ; Build NULL value
-     MOV.L   R2,[R1]                         ; Set current thread to NULL
+     MOV.L   R0,8[R2]                            ; Save thread's stack pointer in thread control block
+     MOV.L   #0,R2                               ; Build NULL value
+     MOV.L   R2,[R1]                             ; Set current thread to NULL
 
 ;    /* Return to the scheduler.  */
 ;    _tx_thread_schedule();
 
 __tx_thread_idle_system_restore:
-     MVTC    #0, PSW                          ; reset interrupt priority level to 0
-     BRA     __tx_thread_schedule             ; jump to scheduler
+     MVTC    #0, PSW                             ; Reset interrupt priority level to 0
+     BRA     __tx_thread_schedule                ; Jump to scheduler
 ;    }
 ;
 ;}

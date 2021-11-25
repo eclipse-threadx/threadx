@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Semaphore                                                           */
 /**                                                                       */
@@ -30,47 +30,49 @@
 #include "tx_semaphore.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_semaphore_cleanup                               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_semaphore_cleanup                               PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function processes semaphore timeout and thread terminate      */ 
-/*    actions that require the semaphore data structures to be cleaned    */ 
-/*    up.                                                                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                        Pointer to suspended thread's     */ 
-/*                                        control block                   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_resume          Resume thread service             */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_timeout                Thread timeout processing         */ 
-/*    _tx_thread_terminate              Thread terminate processing       */ 
-/*    _tx_thread_wait_abort             Thread wait abort processing      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function processes semaphore timeout and thread terminate      */
+/*    actions that require the semaphore data structures to be cleaned    */
+/*    up.                                                                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                        Pointer to suspended thread's     */
+/*                                        control block                   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_resume          Resume thread service             */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_timeout                Thread timeout processing         */
+/*    _tx_thread_terminate              Thread terminate processing       */
+/*    _tx_thread_wait_abort             Thread wait abort processing      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_semaphore_cleanup(TX_THREAD *thread_ptr, ULONG suspension_sequence)
@@ -80,12 +82,12 @@ VOID  _tx_semaphore_cleanup(TX_THREAD *thread_ptr, ULONG suspension_sequence)
 TX_INTERRUPT_SAVE_AREA
 #endif
 
-TX_SEMAPHORE        *semaphore_ptr;            
+TX_SEMAPHORE        *semaphore_ptr;
 UINT                suspended_count;
 TX_THREAD           *next_thread;
 TX_THREAD           *previous_thread;
 
-    
+
 
 #ifndef TX_NOT_INTERRUPTABLE
 
@@ -95,7 +97,7 @@ TX_THREAD           *previous_thread;
     /* Determine if the cleanup is still required.  */
     if (thread_ptr -> tx_thread_suspend_cleanup == &(_tx_semaphore_cleanup))
     {
-    
+
         /* Check for valid suspension sequence.  */
         if (suspension_sequence == thread_ptr -> tx_thread_suspension_sequence)
         {
@@ -119,7 +121,7 @@ TX_THREAD           *previous_thread;
                         /* Setup pointer to semaphore control block.  */
                         semaphore_ptr =  TX_VOID_TO_SEMAPHORE_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
 #endif
-                
+
                         /* Yes, we still have thread suspension!  */
 
                         /* Clear the suspension cleanup flag.  */
@@ -138,7 +140,7 @@ TX_THREAD           *previous_thread;
                         {
 
                             /* Yes, the only suspended thread.  */
-    
+
                             /* Update the head pointer.  */
                             semaphore_ptr -> tx_semaphore_suspension_list =  TX_NULL;
                         }
@@ -152,22 +154,22 @@ TX_THREAD           *previous_thread;
                             previous_thread =                               thread_ptr -> tx_thread_suspended_previous;
                             next_thread -> tx_thread_suspended_previous =   previous_thread;
                             previous_thread -> tx_thread_suspended_next =   next_thread;
-            
+
                             /* Determine if we need to update the head pointer.  */
                             if (semaphore_ptr -> tx_semaphore_suspension_list == thread_ptr)
                             {
 
                                 /* Update the list head pointer.  */
                                 semaphore_ptr -> tx_semaphore_suspension_list =   next_thread;
-                            }    
-                        } 
- 
+                            }
+                        }
+
                         /* Now we need to determine if this cleanup is from a terminate, timeout,
                            or from a wait abort.  */
                         if (thread_ptr -> tx_thread_state == TX_SEMAPHORE_SUSP)
                         {
 
-                            /* Timeout condition and the thread is still suspended on the semaphore.  
+                            /* Timeout condition and the thread is still suspended on the semaphore.
                                Setup return error status and resume the thread.  */
 
 #ifdef TX_SEMAPHORE_ENABLE_PERFORMANCE_INFO
@@ -194,7 +196,7 @@ TX_THREAD           *previous_thread;
                             /* Restore interrupts.  */
                             TX_RESTORE
 
-                            /* Resume the thread!  */ 
+                            /* Resume the thread!  */
                             _tx_thread_system_resume(thread_ptr);
 
                             /* Disable interrupts.  */

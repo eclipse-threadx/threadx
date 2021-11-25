@@ -161,28 +161,28 @@ UINT            list_changed;
             /* Disable interrupts again.  */
             TX_DISABLE
 
-            /* Determine if any changes to the list have occurred while 
+            /* Determine if any changes to the list have occurred while
                interrupts were enabled.  */
-              
+
             /* Is the list head the same?  */
             if (head_ptr != semaphore_ptr -> tx_semaphore_suspension_list)
             {
-            
+
                 /* The list head has changed, set the list changed flag.  */
                 list_changed =  TX_TRUE;
             }
             else
             {
-            
+
                 /* Is the suspended count the same?  */
                 if (suspended_count != semaphore_ptr -> tx_semaphore_suspended_count)
                 {
-              
+
                     /* The list head has changed, set the list changed flag.  */
                     list_changed =  TX_TRUE;
                 }
             }
-             
+
             /* Determine if the list has changed.  */
             if (list_changed == TX_FALSE)
             {
@@ -214,12 +214,12 @@ UINT            list_changed;
         /* Release preemption.  */
         _tx_thread_preempt_disable--;
 
-        /* Now determine if the highest priority thread is at the front 
+        /* Now determine if the highest priority thread is at the front
            of the list.  */
         if (priority_thread_ptr != head_ptr)
         {
 
-            /* No, we need to move the highest priority suspended thread to the 
+            /* No, we need to move the highest priority suspended thread to the
                front of the list.  */
 
             /* First, remove the highest priority thread by updating the

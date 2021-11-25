@@ -38,8 +38,8 @@ extern VOID    (*_txm_module_manager_fault_notify)(TX_THREAD *, TXM_MODULE_INSTA
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_memory_fault_notify         Cortex-M33/MPU/IAR  */
-/*                                                           6.1.5        */
+/*    _txm_module_manager_memory_fault_notify            Cortex-M33       */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -71,7 +71,7 @@ extern VOID    (*_txm_module_manager_fault_notify)(TX_THREAD *, TXM_MODULE_INSTA
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021     Scott Larson             Initial Version 6.1.5         */
+/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_memory_fault_notify(VOID (*notify_function)(TX_THREAD *, TXM_MODULE_INSTANCE *))

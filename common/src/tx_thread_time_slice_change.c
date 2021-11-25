@@ -105,7 +105,7 @@ TX_THREAD       *current_thread;
     /* Determine if this thread is the currently executing thread.  */
     if (thread_ptr == current_thread)
     {
-    
+
         /* Yes, update the time-slice countdown variable.  */
         _tx_timer_time_slice =  new_time_slice;
     }

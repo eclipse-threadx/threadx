@@ -84,8 +84,8 @@
 /*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
-;VOID   _tx_thread_schedule(VOID)
-;{
+// VOID   _tx_thread_schedule(VOID)
+// {
     PUBLIC  _tx_thread_schedule
 _tx_thread_schedule:
     /* This function should only ever be called on Cortex-M
@@ -93,7 +93,7 @@ _tx_thread_schedule:
        from the PendSV handling routine below. */
 
     /* Clear the preempt-disable flag to enable rescheduling after initialization on Cortex-M targets.  */
-    MOV     r0, #0                                  // Build value for TX_FALSE
+    MOVW    r0, #0                                  // Build value for TX_FALSE
     LDR     r2, =_tx_thread_preempt_disable         // Build address of preempt disable flag
     STR     r0, [r2, #0]                            // Clear preempt disable flag
 
@@ -101,7 +101,6 @@ _tx_thread_schedule:
     CPSIE   i
 
     /* Enter the scheduler for the first time.  */
-
     LDR     r0, =0x10000000                         // Load PENDSVSET bit
     LDR     r1, =0xE000ED04                         // Load ICSR address
     STR     r0, [r1]                                // Set PENDSVBIT in ICSR
@@ -120,7 +119,7 @@ __tx_wait_here:
 PendSV_Handler:
 __tx_ts_handler:
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
@@ -130,9 +129,9 @@ __tx_ts_handler:
     CPSIE   i                                       // Enable interrupts
 #endif
 
-    MOV32   r0, _tx_thread_current_ptr              // Build current thread pointer address
-    MOV32   r2, _tx_thread_execute_ptr              // Build execute thread pointer address
-    MOV     r3, #0                                  // Build NULL value
+    LDR     r0, =_tx_thread_current_ptr             // Build current thread pointer address
+    LDR     r2, =_tx_thread_execute_ptr             // Build execute thread pointer address
+    MOVW    r3, #0                                  // Build NULL value
     LDR     r1, [r0]                                // Pickup current thread pointer
 
     /* Determine if there is a current thread to finish preserving.  */
@@ -144,27 +143,27 @@ __tx_ts_handler:
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r3, PSP                                 // Pickup PSP pointer (thread's stack pointer)
     SUBS    r3, r3, #16                             // Allocate stack space
-    STM     r3!, {r4-r7}                            // Save its remaining registers (M3 Instruction: STMDB r12!, {r4-r11})
-    MOV     r4, r8                                  // 
-    MOV     r5, r9                                  // 
-    MOV     r6, r10                                 // 
-    MOV     r7, r11                                 // 
+    STM     r3!, {r4-r7}                            // Save r4-r7 (M4 Instruction: STMDB r12!, {r4-r11})
+    MOV     r4, r8                                  // Copy r8-r11 to multisave registers
+    MOV     r5, r9
+    MOV     r6, r10
+    MOV     r7, r11
     SUBS    r3, r3, #32                             // Allocate stack space
-    STM     r3!, {r4-r7}                            // 
+    STM     r3!, {r4-r7}                            // Save r8-r11
     SUBS    r3, r3, #20                             // Allocate stack space
-    MOV     r5, lr                                  // 
-    STR     r5, [r3]                                // Save LR on the stack
+    MOV     r5, lr                                  // Copy lr to saveable register
+    STR     r5, [r3]                                // Save lr on the stack
     STR     r3, [r1, #8]                            // Save the thread stack pointer
-    
+
 #if (!defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE))
     // Save secure context
     LDR     r5, =0x90                               // Secure stack index offset
     LDR     r5, [r1, r5]                            // Load secure stack index
     CBZ     r5, _skip_secure_save                   // Skip save if there is no secure context
-    PUSH    {r0, r1, r2, r3}                        // Save scratch registers
+    PUSH    {r0-r3}                                 // Save scratch registers
     MOV     r0, r1                                  // Move thread ptr to r0
     BL      _tx_thread_secure_stack_context_save    // Save secure stack
-    POP     {r0, r1, r2, r3}                        // Restore secure registers
+    POP     {r0-r3}                                 // Restore secure registers
 _skip_secure_save:
 #endif
 
@@ -180,7 +179,7 @@ _skip_secure_save:
 
     /* Clear the global time-slice.  */
 
-    MOVS    r5, #0                                  // Build clear value
+    MOVW    r5, #0                                  // Build clear value
     STR     r5, [r4]                                // Clear time-slice
 
     /* Executing thread is now completely preserved!!!  */
@@ -202,7 +201,7 @@ __tx_ts_new:
 
 __tx_ts_restore:
     LDR     r7, [r1, #4]                            // Pickup the current thread run count
-    MOV32   r4, _tx_timer_time_slice                // Build address of time-slice variable
+    LDR     r4, =_tx_timer_time_slice               // Build address of time-slice variable
     LDR     r5, [r1, #24]                           // Pickup thread's current time-slice
     ADDS    r7, r7, #1                              // Increment the thread run count
     STR     r7, [r1, #4]                            // Store the new run count
@@ -211,7 +210,7 @@ __tx_ts_restore:
 
     STR     r5, [r4]                                // Setup global time-slice
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))   
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing.  */
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
@@ -240,15 +239,14 @@ _skip_secure_restore:
     LDR     r5, [r3]                                // Recover saved LR
     ADDS    r3, r3, #4                              // Position past LR
     MOV     lr, r5                                  // Restore LR
-    LDM     r3!, {r4-r7}                            // Recover thread's registers (r4-r11)
-    MOV     r11, r7                                 // 
-    MOV     r10, r6                                 // 
-    MOV     r9, r5                                  // 
-    MOV     r8, r4                                  // 
-    LDM     r3!, {r4-r7}                            // 
+    LDM     r3!, {r4-r7}                            // Recover thread's registers (r8-r11)
+    MOV     r11, r7
+    MOV     r10, r6
+    MOV     r9, r5
+    MOV     r8, r4
+    LDM     r3!, {r4-r7}                            // Recover thread's registers (r4-r7)
     MSR     PSP, r3                                 // Setup the thread's stack pointer
 
-    /* Return to thread.  */
     BX      lr                                      // Return to thread!
 
     /* The following is the idle wait processing... in this case, no threads are ready for execution and the
@@ -292,33 +290,34 @@ __tx_ts_ready:
     /* Re-enable interrupts and restore new thread.  */
     CPSIE   i                                       // Enable interrupts
     B       __tx_ts_restore                         // Restore the thread
+// }
 
 
 #if (!defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE))
     // SVC_Handler is not needed when ThreadX is running in single mode.
     PUBLIC  SVC_Handler
 SVC_Handler:
-    MOVS    r0, #4
-    MOV     r1, lr
-    TST     r1, r0                  // Determine return stack from EXC_RETURN bit 2
-    BEQ     _tx_get_msp
-    MRS     r0, PSP                 // Get PSP if return stack is PSP
-    B       _tx_got_sp
-_tx_get_msp:
-    MRS     r0, MSP                 // Get MSP if return stack is MSP
-_tx_got_sp:
-    LDR     r1, [r0, #24]           // Load saved PC from stack
-    SUBS    r1, r1, #2              // Calculate SVC number address
-    LDRB    r1, [r1]                // Load SVC number
+    MOV     r0, lr
+    MOVS    r1, #0x04
+    TST     r1, r0                                  // Determine return stack from EXC_RETURN bit 2
+    BEQ     _tx_load_msp
+    MRS     r0, PSP                                 // Get PSP if return stack is PSP
+    B       _tx_get_svc
+_tx_load_msp:
+    MRS     r0, MSP                                 // Get MSP if return stack is MSP
+_tx_get_svc:
+    LDR     r1, [r0,#24]                            // Load saved PC from stack
+    LDR     r3, =-2
+    LDRB    r1, [r1,r3]                             // Load SVC number
 
-    CMP     r1, #1                  // Is it a secure stack allocate request?
-    BEQ     _tx_svc_secure_alloc    // Yes, go there
+    CMP     r1, #1                                  // Is it a secure stack allocate request?
+    BEQ     _tx_svc_secure_alloc                    // Yes, go there
 
-    CMP     r1, #2                  // Is it a secure stack free request?
-    BEQ     _tx_svc_secure_free     // Yes, go there
+    CMP     r1, #2                                  // Is it a secure stack free request?
+    BEQ     _tx_svc_secure_free                     // Yes, go there
     
-    CMP     r1, #3                  // Is it a secure stack init request?
-    BEQ     _tx_svc_secure_init     // Yes, go there
+    CMP     r1, #3                                  // Is it a secure stack init request?
+    BEQ     _tx_svc_secure_init                     // Yes, go there
 
     // Unknown SVC argument - just return
     BX      lr

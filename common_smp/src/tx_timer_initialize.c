@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
@@ -37,7 +37,7 @@
 #ifndef TX_NO_TIMER
 
 
-/* Define the system clock value that is continually incremented by the 
+/* Define the system clock value that is continually incremented by the
    periodic timer interrupt processing.  */
 
 volatile ULONG    _tx_timer_system_clock;
@@ -73,7 +73,7 @@ TX_TIMER_INTERNAL **_tx_timer_list_end;
 TX_TIMER_INTERNAL **_tx_timer_current_ptr;
 
 
-/* Define the timer expiration flag.  This is used to indicate that a timer 
+/* Define the timer expiration flag.  This is used to indicate that a timer
    has expired.  */
 
 UINT              _tx_timer_expired;
@@ -152,8 +152,8 @@ ULONG            _tx_timer_performance_expiration_count;
 
 
 /* Define the total number of timer expiration adjustments. These are required
-   if the expiration time is greater than the size of the timer list. In such 
-   cases, the timer is placed at the end of the list and then reactivated 
+   if the expiration time is greater than the size of the timer list. In such
+   cases, the timer is placed at the end of the list and then reactivated
    as many times as necessary to finally achieve the resulting timeout. */
 
 ULONG            _tx_timer_performance__expiration_adjust_count;
@@ -163,45 +163,45 @@ ULONG            _tx_timer_performance__expiration_adjust_count;
 
 
 /* Define the current time slice value.  If non-zero, a time-slice is active.
-   Otherwise, the time_slice is not active.  There is one of these entries 
+   Otherwise, the time_slice is not active.  There is one of these entries
    per core.  */
 
 ULONG             _tx_timer_time_slice[TX_THREAD_SMP_MAX_CORES];
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_timer_initialize                               PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_initialize                               PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function initializes the various control data structures for   */ 
-/*    the clock control component.                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_create                 Create the system timer thread    */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_high_level         High level initialization         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function initializes the various control data structures for   */
+/*    the clock control component.                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_create                 Create the system timer thread    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_high_level         High level initialization         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -250,28 +250,28 @@ UINT    status;
 
 #ifndef TX_TIMER_PROCESS_IN_ISR
 
-    /* Setup the variables associated with the system timer thread's stack and 
+    /* Setup the variables associated with the system timer thread's stack and
        priority.  */
     _tx_timer_stack_start =  (VOID *) &_tx_timer_thread_stack_area[0];
     _tx_timer_stack_size =   ((ULONG) TX_TIMER_THREAD_STACK_SIZE);
     _tx_timer_priority =     ((UINT) TX_TIMER_THREAD_PRIORITY);
 
-    /* Create the system timer thread.  This thread processes all of the timer 
+    /* Create the system timer thread.  This thread processes all of the timer
        expirations and reschedules.  Its stack and priority are defined in the
        low-level initialization component.  */
     do
     {
-      
+
         /* Create the system timer thread.  */
-        status =  _tx_thread_create(&_tx_timer_thread, 
-                                    TX_CONST_CHAR_TO_CHAR_POINTER_CONVERT("System Timer Thread"), 
-                                    _tx_timer_thread_entry, 
-                                    (ULONG) TX_TIMER_ID,  _tx_timer_stack_start, _tx_timer_stack_size, 
+        status =  _tx_thread_create(&_tx_timer_thread,
+                                    TX_CONST_CHAR_TO_CHAR_POINTER_CONVERT("System Timer Thread"),
+                                    _tx_timer_thread_entry,
+                                    (ULONG) TX_TIMER_ID,  _tx_timer_stack_start, _tx_timer_stack_size,
                                     _tx_timer_priority, _tx_timer_priority, TX_NO_TIME_SLICE, TX_DONT_START);
 
         /* Define timer initialize extension.  */
         TX_TIMER_INITIALIZE_EXTENSION(status)
-        
+
     } while (status != TX_SUCCESS);
 
 #else

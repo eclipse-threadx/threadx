@@ -139,7 +139,7 @@ TX_THREAD       *previous_thread;
     {
 
         /* A thread is suspended on this semaphore.  */
-        
+
         /* Pickup the pointer to the first suspended thread.  */
         thread_ptr =  semaphore_ptr -> tx_semaphore_suspension_list;
 

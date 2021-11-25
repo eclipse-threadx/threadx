@@ -471,7 +471,7 @@ extern int xt_timer_intnum;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. * Azure RTOS Xtensa Version 6.1.6 *";
+                                    "Copyright (c) Microsoft Corporation. * Azure RTOS Xtensa Version 6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

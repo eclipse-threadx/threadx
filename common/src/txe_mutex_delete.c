@@ -87,7 +87,7 @@ TX_THREAD       *thread_ptr;
     /* Default status to success.  */
     status =  TX_SUCCESS;
 #endif
-    
+
     /* Check for an invalid mutex pointer.  */
     if (mutex_ptr == TX_NULL)
     {
@@ -95,7 +95,7 @@ TX_THREAD       *thread_ptr;
         /* Mutex pointer is invalid, return appropriate error code.  */
         status =  TX_MUTEX_ERROR;
     }
-    
+
     /* Now check for a valid mutex ID.  */
     else if (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID)
     {

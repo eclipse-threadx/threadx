@@ -12,7 +12,7 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */
+/**                                                                       */ 
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   Port Specific                                                       */
@@ -21,37 +21,39 @@
 /**************************************************************************/
 
 
-/**************************************************************************/
-/*                                                                        */
-/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
-/*                                                                        */
+/**************************************************************************/ 
+/*                                                                        */ 
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
+/*                                                                        */ 
 /*    tx_port.h                                            RXv2/GNURX     */
-/*                                                           6.1.7        */
+/*                                                           6.1.9        */
 /*                                                                        */
-/*  AUTHOR                                                                */
-/*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
-/*                                                                        */
-/*  DESCRIPTION                                                           */
-/*                                                                        */
-/*    This file contains data type definitions that make the ThreadX      */
-/*    real-time kernel function identically on a variety of different     */
-/*    processor architectures.  For example, the size or number of bits   */
-/*    in an "int" data type vary between microprocessor architectures and */
-/*    even C compilers for the same microprocessor.  ThreadX does not     */
-/*    directly use native C data types.  Instead, ThreadX creates its     */
-/*    own special types that can be mapped to actual data types by this   */
-/*    file to guarantee consistency in the interface and functionality.   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
+/*  AUTHOR                                                                */ 
+/*                                                                        */ 
+/*    William E. Lamie, Microsoft Corporation                             */ 
+/*                                                                        */ 
+/*  DESCRIPTION                                                           */ 
+/*                                                                        */ 
+/*    This file contains data type definitions that make the ThreadX      */ 
+/*    real-time kernel function identically on a variety of different     */ 
+/*    processor architectures.  For example, the size or number of bits   */ 
+/*    in an "int" data type vary between microprocessor architectures and */ 
+/*    even C compilers for the same microprocessor.  ThreadX does not     */ 
+/*    directly use native C data types.  Instead, ThreadX creates its     */ 
+/*    own special types that can be mapped to actual data types by this   */ 
+/*    file to guarantee consistency in the interface and functionality.   */ 
+/*                                                                        */ 
+/*  RELEASE HISTORY                                                       */ 
+/*                                                                        */ 
+/*    DATE              NAME                      DESCRIPTION             */ 
+/*                                                                        */ 
+/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
 /*  06-02-2021     William E. Lamie         Modified comments,            */
 /*                                            resulting in version 6.1.7  */   
-/*                                                                        */
-/**************************************************************************/
+/*  10-15-2021     William E. Lamie         Modified comment(s),          */
+/*                                            resulting in version 6.1.9  */
+/*                                                                        */ 
+/**************************************************************************/ 
 
 #ifndef TX_PORT_H
 #define TX_PORT_H
@@ -257,7 +259,7 @@ static void _tx_thread_system_return_inline(void)
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv2/GNURX Version 6.1.7 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv2/GNURX Version 6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

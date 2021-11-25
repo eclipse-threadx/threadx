@@ -42,7 +42,7 @@
 							<tool id="com.arc.cdt.toolchain.av2em.libDebugAsm.1772833895" superClass="com.arc.cdt.toolchain.av2em.libDebugAsm">
 								<option id="arc.compiler.options.target.asm.version.1731127945" name="ARC Core Version" superClass="arc.compiler.options.target.asm.version" value="arc.compiler.options.target.arcv2em" valueType="enumerated"/>
 								<option id="arc.asm.options.stack_check.155109415" name="Hardware Stack Checking(-Xstack_check)" superClass="arc.asm.options.stack_check" value="true" valueType="boolean"/>
-								<option id="com.arc.cdt.toolchain.asm.option.defines.645804646" name="Preprocessor Defines (one per line)" superClass="com.arc.cdt.toolchain.asm.option.defines" valueType="definedSymbols">
+								<option id="com.arc.cdt.toolchain.asm.option.defines.645804646" isActive="false" isDefinedList="false" name="Preprocessor Defines (one per line)" superClass="com.arc.cdt.toolchain.asm.option.defines" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="TX_ENABLE_HW_STACK_CHECKING"/>
 								</option>
 								<inputType id="com.arc.cdt.toolchain.asminput.1568134071" name="Assembler Inputs" superClass="com.arc.cdt.toolchain.asminput"/>

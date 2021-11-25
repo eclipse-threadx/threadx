@@ -29,7 +29,7 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_mm_register_setup           Cortex-M33/Generic  */
+/*    _txm_module_manager_mm_register_setup              Cortex-M33       */
 /*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -123,7 +123,7 @@ ULONG   callback_stack_size;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_inside_data_check           Cortex-M33/Generic  */
+/*    _txm_module_manager_inside_data_check              Cortex-M33       */
 /*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */

@@ -8,67 +8,56 @@
 ;/*       and in the root directory of this software.                      */
 ;/*                                                                        */
 ;/**************************************************************************/
-;
-;
+
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Timer                                                               */
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-;
-;#define TX_SOURCE_CODE
-;
-;
-;/* Include necessary system files.  */
-;
-;#include "tx_api.h"
-;#include "tx_timer.h"
-;#include "tx_thread.h"
-;
-;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_timer_interrupt                               ARC_HS/MetaWare   */
-;/*                                                           6.1.3        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function processes the hardware timer interrupt.  This         */ 
-;/*    processing includes incrementing the system clock and checking for  */ 
-;/*    time slice and/or timer expiration.  If either is found, the        */ 
-;/*    interrupt context save/restore functions are called along with the  */ 
-;/*    expiration functions.                                               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_timer_expiration_process          Process timer expiration      */ 
-;/*    _tx_thread_time_slice                 Time slice interrupted thread */ 
-;/*    _tx_thread_context_save               Save interrupt context        */ 
-;/*    _tx_thread_context_restore            Restore interrupt context     */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    interrupt vector                                                    */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function processes the hardware timer interrupt.  This         */
+;/*    processing includes incrementing the system clock and checking for  */
+;/*    time slice and/or timer expiration.  If either is found, the        */
+;/*    interrupt context save/restore functions are called along with the  */
+;/*    expiration functions.                                               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_timer_expiration_process          Process timer expiration      */
+;/*    _tx_thread_time_slice                 Time slice interrupted thread */
+;/*    _tx_thread_context_save               Save interrupt context        */
+;/*    _tx_thread_context_restore            Restore interrupt context     */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    interrupt vector                                                    */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -76,12 +65,16 @@
 ;/*                                            unneeded load of            */
 ;/*                                            _tx_thread_preempt_disable, */
 ;/*                                            resulting in version 6.1.3  */
+;/*  10-15-2021     Yuxin Zhou               Modified comment(s), and      */
+;/*                                            fixed possible race         */
+;/*                                            condition on preemption     */         
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_timer_interrupt(VOID)
 ;{
     .global _tx_timer_interrupt
-    .type   _tx_timer_interrupt, @function 
+    .type   _tx_timer_interrupt, @function
 _tx_timer_interrupt:
 ;
 ;    /* Upon entry to this routine, it is assumed the interrupt stack frame has
@@ -132,7 +125,7 @@ __tx_timer_no_time_slice:
 ;
     ld      r0, [gp, _tx_timer_current_ptr@sda]         ; Pickup current timer pointer
     ld      r2, [r0, 0]                                 ; Pickup examine actual list entry
-    breq    r2, 0, __tx_timer_no_timer                         ; 
+    breq    r2, 0, __tx_timer_no_timer                         ;
                                                         ; If NULL, no timer has expired, just move to the next entry
 ;
 ;        /* Set expiration flag.  */
@@ -175,6 +168,10 @@ __tx_timer_done:
 ;    /* See if anything has expired.  */
 ;    if ((_tx_timer_expired_time_slice) || (_tx_timer_expired))
 ;    {
+;
+    ld      r0, [gp, _tx_thread_current_ptr@sda]
+    ld      r2, [gp, _tx_thread_execute_ptr@sda]
+    brne    r0, r2, __tx_something_expired
 ;
     breq    r1, 0, __tx_timer_nothing_expired           ; If 0, nothing has expired
 ;
@@ -220,7 +217,7 @@ __tx_timer_dont_activate:
 ;
 __tx_timer_not_ts_expiration:
 ;
-    st      0, [gp, _tx_timer_expired_time_slice@sda]  
+    st      0, [gp, _tx_timer_expired_time_slice@sda]
     b       _tx_thread_context_restore                  ; Go restore interrupt context..
                                                         ; ..clearing time-slice expired flag
                                                         ; Note that we don't return from
@@ -233,9 +230,9 @@ __tx_timer_nothing_expired:
     ld      r0, [sp, 0]                                 ; Recover r0
     ld      r1, [sp, 4]                                 ; Recover r1
     ld      r2, [sp, 8]                                 ; Recover r2
-    add     sp, sp, 160                                 ; Recover interrupt stack frame 
+    add     sp, sp, 160                                 ; Recover interrupt stack frame
     rtie                                                ; Return to point of interrupt
 ;
 ;}
     .end
-    
+

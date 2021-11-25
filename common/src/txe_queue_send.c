@@ -95,7 +95,7 @@ TX_THREAD   *current_thread;
         /* Queue pointer is invalid, return appropriate error code.  */
         status =  TX_QUEUE_ERROR;
     }
-    
+
     /* Now check for invalid queue ID.  */
     else if (queue_ptr -> tx_queue_id != TX_QUEUE_ID)
     {
@@ -114,7 +114,7 @@ TX_THREAD   *current_thread;
     else
     {
 
-        /* Check for a wait option error.  Only threads are allowed any form of 
+        /* Check for a wait option error.  Only threads are allowed any form of
            suspension.  */
         if (wait_option != TX_NO_WAIT)
         {
@@ -126,11 +126,11 @@ TX_THREAD   *current_thread;
                 /* A non-thread is trying to suspend, return appropriate error code.  */
                 status =  TX_WAIT_ERROR;
             }
-       
+
 #ifndef TX_TIMER_PROCESS_IN_ISR
             else
             {
-    
+
                 /* Pickup thread pointer.  */
                 TX_THREAD_GET_CURRENT(current_thread)
 

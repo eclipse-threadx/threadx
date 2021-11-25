@@ -87,9 +87,9 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT    _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, 
+UINT    _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
                 VOID (*entry_function)(ULONG id), ULONG entry_input,
-                VOID *stack_start, ULONG stack_size, 
+                VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start, UINT thread_control_block_size)
 {
@@ -145,19 +145,19 @@ TX_THREAD       *current_thread;
         stack_end =    TX_UCHAR_TO_VOID_POINTER_CONVERT(work_ptr);
         for (i = ((ULONG) 0); i < _tx_thread_created_count; i++)
         {
-        
+
             /* Determine if this thread matches the thread in the list.  */
             if (thread_ptr == next_thread)
             {
-        
+
                 /* Set the break flag.  */
                 break_flag =  TX_TRUE;
             }
-            
+
             /* Determine if we need to break the loop.  */
             if (break_flag == TX_TRUE)
             {
-            
+
                 /* Yes, break out of the loop.  */
                 break;
             }
@@ -168,11 +168,11 @@ TX_THREAD       *current_thread;
 
                 if (stack_start < next_thread -> tx_thread_stack_end)
                 {
-        
-                    /* This stack overlaps with an existing thread, clear the stack pointer to 
+
+                    /* This stack overlaps with an existing thread, clear the stack pointer to
                        force a stack error below.  */
                     stack_start =  TX_NULL;
-                    
+
                     /* Set the break flag.  */
                     break_flag =  TX_TRUE;
                 }
@@ -184,11 +184,11 @@ TX_THREAD       *current_thread;
 
                 if (stack_end < next_thread -> tx_thread_stack_end)
                 {
-        
-                    /* This stack overlaps with an existing thread, clear the stack pointer to 
+
+                    /* This stack overlaps with an existing thread, clear the stack pointer to
                        force a stack error below.  */
                     stack_start =  TX_NULL;
-                    
+
                     /* Set the break flag.  */
                     break_flag =  TX_TRUE;
                 }
@@ -203,7 +203,7 @@ TX_THREAD       *current_thread;
 
         /* Decrement the preempt disable flag.  */
         _tx_thread_preempt_disable--;
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
 
@@ -285,11 +285,11 @@ TX_THREAD       *current_thread;
             /* Check for interrupt call.  */
             if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
             {
-    
+
                 /* Now, make sure the call is from an interrupt and not initialization.  */
                 if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
                 {
-            
+
                     /* Invalid caller of this function, return appropriate error code.  */
                     status =  TX_CALLER_ERROR;
                 }

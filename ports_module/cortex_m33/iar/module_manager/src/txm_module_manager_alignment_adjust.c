@@ -30,8 +30,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_alignment_adjust            Cortex-M33/MPU/IAR  */
-/*                                                           6.1.5        */
+/*    _txm_module_manager_alignment_adjust               Cortex-M33       */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -65,7 +65,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021     Scott Larson             Initial Version 6.1.5         */
+/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,

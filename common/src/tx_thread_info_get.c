@@ -80,8 +80,8 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_thread_info_get(TX_THREAD *thread_ptr, CHAR **name, UINT *state, ULONG *run_count, 
-                UINT *priority, UINT *preemption_threshold, ULONG *time_slice, 
+UINT  _tx_thread_info_get(TX_THREAD *thread_ptr, CHAR **name, UINT *state, ULONG *run_count,
+                UINT *priority, UINT *preemption_threshold, ULONG *time_slice,
                 TX_THREAD **next_thread, TX_THREAD **next_suspended_thread)
 {
 
@@ -103,59 +103,59 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the name of the thread.  */
     if (name != TX_NULL)
     {
-    
+
         *name =  thread_ptr -> tx_thread_name;
     }
-    
+
     /* Pickup the thread's current state.  */
     if (state != TX_NULL)
     {
-    
+
         *state =  thread_ptr -> tx_thread_state;
     }
-    
+
     /* Pickup the number of times the thread has been scheduled.  */
     if (run_count != TX_NULL)
     {
-    
+
         *run_count =  thread_ptr -> tx_thread_run_count;
     }
-    
+
     /* Pickup the thread's priority.  */
     if (priority != TX_NULL)
     {
-    
+
         *priority =  thread_ptr -> tx_thread_user_priority;
     }
-    
+
     /* Pickup the thread's preemption-threshold.  */
     if (preemption_threshold != TX_NULL)
     {
-    
+
         *preemption_threshold =  thread_ptr -> tx_thread_user_preempt_threshold;
     }
-    
+
     /* Pickup the thread's current time-slice.  */
     if (time_slice != TX_NULL)
     {
-    
+
         *time_slice =  thread_ptr -> tx_thread_time_slice;
     }
-    
+
     /* Pickup the next created thread.  */
     if (next_thread != TX_NULL)
     {
-    
+
         *next_thread =  thread_ptr -> tx_thread_created_next;
     }
-    
+
     /* Pickup the next thread suspended.  */
     if (next_suspended_thread != TX_NULL)
     {
-    
+
         *next_suspended_thread =  thread_ptr -> tx_thread_suspended_next;
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 

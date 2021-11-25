@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    sched_get_priority_max                             PORTABLE C       */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -63,7 +63,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -83,7 +83,7 @@ INT sched_get_priority_max(INT policy)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    sched_get_priority_min                              PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -113,7 +113,7 @@ INT sched_get_priority_max(INT policy)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 INT sched_get_priority_min(INT policy)

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Initialize                                                          */
 /**                                                                       */
@@ -44,68 +44,70 @@
 #include "tx_byte_pool.h"
 
 
-/* Define the unused memory pointer.  The value of the first available 
+/* Define the unused memory pointer.  The value of the first available
    memory address is placed in this variable in the low-level
-   initialization function.  The content of this variable is passed 
+   initialization function.  The content of this variable is passed
    to the application's system definition function.  */
 
 VOID     *_tx_initialize_unused_memory;
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_initialize_high_level                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_initialize_high_level                           PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is responsible for initializing all of the other      */ 
+/*                                                                        */
+/*    This function is responsible for initializing all of the other      */
 /*    components in the ThreadX real-time kernel.                         */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_initialize             Initialize the thread control     */ 
-/*                                        component                       */ 
-/*    _tx_timer_initialize              Initialize the timer control      */ 
-/*                                        component                       */ 
-/*    _tx_semaphore_initialize          Initialize the semaphore control  */ 
-/*                                        component                       */ 
-/*    _tx_queue_initialize              Initialize the queue control      */ 
-/*                                        component                       */ 
-/*    _tx_event_flags_initialize        Initialize the event flags control*/ 
-/*                                        component                       */ 
-/*    _tx_block_pool_initialize         Initialize the block pool control */ 
-/*                                        component                       */ 
-/*    _tx_byte_pool_initialize          Initialize the byte pool control  */ 
-/*                                        component                       */ 
-/*    _tx_mutex_initialize              Initialize the mutex control      */ 
-/*                                        component                       */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter       Kernel entry function             */ 
-/*    _tx_initialize_kernel_setup       Early kernel setup function that  */ 
-/*                                        is optionally called by         */ 
-/*                                        compiler's startup code.        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_initialize             Initialize the thread control     */
+/*                                        component                       */
+/*    _tx_timer_initialize              Initialize the timer control      */
+/*                                        component                       */
+/*    _tx_semaphore_initialize          Initialize the semaphore control  */
+/*                                        component                       */
+/*    _tx_queue_initialize              Initialize the queue control      */
+/*                                        component                       */
+/*    _tx_event_flags_initialize        Initialize the event flags control*/
+/*                                        component                       */
+/*    _tx_block_pool_initialize         Initialize the block pool control */
+/*                                        component                       */
+/*    _tx_byte_pool_initialize          Initialize the byte pool control  */
+/*                                        component                       */
+/*    _tx_mutex_initialize              Initialize the mutex control      */
+/*                                        component                       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter       Kernel entry function             */
+/*    _tx_initialize_kernel_setup       Early kernel setup function that  */
+/*                                        is optionally called by         */
+/*                                        compiler's startup code.        */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID    _tx_initialize_high_level(VOID)

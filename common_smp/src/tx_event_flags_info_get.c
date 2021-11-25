@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Event Flags                                                         */
 /**                                                                       */
@@ -30,55 +30,57 @@
 #include "tx_event_flags.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_event_flags_info_get                            PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_event_flags_info_get                            PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function retrieves information from the specified event flag   */ 
-/*    group.                                                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    group_ptr                         Pointer to event flag group       */ 
-/*    name                              Destination for the event flag    */ 
-/*                                        group name                      */ 
-/*    current_flags                     Current event flags               */ 
-/*    first_suspended                   Destination for pointer of first  */ 
-/*                                        thread suspended on event flags */ 
-/*    suspended_count                   Destination for suspended count   */ 
-/*    next_group                        Destination for pointer to next   */ 
-/*                                        event flag group on the created */ 
-/*                                        list                            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function retrieves information from the specified event flag   */
+/*    group.                                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    group_ptr                         Pointer to event flag group       */
+/*    name                              Destination for the event flag    */
+/*                                        group name                      */
+/*    current_flags                     Current event flags               */
+/*    first_suspended                   Destination for pointer of first  */
+/*                                        thread suspended on event flags */
+/*    suspended_count                   Destination for suspended count   */
+/*    next_group                        Destination for pointer to next   */
+/*                                        event flag group on the created */
+/*                                        list                            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_event_flags_info_get(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR **name, ULONG *current_flags, 
-                    TX_THREAD **first_suspended, ULONG *suspended_count, 
+UINT  _tx_event_flags_info_get(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR **name, ULONG *current_flags,
+                    TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_EVENT_FLAGS_GROUP **next_group)
 {
 
@@ -100,7 +102,7 @@ TX_INTERRUPT_SAVE_AREA
     /* Retrieve the name of the event flag group.  */
     if (name != TX_NULL)
     {
-    
+
         *name =  group_ptr -> tx_event_flags_group_name;
     }
 
@@ -109,31 +111,31 @@ TX_INTERRUPT_SAVE_AREA
     {
 
         /* Pickup the current flags and apply delayed clearing.  */
-        *current_flags =  group_ptr -> tx_event_flags_group_current & 
+        *current_flags =  group_ptr -> tx_event_flags_group_current &
                                                         ~group_ptr -> tx_event_flags_group_delayed_clear;
     }
 
     /* Retrieve the first thread suspended on this event flag group.  */
     if (first_suspended != TX_NULL)
     {
-    
+
         *first_suspended =  group_ptr -> tx_event_flags_group_suspension_list;
     }
 
     /* Retrieve the number of threads suspended on this event flag group.  */
     if (suspended_count != TX_NULL)
     {
-    
+
         *suspended_count =  (ULONG) group_ptr -> tx_event_flags_group_suspended_count;
     }
-    
+
     /* Retrieve the pointer to the next event flag group created.  */
     if (next_group != TX_NULL)
     {
-    
+
         *next_group =  group_ptr -> tx_event_flags_group_created_next;
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 

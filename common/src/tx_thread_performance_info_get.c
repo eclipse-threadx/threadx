@@ -97,7 +97,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_thread_performance_info_get(TX_THREAD *thread_ptr, ULONG *resumptions, ULONG *suspensions, 
+UINT  _tx_thread_performance_info_get(TX_THREAD *thread_ptr, ULONG *resumptions, ULONG *suspensions,
                 ULONG *solicited_preemptions, ULONG *interrupt_preemptions, ULONG *priority_inversions,
                 ULONG *time_slices, ULONG *relinquishes, ULONG *timeouts, ULONG *wait_aborts, TX_THREAD **last_preempted_by)
 {
@@ -111,15 +111,15 @@ UINT                    status;
     /* Determine if this is a legal request.  */
     if (thread_ptr == TX_NULL)
     {
-        
+
         /* Thread pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
-    
+
     /* Determine if the thread ID is invalid.  */
     else if (thread_ptr -> tx_thread_id != TX_THREAD_ID)
     {
-        
+
         /* Thread pointer is illegal, return error.  */
         status =  TX_PTR_ERROR;
     }
@@ -141,73 +141,73 @@ UINT                    status;
         /* Retrieve number of resumptions for this thread.  */
         if (resumptions != TX_NULL)
         {
-    
+
             *resumptions =  thread_ptr -> tx_thread_performance_resume_count;
         }
-    
+
         /* Retrieve number of suspensions for this thread.  */
         if (suspensions != TX_NULL)
         {
-    
+
             *suspensions =  thread_ptr -> tx_thread_performance_suspend_count;
         }
-    
+
         /* Retrieve number of solicited preemptions for this thread.  */
         if (solicited_preemptions != TX_NULL)
         {
-    
+
             *solicited_preemptions =  thread_ptr -> tx_thread_performance_solicited_preemption_count;
         }
-    
+
         /* Retrieve number of interrupt preemptions for this thread.  */
         if (interrupt_preemptions != TX_NULL)
         {
-    
+
             *interrupt_preemptions =  thread_ptr -> tx_thread_performance_interrupt_preemption_count;
         }
-    
+
         /* Retrieve number of priority inversions for this thread.  */
         if (priority_inversions != TX_NULL)
         {
-    
+
             *priority_inversions =  thread_ptr -> tx_thread_performance_priority_inversion_count;
         }
-    
+
         /* Retrieve number of time-slices for this thread.  */
         if (time_slices != TX_NULL)
         {
-    
+
             *time_slices =  thread_ptr -> tx_thread_performance_time_slice_count;
         }
-    
+
         /* Retrieve number of relinquishes for this thread.  */
         if (relinquishes != TX_NULL)
         {
-    
+
             *relinquishes =  thread_ptr -> tx_thread_performance_relinquish_count;
         }
-    
+
         /* Retrieve number of timeouts for this thread.  */
         if (timeouts != TX_NULL)
         {
-    
+
             *timeouts =  thread_ptr -> tx_thread_performance_timeout_count;
         }
-    
+
         /* Retrieve number of wait aborts for this thread.  */
         if (wait_aborts != TX_NULL)
         {
-    
+
             *wait_aborts =  thread_ptr -> tx_thread_performance_wait_abort_count;
         }
-    
+
         /* Retrieve the pointer of the last thread that preempted this thread.  */
         if (last_preempted_by != TX_NULL)
         {
-    
+
             *last_preempted_by =  thread_ptr -> tx_thread_performance_last_preempting_thread;
         }
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
 

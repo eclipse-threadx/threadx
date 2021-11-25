@@ -3,6 +3,7 @@
 	<name>sample_threadx</name>
 	<comment></comment>
 	<projects>
+		<project>tx</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

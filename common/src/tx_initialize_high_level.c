@@ -44,9 +44,9 @@
 #include "tx_byte_pool.h"
 
 
-/* Define the unused memory pointer.  The value of the first available 
+/* Define the unused memory pointer.  The value of the first available
    memory address is placed in this variable in the low-level
-   initialization function.  The content of this variable is passed 
+   initialization function.  The content of this variable is passed
    to the application's system definition function.  */
 
 VOID     *_tx_initialize_unused_memory;

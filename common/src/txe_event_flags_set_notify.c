@@ -85,7 +85,7 @@ UINT    status;
         /* Event flags group pointer is invalid, return appropriate error code.  */
         status =  TX_GROUP_ERROR;
     }
-    
+
     /* Now check for invalid event group ID.  */
     else if (group_ptr -> tx_event_flags_group_id != TX_EVENT_FLAGS_ID)
     {

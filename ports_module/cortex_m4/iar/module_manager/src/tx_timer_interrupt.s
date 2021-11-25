@@ -39,11 +39,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_timer_interrupt                               Cortex-M4/IAR     */
-/*                                                           6.1.2        */
+/*    _tx_timer_interrupt                              Cortex-M4/IAR      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -73,9 +73,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  06-02-2021     Scott Larson             Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
@@ -113,6 +111,7 @@ _tx_timer_interrupt:
        // if (__tx_timer_time_slice == 0)
 
     CBNZ    r2, __tx_timer_no_time_slice            // Has it expired?
+                                                    // No, skip expiration processing
 
        /* Set the time-slice expired flag.  */
        // _tx_timer_expired_time_slice =  TX_TRUE;
@@ -249,6 +248,5 @@ __tx_timer_nothing_expired:
 
     DSB                                             // Complete all memory access
     BX      lr                                      // Return to caller
-
 // }
     END

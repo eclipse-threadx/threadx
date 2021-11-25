@@ -39,8 +39,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_timer_interrupt                               Cortex-M/IAR      */
-/*                                                           6.1.5        */
+/*    _tx_timer_interrupt                               Cortex-M33/IAR    */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -73,7 +73,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  03-02-2021     Scott Larson             Initial Version 6.1.5         */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
@@ -188,7 +188,7 @@ __tx_timer_done:
 
 __tx_something_expired:
 
-    STMDB   sp!, {r0, lr}                           // Save the lr register on the stack
+    PUSH    {r0, lr}                                // Save the lr register on the stack
                                                     //   and save r0 just to keep 8-byte alignment
 
     /* Did a timer expire?  */
@@ -234,12 +234,11 @@ __tx_timer_dont_activate:
     BEQ     __tx_timer_skip_time_slice              // If the same, there was no time-slice performed
     STR     r2, [r0]                                // Not the same, issue the PendSV for preemption
 __tx_timer_skip_time_slice:
-
     // }
 
 __tx_timer_not_ts_expiration:
 
-    LDMIA   sp!, {r0, lr}                           // Recover lr register (r0 is just there for
+    POP     {r0, lr}                                // Recover lr register (r0 is just there for
                                                     //   the 8-byte stack alignment
 
     // }
@@ -248,6 +247,5 @@ __tx_timer_nothing_expired:
 
     DSB                                             // Complete all memory access
     BX      lr                                      // Return to caller
-
 // }
     END

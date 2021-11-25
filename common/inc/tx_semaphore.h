@@ -56,10 +56,10 @@
 #define TX_SEMAPHORE_ID                         ((ULONG) 0x53454D41)
 
 
-/* Determine if in-line component initialization is supported by the 
+/* Determine if in-line component initialization is supported by the
    caller.  */
 #ifdef TX_INVOKE_INLINE_INITIALIZATION
-            /* Yes, in-line initialization is supported, remap the 
+            /* Yes, in-line initialization is supported, remap the
                semaphore initialization function.  */
 #ifndef TX_SEMAPHORE_ENABLE_PERFORMANCE_INFO
 #define _tx_semaphore_initialize() \
@@ -76,7 +76,7 @@
 #endif
 #define TX_SEMAPHORE_INIT
 #else
-            /* No in-line initialization is supported, use standard 
+            /* No in-line initialization is supported, use standard
                function call.  */
 VOID        _tx_semaphore_initialize(VOID);
 #endif

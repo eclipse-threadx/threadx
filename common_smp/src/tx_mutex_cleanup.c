@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Mutex                                                               */
 /**                                                                       */
@@ -30,47 +30,49 @@
 #include "tx_mutex.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_mutex_cleanup                                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_mutex_cleanup                                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function processes mutex timeout and thread terminate          */ 
-/*    actions that require the mutex data structures to be cleaned        */ 
-/*    up.                                                                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                        Pointer to suspended thread's     */ 
-/*                                        control block                   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_system_resume          Resume thread service             */ 
-/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_timeout                Thread timeout processing         */ 
-/*    _tx_thread_terminate              Thread terminate processing       */ 
-/*    _tx_thread_wait_abort             Thread wait abort processing      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function processes mutex timeout and thread terminate          */
+/*    actions that require the mutex data structures to be cleaned        */
+/*    up.                                                                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                        Pointer to suspended thread's     */
+/*                                        control block                   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_system_resume          Resume thread service             */
+/*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_timeout                Thread timeout processing         */
+/*    _tx_thread_terminate              Thread terminate processing       */
+/*    _tx_thread_wait_abort             Thread wait abort processing      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_mutex_cleanup(TX_THREAD  *thread_ptr, ULONG suspension_sequence)
@@ -80,7 +82,7 @@ VOID  _tx_mutex_cleanup(TX_THREAD  *thread_ptr, ULONG suspension_sequence)
 TX_INTERRUPT_SAVE_AREA
 #endif
 
-TX_MUTEX            *mutex_ptr;            
+TX_MUTEX            *mutex_ptr;
 UINT                suspended_count;
 TX_THREAD           *next_thread;
 TX_THREAD           *previous_thread;
@@ -98,14 +100,14 @@ TX_THREAD           *previous_thread;
         /* Check for valid suspension sequence.  */
         if (suspension_sequence == thread_ptr -> tx_thread_suspension_sequence)
         {
-   
+
             /* Setup pointer to mutex control block.  */
             mutex_ptr =  TX_VOID_TO_MUTEX_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
-    
+
             /* Check for NULL mutex pointer.  */
             if (mutex_ptr != TX_NULL)
             {
-    
+
                 /* Determine if the mutex ID is valid.  */
                 if (mutex_ptr -> tx_mutex_id == TX_MUTEX_ID)
                 {
@@ -131,7 +133,7 @@ TX_THREAD           *previous_thread;
                         suspended_count =  mutex_ptr -> tx_mutex_suspended_count;
 
                         /* Remove the suspended thread from the list.  */
-    
+
                         /* See if this is the only suspended thread on the list.  */
                         if (suspended_count == TX_NO_SUSPENSIONS)
                         {
@@ -145,7 +147,7 @@ TX_THREAD           *previous_thread;
                         {
 
                             /* At least one more thread is on the same suspension list.  */
-    
+
                             /* Update the links of the adjacent threads.  */
                             next_thread =                                   thread_ptr -> tx_thread_suspended_next;
                             previous_thread =                               thread_ptr -> tx_thread_suspended_previous;
@@ -155,18 +157,18 @@ TX_THREAD           *previous_thread;
                             /* Determine if we need to update the head pointer.  */
                             if (mutex_ptr -> tx_mutex_suspension_list == thread_ptr)
                             {
-            
+
                                 /* Update the list head pointer.  */
                                 mutex_ptr -> tx_mutex_suspension_list =         next_thread;
                             }
-                        } 
- 
+                        }
+
                         /* Now we need to determine if this cleanup is from a terminate, timeout,
                            or from a wait abort.  */
                         if (thread_ptr -> tx_thread_state == TX_MUTEX_SUSP)
                         {
 
-                            /* Timeout condition and the thread still suspended on the mutex.  
+                            /* Timeout condition and the thread still suspended on the mutex.
                                Setup return error status and resume the thread.  */
 
 #ifdef TX_MUTEX_ENABLE_PERFORMANCE_INFO
@@ -192,7 +194,7 @@ TX_THREAD           *previous_thread;
 
                             /* Restore interrupts.  */
                             TX_RESTORE
-    
+
                             /* Resume the thread!  */
                             _tx_thread_system_resume(thread_ptr);
 
@@ -206,50 +208,52 @@ TX_THREAD           *previous_thread;
             }
         }
     }
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 #endif
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_mutex_thread_release                            PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_mutex_thread_release                            PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function releases all mutexes owned by the thread. This        */ 
-/*    function is called when the thread completes or is terminated.      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                        Pointer to thread's control block */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_mutex_put                     Release the mutex                 */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_shell_entry            Thread completion processing      */ 
-/*    _tx_thread_terminate              Thread terminate processing       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function releases all mutexes owned by the thread. This        */
+/*    function is called when the thread completes or is terminated.      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                        Pointer to thread's control block */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_mutex_put                     Release the mutex                 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_shell_entry            Thread completion processing      */
+/*    _tx_thread_terminate              Thread terminate processing       */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_mutex_thread_release(TX_THREAD  *thread_ptr)
@@ -265,24 +269,24 @@ UINT        status;
 
     /* Disable interrupts.  */
     TX_DISABLE
-    
+
     /* Temporarily disable preemption.  */
     _tx_thread_preempt_disable++;
 
     /* Loop to look at all the mutexes.  */
     do
     {
-    
+
         /* Pickup the mutex head pointer.  */
         mutex_ptr =  thread_ptr -> tx_thread_owned_mutex_list;
 
         /* Determine if there is a mutex.  */
         if (mutex_ptr != TX_NULL)
         {
-        
+
             /* Yes, set the ownership count to 1.  */
             mutex_ptr -> tx_mutex_ownership_count =  ((UINT) 1);
- 
+
             /* Restore interrupts.   */
             TX_RESTORE
 
@@ -301,12 +305,12 @@ UINT        status;
 
             /* Move to the next mutex.  */
             mutex_ptr =  thread_ptr -> tx_thread_owned_mutex_list;
-        }        
+        }
     } while (mutex_ptr != TX_NULL);
-    
+
     /* Restore preemption.  */
     _tx_thread_preempt_disable--;
-    
+
     /* Restore interrupts.  */
     TX_RESTORE
 }

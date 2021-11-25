@@ -26,11 +26,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_system_return                          Cortex-M7/IAR     */
-/*                                                           6.1.2        */
+/*    _tx_thread_system_return                         Cortex-M7/IAR      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -59,15 +59,12 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  11-09-2020     Scott Larson             Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_system_return(VOID)
 // {
     PUBLIC  _tx_thread_system_return
-_tx_thread_system_return??rA:
 _tx_thread_system_return:
 
     /* Return to real scheduler via PendSV. Note that this routine is often
@@ -79,11 +76,17 @@ _tx_thread_system_return:
     MRS     r0, IPSR                                // Pickup IPSR
     CMP     r0, #0                                  // Is it a thread returning?
     BNE     _isr_context                            // If ISR, skip interrupt enable
+#ifdef TX_PORT_USE_BASEPRI
+    MRS     r1, BASEPRI                             // Thread context returning, pickup BASEPRI
+    MOV     r0, #0
+    MSR     BASEPRI, r0                             // Enable interrupts
+    MSR     BASEPRI, r1                             // Restore original interrupt posture
+#else
     MRS     r1, PRIMASK                             // Thread context returning, pickup PRIMASK
     CPSIE   i                                       // Enable interrupts
     MSR     PRIMASK, r1                             // Restore original interrupt posture
+#endif
 _isr_context:
     BX      lr                                      // Return to caller
-
 // }
     END

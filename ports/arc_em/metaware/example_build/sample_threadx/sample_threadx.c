@@ -51,6 +51,7 @@ void    thread_3_and_4_entry(ULONG thread_input);
 void    thread_5_entry(ULONG thread_input);
 void    thread_6_and_7_entry(ULONG thread_input);
 
+
 /* Define main entry point.  */
 
 int main()
@@ -91,7 +92,7 @@ CHAR    *pointer = TX_NULL;
     /* Create threads 1 and 2. These threads pass information through a ThreadX 
        message queue.  It is also interesting to note that these threads have a time
        slice.  */
-    tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
+    tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
             pointer, DEMO_STACK_SIZE, 
             16, 16, 4, TX_AUTO_START);
 
@@ -178,6 +179,7 @@ void    thread_0_entry(ULONG thread_input)
 {
 
 UINT    status;
+
 
     /* This thread simply sits in while-forever-sleep loop.  */
     while(1)

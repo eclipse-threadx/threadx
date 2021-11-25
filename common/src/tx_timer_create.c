@@ -75,7 +75,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr, 
+UINT  _tx_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr,
             VOID (*expiration_function)(ULONG id), ULONG expiration_input,
             ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
 {
@@ -95,7 +95,7 @@ TX_TIMER        *previous_timer;
     timer_ptr -> tx_timer_internal.tx_timer_internal_re_initialize_ticks =  reschedule_ticks;
     timer_ptr -> tx_timer_internal.tx_timer_internal_timeout_function =     expiration_function;
     timer_ptr -> tx_timer_internal.tx_timer_internal_timeout_param =        expiration_input;
-    
+
     /* Disable interrupts to put the timer on the created list.  */
     TX_DISABLE
 
@@ -130,7 +130,7 @@ TX_TIMER        *previous_timer;
 
     /* Increment the number of created timers.  */
     _tx_timer_created_count++;
-    
+
     /* Optional timer create extended processing.  */
     TX_TIMER_CREATE_EXTENSION(timer_ptr)
 

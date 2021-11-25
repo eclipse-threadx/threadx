@@ -72,7 +72,7 @@
 .type _tx_thread_stack_build, function
 _tx_thread_stack_build:
     /* Build a fake interrupt frame.  The form of the fake interrupt stack
-       on the Cortex-M33 should look like the following after it is built:
+       on the Cortex-M should look like the following after it is built:
 
        Stack Top:
                        LR          Interrupted LR (LR at time of PENDSV)

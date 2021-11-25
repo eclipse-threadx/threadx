@@ -87,7 +87,7 @@ TX_THREAD       *thread_ptr;
     /* Default status to success.  */
     status =  TX_SUCCESS;
 #endif
-    
+
     /* Check for an invalid byte pool pointer.  */
     if (pool_ptr == TX_NULL)
     {
@@ -107,7 +107,7 @@ TX_THREAD       *thread_ptr;
     /* Check for interrupt or initialization.  */
     else if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
     {
-    
+
         /* Invalid caller of this function, return appropriate error code.  */
         status =  TX_CALLER_ERROR;
     }
@@ -134,7 +134,7 @@ TX_THREAD       *thread_ptr;
 
             /* Call actual byte pool delete function.  */
             status =  _tx_byte_pool_delete(pool_ptr);
-            
+
 #ifndef TX_TIMER_PROCESS_IN_ISR
         }
 #endif

@@ -1538,6 +1538,11 @@
               <FileType>1</FileType>
               <FilePath>..\module_manager\src\txm_module_manager_port_dispatch.c</FilePath>
             </File>
+            <File>
+              <FileName>tx_thread_secure_stack_initialize.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\module_manager\src\tx_thread_secure_stack_initialize.S</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

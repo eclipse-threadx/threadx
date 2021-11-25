@@ -29,7 +29,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_initialize_low_level                             RXv3/GNURX     */
-;/*                                                           6.1.7        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -63,6 +63,8 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s),          */ 
+;/*                                            resulting in version 6.1.9  */ 
 ;/*                                                                        */
 ;/**************************************************************************/
     .global __tx_initialize_low_level
@@ -72,7 +74,7 @@ __tx_initialize_low_level:
 ;    /* Save the first available memory address.  */
 ;    _tx_initialize_unused_memory =  (VOID_PTR) &free_mem_start;
 ;
-    MOV.L    #_end, R1                ; Pickup unused memory address
+    MOV.L    #_end, R1                          ; Pickup unused memory address
     MOV.L    #__tx_initialize_unused_memory, R2
     MOV.L    R1,[R2]                            ; Save first free memory address
 
@@ -91,3 +93,4 @@ __tx_initialize_low_level:
 
 
     .end
+

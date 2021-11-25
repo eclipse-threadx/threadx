@@ -80,7 +80,7 @@ TX_TIMER_INTERNAL   *previous_timer;
 ULONG               ticks_left;
 UINT                active_timer_list;
 
-    
+
     /* Setup internal timer pointer.  */
     internal_ptr =  &(timer_ptr -> tx_timer_internal);
 
@@ -125,7 +125,7 @@ UINT                active_timer_list;
                 active_timer_list =  TX_TRUE;
             }
         }
-        
+
         /* Determine if the timer is on active timer list.  */
         if (active_timer_list == TX_TRUE)
         {
@@ -139,7 +139,7 @@ UINT                active_timer_list;
             if (TX_TIMER_INDIRECT_TO_VOID_POINTER_CONVERT(list_head) >= TX_TIMER_INDIRECT_TO_VOID_POINTER_CONVERT(_tx_timer_current_ptr))
             {
 
-                /* Calculate ticks left to expiration - just the difference between this 
+                /* Calculate ticks left to expiration - just the difference between this
                    timer's entry and the current timer pointer.  */
                 ticks_left =  (ULONG) (TX_TIMER_POINTER_DIF(list_head,_tx_timer_current_ptr)) + ((ULONG) 1);
             }
@@ -148,57 +148,57 @@ UINT                active_timer_list;
 
                 /* Calculate the ticks left with a wrapped list condition.  */
                 ticks_left =  (ULONG) (TX_TIMER_POINTER_DIF(list_head,_tx_timer_list_start));
-    
+
                 ticks_left =  ticks_left + (ULONG) ((TX_TIMER_POINTER_DIF(_tx_timer_list_end, _tx_timer_current_ptr)) + ((ULONG) 1));
             }
 
             /* Adjust the remaining ticks accordingly.  */
             if (internal_ptr -> tx_timer_internal_remaining_ticks > TX_TIMER_ENTRIES)
             {
-            
+
                 /* Subtract off the last full pass through the timer list and add the
                    time left.  */
-                internal_ptr -> tx_timer_internal_remaining_ticks =  
+                internal_ptr -> tx_timer_internal_remaining_ticks =
                         (internal_ptr -> tx_timer_internal_remaining_ticks - TX_TIMER_ENTRIES) + ticks_left;
             }
             else
             {
-    
+
                 /* Just put the ticks left into the timer's remaining ticks.  */
                 internal_ptr -> tx_timer_internal_remaining_ticks =  ticks_left;
             }
         }
         else
         {
-        
+
             /* Determine if this is timer has just expired.  */
             if (_tx_timer_expired_timer_ptr != internal_ptr)
             {
-            
+
                 /* No, it hasn't expired. Now check for remaining time greater than the list
                    size.  */
                 if (internal_ptr -> tx_timer_internal_remaining_ticks > TX_TIMER_ENTRIES)
                 {
-                    
+
                     /* Adjust the remaining ticks.  */
-                    internal_ptr -> tx_timer_internal_remaining_ticks =  
+                    internal_ptr -> tx_timer_internal_remaining_ticks =
                                             internal_ptr -> tx_timer_internal_remaining_ticks - TX_TIMER_ENTRIES;
                 }
                 else
                 {
-                
+
                     /* Set the remaining time to the reactivation time.  */
                     internal_ptr -> tx_timer_internal_remaining_ticks =  internal_ptr -> tx_timer_internal_re_initialize_ticks;
                 }
             }
             else
             {
-            
+
                 /* Set the remaining time to the reactivation time.  */
                 internal_ptr -> tx_timer_internal_remaining_ticks =  internal_ptr -> tx_timer_internal_re_initialize_ticks;
             }
         }
-    
+
         /* Pickup the next timer.  */
         next_timer =  internal_ptr -> tx_timer_internal_active_next;
 
@@ -230,7 +230,7 @@ UINT                active_timer_list;
             if (*(list_head) == internal_ptr)
             {
 
-                /* Update the next timer in the list with the list head 
+                /* Update the next timer in the list with the list head
                    pointer.  */
                 next_timer -> tx_timer_internal_list_head =  list_head;
 

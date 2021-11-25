@@ -29,13 +29,12 @@ SYSTICK_CYCLES      =     ((SYSTEM_CLOCK / 100) -1)
 STACK_SIZE          =     0x00000400
 HEAP_SIZE           =     0x00000000
 
-
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                          Cortex-M23/GNU    */
-/*                                                            6.1         */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -165,10 +164,14 @@ __tx_IntHandler:
 // VOID InterruptHandler (VOID)
 // {
     PUSH    {r0,lr}     // Save LR (and dummy r0 to maintain stack alignment)
-    
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_enter             // Call the ISR enter function
+#endif
     /* Do interrupt handler work here */
     /* .... */
-
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_exit              // Call the ISR exit function
+#endif
     POP     {r0, r1}
     MOV     lr, r1
     BX      lr
@@ -186,7 +189,13 @@ SysTick_Handler:
 // VOID TimerInterruptHandler (VOID)
 // {
     PUSH    {r0,lr}     // Save LR (and dummy r0 to maintain stack alignment)
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_enter             // Call the ISR enter function
+#endif
     BL      _tx_timer_interrupt
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    BL      _tx_execution_isr_exit              // Call the ISR exit function
+#endif
     POP     {r0, r1}
     MOV     lr, r1
     BX      lr

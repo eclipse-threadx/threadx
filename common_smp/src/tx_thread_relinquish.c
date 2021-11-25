@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -32,42 +32,42 @@
 #include "tx_trace.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_relinquish                              PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_relinquish                              PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function determines if there is another higher or equal        */ 
-/*    priority, non-executing thread that can execute on this processor.  */ 
-/*    such a thread is found, the calling thread relinquishes control.    */ 
-/*    Otherwise, this function simply returns.                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */ 
-/*    _tx_thread_system_return              Return to the system          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function determines if there is another higher or equal        */
+/*    priority, non-executing thread that can execute on this processor.  */
+/*    such a thread is found, the calling thread relinquishes control.    */
+/*    Otherwise, this function simply returns.                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */
+/*    _tx_thread_system_return              Return to the system          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -78,7 +78,7 @@ VOID  _tx_thread_relinquish(VOID)
 
 TX_INTERRUPT_SAVE_AREA
 
-UINT            priority;                   
+UINT            priority;
 TX_THREAD       *thread_ptr;
 TX_THREAD       *head_ptr;
 TX_THREAD       *tail_ptr;
@@ -93,7 +93,7 @@ ULONG           excluded;
 UINT            base_priority;
 UINT            priority_bit_set;
 UINT            next_preempted;
-ULONG           priority_bit;                    
+ULONG           priority_bit;
 ULONG           priority_map;
 TX_THREAD       *preempted_thread;
 #if TX_MAX_PRIORITIES > 32
@@ -124,7 +124,7 @@ UINT            finished;
     _tx_timer_time_slice[core_index] =  thread_ptr -> tx_thread_new_time_slice;
 #endif
 
-#ifdef TX_ENABLE_STACK_CHECKING 
+#ifdef TX_ENABLE_STACK_CHECKING
 
     /* Check this thread's stack.  */
     TX_THREAD_STACK_CHECK(thread_ptr)
@@ -137,14 +137,14 @@ UINT            finished;
     TX_EL_THREAD_RELINQUISH_INSERT
 
     /* Pickup the thread's priority.  */
-    priority =  thread_ptr -> tx_thread_priority; 
+    priority =  thread_ptr -> tx_thread_priority;
 
 #ifdef TX_THREAD_SMP_DEBUG_ENABLE
 
     /* Debug entry.  */
     _tx_thread_smp_debug_entry_insert(0, 0, thread_ptr);
 #endif
-    
+
     /* Pickup the next thread.  */
     next_thread =  thread_ptr -> tx_thread_ready_next;
 
@@ -163,7 +163,7 @@ UINT            finished;
         /* Determine if this thread is at the head of the list.  */
         if (head_ptr == thread_ptr)
         {
-        
+
             /* Simply move the head pointer to put this thread at the end of the ready list at this priority.  */
             _tx_thread_priority_list[priority] =  next_thread;
         }
@@ -188,22 +188,22 @@ UINT            finished;
 
         /* Pickup the mapped core of the relinquishing thread - this can be different from the current core.  */
         mapped_core =  thread_ptr -> tx_thread_smp_core_mapped;
-    
+
         /* Determine if the relinquishing thread is no longer present in the execute list.  */
         if (thread_ptr != _tx_thread_execute_ptr[mapped_core])
         {
-    
-            /* Yes, the thread is no longer mapped.  Set the rebalance flag to determine if there is a new mapping due to moving 
+
+            /* Yes, the thread is no longer mapped.  Set the rebalance flag to determine if there is a new mapping due to moving
                this thread to the end of the priority list.  */
 
             /* Set the rebalance flag to true.  */
             rebalance =  TX_TRUE;
         }
-     
+
         /* Determine if preemption-threshold is in force. */
         else if (thread_ptr -> tx_thread_preempt_threshold == priority)
         {
-           
+
             /* No preemption-threshold is in force.  */
 
             /* Determine if there is a thread at the same priority that isn't currently executing.  */
@@ -212,7 +212,7 @@ UINT            finished;
 
                 /* Isolate the exclusion for this core.  */
                 excluded =  (next_thread -> tx_thread_smp_cores_excluded >> mapped_core) & ((ULONG) 1);
-                
+
                 /* Determine if the next thread has preemption-threshold set or is excluded from running on the
                    mapped core.  */
                 if ((next_thread -> tx_thread_preempt_threshold  < next_thread -> tx_thread_priority) ||
@@ -221,7 +221,7 @@ UINT            finished;
 
                     /* Set the rebalance flag.  */
                     rebalance =  TX_TRUE;
-            
+
                     /* Get out of the loop. We need to rebalance the list when we detect preemption-threshold.  */
                     break;
                 }
@@ -231,8 +231,8 @@ UINT            finished;
                     /* Is the next thread already in the execute list?  */
                     if (next_thread != _tx_thread_execute_ptr[next_thread -> tx_thread_smp_core_mapped])
                     {
-        
-                        /* No, we can place this thread in the position the relinquishing thread 
+
+                        /* No, we can place this thread in the position the relinquishing thread
                            was in.  */
 
                         /* Remember this index in the thread control block.  */
@@ -240,13 +240,13 @@ UINT            finished;
 
                         /* Setup the entry in the execution list.  */
                         _tx_thread_execute_ptr[mapped_core] =  next_thread;
-                                  
+
 #ifdef TX_THREAD_SMP_DEBUG_ENABLE
 
                         /* Debug entry.  */
                         _tx_thread_smp_debug_entry_insert(1, 0, next_thread);
 #endif
-                
+
 #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
 
                         /* Increment the number of thread relinquishes.  */
@@ -259,7 +259,7 @@ UINT            finished;
                         _tx_thread_performance_non_idle_return_count++;
 #endif
 
-#ifdef TX_ENABLE_STACK_CHECKING 
+#ifdef TX_ENABLE_STACK_CHECKING
 
                         /* Check this thread's stack.  */
                         TX_THREAD_STACK_CHECK(next_thread)
@@ -269,7 +269,7 @@ UINT            finished;
 
                         /* Increment the preempt disable flag in order to keep the protection.  */
                         _tx_thread_preempt_disable++;
-        
+
                         /* Restore interrupts.  */
                         TX_RESTORE
 #endif
@@ -280,14 +280,14 @@ UINT            finished;
 
 
 #ifdef TX_NOT_INTERRUPTABLE
-        
+
                         /* Restore interrupts.  */
                         TX_RESTORE
 #endif
 
                         /* Set the finished flag.  */
-                        finished =  TX_TRUE;                
-                     
+                        finished =  TX_TRUE;
+
                     }
 
                     /* Move to the next thread at this priority.  */
@@ -301,16 +301,16 @@ UINT            finished;
             {
 
                 /* No other thread is ready at this priority... simply return.  */
-            
+
 #ifdef TX_THREAD_SMP_DEBUG_ENABLE
 
                 /* Debug entry.  */
                 _tx_thread_smp_debug_entry_insert(1, 0, thread_ptr);
 #endif
-            
+
                 /* Restore interrupts.  */
                 TX_RESTORE
-            
+
                 /* Set the finished flag.  */
                 finished =  TX_TRUE;
             }
@@ -324,13 +324,13 @@ UINT            finished;
             rebalance =  TX_TRUE;
         }
     }
-    
+
     /* Determine if preemption-threshold is in force. */
     if (thread_ptr -> tx_thread_preempt_threshold < priority)
     {
-        
+
         /* Set the rebalance flag.  */
-        rebalance =  TX_TRUE;      
+        rebalance =  TX_TRUE;
 
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
@@ -339,7 +339,7 @@ UINT            finished;
         /* Calculate the index into the bit map array.  */
         map_index =  priority/((UINT) 32);
 #endif
-        
+
         /* Ensure that this thread's priority is clear in the preempt map.  */
         TX_MOD32_BIT_SET(priority, priority_bit)
         _tx_thread_preempted_maps[MAP_INDEX] =  _tx_thread_preempted_maps[MAP_INDEX] & (~(priority_bit));
@@ -362,7 +362,7 @@ UINT            finished;
         /* Does this thread have preemption-threshold?  */
         if (_tx_thread_preemption__threshold_scheduled == thread_ptr)
         {
-                    
+
             /* Yes, set the preempted thread to NULL.  */
             _tx_thread_preemption__threshold_scheduled =  TX_NULL;
         }
@@ -372,7 +372,7 @@ UINT            finished;
         if (_tx_thread_preempted_map_active != ((ULONG) 0))
 #else
         if (_tx_thread_preempted_maps[0] != ((ULONG) 0))
-#endif    
+#endif
         {
 #if TX_MAX_PRIORITIES > 32
 
@@ -400,20 +400,20 @@ UINT            finished;
             priority_bit =  (ULONG) priority_bit_set;
 
             /* Setup the highest priority preempted thread.  */
-            next_preempted =  base_priority + priority_bit;       
+            next_preempted =  base_priority + priority_bit;
 
             /* Pickup the previously preempted thread.  */
             preempted_thread =  _tx_thread_preemption_threshold_list[next_preempted];
-                          
+
             /* Setup the preempted thread.  */
             _tx_thread_preemption__threshold_scheduled =  preempted_thread;
         }
 #else
-              
+
         /* Determine if this thread has preemption-threshold disabled.  */
         if (thread_ptr == _tx_thread_preemption__threshold_scheduled)
         {
-        
+
             /* Clear the global preemption disable flag.  */
             _tx_thread_preemption__threshold_scheduled =  TX_NULL;
         }
@@ -433,7 +433,7 @@ UINT            finished;
         /* Determine if we need to rebalance the execute list.  */
         if (rebalance == TX_TRUE)
         {
-        
+
             /* Rebalance the excute list.  */
             _tx_thread_smp_rebalance_execute_list(core_index);
         }
@@ -465,7 +465,7 @@ UINT            finished;
             }
 #endif
 
-#ifdef TX_ENABLE_STACK_CHECKING 
+#ifdef TX_ENABLE_STACK_CHECKING
 
             /* Pickup new thread pointer.  */
             thread_ptr =  _tx_thread_execute_ptr[core_index];
@@ -478,7 +478,7 @@ UINT            finished;
 
             /* Increment the preempt disable flag in order to keep the protection.  */
             _tx_thread_preempt_disable++;
-        
+
             /* Restore interrupts.  */
             TX_RESTORE
 #endif
@@ -488,7 +488,7 @@ UINT            finished;
             _tx_thread_system_return();
 
 #ifdef TX_NOT_INTERRUPTABLE
-        
+
             /* Restore interrupts.  */
             TX_RESTORE
 #endif

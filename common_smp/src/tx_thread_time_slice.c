@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -32,41 +32,41 @@
 #include "tx_trace.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_time_slice                              PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_time_slice                              PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function moves the currently executing thread to the end of    */ 
-/*    the threads ready at the same priority level as a result of a       */ 
-/*    time-slice interrupt.  If no other thread of the same priority is   */ 
-/*    ready, this function simply returns.                                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_timer_interrupt                   Timer interrupt handling      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function moves the currently executing thread to the end of    */
+/*    the threads ready at the same priority level as a result of a       */
+/*    time-slice interrupt.  If no other thread of the same priority is   */
+/*    ready, this function simply returns.                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_smp_rebalance_execute_list Rebalance the execution list  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_timer_interrupt                   Timer interrupt handling      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -103,11 +103,11 @@ UINT            preempt_disable;
 #if TX_THREAD_SMP_MAX_CORES == 3
     if ((_tx_timer_time_slice[0] != ((ULONG) 0)) || (_tx_timer_time_slice[1] != ((ULONG) 0)) || (_tx_timer_time_slice[2] != ((ULONG) 0)))
     {
-#endif 
+#endif
 #if TX_THREAD_SMP_MAX_CORES == 4
     if ((_tx_timer_time_slice[0] != ((ULONG) 0)) || (_tx_timer_time_slice[1] != ((ULONG) 0)) || (_tx_timer_time_slice[2] != ((ULONG) 0)) || (_tx_timer_time_slice[3] != ((ULONG) 0)))
     {
-#endif 
+#endif
 
         /* Initialize the rebalance flag to false.  */
         rebalance =  TX_FALSE;
@@ -129,7 +129,7 @@ UINT            preempt_disable;
             /* Determine if there is a time-slice active on this core.  */
             if (_tx_timer_time_slice[core_index] != ((ULONG) 0))
             {
-        
+
                 /* Time-slice is active, decrement it for this core.  */
                 _tx_timer_time_slice[core_index]--;
 
@@ -153,14 +153,14 @@ UINT            preempt_disable;
 
                         /* Reset the actual time-slice variable.  */
                         _tx_timer_time_slice[core_index] =  thread_ptr -> tx_thread_time_slice;
-    
+
 #ifdef TX_THREAD_SMP_DEBUG_ENABLE
 
                         /* Debug entry.  */
                         _tx_thread_smp_debug_entry_insert(10, 0, thread_ptr);
 #endif
-                
-#ifdef TX_ENABLE_STACK_CHECKING 
+
+#ifdef TX_ENABLE_STACK_CHECKING
 
                         /* Check this thread's stack.  */
                         TX_THREAD_STACK_CHECK(thread_ptr)
@@ -181,9 +181,9 @@ UINT            preempt_disable;
                         /* Determine if preemption-threshold is set. If so, don't time-slice.  */
                         if (priority == thread_ptr -> tx_thread_preempt_threshold)
                         {
-            
+
                             /* Preemption-threshold is not set.  */
-    
+
                             /* Pickup the next thread.  */
                             next_thread =  thread_ptr -> tx_thread_ready_next;
 
@@ -202,7 +202,7 @@ UINT            preempt_disable;
                                 /* Determine if this thread is at the head of the list.  */
                                 if (head_ptr == thread_ptr)
                                 {
-        
+
                                     /* Simply move the head pointer to put this thread at the end of the ready list at this priority.  */
                                     _tx_thread_priority_list[priority] =  next_thread;
                                 }
@@ -229,12 +229,12 @@ UINT            preempt_disable;
                                    preempted it either from another ISR or from the timer processing.  */
                                 if (_tx_thread_execute_ptr[core_index] != thread_ptr)
                                 {
-                                
+
                                     /* Set the rebalance flag.  */
                                     rebalance =  TX_TRUE;
-                                }        
-                                
-                                /* Determine if the rebalance flag has been set already.  If so, don't bother trying to update the 
+                                }
+
+                                /* Determine if the rebalance flag has been set already.  If so, don't bother trying to update the
                                    execute list from this routine.  */
                                 if (rebalance == TX_FALSE)
                                 {
@@ -248,35 +248,35 @@ UINT            preempt_disable;
 
                                         /* Isolate the exclusion for this core.  */
                                         excluded =  (next_thread -> tx_thread_smp_cores_excluded >> core_index) & ((ULONG) 1);
-                                      
+
                                         /* Determine if the next thread has preemption-threshold set.  */
                                         if (next_thread -> tx_thread_preempt_threshold < next_thread -> tx_thread_priority)
                                         {
-            
+
                                             /* Set the rebalance flag.  */
                                             rebalance =  TX_TRUE;
 
                                             /* Get out of the loop.  */
                                             loop_finished =  TX_TRUE;
                                         }
-                                        
+
                                         /* Determine if the next thread is excluded from running on this core.  */
                                         else if (excluded == ((ULONG) 1))
                                         {
-            
+
                                             /* Set the rebalance flag.  */
                                             rebalance =  TX_TRUE;
-                
+
                                             /* Get out of the loop.  */
                                             loop_finished =  TX_TRUE;
                                         }
                                         else
                                         {
-                                    
+
                                             /* Is the next thread not scheduled  */
                                             if (next_thread != _tx_thread_execute_ptr[next_thread -> tx_thread_smp_core_mapped])
                                             {
-       
+
                                                 /* Remember this index in the thread control block.  */
                                                 next_thread -> tx_thread_smp_core_mapped =  core_index;
 
@@ -295,20 +295,20 @@ UINT            preempt_disable;
 #endif
                                                 /* Get out of the loop.  */
                                                 loop_finished =  TX_TRUE;
-                                            }            
+                                            }
                                         }
 
                                         /* Is the loop fininshed?  */
                                         if (loop_finished == TX_TRUE)
                                         {
-                                    
+
                                             /* Yes, break out of the loop.  */
                                             break;
                                         }
-                    
+
                                         /* Move to the next thread at this priority.  */
                                         next_thread =  next_thread -> tx_thread_ready_next;
-        
+
                                     } while (next_thread != thread_ptr);
                                 }
                             }
@@ -337,11 +337,11 @@ UINT            preempt_disable;
         /* Pickup the volatile information.  */
         system_state =  TX_THREAD_GET_SYSTEM_STATE();
         preempt_disable =  _tx_thread_preempt_disable;
-   
+
         /* Insert this event into the trace buffer.  */
         TX_TRACE_IN_LINE_INSERT(TX_TRACE_TIME_SLICE, _tx_thread_execute_ptr[0], system_state, preempt_disable, TX_POINTER_TO_ULONG_CONVERT(&thread_ptr), TX_TRACE_INTERNAL_EVENTS)
 #endif
-        
+
 #if TX_THREAD_SMP_MAX_CORES == 1
     }
 #endif
@@ -350,9 +350,9 @@ UINT            preempt_disable;
 #endif
 #if TX_THREAD_SMP_MAX_CORES == 3
     }
-#endif 
+#endif
 #if TX_THREAD_SMP_MAX_CORES == 4
     }
-#endif 
+#endif
 }
 

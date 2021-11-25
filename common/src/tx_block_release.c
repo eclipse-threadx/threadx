@@ -90,7 +90,7 @@ TX_THREAD           *previous_thread;
     /* Disable interrupts to put this block back in the pool.  */
     TX_DISABLE
 
-    /* Pickup the pool pointer which is just previous to the starting 
+    /* Pickup the pool pointer which is just previous to the starting
        address of the block that the caller sees.  */
     work_ptr =        TX_VOID_TO_UCHAR_POINTER_CONVERT(block_ptr);
     work_ptr =        TX_UCHAR_POINTER_SUB(work_ptr, (sizeof(UCHAR *)));
@@ -121,7 +121,7 @@ TX_THREAD           *previous_thread;
 
         /* Decrement the number of threads suspended.  */
         (pool_ptr -> tx_block_pool_suspended_count)--;
-        
+
         /* Pickup the suspended count.  */
         suspended_count =  (pool_ptr -> tx_block_pool_suspended_count);
 
@@ -148,7 +148,7 @@ TX_THREAD           *previous_thread;
             next_thread -> tx_thread_suspended_previous =  previous_thread;
             previous_thread -> tx_thread_suspended_next =  next_thread;
         }
- 
+
         /* Prepare for resumption of the first thread.  */
 
         /* Clear cleanup routine to avoid timeout.  */

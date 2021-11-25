@@ -12,7 +12,7 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   Semaphore                                                           */
@@ -21,27 +21,29 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    tx_semaphore.h                                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    tx_semaphore.h                                      PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file defines the ThreadX semaphore management component,       */ 
-/*    including all data types and external references.  It is assumed    */ 
-/*    that tx_api.h and tx_port.h have already been included.             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This file defines the ThreadX semaphore management component,       */
+/*    including all data types and external references.  It is assumed    */
+/*    that tx_api.h and tx_port.h have already been included.             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -54,15 +56,15 @@
 #define TX_SEMAPHORE_ID                         ((ULONG) 0x53454D41)
 
 
-/* Determine if in-line component initialization is supported by the 
+/* Determine if in-line component initialization is supported by the
    caller.  */
 #ifdef TX_INVOKE_INLINE_INITIALIZATION
-            /* Yes, in-line initialization is supported, remap the 
+            /* Yes, in-line initialization is supported, remap the
                semaphore initialization function.  */
 #ifndef TX_SEMAPHORE_ENABLE_PERFORMANCE_INFO
 #define _tx_semaphore_initialize() \
                     _tx_semaphore_created_ptr =                   TX_NULL;     \
-                    _tx_semaphore_created_count =                 TX_EMPTY 
+                    _tx_semaphore_created_count =                 TX_EMPTY
 #else
 #define _tx_semaphore_initialize() \
                     _tx_semaphore_created_ptr =                   TX_NULL;     \
@@ -74,7 +76,7 @@
 #endif
 #define TX_SEMAPHORE_INIT
 #else
-            /* No in-line initialization is supported, use standard 
+            /* No in-line initialization is supported, use standard
                function call.  */
 VOID        _tx_semaphore_initialize(VOID);
 #endif
@@ -92,7 +94,7 @@ VOID        _tx_semaphore_cleanup(TX_THREAD *thread_ptr, ULONG suspension_sequen
    make them extern so other functions in the component can access them.  */
 
 #ifdef TX_SEMAPHORE_INIT
-#define SEMAPHORE_DECLARE 
+#define SEMAPHORE_DECLARE
 #else
 #define SEMAPHORE_DECLARE extern
 #endif

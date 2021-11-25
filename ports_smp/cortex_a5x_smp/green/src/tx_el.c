@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   ThreadX/GHS Event Log (EL)                                          */
 /**                                                                       */
@@ -51,41 +51,41 @@ extern  TX_THREAD   *_tx_thread_current_ptr[];
 UINT                _tx_thread_interrupt_control(UINT new_posture);
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_initialize                                  PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_initialize                                  PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates the Event Log (in the format dictated by the  */ 
-/*    GHS Event Analyzer) and sets up various information for subsequent  */ 
-/*    operation.  The start and end of the Event Log is determined by the */ 
-/*    .eventlog section in the linker control file.                       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function creates the Event Log (in the format dictated by the  */
+/*    GHS Event Analyzer) and sets up various information for subsequent  */
+/*    operation.  The start and end of the Event Log is determined by the */
+/*    .eventlog section in the linker control file.                       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -152,7 +152,7 @@ UINT    i;
 
     /* Setup event_ptr (pointer to oldest event) field to the start
        of the event pool.  */
-    *_tx_el_current_event =  (UCHAR *) (((ULONG) __ghsbegin_eventlog) + TX_EL_HEADER_SIZE + 
+    *_tx_el_current_event =  (UCHAR *) (((ULONG) __ghsbegin_eventlog) + TX_EL_HEADER_SIZE +
                                         (TX_EL_TNIS * TX_EL_TNI_ENTRY_SIZE));
     work_ptr =  work_ptr + sizeof(ULONG);
 
@@ -168,17 +168,17 @@ UINT    i;
     /* Clear the entire TNI array, this is the initial setting.  */
     end_ptr =  work_ptr + (TX_EL_TNIS * TX_EL_TNI_ENTRY_SIZE);
     memset((void *)work_ptr, 0, (TX_EL_TNIS * TX_EL_TNI_ENTRY_SIZE));
-    work_ptr = end_ptr; 
+    work_ptr = end_ptr;
 
     /* At this point, we are pointing at the actual Event Entry area.  */
-    
+
     /* Remember the start of the actual event log area.  */
     _tx_el_event_area_start =  work_ptr;
 
     /* Clear the entire Event area.  */
     end_ptr =  work_ptr + event_log_size;
     memset((void *)work_ptr, 0, event_log_size);
-    work_ptr = end_ptr; 
+    work_ptr = end_ptr;
 
     /* Save the end pointer for later use.  */
     _tx_el_event_area_end =  work_ptr;
@@ -203,7 +203,7 @@ UINT    i;
     {
 
         /* Yes, insert a NULL into the event log string.  */
-        *work_ptr =  (unsigned char) 0;        
+        *work_ptr =  (unsigned char) 0;
     }
 
     /* Setup the thread ID to NULL.  */
@@ -218,40 +218,40 @@ UINT    i;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_thread_register                             PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_thread_register                             PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function registers a thread in the event log for future        */ 
+/*                                                                        */
+/*    This function registers a thread in the event log for future        */
 /*    display purposes.                                                   */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                        Pointer to thread control block   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                        Pointer to thread control block   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    TX_SUCCESS                        Thread was placed in TNI area     */
 /*    TX_ERROR                          No more room in the TNI area      */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_create                 ThreadX thread create function    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_create                 ThreadX thread create function    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -280,7 +280,7 @@ UINT    i;
         i++;
         entry_ptr =  entry_ptr + TX_EL_TNI_ENTRY_SIZE;
     }
-    
+
     /* Check to see if there were no more valid entries.  */
     if (i >= TX_EL_TNIS)
         return(TX_EL_NO_MORE_TNI_ROOM);
@@ -306,7 +306,7 @@ UINT    i;
     {
 
         /* Yes, insert a NULL into the event log string.  */
-        *work_ptr =  (unsigned char) 0;        
+        *work_ptr =  (unsigned char) 0;
     }
 
     /* Setup the thread ID.  */
@@ -323,40 +323,40 @@ UINT    i;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_thread_unregister                           PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_thread_unregister                           PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function unregisters a thread in the event log for future      */ 
+/*                                                                        */
+/*    This function unregisters a thread in the event log for future      */
 /*    display purposes.                                                   */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                        Pointer to thread control block   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                        Pointer to thread control block   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    TX_SUCCESS                        Thread was placed in TNI area     */
 /*    TX_ERROR                          No more room in the TNI area      */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_create                 ThreadX thread create function    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_create                 ThreadX thread create function    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -396,7 +396,7 @@ UINT    i, j;
             }
             else if (*work_ptr == 0)
             {
-            
+
                 /* Null terminated, just break the loop.  */
                 break;
             }
@@ -428,7 +428,7 @@ UINT    i, j;
         i++;
         entry_ptr =  entry_ptr + TX_EL_TNI_ENTRY_SIZE;
     }
-    
+
     /* Determine status to return.  */
     if (found)
         return(TX_SUCCESS);
@@ -437,49 +437,49 @@ UINT    i, j;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_user_event_insert                           PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_user_event_insert                           PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function inserts a user event into the event log.              */
-/*    If the event log is full, the oldest event is overwritten.          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*    If the event log is full, the oldest event is overwritten.          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    sub_type                              Event subtype for kernel call */
 /*    info_1                                First information field       */
 /*    info_2                                Second information field      */
 /*    info_3                                Third information field       */
 /*    info_4                                Fourth information field      */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX services                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX services                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
-VOID  _tx_el_user_event_insert(UINT sub_type, ULONG info_1, ULONG info_2, 
+VOID  _tx_el_user_event_insert(UINT sub_type, ULONG info_1, ULONG info_2,
                                                     ULONG info_3, ULONG info_4)
 {
 
@@ -547,7 +547,7 @@ UCHAR   *entry_ptr;
     if (entry_ptr >= _tx_el_event_area_end)
     {
 
-        /* Yes, we have wrapped around to the end of the event area.  
+        /* Yes, we have wrapped around to the end of the event area.
            Start back at the top!  */
         entry_ptr =  _tx_el_event_area_start;
     }
@@ -560,41 +560,41 @@ UCHAR   *entry_ptr;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_thread_running                              PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_thread_running                              PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function inserts a thread change event into the event          */
 /*    log, which indicates that a context switch is taking place.         */
 /*    If the event log is full, the oldest event is overwritten.          */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    thread_ptr                            Pointer to thread being       */
 /*                                            scheduled                   */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_schedule                   ThreadX scheduler             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_schedule                   ThreadX scheduler             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -606,7 +606,7 @@ VOID  _tx_el_thread_running(TX_THREAD *thread_ptr)
 UINT    upper_tb;
 UCHAR   *entry_ptr;
 
-    TX_EL_NO_STATUS_EVENTS 
+    TX_EL_NO_STATUS_EVENTS
 
     /* Increment total event counter.  */
     _tx_el_total_events++;
@@ -648,7 +648,7 @@ UCHAR   *entry_ptr;
     if (entry_ptr >= _tx_el_event_area_end)
     {
 
-        /* Yes, we have wrapped around to the end of the event area.  
+        /* Yes, we have wrapped around to the end of the event area.
            Start back at the top!  */
         entry_ptr =  _tx_el_event_area_start;
     }
@@ -660,43 +660,43 @@ UCHAR   *entry_ptr;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_thread_preempted                            PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_thread_preempted                            PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function inserts a thread preempted event into the event       */
 /*    log, which indicates that an interrupt occurred that made a higher  */
 /*    priority thread ready for execution.  In this case, the previously  */
 /*    executing thread has an event entered to indicate it is no longer   */
 /*    running.                                                            */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    thread_ptr                            Pointer to thread being       */
 /*                                            scheduled                   */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_context_restore            ThreadX context restore       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_context_restore            ThreadX context restore       */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -709,7 +709,7 @@ UINT    upper_tb;
 UCHAR   *entry_ptr;
 
 
-    TX_EL_NO_STATUS_EVENTS 
+    TX_EL_NO_STATUS_EVENTS
 
     /* Increment total event counter.  */
     _tx_el_total_events++;
@@ -751,7 +751,7 @@ UCHAR   *entry_ptr;
     if (entry_ptr >= _tx_el_event_area_end)
     {
 
-        /* Yes, we have wrapped around to the end of the event area.  
+        /* Yes, we have wrapped around to the end of the event area.
            Start back at the top!  */
         entry_ptr =  _tx_el_event_area_start;
     }
@@ -763,40 +763,40 @@ UCHAR   *entry_ptr;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_interrupt                                   PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_interrupt                                   PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function inserts an interrupt event into the log, which        */
 /*    indicates the start of interrupt processing for the specific        */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    interrupt_number                      Interrupt number supplied by  */
 /*                                            ISR                         */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISR processing                                                      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISR processing                                                      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -809,7 +809,7 @@ UINT    upper_tb;
 UCHAR   *entry_ptr;
 
 
-    TX_EL_NO_INTERRUPT_EVENTS 
+    TX_EL_NO_INTERRUPT_EVENTS
 
     /* Increment total event counter.  */
     _tx_el_total_events++;
@@ -855,7 +855,7 @@ UCHAR   *entry_ptr;
     if (entry_ptr >= _tx_el_event_area_end)
     {
 
-        /* Yes, we have wrapped around to the end of the event area.  
+        /* Yes, we have wrapped around to the end of the event area.
            Start back at the top!  */
         entry_ptr =  _tx_el_event_area_start;
     }
@@ -867,40 +867,40 @@ UCHAR   *entry_ptr;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_interrupt_end                               PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_interrupt_end                               PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function inserts an interrupt end event into the log, which    */
 /*    indicates the end of interrupt processing for the specific          */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    interrupt_number                      Interrupt number supplied by  */
 /*                                            ISR                         */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISR processing                                                      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISR processing                                                      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -913,7 +913,7 @@ UINT    upper_tb;
 UCHAR   *entry_ptr;
 
 
-    TX_EL_NO_INTERRUPT_EVENTS 
+    TX_EL_NO_INTERRUPT_EVENTS
 
     /* Increment total event counter.  */
     _tx_el_total_events++;
@@ -959,7 +959,7 @@ UCHAR   *entry_ptr;
     if (entry_ptr >= _tx_el_event_area_end)
     {
 
-        /* Yes, we have wrapped around to the end of the event area.  
+        /* Yes, we have wrapped around to the end of the event area.
            Start back at the top!  */
         entry_ptr =  _tx_el_event_area_start;
     }
@@ -971,39 +971,39 @@ UCHAR   *entry_ptr;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_interrupt_control                           PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_interrupt_control                           PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function remaps the tx_interrupt_control service call so that  */ 
-/*    it can be tracked in the event log.                                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function remaps the tx_interrupt_control service call so that  */
+/*    it can be tracked in the event log.                                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    new_posture                           New interrupt posture         */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    old_posture                           Old interrupt posture         */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_interrupt_control          Interrupt control service     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX services                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    old_posture                           Old interrupt posture         */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_interrupt_control          Interrupt control service     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX services                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -1016,7 +1016,7 @@ TX_INTERRUPT_SAVE_AREA
 UINT    old_posture;
 
 
-    TX_EL_NO_INTERRUPT_EVENTS 
+    TX_EL_NO_INTERRUPT_EVENTS
 
     TX_DISABLE
     TX_EL_KERNEL_CALL_EVENT_INSERT_INFO2(TX_EL_INTERRUPT_CONTROL, _tx_thread_current_ptr[TX_SMP_CORE_ID], new_posture)
@@ -1029,38 +1029,38 @@ UINT    old_posture;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_event_log_on                                PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_event_log_on                                PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function disables all event filters.                           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*    This function disables all event filters.                           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -1074,39 +1074,39 @@ VOID  _tx_el_event_log_on(void)
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_event_log_off                               PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_event_log_off                               PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function sets all event filters, thereby turning event         */ 
-/*    logging off.                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*    This function sets all event filters, thereby turning event         */
+/*    logging off.                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -1120,38 +1120,38 @@ VOID  _tx_el_event_log_off(void)
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_el_event_log_set                               PORTABLE SMP     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_el_event_log_set                               PORTABLE SMP     */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function sets the events filters specified by the user.        */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    filter                            Events to filter                  */ 
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*    This function sets the events filters specified by the user.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    filter                            Events to filter                  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */

@@ -78,8 +78,8 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txe_byte_pool_info_get(TX_BYTE_POOL *pool_ptr, CHAR **name, ULONG *available_bytes, 
-                    ULONG *fragments, TX_THREAD **first_suspended, 
+UINT  _txe_byte_pool_info_get(TX_BYTE_POOL *pool_ptr, CHAR **name, ULONG *available_bytes,
+                    ULONG *fragments, TX_THREAD **first_suspended,
                     ULONG *suspended_count, TX_BYTE_POOL **next_pool)
 {
 
@@ -105,7 +105,7 @@ UINT    status;
     {
 
         /* Otherwise, call the actual byte pool information get service.  */
-        status =  _tx_byte_pool_info_get(pool_ptr, name, available_bytes, 
+        status =  _tx_byte_pool_info_get(pool_ptr, name, available_bytes,
                             fragments, first_suspended, suspended_count, next_pool);
     }
 

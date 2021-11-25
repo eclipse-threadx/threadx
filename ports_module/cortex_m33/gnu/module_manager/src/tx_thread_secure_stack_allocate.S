@@ -67,6 +67,7 @@
     .syntax unified
     .eabi_attribute Tag_ABI_align_preserved, 1
     .global  _tx_thread_secure_stack_allocate
+    .global _tx_alloc_return
     .thumb_func
 .type _tx_thread_secure_stack_allocate, function
 _tx_thread_secure_stack_allocate:
@@ -74,6 +75,7 @@ _tx_thread_secure_stack_allocate:
     MRS     r3, PRIMASK     // Save interrupt mask
     CPSIE   i               // Enable interrupts for SVC call
     SVC     1
+_tx_alloc_return:
     CMP     r3, #0          // If interrupts enabled, just return
     BEQ     _alloc_return_interrupt_enabled
     CPSID   i               // Otherwise, disable interrupts

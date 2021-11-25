@@ -23,7 +23,7 @@
     .global _tx_thread_current_ptr
     .global _tx_thread_execute_ptr
     .global _tx_timer_time_slice
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))     
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     .global _tx_execution_thread_enter
     .global _tx_execution_thread_exit
 #endif
@@ -130,7 +130,7 @@ __tx_PendSVHandler:
 
 __tx_ts_handler:
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                        
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing.  */
     CPSID   i                                       // Disable interrupts
     PUSH    {r0, lr}                                // Save LR (and r0 just for alignment)
@@ -204,7 +204,7 @@ __tx_ts_restore:
 
     STR     r5, [r4]                                // Setup global time-slice
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing.  */
     PUSH    {r0, r1}                                // Save r0 and r1
     BL      _tx_execution_thread_enter              // Call the thread execution enter function
@@ -239,7 +239,9 @@ __tx_ts_wait:
     CBNZ    r1, __tx_ts_ready                       // If non-NULL, a new thread is ready!
 
 #ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
     BL      tx_low_power_enter                      // Possibly enter low power mode
+    POP     {r0-r3}
 #endif
 
 #ifdef TX_ENABLE_WFI
@@ -249,7 +251,9 @@ __tx_ts_wait:
 #endif
 
 #ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
     BL      tx_low_power_exit                       // Exit low power mode
+    POP     {r0-r3}
 #endif
 
     CPSIE   i                                       // Enable interrupts

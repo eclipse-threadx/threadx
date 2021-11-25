@@ -304,7 +304,7 @@ UINT    _tx_thread_secure_mode_stack_free(TX_THREAD *thread_ptr)
 {
 UINT    status;
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
-    
+
     status = TX_SUCCESS;
     
     /* Pickup stack info from thread. */
@@ -389,7 +389,7 @@ void _tx_thread_secure_stack_context_save(TX_THREAD *thread_ptr)
 {
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 ULONG   sp;
-    
+
     /* This function should be called from scheduler only. */
     if (__get_IPSR() == 0)
     {

@@ -19,14 +19,24 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
-
+;
+;
+;#define TX_SOURCE_CODE
+;
+;
+;/* Include necessary system files.  */
+;
+;#include "tx_api.h"
+;#include "tx_thread.h"
+;
+;
     .text
 ;/**************************************************************************/
 ;/*                                                                        */
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_stack_build                               RXv2/GNURX     */
-;/*                                                           6.1.3        */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -58,7 +68,11 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
+;/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
+;/*                                            removed unnecessary stack   */
+;/*                                            type placement,             */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -70,8 +84,7 @@ __tx_thread_stack_build:
 ;    /* Build an interrupt frame.  The form of the fake interrupt stack
 ;       on the Renesas RX should look like the following after it is built:
 ;
-;  Stack Top:           1       Interrupt stack frame type
-;                       ACC0
+;  Stack Top:           ACC0
 ;                       ACC1
 ;                       R6
 ;                       R7
@@ -95,51 +108,48 @@ __tx_thread_stack_build:
 ;
 ;    Stack Bottom: (higher memory address)  */
 ;
-    MOV.L   16[R1],R3               ; Pickup end of stack area
-    BCLR    #0, R3                  ; mask for 4-byte alignment
+    MOV.L   16[R1],R3                            ; Pickup end of stack area
+    BCLR    #0, R3                               ; Mask for 4-byte alignment
     BCLR    #1, R3
 ;
 ;    /* Build the stack frame.  */
 ;
     MOV.L #30000h, R4
-    MOV.L R4, [-R3]                         ; initial PSW (SVC mode, U flag set)
-    MOV.L R2, [-R3]                         ; initial PC
+    MOV.L R4, [-R3]                              ; Initial PSW (SVC mode, U flag set)
+    MOV.L R2, [-R3]                              ; Initial PC
     MOV.L #0, R4
-    MOV.L R4,[-R3]                          ; initial R2 ...
-    MOV.L R4,[-R3]                          ; initial R1 ...
-    MOV.L R4,[-R3]                          ; initial R5 ...
-    MOV.L R4,[-R3]                          ; initial R4 ...
-    MOV.L R4,[-R3]                          ; initial R3 ...
-    MOV.L R4,[-R3]                          ; initial R15 ...
-    MOV.L R4,[-R3]                          ; initial R14 ...
+    MOV.L R4,[-R3]                               ; Initial R2 ...
+    MOV.L R4,[-R3]                               ; Initial R1 ...
+    MOV.L R4,[-R3]                               ; Initial R5 ...
+    MOV.L R4,[-R3]                               ; Initial R4 ...
+    MOV.L R4,[-R3]                               ; Initial R3 ...
+    MOV.L R4,[-R3]                               ; Initial R15 ...
+    MOV.L R4,[-R3]                               ; Initial R14 ...
     MVFC  FPSW, r4
-    MOV.L R4, [-R3]                         ; initial FPSW
+    MOV.L R4, [-R3]                              ; Initial FPSW
     MOV.L #0, R4
-    MOV.L R4,[-R3]                          ; initial R13 ...
-    MOV.L R4,[-R3]                          ; initial R12 ...
-    MOV.L R4,[-R3]                          ; initial R11 ...
-    MOV.L R4,[-R3]                          ; initial R10 ...
-    MOV.L R4,[-R3]                          ; initial R9 ...
-    MOV.L R4,[-R3]                          ; initial R8 ...
-    MOV.L R4,[-R3]                          ; initial R7 ...
-    MOV.L R4,[-R3]                          ; initial R6 ...
+    MOV.L R4,[-R3]                               ; Initial R13 ...
+    MOV.L R4,[-R3]                               ; Initial R12 ...
+    MOV.L R4,[-R3]                               ; Initial R11 ...
+    MOV.L R4,[-R3]                               ; Initial R10 ...
+    MOV.L R4,[-R3]                               ; Initial R9 ...
+    MOV.L R4,[-R3]                               ; Initial R8 ...
+    MOV.L R4,[-R3]                               ; Initial R7 ...
+    MOV.L R4,[-R3]                               ; Initial R6 ...
 
-    MOV.L R4,[-R3]                          ; Accumulator 1
-    MOV.L R4,[-R3]
-    MOV.L R4,[-R3]
-
-    MOV.L R4,[-R3]                          ; Accumulator 0
+    MOV.L R4,[-R3]                               ; Accumulator 1
     MOV.L R4,[-R3]
     MOV.L R4,[-R3]
 
-    MOV.L #1, R4
-    MOV.L R4,[-R3]                           ; indicate interrupt stack frame
+    MOV.L R4,[-R3]                               ; Accumulator 0
+    MOV.L R4,[-R3]
+    MOV.L R4,[-R3]
+
 ;    /* Setup stack pointer.  */
 ;    thread_ptr -> tx_thread_stack_ptr =  R1;
     MOV.L R3, 8[R1]
-                                            ; store initial SP in thread control block
+                                                 ; Store initial SP in thread control block
     RTS
 
 ;}
     .end
-

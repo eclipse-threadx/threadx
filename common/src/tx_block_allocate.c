@@ -170,7 +170,7 @@ ULONG                       lower_tbu;
         /* Save the pool's address in the block for when it is released!  */
         temp_ptr =  TX_BLOCK_POOL_TO_UCHAR_POINTER_CONVERT(pool_ptr);
         *next_block_ptr =  temp_ptr;
-    
+
 #ifdef TX_ENABLE_EVENT_TRACE
 
         /* Check that the event time stamp is unchanged.  A different
@@ -182,7 +182,7 @@ ULONG                       lower_tbu;
             /* Is the time stamp the same?  */
             if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
             {
-            
+
                 /* Timestamp is the same, update the entry with the address.  */
 #ifdef TX_MISRA_ENABLE
                 entry_ptr -> tx_trace_buffer_entry_info_2 =  TX_POINTER_TO_ULONG_CONVERT(*block_ptr);
@@ -200,7 +200,7 @@ ULONG                       lower_tbu;
 
         /* Set status to success.  */
         status =  TX_SUCCESS;
-        
+
         /* Restore interrupts.  */
         TX_RESTORE
     }
@@ -229,7 +229,7 @@ ULONG                       lower_tbu;
             {
 
                 /* Prepare for suspension of this thread.  */
-            
+
 #ifdef TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO
 
                 /* Increment the total suspensions counter.  */
@@ -261,7 +261,7 @@ ULONG                       lower_tbu;
 
                 /* Pickup the number of suspended threads.  */
                 suspended_count =  (pool_ptr -> tx_block_pool_suspended_count);
-            
+
                 /* Increment the number of suspended threads.  */
                 (pool_ptr -> tx_block_pool_suspended_count)++;
 
@@ -322,11 +322,11 @@ ULONG                       lower_tbu;
                    allocate event.  In that case, do nothing here.  */
                 if (entry_ptr != TX_NULL)
                 {
-            
+
                     /* Is the time-stamp the same?  */
                     if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
                     {
-                
+
                         /* Timestamp is the same, update the entry with the address.  */
 #ifdef TX_MISRA_ENABLE
                         entry_ptr -> tx_trace_buffer_entry_info_2 =  TX_POINTER_TO_ULONG_CONVERT(*block_ptr);

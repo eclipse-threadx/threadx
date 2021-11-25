@@ -12,7 +12,7 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   Mutex                                                               */
@@ -21,27 +21,29 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    tx_mutex.h                                          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    tx_mutex.h                                          PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file defines the ThreadX mutex management component,           */ 
-/*    including all data types and external references.  It is assumed    */ 
-/*    that tx_api.h and tx_port.h have already been included.             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This file defines the ThreadX mutex management component,           */
+/*    including all data types and external references.  It is assumed    */
+/*    that tx_api.h and tx_port.h have already been included.             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -54,18 +56,18 @@
 #define TX_MUTEX_ID                             ((ULONG) 0x4D555445)
 
 
-/* Determine if in-line component initialization is supported by the 
+/* Determine if in-line component initialization is supported by the
    caller.  */
 
 #ifdef TX_INVOKE_INLINE_INITIALIZATION
 
-/* Yes, in-line initialization is supported, remap the mutex initialization 
+/* Yes, in-line initialization is supported, remap the mutex initialization
    function.  */
 
 #ifndef TX_MUTEX_ENABLE_PERFORMANCE_INFO
 #define _tx_mutex_initialize() \
                     _tx_mutex_created_ptr =                             TX_NULL;      \
-                    _tx_mutex_created_count =                           TX_EMPTY                          
+                    _tx_mutex_created_count =                           TX_EMPTY
 #else
 #define _tx_mutex_initialize() \
                     _tx_mutex_created_ptr =                             TX_NULL;      \
@@ -75,7 +77,7 @@
                     _tx_mutex_performance_suspension_count =            ((ULONG) 0);  \
                     _tx_mutex_performance_timeout_count =               ((ULONG) 0);  \
                     _tx_mutex_performance_priority_inversion_count =    ((ULONG) 0);  \
-                    _tx_mutex_performance__priority_inheritance_count =  ((ULONG) 0)
+                    _tx_mutex_performance__priority_inheritance_count = ((ULONG) 0)
 #endif
 #define TX_MUTEX_INIT
 #else
@@ -99,7 +101,7 @@ VOID        _tx_mutex_priority_change(TX_THREAD *thread_ptr, UINT new_priority);
    make them extern so other functions in the component can access them.  */
 
 #ifdef TX_MUTEX_INIT
-#define MUTEX_DECLARE 
+#define MUTEX_DECLARE
 #else
 #define MUTEX_DECLARE extern
 #endif

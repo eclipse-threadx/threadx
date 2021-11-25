@@ -20,7 +20,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
     .text 32
     .align 4
     .syntax unified
@@ -28,11 +27,11 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_system_return                          Cortex-M4/AC6     */
-/*                                                           6.1          */
+/*    _tx_thread_system_return                         Cortex-M4/AC6      */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -61,7 +60,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_system_return(VOID)
@@ -79,10 +78,16 @@ _tx_thread_system_return:
     MRS     r0, IPSR                                // Pickup IPSR
     CMP     r0, #0                                  // Is it a thread returning?
     BNE     _isr_context                            // If ISR, skip interrupt enable
+#ifdef TX_PORT_USE_BASEPRI
+    MRS     r1, BASEPRI                             // Thread context returning, pickup BASEPRI
+    MOV     r0, #0
+    MSR     BASEPRI, r0                             // Enable interrupts
+    MSR     BASEPRI, r1                             // Restore original interrupt posture
+#else
     MRS     r1, PRIMASK                             // Thread context returning, pickup PRIMASK
     CPSIE   i                                       // Enable interrupts
     MSR     PRIMASK, r1                             // Restore original interrupt posture
+#endif
 _isr_context:
     BX      lr                                      // Return to caller
-
 // }

@@ -1,0 +1,57 @@
+//-----------------------------------------------------------------------------
+// ILINK command file template for the Renesas RX microcontroller R5F565N9
+//-----------------------------------------------------------------------------
+define exported symbol __link_file_version_4 = 1;
+define memory mem with size = 4G;
+
+// ID Code Protection
+define exported symbol __ID_BYTES_1_4   = 0xFFFFFFFF;
+define exported symbol __ID_BYTES_5_8   = 0xFFFFFFFF;
+define exported symbol __ID_BYTES_9_12  = 0xFFFFFFFF;
+define exported symbol __ID_BYTES_13_16 = 0xFFFFFFFF;
+
+// Endian Select Register (MDE)
+// Choose between Little endian=0xFFFFFFFF or Big endian=0xFFFFFFF8
+define exported symbol __MDES           = 0xFFFFFFFF;
+
+// Option Function Select Register 0 (OFS0)
+define exported symbol __OFS0           = 0xFFFFFFFF;
+
+// Option Function Select Register 1 (OFS1)
+define exported symbol __OFS1           = 0xFFFFFFFF;
+
+define region ROM_region16 = mem:[from 0xFFFF8000 to 0xFFF10000];
+define region RAM_region16 = mem:[from 0x00000004 to 0x0003FFFF];
+define region ROM_region24 = mem:[from 0xFFF00000 to 0xFFF10000];
+define region RAM_region24 = mem:[from 0x00000004 to 0x0003FFFF];
+define region ROM_region32 = mem:[from 0xFFF00000 to 0xFFF10000];
+define region RAM_region32 = mem:[from 0x00000004 to 0x0003FFFF];
+
+initialize by copy { rw, ro section D, ro section D_1, ro section D_2 };
+do not initialize  { section .*.noinit };
+
+define block HEAP     with alignment = 4, size = _HEAP_SIZE { };
+define block USTACK   with alignment = 4, size = _USTACK_SIZE { };
+define block ISTACK   with alignment = 4, size = _ISTACK_SIZE { };
+
+define block STACKS with fixed order { block ISTACK,
+                                       block USTACK };
+place at address mem:0xFE7F5D00 { ro section .option_mem };
+place at address mem:0xFFFFFF80 { ro section .exceptvect };
+place at address mem:0xFFFFFFFC { ro section .resetvect };
+
+"ROM16":place in ROM_region16        { ro section .code16*,
+                                       ro section .data16* };
+"RAM16":place in RAM_region16        { rw section .data16*,
+                                       rw section __DLIB_PERTHREAD };
+"ROM24":place in ROM_region24        { ro section .code24*,
+                                       ro section .data24* };
+"RAM24":place in RAM_region24        { rw section .data24* };
+"ROM32":place in ROM_region32        { ro };
+"RAM32":place in RAM_region32        { rw,
+                                       ro section D,
+                                       ro section D_1,
+                                       ro section D_2,
+                                       block HEAP,
+                                       block STACKS,
+                                       last section FREEMEM };
