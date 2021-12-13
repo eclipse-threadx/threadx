@@ -58,12 +58,6 @@
 #define TX_PORT_H
 
 
-/* Include prototypes for memset.  */
-
-#include <string.h>
-#include <intrinsics.h>
-
-
 /* Determine if the optional ThreadX user define file should be used.  */
 
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
@@ -77,7 +71,8 @@
 
 
 /* Define compiler library include files.  */
-
+#include <stdlib.h>
+#include <string.h>
 
 /* Define ThreadX basic types for this port.  */ 
 
@@ -88,6 +83,7 @@ typedef int                                     INT;
 typedef unsigned int                            UINT;
 typedef long                                    LONG;
 typedef unsigned long                           ULONG;
+typedef unsigned long long                      ULONG64;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
 
@@ -104,7 +100,7 @@ typedef unsigned short                          USHORT;
    thread creation is less than this value, the thread create call will return an error.  */
 
 #ifndef TX_MINIMUM_STACK
-#define TX_MINIMUM_STACK                        512         /* Minimum stack size for this port  */
+#define TX_MINIMUM_STACK                        200         /* Minimum stack size for this port  */
 #endif
 
 
@@ -234,6 +230,8 @@ typedef unsigned short                          USHORT;
    is used to define a local function save area for the disable and restore
    macros.  */
 
+#define TX_DISABLE_INLINE 1
+
 #ifdef TX_DISABLE_INLINE
 
 unsigned int                                    _tx_thread_interrupt_control(unsigned int new_posture);
@@ -245,7 +243,7 @@ unsigned int                                    _tx_thread_interrupt_control(uns
 
 #else
 
-#define TX_INTERRUPT_SAVE_AREA                  __istate_t interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save;
 #define TX_DISABLE                              {interrupt_save = __get_interrupt_state();__disable_interrupt();};
 #define TX_RESTORE                              {__set_interrupt_state(interrupt_save);};
 
@@ -266,7 +264,7 @@ unsigned int                                    _tx_thread_interrupt_control(uns
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RISC-V32/IAR Version G6.1.6 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RISC-V32/IAR Version G6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
