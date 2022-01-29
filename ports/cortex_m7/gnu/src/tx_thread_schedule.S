@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                              Cortex-M7/GNU      */
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -64,13 +64,14 @@
 /*                                                                        */
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
-/*    _tx_thread_context_restore           Restore thread's context       */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
+/*  01-31-2022      Scott Larson            Fixed predefined macro name,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -91,7 +92,7 @@ _tx_thread_schedule:
 
     /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
 
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     MRS     r0, CONTROL                             // Pickup current CONTROL register
     BIC     r0, r0, #4                              // Clear the FPCA bit
     MSR     CONTROL, r0                             // Setup new CONTROL register
@@ -151,7 +152,7 @@ __tx_ts_handler:
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r12, PSP                                // Pickup PSP pointer (thread's stack pointer)
     STMDB   r12!, {r4-r11}                          // Save its remaining registers
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_save
     VSTMDB  r12!,{s16-s31}                          // Yes, save additional VFP registers
@@ -213,7 +214,7 @@ __tx_ts_restore:
 
     LDR     r12, [r1, #8]                           // Pickup thread's stack pointer
     LDMIA   r12!, {LR}                              // Pickup LR
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_restore                       // If not, skip VFP restore
     VLDMIA  r12!, {s16-s31}                         // Yes, restore additional VFP registers
@@ -271,7 +272,7 @@ __tx_ts_ready:
     B       __tx_ts_restore                         // Restore the thread
 // }
 
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
 
     .global  tx_thread_fpu_enable
     .thumb_func

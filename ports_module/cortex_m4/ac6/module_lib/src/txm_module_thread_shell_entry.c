@@ -44,10 +44,12 @@ TXM_MODULE_THREAD_ENTRY_INFO    *_txm_module_entry_info;
 ULONG                           (*_txm_module_kernel_call_dispatcher)(ULONG kernel_request, ULONG param_1, ULONG param_2, ULONG param3);
 
 
-/* Define the startup code that clears the uninitialized global data and sets up the
-   preset global variables.  */
+/* Define the module's heap and align it to 8 bytes.  */
+__attribute__((aligned(8))) UCHAR txm_heap[TXM_MODULE_HEAP_SIZE];
 
-extern VOID _txm_module_initialize(VOID);
+
+/* Use our asm routine that calls the ARM code to initialize data and heap.  */
+extern VOID     _txm_module_initialize(VOID *heap_base, VOID *heap_top);
 
 
 /**************************************************************************/
@@ -55,7 +57,7 @@ extern VOID _txm_module_initialize(VOID);
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_thread_shell_entry                    Cortex-M4/AC6     */
-/*                                                           6.1.9        */
+/*                                                           6.1.10          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -92,6 +94,9 @@ extern VOID _txm_module_initialize(VOID);
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
+/*  01-31-2022      Scott Larson            Modified comments and made    */
+/*                                            heap user configurable,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_ENTRY_INFO *thread_info)
@@ -107,7 +112,7 @@ VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_EN
     if (thread_info -> txm_module_thread_entry_info_start_thread)
     {
         /* Initialize the C environment.  */
-        _txm_module_initialize();
+        _txm_module_initialize(&txm_heap[0], &txm_heap[TXM_MODULE_HEAP_SIZE-1]);
         
         /* Save the entry info pointer, for later use.  */
         _txm_module_entry_info =  thread_info;

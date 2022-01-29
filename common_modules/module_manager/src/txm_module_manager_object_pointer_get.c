@@ -76,7 +76,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_object_pointer_get(UINT object_type, CHAR *name, VOID **object_ptr)
@@ -84,7 +84,7 @@ UINT  _txm_module_manager_object_pointer_get(UINT object_type, CHAR *name, VOID 
 
 UINT    status;
 
-    /* Call the secure version of this function with the maximum length 
+    /* Call the secure version of this function with the maximum length
        possible since none was passed.  */
     status =  _txm_module_manager_object_pointer_get_extended(object_type, name, TXM_MODULE_MANAGER_UTIL_MAX_VALUE_OF_TYPE_UNSIGNED(UINT), object_ptr);
     return(status);

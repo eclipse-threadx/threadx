@@ -10,15 +10,15 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Manager                                                      */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Manager                                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 #define TX_SOURCE_CODE
 
@@ -27,43 +27,43 @@
 #include "tx_thread.h"
 #include "tx_timer.h"
 #include "txm_module.h"
-                
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_timer_notify_trampoline         PORTABLE C      */ 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_timer_notify_trampoline         PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function processes the timer expirations from ThreadX.         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    id                                Timer ID                          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _txm_module_manager_callback_request  Send module callback request  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function processes the timer expirations from ThreadX.         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    id                                Timer ID                          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_callback_request  Send module callback request  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_timer_notify_trampoline(ULONG id)
@@ -77,20 +77,20 @@ TX_QUEUE                    *module_callback_queue;
 TX_TIMER                    *timer_ptr;
 CHAR                        *internal_ptr;
 
-  
+
     /* We now know the callback is for a module.  */
-        
+
     /* Disable interrupts.  */
     TX_DISABLE
-    
-    /* Our expired timer pointer points to the internal timer, 
+
+    /* Our expired timer pointer points to the internal timer,
      * we need to get to the full timer pointer.  */
     /* Pickup the current internal timer pointer.  */
-    internal_ptr =  (CHAR *) _tx_timer_expired_timer_ptr;  
-    
+    internal_ptr =  (CHAR *) _tx_timer_expired_timer_ptr;
+
     /* Get the timer pointer from the internal pointer.  */
     TX_USER_TIMER_POINTER_GET((TX_TIMER_INTERNAL *) internal_ptr, timer_ptr);
-    
+
     /* Pickup the module instance pointer.  */
     module_instance =  (TXM_MODULE_INSTANCE *) timer_ptr -> tx_timer_module_instance;
 
@@ -98,9 +98,9 @@ CHAR                        *internal_ptr;
     if ((module_instance) && (module_instance -> txm_module_instance_id == TXM_MODULE_ID) &&
         (module_instance -> txm_module_instance_state == TXM_MODULE_STARTED))
     {
-        
-        /* Yes, the module is still valid.  */        
-         
+
+        /* Yes, the module is still valid.  */
+
         /* Pickup the module's callback message queue.  */
         module_callback_queue =  &(module_instance -> txm_module_instance_callback_request_queue);
 
@@ -118,24 +118,24 @@ CHAR                        *internal_ptr;
         callback_message.txm_module_callback_message_param_8 =               0;
         callback_message.txm_module_callback_message_reserved1 =             0;
         callback_message.txm_module_callback_message_reserved2 =             0;
-         
+
         /* Restore interrupts.  */
         TX_RESTORE
-    
-        /* Call the general processing that will place the callback on the 
+
+        /* Call the general processing that will place the callback on the
            module's callback request queue.  */
         _txm_module_manager_callback_request(module_callback_queue, &callback_message);
     }
     else
     {
-    
+
         /* Module no longer valid.  */
 
         /* Error, increment the error counter and return.  */
         _txm_module_manager_callback_error_count++;
-        
+
         /* Restore interrupts.  */
         TX_RESTORE
     }
-}       
-  
+}
+

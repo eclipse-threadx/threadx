@@ -22,48 +22,51 @@
 
 #define TXM_MODULE
 #include "txm_module.h"
-
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txe_semaphore_create                               PORTABLE C      */ 
-/*                                                           6.1          */
+#ifndef TXM_SEMAPHORE_CREATE_CALL_NOT_USED
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_semaphore_create                               PORTABLE C      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function checks for errors in the create semaphore function    */ 
-/*    call.                                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    semaphore_ptr                     Pointer to semaphore control block*/ 
-/*    name_ptr                          Pointer to semaphore name         */ 
-/*    initial_count                     Initial semaphore count           */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in the create semaphore function    */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    semaphore_ptr                     Pointer to semaphore control block*/
+/*    name_ptr                          Pointer to semaphore name         */
+/*    initial_count                     Initial semaphore count           */
 /*    semaphore_control_block_size      Size of semaphore control block   */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_SEMAPHORE_ERROR                Invalid semaphore pointer         */ 
-/*    TX_CALLER_ERROR                   Invalid caller of this function   */ 
-/*    status                            Actual completion status          */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SEMAPHORE_ERROR                Invalid semaphore pointer         */
+/*    TX_CALLER_ERROR                   Invalid caller of this function   */
+/*    status                            Actual completion status          */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _txm_module_kernel_call_dispatcher                                  */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Module application code                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module application code                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  01-31-2022      Scott Larson            Modified comments and added   */
+/*                                            CALL_NOT_USED option,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _txe_semaphore_create(TX_SEMAPHORE *semaphore_ptr, CHAR *name_ptr, ULONG initial_count, UINT semaphore_control_block_size)
@@ -81,3 +84,4 @@ ALIGN_TYPE extra_parameters[2];
     /* Return value to the caller.  */
     return(return_value);
 }
+#endif

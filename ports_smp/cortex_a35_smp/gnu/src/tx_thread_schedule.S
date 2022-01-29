@@ -27,8 +27,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_schedule                              Cortex-A35-SMP/GCC */
-/*                                                           6.1.9        */
+/*    _tx_thread_schedule                                ARMv8-A-SMP      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -62,9 +62,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                             added ARMv8.2-A support,   */
-/*                                             resulting in version 6.1.9 */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -205,7 +205,7 @@ _execute_pointer_did_not_change:
     MOV     sp, x4                              //
     STR     w3, [x2, x20, LSL #2]               // Setup time-slice
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 
     /* Call the thread entry function to indicate the thread is executing.  */
 

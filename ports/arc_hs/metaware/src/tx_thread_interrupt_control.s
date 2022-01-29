@@ -72,7 +72,7 @@ _tx_thread_interrupt_control:
 ;    /* Apply the new interrupt posture.  */
 ;
     seti    r0                                          ; Set desired interrupt state
-    j_s.d [blink]                                       ; Return to caller with delay slot
+    j_s.d   [blink]                                     ; Return to caller with delay slot
     mov     r0, r1                                      ; Return previous mask value. Return value is TX_INT_DISABLE or TX_INT_ENABLE.
 ;
 ;}

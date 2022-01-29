@@ -29,7 +29,7 @@
 #include "tx_queue.h"
 #include "tx_mutex.h"
 #include "tx_semaphore.h"
-#include "tx_thread.h" 
+#include "tx_thread.h"
 #include "tx_timer.h"
 #include "tx_trace.h"
 #include "txm_module.h"
@@ -41,7 +41,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_kernel_dispatch                 PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -89,6 +89,9 @@
 /*                                            added optional defines to   */
 /*                                            remove unneeded functions,  */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022      Scott Larson            Modified comments and added   */
+/*                                            CALL_NOT_USED option,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 ALIGN_TYPE _txm_module_manager_kernel_dispatch(ULONG kernel_request, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2)
@@ -437,7 +440,7 @@ TXM_MODULE_INSTANCE *module_instance;
         break;
     }
     #endif
-
+    
     #ifndef TXM_QUEUE_SEND_CALL_NOT_USED
     case TXM_QUEUE_SEND_CALL:
     {
@@ -888,14 +891,16 @@ TXM_MODULE_INSTANCE *module_instance;
             return_value = (ALIGN_TYPE) _txm_module_manager_port_dispatch(module_instance, kernel_request, param_0, param_1, param_2);
         }
 #endif
-        
-        /* Determine if an application request is present.   */
+
+        #ifndef TXM_MODULE_APPLICATION_REQUEST_CALL_NOT_USED
+        /* Determine if an application request is present.  */
         if (kernel_request >= TXM_APPLICATION_REQUEST_ID_BASE)
         {
             /* Yes, call the module manager function that the application defines in order to
                support application-specific requests.  */
             return_value =  (ALIGN_TYPE)  _txm_module_manager_application_request(kernel_request-TXM_APPLICATION_REQUEST_ID_BASE, param_0, param_1, param_2);
         }
+        #endif
 
 #ifdef TXM_MODULE_ENABLE_NETX
         /* Determine if there is a NetX request.  */

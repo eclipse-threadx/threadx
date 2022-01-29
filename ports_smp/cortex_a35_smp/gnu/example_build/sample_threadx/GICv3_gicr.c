@@ -1,7 +1,7 @@
 /*
  * GICv3_gicr.c - generic driver code for GICv3 redistributor
  *
- * Copyright (c) 2014-2018 Arm Limited (or its affiliates). All rights reserved.
+ * Copyright (c) 2014-2019 Arm Limited (or its affiliates). All rights reserved.
  * Use, modification and redistribution of this file is subject to your possession of a
  * valid End User License Agreement for the Arm Product of which these examples are part of
  * and your compliance with all applicable terms and conditions of such licence agreement.
@@ -128,6 +128,25 @@ static inline GICv3_redistributor_SGI *const getgicrSGI(uint32_t gicr)
 }
 
 /**********************************************************************/
+
+// This function walks a block of RDs to find one with the matching affinity
+uint32_t GetGICR(uint32_t affinity)
+{
+  GICv3_redistributor_RD* gicr;
+  uint32_t index = 0;
+
+  do
+  {
+    gicr = getgicrRD(index);
+    if (gicr->GICR_TYPER[1] == affinity)
+       return index;
+
+    index++;
+  }
+  while((gicr->GICR_TYPER[0] & (1<<4)) == 0); // Keep looking until GICR_TYPER.Last reports no more RDs in block
+
+  return 0xFFFFFFFF; // return -1 to signal not RD found
+}
 
 void WakeupGICR(uint32_t gicr)
 {

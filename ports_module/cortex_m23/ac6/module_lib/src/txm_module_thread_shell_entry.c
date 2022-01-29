@@ -28,11 +28,12 @@
 #define TX_SOURCE_CODE
 #endif
 
-
 /* Include necessary system files.  */
 
 #include "txm_module.h"
 #include "tx_thread.h"
+
+__asm(".global __ARM_use_no_argv");
 
 /* Define the global module entry pointer from the start thread of the module.  */
 
@@ -44,23 +45,27 @@ TXM_MODULE_THREAD_ENTRY_INFO    *_txm_module_entry_info;
 ULONG                           (*_txm_module_kernel_call_dispatcher)(ULONG kernel_request, ULONG param_1, ULONG param_2, ULONG param3);
 
 
-/* Define the ARM cstartup code.  */
-extern VOID _txm_module_initialize(VOID);
+/* Define the module's heap and align it to 8 bytes.  */
+__attribute__((aligned(8))) UCHAR txm_heap[TXM_MODULE_HEAP_SIZE];
+
+
+/* Use our asm routine that calls the ARM code to initialize data and heap.  */
+extern VOID     _txm_module_initialize(VOID *heap_base, VOID *heap_top);
 
 
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_thread_shell_entry                    Cortex-M23/AC6    */
-/*                                                           6.1.6        */
+/*    _txm_module_thread_shell_entry                   Cortex-M23/AC6     */
+/*                                                           6.1.10          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function calls the specified entry function of the thread.  It */
+/*    This function calls the specified entry function of the thread. It  */
 /*    also provides a place for the thread's entry function to return.    */
 /*    If the thread returns, this function places the thread in a         */
 /*    "COMPLETED" state.                                                  */
@@ -90,6 +95,10 @@ extern VOID _txm_module_initialize(VOID);
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
+/*  01-31-2022      Scott Larson            Modified comments, fixed      */
+/*                                            scatterload, and made       */
+/*                                            heap user configurable,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_ENTRY_INFO *thread_info)
@@ -99,13 +108,12 @@ VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_EN
     VOID            (*entry_exit_notify)(TX_THREAD *, UINT);
 #endif
 
-
     /* Determine if this is the start thread.  If so, we must prepare the module for
        execution.  If not, simply skip the C startup code.  */
     if (thread_info -> txm_module_thread_entry_info_start_thread)
     {
-        /* Initialize the ARM C environment.  */
-        _txm_module_initialize();
+        /* Initialize the C environment.  */
+        _txm_module_initialize(&txm_heap[0], &txm_heap[TXM_MODULE_HEAP_SIZE-1]);
         
         /* Save the entry info pointer, for later use.  */
         _txm_module_entry_info =  thread_info;
@@ -169,4 +177,3 @@ VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_EN
     TX_SAFETY_CRITICAL_EXCEPTION(__FILE__, __LINE__, 0);
 #endif
 }
-

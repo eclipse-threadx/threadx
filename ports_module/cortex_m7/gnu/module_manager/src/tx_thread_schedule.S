@@ -40,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M7/GNU     */
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -74,6 +74,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
+/*  01-31-2022      Scott Larson            Fixed predefined macro name,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -92,7 +94,7 @@ _tx_thread_schedule:
     LDR     r2, =_tx_thread_preempt_disable         // Build address of preempt disable flag
     STR     r0, [r2, #0]                            // Clear preempt disable flag
 
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
     MRS     r0, CONTROL                             // Pickup current CONTROL register
     BIC     r0, r0, #4                              // Clear the FPCA bit
@@ -191,7 +193,7 @@ UsageFault_Handler:
                                                     //     Bit 7 = 1 -> MMFAR is valid
     STRB    r1, [r0]                                // Clear the MMFSR
 
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     LDR     r0, =0xE000EF34                         // Cleanup FPU context: Load FPCCR address
     LDR     r1, [r0]                                // Load FPCCR
     BIC     r1, r1, #1                              // Clear the lazy preservation active bit
@@ -258,7 +260,7 @@ __tx_ts_handler:
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r12, PSP                                // Pickup PSP pointer (thread's stack pointer)
     STMDB   r12!, {r4-r11}                          // Save its remaining registers
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_save
     VSTMDB  r12!,{s16-s31}                          // Yes, save additional VFP registers
@@ -383,7 +385,7 @@ __tx_ts_restore:
     STR     r1, [r0]                                // Enable MPU
 skip_mpu_setup:
     LDMIA   r12!, {LR}                              // Pickup LR
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_restore                       // If not, skip VFP restore
     VLDMIA  r12!, {s16-s31}                         // Yes, restore additional VFP registers
@@ -448,14 +450,14 @@ __tx_SVCallHandler:
 #endif
 
     MRS     r3, PSP                                 // Pickup thread stack pointer
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     TST     lr, #0x10                               // Test for extended module stack
     ITT     EQ
     ORREQ   r3, r3, #1                              // If so, set LSB in thread stack pointer to indicate extended frame
     ORREQ   lr, lr, #0x10                           // Set bit, return with standard frame
 #endif
     STR     r3, [r2, #0xB0]                         // Save thread stack pointer
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     BIC     r3, #1                                  // Clear possibly OR'd bit
 #endif
 
@@ -504,7 +506,7 @@ _tx_thread_user_return:
     STR     r3, [r2, #20]                           // Set stack size
 #endif
 
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     /* If lazy stacking is pending, check if it can be cleared.
        if(LSPACT && tx_thread_module_stack_start < FPCAR && FPCAR < tx_thread_module_stack_end)
        then clear LSPACT. */
@@ -528,7 +530,7 @@ _tx_no_lazy_clear:
 
     LDR     r0, [r2, #0xB0]                         // Load the module thread stack pointer
     MRS     r3, PSP                                 // Pickup kernel stack pointer
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     TST     r0, #1                                  // Is module stack extended?
     ITTE    NE                                      // If so...
     BICNE   lr, #0x10                               // Clear bit, return with extended frame
@@ -589,7 +591,7 @@ _txm_module_user_mode_exit:
     NOP
 // }
 
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
 
     .global  tx_thread_fpu_enable
     .thumb_func

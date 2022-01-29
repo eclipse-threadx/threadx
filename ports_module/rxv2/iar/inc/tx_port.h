@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                            RXv2/IAR       */
-/*                                                           6.x          */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,7 +47,11 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
+/*  06-02-2021     William E. Lamie         Modified comments,            */
+/*                                            resulting in version 6.1.7  */   
+/*  10-15-2021     William E. Lamie         Modified comment(s),          */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -282,7 +286,7 @@ extern volatile ULONG  _tx_thread_system_state;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv2/IAR Version 6.x *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv2/IAR Version 6.1.9 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    txm_module_port.h                                    RXv2/IAR       */
-/*                                                           6.x          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -40,7 +40,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      Scott Larson            Initial Version 6.x           */
+/*  01-31-2022      Scott Larson            Initial Version 6.1.10        */
 /*                                                                        */
 /**************************************************************************/
 
@@ -396,6 +396,6 @@ VOID  _txm_module_manager_setup_mpu_registers(TXM_MODULE_INSTANCE *module_instan
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module RXv2/IAR Version 6.x *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module RXv2/IAR Version 6.1.10 *";
 
 #endif

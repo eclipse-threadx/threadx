@@ -23,7 +23,7 @@
 #define TX_SOURCE_CODE
 
 #include "tx_api.h"
-#include "tx_thread.h" 
+#include "tx_thread.h"
 #include "txm_module.h"
 
 /**************************************************************************/
@@ -38,11 +38,11 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function deallocates a previously allocated object.            */ 
+/*    This function deallocates a previously allocated object.            */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    object_ptr                        Object pointer to deallocate      */ 
+/*    object_ptr                        Object pointer to deallocate      */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
@@ -63,7 +63,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_object_deallocate(VOID *object_ptr)
@@ -78,18 +78,18 @@ UINT                        return_value;
     /* Determine if an object pool was created.  */
     if (_txm_module_manager_object_pool_created)
     {
-        
+
     TXM_MODULE_ALLOCATED_OBJECT   *next_object, *previous_object;
-        
+
         /* Pickup module instance pointer.  */
         module_instance =  _tx_thread_current_ptr -> tx_thread_module_instance_ptr;
-        
+
         /* Setup the memory pointer.  */
         module_allocated_object_ptr =  (TXM_MODULE_ALLOCATED_OBJECT *) object_ptr;
-        
+
         /* Position the object pointer backwards to position back to the module manager information.  */
         previous_object =  module_allocated_object_ptr--;
-        
+
         /* Make sure the object is valid.  */
         if ((module_allocated_object_ptr == TX_NULL) || (module_allocated_object_ptr -> txm_module_allocated_object_module_instance != module_instance) || (module_instance -> txm_module_instance_object_list_count == 0))
         {
@@ -98,8 +98,8 @@ UINT                        return_value;
         }
         else
         {
-            
-            /* Unlink the node.  */    
+
+            /* Unlink the node.  */
             if ((--module_instance -> txm_module_instance_object_list_count) == 0)
             {
                 /* Only allocated object, just set the allocated list to NULL.  */
@@ -112,16 +112,16 @@ UINT                        return_value;
                 previous_object =                                       module_allocated_object_ptr -> txm_module_allocated_object_previous;
                 next_object -> txm_module_allocated_object_previous =   previous_object;
                 previous_object -> txm_module_allocated_object_next =   next_object;
-                
+
                 /* See if we have to update the allocated object list head pointer.  */
                 if (module_instance -> txm_module_instance_object_list_head == module_allocated_object_ptr)
                 {
                     /* Yes, move the head pointer to the next link. */
-                    module_instance -> txm_module_instance_object_list_head =  next_object; 
+                    module_instance -> txm_module_instance_object_list_head =  next_object;
                 }
             }
-            
-            /* Release the object memory.  */ 
+
+            /* Release the object memory.  */
             return_value =  (ULONG)  _txe_byte_release((VOID *) module_allocated_object_ptr);
         }
     }
@@ -130,9 +130,9 @@ UINT                        return_value;
         /* Set return value to not enabled.  */
         return_value =  TX_NOT_AVAILABLE;
     }
-    
+
     /* Release the protection mutex.  */
     _txe_mutex_put(&_txm_module_manager_mutex);
-    
+
     return(return_value);
 }

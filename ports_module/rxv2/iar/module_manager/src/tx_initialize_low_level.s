@@ -29,7 +29,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                             RXv2/IAR       */
-/*                                                           6.x          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -62,7 +62,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+/*  01-31-2022     William E. Lamie         Initial Version 6.1.10        */
 /*                                                                        */
 /**************************************************************************/
     public __tx_initialize_low_level

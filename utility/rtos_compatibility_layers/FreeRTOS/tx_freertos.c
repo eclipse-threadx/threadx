@@ -26,6 +26,9 @@
 /*  10-15-2021     William E. Lamie         Modified comment(s), and      */
 /*                                            fixed compiler warnings,    */
 /*                                            resulting in version 6.1.7  */
+/*  01-31-2022     William E. Lamie         Modified comment(s), and      */
+/*                                            fixed compiler warnings,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -1334,43 +1337,30 @@ BaseType_t xSemaphoreGive(SemaphoreHandle_t xSemaphore)
 
     configASSERT(xSemaphore != NULL);
 
-
-    if(xSemaphore->p_set != NULL) {
-        TX_DISABLE;
-        _tx_thread_preempt_disable++;
-    }
-
     if(xSemaphore->is_mutex == 1u) {
         ret = tx_mutex_put(&xSemaphore->mutex);
         if(ret != TX_SUCCESS) {
             return pdFALSE;
         }
-    } else {
-        if(xSemaphore->p_set == NULL) {
-            TX_DISABLE;
-            _tx_thread_preempt_disable++;
-        }
 
-        if(xSemaphore->sem.tx_semaphore_count >= xSemaphore->max_count) {
-            /* Maximum semaphore count reached return failure. */
-            _tx_thread_preempt_disable--;
-            TX_RESTORE
-            return pdFALSE;
-        }
+      return pdTRUE;
+    }
 
-        ret = tx_semaphore_put(&xSemaphore->sem);
-        if(ret != TX_SUCCESS) {
-            _tx_thread_preempt_disable--;
-            TX_RESTORE;
-            return pdFALSE;
-        }
+    TX_DISABLE;
+    _tx_thread_preempt_disable++;
 
-        if(xSemaphore->p_set == NULL) {
-            _tx_thread_preempt_disable--;
-            TX_RESTORE;
+    if(xSemaphore->sem.tx_semaphore_count >= xSemaphore->max_count) {
+        /* Maximum semaphore count reached return failure. */
+        _tx_thread_preempt_disable--;
+         TX_RESTORE
+        return pdFALSE;
+    }
 
-            _tx_thread_system_preempt_check();
-        }
+    ret = tx_semaphore_put(&xSemaphore->sem);
+    if(ret != TX_SUCCESS) {
+        _tx_thread_preempt_disable--;
+        TX_RESTORE;
+        return pdFALSE;
     }
 
     if(xSemaphore->p_set != NULL) {
@@ -1383,12 +1373,12 @@ BaseType_t xSemaphoreGive(SemaphoreHandle_t xSemaphore)
             TX_FREERTOS_ASSERT_FAIL();
             return pdFALSE;
         }
-
-        _tx_thread_preempt_disable--;
-        TX_RESTORE;
-
-        _tx_thread_system_preempt_check();
     }
+
+    _tx_thread_preempt_disable--;
+    TX_RESTORE;
+
+    _tx_thread_system_preempt_check();
 
     return pdTRUE;
 }

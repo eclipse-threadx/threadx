@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M3/AC6     */
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,6 +51,11 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
+/*  01-31-2022      Scott Larson            Modified comments, updated    */
+/*                                            typedef to fix misra        */
+/*                                            violation,                  */
+/*                                            fixed predefined macro,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -277,7 +282,7 @@ void    __iar_Initlocks(void);
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #endif
 
-#if defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__TARGET_FPU_VFP) || defined(__VFP__)
+#if defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_FPU_VFP) || defined(__VFP__)
 
 #ifdef TX_MISRA_ENABLE
 
@@ -366,9 +371,9 @@ void _tx_vfp_access(void);
                                                         if ((_tx_system_state == ((ULONG) 0)) && ((thread_ptr) == _tx_thread_current_ptr))  \
                                                         {                                                                                   \
                                                         ULONG  _tx_vfp_state;                                                               \
-                                                            _tx_vfp_state =  __get_control_value();                                               \
+                                                            _tx_vfp_state =  __get_control_value();                                         \
                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                                \
-                                                            __set_control_value(_tx_vfp_state);                                                   \
+                                                            __set_control_value(_tx_vfp_state);                                             \
                                                         }                                                                                   \
                                                         else                                                                                \
                                                         {                                                                                   \
@@ -378,14 +383,14 @@ void _tx_vfp_access(void);
                                                             if (_tx_fpccr == ((ULONG) 0x01))                                                \
                                                             {                                                                               \
                                                             ULONG _tx_vfp_state;                                                            \
-                                                                _tx_vfp_state = __get_control_value();                                            \
+                                                                _tx_vfp_state = __get_control_value();                                      \
                                                                 _tx_vfp_state =  _tx_vfp_state & ((ULONG) 0x4);                             \
                                                                 TX_VFP_TOUCH();                                                             \
                                                                 if (_tx_vfp_state == ((ULONG) 0))                                           \
                                                                 {                                                                           \
-                                                                    _tx_vfp_state =  __get_control_value();                                       \
+                                                                    _tx_vfp_state =  __get_control_value();                                 \
                                                                     _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                        \
-                                                                    __set_control_value(_tx_vfp_state);                                           \
+                                                                    __set_control_value(_tx_vfp_state);                                     \
                                                                 }                                                                           \
                                                             }                                                                               \
                                                         }                                                                                   \
@@ -429,7 +434,7 @@ void _tx_vfp_access(void);
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
 #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
 
-#endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__TARGET_FPU_VFP) || defined(__VFP__) */
+#endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_FPU_VFP) || defined(__VFP__) */
 
 
 /* Define the ThreadX object creation extensions for the remaining objects.  */
@@ -590,7 +595,7 @@ unsigned int interrupt_save;
     }
 }
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 #define TX_DISABLE                              interrupt_save =  __disable_interrupts();
 #define TX_RESTORE                              __restore_interrupt(interrupt_save);
 
@@ -663,7 +668,7 @@ unsigned int interrupt_save;
 }
 
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 #define TX_DISABLE                              interrupt_save = __disable_interrupts();
 #define TX_RESTORE                              __restore_interrupt(interrupt_save);
 

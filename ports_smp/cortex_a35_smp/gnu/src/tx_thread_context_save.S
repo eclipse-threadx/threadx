@@ -27,8 +27,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_context_save                          Cortex-A35-SMP/GCC */
-/*                                                           6.1.9        */
+/*    _tx_thread_context_save                            ARMv8-A-SMP      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -60,9 +60,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                             added ARMv8.2-A support,   */
-/*                                             resulting in version 6.1.9 */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_save(VOID)
@@ -135,7 +135,7 @@ _tx_thread_context_save:
 #endif
     STP     x0, x1, [sp, #-16]!                 // Save SPSR, ELR
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 
     /* Call the ISR enter function to indicate an ISR is executing.  */
 
@@ -238,7 +238,7 @@ __tx_thread_idle_system_save:
     /* Not much to do here, just adjust the stack pointer, and return to IRQ
        processing.  */
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 
     /* Call the ISR enter function to indicate an ISR is executing.  */
 

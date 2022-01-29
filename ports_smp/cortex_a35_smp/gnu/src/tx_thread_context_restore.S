@@ -30,8 +30,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_context_restore                       Cortex-A35-SMP/GCC */
-/*                                                           6.1.9        */
+/*    _tx_thread_context_restore                         ARMv8-A-SMP      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -64,9 +64,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                             added ARMv8.2-A support,   */
-/*                                             resulting in version 6.1.9 */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_restore(VOID)
@@ -79,7 +79,7 @@ _tx_thread_context_restore:
 
     MSR     DAIFSet, 0x3                        // Lockout interrupts
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 
     /* Call the ISR exit function to indicate an ISR is complete.  */
 

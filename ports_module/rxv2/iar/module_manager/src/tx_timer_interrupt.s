@@ -37,7 +37,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_timer_interrupt                                  RXv2/IAR       */
-;/*                                                           6.x          */
+;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -73,7 +73,9 @@
 ;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  xx-xx-xxxx     William E. Lamie         Initial Version 6.x           */
+;/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
+;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 
@@ -134,7 +136,7 @@ __tx_timer_no_time_slice:
 ;
     MOV.L   #__tx_timer_current_ptr, R1     ; Pickup address of current timer ptr
     MOV.L   [R1], R2                        ; Pickup current pointer
-    MOV.L   [R2+], R1                       ; pickup timer list entry, _tx_timer_current_ptr++
+    MOV.L   [R2+], R1                            ; Pickup timer list entry, _tx_timer_current_ptr++
     CMP     #0, R1                          ; Is timer pointer NULL?
     BEQ     __tx_timer_no_timer            ; Yes, no timer has expired
         
@@ -175,7 +177,7 @@ __tx_timer_no_timer:
 ;
 __tx_timer_skip_wrap:
     MOV.L   #__tx_timer_current_ptr,R1     
-    MOV.L   R2, [R1]                          ; store in updated pointer in  _tx_timer_current_ptr  
+    MOV.L   R2, [R1]                             ; Store in updated pointer in  _tx_timer_current_ptr
     
 __tx_timer_done:
 ;
@@ -229,7 +231,7 @@ __tx_timer_nothing_expired:
     POPM R1-R5
     POPM R14-R15
 ;
-    RTS                                       ; return to point of interrupt
+    RTS                                          ; Return to point of interrupt
 ;
 ;}
     END

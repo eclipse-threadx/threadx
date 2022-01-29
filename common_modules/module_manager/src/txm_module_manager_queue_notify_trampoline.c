@@ -10,15 +10,15 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Manager                                                      */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Manager                                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 #define TX_SOURCE_CODE
 
@@ -28,41 +28,41 @@
 #include "txm_module.h"
 
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_queue_notify_trampoline         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_queue_notify_trampoline         PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function processes the queue notification call from ThreadX.   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    queue_ptr                         Queue pointer                     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _txm_module_manager_callback_request  Send module callback request  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function processes the queue notification call from ThreadX.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    queue_ptr                         Queue pointer                     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_callback_request  Send module callback request  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_queue_notify_trampoline(TX_QUEUE *queue_ptr)
@@ -74,9 +74,9 @@ TXM_MODULE_INSTANCE         *module_instance;
 TXM_MODULE_CALLBACK_MESSAGE  callback_message;
 TX_QUEUE                    *module_callback_queue;
 
-  
+
     /* We now know the callback is for a module.  */
-        
+
     /* Disable interrupts.  */
     TX_DISABLE
 
@@ -87,9 +87,9 @@ TX_QUEUE                    *module_callback_queue;
     if ((module_instance) && (module_instance -> txm_module_instance_id == TXM_MODULE_ID) &&
         (module_instance -> txm_module_instance_state == TXM_MODULE_STARTED))
     {
-        
-        /* Yes, the module is still valid.  */        
-         
+
+        /* Yes, the module is still valid.  */
+
         /* Pickup the module's callback message queue.  */
         module_callback_queue =  &(module_instance -> txm_module_instance_callback_request_queue);
 
@@ -107,26 +107,26 @@ TX_QUEUE                    *module_callback_queue;
         callback_message.txm_module_callback_message_param_8 =               0;
         callback_message.txm_module_callback_message_reserved1 =             0;
         callback_message.txm_module_callback_message_reserved2 =             0;
-         
+
         /* Restore interrupts.  */
         TX_RESTORE
-    
-        /* Call the general processing that will place the callback on the 
+
+        /* Call the general processing that will place the callback on the
            module's callback request queue.  */
         _txm_module_manager_callback_request(module_callback_queue, &callback_message);
     }
     else
     {
-    
+
         /* Module no longer valid.  */
-        
+
         /* Error, increment the error counter and return.  */
         _txm_module_manager_callback_error_count++;
 
         /* Restore interrupts.  */
         TX_RESTORE
     }
-}         
+}
 #endif
-        
+
 

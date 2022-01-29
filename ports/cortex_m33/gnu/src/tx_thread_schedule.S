@@ -26,7 +26,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M33/GNU    */
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -65,6 +65,8 @@
 /*  06-02-2021      Scott Larson            Added secure stack initialize */
 /*                                            in SVC handler,             */
 /*                                            resulting in version 6.1.7  */
+/*  01-31-2022      Scott Larson            Fixed predefined macro name,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -86,7 +88,7 @@ _tx_thread_schedule:
     LDR     r2, =_tx_thread_preempt_disable         // Build address of preempt disable flag
     STR     r0, [r2, #0]                            // Clear preempt disable flag
 
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     /* Clear CONTROL.FPCA bit so VFP registers aren't unnecessarily stacked.  */
     MRS     r0, CONTROL                             // Pickup current CONTROL register
     BIC     r0, r0, #4                              // Clear the FPCA bit
@@ -145,7 +147,7 @@ __tx_ts_handler:
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r12, PSP                                // Pickup PSP pointer (thread's stack pointer)
     STMDB   r12!, {r4-r11}                          // Save its remaining registers
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_save
     VSTMDB  r12!,{s16-s31}                          // Yes, save additional VFP registers
@@ -230,7 +232,7 @@ _skip_secure_restore:
     MSR     PSPLIM, r12                             // Set stack limit
     LDR     r12, [r1, #8]                           // Pickup thread's stack pointer
     LDMIA   r12!, {LR}                              // Pickup LR
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
     BNE     _skip_vfp_restore                       // If not, skip VFP restore
     VLDMIA  r12!, {s16-s31}                         // Yes, restore additional VFP registers

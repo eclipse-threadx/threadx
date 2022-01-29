@@ -80,7 +80,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_file_load(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, FX_MEDIA *media_ptr, CHAR *file_name)

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -21,66 +21,50 @@
 /**************************************************************************/
 
 
-/* #define TX_SOURCE_CODE  */
-
-
-/* Include necessary system files.  */
-
-/* 
-#include "tx_api.h"
-#include "tx_thread.h"
-#include "tx_timer.h"
-*/
-
-/*    .set ENABLE_ARM_FP,1  */
-
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_context_restore                        Cortex-A35/GNU    */ 
-/*                                                           6.1.9        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_context_restore                           ARMv8-A        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function restores the interrupt context if it is processing a  */ 
-/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-/*    if no thread was running, the function returns to the scheduler.    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISRs                                  Interrupt Service Routines    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function restores the interrupt context if it is processing a  */
+/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+/*    if no thread was running, the function returns to the scheduler.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_schedule                   Thread scheduling routine     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISRs                                  Interrupt Service Routines    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
-/*                                            execution profile support,  */
-/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
-/* VOID   _tx_thread_context_restore(VOID)
-{ */
+// VOID   _tx_thread_context_restore(VOID)
+// {
     .global _tx_thread_context_restore
     .type   _tx_thread_context_restore, @function
 _tx_thread_context_restore:
@@ -97,19 +81,19 @@ _tx_thread_context_restore:
 #endif
 
     /* Determine if interrupts are nested.  */
-    /* if (--_tx_thread_system_state)
-    { */
+    // if (--_tx_thread_system_state)
+    // {
 
     LDR     x3, =_tx_thread_system_state        // Pickup address of system state var
     LDR     w2, [x3, #0]                        // Pickup system state
     SUB     w2, w2, #1                          // Decrement the counter
-    STR     w2, [x3, #0]                        // Store the counter 
+    STR     w2, [x3, #0]                        // Store the counter
     CMP     w2, #0                              // Was this the first interrupt?
     BEQ     __tx_thread_not_nested_restore      // If so, not a nested restore
 
     /* Interrupts are nested.  */
 
-    /* Just recover the saved registers and return to the point of 
+    /* Just recover the saved registers and return to the point of
        interrupt.  */
 
     LDP     x4, x5, [sp], #16                   // Pickup saved SPSR/DAIF and ELR_EL
@@ -138,13 +122,13 @@ _tx_thread_context_restore:
     LDP     x29, x30, [sp], #16                 // Recover x29, x30
     ERET                                        // Return to point of interrupt
 
-    /* }  */
+    // }
 __tx_thread_not_nested_restore:
 
     /* Determine if a thread was interrupted and no preemption is required.  */
-    /* else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr) 
-               || (_tx_thread_preempt_disable))
-    { */
+    // else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr)
+    //           || (_tx_thread_preempt_disable))
+    // {
 
     LDR     x1, =_tx_thread_current_ptr         // Pickup address of current thread ptr
     LDR     x0, [x1, #0]                        // Pickup actual current thread pointer
@@ -166,7 +150,7 @@ __tx_thread_no_preempt_restore:
     /* Restore interrupted thread or ISR.  */
 
     /* Pickup the saved stack pointer.  */
-    /* sp =  _tx_thread_current_ptr -> tx_thread_stack_ptr;  */
+    // sp =  _tx_thread_current_ptr -> tx_thread_stack_ptr;
 
     LDR     x4, [x0, #8]                        // Switch to thread stack pointer
     MOV     sp, x4                              //
@@ -199,9 +183,9 @@ __tx_thread_no_preempt_restore:
     LDP     x29, x30, [sp], #16                 // Recover x29, x30
     ERET                                        // Return to point of interrupt
 
-    /* }
-    else
-    { */
+    // }
+    // else
+    // {
 __tx_thread_preempt_restore:
 
     LDR     x4, [x0, #8]                        // Switch to thread stack pointer
@@ -249,22 +233,22 @@ _skip_fp_save:
 
 
     /* Save the remaining time-slice and disable it.  */
-    /* if (_tx_timer_time_slice)
-    {  */
+    // if (_tx_timer_time_slice)
+    // {
 
     LDR     x3, =_tx_timer_time_slice           // Pickup time-slice variable address
     LDR     w2, [x3, #0]                        // Pickup time-slice
     CMP     w2, #0                              // Is it active?
     BEQ     __tx_thread_dont_save_ts            // No, don't save it
 
-        /* _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
-        _tx_timer_time_slice =  0;  */
+        // _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
+        // _tx_timer_time_slice =  0;
 
     STR     w2, [x0, #36]                       // Save thread's time-slice
     MOV     w2, #0                              // Clear value
     STR     w2, [x3, #0]                        // Disable global time-slice flag
 
-    /* } */
+    // }
 __tx_thread_dont_save_ts:
 
 
@@ -275,9 +259,9 @@ __tx_thread_dont_save_ts:
     STR     x0, [x1, #0]                        // Clear current thread pointer
 
     /* Return to the scheduler.  */
-    /* _tx_thread_schedule();  */
+    // _tx_thread_schedule();
 
-    /* }  */
+    // }
 
 __tx_thread_idle_system_restore:
 
@@ -300,6 +284,4 @@ __tx_thread_idle_system_restore:
 #endif
 #endif
     ERET                                        // Return to scheduler
-/* }  */
-
-
+// }

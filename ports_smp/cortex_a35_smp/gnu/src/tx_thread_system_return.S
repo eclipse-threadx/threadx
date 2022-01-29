@@ -27,8 +27,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_system_return                         Cortex-A35-SMP/GCC */
-/*                                                           6.1.9        */
+/*    _tx_thread_system_return                           ARMv8-A-SMP      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -61,9 +61,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                             added ARMv8.2-A support,   */
-/*                                             resulting in version 6.1.9 */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_system_return(VOID)
@@ -117,7 +117,7 @@ _skip_fp_save:
     MOV     x1, #0                              // Clear x1
     STP     x0, x1, [sp, #-16]!                 // Save DAIF and clear value for ELR_EK1
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 
     /* Call the thread exit function to indicate the thread is no longer executing.  */
 

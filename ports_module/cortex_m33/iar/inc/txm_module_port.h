@@ -25,8 +25,8 @@
 /*                                                                        */
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
-/*    txm_module_port.h                               Cortex-M33/MPU/IAR  */
-/*                                                           6.1.5        */
+/*    txm_module_port.h                                 Cortex-M33/IAR    */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -41,6 +41,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  03-02-2021      Scott Larson            Initial Version 6.1.5         */
+/*  01-31-2022      Scott Larson            Modified comment(s),          */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -350,6 +352,6 @@ ALIGN_TYPE _txm_module_manager_port_dispatch(TXM_MODULE_INSTANCE *module_instanc
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M33/MPU/IAR Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX Module Cortex-M33/IAR Version 6.1.10 *";
 
 #endif

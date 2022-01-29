@@ -27,8 +27,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_initialize_wait                   Cortex-A35-SMP/GCC */
-/*                                                           6.1.9        */
+/*    _tx_thread_smp_initialize_wait                   Cortex-A35-SMP/AC6 */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -60,9 +60,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     Andres Mlinar            Updated comments,             */
+/*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                             added ARMv8.2-A support,   */
-/*                                             resulting in version 6.1.9 */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_initialize_wait

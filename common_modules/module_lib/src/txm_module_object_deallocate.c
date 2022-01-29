@@ -22,24 +22,24 @@
 
 #define TXM_MODULE
 #include "txm_module.h"
-
+#ifndef TXM_MODULE_OBJECT_DEALLOCATE_CALL_NOT_USED
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_object_deallocate               PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function deallocates a previously allocated object.            */ 
+/*    This function deallocates a previously allocated object.            */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    object_ptr                        Object pointer to deallocate      */ 
+/*    object_ptr                        Object pointer to deallocate      */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
@@ -57,7 +57,10 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  01-31-2022      Scott Larson            Modified comments and added   */
+/*                                            CALL_NOT_USED option,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _txm_module_object_deallocate(VOID *object_ptr)
@@ -71,3 +74,4 @@ UINT return_value;
     /* Return value to the caller.  */
     return(return_value);
 }
+#endif

@@ -1,0 +1,103 @@
+;********************************************************
+; Scatter file for Armv8-A Startup code on FVP Base model
+; Copyright (c) 2014-2017 Arm Limited (or its affiliates). All rights reserved.
+; Use, modification and redistribution of this file is subject to your possession of a
+; valid End User License Agreement for the Arm Product of which these examples are part of 
+; and your compliance with all applicable terms and conditions of such licence agreement.
+;********************************************************
+
+LOAD 0x80000000
+{
+    EXEC +0
+    {
+        startup.o (StartUp, +FIRST)
+        * (+RO, +RW, +ZI)
+    }
+
+    ;
+    ; App stacks for all CPUs
+    ; All stacks and heap are aligned to a cache-line boundary
+    ;
+    ARM_LIB_STACK    +0 ALIGN 64 EMPTY 8 * 0x4000 {}
+
+    ;
+    ; Separate heap - import symbol __use_two_region_memory
+    ; in source code for this to work correctly
+    ;
+    ARM_LIB_HEAP     +0 ALIGN 64 EMPTY 0xA0000 {}
+    
+    ;
+    ; Handler stacks for all CPUs
+    ; All stacks and heap are aligned to a cache-line boundary
+    ;
+    HANDLER_STACK    +0 ALIGN 64 EMPTY 4 * 0x4000 {}
+
+    ;
+    ; Stacks for EL3
+    ;
+    EL3_STACKS       +0 ALIGN 64 EMPTY 8 * 0x1000 {}
+    ;
+    ; Strictly speaking, the L1 tables do not need to
+    ; be so strongly aligned, but no matter
+    ;
+    TTB0_L1          +0 ALIGN 4096 EMPTY 0x1000 {}
+
+    ;
+    ; Various sets of L2 tables
+    ;
+    ; Alignment is 4KB, since the code uses a 4K page
+    ; granularity - larger granularities would require
+    ; correspondingly stricter alignment
+    ;
+    TTB0_L2_RAM      +0 ALIGN 4096 EMPTY 0x1000 {}
+
+    TTB0_L2_PRIVATE  +0 ALIGN 4096 EMPTY 0x1000 {}
+
+    TTB0_L2_PERIPH   +0 ALIGN 4096 EMPTY 0x1000 {}
+
+    ;
+    ; The startup code uses the end of this region to calculate
+    ; the top of memory - do not place any RAM regions after it
+    ;
+    TOP_OF_RAM  +0 EMPTY 4 {}
+
+    ;
+    ; CS3 Peripherals is a 64MB region from 0x1c000000
+    ; that includes the following:
+    ; System Registers             at 0x1C010000
+    ; UART0 (PL011)                at 0x1C090000
+    ; Color LCD Controller (PL111) at 0x1C1F0000
+    ; plus a number of others.
+    ; CS3_PERIPHERALS is used by the startup code for page-table generation
+    ; This region is not truly empty, but we have no
+    ; predefined objects that live within it
+    ;
+    CS3_PERIPHERALS  0x1c000000 EMPTY 0x90000 {}
+
+    ;
+    ; Place the UART peripheral registers data structure
+    ; This is only really needed if USE_SERIAL_PORT is defined, but
+    ; the linker will remove unused sections if not needed
+;    PL011  0x1c090000 UNINIT 0x1000
+;    {
+;        uart.o (+ZI)
+;    }
+    ; Note that some other CS3_PERIPHERALS follow this
+
+    ;
+    ; GICv3 distributor
+    ;
+    GICD  0x2f000000 UNINIT 0x8000
+    {
+        GICv3_gicd.o (.bss.distributor)
+    }
+
+    ;
+    ; GICv3 redistributors
+    ; 128KB for each redistributor in the system
+    ;
+    GICR  0x2f100000 UNINIT 0x80000
+    {
+        GICv3_gicr.o (.bss.redistributor)
+    }
+}

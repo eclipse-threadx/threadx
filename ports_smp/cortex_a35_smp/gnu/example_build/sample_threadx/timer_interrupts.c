@@ -2,10 +2,10 @@
 
 /* Timer and interrupts */
 
-/* Copyright (c) 2016 Arm Limited (or its affiliates). All rights reserved. */
-/* Use, modification and redistribution of this file is subject to your      */
-/* possession of a valid DS-5 end user licence agreement and your compliance */
-/* with all applicable terms and conditions of such licence agreement.       */
+/* Copyright (c) 2016-2018 Arm Limited (or its affiliates). All rights reserved. */
+/* Use, modification and redistribution of this file is subject to your possession of a     */
+/* valid End User License Agreement for the Arm Product of which these examples are part of */
+/* and your compliance with all applicable terms and conditions of such licence agreement.  */
 
 #include <stdio.h>
 
@@ -112,14 +112,14 @@ void fiqHandler(void)
   unsigned int aliased = 0;
 
   ID = getICC_IAR0(); // readIntAck();
-  printf("fiqHandler() - Read %d from IAR0\n", ID);
+  //printf("fiqHandler() - Read %d from IAR0\n", ID);
 
   // Check for reserved IDs
   if ((1020 <= ID) && (ID <= 1023))
   {
-    printf("fiqHandler() - Reserved INTID %d\n\n", ID);
+    //printf("fiqHandler() - Reserved INTID %d\n\n", ID);
     ID = getICC_IAR1(); // readAliasedIntAck();
-    printf("fiqHandler() - Read %d from AIAR\n", ID);
+    //printf("fiqHandler() - Read %d from AIAR\n", ID);
     aliased = 1;
 
     // If still spurious then simply return
@@ -131,13 +131,13 @@ void fiqHandler(void)
   {
     case 34:
       // Dual-Timer 0 (SP804)
-      printf("fiqHandler() - External timer interrupt\n\n");
+      //printf("fiqHandler() - External timer interrupt\n\n");
       clearTimerIrq();
       break;
 
     default:
       // Unexpected ID value
-      printf("fiqHandler() - Unexpected INTID %d\n\n", ID);
+      //printf("fiqHandler() - Unexpected INTID %d\n\n", ID);
       break;
   }
 

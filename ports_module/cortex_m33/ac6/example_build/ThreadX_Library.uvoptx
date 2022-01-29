@@ -2386,30 +2386,6 @@
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>185</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\module_manager\src\tx_thread_stack_error_handler.c</PathWithFileName>
-      <FilenameWithoutPath>tx_thread_stack_error_handler.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>1</GroupNumber>
-      <FileNumber>186</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\module_manager\src\tx_thread_stack_error_notify.c</PathWithFileName>
-      <FilenameWithoutPath>tx_thread_stack_error_notify.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>1</GroupNumber>
-      <FileNumber>187</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2956,6 +2932,30 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\module_manager\src\tx_thread_secure_stack_initialize.S</PathWithFileName>
       <FilenameWithoutPath>tx_thread_secure_stack_initialize.S</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>1</GroupNumber>
+      <FileNumber>231</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\common\src\tx_thread_stack_error_handler.c</PathWithFileName>
+      <FilenameWithoutPath>tx_thread_stack_error_handler.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>1</GroupNumber>
+      <FileNumber>232</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\common\src\tx_thread_stack_error_notify.c</PathWithFileName>
+      <FilenameWithoutPath>tx_thread_stack_error_notify.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
