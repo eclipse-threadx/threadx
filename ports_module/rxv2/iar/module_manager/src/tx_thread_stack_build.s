@@ -28,7 +28,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_stack_build                               RXv2/IAR       */
-;/*                                                           6.1.9        */
+;/*                                                           6.1.10       */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -65,6 +65,8 @@
 ;/*                                            removed unnecessary stack   */
 ;/*                                            type placement,             */
 ;/*                                            resulting in version 6.1.9  */
+;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.10 */
 ;/*                                                                        */
 ;/**************************************************************************/
     public __tx_thread_stack_build
@@ -98,7 +100,7 @@ __tx_thread_stack_build:
 ;
 ;    Stack Bottom: (higher memory address)  */
 ;
-    MOV.L   16[R1],R3               ; Pickup end of stack area
+    MOV.L   16[R1],R3                            ; Pickup end of stack area
     BCLR    #0, R3                               ; Mask for 4-byte alignment
     BCLR    #1, R3
 ;
@@ -127,11 +129,11 @@ __tx_thread_stack_build:
     MOV.L R4,[-R3]                               ; Initial R7 ...
     MOV.L R4,[-R3]                               ; Initial R6 ...
 
-    MOV.L R4,[-R3]                          ; Accumulator 1
+    MOV.L R4,[-R3]                               ; Accumulator 1
     MOV.L R4,[-R3]
     MOV.L R4,[-R3]
 
-    MOV.L R4,[-R3]                          ; Accumulator 0
+    MOV.L R4,[-R3]                               ; Accumulator 0
     MOV.L R4,[-R3]
     MOV.L R4,[-R3]
 
