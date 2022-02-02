@@ -203,6 +203,10 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
+01-31-2022  Release 6.1.10 changes:
+            tx_port.h                           Added missing interrupt control defines
+            tx_timer_interrupt.src              Added missing thread preemption logic
+
 10-15-2021  Release 6.1.9 changes:
             tx_port.h                           Added FPU support
             tx_thread_context_restore.s         Added FPU support
@@ -212,7 +216,7 @@ information associated with this specific port of ThreadX:
 06-02-2021  Initial ThreadX release for the RXv3 using GNURX tools, version 6.1.7
 
 
-Copyright(c) 1996-2021 Microsoft Corporation
+Copyright(c) 1996-2022 Microsoft Corporation
 
 
 https://azure.com/rtos

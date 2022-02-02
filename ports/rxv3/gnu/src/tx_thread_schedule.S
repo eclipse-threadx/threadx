@@ -42,7 +42,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                                  RXv3/GNURX     */
-;/*                                                           6.1.9        */
+;/*                                                           6.1.10       */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -79,6 +79,8 @@
 ;/*  10-15-2021     William E. Lamie         Modified comment(s), and      */ 
 ;/*                                            added FPU support,          */ 
 ;/*                                            resulting in version 6.1.9  */ 
+;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.10 */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)

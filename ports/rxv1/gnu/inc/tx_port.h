@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                            RXv1/GNURX     */
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -50,6 +50,10 @@
 /*  08-02-2021     William E. Lamie         Initial Version 6.1.8         */
 /*  10-15-2021     William E. Lamie         Modified comment(s),          */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     William E. Lamie         Modified comment(s), and      */
+/*                                            added missing interrupt     */
+/*                                            control defines,            */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -81,6 +85,12 @@ typedef long                                    LONG;
 typedef unsigned long                           ULONG;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
+
+
+/* Define interrupt control options.  */
+
+#define TX_INT_DISABLE                          0x00000000
+#define TX_INT_ENABLE                           0x00010000
 
 
 /* Define the priority levels for ThreadX.  Legal values range
@@ -257,7 +267,7 @@ static void _tx_thread_system_return_inline(void)
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv1/GNURX Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv1/GNURX Version 6.1.10 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

@@ -32,6 +32,8 @@
 ;
 ;Define Assembly language external references...
 ;
+
+    .equ        SWI0, 872E0H
     .global     __tx_timer_time_slice
     .global     __tx_timer_system_clock
     .global     __tx_timer_current_ptr
@@ -43,6 +45,9 @@
     .global     __tx_thread_context_save
     .global     __tx_thread_time_slice
     .global     __tx_thread_context_restore
+    .global     __tx_thread_preempt_disable
+    .global     __tx_thread_execute_ptr
+    .global     __tx_thread_current_ptr
 ;
     .SECTION    P,CODE
 ;/**************************************************************************/
@@ -50,7 +55,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_timer_interrupt                                  RXv2/GNURX     */
-;/*                                                           6.1.9        */
+;/*                                                           6.1.10       */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -89,6 +94,10 @@
 ;/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
 ;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
 ;/*                                            resulting in version 6.1.9  */
+;/*  01-31-2022     William E. Lamie         Modified comment(s), and      */
+;/*                                            added missing thread        */
+;/*                                            preemption logic,           */
+;/*                                            resulting in version 6.1.10 */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_timer_interrupt(VOID)
@@ -236,6 +245,23 @@ __tx_timer_dont_activate:
 ;        _tx_thread_time_slice();
 
     BSR     __tx_thread_time_slice               ; Call time-slice processing
+
+;   /* Check if we must trigger a context switch. */
+    MOV.L   #__tx_thread_preempt_disable, R1     ; Load prempt disable flag.
+    MOV.L  [R1], R1
+    CMP    #0, R1
+	BNE    __tx_timer_not_ts_expiration          ; Skip if prempt disabled.
+
+    MOV.L   #__tx_thread_execute_ptr, R1
+    MOV.L  [R1], R1
+    MOV.L   #__tx_thread_current_ptr, R2
+    MOV.L  [R2], R2
+    CMP    R1, R2
+    BEQ    __tx_timer_not_ts_expiration
+
+    MOV.L   #SWI0, R1
+    MOV.L   #1, [R1]
+
 ;    }
 ;
 __tx_timer_not_ts_expiration:

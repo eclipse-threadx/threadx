@@ -26,7 +26,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_interrupt_control                         RXv1/IAR       */
-;/*                                                           6.1.9        */
+;/*                                                           6.1.10       */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -59,6 +59,8 @@
 ;/*  08-02-2021     William E. Lamie         Initial Version 6.1.8         */
 ;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
 ;/*                                            resulting in version 6.1.9  */
+;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.10 */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;UINT   _tx_thread_interrupt_control(UINT new_posture)
