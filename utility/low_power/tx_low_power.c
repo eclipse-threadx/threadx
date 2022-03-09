@@ -95,6 +95,11 @@ ULONG   timers_active;
     /* Disable interrupts while we prepare for low power mode.  */
     TX_DISABLE
 
+    /* Set the flag indicating that low power has been entered. This 
+       flag is checked in tx_low_power_exit to determine if the logic
+       used to adjust the ThreadX time is required.  */
+    tx_low_power_entered =  TX_TRUE;
+    
     /*  TX_LOW_POWER_TIMER_SETUP is a macro to a routine that sets up a low power
         clock. If such routine does not exist, we can skip the logic that computes
         the next expiration time. */
@@ -141,12 +146,6 @@ ULONG   timers_active;
         TX_LOW_POWER_TIMER_SETUP(tx_low_power_next_expiration);
     }
 #endif /* TX_LOW_POWER_TIMER_SETUP */
-
-
-    /* Set the flag indicating that low power has been entered. This 
-       flag is checked in tx_low_power_exit to determine if the logic
-       used to adjust the ThreadX time is required.  */
-    tx_low_power_entered =  TX_TRUE;
 
     /* Re-enable interrupts before low power mode is entered.  */
     TX_RESTORE
