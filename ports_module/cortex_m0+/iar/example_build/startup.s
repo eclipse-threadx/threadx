@@ -58,9 +58,9 @@ __vector_table
 
         DC32    NMI_Handler                       ; NMI
         DC32    HardFault_Handler                 ; HardFault
-        DC32    MemManage_Handler                 ; MemManage
-        DC32    0                                 ; BusFault
-        DC32    0                                 ; UsageFault
+        DC32    HardFault_Handler                 ; MemManage
+        DC32    HardFault_Handler                 ; BusFault
+        DC32    HardFault_Handler                 ; UsageFault
         DC32    0                                 ; 7
         DC32    0                                 ; 8
         DC32    0                                 ; 9

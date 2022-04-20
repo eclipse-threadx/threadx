@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE SMP    */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -71,6 +71,10 @@
 /*                                            add unused parameter macro, */
 /*                                            update patch number,        */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022      Wenhui Xie              Modified comment(s),          */
+/*                                            optimized the definition of */
+/*                                            TX_TIMER_TICKS_PER_SECOND,  */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -123,7 +127,7 @@ extern   "C" {
 #define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
 #define THREADX_MINOR_VERSION           1
-#define THREADX_PATCH_VERSION           10
+#define THREADX_PATCH_VERSION           11
 
 /* Define the following symbol for backward compatibility */
 #define EL_PRODUCT_THREADX
@@ -226,7 +230,7 @@ extern   "C" {
    as a compilation option.  */
 
 #ifndef TX_TIMER_TICKS_PER_SECOND
-#define TX_TIMER_TICKS_PER_SECOND       ((ULONG) 100)
+#define TX_TIMER_TICKS_PER_SECOND       (100UL)
 #endif
 
 

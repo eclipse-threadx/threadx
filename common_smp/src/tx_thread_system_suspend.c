@@ -38,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_system_suspend                          PORTABLE SMP     */
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -87,7 +87,10 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
+/*  04-25-2022      Scott Larson            Modified comments and fixed   */
+/*                                            loop to find next thread,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_system_suspend(TX_THREAD *thread_ptr)
@@ -667,9 +670,18 @@ UINT                        processing_complete;
                     /* Calculate the possible complex path.  */
                     complex_path_possible =  possible_cores & available_cores;
 
+                    /* Check if we need to loop to find the next highest priority thread.  */
+                    if (next_priority == TX_MAX_PRIORITIES)
+                    {
+                        loop_finished = TX_TRUE;
+                    }
+                    else
+                    {
+                        loop_finished = TX_FALSE;
+                    }
+
                     /* Loop to find the next highest priority ready thread that is allowed to run on this core.  */
-                    loop_finished =  TX_FALSE;
-                    do
+                    while (loop_finished == TX_FALSE)
                     {
 
                         /* Determine if there is a thread to examine.  */
@@ -814,7 +826,7 @@ UINT                        processing_complete;
                                 }
                             }
                         }
-                    } while (loop_finished == TX_FALSE);
+                    }
 
 #ifdef TX_THREAD_SMP_INTER_CORE_INTERRUPT
 

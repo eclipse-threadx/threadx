@@ -131,7 +131,7 @@
                         						
                         <tool id="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428.1242981128" name="Arm C Compiler 6" superClass="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428">
                             							
-                            <inputType id="com.arm.tool.c.compiler.v6.base.input.1275109624" superClass="com.arm.tool.c.compiler.v6.base.input"/>
+                            <inputType id="com.arm.tool.c.compiler.v6.base.input.1275455284" superClass="com.arm.tool.c.compiler.v6.base.input"/>
                             						
                         </tool>
                         					

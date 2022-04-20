@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M0+/IAR    */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -69,6 +69,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022      Scott Larson            Initial Version 6.1.10        */
+/*  04-25-2022      Scott Larson            Optimized MPU configuration,  */
+/*                                            change handler name,        */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -103,12 +106,8 @@ __tx_wait_here:
 
     /* Memory Exception Handler.  */
 
-    PUBLIC  MemManage_Handler
-    PUBLIC  BusFault_Handler
-    PUBLIC  UsageFault_Handler
-MemManage_Handler:
-BusFault_Handler:
-UsageFault_Handler:
+    PUBLIC  HardFault_Handler
+HardFault_Handler:
 
     CPSID   i                                       // Disable interrupts
 
@@ -326,14 +325,23 @@ __tx_ts_restore:
     CMP     r0, #0
     BEQ     skip_mpu_setup                          // Is this thread owned by a module? No, skip MPU setup
     MOV     r8, r1                                  // Copy thread ptr
-    LDR     r1, [r0, #0x64]                         // Pickup MPU register[0]
-    CMP     r1, #0
+    MOVS	r6, #0x8C
+    LDR     r2, [r0, r6]                            // Pickup MPU region 5 address
+    CMP     r2, #0
     BEQ     skip_mpu_setup                          // Is protection required for this module? No, skip MPU setup
-    LDR     r1, =0xE000ED9C                         // Build address of MPU base register
+
+    // Is the MPU already set up for this module?
+    MOVS    r1, #5                                  // Select region 5 from MPU
+    LDR     r3, =0xE000ED98                         // MPU_RNR register address
+    STR     r1, [r3]                                // Set region to 5
+    LDR     r1, =0xE000ED9C                         // MPU_RBAR register address
+    LDR     r3, [r1]                                // Load address stored in MPU region 5
+    MOVS	r6, #0x10
+    BICS    r2, r2, r6                              // Clear VALID bit
+    CMP     r2, r3                                  // Is module already loaded?
+    BEQ     _tx_enable_mpu                          // Yes - skip MPU reconfiguration
 
     // Initialize loop to configure MPU registers
-    // Order doesn't matter, so txm_module_instance_mpu_registers[0]
-    // will be in region 7 and txm_module_instance_mpu_registers[7] will be in region 0.
     MOVS    r3, #0x64                               // Index of MPU register settings in thread control block
     ADD     r0, r0, r3                              // Build address of MPU register start in thread control block
     MOVS    r5, #0                                  // Select region 0
@@ -347,7 +355,7 @@ _tx_mpu_loop:
     ADDS    r5, r5, #1                              // Increment to next region
     CMP     r5, #8                                  // Check if all regions have been set
     BNE     _tx_mpu_loop
-
+_tx_enable_mpu:
     LDR     r0, =0xE000ED94                         // Build MPU control reg address
     MOVS    r1, #5                                  // Build enable value with background region enabled
     STR     r1, [r0]                                // Enable MPU

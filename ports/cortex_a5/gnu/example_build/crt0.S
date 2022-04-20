@@ -26,13 +26,13 @@ _mainCRTStartup:
     mov     a2, #0          /* Second arg: fill value */
     mov fp, a2          /* Null frame pointer */
     mov r7, a2          /* Null frame pointer for Thumb */
-    
-    ldr a1, .LC1        /* First arg: start of memory block */
-    ldr a3, .LC2    
-    sub a3, a3, a1      /* Third arg: length of block */
-    
 
-    
+    ldr a1, .LC1        /* First arg: start of memory block */
+    ldr a3, .LC2
+    sub a3, a3, a1      /* Third arg: length of block */
+
+
+
         bl      memset
     mov r0, #0      /*  no arguments  */
     mov r1, #0      /*  no argv either */
@@ -48,15 +48,15 @@ _mainCRTStartup:
 /*        bl      init */
     mov r0, r4
     mov r1, r5
-#endif  
+#endif
         bl      main
 
         bl      exit         /* Should not return.  */
 
-    
-    /* For Thumb, constants must be after the code since only 
+
+    /* For Thumb, constants must be after the code since only
        positive offsets are supported for PC relative addresses.  */
-    
+
     .align 0
 .LC0:
 .LC1:

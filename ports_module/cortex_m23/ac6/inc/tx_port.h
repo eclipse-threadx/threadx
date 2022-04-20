@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M23/AC6    */
-/*                                                            6.1.6       */
+/*                                                           6.1.11       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
+/*  04-25-2022      Scott Larson            Modified comments and added   */
+/*                                            volatile to registers,      */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -163,7 +166,7 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
 #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
 #endif
 
-#ifndef TX_TIMER_THREAD_PRIORITY    
+#ifndef TX_TIMER_THREAD_PRIORITY
 #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
@@ -175,17 +178,17 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
 
 
 /* Define the clock source for trace event entry time stamp. The following two item are port specific.
-   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0x0a800024)
 #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
 
 */
 
 #ifndef TX_MISRA_ENABLE
 #ifndef TX_TRACE_TIME_SOURCE
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0xE0001004)
 #endif
 #else
 ULONG   _tx_misra_time_stamp_get(VOID);
@@ -214,7 +217,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #endif
 
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -228,7 +231,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 
 /* Define the TX_THREAD control block extensions for this port. The main reason
-   for the multiple macros is so that backward compatibility can be maintained with 
+   for the multiple macros is so that backward compatibility can be maintained with
    existing ThreadX kernel awareness modules.  */
 
 #define TX_THREAD_EXTENSION_0
@@ -284,7 +287,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 
 
-/* Define the user extension field of the thread control block.  Nothing 
+/* Define the user extension field of the thread control block.  Nothing
    additional is needed for this port so it is defined as white space.  */
 
 #ifndef TX_THREAD_USER_EXTENSION
@@ -362,9 +365,9 @@ static void _set_control(unsigned int _control)
 
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)                   {                                                                                             \
                                                                     ULONG  _tx_vfp_state;                                                                         \
-                                                                        _tx_vfp_state =  _get_control();                                                                \
+                                                                        _tx_vfp_state =  _get_control();                                                          \
                                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                                          \
-                                                                        _set_control(_tx_vfp_state);;                                                           \
+                                                                        _set_control(_tx_vfp_state);;                                                             \
                                                                     }
 #else
 
@@ -392,26 +395,26 @@ void _tx_vfp_access(void);
                                                                         if ((_tx_system_state == ((ULONG) 0)) && ((thread_ptr) == _tx_thread_current_ptr))        \
                                                                         {                                                                                         \
                                                                         ULONG  _tx_vfp_state;                                                                     \
-                                                                            _tx_vfp_state =  _get_control();                                                            \
+                                                                            _tx_vfp_state =  _get_control();                                                      \
                                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                                      \
-                                                                            _set_control(_tx_vfp_state);                                                       \
+                                                                            _set_control(_tx_vfp_state);                                                          \
                                                                         }                                                                                         \
                                                                         else                                                                                      \
                                                                         {                                                                                         \
                                                                         ULONG  _tx_fpccr;                                                                         \
-                                                                            _tx_fpccr =  *((ULONG *) 0xE000EF34);                                                 \
+                                                                            _tx_fpccr =  *((volatile ULONG *) 0xE000EF34);                                        \
                                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01);                                              \
                                                                             if (_tx_fpccr == ((ULONG) 0x01))                                                      \
                                                                             {                                                                                     \
                                                                             ULONG _tx_vfp_state;                                                                  \
-                                                                                _tx_vfp_state =  _get_control();                                                        \
+                                                                                _tx_vfp_state =  _get_control();                                                  \
                                                                                 _tx_vfp_state =  _tx_vfp_state & ((ULONG) 0x4);                                   \
                                                                                 _tx_vfp_access();                                                                 \
                                                                                 if (_tx_vfp_state == ((ULONG) 0))                                                 \
                                                                                 {                                                                                 \
-                                                                                    _tx_vfp_state =  _get_control();                                                    \
+                                                                                    _tx_vfp_state =  _get_control();                                              \
                                                                                     _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                              \
-                                                                                    _set_control(_tx_vfp_state);                                               \
+                                                                                    _set_control(_tx_vfp_state);                                                  \
                                                                                 }                                                                                 \
                                                                             }                                                                                     \
                                                                         }                                                                                         \
@@ -481,7 +484,7 @@ void _tx_vfp_access(void);
 
 
 /* Define the get system state macro.   */
-   
+
 #ifndef TX_THREAD_GET_SYSTEM_STATE
 #ifndef TX_MISRA_ENABLE
 #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _get_ipsr())
@@ -507,15 +510,12 @@ extern void    _tx_thread_secure_stack_initialize(void);
 #define TX_INITIALIZE_KERNEL_ENTER_EXTENSION            _tx_thread_secure_stack_initialize();
 #endif
 
-/* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to 
+/* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
    prevent early scheduling on Cortex-M parts.  */
-   
+
 #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
 
 
-/* Determine if the ARM architecture has the CLZ instruction. This is available on 
-   architectures v5 and above. If available, redefine the macro for calculating the 
-   lowest bit set.  */
 
 #ifndef TX_DISABLE_INLINE
 
@@ -557,7 +557,7 @@ unsigned int          was_masked;
 
 
     /* Set PendSV to invoke ThreadX scheduler.  */
-    *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
     if (_get_ipsr() == 0)
     {
         was_masked = __disable_irq();
@@ -572,8 +572,8 @@ unsigned int          was_masked;
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M23/AC6 Version 6.1.9 *";
+CHAR                            _tx_version_id[] =
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M23/AC6 Version 6.1.11 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

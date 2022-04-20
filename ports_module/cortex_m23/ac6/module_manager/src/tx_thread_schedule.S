@@ -30,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M23/AC6    */
-/*                                                           6.1.6        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -63,6 +63,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
+/*  04-25-2022      Scott Larson            Optimized MPU configuration,  */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -373,12 +375,20 @@ _skip_secure_restore:
     LDR     r0, [r1, r2]                            // Pickup the module instance pointer
     CBZ     r0, skip_mpu_setup                      // Is this thread owned by a module? No, skip MPU setup
     MOV     r8, r1                                  // Copy thread ptr
-    LDR     r1, [r0, #0x64]                         // Pickup MPU register[0]
-    CBZ     r1, skip_mpu_setup                      // Is protection required for this module? No, skip MPU setup
+    MOVS    r2, #0x74                               // Index of MPU data region
+    LDR     r2, [r0, r2]                            // Pickup MPU data region address
+    CBZ     r2, skip_mpu_setup                      // Is protection required for this module? No, skip MPU setup
+
+    // Is the MPU already set up for this module?
+    MOVS    r1, #2                                  // Select MPU region 2
+    LDR     r3, =0xE000ED98                         // MPU_RNR register address
+    STR     r1, [r3]                                // Set region to 2
+    LDR     r1, =0xE000ED9C                         // MPU_RBAR register address
+    LDR     r3, [r1]                                // Load address stored in MPU region 2
+    CMP     r2, r3                                  // Is module already loaded?
+    BEQ     _tx_enable_mpu                          // Yes - skip MPU reconfiguration
 
     // Initialize loop to configure MPU registers
-    // Order doesn't matter, so txm_module_instance_mpu_registers[0] 
-    // will be in region 7 and txm_module_instance_mpu_registers[7] will be in region 0.
     MOVS    r3, #0x64                               // Index of MPU register settings in thread control block
     ADD     r0, r0, r3                              // Build address of MPU register start in thread control block
     MOVS    r5, #0                                  // Select region 0
@@ -392,7 +402,7 @@ _tx_mpu_loop:
     ADDS    r5, r5, #1                              // Increment to next region
     CMP     r5, #8                                  // Check if all regions have been set
     BNE     _tx_mpu_loop
-    
+_tx_enable_mpu:
     LDR     r0, =0xE000ED94                         // Build MPU control reg address
     MOVS    r1, #5                                  // Build enable value with background region enabled
     STR     r1, [r0]                                // Enable MPU

@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                          Cortex-M33       */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -61,13 +61,16 @@
 /*                                            added symbol to enable      */
 /*                                            stack error handler,        */
 /*                                            resulting in version 6.1.7  */
-/*  10-15-2021     Scott Larson             Modified comment(s), improved */
+/*  10-15-2021      Scott Larson            Modified comment(s), improved */
 /*                                            stack check error handling, */
 /*                                            resulting in version 6.1.9  */
 /*  01-31-2022     Scott Larson             Modified comment(s), unified  */
 /*                                            this file across compilers, */
 /*                                            fixed predefined macro,     */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022      Scott Larson            Modified comments and added   */
+/*                                            volatile to registers,      */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -196,14 +199,14 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0x0a800024)
 #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
 
 */
 
 #ifndef TX_MISRA_ENABLE
 #ifndef TX_TRACE_TIME_SOURCE
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0xE0001004)
 #endif
 #else
 ULONG   _tx_misra_time_stamp_get(VOID);
@@ -429,9 +432,9 @@ __attribute__( ( always_inline ) ) static inline void _tx_control_set(ULONG cont
 
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                                       \
                                                     ULONG  _tx_vfp_state;                                   \
-                                                        _tx_vfp_state = _tx_control_get();              \
+                                                        _tx_vfp_state = _tx_control_get();                  \
                                                         _tx_vfp_state = _tx_vfp_state & ~((ULONG) 0x4);     \
-                                                        _tx_control_set(_tx_vfp_state);                 \
+                                                        _tx_control_set(_tx_vfp_state);                     \
                                                     }
 #else
 
@@ -456,26 +459,26 @@ __attribute__( ( always_inline ) ) static inline void _tx_control_set(ULONG cont
                                                         if ((_tx_system_state == ((ULONG) 0)) && ((thread_ptr) == _tx_thread_current_ptr))  \
                                                         {                                                                                   \
                                                         ULONG  _tx_vfp_state;                                                               \
-                                                            _tx_vfp_state = _tx_control_get();                                          \
+                                                            _tx_vfp_state = _tx_control_get();                                              \
                                                             _tx_vfp_state = _tx_vfp_state & ~((ULONG) 0x4);                                 \
-                                                            _tx_control_set(_tx_vfp_state);                                             \
+                                                            _tx_control_set(_tx_vfp_state);                                                 \
                                                         }                                                                                   \
                                                         else                                                                                \
                                                         {                                                                                   \
                                                         ULONG  _tx_fpccr;                                                                   \
-                                                            _tx_fpccr = *((ULONG *) 0xE000EF34);                                            \
+                                                            _tx_fpccr = *((volatile ULONG *) 0xE000EF34);                                   \
                                                             _tx_fpccr = _tx_fpccr & ((ULONG) 0x01);                                         \
                                                             if (_tx_fpccr == ((ULONG) 0x01))                                                \
                                                             {                                                                               \
                                                             ULONG _tx_vfp_state;                                                            \
-                                                                _tx_vfp_state = _tx_control_get();                                      \
+                                                                _tx_vfp_state = _tx_control_get();                                          \
                                                                 _tx_vfp_state = _tx_vfp_state & ((ULONG) 0x4);                              \
                                                                 TX_VFP_TOUCH();                                                             \
                                                                 if (_tx_vfp_state == ((ULONG) 0))                                           \
                                                                 {                                                                           \
-                                                                    _tx_vfp_state = _tx_control_get();                                  \
+                                                                    _tx_vfp_state = _tx_control_get();                                      \
                                                                     _tx_vfp_state = _tx_vfp_state & ~((ULONG) 0x4);                         \
-                                                                    _tx_control_set(_tx_vfp_state);                                     \
+                                                                    _tx_control_set(_tx_vfp_state);                                         \
                                                                 }                                                                           \
                                                             }                                                                               \
                                                         }                                                                                   \
@@ -657,7 +660,7 @@ __attribute__( ( always_inline ) ) static inline void _tx_thread_system_return_i
 UINT interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
-    *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
     if (_tx_ipsr_get() == 0)
     {
         interrupt_save = __get_interrupt_posture();

@@ -49,7 +49,7 @@
                             							
                             <tool id="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428" name="Arm C Compiler 6" superClass="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6">
                                 								
-                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.1024278185" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a53" valueType="string"/>
+                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.1024278185" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a35" valueType="string"/>
                                 								
                                 <option id="com.arm.tool.c.compiler.v6.base.options.preproc.enableToolSpecificSettings.830475099" name="Enable tool specific settings" superClass="com.arm.tool.c.compiler.v6.base.options.preproc.enableToolSpecificSettings" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
@@ -129,11 +129,7 @@
                     					
                     <fileInfo id="com.arm.eclipse.build.config.v6.lib.debug.base.1470528944.1145515026" name="tx_misra.c" rcbsApplicability="disable" resourcePath="src_generic/tx_misra.c" toolsToInvoke="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428.1242981128">
                         						
-                        <tool id="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428.1242981128" name="Arm C Compiler 6" superClass="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428">
-                            							
-                            <inputType id="com.arm.tool.c.compiler.v6.base.input.1409269723" superClass="com.arm.tool.c.compiler.v6.base.input"/>
-                            						
-                        </tool>
+                        <tool id="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428.1242981128" name="Arm C Compiler 6" superClass="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428"/>
                         					
                     </fileInfo>
                     					

@@ -1,12 +1,11 @@
 //----------------------------------------------------------------
-// Cortex-A9 Embedded example - Startup Code
+// ARMv7-A Embedded example - Startup Code
 //
 // Copyright (c) 2005-2018 Arm Limited (or its affiliates). All rights reserved.
 // Use, modification and redistribution of this file is subject to your possession of a
-// valid End User License Agreement for the Arm Product of which these examples are part of 
+// valid End User License Agreement for the Arm Product of which these examples are part of
 // and your compliance with all applicable terms and conditions of such licence agreement.
 //----------------------------------------------------------------
-
 
 // Standard definitions of mode bits and interrupt (I & F) flags in PSRs
 
@@ -26,7 +25,7 @@
     .align 3
     .cfi_sections .debug_frame  // put stack frame info into .debug_frame instead of .eh_frame
 
- 
+
 //----------------------------------------------------------------
 // Entry point for the Reset handler
 //----------------------------------------------------------------
@@ -45,7 +44,7 @@ Vectors:
     LDR PC, SVC_Addr
     LDR PC, Prefetch_Addr
     LDR PC, Abort_Addr
-    B .                                    // Reserved vector
+    LDR PC, Hypervisor_Addr
     LDR PC, IRQ_Addr
     LDR PC, FIQ_Addr
 
@@ -54,22 +53,18 @@ Vectors:
 Reset_Addr:
     .word Reset_Handler
 Undefined_Addr:
-    //.word Undefined_Handler
     .word __tx_undefined
 SVC_Addr:
-    //.word SVC_Handler
     .word __tx_swi_interrupt
 Prefetch_Addr:
-    //.word Prefetch_Handler
     .word __tx_prefetch_handler
 Abort_Addr:
-    //.word Abort_Handler
     .word __tx_abort_handler
+Hypervisor_Addr:
+    .word __tx_reserved_handler
 IRQ_Addr:
-    //.word IRQ_Handler
     .word __tx_irq_handler
 FIQ_Addr:
-    //.word FIQ_Handler
     .word __tx_fiq_handler
 
 
@@ -85,12 +80,12 @@ Prefetch_Handler:
     B   Prefetch_Handler
 Abort_Handler:
     B   Abort_Handler
+Hypervisor_Handler:
+    B   Hypervisor_Handler
 IRQ_Handler:
     B   IRQ_Handler
 FIQ_Handler:
     B   FIQ_Handler
-
-
 
 
 //----------------------------------------------------------------
@@ -99,7 +94,7 @@ FIQ_Handler:
 Reset_Handler:
 
 //----------------------------------------------------------------
-// Disable caches, MMU and branch prediction in case they were left enabled from an earlier run
+// Disable caches and MMU in case they were left enabled from an earlier run
 // This does not need to be done from a cold reset
 //----------------------------------------------------------------
 
@@ -107,12 +102,30 @@ Reset_Handler:
     BIC     r0, r0, #(0x1 << 12)        // Clear I bit 12 to disable I Cache
     BIC     r0, r0, #(0x1 <<  2)        // Clear C bit  2 to disable D Cache
     BIC     r0, r0, #0x1                // Clear M bit  0 to disable MMU
-    BIC     r0, r0, #(0x1 << 11)        // Clear Z bit 11 to disable branch prediction
+	BIC     r0, r0, #(0x1 << 11)        // Clear Z bit 11 to disable branch prediction
     MCR     p15, 0, r0, c1, c0, 0       // Write System Control Register
     ISB
 
-// The MMU is enabled later, before calling main().  Caches and branch prediction are enabled inside main(),
+// The MMU is enabled later, before calling main().  Caches are enabled inside main(),
 // after the MMU has been enabled and scatterloading has been performed.
+
+//----------------------------------------------------------------
+// ACTLR.SMP bit must be set before the caches and MMU are enabled,
+// or any cache and TLB maintenance operations are performed, even for single-core
+//----------------------------------------------------------------
+        MRC     p15, 0, r0, c1, c0, 1      // Read ACTLR
+        ORR     r0, r0, #(1 << 6)          // Set ACTLR.SMP bit
+        MCR     p15, 0, r0, c1, c0, 1      // Write ACTLR
+        ISB
+
+//----------------------------------------------------------------
+// Invalidate Data and Instruction TLBs and branch predictor
+// This does not need to be done from a cold reset
+//----------------------------------------------------------------
+
+        MOV     r0,#0
+        MCR     p15, 0, r0, c8, c7, 0      // I-TLB and D-TLB invalidation
+        MCR     p15, 0, r0, c7, c5, 6      // BPIALL - Invalidate entire branch predictor array
 
 //----------------------------------------------------------------
 // Initialize Supervisor Mode Stack
@@ -122,12 +135,24 @@ Reset_Handler:
         LDR     SP, =Image$$ARM_LIB_STACK$$ZI$$Limit
 
 //----------------------------------------------------------------
-// Invalidate Data and Instruction TLBs and branch predictor
+// Disable loop-buffer to fix errata on A15 r0p0
 //----------------------------------------------------------------
-
-        MOV     r0,#0
-        MCR     p15, 0, r0, c8, c7, 0      // I-TLB and D-TLB invalidation
-        MCR     p15, 0, r0, c7, c5, 6      // BPIALL - Invalidate entire branch predictor array
+        MRC     p15, 0, r0, c0, c0, 0      // Read main ID register MIDR
+        MOV     r1, r0, lsr #4             // Extract Primary Part Number
+        LDR     r2, =0xFFF
+        AND     r1, r1, r2
+        LDR     r2, =0xC0F
+        CMP     r1, r2                     // Is this an A15?
+        BNE     notA15r0p0                 // Jump if not A15
+        AND     r5, r0, #0x00f00000        // Variant
+        AND     r6, r0, #0x0000000f        // Revision
+        ORRS    r6, r6, r5                 // Combine variant and revision
+        BNE     notA15r0p0                 // Jump if not r0p0
+        MRC     p15, 0, r0, c1, c0, 1      // Read Aux Ctrl Reg
+        ORR     r0, r0, #(1 << 1)          // Set bit 1 to Disable Loop Buffer
+        MCR     p15, 0, r0, c1, c0, 1      // Write Aux Ctrl Reg
+        ISB
+notA15r0p0:
 
 //----------------------------------------------------------------
 // Set Vector Base Address Register (VBAR) to point to this application's vector table
@@ -137,7 +162,9 @@ Reset_Handler:
         MCR     p15, 0, r0, c12, c0, 0
 
 //----------------------------------------------------------------
-// Cache Invalidation code for Cortex-A9
+// Cache Invalidation code for ARMv7-A
+// The caches, MMU and BTB do not need post-reset invalidation on Cortex-A7,
+// but forcing a cache invalidation makes the code more portable to other CPUs (e.g. Cortex-A9)
 //----------------------------------------------------------------
 
         // Invalidate L1 Instruction Cache
@@ -206,16 +233,18 @@ Finished:
 
         // write the address of our page table base to TTB register 0
         LDR     r0,=Image$$TTB$$ZI$$Base
+
         MOV     r1, #0x08                  // RGN=b01  (outer cacheable write-back cached, write allocate)
                                            // S=0      (translation table walk to non-shared memory)
         ORR     r1,r1,#0x40                // IRGN=b01 (inner cacheability for the translation table walk is Write-back Write-allocate)
 
         ORR     r0,r0,r1
+
         MCR     p15, 0, r0, c2, c0, 0
 
 
 //----------------------------------------------------------------
-// PAGE TABLE generation 
+// PAGE TABLE generation
 
 // Generate the page tables
 // Build a flat translation table for the whole address space.
@@ -228,7 +257,7 @@ Finished:
 // Bits[31:20]   - Top 12 bits of VA is pointer into table
 // nG[17]=0      - Non global, enables matching against ASID in the TLB when set.
 // S[16]=0       - Indicates normal memory is shared when set.
-// AP2[15]=0  
+// AP2[15]=0
 // AP[11:10]=11  - Configure for full read/write access in all modes
 // TEX[14:12]=000
 // CB[3:2]= 00   - Set attributes to Strongly-ordered memory.
@@ -247,7 +276,7 @@ Finished:
         // r2 is level1 descriptor (bits 19:0)
 
         // use loop counter to create 4096 individual table entries.
-        // this writes from address 'Image$$TTB$$ZI$$Base' + 
+        // this writes from address 'Image$$TTB$$ZI$$Base' +
         // offset 0x3FFC down to offset 0x0 in word steps (4 bytes)
 
 init_ttb_1:
@@ -344,16 +373,25 @@ enable_caches:
         MCR     p15, 0, r0, c1, c0, 0      // Write System Control Register
         ISB
 
-
-//----------------------------------------------------------------
-// Enable L1 D-side prefetch (A9 specific)
-//----------------------------------------------------------------
-
         MRC     p15, 0, r0, c1, c0, 1      // Read Auxiliary Control Register
+        ORR     r0, #2                     // L2EN bit, enable L2 cache
         ORR     r0, r0, #(0x1 << 2)        // Set DP bit 2 to enable L1 Dside prefetch
         MCR     p15, 0, r0, c1, c0, 1      // Write Auxiliary Control Register
         ISB
 
         BX      lr
     .cfi_endproc
+
+    .global disable_caches
+    .type disable_caches, "function"
+disable_caches:
+
+        MRC     p15, 0, r0, c1, c0, 0       // Read System Control Register
+        BIC     r0, r0, #(0x1 << 12)        // Clear I bit 12 to disable I Cache
+        BIC     r0, r0, #(0x1 <<  2)        // Clear C bit  2 to disable D Cache
+        MCR     p15, 0, r0, c1, c0, 0       // Write System Control Register
+        ISB
+
+        BX    lr
+
 

@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                           C667x/TI        */
-/*                                                           6.1.6        */
+/*                                                           6.1.11       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,6 +51,10 @@
 /*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
 /*                                            macro definition,           */
 /*                                            resulting in version 6.1.6  */
+/*  04-25-2022     Wenhui Xie               Modified comment(s),          */
+/*                                            optimized the definition of */
+/*                                            TX_TIMER_TICKS_PER_SECOND,  */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -125,7 +129,7 @@ typedef unsigned short                          USHORT;
 
 
 #ifndef TX_TIMER_TICKS_PER_SECOND
-#define TX_TIMER_TICKS_PER_SECOND               ((ULONG) 100)
+#define TX_TIMER_TICKS_PER_SECOND               (100UL)
 #endif
 
 

@@ -5,11 +5,9 @@
 ; and your compliance with all applicable terms and conditions of such licence agreement.
 ;*******************************************************
 
-; Scatter-file for Cortex-A9 bare-metal example on Versatile Express
+; Scatter-file for ARMv7-A bare-metal example on Versatile Express
 
 ; This scatter-file places application code, data, stack and heap at suitable addresses in the memory map.
-
-; Versatile Express with Cortex-A9 has 1GB SDRAM at 0x60000000 to 0x9FFFFFFF, which this scatter-file uses.
 
 
 SDRAM 0x80000000 0x20000000
@@ -35,11 +33,11 @@ SDRAM 0x80000000 0x20000000
     ARM_LIB_HEAP  0x80040000 EMPTY  0x00040000 ; Application heap
     { }
 
-    ARM_LIB_STACK 0x80090000 EMPTY 0x00010000 ; Application (SVC mode) stack
+    ARM_LIB_STACK 0x80090000 EMPTY  0x00010000 ; Application (SVC mode) stack
     { }
 
-    ;IRQ_STACK     0x800A0000 EMPTY -0x00010000 ; IRQ mode stack
-    ;{ }
+;    IRQ_STACK     0x800A0000 EMPTY -0x00010000 ; IRQ mode stack
+;    { }
 
     TTB           0x80100000 EMPTY 0x4000      ; Level-1 Translation Table for MMU
     { }

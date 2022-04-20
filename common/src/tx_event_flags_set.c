@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_event_flags_set                                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -72,9 +72,13 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
+/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022      William E. Lamie        Modified comment(s), and      */
+/*                                            added corrected preemption  */
+/*                                            check logic, resulting in   */
+/*                                            version 6.1.11              */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_event_flags_set(TX_EVENT_FLAGS_GROUP *group_ptr, ULONG flags_to_set, UINT set_option)
@@ -264,9 +268,6 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                     /* Yes, resume the thread and apply any event flag
                        clearing.  */
 
-                    /* Set the preempt check flag.  */
-                    preempt_check =  TX_TRUE;
-
                     /* Return the actual event flags that satisfied the request.  */
                     suspend_info_ptr =   TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_additional_suspend_info);
                     *suspend_info_ptr =  current_event_flags;
@@ -335,6 +336,11 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
 
                 /* Disable preemption while we process the suspended list.  */
                 _tx_thread_preempt_disable++;
+
+                /* Since we have temporarily disabled preemption globally, set the preempt 
+                   check flag to check for any preemption condition - including from 
+                   unrelated ISR processing.  */
+                preempt_check =  TX_TRUE;
 
                 /* Loop to examine all of the suspended threads. */
                 do
@@ -418,9 +424,6 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                     {
 
                         /* Yes, this request can be handled now.  */
-
-                        /* Set the preempt check flag.  */
-                        preempt_check =  TX_TRUE;
 
                         /* Determine if the thread is still suspended on the event flag group. If not, a wait
                            abort must have been done from an ISR.  */

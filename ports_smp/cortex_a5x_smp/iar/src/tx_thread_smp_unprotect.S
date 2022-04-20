@@ -21,19 +21,6 @@
 /**************************************************************************/
 
 
-/*
-#define TX_SOURCE_CODE
-#define TX_THREAD_SMP_SOURCE_CODE
-*/
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_thread.h"
-#include "tx_timer.h"
-*/
-
     EXTERN     _tx_thread_current_ptr
     EXTERN     _tx_thread_smp_protection
     EXTERN     _tx_thread_preempt_disable
@@ -46,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_smp_unprotect                         Cortex-A5x-SMP/IAR */
-/*                                                           6.1.9        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -79,6 +66,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-15-2021      William E. Lamie        Initial Version 6.1.9         */
+/*  04-25-2022      William E. Lamie        Modified comments, removed    */
+/*                                            FIFO queueing,              */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
     PUBLIC   _tx_thread_smp_unprotect
@@ -117,11 +107,6 @@ _tx_thread_smp_unprotect:
     LDR     x2,=_tx_thread_preempt_disable      // Build address of preempt disable flag
     LDR     w3, [x2]                            // Pickup preempt disable flag
     CMP     w3, #0                              // Is the preempt disable flag set?
-    B.NE    _still_protected                    // Yes, skip the protection release
-
-    LDR     x2,=_tx_thread_smp_protect_wait_counts // Build build address of wait counts
-    LDR     w3, [x2, x1, LSL #2]                // Pickup wait list value
-    CMP     w3, #0                              // Are any entities on this core waiting?
     B.NE    _still_protected                    // Yes, skip the protection release
 
     LDR     x2,=_tx_thread_smp_protection       // Build address of protection structure

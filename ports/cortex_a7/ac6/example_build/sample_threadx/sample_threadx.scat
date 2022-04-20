@@ -5,11 +5,9 @@
 ; and your compliance with all applicable terms and conditions of such licence agreement.
 ;*******************************************************
 
-; Scatter-file for Cortex-A7 bare-metal example on Versatile Express
+; Scatter-file for ARMv7-A bare-metal example on Versatile Express
 
 ; This scatter-file places application code, data, stack and heap at suitable addresses in the memory map.
-
-; Versatile Express with Cortex-A7 has 1GB SDRAM at 0x60000000 to 0x9FFFFFFF, which this scatter-file uses.
 
 
 SDRAM 0x80000000 0x20000000
