@@ -42,7 +42,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_timer_interrupt                                  RXv1/GNURX     */
-;/*                                                           6.1.10       */
+;/*                                                           6.1.11       */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -85,6 +85,8 @@
 ;/*                                            added missing thread        */
 ;/*                                            preemption logic,           */
 ;/*                                            resulting in version 6.1.10 */
+;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.11 */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_timer_interrupt(VOID)

@@ -146,9 +146,12 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
+04-25-2022  Release 6.1.11 changes:
+            tx_thread_schedule.s                Added low power support
+
 01-31-2022  Release 6.1.10 changes:
             tx_port.h                           Added missing interrupt control defines
-            tx_timer_interrupt.src              Added missing thread preemption logic
+            tx_timer_interrupt.s                Added missing thread preemption logic
 
 10-15-2021  Release 6.1.9 changes:
             tx_thread_context_restore.s         Removed unnecessary stack type placement 
