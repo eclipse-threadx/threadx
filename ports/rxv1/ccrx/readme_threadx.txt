@@ -150,6 +150,9 @@ For generic code revision information, please refer to the readme_threadx_generi
 file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
+04-25-2022  Release 6.1.11 changes:
+            tx_thread_schedule.src              Added low power support
+
 01-31-2022  Release 6.1.10 changes:
             tx_port.h                           Removed system state macro, and added 
                                                 missing interrupt control defines

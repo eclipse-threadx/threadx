@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                            RXv1/CCRX      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -55,6 +55,8 @@
 /*                                            added missing interrupt     */
 /*                                            control defines,            */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     William E. Lamie         Modified comment(s),          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -271,7 +273,7 @@ static void _tx_thread_system_return_inline(void)
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv1/CCRX Version 6.1.10 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX RXv1/CCRX Version 6.1.11 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

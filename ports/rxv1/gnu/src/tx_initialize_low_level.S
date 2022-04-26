@@ -29,7 +29,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_initialize_low_level                             RXv1/GNURX     */
-;/*                                                           6.1.10       */
+;/*                                                           6.1.11       */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -67,6 +67,8 @@
 ;/*                                            resulting in version 6.1.9  */
 ;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
 ;/*                                            resulting in version 6.1.10 */
+;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.11 */
 ;/*                                                                        */
 ;/**************************************************************************/
     .global __tx_initialize_low_level

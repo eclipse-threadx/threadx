@@ -34,6 +34,11 @@
     .global     __tx_thread_execute_ptr
     .global     __tx_thread_current_ptr
     .global     __tx_timer_time_slice
+#if (TX_LOW_POWER == 1)
+    .global     _tx_low_power_enter
+    .global     _tx_low_power_exit
+    .global     __tx_thread_preempt_disable
+#endif
 ;
     .text
 
@@ -42,7 +47,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                                  RXv2/GNURX     */
-;/*                                                           6.1.10       */
+;/*                                                           6.1.11       */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -82,6 +87,9 @@
 ;/*                                            resulting in version 6.1.9  */
 ;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
 ;/*                                            resulting in version 6.1.10 */
+;/*  04-25-2022     William E. Lamie         Modified comment(s), and      */ 
+;/*                                            added low power support,    */ 
+;/*                                            resulting in version 6.1.11 */ 
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -89,26 +97,48 @@
     .global __tx_thread_schedule
 __tx_thread_schedule:
 ;
-;    /* Enable interrupts.  */
-;
-    SETPSW I
 ;
 ;    /* Wait for a thread to execute.  */
 ;    do
 ;    {
     MOV.L    #__tx_thread_execute_ptr, R1        ; Address of thread to executer ptr
 __tx_thread_schedule_loop:
+    SETPSW I                                     ; Enable interrupts
+    CLRPSW I                                     ; Disable interrupts
     MOV.L    [R1],R2                             ; Pickup next thread to execute
     CMP      #0,R2                               ; Is it NULL?
-    BEQ      __tx_thread_schedule_loop           ; Yes, idle system, keep checking
+    BNE      __tx_thread_thread_ready            ; Not NULL, schedule the thread
+                                                 ; Idle system - no thread is ready    
+#if (TX_LOW_POWER == 1)
+    MOV.L    #__tx_thread_preempt_disable, R1    ; Load prempt disable flag.
+    MOV.L    [R1], R2
+    ADD	     #1, R2                              ; Disable preemption while enter/exit
+    MOV.L    R2, [R1]
+    BSR      _tx_low_power_enter                 ; Possibly enter low power mode
+#endif
+
+#if (TX_ENABLE_WAIT == 1)
+    WAIT                                         ; Wait for interrupt
+#endif
+
+#if (TX_LOW_POWER == 1)
+    CLRPSW I                                     ; Disable interrupts (because WAIT enables interrupts)
+    BSR      _tx_low_power_exit                  ; Possibly exit low power mode
+    MOV.L    #__tx_thread_preempt_disable, R1    ; Load prempt disable flag.
+    MOV.L    [R1], R2
+    SUB	     #1, R2				 ; Enable preemption
+    MOV.L    R2, [R1]
+    MOV.L    #__tx_thread_execute_ptr, R1        ; Address of thread to executer ptr
+#endif
+
+    BRA      __tx_thread_schedule_loop           ; Idle system, keep checking
+
+__tx_thread_thread_ready:
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr == TX_NULL);
-;
-;    /* Yes! We have a thread to execute.  Lockout interrupts and
-;       transfer control to it.  */
-;
-    CLRPSW I                                     ; Disable interrupts
+;    
+;    /* Yes! We have a thread to execute. Note that interrupts are locked out at this point.  */
 ;
 ;    /* Setup the current thread pointer.  */
 ;    _tx_thread_current_ptr =  _tx_thread_execute_ptr;
