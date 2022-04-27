@@ -40,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_timer_interrupt                              Cortex-M7/AC5      */
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -73,11 +73,15 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     Scott Larson             Initial Version 6.1.7         */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
+/*  01-31-2022      Scott Larson            Modified comment(s), added    */
+/*                                            TX_NO_TIMER support,        */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
 // {
+#ifndef TX_NO_TIMER
     EXPORT  _tx_timer_interrupt
 _tx_timer_interrupt
 
@@ -249,6 +253,7 @@ __tx_timer_nothing_expired
     DSB                                             // Complete all memory access
     BX      lr                                      // Return to caller
 // }
+#endif
     ALIGN
     LTORG
     END

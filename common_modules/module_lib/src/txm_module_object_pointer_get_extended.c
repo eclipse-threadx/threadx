@@ -22,13 +22,13 @@
 
 #define TXM_MODULE
 #include "txm_module.h"
-
+#ifndef TXM_MODULE_OBJECT_POINTER_GET_EXTENDED_CALL_NOT_USED
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_object_pointer_get_extended     PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -76,7 +76,10 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  01-31-2022      Scott Larson            Modified comments and added   */
+/*                                            CALL_NOT_USED option,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _txm_module_object_pointer_get_extended(UINT object_type, CHAR *name, UINT name_length, VOID **object_ptr)
@@ -94,3 +97,4 @@ ALIGN_TYPE extra_parameters[2];
     /* Return value to the caller.  */
     return(return_value);
 }
+#endif

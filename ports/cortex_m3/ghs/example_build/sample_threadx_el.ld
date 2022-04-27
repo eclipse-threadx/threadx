@@ -19,25 +19,25 @@
 
 -sec
 {
-    .reset      0x000000 : 
-    .picbase	0x1000 : 		
-    .text	:			
+    .reset      0x000000 :
+    .picbase	0x1000 :
+    .text	:
 	.comment :
     .intercall :
     .interfunc :
-    .syscall	:			
+    .syscall	:
     .fixaddr	:
     .fixtype	:
-    .rodata	:   
+    .rodata	:
     .romdata	ROM(.data) :
     .romsdata	ROM(.sdata) :
-    .secinfo	:			
-    .pidbase	align(16) :		
-    .sdabase	:		
-    .sbss	:		
-    .sdata      :		
-    .data	:		
-    .bss	:		
+    .secinfo	:
+    .pidbase	align(16) :
+    .sdabase	:
+    .sbss	:
+    .sdata      :
+    .data	:
+    .bss	:
     .heap align(16) pad(0x1000) :
     .stack align(16) pad(0x1000) :
     .eventlog align(16) pad(0x10000) :

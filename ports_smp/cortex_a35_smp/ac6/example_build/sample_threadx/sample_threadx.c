@@ -3,19 +3,22 @@
    byte pool, and block pool.  */
 
 #include "tx_api.h"
-#include <stddef.h>
+
 
 extern void init_timer(void);    /* in timer_interrupts.c  */
 
-#define DEMO_STACK_SIZE         1024
-#define DEMO_BYTE_POOL_SIZE     0x20000
-#define DEMO_BLOCK_POOL_SIZE    100
-#define DEMO_QUEUE_SIZE         100
+
+#define     DEMO_STACK_SIZE         1024
+#define     DEMO_BYTE_POOL_SIZE     9120
+#define     DEMO_BLOCK_POOL_SIZE    100
+#define     DEMO_QUEUE_SIZE         100
 
 
-/* Define a memory area to create a byte pool in.  */
+/* Define byte pool memory.  */
 
-UCHAR                   memory_area[DEMO_BYTE_POOL_SIZE] __attribute__((aligned (8)));
+UCHAR                   byte_pool_memory[DEMO_BYTE_POOL_SIZE];
+
+
 
 
 /* Define the ThreadX object control blocks...  */
@@ -68,6 +71,8 @@ UCHAR   event_buffer[65536];
 #endif
 
 
+/* Define main entry point.  */
+
 int main(void)
 {
 
@@ -95,7 +100,7 @@ CHAR    *pointer = TX_NULL;
 #endif
 
     /* Create a byte memory pool from which to allocate the thread stacks.  */
-    tx_byte_pool_create(&byte_pool_0, "byte pool 0", memory_area, DEMO_BYTE_POOL_SIZE);
+    tx_byte_pool_create(&byte_pool_0, "byte pool 0", byte_pool_memory, DEMO_BYTE_POOL_SIZE);
 
     /* Allocate the stack for thread 0.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
@@ -386,4 +391,3 @@ UINT    status;
             break;
     }
 }
-

@@ -77,9 +77,6 @@
 // The entry point vectors are common for call0 and windowed configurations.
 //-----------------------------------------------------------------------------
 
-        .extern _DoubleExceptionHandler
-        .extern _xtos_exc_dispatch
-
         .section .DispatchVector.text, "ax"
 #if XCHAL_HAVE_VECBASE
         .align  64                      // 64-byte alignment needed when vecbase
@@ -105,7 +102,7 @@ _Reserved1:
         .weak   _DoubleExceptionVector
 
 _DoubleExceptionVector:
-        j       _DoubleExceptionHandler
+        j       _DoubleExceptionHandler // Externally defined
 
         .org    9                       // Reserved
         .local  _Reserved2

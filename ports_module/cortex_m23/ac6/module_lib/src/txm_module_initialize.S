@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_initialize                            Cortex-M23/AC6    */
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -63,12 +63,17 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
+/*  01-31-2022      Scott Larson            Modified comments, fixed      */
+/*                                            scatterload, and made       */
+/*                                            heap user configurable,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_initialize(VOID)
     .global  _txm_module_initialize
     .thumb_func
 _txm_module_initialize:
+    PUSH    {r0-r3}                             // Save r0-r3
     MOV     r0, r8                              // Copy r8-r11
     MOV     r1, r9
     MOV     r2, r10
@@ -78,7 +83,7 @@ _txm_module_initialize:
     MOV     r1, lr
     PUSH    {r0-r1}                             // Save r12, lr
 
-    //B       __scatterload                       // Call ARM func to initialize variables
+    B       __scatterload                       // Call ARM func to initialize variables
 
 // Override the __rt_exit function.
     .global  __rt_exit
@@ -94,25 +99,21 @@ __rt_exit:
     MOV     r11, r3
     BX      lr                                  // Return to caller
 
-#define TXM_MODULE_HEAP_SIZE 512
-
-// returns heap start address in  R0
-// returns heap end address in    R2
-// does not touch SP, it is already set up before the module runs
-    .global __user_setup_stackheap
-    .thumb_func
-__user_setup_stackheap:
-    LDR     r1, _txm_heap                       // load heap offset
-    MOV     r2, TXM_MODULE_HEAP_SIZE            // load heap size
-    ADD     r2, r2, r0                          // calculate heap end address
-    BX      lr
-
-// dummy main function
-    .global main
-    .thumb_func
-main:
-    BX      lr
-
-    .align 8
-_txm_heap:
-    .zero   TXM_MODULE_HEAP_SIZE
+// Override the __rt_entry function.
+    .global __rt_entry
+    .type   __rt_entry, %function
+__rt_entry:
+    MOV     r0,sp
+    ADDS    r0,r0,#40
+    LDM     r0,{r0-r1}
+    BL      __rt_lib_init                       // Call ARM func to initialize library
+    POP     {r0-r1}                             // Restore dregs and LR
+    MOV     r12, r0                             
+    MOV     lr, r1
+    POP     {r0-r7}
+    MOV     r8, r0
+    MOV     r9, r1
+    MOV     r10, r2
+    MOV     r11, r3
+    POP     {r0-r3}
+    BX      lr                                  // Return to caller

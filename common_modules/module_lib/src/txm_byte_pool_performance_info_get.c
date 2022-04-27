@@ -22,59 +22,62 @@
 
 #define TXM_MODULE
 #include "txm_module.h"
-
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_byte_pool_performance_info_get                  PORTABLE C      */ 
-/*                                                           6.1          */
+#ifndef TXM_BYTE_POOL_PERFORMANCE_INFO_GET_CALL_NOT_USED
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_byte_pool_performance_info_get                  PORTABLE C      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function retrieves performance information from the specified  */ 
-/*    byte pool.                                                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pool_ptr                          Pointer to byte pool control block*/ 
-/*    allocates                         Destination for number of         */ 
-/*                                        allocates on this pool          */ 
-/*    releases                          Destination for number of         */ 
-/*                                        releases on this pool           */ 
-/*    fragments_searched                Destination for number of         */ 
-/*                                        fragments searched during       */ 
-/*                                        allocation                      */ 
-/*    merges                            Destination for number of adjacent*/ 
-/*                                        free fragments merged           */ 
-/*    splits                            Destination for number of         */ 
-/*                                        fragments split during          */ 
-/*                                        allocation                      */ 
-/*    suspensions                       Destination for number of         */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function retrieves performance information from the specified  */
+/*    byte pool.                                                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pool_ptr                          Pointer to byte pool control block*/
+/*    allocates                         Destination for number of         */
+/*                                        allocates on this pool          */
+/*    releases                          Destination for number of         */
+/*                                        releases on this pool           */
+/*    fragments_searched                Destination for number of         */
+/*                                        fragments searched during       */
+/*                                        allocation                      */
+/*    merges                            Destination for number of adjacent*/
+/*                                        free fragments merged           */
+/*    splits                            Destination for number of         */
+/*                                        fragments split during          */
+/*                                        allocation                      */
+/*    suspensions                       Destination for number of         */
 /*                                        suspensions on this pool        */
-/*    timeouts                          Destination for number of timeouts*/ 
-/*                                        on this byte pool               */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*    timeouts                          Destination for number of timeouts*/
+/*                                        on this byte pool               */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _txm_module_kernel_call_dispatcher                                  */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Module application code                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module application code                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  01-31-2022      Scott Larson            Modified comments and added   */
+/*                                            CALL_NOT_USED option,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _tx_byte_pool_performance_info_get(TX_BYTE_POOL *pool_ptr, ULONG *allocates, ULONG *releases, ULONG *fragments_searched, ULONG *merges, ULONG *splits, ULONG *suspensions, ULONG *timeouts)
@@ -96,3 +99,4 @@ ALIGN_TYPE extra_parameters[6];
     /* Return value to the caller.  */
     return(return_value);
 }
+#endif

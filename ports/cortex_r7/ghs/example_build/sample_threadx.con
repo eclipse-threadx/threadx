@@ -1,0 +1,17 @@
+target_connection {
+     {
+        title = "Simulator"
+        type = "Custom"
+        short_type = "Custom"
+        args = "simarm -cpu=cortexr7 -fpu -rom"
+        command = "simarm -cpu=cortexr7 -fpu -rom"
+        logfile = ""
+        mode = ""
+        setup_script = ""
+        run_mode_partner = ""
+        run_mode_policy = ""
+        sane = "yes"
+        log = "no"
+        timestamp = "0"
+    }
+}

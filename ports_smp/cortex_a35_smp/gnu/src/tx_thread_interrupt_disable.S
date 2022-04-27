@@ -27,8 +27,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_interrupt_disable                     Cortex-A35-SMP/GCC */
-/*                                                           6.1.9        */
+/*    _tx_thread_interrupt_disable                         ARMv8-A        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -58,8 +58,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     Andres Mlinar            Updated comments,             */
-/*                                             resulting in version 6.1.9 */
+/*  01-31-2022     Andres Mlinar            Updated comments,             */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_interrupt_disable(void)

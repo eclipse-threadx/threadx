@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M7/AC5     */
-/*                                                           6.1.9        */
+/*                                                           6.1.11       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
+/*  04-25-2022      Scott Larson            Modified comments and added   */
+/*                                            volatile to registers,      */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -123,13 +126,13 @@ typedef unsigned short                          USHORT;
    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
    source constants would be:
 
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0x0a800024)
 #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
 
 */
 
 #ifndef TX_TRACE_TIME_SOURCE
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)  
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0xE0001004)
 #endif
 #ifndef TX_TRACE_TIME_MASK
 #define TX_TRACE_TIME_MASK                      0xFFFFFFFFUL
@@ -282,7 +285,7 @@ void _tx_vfp_access(void);
                                                                         else                                                                                      \
                                                                         {                                                                                         \
                                                                         ULONG  _tx_fpccr;                                                                         \
-                                                                            _tx_fpccr =  *((ULONG *) 0xE000EF34);                                                 \
+                                                                            _tx_fpccr =  *((volatile ULONG *) 0xE000EF34);                                        \
                                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01);                                              \
                                                                             if (_tx_fpccr == ((ULONG) 0x01))                                                      \
                                                                             {                                                                                     \
@@ -435,7 +438,7 @@ unsigned int          was_masked;
 
 
     /* Set PendSV to invoke ThreadX scheduler.  */
-    *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
     if (_ipsr == 0)
     {
         was_masked = __disable_irq();
@@ -458,7 +461,7 @@ void    tx_thread_fpu_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M7/AC5 Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M7/AC5 Version 6.1.11 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

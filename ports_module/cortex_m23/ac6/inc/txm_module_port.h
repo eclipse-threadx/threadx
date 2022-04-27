@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    txm_module_port.h                                 Cortex-M23/AC6    */
-/*                                                           6.1.6        */
+/*                                                           6.1.10          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -41,6 +41,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
+/*  01-31-2022      Scott Larson            Modified comments and made    */
+/*                                            heap user-configurable,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -90,6 +93,11 @@ The following extensions must also be defined in tx_port.h:
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 */
 
+/* Users can define the module heap size. */
+#ifndef TXM_MODULE_HEAP_SIZE
+#define TXM_MODULE_HEAP_SIZE                    512
+#endif
+
 /* Define the kernel stack size for a module thread.  */
 #ifndef TXM_MODULE_KERNEL_STACK_SIZE
 #define TXM_MODULE_KERNEL_STACK_SIZE            768
@@ -105,6 +113,8 @@ The following extensions must also be defined in tx_port.h:
 
 
 /* Define the properties for this particular module port.  */
+
+#define TXM_MODULE_PORT_DISPATCH
 
 #define TXM_MODULE_MEMORY_PROTECTION_ENABLED
 
@@ -347,6 +357,6 @@ ALIGN_TYPE _txm_module_manager_port_dispatch(TXM_MODULE_INSTANCE *module_instanc
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M23/AC6 Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX Module Cortex-M23/AC6 Version 6.1.10 *";
 
 #endif

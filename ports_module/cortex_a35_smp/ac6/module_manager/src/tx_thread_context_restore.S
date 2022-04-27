@@ -21,9 +21,6 @@
 /**************************************************************************/
 
 
-/* Include macros for modifying the wait list.  */
-#include "tx_thread_smp_protection_wait_list_macros.h"
-
     .text
     .align 3
 /**************************************************************************/
@@ -31,7 +28,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_restore                       Cortex-A35-SMP/AC6 */
-/*                                                           6.1.3        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Andres Mlinar, Microsoft Corporation                                */
@@ -63,7 +60,10 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  12-31-2020     Andres Mlinar            Initial Version 6.1.3         */
+/*  12-31-2020      Andres Mlinar           Initial Version 6.1.3         */
+/*  04-25-2022      William E. Lamie        Modified comments, removed    */
+/*                                            FIFO queueing,              */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_restore(VOID)
@@ -76,7 +76,7 @@ _tx_thread_context_restore:
 
     MSR     DAIFSet, 0x3                        // Lockout interrupts
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 
     /* Call the ISR exit function to indicate an ISR is complete.  */
 
@@ -101,13 +101,13 @@ _tx_thread_context_restore:
     LDR     x3, =_tx_thread_system_state        // Pickup address of system state var
     LDR     w2, [x3, x8, LSL #2]                // Pickup system state
     SUB     w2, w2, #1                          // Decrement the counter
-    STR     w2, [x3, x8, LSL #2]                // Store the counter 
+    STR     w2, [x3, x8, LSL #2]                // Store the counter
     CMP     w2, #0                              // Was this the first interrupt?
     BEQ     __tx_thread_not_nested_restore      // If so, not a nested restore
 
     /* Interrupts are nested.  */
 
-    /* Just recover the saved registers and return to the point of 
+    /* Just recover the saved registers and return to the point of
        interrupt.  */
 
     LDP     x4, x5, [sp], #16                   // Pickup saved SPSR/DAIF and ELR_EL
@@ -151,7 +151,7 @@ __tx_thread_not_nested_restore:
     LDR     x3, =_tx_thread_execute_ptr         // Pickup address of execute thread ptr
     LDR     x2, [x3, x8, LSL #3]                // Pickup actual execute thread pointer
     CMP     x0, x2                              // Is the same thread highest priority?
-    BEQ     __tx_thread_no_preempt_restore      // Same thread in the execute list, 
+    BEQ     __tx_thread_no_preempt_restore      // Same thread in the execute list,
                                                 //   no preemption needs to happen
     LDR     x3, =_tx_thread_smp_protection      // Build address to protection structure
     LDR     w3, [x3, #4]                        // Pickup the owning core
@@ -206,74 +206,6 @@ __tx_thread_no_preempt_restore:
     // {
 __tx_thread_preempt_restore:
 
-    /* Was the thread being preempted waiting for the lock?  */
-    // if (_tx_thread_smp_protect_wait_counts[this_core] != 0)
-    // {
-
-    LDR     x2, =_tx_thread_smp_protect_wait_counts // Load waiting count list
-    LDR     w3, [x2, x8, LSL #2]                // Load waiting value for this core
-    CMP     w3, #0
-    BEQ     _nobody_waiting_for_lock            // Is the core waiting for the lock?
-
-    /* Do we not have the lock? This means the ISR never got the inter-core lock.  */
-    // if (_tx_thread_smp_protection.tx_thread_smp_protect_owned != this_core)
-    // {
-
-    LDR     x2, =_tx_thread_smp_protection      // Load address of protection structure
-    LDR     w3, [x2, #4]                        // Pickup the owning core
-    CMP     w8, w3                              // Compare our core to the owning core
-    BEQ     _this_core_has_lock                 // Do we have the lock?
-
-    /* We don't have the lock. This core should be in the list. Remove it.  */
-    // _tx_thread_smp_protect_wait_list_remove(this_core);
-
-    _tx_thread_smp_protect_wait_list_remove     // Call macro to remove core from the list
-    B       _nobody_waiting_for_lock            // Leave
-
-    // }
-    // else
-    // {
-    /* We have the lock. This means the ISR got the inter-core lock, but
-       never released it because it saw that there was someone waiting.
-       Note this core is not in the list.  */
-
-_this_core_has_lock:
-
-    /* We're no longer waiting. Note that this should be zero since this happens during thread preemption.  */
-    // _tx_thread_smp_protect_wait_counts[core]--;
-
-    LDR     x2, =_tx_thread_smp_protect_wait_counts // Load waiting count list
-    LDR     w3, [x2, x8, LSL #2]                // Load waiting value for this core
-    SUB     w3, w3, #1                          // Decrement waiting value. Should be zero now
-    STR     w3, [x2, x8, LSL #2]                // Store new waiting value
-
-    /* Now release the inter-core lock.  */
-
-    /* Set protected core as invalid.  */
-    // _tx_thread_smp_protection.tx_thread_smp_protect_core = 0xFFFFFFFF;
-
-    LDR     x2, =_tx_thread_smp_protection      // Load address of protection structure
-    MOV     w3, #0xFFFFFFFF                     // Build invalid value
-    STR     w3, [x2, #4]                        // Mark the protected core as invalid
-    DMB     ISH                                 // Ensure that accesses to shared resource have completed
-
-    /* Release protection.  */
-    // _tx_thread_smp_protection.tx_thread_smp_protect_in_force = 0;
-
-    MOV     w3, #0                              // Build release protection value
-    STR     w3, [x2, #0]                        // Release the protection
-    DSB     ISH                                 // To ensure update of the protection occurs before other CPUs awake
-
-    /* Wake up waiting processors. Note interrupts are already enabled.  */
-
-#ifdef TX_ENABLE_WFE
-    SEV                                         // Send event to other CPUs
-#endif
-
-      // }
-    // }
-
-_nobody_waiting_for_lock:
 
     LDR     x4, [x0, #8]                        // Switch to thread stack pointer
     MOV     sp, x4                              //
@@ -328,8 +260,8 @@ _skip_fp_save:
     CMP     w2, #0                              // Is it active?
     BEQ     __tx_thread_dont_save_ts            // No, don't save it
 
-        /* _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
-        _tx_timer_time_slice =  0;  */
+        // _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
+        // _tx_timer_time_slice =  0;
 
     STR     w2, [x0, #36]                       // Save thread's time-slice
     MOV     w2, #0                              // Clear value

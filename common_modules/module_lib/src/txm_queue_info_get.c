@@ -22,52 +22,55 @@
 
 #define TXM_MODULE
 #include "txm_module.h"
-
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txe_queue_info_get                                 PORTABLE C      */ 
-/*                                                           6.1          */
+#ifndef TXM_QUEUE_INFO_GET_CALL_NOT_USED
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_queue_info_get                                 PORTABLE C      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function checks for errors in the queue information get        */ 
-/*    service.                                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    queue_ptr                         Pointer to queue control block    */ 
-/*    name                              Destination for the queue name    */ 
-/*    enqueued                          Destination for enqueued count    */ 
-/*    available_storage                 Destination for available storage */ 
-/*    first_suspended                   Destination for pointer of first  */ 
-/*                                        thread suspended on this queue  */ 
-/*    suspended_count                   Destination for suspended count   */ 
-/*    next_queue                        Destination for pointer to next   */ 
-/*                                        queue on the created list       */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    TX_QUEUE_ERROR                    Invalid queue pointer             */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in the queue information get        */
+/*    service.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    queue_ptr                         Pointer to queue control block    */
+/*    name                              Destination for the queue name    */
+/*    enqueued                          Destination for enqueued count    */
+/*    available_storage                 Destination for available storage */
+/*    first_suspended                   Destination for pointer of first  */
+/*                                        thread suspended on this queue  */
+/*    suspended_count                   Destination for suspended count   */
+/*    next_queue                        Destination for pointer to next   */
+/*                                        queue on the created list       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_QUEUE_ERROR                    Invalid queue pointer             */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _txm_module_kernel_call_dispatcher                                  */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Module application code                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module application code                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  01-31-2022      Scott Larson            Modified comments and added   */
+/*                                            CALL_NOT_USED option,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _txe_queue_info_get(TX_QUEUE *queue_ptr, CHAR **name, ULONG *enqueued, ULONG *available_storage, TX_THREAD **first_suspended, ULONG *suspended_count, TX_QUEUE **next_queue)
@@ -88,3 +91,4 @@ ALIGN_TYPE extra_parameters[5];
     /* Return value to the caller.  */
     return(return_value);
 }
+#endif

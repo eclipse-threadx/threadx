@@ -22,54 +22,57 @@
 
 #define TXM_MODULE
 #include "txm_module.h"
-
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_timer_performance_info_get                      PORTABLE C      */ 
-/*                                                           6.1          */
+#ifndef TXM_TIMER_PERFORMANCE_INFO_GET_CALL_NOT_USED
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_performance_info_get                      PORTABLE C      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function retrieves performance information from the specified  */ 
-/*    timer.                                                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    timer_ptr                         Pointer to timer control block    */ 
-/*    activates                         Destination for the number of     */ 
-/*                                        activations of this timer       */ 
-/*    reactivates                       Destination for the number of     */ 
-/*                                        reactivations of this timer     */ 
-/*    deactivates                       Destination for the number of     */ 
-/*                                        deactivations of this timer     */ 
-/*    expirations                       Destination for the number of     */ 
-/*                                        expirations of this timer       */ 
-/*    expiration_adjusts                Destination for the number of     */ 
-/*                                        expiration adjustments of this  */ 
-/*                                        timer                           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function retrieves performance information from the specified  */
+/*    timer.                                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                         Pointer to timer control block    */
+/*    activates                         Destination for the number of     */
+/*                                        activations of this timer       */
+/*    reactivates                       Destination for the number of     */
+/*                                        reactivations of this timer     */
+/*    deactivates                       Destination for the number of     */
+/*                                        deactivations of this timer     */
+/*    expirations                       Destination for the number of     */
+/*                                        expirations of this timer       */
+/*    expiration_adjusts                Destination for the number of     */
+/*                                        expiration adjustments of this  */
+/*                                        timer                           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _txm_module_kernel_call_dispatcher                                  */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Module application code                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module application code                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  01-31-2022      Scott Larson            Modified comments and added   */
+/*                                            CALL_NOT_USED option,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _tx_timer_performance_info_get(TX_TIMER *timer_ptr, ULONG *activates, ULONG *reactivates, ULONG *deactivates, ULONG *expirations, ULONG *expiration_adjusts)
@@ -89,3 +92,4 @@ ALIGN_TYPE extra_parameters[4];
     /* Return value to the caller.  */
     return(return_value);
 }
+#endif

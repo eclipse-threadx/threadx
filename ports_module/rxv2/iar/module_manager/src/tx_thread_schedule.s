@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                                  RXv2/IAR       */
-/*                                                           6.x          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -68,7 +68,11 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      Scott Larson            Initial Version 6.x           */
+/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
+/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
+/*                                            removed unnecessary stack   */
+/*                                            type checking,              */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -94,7 +98,7 @@ __tx_thread_schedule_loop:
 
     /* Yes! We have a thread to execute.  Lockout interrupts and transfer control to it.  */
 
-    CLRPSW  I                                   // disable interrupts
+    CLRPSW  I                                   // Disable interrupts
 
     /* Setup the current thread pointer.  */
     // _tx_thread_current_ptr =  _tx_thread_execute_ptr;
@@ -118,7 +122,7 @@ __tx_thread_schedule_loop:
 
     /* Switch to the thread's stack.  */
     // SP =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;
-    SETPSW  U                                   // user stack mode
+    SETPSW  U                                   // User stack mode
     MOV.L   8[R2],SP                            // Pickup stack pointer
 
 
@@ -167,13 +171,6 @@ __tx_thread_schedule_loop:
     
 skip_mpu_setup
 
-
-    /* Determine if an interrupt frame or a synchronous task suspension frame is present.  */
-
-    POP     R1                                  // Pickup stack type
-    CMP     #1, R1                              // Is it an interrupt stack?
-    BNE     __tx_thread_synch_return            // No, a synchronous return frame is present.
-
     POPM    R1-R3                               // Restore accumulators.
     MVTACLO R3, A0
     MVTACHI R2, A0
@@ -188,12 +185,8 @@ skip_mpu_setup
     POPM    R14-R15
     POPM    R3-R5
     POPM    R1-R2
-    RTE                                         // return to point of interrupt, this restores PC and PSW
+    RTE                                         // Return to point of interrupt, this restores PC and PSW
 
-__tx_thread_synch_return
-    POPC    PSW
-    POPM    R6-R13                              // Recover solicited stack frame
-    RTS
 // }
 
     extern __tx_thread_context_save

@@ -22,68 +22,71 @@
 
 #define TXM_MODULE
 #include "txm_module.h"
-
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_performance_system_info_get              PORTABLE C      */ 
-/*                                                           6.1          */
+#ifndef TXM_THREAD_PERFORMANCE_SYSTEM_INFO_GET_CALL_NOT_USED
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_performance_system_info_get              PORTABLE C      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function retrieves thread system performance information.      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    resumptions                       Destination for total number of   */ 
-/*                                        thread resumptions              */ 
-/*    suspensions                       Destination for total number of   */ 
-/*                                        thread suspensions              */ 
-/*    solicited_preemptions             Destination for total number of   */ 
-/*                                        thread preemption from thread   */ 
-/*                                        API calls                       */ 
-/*    interrupt_preemptions             Destination for total number of   */ 
-/*                                        thread preemptions as a result  */ 
-/*                                        of threads made ready inside of */ 
-/*                                        Interrupt Service Routines      */ 
-/*    priority_inversions               Destination for total number of   */ 
-/*                                        priority inversions             */ 
-/*    time_slices                       Destination for total number of   */ 
-/*                                        time-slices                     */ 
-/*    relinquishes                      Destination for total number of   */ 
-/*                                        relinquishes                    */ 
-/*    timeouts                          Destination for total number of   */ 
-/*                                        timeouts                        */ 
-/*    wait_aborts                       Destination for total number of   */ 
-/*                                        wait aborts                     */ 
-/*    non_idle_returns                  Destination for total number of   */ 
-/*                                        times threads return when       */ 
-/*                                        another thread is ready         */ 
-/*    idle_returns                      Destination for total number of   */ 
-/*                                        times threads return when no    */ 
-/*                                        other thread is ready           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function retrieves thread system performance information.      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    resumptions                       Destination for total number of   */
+/*                                        thread resumptions              */
+/*    suspensions                       Destination for total number of   */
+/*                                        thread suspensions              */
+/*    solicited_preemptions             Destination for total number of   */
+/*                                        thread preemption from thread   */
+/*                                        API calls                       */
+/*    interrupt_preemptions             Destination for total number of   */
+/*                                        thread preemptions as a result  */
+/*                                        of threads made ready inside of */
+/*                                        Interrupt Service Routines      */
+/*    priority_inversions               Destination for total number of   */
+/*                                        priority inversions             */
+/*    time_slices                       Destination for total number of   */
+/*                                        time-slices                     */
+/*    relinquishes                      Destination for total number of   */
+/*                                        relinquishes                    */
+/*    timeouts                          Destination for total number of   */
+/*                                        timeouts                        */
+/*    wait_aborts                       Destination for total number of   */
+/*                                        wait aborts                     */
+/*    non_idle_returns                  Destination for total number of   */
+/*                                        times threads return when       */
+/*                                        another thread is ready         */
+/*    idle_returns                      Destination for total number of   */
+/*                                        times threads return when no    */
+/*                                        other thread is ready           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _txm_module_kernel_call_dispatcher                                  */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Module application code                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module application code                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  01-31-2022      Scott Larson            Modified comments and added   */
+/*                                            CALL_NOT_USED option,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _tx_thread_performance_system_info_get(ULONG *resumptions, ULONG *suspensions, ULONG *solicited_preemptions, ULONG *interrupt_preemptions, ULONG *priority_inversions, ULONG *time_slices, ULONG *relinquishes, ULONG *timeouts, ULONG *wait_aborts, ULONG *non_idle_returns, ULONG *idle_returns)
@@ -108,3 +111,4 @@ ALIGN_TYPE extra_parameters[9];
     /* Return value to the caller.  */
     return(return_value);
 }
+#endif

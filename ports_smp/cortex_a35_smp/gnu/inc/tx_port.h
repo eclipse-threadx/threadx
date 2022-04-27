@@ -25,8 +25,8 @@
 /*                                                                        */
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
-/*    tx_port.h                                        Cortex-A35-SMP/GNU */
-/*                                                           6.1.6        */
+/*    tx_port.h                                          ARMv8-A-SMP      */
+/*                                                           6.1.10       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,9 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*  01-31-2022     Bhupendra Naphade        Modified comment(s),updated   */
 /*                                            macro definition,           */
-/*                                            resulting in version 6.1.6  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -405,8 +405,7 @@ typedef struct TX_THREAD_SMP_PROTECT_STRUCT
 #define TX_SEMAPHORE_DISABLE                    TX_DISABLE
 
 
-/* Define VFP extension for the Cortex-A35.  Each is assumed to be called in the context of the executing
-   thread.  */
+/* Define FP extension for ARMv8.  Each is assumed to be called in the context of the executing thread.  */
 
 #ifndef TX_SOURCE_CODE
 #define tx_thread_fp_enable                     _tx_thread_fp_enable
@@ -421,7 +420,7 @@ VOID    tx_thread_fp_disable(VOID);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-A35-SMP/GNU Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARMv8-A-SMP Version 6.1.10 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

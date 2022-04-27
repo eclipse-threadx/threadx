@@ -58,20 +58,21 @@ typedef unsigned long                   EXECUTION_TIME_SOURCE_TYPE;
 
 /*  Example for Cortex-M targets:  */
 #ifndef TX_EXECUTION_TIME_SOURCE
-#define TX_EXECUTION_TIME_SOURCE         (EXECUTION_TIME_SOURCE_TYPE) *((ULONG *) 0xE0001004)
+#define TX_EXECUTION_TIME_SOURCE         (EXECUTION_TIME_SOURCE_TYPE) *((volatile ULONG *) 0xE0001004)
 #endif
 #ifndef TX_EXECUTION_MAX_TIME_SOURCE
 #define TX_EXECUTION_MAX_TIME_SOURCE     0xFFFFFFFF
 #endif
 
 /* For 64-bit time source, the constant would be:  */
-/*#define TX_EXECUTION_TIME_SOURCE         (EXECUTION_TIME_SOURCE_TYPE) *((unsigned long long *) 0xE0001004)  */
+/*#define TX_EXECUTION_TIME_SOURCE         (EXECUTION_TIME_SOURCE_TYPE) *((volatile unsigned long long *) 0xE0001004)  */
 /*#define TX_EXECUTION_MAX_TIME_SOURCE     0xFFFFFFFFFFFFFFFF  */
 
 
 /* Define APIs of the execution profile kit.  */
 
 struct TX_THREAD_STRUCT;
+VOID  _tx_execution_initialize(void);
 VOID  _tx_execution_thread_enter(void);
 VOID  _tx_execution_thread_exit(void);
 VOID  _tx_execution_isr_enter(void);

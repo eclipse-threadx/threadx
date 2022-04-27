@@ -81,7 +81,7 @@ _tx_thread_system_return:
     CPSIE   i                                       ; Enable interrupts
     MSR     PRIMASK, r1                             ; Restore original interrupt posture
 _isr_context:
-    BX      lr                                      ; Return to caller 
+    BX      lr                                      ; Return to caller
 ;}
     .type _tx_thread_system_return,$function
     .size _tx_thread_system_return,.-_tx_thread_system_return

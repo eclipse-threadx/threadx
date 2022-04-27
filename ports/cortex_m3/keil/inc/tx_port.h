@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M3/Keil    */
-/*                                                           6.1.7        */
+/*                                                           6.1.11       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,6 +51,14 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
+/*  01-31-2022      Scott Larson            Modified comments, updated    */
+/*                                            typedef to fix misra        */
+/*                                            violation,                  */
+/*                                            fixed predefined macro,     */
+/*                                            resulting in version 6.1.10 */
+/*  04-25-2022      Scott Larson            Modified comments and added   */
+/*                                            volatile to registers,      */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -149,14 +157,14 @@ typedef unsigned short                          USHORT;
    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0x0a800024)
 #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
 
 */
 
 #ifndef TX_MISRA_ENABLE
 #ifndef TX_TRACE_TIME_SOURCE
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0xE0001004)
 #endif
 #else
 ULONG   _tx_misra_time_stamp_get(VOID);
@@ -277,7 +285,7 @@ void    __iar_Initlocks(void);
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #endif
 
-#if defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__TARGET_FPU_VFP) || defined(__VFP__)
+#if defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_FPU_VFP) || defined(__VFP__)
 
 #ifdef TX_MISRA_ENABLE
 
@@ -366,26 +374,26 @@ void _tx_vfp_access(void);
                                                         if ((_tx_system_state == ((ULONG) 0)) && ((thread_ptr) == _tx_thread_current_ptr))  \
                                                         {                                                                                   \
                                                         ULONG  _tx_vfp_state;                                                               \
-                                                            _tx_vfp_state =  __get_control_value();                                               \
+                                                            _tx_vfp_state =  __get_control_value();                                         \
                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                                \
-                                                            __set_control_value(_tx_vfp_state);                                                   \
+                                                            __set_control_value(_tx_vfp_state);                                             \
                                                         }                                                                                   \
                                                         else                                                                                \
                                                         {                                                                                   \
                                                         ULONG  _tx_fpccr;                                                                   \
-                                                            _tx_fpccr =  *((ULONG *) 0xE000EF34);                                           \
+                                                            _tx_fpccr =  *((volatile ULONG *) 0xE000EF34);                                  \
                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01);                                        \
                                                             if (_tx_fpccr == ((ULONG) 0x01))                                                \
                                                             {                                                                               \
                                                             ULONG _tx_vfp_state;                                                            \
-                                                                _tx_vfp_state = __get_control_value();                                            \
+                                                                _tx_vfp_state = __get_control_value();                                      \
                                                                 _tx_vfp_state =  _tx_vfp_state & ((ULONG) 0x4);                             \
                                                                 TX_VFP_TOUCH();                                                             \
                                                                 if (_tx_vfp_state == ((ULONG) 0))                                           \
                                                                 {                                                                           \
-                                                                    _tx_vfp_state =  __get_control_value();                                       \
+                                                                    _tx_vfp_state =  __get_control_value();                                 \
                                                                     _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                        \
-                                                                    __set_control_value(_tx_vfp_state);                                           \
+                                                                    __set_control_value(_tx_vfp_state);                                     \
                                                                 }                                                                           \
                                                             }                                                                               \
                                                         }                                                                                   \
@@ -429,7 +437,7 @@ void _tx_vfp_access(void);
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
 #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
 
-#endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__TARGET_FPU_VFP) || defined(__VFP__) */
+#endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_FPU_VFP) || defined(__VFP__) */
 
 
 /* Define the ThreadX object creation extensions for the remaining objects.  */
@@ -577,7 +585,7 @@ __attribute__( ( always_inline ) ) static inline void _tx_thread_system_return_i
 unsigned int interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
-    *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
     if (__get_ipsr_value() == 0)
     {
         interrupt_save = __get_interrupt_posture();
@@ -590,7 +598,7 @@ unsigned int interrupt_save;
     }
 }
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 #define TX_DISABLE                              interrupt_save =  __disable_interrupts();
 #define TX_RESTORE                              __restore_interrupt(interrupt_save);
 
@@ -646,7 +654,7 @@ static void _tx_thread_system_return_inline(void)
 unsigned int interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
-    *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
     if (_ipsr == 0)
     {
 #ifdef TX_PORT_USE_BASEPRI
@@ -663,7 +671,7 @@ unsigned int interrupt_save;
 }
 
 
-#define TX_INTERRUPT_SAVE_AREA                  unsigned int interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 #define TX_DISABLE                              interrupt_save = __disable_interrupts();
 #define TX_RESTORE                              __restore_interrupt(interrupt_save);
 
@@ -699,7 +707,7 @@ void    tx_thread_fpu_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M3/Keil Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M3/Keil Version 6.1.11 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

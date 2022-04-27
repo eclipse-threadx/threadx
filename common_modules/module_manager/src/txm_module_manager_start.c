@@ -75,22 +75,22 @@
 /**************************************************************************/
 UINT  _txm_module_manager_start(TXM_MODULE_INSTANCE *module_instance)
 {
-    
+
 UINT    status;
 
 
     /* Determine if the module manager has not been initialized yet.  */
     if (_txm_module_manager_ready != TX_TRUE)
     {
-    
+
         /* Module manager has not been initialized.  */
-        return(TX_NOT_AVAILABLE); 
+        return(TX_NOT_AVAILABLE);
     }
 
     /* Determine if the module is valid.  */
     if (module_instance == TX_NULL)
     {
-    
+
         /* Invalid module pointer.  */
         return(TX_PTR_ERROR);
     }
@@ -108,11 +108,11 @@ UINT    status;
         /* Invalid module pointer.  */
         return(TX_PTR_ERROR);
     }
-    
+
     /* Determine if the module instance is in the loaded state.  */
     if ((module_instance -> txm_module_instance_state != TXM_MODULE_LOADED) && (module_instance -> txm_module_instance_state != TXM_MODULE_STOPPED))
     {
-    
+
         /* Release the protection mutex.  */
         _tx_mutex_put(&_txm_module_manager_mutex);
 
@@ -124,7 +124,7 @@ UINT    status;
     if (module_instance -> txm_module_instance_start_stop_priority < module_instance -> txm_module_instance_maximum_priority ||
         module_instance -> txm_module_instance_callback_priority < module_instance -> txm_module_instance_maximum_priority)
     {
-    
+
         /* Release the protection mutex.  */
         _tx_mutex_put(&_txm_module_manager_mutex);
 
@@ -133,13 +133,13 @@ UINT    status;
     }
 
     /* Create the module's callback request queue.  */
-    status = _tx_queue_create(&(module_instance -> txm_module_instance_callback_request_queue), "Module Callback Request Queue", (sizeof(TXM_MODULE_CALLBACK_MESSAGE)/sizeof(ULONG)), 
+    status = _tx_queue_create(&(module_instance -> txm_module_instance_callback_request_queue), "Module Callback Request Queue", (sizeof(TXM_MODULE_CALLBACK_MESSAGE)/sizeof(ULONG)),
                               module_instance -> txm_module_instance_callback_request_queue_area, sizeof(module_instance -> txm_module_instance_callback_request_queue_area));
 
     /* Determine if there was an error.  */
     if (status)
     {
-    
+
         /* Release the protection mutex.  */
         _tx_mutex_put(&_txm_module_manager_mutex);
 
@@ -147,7 +147,7 @@ UINT    status;
         return(TX_START_ERROR);
     }
 
-    /* Create the module start thread.  */    
+    /* Create the module start thread.  */
     status =  _txm_module_manager_thread_create(&(module_instance -> txm_module_instance_start_stop_thread),
                                                 "Module Start Thread",
                                                 module_instance -> txm_module_instance_shell_entry_function,
@@ -158,14 +158,14 @@ UINT    status;
                                                 (UINT) module_instance -> txm_module_instance_start_stop_priority,
                                                 (UINT) module_instance -> txm_module_instance_start_stop_priority,
                                                 TXM_MODULE_TIME_SLICE,
-                                                TX_DONT_START, 
+                                                TX_DONT_START,
                                                 sizeof(TX_THREAD),
                                                 module_instance);
-    
+
     /* Determine if the thread create was successful.  */
     if (status != TX_SUCCESS)
     {
-   
+
         /* Delete the callback notification queue.  */
         _tx_queue_delete(&(module_instance -> txm_module_instance_callback_request_queue));
 
@@ -173,10 +173,10 @@ UINT    status;
         _tx_mutex_put(&_txm_module_manager_mutex);
 
         /* Return the error status.  */
-        return(status);    
+        return(status);
     }
 
-    /* Create the module callback thread.  */    
+    /* Create the module callback thread.  */
     status =  _txm_module_manager_thread_create(&(module_instance -> txm_module_instance_callback_request_thread),
                                                 "Module Callback Request Thread",
                                                 module_instance -> txm_module_instance_shell_entry_function,
@@ -187,20 +187,20 @@ UINT    status;
                                                 (UINT) module_instance -> txm_module_instance_callback_priority,
                                                 (UINT) module_instance -> txm_module_instance_callback_priority,
                                                 TX_NO_TIME_SLICE,
-                                                TX_DONT_START, 
+                                                TX_DONT_START,
                                                 sizeof(TX_THREAD),
                                                 module_instance);
-    
+
     /* Determine if the thread create was successful.  */
     if (status != TX_SUCCESS)
     {
 
         /* Terminate the start thread.  */
         _tx_thread_terminate(&(module_instance -> txm_module_instance_start_stop_thread));
-        
+
         /* Delete the start thread.  */
         _tx_thread_delete(&(module_instance -> txm_module_instance_start_stop_thread));
-   
+
         /* Delete the callback notification queue.  */
         _tx_queue_delete(&(module_instance -> txm_module_instance_callback_request_queue));
 
@@ -208,7 +208,7 @@ UINT    status;
         _tx_mutex_put(&_txm_module_manager_mutex);
 
         /* Return the error status.  */
-        return(status);    
+        return(status);
     }
 
 

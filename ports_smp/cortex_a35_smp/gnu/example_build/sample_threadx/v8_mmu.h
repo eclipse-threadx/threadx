@@ -1,7 +1,7 @@
 //
 // Defines for v8 Memory Model
 //
-// Copyright (c) 2012-2016 Arm Limited (or its affiliates). All rights reserved.
+// Copyright (c) 2012-2019 Arm Limited (or its affiliates). All rights reserved.
 // Use, modification and redistribution of this file is subject to your possession of a
 // valid End User License Agreement for the Arm Product of which these examples are part of
 // and your compliance with all applicable terms and conditions of such licence agreement.
@@ -90,9 +90,19 @@
 #define TT_S1_ATTR_AF (1 << 10)
 #define TT_S1_ATTR_nG (1 << 11)
 
+// OA bits [15:12] - If Armv8.2-LPA is implemented, bits[15:12] are bits[51:48]
+// and bits[47:16] are bits[47:16] of the output address for a page of memory
+
+#define TT_S1_ATTR_nT (1 << 16) // Present if Armv8.4-TTRem is implemented, otherwise RES0
+
+#define TT_S1_ATTR_DBM (1 << 51) // Present if Armv8.1-TTHM is implemented, otherwise RES0
+
 #define TT_S1_ATTR_CONTIG (1 << 52)
 #define TT_S1_ATTR_PXN    (1 << 53)
 #define TT_S1_ATTR_UXN    (1 << 54)
+
+// PBHA bits[62:59] - If Armv8.2-TTPBHA is implemented, hardware can use these bits 
+// for IMPLEMENTATIONDEFINED purposes, otherwise IGNORED
 
 #define TT_S1_MAIR_DEV_nGnRnE 0b00000000
 #define TT_S1_MAIR_DEV_nGnRE  0b00000100

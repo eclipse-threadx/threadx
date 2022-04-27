@@ -39,7 +39,6 @@
 ..\..\src\tx_thread_smp_unprotect.a64
 ..\..\src\tx_thread_stack_build.a64
 ..\..\src\tx_thread_system_return.a64
-..\..\src\tx_thread_timeout.c
 ..\..\src\tx_timer_interrupt.a64
 ..\..\..\..\..\common_smp\src\tx_block_allocate.c
 ..\..\..\..\..\common_smp\src\tx_block_pool_cleanup.c
@@ -233,3 +232,4 @@
 ..\..\..\..\..\common_smp\src\txe_timer_deactivate.c
 ..\..\..\..\..\common_smp\src\txe_timer_delete.c
 ..\..\..\..\..\common_smp\src\txe_timer_info_get.c
+..\..\..\..\..\common_smp\src\tx_thread_timeout.c

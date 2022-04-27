@@ -73,4 +73,4 @@ _tx_thread_interrupt_restore:
 ;
 ;}
    .type _tx_thread_interrupt_restore,$function
-   .size _tx_thread_interrupt_restore,.-_tx_thread_interrupt_restore  
+   .size _tx_thread_interrupt_restore,.-_tx_thread_interrupt_restore

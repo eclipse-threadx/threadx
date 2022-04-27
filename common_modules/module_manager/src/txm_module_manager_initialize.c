@@ -10,15 +10,15 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Manager                                                      */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Manager                                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 #define TX_SOURCE_CODE
 #define TX_MODULE_MANAGER_INIT
@@ -80,7 +80,7 @@ ULONG                   _txm_module_manger_loaded_count;
 
 /* Define the ready flag, which is checked by other module manager APIs
    to make sure the manager has been initialized.  */
-   
+
 UINT                    _txm_module_manager_ready;
 
 
@@ -97,44 +97,44 @@ ULONG                   _txm_module_manager_callback_error_count;
 
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_initialize                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_initialize                      PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function initializes the module manager.                       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    module_memory_start               Start of module area              */ 
-/*    module_memory_size                Size in bytes of module area      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Completion status                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_byte_pool_create              Create module memory byte pool    */ 
-/*    _tx_mutex_create                  Create module manager             */ 
-/*                                        protection mutex                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function initializes the module manager.                       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_memory_start               Start of module area              */
+/*    module_memory_size                Size in bytes of module area      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_byte_pool_create              Create module memory byte pool    */
+/*    _tx_mutex_create                  Create module manager             */
+/*                                        protection mutex                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_memory_size)
@@ -143,11 +143,11 @@ UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_mem
     /* Check for interrupt call.  */
     if (TX_THREAD_GET_SYSTEM_STATE() != 0)
     {
-    
+
         /* Now, make sure the call is from an interrupt and not initialization.  */
         if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
         {
-        
+
             /* Invalid caller of this function, return appropriate error code.  */
             return(TX_CALLER_ERROR);
         }
@@ -171,7 +171,7 @@ UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_mem
     /* Create the module manager protection mutex.  */
     _tx_mutex_create(&_txm_module_manager_mutex, "Module Manager Protection Mutex", TX_NO_INHERIT);
 
-    /* Create a byte pool for allocating RAM areas for modules.  */ 
+    /* Create a byte pool for allocating RAM areas for modules.  */
     _tx_byte_pool_create(&_txm_module_manager_byte_pool, "Module Manager Byte Pool", module_memory_start, module_memory_size);
 
     /* Indicate the module manager object pool has not been created.  */
@@ -179,7 +179,7 @@ UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_mem
 
     /* Mark the module manager as ready!  */
     _txm_module_manager_ready =  TX_TRUE;
-    
+
     /* Return success.  */
     return(TX_SUCCESS);
 }

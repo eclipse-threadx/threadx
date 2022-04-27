@@ -34,7 +34,7 @@ HEAP_SIZE           =     0x00000000
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                          Cortex-M33/GNU    */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -68,6 +68,8 @@ HEAP_SIZE           =     0x00000000
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  01-31-2022      Scott Larson            Fixed predefined macro name,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_initialize_low_level(VOID)
@@ -218,7 +220,7 @@ _unhandled_usage_loop:
     // Handle stack overflow
     STR     r1, [r0]                                // Clear CFSR flag(s)
 
-#ifdef __ARM_PCS_VFP
+#ifdef __ARM_FP
     LDR     r0, =0xE000EF34                         // Cleanup FPU context: Load FPCCR address
     LDR     r1, [r0]                                // Load FPCCR
     BIC     r1, r1, #1                              // Clear the lazy preservation active bit

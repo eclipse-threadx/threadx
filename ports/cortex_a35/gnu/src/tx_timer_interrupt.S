@@ -12,71 +12,61 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
-/* #define TX_SOURCE_CODE  */
-
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_timer.h"
-#include "tx_thread.h"
-*/
 
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_timer_interrupt                               Cortex-A35/GNU    */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_interrupt                                  ARMv8-A        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function processes the hardware timer interrupt.  This         */ 
-/*    processing includes incrementing the system clock and checking for  */ 
-/*    time slice and/or timer expiration.  If either is found, the        */ 
-/*    interrupt context save/restore functions are called along with the  */ 
-/*    expiration functions.                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_timer_expiration_process          Timer expiration processing   */ 
-/*    _tx_thread_time_slice                 Time slice interrupted thread */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    interrupt vector                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function processes the hardware timer interrupt.  This         */
+/*    processing includes incrementing the system clock and checking for  */
+/*    time slice and/or timer expiration.  If either is found, the        */
+/*    interrupt context save/restore functions are called along with the  */
+/*    expiration functions.                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_timer_expiration_process          Timer expiration processing   */
+/*    _tx_thread_time_slice                 Time slice interrupted thread */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    interrupt vector                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
-/* VOID   _tx_timer_interrupt(VOID)
-{  */
+// VOID   _tx_timer_interrupt(VOID)
+// {
     .global _tx_timer_interrupt
     .type   _tx_timer_interrupt, @function
 _tx_timer_interrupt:
@@ -86,7 +76,7 @@ _tx_timer_interrupt:
        for use.  */
 
     /* Increment the system clock.  */
-    /* _tx_timer_system_clock++;  */
+    // _tx_timer_system_clock++;
 
     LDR     x1, =_tx_timer_system_clock         // Pickup address of system clock
     LDR     w0, [x1, #0]                        // Pickup system clock
@@ -97,7 +87,7 @@ _tx_timer_interrupt:
     /* if (_tx_timer_time_slice)
     { */
 
-    LDR     x3, =_tx_timer_time_slice           // Pickup address of time-slice 
+    LDR     x3, =_tx_timer_time_slice           // Pickup address of time-slice
     LDR     w2, [x3, #0]                        // Pickup time-slice
     CMP     w2, #0                              // Is it non-active?
     BEQ     __tx_timer_no_time_slice            // Yes, skip time-slice processing
@@ -126,8 +116,8 @@ _tx_timer_interrupt:
 __tx_timer_no_time_slice:
 
     /* Test for timer expiration.  */
-    /* if (*_tx_timer_current_ptr)
-    {  */
+    // if (*_tx_timer_current_ptr)
+    // {
 
     LDR     x1, =_tx_timer_current_ptr          // Pickup current timer pointer addr
     LDR     x0, [x1, #0]                        // Pickup current timer
@@ -136,25 +126,25 @@ __tx_timer_no_time_slice:
     BEQ     __tx_timer_no_timer                 // No, just increment the timer
 
         /* Set expiration flag.  */
-        /* _tx_timer_expired =  TX_TRUE;  */
+        // _tx_timer_expired =  TX_TRUE;
 
     LDR     x3, =_tx_timer_expired              // Pickup expiration flag address
     MOV     w2, #1                              // Build expired value
     STR     w2, [x3, #0]                        // Set expired flag
     B       __tx_timer_done                     // Finished timer processing
 
-    /* }
-    else
-    { */
+    // }
+    // else
+    // {
 __tx_timer_no_timer:
 
         /* No timer expired, increment the timer pointer.  */
-        /* _tx_timer_current_ptr++;  */
+        // _tx_timer_current_ptr++;
 
     ADD     x0, x0, #8                          // Move to next timer
 
         /* Check for wrap-around.  */
-        /* if (_tx_timer_current_ptr == _tx_timer_list_end)  */
+        // if (_tx_timer_current_ptr == _tx_timer_list_end)
 
     LDR     x3, =_tx_timer_list_end             // Pickup addr of timer list end
     LDR     x2, [x3, #0]                        // Pickup list end
@@ -162,7 +152,7 @@ __tx_timer_no_timer:
     BNE     __tx_timer_skip_wrap                // No, skip wrap-around logic
 
             /* Wrap to beginning of list.  */
-            /* _tx_timer_current_ptr =  _tx_timer_list_start;  */
+            // _tx_timer_current_ptr =  _tx_timer_list_start;
 
     LDR     x3, =_tx_timer_list_start           // Pickup addr of timer list start
     LDR     x0, [x3, #0]                        // Set current pointer to list start
@@ -170,14 +160,14 @@ __tx_timer_no_timer:
 __tx_timer_skip_wrap:
 
     STR     x0, [x1, #0]                        // Store new current timer pointer
-    /* } */
+    // }
 
 __tx_timer_done:
 
 
     /* See if anything has expired.  */
-    /* if ((_tx_timer_expired_time_slice) || (_tx_timer_expired))
-    { */
+    // if ((_tx_timer_expired_time_slice) || (_tx_timer_expired))
+    //{
 
     LDR     x3, =_tx_timer_expired_time_slice   // Pickup addr of expired flag
     LDR     w2, [x3, #0]                        // Pickup time-slice expired flag
@@ -194,8 +184,8 @@ __tx_something_expired:
     STP     x29, x30, [sp, #-16]!               // Save x29 (frame pointer), x30 (link register)
 
     /* Did a timer expire?  */
-    /* if (_tx_timer_expired)
-    { */
+    // if (_tx_timer_expired)
+    // {
 
     LDR     x1, =_tx_timer_expired              // Pickup addr of expired flag
     LDR     w0, [x1, #0]                        // Pickup timer expired flag
@@ -203,38 +193,36 @@ __tx_something_expired:
     BEQ     __tx_timer_dont_activate            // If not set, skip timer activation
 
         /* Process timer expiration.  */
-        /* _tx_timer_expiration_process();  */
+        // _tx_timer_expiration_process();
 
     BL      _tx_timer_expiration_process        // Call the timer expiration handling routine
 
-    /* }  */
+    // }
 __tx_timer_dont_activate:
 
     /* Did time slice expire?  */
-    /* if (_tx_timer_expired_time_slice)
-    { */
+    // if (_tx_timer_expired_time_slice)
+    // {
 
-    LDR     x3, =_tx_timer_expired_time_slice   // Pickup addr of time-slice expired 
+    LDR     x3, =_tx_timer_expired_time_slice   // Pickup addr of time-slice expired
     LDR     w2, [x3, #0]                        // Pickup the actual flag
     CMP     w2, #0                              // See if the flag is set
     BEQ     __tx_timer_not_ts_expiration        // No, skip time-slice processing
 
         /* Time slice interrupted thread.  */
-        /* _tx_thread_time_slice();   */
+        // _tx_thread_time_slice();
 
     BL      _tx_thread_time_slice               // Call time-slice processing
 
-    /* }  */
+    // }/
 
 __tx_timer_not_ts_expiration:
 
     LDP     x29, x30, [sp], #16                 // Recover x29, x30
-    /* }  */
+    // }
 
 __tx_timer_nothing_expired:
 
     RET                                         // Return to caller
 
-/* } */
-
-
+// }

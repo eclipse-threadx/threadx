@@ -82,7 +82,7 @@ CHAR    *pointer = TX_NULL;
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
 
     /* Create the main thread.  */
-    tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
+    tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
             pointer, DEMO_STACK_SIZE, 
             1, 1, TX_NO_TIME_SLICE, TX_AUTO_START);
 

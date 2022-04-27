@@ -52,7 +52,10 @@ int32_t xt_timer_intnum = -1;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
+/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
+/*  04-25-2022      Scott Larson            Modified comments and updated */
+/*                                            function names,             */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_initialize_low_level(VOID)
@@ -154,14 +157,14 @@ VOID   _tx_initialize_low_level(VOID)
 
     /* Compute tick divisor if clock freq is not compile-time constant. */
     #ifndef XT_CLOCK_FREQ
-    _xt_tick_divisor_init();
+    xt_tick_divisor_init();
     #endif
 
     /* Set up the periodic tick timer (assume enough time to complete init). */
     #ifdef XT_CLOCK_FREQ
     XT_WSR_CCOMPARE(XT_RSR_CCOUNT() + XT_TICK_DIVISOR);
     #else
-    XT_WSR_CCOMPARE(XT_RSR_CCOUNT() + _xt_tick_divisor);
+    XT_WSR_CCOMPARE(XT_RSR_CCOUNT() + xt_tick_divisor);
     #endif
 
     #if XCHAL_HAVE_XEA3

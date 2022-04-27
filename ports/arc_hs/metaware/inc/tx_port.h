@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         ARC_HS/MetaWare   */
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,9 +48,14 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*  04-02-2021     Bhupendra Naphade        Modified comment(s), updated  */
 /*                                            macro definition,           */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Andres Mlinar            Modified comments(s),         */
+/*                                            initialize interrupts right */
+/*                                            before enabling the task    */
+/*                                            scheduler,                  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -183,6 +188,12 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #else
 #define TX_INLINE_INITIALIZATION
 #endif
+
+/* Define the ARC-specific initialization code that is expanded in the generic source.  */
+
+void    _tx_initialize_start_interrupts(void);
+
+#define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION                       _tx_initialize_start_interrupts();
 
 
 /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
@@ -325,7 +336,7 @@ VOID  tx_thread_register_bank_assign(VOID *thread_ptr, UINT register_bank);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARC_HS/MetaWare Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARC_HS/MetaWare Version 6.1.10 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

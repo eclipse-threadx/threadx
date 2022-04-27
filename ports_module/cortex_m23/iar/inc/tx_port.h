@@ -25,8 +25,8 @@
 /*                                                                        */
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
-/*    tx_port.h                                            ARMv8-M        */
-/*                                                           6.1.6        */
+/*    tx_port.h                                         Cortex-M23/IAR    */
+/*                                                           6.1.11       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
+/*  04-25-2022      Scott Larson            Modified comments and added   */
+/*                                            volatile to registers,      */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -179,7 +182,7 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
 #endif
 
 
-/* Define various constants for the ThreadX Cortex-M port.  */
+/* Define various constants for the ThreadX Cortex-M23 port.  */
 
 #define TX_INT_DISABLE                          1           /* Disable interrupts               */
 #define TX_INT_ENABLE                           0           /* Enable interrupts                */
@@ -189,14 +192,14 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0x0a800024)
 #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
 
 */
 
 #ifndef TX_MISRA_ENABLE
 #ifndef TX_TRACE_TIME_SOURCE
-#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
+#define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0xE0001004)
 #endif
 #else
 ULONG   _tx_misra_time_stamp_get(VOID);
@@ -464,7 +467,7 @@ __attribute__( ( always_inline ) ) static inline void __set_CONTROL(ULONG contro
                                                         else                                                                                \
                                                         {                                                                                   \
                                                         ULONG  _tx_fpccr;                                                                   \
-                                                            _tx_fpccr =  *((ULONG *) 0xE000EF34);                                           \
+                                                            _tx_fpccr =  *((volatile ULONG *) 0xE000EF34);                                  \
                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01);                                        \
                                                             if (_tx_fpccr == ((ULONG) 0x01))                                                \
                                                             {                                                                               \
@@ -644,7 +647,7 @@ __attribute__( ( always_inline ) ) static inline void _tx_thread_system_return_i
 unsigned int interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
-    *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
     if (__get_IPSR() == 0)
     {
         interrupt_save = __get_primask_value();
@@ -665,7 +668,7 @@ static void _tx_thread_system_return_inline(void)
 __istate_t interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
-    *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
     if (__get_IPSR() == 0)
     {
         interrupt_save = __get_interrupt_state();
@@ -701,7 +704,7 @@ VOID                                            _tx_thread_interrupt_restore(UIN
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Modules ARMv8-M Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M23/IAR Version 6.1.11 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

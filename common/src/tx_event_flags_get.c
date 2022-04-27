@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_event_flags_get                                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -73,9 +73,12 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
+/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022      Scott Larson            Modified comment(s),          */
+/*                                            handle 0 flags case,        */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_event_flags_get(TX_EVENT_FLAGS_GROUP *group_ptr, ULONG requested_flags,
@@ -276,11 +279,12 @@ UINT            interrupted_set_request;
         if (wait_option != TX_NO_WAIT)
         {
 
-            /* Determine if the preempt disable flag is non-zero.  */
-            if (_tx_thread_preempt_disable != ((UINT) 0))
+            /* Determine if the preempt disable flag is non-zero OR the requested events is 0.  */
+            if ((_tx_thread_preempt_disable != ((UINT) 0)) || (requested_flags == (UINT) 0))
             {
 
-                /* Suspension is not allowed if the preempt disable flag is non-zero at this point, return error completion.  */
+                /* Suspension is not allowed if the preempt disable flag is non-zero at this point,
+                   or if requested_flags is 0, return error completion.  */
                 status =  TX_NO_EVENTS;
             }
             else

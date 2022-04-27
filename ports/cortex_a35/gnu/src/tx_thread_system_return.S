@@ -12,80 +12,65 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
-/* #define TX_SOURCE_CODE  */
-
-
-/* Include necessary system files.  */
-
-/*
-#include "tx_api.h"
-#include "tx_thread.h"
-#include "tx_timer.h"
-*/
-
-/*    .set ENABLE_ARM_FP,1  */
 
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_system_return                          Cortex-A35/GNU    */ 
-/*                                                           6.1.9        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_system_return                             ARMv8-A        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is target processor specific.  It is used to transfer */ 
-/*    control from a thread back to the ThreadX system.  Only a           */ 
-/*    minimal context is saved since the compiler assumes temp registers  */ 
-/*    are going to get slicked by a function call anyway.                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_schedule                   Thread scheduling loop        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX components                                                  */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is target processor specific.  It is used to transfer */
+/*    control from a thread back to the ThreadX system.  Only a           */
+/*    minimal context is saved since the compiler assumes temp registers  */
+/*    are going to get slicked by a function call anyway.                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_schedule                   Thread scheduling loop        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX components                                                  */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
-/*                                            execution profile support,  */
-/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
-/* VOID   _tx_thread_system_return(VOID)
-{ */
+// VOID   _tx_thread_system_return(VOID)
+// {
     .global _tx_thread_system_return
     .type   _tx_thread_system_return, @function
 _tx_thread_system_return:
-;
-;    /* Save minimal context on the stack.  */
-;
+
+    /* Save minimal context on the stack.  */
+
     MRS     x0, DAIF                            // Pickup DAIF
     MSR     DAIFSet, 0x3                        // Lockout interrupts
     STP     x29, x30, [sp, #-16]!               // Save x29 (frame pointer), x30 (link register)
@@ -129,8 +114,8 @@ _skip_fp_save:
     LDR     w1, [x2, #0]                        // Pickup current time slice
 
     /* Save current stack and switch to system stack.  */
-    /* _tx_thread_current_ptr -> tx_thread_stack_ptr =  sp;  */
-    /* sp = _tx_thread_system_stack_ptr;  */
+    // _tx_thread_current_ptr -> tx_thread_stack_ptr =  sp;
+    // sp = _tx_thread_system_stack_ptr;
 
     MOV     x4, sp                              //
     STR     x4, [x6, #8]                        // Save thread stack pointer
@@ -139,30 +124,28 @@ _skip_fp_save:
     MOV     sp, x4                              // Setup system stack pointer
 
     /* Determine if the time-slice is active.  */
-    /* if (_tx_timer_time_slice)
-    { */
+    // if (_tx_timer_time_slice)
+    // {
 
     MOV     x4, #0                              // Build clear value
     CMP     w1, #0                              // Is a time-slice active?
     BEQ     __tx_thread_dont_save_ts            // No, don't save the time-slice
 
        /* Save the current remaining time-slice.  */
-       /* _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
-       _tx_timer_time_slice =  0;  */
+       // _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
+       // _tx_timer_time_slice =  0;
 
     STR     w4, [x2, #0]                        // Clear time-slice
     STR     w1, [x6, #36]                       // Store current time-slice
 
-    /* }  */
+    // }
 __tx_thread_dont_save_ts:
 
     /* Clear the current thread pointer.  */
-    /* _tx_thread_current_ptr =  TX_NULL;  */
+    // _tx_thread_current_ptr =  TX_NULL;
 
     STR     x4, [x5, #0]                        // Clear current thread pointer
 
     B       _tx_thread_schedule                 // Jump to scheduler!
 
-/* }  */
-
-
+// }

@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                           Linux/GNU       */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.11       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,6 +51,9 @@
 /*  10-15-2021     William E. Lamie         Modified comment(s), added    */
 /*                                            symbol ULONG64_DEFINED,     */
 /*                                            resulting in version 6.1.9  */
+/*  04-25-2022     William E. Lamie         Modified comment(s), removed  */
+/*                                            useless definition,         */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -565,8 +568,6 @@ void    _tx_linux_thread_init();
 #ifndef TX_LINUX_MEMORY_SIZE
 #define TX_LINUX_MEMORY_SIZE                    64000
 #endif
-
-#define TX_TIMER_TICKS_PER_SECOND               100UL
 
 /* Define priorities of pthreads. */
 

@@ -461,8 +461,10 @@ _xt_coproc_restorecs:
 
 //-----------------------------------------------------------------------------
 //  For XEA3, coprocessor exceptions come here. This is a wrapper function that
-//  calls _xt_coproc_handler() to do the actual work. Since the handler can be
-//  interrupted make sure that no context switch occurs.
+//  calls _xt_coproc_handler() to do the actual work. We don't want the handler
+//  to be interrupted because that might cause a round-robin switch and leave
+//  coprocessor context in a confused state. So interrupts are disabled before
+//  calling the handler. They will be re-enabled on return from exception.
 //-----------------------------------------------------------------------------
 
         .text
@@ -474,9 +476,9 @@ _xt_coproc_exc:
 #ifdef __XTENSA_CALL0_ABI__
     addi    a1,  a1, -16                    // reserve 16 bytes on stack
     s32i    a0,  a1, 0                      // save return address
-    s32i    a2,  a1, 4                      // save a2
     s32i   a15,  a1, 8                      // must save a15 (see dispatch)
-    l32i    a2,  a1, 4
+    movi    a3,  PS_DI_MASK
+    xps     a3,  a3                         // Set PS.DI, disable interrupts
     l32i    a3,  a2, XT_STK_EXCCAUSE        // a3 <- exccause
     extui   a2,  a3, 8, 4                   // a2 <- CP index
     call0   _xt_coproc_handler
@@ -487,6 +489,8 @@ _xt_coproc_exc:
 #else
     entry   a1,  48                         // reserve 16 bytes on stack
     s32i    a0,  a1, 0                      // save return address
+    movi    a3,  PS_DI_MASK
+    xps     a3,  a3                         // Set PS.DI, disable interrupts
     l32i    a3,  a2, XT_STK_EXCCAUSE        // a3 <- exccause
     extui   a2,  a3, 8, 4                   // a2 <- CP index
     call0   _xt_coproc_handler

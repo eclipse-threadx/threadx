@@ -10,15 +10,15 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Manager                                                      */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Manager                                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 #define TX_SOURCE_CODE
 
@@ -28,43 +28,43 @@
 #include "txm_module.h"
 
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_thread_notify_trampoline        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_thread_notify_trampoline        PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function processes the thread entry/exit notification call     */ 
-/*    from ThreadX.                                                       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                        Thread pointer                    */ 
-/*    type                              Entry or exit type                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _txm_module_manager_callback_request  Send module callback request  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function processes the thread entry/exit notification call     */
+/*    from ThreadX.                                                       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                        Thread pointer                    */
+/*    type                              Entry or exit type                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_callback_request  Send module callback request  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_thread_notify_trampoline(TX_THREAD *thread_ptr, UINT type)
@@ -77,9 +77,9 @@ TXM_MODULE_CALLBACK_MESSAGE     callback_message;
 TX_QUEUE                        *module_callback_queue;
 TXM_MODULE_THREAD_ENTRY_INFO    *thread_info;
 
-  
+
     /* We now know the callback is for a module.  */
-        
+
     /* Disable interrupts.  */
     TX_DISABLE
 
@@ -97,9 +97,9 @@ TXM_MODULE_THREAD_ENTRY_INFO    *thread_info;
         if ((module_instance) && (module_instance -> txm_module_instance_id == TXM_MODULE_ID) &&
             (module_instance -> txm_module_instance_state == TXM_MODULE_STARTED))
         {
-        
-            /* Yes, the module is still valid.  */        
-         
+
+            /* Yes, the module is still valid.  */
+
             /* Pickup the module's callback message queue.  */
             module_callback_queue =  &(module_instance -> txm_module_instance_callback_request_queue);
 
@@ -117,19 +117,19 @@ TXM_MODULE_THREAD_ENTRY_INFO    *thread_info;
             callback_message.txm_module_callback_message_param_8 =               0;
             callback_message.txm_module_callback_message_reserved1 =             0;
             callback_message.txm_module_callback_message_reserved2 =             0;
-          
+
             /* Restore interrupts.  */
             TX_RESTORE
-    
-            /* Call the general processing that will place the callback on the 
+
+            /* Call the general processing that will place the callback on the
                module's callback request queue.  */
             _txm_module_manager_callback_request(module_callback_queue, &callback_message);
         }
         else
         {
-    
+
             /* Module no longer valid.  */
-        
+
             /* Error, increment the error counter and return.  */
             _txm_module_manager_callback_error_count++;
 
@@ -139,15 +139,15 @@ TXM_MODULE_THREAD_ENTRY_INFO    *thread_info;
     }
     else
     {
-    
+
         /* Thread pointer is not valid.  */
-    
+
         /* Error, increment the error counter and return.  */
         _txm_module_manager_callback_error_count++;
 
         /* Restore interrupts.  */
         TX_RESTORE
     }
-}         
+}
 #endif
-        
+

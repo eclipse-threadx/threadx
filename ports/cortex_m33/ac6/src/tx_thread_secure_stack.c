@@ -23,7 +23,7 @@
 
 #include "tx_api.h"
 
-/* If TX_SINGLE_MODE_SECURE or TX_SINGLE_MODE_NON_SECURE is defined, 
+/* If TX_SINGLE_MODE_SECURE or TX_SINGLE_MODE_NON_SECURE is defined,
    no secure stack functionality is needed. */
 #if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE)
 
@@ -45,8 +45,14 @@
 #define TX_THREAD_STACK_SEAL_SIZE           8
 #define TX_THREAD_STACK_SEAL_VALUE          0xFEF5EDA5
 
-/* Secure stack info struct to hold stack start, stack limit, 
-   current stack pointer, and pointer to owning thread. 
+/* max number of Secure context */
+#ifndef TX_MAX_SECURE_CONTEXTS
+#define TX_MAX_SECURE_CONTEXTS              32
+#endif
+#define TX_INVALID_SECURE_CONTEXT_IDX       (-1)
+
+/* Secure stack info struct to hold stack start, stack limit,
+   current stack pointer, and pointer to owning thread.
    This will be allocated for each thread with a secure stack. */
 typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 {
@@ -54,7 +60,13 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
     VOID        *tx_thread_secure_stack_start;      /* Thread's secure stack start address */
     VOID        *tx_thread_secure_stack_limit;      /* Thread's secure stack limit */
     TX_THREAD   *tx_thread_ptr;                     /* Keep track of thread for error handling */
+    INT          tx_next_free_index;                /* Next free index of free secure context */
 } TX_THREAD_SECURE_STACK_INFO;
+
+/* Static secure contexts */
+static TX_THREAD_SECURE_STACK_INFO tx_thread_secure_context[TX_MAX_SECURE_CONTEXTS];
+/* Head of free secure context */
+static INT tx_head_free_index = 0U;
 
 
 
@@ -63,7 +75,7 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_initialize           Cortex-M33/AC6    */
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -102,12 +114,16 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 /*                                            changed name, execute in    */
 /*                                            handler mode,               */
 /*                                            resulting in version 6.1.7  */
+/*  01-31-2022      Himanshu Gupta          Modified comments(s), updated */
+/*                                            secure stack allocation,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
 UINT    _tx_thread_secure_mode_stack_initialize(void)
 {
 UINT    status;
+INT     index;
 
     /* Make sure function is called from interrupt (threads should not call). */
     if (__get_IPSR() == 0)
@@ -118,12 +134,26 @@ UINT    status;
     {
         /* Set secure mode to use PSP. */
         __set_CONTROL(__get_CONTROL() | 2);
-        
+
         /* Set process stack pointer and stack limit to 0 to throw exception when a thread
            without a secure stack calls a secure function that tries to use secure stack. */
         __set_PSPLIM(0);
         __set_PSP(0);
-        
+
+        for (index = 0; index < TX_MAX_SECURE_CONTEXTS; index++)
+        {
+
+            /* Check last index and mark next free to invalid index */
+            if(index == (TX_MAX_SECURE_CONTEXTS - 1))
+            {
+                tx_thread_secure_context[index].tx_next_free_index = TX_INVALID_SECURE_CONTEXT_IDX;
+            }
+            else
+            {
+                tx_thread_secure_context[index].tx_next_free_index = index + 1;
+            }
+        }
+
         status = TX_SUCCESS;
     }
     return status;
@@ -136,7 +166,7 @@ UINT    status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_allocate             Cortex-M33/AC6    */
-/*                                                           6.1.1        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -160,9 +190,7 @@ UINT    status;
 /*  CALLS                                                                 */
 /*                                                                        */
 /*    __get_IPSR                            Intrinsic to get IPSR         */
-/*    calloc                                Compiler's calloc function    */
 /*    malloc                                Compiler's malloc function    */
-/*    free                                  Compiler's free() function    */
 /*    __set_PSPLIM                          Intrinsic to set PSP limit    */
 /*    __set_PSP                             Intrinsic to set PSP          */
 /*    __TZ_get_PSPLIM_NS                    Intrinsic to get NS PSP       */
@@ -179,17 +207,22 @@ UINT    status;
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            added stack sealing,        */
 /*                                            resulting in version 6.1.1  */
+/*  01-31-2022      Himanshu Gupta          Modified comments(s), updated */
+/*                                            secure stack allocation,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
 UINT    _tx_thread_secure_mode_stack_allocate(TX_THREAD *thread_ptr, ULONG stack_size)
 {
+TX_INTERRUPT_SAVE_AREA
 UINT    status;
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 UCHAR   *stack_mem;
+INT      secure_context_index;
 
     status = TX_SUCCESS;
-    
+
     /* Make sure function is called from interrupt (threads should not call). */
     if (__get_IPSR() == 0)
     {
@@ -199,23 +232,39 @@ UCHAR   *stack_mem;
     {
         status = TX_SIZE_ERROR;
     }
-    
+
     /* Check if thread already has secure stack allocated. */
     else if (thread_ptr -> tx_thread_secure_stack_context != 0)
     {
         status = TX_THREAD_ERROR;
     }
-    
+
     else
     {
-        /* Allocate space for secure stack info. */
-        info_ptr = calloc(1, sizeof(TX_THREAD_SECURE_STACK_INFO));
-        
-        if(info_ptr != TX_NULL)
+
+        TX_DISABLE
+
+        /* Allocate free index for secure stack info. */
+        if(tx_head_free_index != TX_INVALID_SECURE_CONTEXT_IDX)
         {
+            secure_context_index = tx_head_free_index;
+            tx_head_free_index = tx_thread_secure_context[tx_head_free_index].tx_next_free_index;
+            tx_thread_secure_context[secure_context_index].tx_next_free_index = TX_INVALID_SECURE_CONTEXT_IDX;
+        }
+        else
+        {
+            secure_context_index = TX_INVALID_SECURE_CONTEXT_IDX;
+        }
+
+        TX_RESTORE
+
+        if(secure_context_index != TX_INVALID_SECURE_CONTEXT_IDX)
+        {
+            info_ptr = &tx_thread_secure_context[secure_context_index];
+
             /* If stack info allocated, allocate a stack & seal. */
             stack_mem = malloc(stack_size + TX_THREAD_STACK_SEAL_SIZE);
-            
+
             if(stack_mem != TX_NULL)
             {
                 /* Secure stack has been allocated, save in the stack info struct. */
@@ -223,13 +272,13 @@ UCHAR   *stack_mem;
                 info_ptr -> tx_thread_secure_stack_start = stack_mem + stack_size;
                 info_ptr -> tx_thread_secure_stack_ptr = info_ptr -> tx_thread_secure_stack_start;
                 info_ptr -> tx_thread_ptr = thread_ptr;
-                
+
                 /* Seal bottom of stack. */
                 *(ULONG*)info_ptr -> tx_thread_secure_stack_start = TX_THREAD_STACK_SEAL_VALUE;
-                
-                /* Save info pointer in thread. */
-                thread_ptr -> tx_thread_secure_stack_context = info_ptr;
-                
+
+                /* Save secure context id (i.e non-zero base index) in thread. */
+                thread_ptr -> tx_thread_secure_stack_context = (VOID *)(secure_context_index + 1);
+
                 /* Check if this thread is running by looking at its stack start and PSPLIM_NS */
                 if(((ULONG) thread_ptr -> tx_thread_stack_start & 0xFFFFFFF8) == __TZ_get_PSPLIM_NS())
                 {
@@ -238,21 +287,26 @@ UCHAR   *stack_mem;
                     __set_PSP((ULONG)(info_ptr -> tx_thread_secure_stack_ptr));
                 }
             }
-            
+
             else
             {
+                TX_DISABLE
+
                 /* Stack not allocated, free the info struct. */
-                free(info_ptr);
+                tx_thread_secure_context[secure_context_index].tx_next_free_index = tx_head_free_index;
+                tx_head_free_index = secure_context_index;
+                TX_RESTORE
+
                 status = TX_NO_MEMORY;
             }
         }
-        
+
         else
         {
             status = TX_NO_MEMORY;
         }
     }
-    
+
     return(status);
 }
 
@@ -263,7 +317,7 @@ UCHAR   *stack_mem;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_free                 Cortex-M33/AC6    */
-/*                                                           6.1.1        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -298,44 +352,65 @@ UCHAR   *stack_mem;
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.1  */
+/*  01-31-2022      Himanshu Gupta          Modified comments(s), updated */
+/*                                            secure stack allocation,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
 UINT    _tx_thread_secure_mode_stack_free(TX_THREAD *thread_ptr)
 {
+TX_INTERRUPT_SAVE_AREA
 UINT    status;
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
+INT     secure_context_index;
 
     status = TX_SUCCESS;
-    
-    /* Pickup stack info from thread. */
-    info_ptr = thread_ptr -> tx_thread_secure_stack_context;
-    
+
+    /* Pickup stack info id from thread. */
+    secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1;
+
     /* Make sure function is called from interrupt (threads should not call). */
     if (__get_IPSR() == 0)
     {
         status = TX_CALLER_ERROR;
     }
-    
-    /* Check that this secure context is for this thread. */
-    else if (info_ptr -> tx_thread_ptr != thread_ptr)
+
+    /* Check if secure context index is in valid range. */
+    else if (secure_context_index < 0 || secure_context_index >= TX_MAX_SECURE_CONTEXTS)
     {
         status = TX_THREAD_ERROR;
     }
-    
     else
     {
-        
-        /* Free secure stack. */
-        free(info_ptr -> tx_thread_secure_stack_limit);
-        
-        /* Free info struct. */
-        free(info_ptr);
-        
-        /* Clear secure context from thread. */
-        thread_ptr -> tx_thread_secure_stack_context = 0;
+
+        /* Pickup stack info from static array of secure contexts. */
+        info_ptr = &tx_thread_secure_context[secure_context_index];
+
+        /* Check that this secure context is for this thread. */
+        if (info_ptr -> tx_thread_ptr != thread_ptr)
+        {
+            status = TX_THREAD_ERROR;
+        }
+
+        else
+        {
+
+            /* Free secure stack. */
+            free(info_ptr -> tx_thread_secure_stack_limit);
+
+            TX_DISABLE
+
+            /* Free info struct. */
+            tx_thread_secure_context[secure_context_index].tx_next_free_index = tx_head_free_index;
+            tx_head_free_index = secure_context_index;
+            TX_RESTORE
+
+            /* Clear secure context from thread. */
+            thread_ptr -> tx_thread_secure_stack_context = 0;
+        }
     }
-    
+
     return(status);
 }
 
@@ -346,7 +421,7 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_context_save              Cortex-M33/AC6    */
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -383,6 +458,9 @@ TX_THREAD_SECURE_STACK_INFO *info_ptr;
 /*                                            resulting in version 6.1.1  */
 /*  06-02-2021      Scott Larson            Fix stack pointer save,       */
 /*                                            resulting in version 6.1.7  */
+/*  01-31-2022      Himanshu Gupta          Modified comments(s), updated */
+/*                                            secure stack allocation,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
@@ -390,38 +468,45 @@ void _tx_thread_secure_stack_context_save(TX_THREAD *thread_ptr)
 {
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 ULONG   sp;
+INT secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1;
 
     /* This function should be called from scheduler only. */
     if (__get_IPSR() == 0)
     {
         return;
     }
-    
+
+    /* Check if secure context index is in valid range. */
+    else if (secure_context_index < 0 || secure_context_index >= TX_MAX_SECURE_CONTEXTS)
+    {
+        return;
+    }
+
     /* Pickup the secure context pointer. */
-    info_ptr = (TX_THREAD_SECURE_STACK_INFO *)(thread_ptr -> tx_thread_secure_stack_context);
-    
+    info_ptr = &tx_thread_secure_context[secure_context_index];
+
     /* Check that this secure context is for this thread. */
     if (info_ptr -> tx_thread_ptr != thread_ptr)
     {
         return;
     }
-    
+
     /* Check that stack pointer is in range */
     sp = __get_PSP();
-    if ((sp < (ULONG)info_ptr -> tx_thread_secure_stack_limit) || 
+    if ((sp < (ULONG)info_ptr -> tx_thread_secure_stack_limit) ||
         (sp > (ULONG)info_ptr -> tx_thread_secure_stack_start))
     {
         return;
     }
-    
+
     /* Save stack pointer. */
     info_ptr -> tx_thread_secure_stack_ptr = (VOID *) sp;
-    
+
     /* Set process stack pointer and stack limit to 0 to throw exception when a thread
        without a secure stack calls a secure function that tries to use secure stack. */
     __set_PSPLIM(0);
     __set_PSP(0);
-    
+
     return;
 }
 
@@ -432,7 +517,7 @@ ULONG   sp;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_context_restore           Cortex-M33/AC6    */
-/*                                                           6.1.1        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -466,32 +551,42 @@ ULONG   sp;
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*  10-16-2020      Scott Larson            Modified comment(s),          */
 /*                                            resulting in version 6.1.1  */
+/*  01-31-2022      Himanshu Gupta          Modified comments(s), updated */
+/*                                            secure stack allocation,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
 void _tx_thread_secure_stack_context_restore(TX_THREAD *thread_ptr)
 {
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
+INT secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1;
 
     /* This function should be called from scheduler only. */
     if (__get_IPSR() == 0)
     {
         return;
     }
-    
+
+    /* Check if secure context index is in valid range. */
+    else if (secure_context_index < 0 || secure_context_index >= TX_MAX_SECURE_CONTEXTS)
+    {
+        return;
+    }
+
     /* Pickup the secure context pointer. */
-    info_ptr = (TX_THREAD_SECURE_STACK_INFO *)(thread_ptr -> tx_thread_secure_stack_context);
-    
+    info_ptr = &tx_thread_secure_context[secure_context_index];
+
     /* Check that this secure context is for this thread. */
     if (info_ptr -> tx_thread_ptr != thread_ptr)
     {
         return;
     }
-    
+
     /* Set stack pointer and limit. */
     __set_PSPLIM((ULONG)info_ptr -> tx_thread_secure_stack_limit);
     __set_PSP   ((ULONG)info_ptr -> tx_thread_secure_stack_ptr);
-    
+
     return;
 }
 

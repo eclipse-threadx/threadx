@@ -30,6 +30,9 @@
 #include "tx_thread.h"
 #include "tx_timer.h"
 
+#if defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)
+extern VOID _tx_execution_initialize(VOID);
+#endif
 
 /* Define any port-specific scheduling data structures.  */
 
@@ -46,7 +49,7 @@ TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter                         PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -84,9 +87,12 @@ TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
+/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022      Scott Larson            Modified comment(s),          */
+/*                                            added EPK initialization,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_initialize_kernel_enter(VOID)
@@ -137,6 +143,11 @@ VOID  _tx_initialize_kernel_enter(VOID)
 
     /* Call any port specific pre-scheduler processing.  */
     TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION
+
+#if defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)
+    /* Initialize Execution Profile Kit.  */
+    _tx_execution_initialize();
+#endif
 
     /* Enter the scheduling loop to start executing threads!  */
     _tx_thread_schedule();

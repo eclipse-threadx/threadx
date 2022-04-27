@@ -46,7 +46,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_context_restore                           RXv2/GNURX     */
-;/*                                                           6.1.9        */
+;/*                                                           6.1.11       */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -83,6 +83,10 @@
 ;/*                                            removed unnecessary stack   */
 ;/*                                            type placement,             */
 ;/*                                            resulting in version 6.1.9  */
+;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.10 */
+;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
+;/*                                            resulting in version 6.1.11 */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)

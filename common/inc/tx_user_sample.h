@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_user.h                                           PORTABLE C      */
-/*                                                           6.1.9        */
+/*                                                           6.1.11       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -58,6 +58,10 @@
 /*                                            user-configurable symbol    */
 /*                                            TX_TIMER_TICKS_PER_SECOND   */
 /*                                            resulting in version 6.1.9  */
+/*  04-25-2022      Wenhui Xie              Modified comment(s),          */
+/*                                            optimized the definition of */
+/*                                            TX_TIMER_TICKS_PER_SECOND,  */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -116,7 +120,7 @@
    Note: the actual hardware timer value may need to be changed (usually in tx_initialize_low_level).  */
 
 /*
-#define TX_TIMER_TICKS_PER_SECOND       ((ULONG) 100)
+#define TX_TIMER_TICKS_PER_SECOND       (100UL)
 */
 
 /* Determine if there is a FileX pointer in the thread control block.

@@ -60,7 +60,7 @@ _tx_system_stack_base_address:
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_initialize_low_level                        ARCv2_EM/MetaWare   */
-;/*                                                           6.1.9        */
+;/*                                                           6.1.10       */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -97,10 +97,16 @@ _tx_system_stack_base_address:
 ;/*  10-15-2021     Andres Mlinar            Modified comment(s), optimized*/
 ;/*                                            system stack usage,         */
 ;/*                                            resulting in version 6.1.9  */
+;/*  01-31-2022     Andres Mlinar            Modified comments(s),         */
+;/*                                            initialize interrupts right */
+;/*                                            before enabling the task    */
+;/*                                            scheduler,                  */
+;/*                                            resulting in version 6.1.10 */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
 ;{
+    .align  4
     .global _tx_initialize_low_level
     .type   _tx_initialize_low_level, @function
 _tx_initialize_low_level:
@@ -131,6 +137,18 @@ _tx_initialize_low_level:
 ;
     st      r0, [gp, _tx_initialize_unused_memory@sda]
 ;
+;    /* Done, return to caller.  */
+;
+    j_s.d   [blink]                                     ; Return to caller
+    nop
+;}
+;
+;VOID   _tx_initialize_start_interrupts(VOID)
+;{
+    .align  4
+    .global _tx_initialize_start_interrupts
+    .type   _tx_initialize_start_interrupts, @function
+_tx_initialize_start_interrupts:
 ;
 ;    /* Setup Timer 0 for periodic interrupts at interrupt vector 16.  */
 ;

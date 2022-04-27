@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_initialize                            Cortex-M7/AC6     */
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -63,14 +63,17 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
+/*  01-31-2022      Scott Larson            Modified comments and made    */
+/*                                            heap user configurable,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_initialize(VOID)
     .global  _txm_module_initialize
     .thumb_func
 _txm_module_initialize:
-    PUSH    {r4-r12,lr}                         // Save dregs and LR
-    //B       __scatterload                       // Call ARM func to initialize variables
+    PUSH    {r0-r12,lr}                         // Save dregs and LR
+    B       __scatterload                       // Call ARM func to initialize variables
 
 // Override the __rt_exit function.
     .global  __rt_exit
@@ -79,25 +82,10 @@ __rt_exit:
     POP     {r4-r12,lr}                         // Restore dregs and LR
     BX      lr                                  // Return to caller
 
-#define TXM_MODULE_HEAP_SIZE 512
-
-// returns heap start address in  R0
-// returns heap end address in    R2
-// does not touch SP, it is already set up before the module runs
-    .global __user_setup_stackheap
-    .thumb_func
-__user_setup_stackheap:
-    LDR     r1, _txm_heap                       // load heap offset
-    MOV     r2, TXM_MODULE_HEAP_SIZE            // load heap size
-    ADD     r2, r2, r0                          // calculate heap end address
-    BX      lr
-
-// dummy main function
-    .global main
-    .thumb_func
-main:
-    BX      lr
-
-    .align 8
-_txm_heap:
-    .zero   TXM_MODULE_HEAP_SIZE
+    .global __rt_entry
+    .type   __rt_entry, %function
+__rt_entry:
+    POP     {r0-r1}
+    BL      __rt_lib_init
+    POP     {r2-r12,lr}                         // Restore dregs and LR
+    BX      lr                                  // Return to caller

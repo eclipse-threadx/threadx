@@ -10,15 +10,15 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Manager                                                      */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Manager                                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 #define TX_SOURCE_CODE
 
@@ -27,45 +27,45 @@
 #include "tx_thread.h"
 #include "txm_module.h"
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_manager_thread_reset                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_thread_reset                    PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function prepares the thread to run again from the entry       */ 
-/*    point specified during thread creation. The application must        */ 
-/*    call tx_thread_resume after this call completes for the thread      */ 
-/*    to actually run.                                                    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    thread_ptr                        Pointer to thread to reset        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                            Service return status             */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _txm_module_manager_thread_stack_build    Build initial thread      */ 
-/*                                                stack                   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _txm_module_manager_kernel_dispatch   Kernel dispatch function      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function prepares the thread to run again from the entry       */
+/*    point specified during thread creation. The application must        */
+/*    call tx_thread_resume after this call completes for the thread      */
+/*    to actually run.                                                    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                        Pointer to thread to reset        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Service return status             */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_thread_stack_build    Build initial thread      */
+/*                                                stack                   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _txm_module_manager_kernel_dispatch   Kernel dispatch function      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     Scott Larson             Initial Version 6.1           */
+/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_thread_reset(TX_THREAD *thread_ptr)
@@ -101,7 +101,7 @@ TXM_MODULE_THREAD_ENTRY_INFO    *thread_entry_info;
     {
 
         /* Check for proper status of this thread to reset.  */
-        if (thread_ptr -> tx_thread_state != TX_COMPLETED) 
+        if (thread_ptr -> tx_thread_state != TX_COMPLETED)
         {
 
             /* Now check for terminated state.  */
@@ -139,18 +139,18 @@ TXM_MODULE_THREAD_ENTRY_INFO    *thread_entry_info;
 #endif
 
         /* Setup pointer to the thread entry information structure, which will live at the top of each
-           module thread's stack. This will allow the module thread entry function to avoid direct 
+           module thread's stack. This will allow the module thread entry function to avoid direct
            access to the actual thread control block.  */
         thread_entry_info =  (TXM_MODULE_THREAD_ENTRY_INFO *) (((UCHAR *) thread_ptr -> tx_thread_stack_end) + (2*sizeof(ULONG)) + 1);
         thread_entry_info =  (TXM_MODULE_THREAD_ENTRY_INFO *) (((ALIGN_TYPE)(thread_entry_info)) & (~0x3));
-        
+
         /* Place the thread entry information pointer in the thread control block so it can be picked up
            in the following stack build function. This is supplied to the module's shell entry function
            to avoid direct access to the actual thread control block. Note that this is overwritten
            with the actual stack pointer at the end of stack build.  */
         thread_ptr -> tx_thread_stack_ptr =  (VOID *) thread_entry_info;
-        
-        /* Call the target specific stack frame building routine to build the 
+
+        /* Call the target specific stack frame building routine to build the
            thread's initial stack and to setup the actual stack pointer in the
            control block.  */
         _txm_module_manager_thread_stack_build(thread_ptr, module_instance -> txm_module_instance_shell_entry_function);

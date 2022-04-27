@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    txm_module.h                                        PORTABLE C      */
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -44,6 +44,9 @@
 /*  12-31-2020      Scott Larson            Modified comment(s), added    */
 /*                                            port-specific extension,    */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022      Scott Larson            Modified comment(s), added    */
+/*                                            callback thread prototype,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -64,23 +67,23 @@
 
 #ifdef TXM_MODULE_ENABLE_FILEX
 #include "txm_module_filex.h"
-#endif 
+#endif
 
 #ifdef TXM_MODULE_ENABLE_GUIX
 #include "txm_module_guix.h"
-#endif 
+#endif
 
 #ifdef TXM_MODULE_ENABLE_NETX
 #include "txm_module_netx.h"
-#endif 
+#endif
 
 #ifdef TXM_MODULE_ENABLE_NETXDUO
 #include "txm_module_netxduo.h"
-#endif 
+#endif
 
 #ifdef TXM_MODULE_ENABLE_USBX
 #include "txm_module_usbx.h"
-#endif 
+#endif
 
 
 #ifdef FX_FILEX_PRESENT
@@ -157,7 +160,7 @@ extern   "C" {
 /* Define each module's callback queue depth. This is used to queue up incoming call back requests.  */
 
 #ifndef TXM_MODULE_CALLBACKS_QUEUE_DEPTH
-#define TXM_MODULE_CALLBACKS_QUEUE_DEPTH                    8       /* Number queued callback requests.  */   
+#define TXM_MODULE_CALLBACKS_QUEUE_DEPTH                    8       /* Number queued callback requests.  */
 #endif
 
 
@@ -367,7 +370,7 @@ typedef struct TXM_MODULE_PREAMBLE_STRUCT
     ULONG               txm_module_preamble_property_flags;             /* Properties Bit Map                           */
     ULONG               txm_module_preamble_shell_entry_function;       /* Module shell Entry Function                  */
     ULONG               txm_module_preamble_start_function;             /* Module Thread Start Function                 */
-    ULONG               txm_module_preamble_stop_function;              /* Module Thread Stop Function                  */ 
+    ULONG               txm_module_preamble_stop_function;              /* Module Thread Stop Function                  */
     ULONG               txm_module_preamble_start_stop_priority;        /* Module Start/Stop Thread Priority            */
     ULONG               txm_module_preamble_start_stop_stack_size;      /* Module Start/Stop Thread Priority            */
     ULONG               txm_module_preamble_callback_function;          /* Module Callback Thread Function              */
@@ -448,10 +451,10 @@ typedef struct TXM_MODULE_INSTANCE_STRUCT
     VOID                (*txm_module_instance_start_thread_entry)(ULONG);
     VOID                (*txm_module_instance_stop_thread_entry)(ULONG);
     VOID                (*txm_module_instance_callback_request_thread_entry)(ULONG);
-    
+
     /* Define the port extention to the module manager structure.  */
     TXM_MODULE_MANAGER_PORT_EXTENSION
-    
+
     TX_THREAD           txm_module_instance_start_stop_thread;
     TX_THREAD           txm_module_instance_callback_request_thread;
     TX_QUEUE            txm_module_instance_callback_request_queue;
@@ -462,7 +465,7 @@ typedef struct TXM_MODULE_INSTANCE_STRUCT
     ULONG               txm_module_instance_callback_priority;
     ULONG               txm_module_instance_application_module_id;
     UINT                txm_module_instance_maximum_priority;
-    
+
     /* Define the head pointer of the list of objects allocated by the module.  */
     struct TXM_MODULE_ALLOCATED_OBJECT_STRUCT
                         *txm_module_instance_object_list_head;
@@ -470,11 +473,11 @@ typedef struct TXM_MODULE_INSTANCE_STRUCT
 
     struct TXM_MODULE_INSTANCE_STRUCT
                         *txm_module_instance_loaded_next,
-                        *txm_module_instance_loaded_previous;  
+                        *txm_module_instance_loaded_previous;
 } TXM_MODULE_INSTANCE;
 
 
-/* Determine if the thread entry info control block has an extension defined. If not, define the extension to 
+/* Determine if the thread entry info control block has an extension defined. If not, define the extension to
    whitespace.  */
 
 #ifndef TXM_MODULE_THREAD_ENTRY_INFO_USER_EXTENSION
@@ -482,9 +485,9 @@ typedef struct TXM_MODULE_INSTANCE_STRUCT
 #endif
 
 
-/* Define the thread entry information structure. This structure is placed on the thread's stack such that the 
+/* Define the thread entry information structure. This structure is placed on the thread's stack such that the
    module's _txm_thread_shell_entry function does not need to access anything in the thread control block.  */
-   
+
 typedef struct TXM_MODULE_THREAD_ENTRY_INFO_STRUCT
 {
     TX_THREAD           *txm_module_thread_entry_info_thread;
@@ -516,7 +519,7 @@ typedef struct TXM_MODULE_ALLOCATED_OBJECT_STRUCT
 } TXM_MODULE_ALLOCATED_OBJECT;
 
 
-/*  Determine if module code is being compiled. If so, remap the ThreadX API to 
+/*  Determine if module code is being compiled. If so, remap the ThreadX API to
     the module shell functions that will go through the module <-> module manager
     interface.  */
 
@@ -541,6 +544,7 @@ VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_EN
 UINT  _txm_module_thread_system_suspend(TX_THREAD *thread_ptr);
 
 UINT  _txm_module_application_request(ULONG request, ALIGN_TYPE param_1, ALIGN_TYPE param_2, ALIGN_TYPE param_3);
+VOID  _txm_module_callback_request_thread_entry(ULONG id);
 UINT  _txm_module_object_allocate(VOID **object_ptr, ULONG object_size);
 UINT  _txm_module_object_deallocate(VOID *object_ptr);
 UINT  _txm_module_object_pointer_get(UINT object_type, CHAR *name, VOID **object_ptr);
@@ -574,7 +578,7 @@ VOID  _txm_module_usbx_duo_callback_request(TXM_MODULE_CALLBACK_MESSAGE *callbac
 
 /* Map the module manager APIs just in case this is being included from the module manager in the
    resident portion of the application.  */
-   
+
 #define txm_module_manager_initialize                   _txm_module_manager_initialize
 #define txm_module_manager_absolute_load                _txm_module_manager_absolute_load
 #define txm_module_manager_in_place_load                _txm_module_manager_in_place_load
@@ -615,7 +619,7 @@ UINT  _txm_module_manager_file_load(TXM_MODULE_INSTANCE *module_instance, CHAR *
 UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_memory_size);
 UINT  _txm_module_manager_absolute_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location);
 UINT  _txm_module_manager_in_place_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location);
-UINT  _txm_module_manager_internal_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location, 
+UINT  _txm_module_manager_internal_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location,
                                         ULONG code_size, VOID *code_allocation_ptr, ULONG code_allocation_size);
 ALIGN_TYPE _txm_module_manager_kernel_dispatch(ULONG kernel_request, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2);
 UINT  _txm_module_manager_object_allocate(VOID **object_ptr_ptr, ULONG object_size, TXM_MODULE_INSTANCE *module_instance);
@@ -628,7 +632,7 @@ UINT  _txm_module_manager_memory_load(TXM_MODULE_INSTANCE *module_instance, CHAR
 UINT  _txm_module_manager_properties_get(TXM_MODULE_INSTANCE *module_instance, ULONG *module_properties_ptr);
 UINT  _txm_module_manager_start(TXM_MODULE_INSTANCE *module_instance);
 UINT  _txm_module_manager_stop(TXM_MODULE_INSTANCE *module_instance);
-UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name, VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *), 
+UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name, VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
                                VOID (*entry_function)(ULONG), ULONG entry_input,
                                VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                                ULONG time_slice, UINT auto_start, UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance);

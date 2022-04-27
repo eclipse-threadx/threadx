@@ -82,4 +82,4 @@ _tx_thread_interrupt_disable:
 ;
 ;}
    .type _tx_thread_interrupt_disable,$function
-   .size _tx_thread_interrupt_disable,.-_tx_thread_interrupt_disable  
+   .size _tx_thread_interrupt_disable,.-_tx_thread_interrupt_disable
