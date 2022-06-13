@@ -109,7 +109,7 @@ The following are references to additional Azure RTOS and Azure IoT in general:
 | TraceX Installer | https://aka.ms/azrtos-tracex-installer |
 | Azure RTOS Documentation and Guides: | https://docs.microsoft.com/azure/rtos |
 | Azure RTOS Website: | https://azure.microsoft.com/services/rtos/ |
-| Azure RTOS Sales Questions: | https://azure-rtos.ms-iot-contact.com/ |
+| Azure RTOS Sales Questions: | https://aka.ms/azrtos-license |
 | Azure RTOS Product Support Policy | https://aka.ms/azrtos/lts |
 | Azure RTOS Functional Safety Artifacts | https://aka.ms/azrtos/tuv |
 | For technical questions check out Microsoft Q/A for Azure IoT | https://aka.ms/QnA/azure-rtos |
