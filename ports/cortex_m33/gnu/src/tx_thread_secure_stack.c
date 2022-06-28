@@ -212,6 +212,7 @@ INT     index;
 __attribute__((cmse_nonsecure_entry))
 UINT    _tx_thread_secure_mode_stack_allocate(TX_THREAD *thread_ptr, ULONG stack_size)
 {
+TX_INTERRUPT_SAVE_AREA
 UINT    status;
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 UCHAR   *stack_mem;
