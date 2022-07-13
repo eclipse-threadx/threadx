@@ -213,7 +213,7 @@ ULONG tx_timer_get_next(ULONG *next_timer_tick_ptr);
 
 ### Description
 
-This service gets the next ThreadX timer expiration, in ticks. 
+This service gets the next ThreadX timer expiration, in ticks.
 
 ### Input parameters
 
@@ -247,3 +247,67 @@ ULONG   timers_active;
 ### See also
 
 - tx_time_increment
+
+# Use Idle Thread
+
+To implement tickless low power based on an idle thread, developers can create an idle thread with
+the help of these Low Power APIs like this at the cost of a new thread and its stack.
+
+```c
+// Minimum number of ticks for tickless low power mode
+#define MIN_TICKLESS_IDLE_TIME  ...
+
+void thread_idle_entry(ULONG thread_input)
+{
+TX_INTERRUPT_SAVE_AREA
+    ULONG   tx_low_power_next_expiration;
+    uint32_t   timers_active;
+
+    for (;;)
+    {
+        TX_DISABLE
+
+        timers_active =  tx_timer_get_next(&tx_low_power_next_expiration);
+
+        TX_RESTORE
+
+        if (timers_active == TX_FALSE)
+            tx_low_power_next_expiration = 0xFFFFFFFF;
+
+        if (tx_low_power_next_expiration > MIN_TICKLESS_IDLE_TIME)
+        {
+            // try to go to tickless low power mode
+            uint32_t tx_low_power_adjust_ticks = port_enter_tickless_low_power_mode(tx_low_power_next_expiration);
+
+            if (tx_low_power_adjust_ticks > 0)
+            {
+                // adjust to keep the ThreadX timer services accurate
+                tx_time_increment(tx_low_power_adjust_ticks);
+                tx_time_set(tx_time_get() + tx_low_power_adjust_ticks);
+            }
+            else
+            {
+                // failed to enter tickless low power mode
+                port_wait_for_interrupt();
+            }
+        }
+        else
+        {
+            port_wait_for_interrupt();
+        }
+    }
+}
+
+#define IDLE_STACK_SIZE     ...
+static uint8_t idle_stack[IDLE_STACK_SIZE];
+
+tx_thread_create(&thread_idle, "idle", thread_idle_entry, 0,
+                 idle_stack, IDLE_STACK_SIZE,
+                 TX_MAX_PRIORITIES - 1, TX_MAX_PRIORITIES - 1, TX_NO_TIME_SLICE, TX_AUTO_START);
+```
+
+`port_enter_tickless_low_power_mode` is the implementation of tickless low power mode and returns the actualy ticks
+ellapsed during low power mode. `port_wait_for_interrupt` is the implementation of _waiting for interrupts_, such as
+`wfi` for Arm.
+
+`TX_LOW_POWER` should not be defined when using the idle thread.
