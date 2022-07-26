@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="com.arm.debugger.launcher2">
+    <mapAttribute key="AverageDurationTracker">
+        <mapEntry key="*Fetching Data" value="24001419"/>
+        <mapEntry key="*Fetching Data Model" value="837547"/>
+        <mapEntry key="*FunctionLoader" value="60205600"/>
+        <mapEntry key="*list global low level symbols" value="1092807"/>
+        <mapEntry key="*loading memory from target" value="1956885"/>
+        <mapEntry key="*loading values from target" value="5548004"/>
+        <mapEntry key="*trace" value="357936340"/>
+        <mapEntry key="*updating expressions" value="14485737"/>
+        <mapEntry key="*updating local_variables" value="491765"/>
+        <mapEntry key="*updating registers" value="15501822"/>
+        <mapEntry key="*updating variables" value="1347961"/>
+        <mapEntry key="AddEventObserver" value="2496890"/>
+        <mapEntry key="Evaluate" value="1471500"/>
+        <mapEntry key="ResumeToHere" value="16558874"/>
+        <mapEntry key="Retrieving globals list" value="25220314"/>
+        <mapEntry key="add-symbol-file" value="11456014"/>
+        <mapEntry key="areCachesAvailable" value="431165"/>
+        <mapEntry key="backtrace" value="8618003"/>
+        <mapEntry key="break" value="3610654"/>
+        <mapEntry key="checking tracepoints" value="41266"/>
+        <mapEntry key="compute execution mode" value="1223800"/>
+        <mapEntry key="console" value="32264250"/>
+        <mapEntry key="continue" value="30184117"/>
+        <mapEntry key="core" value="8098422"/>
+        <mapEntry key="disable" value="2289400"/>
+        <mapEntry key="disassemble" value="47116008"/>
+        <mapEntry key="enable" value="3396700"/>
+        <mapEntry key="evaluate address" value="610217"/>
+        <mapEntry key="finish" value="27225260"/>
+        <mapEntry key="get byte order" value="435704"/>
+        <mapEntry key="get capabilities" value="392784"/>
+        <mapEntry key="get execution addresss" value="1575181"/>
+        <mapEntry key="get source lines" value="795586"/>
+        <mapEntry key="getValidEncodings" value="417981"/>
+        <mapEntry key="initialize command help" value="40341999"/>
+        <mapEntry key="interrupt" value="78867364"/>
+        <mapEntry key="list breakpoint options" value="130971"/>
+        <mapEntry key="list breakpoints" value="326120"/>
+        <mapEntry key="list instruction sets" value="563705"/>
+        <mapEntry key="list signals" value="23953891"/>
+        <mapEntry key="list watchpoint options" value="1543199"/>
+        <mapEntry key="list watchpoints" value="463760"/>
+        <mapEntry key="loadfile" value="101343639"/>
+        <mapEntry key="next" value="19921924"/>
+        <mapEntry key="remove" value="1212473"/>
+        <mapEntry key="run" value="17693094"/>
+        <mapEntry key="run script" value="50680881"/>
+        <mapEntry key="select-frame" value="428835"/>
+        <mapEntry key="set CWD" value="3439986"/>
+        <mapEntry key="set breakpoint properties" value="3050687"/>
+        <mapEntry key="set debug-from" value="937032"/>
+        <mapEntry key="start" value="71393875"/>
+        <mapEntry key="step" value="29909833"/>
+        <mapEntry key="synchronizing trace ranges" value="37797"/>
+        <mapEntry key="target reset" value="5095100"/>
+        <mapEntry key="toggleBreakpoint" value="7565021"/>
+        <mapEntry key="updateBreakpointLocation" value="1629832"/>
+        <mapEntry key="waitForTargetToStop" value="13692545"/>
+        <mapEntry key="write expression" value="9225850"/>
+    </mapAttribute>
+    <intAttribute key="DEBUG_TAB..RESOURCES.COUNT" value="0"/>
+    <intAttribute key="FILES.CONNECT_TO_GDB_SERVER.RESOURCES.COUNT" value="0"/>
+    <intAttribute key="FILES.DEBUG_EXISTING_ANDROID.RESOURCES.COUNT" value="0"/>
+    <listAttribute key="FILES.DEBUG_RESIDENT_ANDROID"/>
+    <stringAttribute key="FILES.DEBUG_RESIDENT_ANDROID.RESOURCES.0.TYPE" value="TARGET_WORKING_DIR"/>
+    <stringAttribute key="FILES.DEBUG_RESIDENT_ANDROID.RESOURCES.0.VALUE" value=""/>
+    <intAttribute key="FILES.DEBUG_RESIDENT_ANDROID.RESOURCES.COUNT" value="1"/>
+    <listAttribute key="FILES.DEBUG_RESIDENT_APP"/>
+    <stringAttribute key="FILES.DEBUG_RESIDENT_APP.RESOURCES.0.TYPE" value="TARGET_WORKING_DIR"/>
+    <stringAttribute key="FILES.DEBUG_RESIDENT_APP.RESOURCES.0.VALUE" value=""/>
+    <stringAttribute key="FILES.DEBUG_RESIDENT_APP.RESOURCES.1.TYPE" value="APPLICATION_ON_TARGET"/>
+    <stringAttribute key="FILES.DEBUG_RESIDENT_APP.RESOURCES.1.VALUE" value=""/>
+    <intAttribute key="FILES.DEBUG_RESIDENT_APP.RESOURCES.COUNT" value="2"/>
+    <listAttribute key="FILES.DOWNLOAD_AND_DEBUG"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.0.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.0.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.0.TYPE" value="APP_ON_HOST_TO_DOWNLOAD"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.0.VALUE" value=""/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.1.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.1.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.1.TYPE" value="TARGET_WORKING_DIR"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.1.VALUE" value=""/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.2.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.2.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.2.TYPE" value="TARGET_DOWNLOAD_DIR"/>
+    <stringAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.2.VALUE" value=""/>
+    <intAttribute key="FILES.DOWNLOAD_AND_DEBUG.RESOURCES.COUNT" value="3"/>
+    <listAttribute key="FILES.DOWNLOAD_DEBUG"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.0.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.0.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.0.TYPE" value="APP_ON_HOST_TO_DOWNLOAD"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.0.VALUE" value=""/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.1.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.1.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.1.TYPE" value="TARGET_WORKING_DIR"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.1.VALUE" value=""/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.2.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.2.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.2.TYPE" value="TARGET_DOWNLOAD_DIR"/>
+    <stringAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.2.VALUE" value=""/>
+    <intAttribute key="FILES.DOWNLOAD_DEBUG.RESOURCES.COUNT" value="3"/>
+    <intAttribute key="FILES.DOWNLOAD_DEBUG_ANDROID.RESOURCES.COUNT" value="0"/>
+    <listAttribute key="FILES.ICE_DEBUG">
+        <listEntry value="ON_DEMAND_LOAD"/>
+        <listEntry value="ALSO_LOAD_SYMBOLS"/>
+    </listAttribute>
+    <stringAttribute key="FILES.ICE_DEBUG.RESOURCES.0.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
+    <stringAttribute key="FILES.ICE_DEBUG.RESOURCES.0.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.ICE_DEBUG.RESOURCES.0.TYPE" value="APP_ON_HOST_TO_DOWNLOAD"/>
+    <stringAttribute key="FILES.ICE_DEBUG.RESOURCES.0.VALUE" value="${workspace_loc:/sample_threadx/Debug/sample_threadx.axf}"/>
+    <stringAttribute key="FILES.ICE_DEBUG.RESOURCES.1.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.ICE_DEBUG.RESOURCES.1.TYPE" value="SYMBOLS_FILE"/>
+    <stringAttribute key="FILES.ICE_DEBUG.RESOURCES.1.VALUE" value="${workspace_loc:/sample_threadx_module/Debug/sample_threadx_module.axf}"/>
+    <intAttribute key="FILES.ICE_DEBUG.RESOURCES.COUNT" value="1"/>
+    <listAttribute key="FILES.ICE_DEBUG_WITH_ETB_TRACE">
+        <listEntry value="ON_DEMAND_LOAD"/>
+        <listEntry value="ALSO_LOAD_SYMBOLS"/>
+    </listAttribute>
+    <stringAttribute key="FILES.ICE_DEBUG_WITH_ETB_TRACE.RESOURCES.0.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
+    <stringAttribute key="FILES.ICE_DEBUG_WITH_ETB_TRACE.RESOURCES.0.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.ICE_DEBUG_WITH_ETB_TRACE.RESOURCES.0.TYPE" value="APP_ON_HOST_TO_DOWNLOAD"/>
+    <stringAttribute key="FILES.ICE_DEBUG_WITH_ETB_TRACE.RESOURCES.0.VALUE" value=""/>
+    <intAttribute key="FILES.ICE_DEBUG_WITH_ETB_TRACE.RESOURCES.COUNT" value="1"/>
+    <listAttribute key="FILES.ICE_DEBUG_WITH_TRACE">
+        <listEntry value="ON_DEMAND_LOAD"/>
+        <listEntry value="ALSO_LOAD_SYMBOLS"/>
+    </listAttribute>
+    <stringAttribute key="FILES.ICE_DEBUG_WITH_TRACE.RESOURCES.0.OPTION.ALSO_LOAD_SYMBOLS" value="true"/>
+    <stringAttribute key="FILES.ICE_DEBUG_WITH_TRACE.RESOURCES.0.OPTION.ON_DEMAND_LOAD" value="true"/>
+    <stringAttribute key="FILES.ICE_DEBUG_WITH_TRACE.RESOURCES.0.TYPE" value="APP_ON_HOST_TO_DOWNLOAD"/>
+    <stringAttribute key="FILES.ICE_DEBUG_WITH_TRACE.RESOURCES.0.VALUE" value=""/>
+    <intAttribute key="FILES.ICE_DEBUG_WITH_TRACE.RESOURCES.COUNT" value="1"/>
+    <stringAttribute key="FILES.SELECTED_DEBUG_OPEATION" value="ICE_DEBUG"/>
+    <stringAttribute key="HOST_WORKING_DIR" value="${workspace_loc}"/>
+    <booleanAttribute key="HOST_WORKING_DIR_USE_DEFAULT" value="true"/>
+    <booleanAttribute key="KEY_COMMANDS_AFTER_CONNECT" value="false"/>
+    <stringAttribute key="KEY_COMMANDS_AFTER_CONNECT_TEXT" value=""/>
+    <booleanAttribute key="KEY_COMMANDS_AS_CONNECT" value="false"/>
+    <intAttribute key="Messages.POST_TRIGGER_CAPTURE_SIZE.getLocalisedValue().FMTrace" value="50"/>
+    <booleanAttribute key="Messages.STOP_ON_TRIGGER.getLocalisedValue().FMTrace" value="false"/>
+    <intAttribute key="POST_TRIGGER_CAPTURE_SIZE.model_streaming_capture_0" value="50"/>
+    <booleanAttribute key="RSE_USE_HOSTNAME" value="true"/>
+    <booleanAttribute key="STOP_ON_TRIGGER.model_streaming_capture_0" value="false"/>
+    <stringAttribute key="TCP_DISABLE_EXTENDED_MODE" value="true"/>
+    <booleanAttribute key="TCP_KILL_ON_EXIT" value="false"/>
+    <listAttribute key="TREE_NODE_PROPERTIES:debugger.view.ExpressionsView">
+        <listEntry value="NODE CACHE VERSION 1"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:*_tx_timer_current_ptr:VALUE:(*_tx_timer_current_ptr)-&gt;tx_timer_internal_list_head"/>
+        <listEntry value="1"/>
+        <listEntry value="element formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:pointer"/>
+        <listEntry value="1"/>
+        <listEntry value="element formatter"/>
+        <listEntry value="Character"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:&amp;pointer[0]"/>
+        <listEntry value="1"/>
+        <listEntry value="element formatter"/>
+        <listEntry value="Character"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[1]:VALUE:(my_module).txm_module_instance_mpu_registers[1].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[2]:VALUE:(my_module).txm_module_instance_mpu_registers[2].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[3]:VALUE:(my_module).txm_module_instance_mpu_registers[3].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[3]:VALUE:(my_module).txm_module_instance_mpu_registers[3].txm_module_mpu_region_attributes"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[4]:VALUE:(my_module).txm_module_instance_mpu_registers[4].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[4]:VALUE:(my_module).txm_module_instance_mpu_registers[4].txm_module_mpu_region_size"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[4]:VALUE:(my_module).txm_module_instance_mpu_registers[4].txm_module_mpu_region_attributes"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[9]:VALUE:(my_module).txm_module_instance_mpu_registers[9].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[5]:VALUE:(my_module).txm_module_instance_mpu_registers[5].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[6]:VALUE:(my_module).txm_module_instance_mpu_registers[6].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[7]:VALUE:(my_module).txm_module_instance_mpu_registers[7].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[7]:VALUE:(my_module).txm_module_instance_mpu_registers[7].txm_module_mpu_region_size"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_mpu_registers:VALUE:(my_module).txm_module_instance_mpu_registers[8]:VALUE:(my_module).txm_module_instance_mpu_registers[8].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:my_module:VALUE:(my_module).txm_module_instance_name"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:_txm_module_manager_memory_fault_info:VALUE:(_txm_module_manager_memory_fault_info).txm_module_manager_memory_fault_info_dfar"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:_txm_module_manager_memory_fault_info:VALUE:(_txm_module_manager_memory_fault_info).txm_module_manager_memory_fault_info_dfsr"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:_txm_module_manager_memory_fault_info:VALUE:(_txm_module_manager_memory_fault_info).txm_module_manager_memory_fault_info_sp"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:_txm_module_manager_memory_fault_info:VALUE:(_txm_module_manager_memory_fault_info).txm_module_manager_memory_fault_info_r0"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:_txm_module_manager_memory_fault_info:VALUE:(_txm_module_manager_memory_fault_info).txm_module_manager_memory_fault_info_r1"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:_txm_module_manager_memory_fault_info:VALUE:(_txm_module_manager_memory_fault_info).txm_module_manager_memory_fault_info_r9"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:_txm_module_manager_memory_fault_info:VALUE:(_txm_module_manager_memory_fault_info).txm_module_manager_memory_fault_info_cpsr"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:_tx_thread_current_ptr:VALUE:(_tx_thread_current_ptr)-&gt;tx_thread_id"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:(TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers[0]:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers-&gt;txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:(TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers[1]:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers[1].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:(TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers[2]:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers[2].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="EXPRESSION_GROUP:Expressions:VALUE:(TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers[3]:VALUE:((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers[3].txm_module_mpu_region_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+    </listAttribute>
+    <listAttribute key="TREE_NODE_PROPERTIES:debugger.view.VariableTreeView">
+        <listEntry value="NODE CACHE VERSION 1"/>
+        <listEntry value="LOCALS:Locals:VALUE:D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/tx/txm_module_manager_mm_register_setup.c::_txm_module_manager_mm_register_setup::code_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="LOCALS:Locals:VALUE:D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/tx/txm_module_manager_mm_register_setup.c::_txm_module_manager_mm_register_setup::data_address"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="LOCALS:Locals:VALUE:D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/tx/txm_module_manager_mm_register_setup.c::_txm_module_manager_mm_register_setup::block_size"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="LOCALS:Locals:VALUE:D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/tx/txm_module_manager_mm_register_setup.c::_txm_module_manager_mm_register_setup::base_address_register"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="LOCALS:Locals:VALUE:D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/tx/txm_module_manager_in_place_load.c::_txm_module_manager_in_place_load::data_start"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="LOCALS:Locals:VALUE:D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/tx/txm_module_manager_in_place_load.c::_txm_module_manager_in_place_load::module_name"/>
+        <listEntry value="1"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="LOCALS:Locals:VALUE:D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/tx/txm_module_manager_in_place_load.c::_txm_module_manager_in_place_load::memory_ptr"/>
+        <listEntry value="2"/>
+        <listEntry value="formatter"/>
+        <listEntry value="Hexadecimal"/>
+        <listEntry value="element formatter"/>
+        <listEntry value="Character"/>
+    </listAttribute>
+    <booleanAttribute key="VFS_ENABLED" value="true"/>
+    <stringAttribute key="VFS_LOCAL_DIR" value="${workspace_loc}"/>
+    <stringAttribute key="VFS_REMOTE_MOUNT" value="/writeable"/>
+    <stringAttribute key="breakpoints" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;breakpoints order=&quot;ALPHA&quot;&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_thread_resume.c&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_thread_resume.c&quot; line=&quot;590&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_thread_resume.c&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_thread_resume.c&quot; line=&quot;590&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_initialize_low_level.S&quot; line=&quot;176&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_initialize_low_level.S&quot; line=&quot;176&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_initialize_low_level.S&quot; line=&quot;159&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_initialize_low_level.S&quot; line=&quot;159&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_thread_context_restore.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_thread_context_restore.S&quot; line=&quot;151&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_thread_context_restore.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_thread_context_restore.S&quot; line=&quot;151&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_thread_context_save.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_thread_context_save.S&quot; line=&quot;133&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_thread_context_save.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_thread_context_save.S&quot; line=&quot;133&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_initialize_low_level.S&quot; line=&quot;401&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/threadx/modules/txm58/5.8.2/tx58_cortex-r4ac6/v51ds5/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\threadx\modules\txm58\5.8.2\tx58_cortex-r4ac6\v51ds5\tx\tx_initialize_low_level.S&quot; line=&quot;401&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill_original/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill_original\tx\tx_initialize_low_level.S&quot; line=&quot;401&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill_original/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill_original\tx\tx_initialize_low_level.S&quot; line=&quot;401&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill_original/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill_original\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;94&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill_original/sample_threadx_module_manager/sample_threadx_module_manager.c&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill_original\sample_threadx_module_manager\sample_threadx_module_manager.c&quot; line=&quot;94&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill_original/sample_threadx_module/sample_threadx_module.c&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill_original\sample_threadx_module\sample_threadx_module.c&quot; line=&quot;107&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill_original/sample_threadx_module/sample_threadx_module.c&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill_original\sample_threadx_module\sample_threadx_module.c&quot; line=&quot;107&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill\tx\tx_initialize_low_level.S&quot; line=&quot;401&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill/tx/tx_initialize_low_level.S&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill\tx\tx_initialize_low_level.S&quot; line=&quot;401&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill/sample_threadx_module/sample_threadx_module.c&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill\sample_threadx_module\sample_threadx_module.c&quot; line=&quot;274&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; debugFile=&quot;D:/Documents/work/modules_testing/txmcortex-r4_mpu_arm_RC1-frombill/sample_threadx_module/sample_threadx_module.c&quot; hostFile=&quot;D:\Documents\work\modules_testing\txmcortex-r4_mpu_arm_RC1-frombill\sample_threadx_module\sample_threadx_module.c&quot; line=&quot;274&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x0001C46C&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx_andrejm_test/ports_module/cortex-r4/ac6/example_build/sample_threadx/sample_threadx.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx_andrejm_test\ports_module\cortex-r4\ac6\example_build\sample_threadx\sample_threadx.c&quot; line=&quot;193&quot; function=&quot;thread_0_entry&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;0x0001C46C&quot; debugFile=&quot;C:/Users/andrejm/work/git/AzureRTOS/threadx_andrejm_test/ports_module/cortex-r4/ac6/example_build/sample_threadx/sample_threadx.c&quot; hostFile=&quot;C:\Users\andrejm\work\git\AzureRTOS\threadx_andrejm_test\ports_module\cortex-r4\ac6\example_build\sample_threadx\sample_threadx.c&quot; line=&quot;193&quot; function=&quot;thread_0_entry&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&lt;/breakpoints&gt;&#10;"/>
+    <listAttribute key="com.arm.debug.views.common.AddressTracker.debugger.view.DisassemblyView.addresses">
+        <listEntry value="&lt;Next Instruction&gt;"/>
+        <listEntry value=""/>
+        <listEntry value="&amp;(((TXM_MODULE_INSTANCE *)_tx_thread_current_ptr-&gt;tx_thread_module_instance_ptr)-&gt;txm_module_instance_mpu_registers[3].txm_module_mpu_region_address)"/>
+        <listEntry value="0x101326"/>
+        <listEntry value="$pc"/>
+        <listEntry value="0x229"/>
+        <listEntry value="0x107c"/>
+        <listEntry value="0x22c"/>
+        <listEntry value="0x7cb1"/>
+        <listEntry value="0x7cc4"/>
+        <listEntry value="_tx_thread_shell_entry"/>
+        <listEntry value="0x1021d0"/>
+        <listEntry value="_txm_module_initialize"/>
+        <listEntry value="_txm_module_thread_shell_entry"/>
+        <listEntry value="0x00100000"/>
+        <listEntry value="0x201b8"/>
+        <listEntry value="_tx_thread_schedule"/>
+        <listEntry value="0x100000"/>
+        <listEntry value="0x10000"/>
+        <listEntry value="main"/>
+    </listAttribute>
+    <listAttribute key="com.arm.debug.views.common.AddressTracker.debugger.view.DisassemblyView.ranges">
+        <listEntry value="100"/>
+        <listEntry value=""/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+        <listEntry value="100"/>
+    </listAttribute>
+    <listAttribute key="com.arm.debug.views.common.AddressTracker.debugger.view.MemoryView.addresses">
+        <listEntry value=""/>
+        <listEntry value="0xB0110000"/>
+        <listEntry value="$sp-72"/>
+        <listEntry value="$sp-64"/>
+        <listEntry value="$sp-65"/>
+        <listEntry value="$sp-68"/>
+        <listEntry value="$sp"/>
+        <listEntry value="0x14480"/>
+        <listEntry value="0x14490"/>
+        <listEntry value="0x14498"/>
+        <listEntry value="0x1e370"/>
+        <listEntry value="0x1e388"/>
+        <listEntry value="0x80221d4"/>
+        <listEntry value="0x1ddc0"/>
+        <listEntry value="0x00021200"/>
+        <listEntry value="0x00021290"/>
+        <listEntry value="0x000237B0"/>
+        <listEntry value="main"/>
+        <listEntry value="0x00100000"/>
+        <listEntry value="0x08020000"/>
+    </listAttribute>
+    <listAttribute key="com.arm.debug.views.common.AddressTracker.debugger.view.MemoryView.ranges">
+        <listEntry value=""/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+        <listEntry value="1024"/>
+    </listAttribute>
+    <stringAttribute key="com.arm.debug.views.debugConsole.DebugCommandLine.History" value="set semihosting enabled off;set semihosting enabled on"/>
+    <stringAttribute key="config_db_activity_name" value="Cortex-R4"/>
+    <stringAttribute key="config_db_connection_keys" value="dtsl_config dtsl_tracecapture_option connect_existing_model dtsl_config_script model_params model_iris config_file model_connection_address setup TCP_KILL_ON_EXIT TCP_DISABLE_EXTENDED_MODE"/>
+    <stringAttribute key="config_db_connection_type" value="Bare Metal Debug"/>
+    <stringAttribute key="config_db_platform_name" value="Arm FVP (Installed with Arm DS) - VE_Cortex_R4"/>
+    <stringAttribute key="config_db_project_type" value="Bare Metal Debug"/>
+    <stringAttribute key="config_db_project_type_id" value="BARE_METAL"/>
+    <stringAttribute key="config_db_taxonomy_id" value="/platform/armfvp_installedwitharmds_/ve_cortex_r4"/>
+    <stringAttribute key="config_file" value="CDB://../../Arm FVP/VE_Cortex_R4/iris_config.xml"/>
+    <booleanAttribute key="connectOnly" value="false"/>
+    <stringAttribute key="connect_existing_model" value="false"/>
+    <stringAttribute key="debugger.view.DataView.os:DataView" value="rO0ABXNyACtjb20uYXJtLmRlYnVnLnZpZXdzLmRhdGEuRGF0YVZpZXdQcm9wZXJ0aWVzAAAAAAAAAAECAAB4cgAlY29tLmFybS5kZWJ1Zy52aWV3cy5kYXRhLlByb3BlcnR5VHJlZQAAAAAAAAABAwABTAAFbURhdGF0ABNMamF2YS91dGlsL0hhc2hNYXA7eHB3BAAAAAJ0ABJkYXRhYmFzZVByb3BlcnRpZXNzcQB+AAF3BAAAAAF0AAd0aHJlYWR4c3IAK2NvbS5hcm0uZGVidWcudmlld3MuZGF0YS5EYXRhYmFzZVByb3BlcnRpZXMAAAAAAAAAAQIAAHhxAH4AAXcEAAAAA3QABnRhYmxlc3NxAH4AAXcEAAAAAXQAB3RocmVhZHNzcgAoY29tLmFybS5kZWJ1Zy52aWV3cy5kYXRhLlRhYmxlUHJvcGVydGllcwAAAAAAAAABAgAAeHEAfgABdwQAAAAEdAACaWRxAH4AC3QAEGNvbHVtbkF1dG9SZXNpemVzcQB+AAF3BAAAAAp0AAEwdAAEdHJ1ZXQAATFxAH4AEnQAATJxAH4AEnQAATNxAH4AEnQAAi0xcQB+ABJ0AAE0cQB+ABJ0AAE1cQB+ABJ0AAE2cQB+ABJ0AAE3cQB+ABJ0AAE4cQB+ABJ4dAAMY29sdW1uV2lkdGhzc3EAfgABdwQAAAAKdAABMHQAAjYwdAABMXQAAjYzdAABMnQAAjUzdAABM3QAAjc4dAACLTF0AAIyNXQAATR0AAI1OHQAATV0AAI0N3QAATZ0AAI3NnQAATd0AAI3MnQAATh0AAI5MHh0AAZjb25maWd0APlPdXRsaW5lQ29uZmlnMQkxMAktMQlmYWxzZQl0cnVlCTI1CS0xCXRydWUJMAl0cnVlCXRydWUJNjAJLTEJdHJ1ZQkxCXRydWUJdHJ1ZQk2MwktMQl0cnVlCTIJdHJ1ZQl0cnVlCTUzCS0xCXRydWUJMwl0cnVlCXRydWUJNzgJLTEJdHJ1ZQk0CXRydWUJdHJ1ZQk1OAktMQl0cnVlCTUJdHJ1ZQl0cnVlCTQ3CS0xCXRydWUJNgl0cnVlCXRydWUJNzYJLTEJdHJ1ZQk3CXRydWUJdHJ1ZQk3MgktMQl0cnVlCTgJdHJ1ZQl0cnVlCTkwCS0xCXRydWV4eHEAfgAOcQB+AAZ0AAxjdXJyZW50VGFibGVxAH4AC3h4dAAPY3VycmVudERhdGFiYXNldAAHdGhyZWFkeHg="/>
+    <listAttribute key="debugger.view.DisassemblyView:current">
+        <listEntry value="&lt;Next Instruction&gt;"/>
+        <listEntry value="100"/>
+    </listAttribute>
+    <listAttribute key="debugger.view.ExpressionsView">
+        <listEntry value="thread_0_counter"/>
+        <listEntry value="thread_1_counter"/>
+        <listEntry value="thread_1_messages_sent"/>
+        <listEntry value="thread_2_counter"/>
+        <listEntry value="thread_2_messages_received"/>
+        <listEntry value="thread_3_counter"/>
+        <listEntry value="thread_4_counter"/>
+        <listEntry value="thread_5_counter"/>
+        <listEntry value="thread_6_counter"/>
+        <listEntry value="thread_7_counter"/>
+        <listEntry value="_txm_module_manager_memory_fault_info"/>
+    </listAttribute>
+    <mapAttribute key="debugger.view.ExpressionsView.ExpressionsData">
+        <mapEntry key="0" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+        <mapEntry key="1" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+        <mapEntry key="10" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,88;NODE_TYPE,VALUE;FORMATTER,com.arm.debug.views.common.outline.DefaultDataFormatter"/>
+        <mapEntry key="2" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+        <mapEntry key="3" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+        <mapEntry key="4" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+        <mapEntry key="5" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+        <mapEntry key="6" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+        <mapEntry key="7" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+        <mapEntry key="8" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+        <mapEntry key="9" value="NODE_TRANSFER_ELEMENT_COUNT,0;NODE_TRANSFER_ELEMENT_SIZE_IN_BYTES,4;NODE_TYPE,VALUE;FORMATTER,Unsigned Decimal"/>
+    </mapAttribute>
+    <stringAttribute key="debugger.view.ExpressionsView:DebugOutlineColumnState" value="OutlineConfig1&#9;8&#9;0&#9;true&#9;false&#9;355&#9;-1&#9;true&#9;1&#9;false&#9;true&#9;127&#9;-1&#9;true&#9;2&#9;true&#9;false&#9;129&#9;-1&#9;true&#9;3&#9;true&#9;true&#9;400&#9;-1&#9;true&#9;4&#9;true&#9;true&#9;65&#9;-1&#9;true&#9;5&#9;true&#9;true&#9;48&#9;-1&#9;true&#9;6&#9;true&#9;true&#9;122&#9;-1&#9;true&#9;7&#9;true&#9;true&#9;69&#9;-1&#9;true"/>
+    <stringAttribute key="debugger.view.MemoryView" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;page&gt;&#10;&#9;&lt;memoryView/&gt;&#10;&lt;/page&gt;&#10;"/>
+    <listAttribute key="debugger.view.MemoryView:current">
+        <listEntry value=""/>
+        <listEntry value=""/>
+    </listAttribute>
+    <stringAttribute key="debugger.view.NewRegisterView:DebugOutlineColumnState" value="OutlineConfig1&#9;8&#9;0&#9;true&#9;true&#9;77&#9;-1&#9;true&#9;1&#9;false&#9;true&#9;109&#9;-1&#9;true&#9;2&#9;true&#9;false&#9;222&#9;-1&#9;true&#9;3&#9;false&#9;true&#9;47&#9;-1&#9;true&#9;4&#9;false&#9;true&#9;56&#9;-1&#9;true&#9;5&#9;true&#9;true&#9;37&#9;-1&#9;true&#9;6&#9;false&#9;true&#9;74&#9;-1&#9;true&#9;7&#9;true&#9;true&#9;53&#9;-1&#9;true"/>
+    <stringAttribute key="debugger.view.NewRegisterView:_selectedRegisterSet" value="All registers"/>
+    <mapAttribute key="debugger.view.NewRegisterView_registerSets"/>
+    <stringAttribute key="debugger.view.StackView:DebugOutlineColumnState" value="OutlineConfig1&#9;8&#9;0&#9;true&#9;true&#9;56&#9;-1&#9;true&#9;1&#9;false&#9;true&#9;109&#9;-1&#9;true&#9;2&#9;true&#9;true&#9;52&#9;-1&#9;true&#9;3&#9;true&#9;true&#9;47&#9;-1&#9;true&#9;4&#9;true&#9;true&#9;56&#9;-1&#9;true&#9;5&#9;true&#9;true&#9;43&#9;-1&#9;true&#9;6&#9;true&#9;true&#9;74&#9;-1&#9;true&#9;7&#9;true&#9;true&#9;61&#9;-1&#9;true"/>
+    <listAttribute key="debugger.view.TraceView:TRACE_EXPORT_FILTERS"/>
+    <stringAttribute key="debugger.view.VariableTreeView:DebugOutlineColumnState" value="OutlineConfig1&#9;8&#9;0&#9;true&#9;true&#9;178&#9;-1&#9;true&#9;1&#9;false&#9;true&#9;109&#9;-1&#9;true&#9;2&#9;true&#9;true&#9;118&#9;-1&#9;true&#9;3&#9;true&#9;true&#9;47&#9;-1&#9;true&#9;4&#9;true&#9;true&#9;56&#9;-1&#9;true&#9;5&#9;true&#9;true&#9;43&#9;-1&#9;true&#9;6&#9;true&#9;true&#9;74&#9;-1&#9;true&#9;7&#9;true&#9;true&#9;61&#9;-1&#9;true"/>
+    <listAttribute key="debugger.view.VariableTreeView:USER_ADDED_FILE_STATICS"/>
+    <listAttribute key="debugger.view.VariableTreeView:USER_ADDED_GLOBALS"/>
+    <booleanAttribute key="debugger.view.expression.DrawAsHex" value="false"/>
+    <booleanAttribute key="debugger.view.register.DrawAsHex" value="false"/>
+    <stringAttribute key="debugger.view.symbols.FunctionsView:DebugOutlineColumnState" value="OutlineConfig1&#9;8&#9;0&#9;true&#9;true&#9;60&#9;1&#9;true&#9;1&#9;false&#9;true&#9;123&#9;-1&#9;true&#9;2&#9;false&#9;true&#9;109&#9;-1&#9;true&#9;3&#9;true&#9;true&#9;109&#9;0&#9;true&#9;4&#9;true&#9;true&#9;103&#9;-1&#9;true&#9;5&#9;false&#9;true&#9;47&#9;-1&#9;true&#9;6&#9;true&#9;true&#9;134&#9;-1&#9;true&#9;7&#9;true&#9;true&#9;62&#9;-1&#9;true"/>
+    <booleanAttribute key="debugger.view.variable.DrawAsHex" value="false"/>
+    <stringAttribute key="dtsl_config" value="DtslScript"/>
+    <stringAttribute key="dtsl_config_script" value="CDB://../../Arm FVP/VE_Cortex_R4/dtsl_config_script.py"/>
+    <stringAttribute key="dtsl_options_file" value="default"/>
+    <stringAttribute key="dtsl_tracecapture_option" value="options.trace.traceCapture"/>
+    <stringAttribute key="launch_configuration_version" value="5.29.2"/>
+    <booleanAttribute key="linuxOS" value="false"/>
+    <stringAttribute key="model_connection_address" value=""/>
+    <stringAttribute key="model_iris" value="1"/>
+    <stringAttribute key="model_params" value="-C daughterboard.core.NUM_MPU_REGION=12"/>
+    <booleanAttribute key="runAfterConnect" value="false"/>
+    <listAttribute key="setup">
+        <listEntry value="CDB://Scripts/rtsm_launcher.py"/>
+        <listEntry value="&quot;FVP_VE_Cortex-R4&quot;"/>
+    </listAttribute>
+    <stringAttribute key="stopAtExpression" value="main"/>
+    <stringAttribute key="watchpoints" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;watchpoints&gt;&#10;&lt;/watchpoints&gt;&#10;"/>
+</launchConfiguration>

@@ -50,7 +50,7 @@
 @/*  FUNCTION                                               RELEASE        */ 
 @/*                                                                        */ 
 @/*    _tx_thread_smp_protect                          SMP/Cortex-A7/GNU   */ 
-@/*                                                            6.1         */
+@/*                                                            6.1.12      */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -81,7 +81,9 @@
 @/*                                                                        */ 
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
+@/*  07-29-2022      Scott Larson            Fixed preprocessor statement, */
+@/*                                            resulting in version 6.1.12 */
 @/*                                                                        */
 @/**************************************************************************/
     .global _tx_thread_smp_protect
@@ -98,7 +100,7 @@ _tx_thread_smp_protect:
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
     CPSID   if                                  @ Disable IRQ and FIQ interrupts
-    ELSE
+#else
     CPSID   i                                   @ Disable IRQ interrupts
 #endif
 @
@@ -249,7 +251,7 @@ _try_to_get_lock:
 @
 #ifdef TX_ENABLE_FIQ_SUPPORT
     CPSID   if                                  @ Disable IRQ and FIQ interrupts
-    ELSE
+#else
     CPSID   i                                   @ Disable IRQ interrupts
 #endif
 

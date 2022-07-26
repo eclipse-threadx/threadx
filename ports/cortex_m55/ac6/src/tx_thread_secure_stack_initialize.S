@@ -26,7 +26,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_initialize                Cortex-M55/AC6    */
-/*                                                           6.1.7        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -49,13 +49,17 @@
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    TX_INITIALIZE_KERNEL_ENTER_EXTENSION                                */
+/*    TX_PORT_SPECIFIC_PRE_INITIALIZATION                                 */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
+/*  07-29-2022      Scott Larson            Modified comments and changed */
+/*                                            secure stack initialization */
+/*                                            macro to port-specific,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_secure_stack_initialize(VOID)

@@ -30,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M33/AC6    */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -72,6 +72,9 @@
 /*  04-25-2022      Scott Larson            Optimized MPU configuration,  */
 /*                                            added BASEPRI support,      */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022      Scott Larson            Removed the code path to skip */
+/*                                            MPU reloading,              */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -424,14 +427,7 @@ _skip_secure_restore:
     LDR     r2, [r0, #0x74]                         // Pickup MPU address of data region
     CBZ     r2, skip_mpu_setup                      // Is protection required for this module? No, skip MPU setup
 
-    // Is the MPU already set up for this module?
-    MOV     r1, #2                                  // Select MPU region 2
-    LDR     r3, =0xE000ED98                         // MPU_RNR register address
-    STR     r1, [r3]                                // Set region to 2
     LDR     r1, =0xE000ED9C                         // MPU_RBAR register address
-    LDR     r3, [r1]                                // Load address stored in MPU region 2
-    CMP     r2, r3                                  // Is module already loaded?
-    BEQ     _tx_enable_mpu                          // Yes - skip MPU reconfiguration
 
     // Use alias registers to quickly load MPU
     LDR     r2, =0xE000ED98                         // Get region register

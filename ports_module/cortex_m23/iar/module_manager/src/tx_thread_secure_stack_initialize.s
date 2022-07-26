@@ -20,74 +20,59 @@
 /**************************************************************************/
 /**************************************************************************/
 
-#define TX_SOURCE_CODE
-
-
-/* Include necessary system files.  */
-
-#include "tx_api.h"
-#include "tx_thread.h"
-
-/* Define the global function pointer for stack error handling. If a stack error is
-   detected and the application has registered a stack error handler, it will be
-   called via this function pointer.  */
-
-VOID    (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr);
-
+    SECTION `.text`:CODE:NOROOT(2)
+    THUMB
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_stack_error_handler                      Cortex-M33      */
-/*                                                           6.1          */
+/*    _tx_thread_secure_stack_initialize                Cortex-M23/IAR    */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function processes stack errors detected during run-time.      */
-/*                                                                        */
+/*    This function enters the SVC handler to initialize a secure stack.  */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    thread_ptr                            Thread control block pointer  */
+/*    none                                                                */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    None                                                                */
+/*    none                                                                */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    _tx_thread_terminate                                                */
-/*    _tx_thread_application_stack_error_handler                          */
+/*    SVC 3                                                               */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    ThreadX internal code                                               */
+/*    TX_PORT_SPECIFIC_PRE_INITIALIZATION                                 */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
+/*  07-29-2022      Scott Larson            Modified comments and changed */
+/*                                            secure stack initialization */
+/*                                            macro to port-specific,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
-VOID  _tx_thread_stack_error_handler(TX_THREAD *thread_ptr)
-{
-    #ifndef TX_THREAD_NO_TERMINATE_STACK_ERROR
-    /* Is there a thread?  */
-    if (thread_ptr)
-    {
-        /* Terminate the current thread.  */
-        _tx_thread_terminate(_tx_thread_current_ptr);
-    }
-    #endif
-    
-    /* Determine if the application has registered an error handler.  */
-    if (_tx_thread_application_stack_error_handler != TX_NULL)
-    {
-        /* Yes, an error handler is present, simply call the application error handler.  */
-        (_tx_thread_application_stack_error_handler)(thread_ptr);
-    }
-}
+// VOID   _tx_thread_secure_stack_initialize(VOID)
+// {
+    EXPORT _tx_thread_secure_stack_initialize
+_tx_thread_secure_stack_initialize:
+#if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE)
+    CPSIE   i               // Enable interrupts for SVC call
+    SVC     3
+    CPSID   i               // Disable interrupts
+#else
+    MOV     r0, #0xFF       // Feature not enabled
+#endif
+    BX      lr
+    END

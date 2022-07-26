@@ -103,6 +103,14 @@
         .global _tx_misra_vfp_touch
 #endif
 
+        .global _tx_misra_event_flags_group_not_used
+        .global _tx_misra_event_flags_set_notify_not_used
+        .global _tx_misra_queue_not_used
+        .global _tx_misra_queue_send_notify_not_used
+        .global _tx_misra_semaphore_not_used
+        .global _tx_misra_semaphore_put_notify_not_used
+        .global _tx_misra_thread_entry_exit_notify_not_used
+        .global _tx_misra_thread_not_used
 
 /**************************************************************************/
 /**************************************************************************/
@@ -172,17 +180,93 @@ _tx_misra_uchar_pointer_dif:
         BX       LR               // return
 
 
-/**************************************************************************/
-/**************************************************************************/
-/**                                                                       */
-/**  ULONG  _tx_misra_pointer_to_ulong_convert(VOID *ptr);                */
-/**                                                                       */
-/**************************************************************************/
-/**************************************************************************/
-
+/************************************************************************************************************************************/
+/************************************************************************************************************************************/
+/**                                                                                                                                 */
+/**  This single function serves all of the below prototypes.                                                                       */
+/**                                                                                                                                 */
+/**  ULONG  _tx_misra_pointer_to_ulong_convert(VOID *ptr);                                                                          */
+/**  VOID  *_tx_misra_ulong_to_pointer_convert(ULONG input);                                                                        */
+/**  UCHAR  **_tx_misra_indirect_void_to_uchar_pointer_convert(VOID **return_ptr);                                                  */
+/**  UCHAR  **_tx_misra_uchar_to_indirect_uchar_pointer_convert(UCHAR *pointer);                                                    */
+/**  UCHAR  *_tx_misra_block_pool_to_uchar_pointer_convert(TX_BLOCK_POOL *pool);                                                    */
+/**  TX_BLOCK_POOL  *_tx_misra_void_to_block_pool_pointer_convert(VOID *pointer);                                                   */
+/**  UCHAR  *_tx_misra_void_to_uchar_pointer_convert(VOID *pointer);                                                                */
+/**  TX_BLOCK_POOL *_tx_misra_uchar_to_block_pool_pointer_convert(UCHAR *pointer);                                                  */
+/**  UCHAR  **_tx_misra_void_to_indirect_uchar_pointer_convert(VOID *pointer);                                                      */
+/**  TX_BYTE_POOL  *_tx_misra_void_to_byte_pool_pointer_convert(VOID *pointer);                                                     */
+/**  UCHAR  *_tx_misra_byte_pool_to_uchar_pointer_convert(TX_BYTE_POOL *pool);                                                      */
+/**  ALIGN_TYPE  *_tx_misra_uchar_to_align_type_pointer_convert(UCHAR *pointer);                                                    */
+/**  TX_BYTE_POOL  **_tx_misra_uchar_to_indirect_byte_pool_pointer_convert(UCHAR *pointer);                                         */
+/**  TX_EVENT_FLAGS_GROUP  *_tx_misra_void_to_event_flags_pointer_convert(VOID *pointer);                                           */
+/**  ULONG  *_tx_misra_void_to_ulong_pointer_convert(VOID *pointer);                                                                */
+/**  TX_MUTEX  *_tx_misra_void_to_mutex_pointer_convert(VOID *pointer);                                                             */
+/**  TX_QUEUE  *_tx_misra_void_to_queue_pointer_convert(VOID *pointer);                                                             */
+/**  TX_SEMAPHORE  *_tx_misra_void_to_semaphore_pointer_convert(VOID *pointer);                                                     */
+/**  VOID  *_tx_misra_uchar_to_void_pointer_convert(UCHAR *pointer);                                                                */
+/**  TX_THREAD  *_tx_misra_ulong_to_thread_pointer_convert(ULONG value);                                                            */
+/**  VOID  *_tx_misra_timer_indirect_to_void_pointer_convert(TX_TIMER_INTERNAL **pointer);                                          */
+/**  CHAR  *_tx_misra_const_char_to_char_pointer_convert(const char *pointer);                                                      */
+/**  TX_THREAD  *_tx_misra_void_to_thread_pointer_convert(void *pointer);                                                           */
+/**  UCHAR  *_tx_misra_object_to_uchar_pointer_convert(TX_TRACE_OBJECT_ENTRY *pointer);                                             */
+/**  TX_TRACE_OBJECT_ENTRY  *_tx_misra_uchar_to_object_pointer_convert(UCHAR *pointer);                                             */
+/**  TX_TRACE_HEADER  *_tx_misra_uchar_to_header_pointer_convert(UCHAR *pointer);                                                   */
+/**  TX_TRACE_BUFFER_ENTRY  *_tx_misra_uchar_to_entry_pointer_convert(UCHAR *pointer);                                              */
+/**  UCHAR  *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer);                                              */
+/**  UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer);                                                                */
+/**  VOID    _tx_misra_event_flags_group_not_used(TX_EVENT_FLAGS_GROUP *group_ptr);                                                 */
+/**  VOID    _tx_misra_event_flags_set_notify_not_used(VOID (*events_set_notify)(TX_EVENT_FLAGS_GROUP *notify_group_ptr));          */
+/**  VOID    _tx_misra_queue_not_used(TX_QUEUE *queue_ptr);                                                                         */
+/**  VOID    _tx_misra_queue_send_notify_not_used(VOID (*queue_send_notify)(TX_QUEUE *notify_queue_ptr));                           */
+/**  VOID    _tx_misra_semaphore_not_used(TX_SEMAPHORE *semaphore_ptr);                                                             */
+/**  VOID    _tx_misra_semaphore_put_notify_not_used(VOID (*semaphore_put_notify)(TX_SEMAPHORE *notify_semaphore_ptr));             */
+/**  VOID    _tx_misra_thread_not_used(TX_THREAD *thread_ptr);                                                                      */
+/**  VOID    _tx_misra_thread_entry_exit_notify_not_used(VOID (*thread_entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT id));  */
+/**                                                                                                                                 */
+/************************************************************************************************************************************/
+/************************************************************************************************************************************/
         .text
         .thumb_func
 _tx_misra_pointer_to_ulong_convert:
+_tx_misra_ulong_to_pointer_convert:
+_tx_misra_indirect_void_to_uchar_pointer_convert:
+_tx_misra_uchar_to_indirect_uchar_pointer_convert:
+_tx_misra_block_pool_to_uchar_pointer_convert:
+_tx_misra_void_to_block_pool_pointer_convert:
+_tx_misra_void_to_uchar_pointer_convert:
+_tx_misra_uchar_to_block_pool_pointer_convert:
+_tx_misra_void_to_indirect_uchar_pointer_convert:
+_tx_misra_void_to_byte_pool_pointer_convert:
+_tx_misra_byte_pool_to_uchar_pointer_convert:
+_tx_misra_uchar_to_align_type_pointer_convert:
+_tx_misra_uchar_to_indirect_byte_pool_pointer_convert:
+_tx_misra_void_to_event_flags_pointer_convert:
+_tx_misra_void_to_ulong_pointer_convert:
+_tx_misra_void_to_mutex_pointer_convert:
+_tx_misra_void_to_queue_pointer_convert:
+_tx_misra_void_to_semaphore_pointer_convert:
+_tx_misra_uchar_to_void_pointer_convert:
+_tx_misra_ulong_to_thread_pointer_convert:
+_tx_misra_timer_indirect_to_void_pointer_convert:
+_tx_misra_const_char_to_char_pointer_convert:
+_tx_misra_void_to_thread_pointer_convert:
+#ifdef TX_ENABLE_EVENT_TRACE
+_tx_misra_object_to_uchar_pointer_convert:
+_tx_misra_uchar_to_object_pointer_convert:
+_tx_misra_uchar_to_header_pointer_convert:
+_tx_misra_uchar_to_entry_pointer_convert:
+_tx_misra_entry_to_uchar_pointer_convert:
+#endif
+_tx_misra_char_to_uchar_pointer_convert:
+_tx_misra_event_flags_group_not_used:
+_tx_misra_event_flags_set_notify_not_used:
+_tx_misra_queue_not_used:
+_tx_misra_queue_send_notify_not_used:
+_tx_misra_semaphore_not_used:
+_tx_misra_semaphore_put_notify_not_used:
+_tx_misra_thread_entry_exit_notify_not_used:
+_tx_misra_thread_not_used:
+
         BX       LR               // return
 
 
@@ -231,20 +315,6 @@ _tx_misra_ulong_pointer_sub:
 _tx_misra_ulong_pointer_dif:
         SUBS     R0,R0,R1
         ASRS     R0,R0,#+2
-        BX       LR               // return
-
-
-/**************************************************************************/
-/**************************************************************************/
-/**                                                                       */
-/**  VOID  *_tx_misra_ulong_to_pointer_convert(ULONG input);              */
-/**                                                                       */
-/**************************************************************************/
-/**************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_ulong_to_pointer_convert:
         BX       LR               // return
 
 
@@ -332,12 +402,9 @@ _tx_misra_timer_pointer_add:
         .text
         .thumb_func
 _tx_misra_user_timer_pointer_get:
-        ADDS     R2,R0,#+8
-        SUBS     R2,R2,R0
-        RSBS     R2,R2,#+0
-        ADD      R0,R0,R2
-        STR      R0,[R1, #+0]
-        BX       LR               // return
+        SUBS    R0,#8
+        STR     R0,[R1, #+0]
+        BX      LR               // return
 
 
 /**************************************************************************/
@@ -553,202 +620,6 @@ _tx_misra_always_true:
         BX       LR               // return
 
 
-/******************************************************************************************/
-/******************************************************************************************/
-/**                                                                                       */
-/**  UCHAR  **_tx_misra_indirect_void_to_uchar_pointer_convert(VOID **return_ptr);        */
-/**                                                                                       */
-/******************************************************************************************/
-/******************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_indirect_void_to_uchar_pointer_convert:
-        BX       LR               // return
-
-
-/***************************************************************************************/
-/***************************************************************************************/
-/**                                                                                    */
-/**  UCHAR  **_tx_misra_uchar_to_indirect_uchar_pointer_convert(UCHAR *pointer);       */
-/**                                                                                    */
-/***************************************************************************************/
-/***************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_uchar_to_indirect_uchar_pointer_convert:
-        BX       LR               // return
-
-
-/***********************************************************************************/
-/***********************************************************************************/
-/**                                                                                */
-/**  UCHAR  *_tx_misra_block_pool_to_uchar_pointer_convert(TX_BLOCK_POOL *pool);   */
-/**                                                                                */
-/***********************************************************************************/
-/***********************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_block_pool_to_uchar_pointer_convert:
-        BX       LR               // return
-
-
-/******************************************************************************************/
-/******************************************************************************************/
-/**                                                                                       */
-/**  TX_BLOCK_POOL  *_tx_misra_void_to_block_pool_pointer_convert(VOID *pointer);         */
-/**                                                                                       */
-/******************************************************************************************/
-/******************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_block_pool_pointer_convert:
-        BX       LR               // return
-
-
-/*****************************************************************************/
-/*****************************************************************************/
-/**                                                                          */
-/**  UCHAR  *_tx_misra_void_to_uchar_pointer_convert(VOID *pointer);         */
-/**                                                                          */
-/*****************************************************************************/
-/*****************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_uchar_pointer_convert:
-        BX       LR               // return
-
-
-/************************************************************************************/
-/************************************************************************************/
-/**                                                                                 */
-/**  TX_BLOCK_POOL *_tx_misra_uchar_to_block_pool_pointer_convert(UCHAR *pointer);  */
-/**                                                                                 */
-/************************************************************************************/
-/************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_uchar_to_block_pool_pointer_convert:
-        BX       LR               // return
-
-
-/**************************************************************************************/
-/**************************************************************************************/
-/**                                                                                   */
-/**  UCHAR  **_tx_misra_void_to_indirect_uchar_pointer_convert(VOID *pointer);        */
-/**                                                                                   */
-/**************************************************************************************/
-/**************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_indirect_uchar_pointer_convert:
-        BX       LR               // return
-
-
-/*****************************************************************************************/
-/*****************************************************************************************/
-/**                                                                                      */
-/**  TX_BYTE_POOL  *_tx_misra_void_to_byte_pool_pointer_convert(VOID *pointer);          */
-/**                                                                                      */
-/*****************************************************************************************/
-/*****************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_byte_pool_pointer_convert:
-        BX       LR               // return
-
-
-/***************************************************************************************/
-/***************************************************************************************/
-/**                                                                                    */
-/**  UCHAR  *_tx_misra_byte_pool_to_uchar_pointer_convert(TX_BYTE_POOL *pool);         */
-/**                                                                                    */
-/***************************************************************************************/
-/***************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_byte_pool_to_uchar_pointer_convert:
-        BX       LR               // return
-
-
-/*****************************************************************************************/
-/*****************************************************************************************/
-/**                                                                                      */
-/**  ALIGN_TYPE  *_tx_misra_uchar_to_align_type_pointer_convert(UCHAR *pointer);         */
-/**                                                                                      */
-/*****************************************************************************************/
-/*****************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_uchar_to_align_type_pointer_convert:
-        BX       LR               // return
-
-
-/****************************************************************************************************/
-/****************************************************************************************************/
-/**                                                                                                 */
-/**  TX_BYTE_POOL  **_tx_misra_uchar_to_indirect_byte_pool_pointer_convert(UCHAR *pointer);         */
-/**                                                                                                 */
-/****************************************************************************************************/
-/****************************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_uchar_to_indirect_byte_pool_pointer_convert:
-        BX       LR               // return
-
-
-/**************************************************************************************************/
-/**************************************************************************************************/
-/**                                                                                               */
-/**  TX_EVENT_FLAGS_GROUP  *_tx_misra_void_to_event_flags_pointer_convert(VOID *pointer);         */
-/**                                                                                               */
-/**************************************************************************************************/
-/**************************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_event_flags_pointer_convert:
-        BX       LR               // return
-
-
-/*****************************************************************************/
-/*****************************************************************************/
-/**                                                                          */
-/**  ULONG  *_tx_misra_void_to_ulong_pointer_convert(VOID *pointer);         */
-/**                                                                          */
-/*****************************************************************************/
-/*****************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_ulong_pointer_convert:
-        BX       LR               // return
-
-
-/********************************************************************************/
-/********************************************************************************/
-/**                                                                             */
-/**  TX_MUTEX  *_tx_misra_void_to_mutex_pointer_convert(VOID *pointer);         */
-/**                                                                             */
-/********************************************************************************/
-/********************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_mutex_pointer_convert:
-        BX       LR               // return
-
-
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -761,191 +632,6 @@ _tx_misra_void_to_mutex_pointer_convert:
         .thumb_func
 _tx_misra_status_get:
         MOVS     R0,#+0
-        BX       LR               // return
-
-
-/********************************************************************************/
-/********************************************************************************/
-/**                                                                             */
-/**  TX_QUEUE  *_tx_misra_void_to_queue_pointer_convert(VOID *pointer);         */
-/**                                                                             */
-/********************************************************************************/
-/********************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_queue_pointer_convert:
-        BX       LR               // return
-
-
-/****************************************************************************************/
-/****************************************************************************************/
-/**                                                                                     */
-/**  TX_SEMAPHORE  *_tx_misra_void_to_semaphore_pointer_convert(VOID *pointer);         */
-/**                                                                                     */
-/****************************************************************************************/
-/****************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_semaphore_pointer_convert:
-        BX       LR               // return
-
-
-/**************************************************************************/
-/**************************************************************************/
-/**                                                                       */
-/**  VOID  *_tx_misra_uchar_to_void_pointer_convert(UCHAR *pointer);      */
-/**                                                                       */
-/**************************************************************************/
-/**************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_uchar_to_void_pointer_convert:
-        BX       LR               // return
-
-
-/*********************************************************************************/
-/*********************************************************************************/
-/**                                                                              */
-/**  TX_THREAD  *_tx_misra_ulong_to_thread_pointer_convert(ULONG value);         */
-/**                                                                              */
-/*********************************************************************************/
-/*********************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_ulong_to_thread_pointer_convert:
-        BX       LR               // return
-
-
-/***************************************************************************************************/
-/***************************************************************************************************/
-/**                                                                                                */
-/**  VOID  *_tx_misra_timer_indirect_to_void_pointer_convert(TX_TIMER_INTERNAL **pointer);         */
-/**                                                                                                */
-/***************************************************************************************************/
-/***************************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_timer_indirect_to_void_pointer_convert:
-        BX       LR               // return
-
-
-/***************************************************************************************/
-/***************************************************************************************/
-/**                                                                                    */
-/**  CHAR  *_tx_misra_const_char_to_char_pointer_convert(const char *pointer);         */
-/**                                                                                    */
-/***************************************************************************************/
-/***************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_const_char_to_char_pointer_convert:
-        BX       LR               // return
-
-
-/**********************************************************************************/
-/**********************************************************************************/
-/**                                                                               */
-/**  TX_THREAD  *_tx_misra_void_to_thread_pointer_convert(void *pointer);         */
-/**                                                                               */
-/**********************************************************************************/
-/**********************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_void_to_thread_pointer_convert:
-        BX       LR               // return
-
-
-#ifdef TX_ENABLE_EVENT_TRACE
-
-/************************************************************************************************/
-/************************************************************************************************/
-/**                                                                                             */
-/**  UCHAR  *_tx_misra_object_to_uchar_pointer_convert(TX_TRACE_OBJECT_ENTRY *pointer);         */
-/**                                                                                             */
-/************************************************************************************************/
-/************************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_object_to_uchar_pointer_convert:
-        BX       LR               // return
-
-
-/************************************************************************************************/
-/************************************************************************************************/
-/**                                                                                             */
-/**  TX_TRACE_OBJECT_ENTRY  *_tx_misra_uchar_to_object_pointer_convert(UCHAR *pointer);         */
-/**                                                                                             */
-/************************************************************************************************/
-/************************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_uchar_to_object_pointer_convert:
-        BX       LR               // return
-
-
-/******************************************************************************************/
-/******************************************************************************************/
-/**                                                                                       */
-/**  TX_TRACE_HEADER  *_tx_misra_uchar_to_header_pointer_convert(UCHAR *pointer);         */
-/**                                                                                       */
-/******************************************************************************************/
-/******************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_uchar_to_header_pointer_convert:
-        BX       LR               // return
-
-
-/***********************************************************************************************/
-/***********************************************************************************************/
-/**                                                                                            */
-/**  TX_TRACE_BUFFER_ENTRY  *_tx_misra_uchar_to_entry_pointer_convert(UCHAR *pointer);         */
-/**                                                                                            */
-/***********************************************************************************************/
-/***********************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_uchar_to_entry_pointer_convert:
-        BX       LR               // return
-
-
-/***********************************************************************************************/
-/***********************************************************************************************/
-/**                                                                                            */
-/**  UCHAR  *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer);         */
-/**                                                                                            */
-/***********************************************************************************************/
-/***********************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_entry_to_uchar_pointer_convert:
-        BX       LR               // return
-#endif
-
-
-/***********************************************************************************************/
-/***********************************************************************************************/
-/**                                                                                            */
-/**  UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer);                           */
-/**                                                                                            */
-/***********************************************************************************************/
-/***********************************************************************************************/
-
-        .text
-        .thumb_func
-_tx_misra_char_to_uchar_pointer_convert:
         BX       LR               // return
 
 

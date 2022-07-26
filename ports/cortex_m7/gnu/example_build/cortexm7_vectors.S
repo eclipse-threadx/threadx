@@ -1,5 +1,3 @@
-
-
   .global reset_handler
 
   .global __tx_NMIHandler
@@ -9,7 +7,6 @@
   .global __tx_PendSVHandler 
   .global __tx_SysTickHandler 
   .global __tx_BadHandler
-
 
   .syntax unified
   .section .vectors, "ax"
@@ -29,7 +26,7 @@ _vectors:
   .word 0 // Reserved
   .word 0 // Reserved
   .word 0 // Reserved
-  .word __tx_SVCallHandler //_SVC_Handler - used by Threadx scheduler //
+  .word __tx_SVCallHandler    //_SVC_Handler - used by Threadx scheduler //
   .word __tx_DBGHandler
   .word 0 // Reserved
   .word __tx_PendSVHandler 
@@ -70,14 +67,10 @@ _vectors:
   .word __tx_BadHandler
   .word __tx_BadHandler
 
-
-
-    .section .init, "ax"
-    .thumb_func
+  .section .init, "ax"
+  .thumb_func
 reset_handler:
-
-// low level hardware config, such as PLL setup goes here
-
+  // low level hardware config, such as PLL setup goes here
   b _start
 
 

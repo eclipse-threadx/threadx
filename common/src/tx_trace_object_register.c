@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_trace_object_register                           PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -69,9 +69,12 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
+/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022      Scott Larson            Modified comment(s),          */
+/*                                            check for null name,        */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, CHAR *object_name, ULONG parameter_1, ULONG parameter_2)
@@ -222,6 +225,12 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
                     /* Setup work pointer to the object name character.  */
                     work_ptr =  TX_CHAR_TO_UCHAR_POINTER_CONVERT(object_name);
                     work_ptr =  TX_UCHAR_POINTER_ADD(work_ptr, i);
+
+                    /* Determine if object_name (work_ptr) is null.  */
+                    if (work_ptr == TX_NULL)
+                    {
+                        break;
+                    }
 
                     /* Copy a character of the name.  */
                     entry_ptr -> tx_trace_object_entry_name[i] =  (UCHAR) *work_ptr;

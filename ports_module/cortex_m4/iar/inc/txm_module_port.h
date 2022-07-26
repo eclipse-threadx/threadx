@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    txm_module_port.h                                 Cortex-M4/IAR     */
-/*                                                           6.1.9        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -41,6 +41,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
+/*  07-29-2022      Scott Larson            Enabled user-defined and      */
+/*                                            default MPU settings,       */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -111,6 +114,60 @@ The following extensions must also be defined in tx_port.h:
 #ifndef TXM_MODULE_MPU_SHARED_ACCESS_CONTROL
 #define TXM_MODULE_MPU_SHARED_ACCESS_CONTROL    0x12070000
 #endif
+
+/* For Cortex-M devices with 16 MPU regions, the last four regions (12-15)
+   are not used by ThreadX. These may be defined by the user.  */
+#define TXM_MODULE_MPU_USER_DEFINED_RBAR_12     0
+#define TXM_MODULE_MPU_USER_DEFINED_RASR_12     0
+#define TXM_MODULE_MPU_USER_DEFINED_RBAR_13     0
+#define TXM_MODULE_MPU_USER_DEFINED_RASR_13     0
+#define TXM_MODULE_MPU_USER_DEFINED_RBAR_14     0
+#define TXM_MODULE_MPU_USER_DEFINED_RASR_14     0
+#define TXM_MODULE_MPU_USER_DEFINED_RBAR_15     0
+#define TXM_MODULE_MPU_USER_DEFINED_RASR_15     0
+
+
+/* Users can define these default MPU configuration values.
+
+   If TXM_MODULE_MPU_DEFAULT is *not* defined, the MPU is disabled
+   when a thread that is not owned by a module is running
+   and the defines below are not used.
+
+   If TXM_MODULE_MPU_DEFAULT is defined, the MPU is configured to the
+   below values when a thread that is not owned by a module is running.  */
+#define TXM_MODULE_MPU_DEFAULT_RBAR_0           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_0           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_1           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_1           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_2           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_2           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_3           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_3           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_4           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_4           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_5           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_5           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_6           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_6           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_7           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_7           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_8           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_8           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_9           0
+#define TXM_MODULE_MPU_DEFAULT_RASR_9           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_10          0
+#define TXM_MODULE_MPU_DEFAULT_RASR_10          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_11          0
+#define TXM_MODULE_MPU_DEFAULT_RASR_11          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_12          0
+#define TXM_MODULE_MPU_DEFAULT_RASR_12          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_13          0
+#define TXM_MODULE_MPU_DEFAULT_RASR_13          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_14          0
+#define TXM_MODULE_MPU_DEFAULT_RASR_14          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_15          0
+#define TXM_MODULE_MPU_DEFAULT_RASR_15          0
+
 
 /* Define constants specific to the tools the module can be built with for this particular modules port.  */
 
@@ -377,6 +434,6 @@ UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M4/IAR Version 6.1.10 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M4/IAR Version 6.1.12 *";
 
 #endif

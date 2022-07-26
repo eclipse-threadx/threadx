@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                            ARMv7-A        */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,12 +47,15 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
+/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
+/*  04-02-2021      Bhupendra Naphade       Modified comment(s),updated   */
 /*                                            macro definition,           */
 /*                                            resulting in version 6.1.6  */
-/*  04-25-2022     Zhen Kong                Updated comments,             */
+/*  04-25-2022      Zhen Kong               Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022      Scott Larson            Updated comments, removed     */
+/*                                            unneeded temp variable,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -284,7 +287,7 @@ unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
 
 #else
 
-#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save, tx_temp;
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
 #define TX_DISABLE                              asm volatile (" MRS %0,CPSR; CPSID if ": "=r" (interrupt_save) );

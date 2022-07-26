@@ -96,6 +96,22 @@
         PUBLIC _tx_misra_void_to_uchar_pointer_convert
         PUBLIC _tx_misra_void_to_ulong_pointer_convert
         PUBLIC _tx_misra_ipsr_get
+        PUBLIC _tx_misra_control_get
+        PUBLIC _tx_misra_control_set
+#ifdef __ARMVFP__
+        PUBLIC _tx_misra_fpccr_get
+        PUBLIC _tx_misra_vfp_touch
+#endif
+
+        PUBLIC _tx_misra_event_flags_group_not_used
+        PUBLIC _tx_misra_event_flags_set_notify_not_used
+        PUBLIC _tx_misra_queue_not_used
+        PUBLIC _tx_misra_queue_send_notify_not_used
+        PUBLIC _tx_misra_semaphore_not_used
+        PUBLIC _tx_misra_semaphore_put_notify_not_used
+        PUBLIC _tx_misra_thread_entry_exit_notify_not_used
+        PUBLIC _tx_misra_thread_not_used
+        
         PUBLIC _tx_version_id
 
 
@@ -109,7 +125,7 @@ _tx_version_id:
         DC8 45H, 78H, 70H, 72H, 65H, 73H, 73H, 20H
         DC8 4CH, 6FH, 67H, 69H, 63H, 20H, 49H, 6EH
         DC8 63H, 2EH, 20H, 2AH, 20H, 54H, 68H, 72H
-        DC8 65H, 61H, 64H, 58H, 20H, 36H, 2EH, 30H
+        DC8 65H, 61H, 64H, 58H, 20H, 36H, 2EH, 31H
         DC8 20H, 4DH, 49H, 53H, 52H, 41H, 20H, 43H
         DC8 20H, 43H, 6FH, 6DH, 70H, 6CH, 69H, 61H
         DC8 6EH, 74H, 20H, 2AH, 0
@@ -133,7 +149,7 @@ _tx_misra_memset:
         MOVS     R1,R0
         MOVS     R0,R4
         BL       __aeabi_memset
-        POP      {R4,PC}          ;; return
+        POP      {R4,PC}          // return
 
 /**************************************************************************/
 /**************************************************************************/
@@ -147,7 +163,7 @@ _tx_misra_memset:
         THUMB
 _tx_misra_uchar_pointer_add:
         ADD      R0,R0,R1
-        BX       LR               ;; return
+        BX       LR               // return
 
 
 /**************************************************************************/
@@ -163,7 +179,7 @@ _tx_misra_uchar_pointer_add:
 _tx_misra_uchar_pointer_sub:
         RSBS     R1,R1,#+0
         ADD      R0,R0,R1
-        BX       LR               ;; return
+        BX       LR               // return
 
 
 /**************************************************************************/
@@ -178,21 +194,97 @@ _tx_misra_uchar_pointer_sub:
         THUMB
 _tx_misra_uchar_pointer_dif:
         SUBS     R0,R0,R1
-        BX       LR               ;; return
+        BX       LR               // return
 
 
-/**************************************************************************/
-/**************************************************************************/
-/**                                                                       */
-/**  ULONG  _tx_misra_pointer_to_ulong_convert(VOID *ptr);                */
-/**                                                                       */
-/**************************************************************************/
-/**************************************************************************/
-
+/************************************************************************************************************************************/
+/************************************************************************************************************************************/
+/**                                                                                                                                 */
+/**  This single function serves all of the below prototypes.                                                                       */
+/**                                                                                                                                 */
+/**  ULONG  _tx_misra_pointer_to_ulong_convert(VOID *ptr);                                                                          */
+/**  VOID  *_tx_misra_ulong_to_pointer_convert(ULONG input);                                                                        */
+/**  UCHAR  **_tx_misra_indirect_void_to_uchar_pointer_convert(VOID **return_ptr);                                                  */
+/**  UCHAR  **_tx_misra_uchar_to_indirect_uchar_pointer_convert(UCHAR *pointer);                                                    */
+/**  UCHAR  *_tx_misra_block_pool_to_uchar_pointer_convert(TX_BLOCK_POOL *pool);                                                    */
+/**  TX_BLOCK_POOL  *_tx_misra_void_to_block_pool_pointer_convert(VOID *pointer);                                                   */
+/**  UCHAR  *_tx_misra_void_to_uchar_pointer_convert(VOID *pointer);                                                                */
+/**  TX_BLOCK_POOL *_tx_misra_uchar_to_block_pool_pointer_convert(UCHAR *pointer);                                                  */
+/**  UCHAR  **_tx_misra_void_to_indirect_uchar_pointer_convert(VOID *pointer);                                                      */
+/**  TX_BYTE_POOL  *_tx_misra_void_to_byte_pool_pointer_convert(VOID *pointer);                                                     */
+/**  UCHAR  *_tx_misra_byte_pool_to_uchar_pointer_convert(TX_BYTE_POOL *pool);                                                      */
+/**  ALIGN_TYPE  *_tx_misra_uchar_to_align_type_pointer_convert(UCHAR *pointer);                                                    */
+/**  TX_BYTE_POOL  **_tx_misra_uchar_to_indirect_byte_pool_pointer_convert(UCHAR *pointer);                                         */
+/**  TX_EVENT_FLAGS_GROUP  *_tx_misra_void_to_event_flags_pointer_convert(VOID *pointer);                                           */
+/**  ULONG  *_tx_misra_void_to_ulong_pointer_convert(VOID *pointer);                                                                */
+/**  TX_MUTEX  *_tx_misra_void_to_mutex_pointer_convert(VOID *pointer);                                                             */
+/**  TX_QUEUE  *_tx_misra_void_to_queue_pointer_convert(VOID *pointer);                                                             */
+/**  TX_SEMAPHORE  *_tx_misra_void_to_semaphore_pointer_convert(VOID *pointer);                                                     */
+/**  VOID  *_tx_misra_uchar_to_void_pointer_convert(UCHAR *pointer);                                                                */
+/**  TX_THREAD  *_tx_misra_ulong_to_thread_pointer_convert(ULONG value);                                                            */
+/**  VOID  *_tx_misra_timer_indirect_to_void_pointer_convert(TX_TIMER_INTERNAL **pointer);                                          */
+/**  CHAR  *_tx_misra_const_char_to_char_pointer_convert(const char *pointer);                                                      */
+/**  TX_THREAD  *_tx_misra_void_to_thread_pointer_convert(void *pointer);                                                           */
+/**  UCHAR  *_tx_misra_object_to_uchar_pointer_convert(TX_TRACE_OBJECT_ENTRY *pointer);                                             */
+/**  TX_TRACE_OBJECT_ENTRY  *_tx_misra_uchar_to_object_pointer_convert(UCHAR *pointer);                                             */
+/**  TX_TRACE_HEADER  *_tx_misra_uchar_to_header_pointer_convert(UCHAR *pointer);                                                   */
+/**  TX_TRACE_BUFFER_ENTRY  *_tx_misra_uchar_to_entry_pointer_convert(UCHAR *pointer);                                              */
+/**  UCHAR  *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer);                                              */
+/**  UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer);                                                                */
+/**  VOID    _tx_misra_event_flags_group_not_used(TX_EVENT_FLAGS_GROUP *group_ptr);                                                 */
+/**  VOID    _tx_misra_event_flags_set_notify_not_used(VOID (*events_set_notify)(TX_EVENT_FLAGS_GROUP *notify_group_ptr));          */
+/**  VOID    _tx_misra_queue_not_used(TX_QUEUE *queue_ptr);                                                                         */
+/**  VOID    _tx_misra_queue_send_notify_not_used(VOID (*queue_send_notify)(TX_QUEUE *notify_queue_ptr));                           */
+/**  VOID    _tx_misra_semaphore_not_used(TX_SEMAPHORE *semaphore_ptr);                                                             */
+/**  VOID    _tx_misra_semaphore_put_notify_not_used(VOID (*semaphore_put_notify)(TX_SEMAPHORE *notify_semaphore_ptr));             */
+/**  VOID    _tx_misra_thread_not_used(TX_THREAD *thread_ptr);                                                                      */
+/**  VOID    _tx_misra_thread_entry_exit_notify_not_used(VOID (*thread_entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT id));  */
+/**                                                                                                                                 */
+/************************************************************************************************************************************/
+/************************************************************************************************************************************/
         SECTION `.text`:CODE:NOROOT(1)
         THUMB
 _tx_misra_pointer_to_ulong_convert:
-        BX       LR               ;; return
+_tx_misra_ulong_to_pointer_convert:
+_tx_misra_indirect_void_to_uchar_pointer_convert:
+_tx_misra_uchar_to_indirect_uchar_pointer_convert:
+_tx_misra_block_pool_to_uchar_pointer_convert:
+_tx_misra_void_to_block_pool_pointer_convert:
+_tx_misra_void_to_uchar_pointer_convert:
+_tx_misra_uchar_to_block_pool_pointer_convert:
+_tx_misra_void_to_indirect_uchar_pointer_convert:
+_tx_misra_void_to_byte_pool_pointer_convert:
+_tx_misra_byte_pool_to_uchar_pointer_convert:
+_tx_misra_uchar_to_align_type_pointer_convert:
+_tx_misra_uchar_to_indirect_byte_pool_pointer_convert:
+_tx_misra_void_to_event_flags_pointer_convert:
+_tx_misra_void_to_ulong_pointer_convert:
+_tx_misra_void_to_mutex_pointer_convert:
+_tx_misra_void_to_queue_pointer_convert:
+_tx_misra_void_to_semaphore_pointer_convert:
+_tx_misra_uchar_to_void_pointer_convert:
+_tx_misra_ulong_to_thread_pointer_convert:
+_tx_misra_timer_indirect_to_void_pointer_convert:
+_tx_misra_const_char_to_char_pointer_convert:
+_tx_misra_void_to_thread_pointer_convert:
+#ifdef TX_ENABLE_EVENT_TRACE
+_tx_misra_object_to_uchar_pointer_convert:
+_tx_misra_uchar_to_object_pointer_convert:
+_tx_misra_uchar_to_header_pointer_convert:
+_tx_misra_uchar_to_entry_pointer_convert:
+_tx_misra_entry_to_uchar_pointer_convert:
+#endif
+_tx_misra_char_to_uchar_pointer_convert:
+_tx_misra_event_flags_group_not_used:
+_tx_misra_event_flags_set_notify_not_used:
+_tx_misra_queue_not_used:
+_tx_misra_queue_send_notify_not_used:
+_tx_misra_semaphore_not_used:
+_tx_misra_semaphore_put_notify_not_used:
+_tx_misra_thread_entry_exit_notify_not_used:
+_tx_misra_thread_not_used:
+
+        BX       LR               // return
 
 
 /**************************************************************************/
@@ -206,8 +298,9 @@ _tx_misra_pointer_to_ulong_convert:
         SECTION `.text`:CODE:NOROOT(1)
         THUMB
 _tx_misra_ulong_pointer_add:
-        ADD      R0,R0,R1, LSL #+2
-        BX       LR               ;; return
+        LSLS    R1,#2
+        ADD     R0,R0,R1
+        BX      LR              // return
 
 
 /**************************************************************************/
@@ -221,10 +314,11 @@ _tx_misra_ulong_pointer_add:
         SECTION `.text`:CODE:NOROOT(1)
         THUMB
 _tx_misra_ulong_pointer_sub:
-        MVNS     R2,#+3
-        MULS     R1,R2,R1
-        ADD      R0,R0,R1
-        BX       LR               ;; return
+        MOVS    R3,#3
+        MVNS    R2,R3
+        MULS    R1,R2,R1
+        ADD     R0,R0,R1
+        BX      LR               // return
 
 
 /**************************************************************************/
@@ -240,21 +334,7 @@ _tx_misra_ulong_pointer_sub:
 _tx_misra_ulong_pointer_dif:
         SUBS     R0,R0,R1
         ASRS     R0,R0,#+2
-        BX       LR               ;; return
-
-
-/**************************************************************************/
-/**************************************************************************/
-/**                                                                       */
-/**  VOID  *_tx_misra_ulong_to_pointer_convert(ULONG input);              */
-/**                                                                       */
-/**************************************************************************/
-/**************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_ulong_to_pointer_convert:
-        BX       LR               ;; return
+        BX       LR               // return
 
 
 /**************************************************************************/
@@ -293,7 +373,7 @@ _tx_misra_message_copy:
         STR      R3,[R0, #+0]
         STR      R4,[R1, #+0]
         POP      {R4,R5}
-        BX       LR               ;; return
+        BX       LR               // return
 
 
 /**************************************************************************/
@@ -310,7 +390,7 @@ _tx_misra_message_copy:
 _tx_misra_timer_pointer_dif:
         SUBS     R0,R0,R1
         ASRS     R0,R0,#+2
-        BX       LR               ;; return
+        BX       LR               // return
 
 
 /**************************************************************************/
@@ -325,8 +405,9 @@ _tx_misra_timer_pointer_dif:
         SECTION `.text`:CODE:NOROOT(1)
         THUMB
 _tx_misra_timer_pointer_add:
-        ADD      R0,R0,R1, LSL #+2
-        BX       LR               ;; return
+        LSLS    R1,#2
+        ADD     R0,R0,R1
+        BX      LR               // return
 
 
 /**************************************************************************/
@@ -341,12 +422,9 @@ _tx_misra_timer_pointer_add:
         SECTION `.text`:CODE:NOROOT(1)
         THUMB
 _tx_misra_user_timer_pointer_get:
-        ADDS     R2,R0,#+8
-        SUBS     R2,R2,R0
-        RSBS     R2,R2,#+0
-        ADD      R0,R0,R2
-        STR      R0,[R1, #+0]
-        BX       LR               ;; return
+        SUBS    R0,#8
+        STR     R0,[R1, #+0]
+        BX      LR               // return
 
 
 /**************************************************************************/
@@ -361,52 +439,54 @@ _tx_misra_user_timer_pointer_get:
         SECTION `.text`:CODE:NOROOT(1)
         THUMB
 _tx_misra_thread_stack_check:
-        PUSH     {R3-R5,LR}
-        MOVS     R4,R0
-        MOVS     R5,R1
-        BL       _tx_thread_interrupt_disable
-        CMP      R4,#+0
-        BEQ.N    ??_tx_misra_thread_stack_check_0
-        LDR      R1,[R4, #+0]
-        LDR.N    R2,??DataTable2  ;; 0x54485244
-        CMP      R1,R2
-        BNE.N    ??_tx_misra_thread_stack_check_0
-        LDR      R1,[R4, #+8]
-        LDR      R2,[R5, #+0]
-        CMP      R1,R2
-        BCS.N    ??_tx_misra_thread_stack_check_1
-        LDR      R1,[R4, #+8]
-        STR      R1,[R5, #+0]
+        PUSH    {R3-R5,LR}
+        MOVS    R4,R0
+        MOVS    R5,R1
+        BL      _tx_thread_interrupt_disable
+        CMP     R4,#0
+        BEQ.N   ??_tx_misra_thread_stack_check_0
+        LDR     R1,[R4]
+        LDR.N   R2,??DataTable2  // 0x54485244
+        CMP     R1,R2
+        BNE.N   ??_tx_misra_thread_stack_check_0
+        LDR     R1,[R4, #8]
+        LDR     R2,[R5]
+        CMP     R1,R2
+        BCS.N   ??_tx_misra_thread_stack_check_1
+        STR     R1,[R5]
 ??_tx_misra_thread_stack_check_1:
-        LDR      R1,[R4, #+12]
-        LDR      R1,[R1, #+0]
-        CMP      R1,#-269488145
-        BNE.N    ??_tx_misra_thread_stack_check_2
-        LDR      R1,[R4, #+16]
-        LDR      R1,[R1, #+1]
-        CMP      R1,#-269488145
-        BNE.N    ??_tx_misra_thread_stack_check_2
-        LDR      R1,[R5, #+0]
-        LDR      R2,[R4, #+12]
-        CMP      R1,R2
-        BCS.N    ??_tx_misra_thread_stack_check_3
+        LDR     R1,[R4, #12]
+        LDR     R1,[R1]
+        LDR     R6,=0xEFEFEFEF
+        CMP     R1,R6
+        BNE.N   ??_tx_misra_thread_stack_check_2
+        LDR     R1,[R4, #16]
+        MOVS    R7,#1
+        LDR     R1,[R1, R7]
+        CMP     R1,R6
+        BNE.N   ??_tx_misra_thread_stack_check_2
+        LDR     R1,[R5]
+        LDR     R2,[R4, #12]
+        CMP     R1,R2
+        BCS.N   ??_tx_misra_thread_stack_check_3
 ??_tx_misra_thread_stack_check_2:
-        BL       _tx_thread_interrupt_restore
-        MOVS     R0,R4
-        BL       _tx_thread_stack_error_handler
-        BL       _tx_thread_interrupt_disable
+        BL      _tx_thread_interrupt_restore
+        MOVS    R0,R4
+        BL      _tx_thread_stack_error_handler
+        BL      _tx_thread_interrupt_disable
 ??_tx_misra_thread_stack_check_3:
-        LDR      R1,[R5, #+0]
-        LDR      R1,[R1, #-4]
-        CMP      R1,#-269488145
-        BEQ.N    ??_tx_misra_thread_stack_check_0
-        BL       _tx_thread_interrupt_restore
-        MOVS     R0,R4
-        BL       _tx_thread_stack_analyze
-        BL       _tx_thread_interrupt_disable
+        LDR     R1,[R5]
+        LDR     R7,=-4
+        LDR     R1,[R1, R7]
+        CMP     R1,R6
+        BEQ.N   ??_tx_misra_thread_stack_check_0
+        BL      _tx_thread_interrupt_restore
+        MOVS    R0,R4
+        BL      _tx_thread_stack_analyze
+        BL      _tx_thread_interrupt_disable
 ??_tx_misra_thread_stack_check_0:
-        BL       _tx_thread_interrupt_restore
-        POP      {R0,R4,R5,PC}    ;; return
+        BL      _tx_thread_interrupt_restore
+        POP     {R0,R4,R5,R6,R7,PC}    // return
 
 #ifdef TX_ENABLE_EVENT_TRACE
 
@@ -494,7 +574,7 @@ _tx_misra_trace_event_insert:
         LDR      R0,[R0, #+0]
         STR      R4,[R0, #+32]
 ??_tx_misra_trace_event_insert_0:
-        POP      {R0,R4-R7,PC}    ;; return
+        POP      {R0,R4-R7,PC}    // return
 
 
         SECTION `.text`:CODE:NOROOT(2)
@@ -546,7 +626,7 @@ _tx_misra_trace_event_insert:
         THUMB
 _tx_misra_time_stamp_get:
         MOVS     R0,#+0
-        BX       LR               ;; return
+        BX       LR               // return
 
 #endif
 
@@ -581,203 +661,7 @@ _tx_misra_time_stamp_get:
         THUMB
 _tx_misra_always_true:
         MOVS     R0,#+1
-        BX       LR               ;; return
-
-
-/******************************************************************************************/
-/******************************************************************************************/
-/**                                                                                       */
-/**  UCHAR  **_tx_misra_indirect_void_to_uchar_pointer_convert(VOID **return_ptr);        */
-/**                                                                                       */
-/******************************************************************************************/
-/******************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_indirect_void_to_uchar_pointer_convert:
-        BX       LR               ;; return
-
-
-/***************************************************************************************/
-/***************************************************************************************/
-/**                                                                                    */
-/**  UCHAR  **_tx_misra_uchar_to_indirect_uchar_pointer_convert(UCHAR *pointer);       */
-/**                                                                                    */
-/***************************************************************************************/
-/***************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_uchar_to_indirect_uchar_pointer_convert:
-        BX       LR               ;; return
-
-
-/***********************************************************************************/
-/***********************************************************************************/
-/**                                                                                */
-/**  UCHAR  *_tx_misra_block_pool_to_uchar_pointer_convert(TX_BLOCK_POOL *pool);   */
-/**                                                                                */
-/***********************************************************************************/
-/***********************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_block_pool_to_uchar_pointer_convert:
-        BX       LR               ;; return
-
-
-/******************************************************************************************/
-/******************************************************************************************/
-/**                                                                                       */
-/**  TX_BLOCK_POOL  *_tx_misra_void_to_block_pool_pointer_convert(VOID *pointer);         */
-/**                                                                                       */
-/******************************************************************************************/
-/******************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_block_pool_pointer_convert:
-        BX       LR               ;; return
-
-
-/*****************************************************************************/
-/*****************************************************************************/
-/**                                                                          */
-/**  UCHAR  *_tx_misra_void_to_uchar_pointer_convert(VOID *pointer);         */
-/**                                                                          */
-/*****************************************************************************/
-/*****************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_uchar_pointer_convert:
-        BX       LR               ;; return
-
-
-/************************************************************************************/
-/************************************************************************************/
-/**                                                                                 */
-/**  TX_BLOCK_POOL *_tx_misra_uchar_to_block_pool_pointer_convert(UCHAR *pointer);  */
-/**                                                                                 */
-/************************************************************************************/
-/************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_uchar_to_block_pool_pointer_convert:
-        BX       LR               ;; return
-
-
-/**************************************************************************************/
-/**************************************************************************************/
-/**                                                                                   */
-/**  UCHAR  **_tx_misra_void_to_indirect_uchar_pointer_convert(VOID *pointer);        */
-/**                                                                                   */
-/**************************************************************************************/
-/**************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_indirect_uchar_pointer_convert:
-        BX       LR               ;; return
-
-
-/*****************************************************************************************/
-/*****************************************************************************************/
-/**                                                                                      */
-/**  TX_BYTE_POOL  *_tx_misra_void_to_byte_pool_pointer_convert(VOID *pointer);          */
-/**                                                                                      */
-/*****************************************************************************************/
-/*****************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_byte_pool_pointer_convert:
-        BX       LR               ;; return
-
-
-/***************************************************************************************/
-/***************************************************************************************/
-/**                                                                                    */
-/**  UCHAR  *_tx_misra_byte_pool_to_uchar_pointer_convert(TX_BYTE_POOL *pool);         */
-/**                                                                                    */
-/***************************************************************************************/
-/***************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_byte_pool_to_uchar_pointer_convert:
-        BX       LR               ;; return
-
-
-/*****************************************************************************************/
-/*****************************************************************************************/
-/**                                                                                      */
-/**  ALIGN_TYPE  *_tx_misra_uchar_to_align_type_pointer_convert(UCHAR *pointer);         */
-/**                                                                                      */
-/*****************************************************************************************/
-/*****************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_uchar_to_align_type_pointer_convert:
-        BX       LR               ;; return
-
-
-/****************************************************************************************************/
-/****************************************************************************************************/
-/**                                                                                                 */
-/**  TX_BYTE_POOL  **_tx_misra_uchar_to_indirect_byte_pool_pointer_convert(UCHAR *pointer);         */
-/**                                                                                                 */
-/****************************************************************************************************/
-/****************************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_uchar_to_indirect_byte_pool_pointer_convert:
-        BX       LR               ;; return
-
-
-/**************************************************************************************************/
-/**************************************************************************************************/
-/**                                                                                               */
-/**  TX_EVENT_FLAGS_GROUP  *_tx_misra_void_to_event_flags_pointer_convert(VOID *pointer);         */
-/**                                                                                               */
-/**************************************************************************************************/
-/**************************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_event_flags_pointer_convert:
-        BX       LR               ;; return
-
-
-/*****************************************************************************/
-/*****************************************************************************/
-/**                                                                          */
-/**  ULONG  *_tx_misra_void_to_ulong_pointer_convert(VOID *pointer);         */
-/**                                                                          */
-/*****************************************************************************/
-/*****************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_ulong_pointer_convert:
-        BX       LR               ;; return
-
-
-/********************************************************************************/
-/********************************************************************************/
-/**                                                                             */
-/**  TX_MUTEX  *_tx_misra_void_to_mutex_pointer_convert(VOID *pointer);         */
-/**                                                                             */
-/********************************************************************************/
-/********************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_mutex_pointer_convert:
-        BX       LR               ;; return
+        BX       LR               // return
 
 
 /**************************************************************************/
@@ -792,195 +676,10 @@ _tx_misra_void_to_mutex_pointer_convert:
         THUMB
 _tx_misra_status_get:
         MOVS     R0,#+0
-        BX       LR               ;; return
-
-
-/********************************************************************************/
-/********************************************************************************/
-/**                                                                             */
-/**  TX_QUEUE  *_tx_misra_void_to_queue_pointer_convert(VOID *pointer);         */
-/**                                                                             */
-/********************************************************************************/
-/********************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_queue_pointer_convert:
-        BX       LR               ;; return
-
-
-/****************************************************************************************/
-/****************************************************************************************/
-/**                                                                                     */
-/**  TX_SEMAPHORE  *_tx_misra_void_to_semaphore_pointer_convert(VOID *pointer);         */
-/**                                                                                     */
-/****************************************************************************************/
-/****************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_semaphore_pointer_convert:
-        BX       LR               ;; return
-
-
-/**************************************************************************/
-/**************************************************************************/
-/**                                                                       */
-/**  VOID  *_tx_misra_uchar_to_void_pointer_convert(UCHAR *pointer);      */
-/**                                                                       */
-/**************************************************************************/
-/**************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_uchar_to_void_pointer_convert:
-        BX       LR               ;; return
-
-
-/*********************************************************************************/
-/*********************************************************************************/
-/**                                                                              */
-/**  TX_THREAD  *_tx_misra_ulong_to_thread_pointer_convert(ULONG value);         */
-/**                                                                              */
-/*********************************************************************************/
-/*********************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_ulong_to_thread_pointer_convert:
-        BX       LR               ;; return
-
-
-/***************************************************************************************************/
-/***************************************************************************************************/
-/**                                                                                                */
-/**  VOID  *_tx_misra_timer_indirect_to_void_pointer_convert(TX_TIMER_INTERNAL **pointer);         */
-/**                                                                                                */
-/***************************************************************************************************/
-/***************************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_timer_indirect_to_void_pointer_convert:
-        BX       LR               ;; return
-
-
-/***************************************************************************************/
-/***************************************************************************************/
-/**                                                                                    */
-/**  CHAR  *_tx_misra_const_char_to_char_pointer_convert(const char *pointer);         */
-/**                                                                                    */
-/***************************************************************************************/
-/***************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_const_char_to_char_pointer_convert:
-        BX       LR               ;; return
-
-
-/**********************************************************************************/
-/**********************************************************************************/
-/**                                                                               */
-/**  TX_THREAD  *_tx_misra_void_to_thread_pointer_convert(void *pointer);         */
-/**                                                                               */
-/**********************************************************************************/
-/**********************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_void_to_thread_pointer_convert:
-        BX       LR               ;; return
-
-
-#ifdef TX_ENABLE_EVENT_TRACE
-
-/************************************************************************************************/
-/************************************************************************************************/
-/**                                                                                             */
-/**  UCHAR  *_tx_misra_object_to_uchar_pointer_convert(TX_TRACE_OBJECT_ENTRY *pointer);         */
-/**                                                                                             */
-/************************************************************************************************/
-/************************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_object_to_uchar_pointer_convert:
-        BX       LR               ;; return
-
-
-/************************************************************************************************/
-/************************************************************************************************/
-/**                                                                                             */
-/**  TX_TRACE_OBJECT_ENTRY  *_tx_misra_uchar_to_object_pointer_convert(UCHAR *pointer);         */
-/**                                                                                             */
-/************************************************************************************************/
-/************************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_uchar_to_object_pointer_convert:
-        BX       LR               ;; return
-
-
-/******************************************************************************************/
-/******************************************************************************************/
-/**                                                                                       */
-/**  TX_TRACE_HEADER  *_tx_misra_uchar_to_header_pointer_convert(UCHAR *pointer);         */
-/**                                                                                       */
-/******************************************************************************************/
-/******************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_uchar_to_header_pointer_convert:
-        BX       LR               ;; return
+        BX       LR               // return
 
 
 /***********************************************************************************************/
-/***********************************************************************************************/
-/**                                                                                            */
-/**  TX_TRACE_BUFFER_ENTRY  *_tx_misra_uchar_to_entry_pointer_convert(UCHAR *pointer);         */
-/**                                                                                            */
-/***********************************************************************************************/
-/***********************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_uchar_to_entry_pointer_convert:
-        BX       LR               ;; return
-
-
-/***********************************************************************************************/
-/***********************************************************************************************/
-/**                                                                                            */
-/**  UCHAR  *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer);         */
-/**                                                                                            */
-/***********************************************************************************************/
-/***********************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_entry_to_uchar_pointer_convert:
-        BX       LR               ;; return
-#endif
-
-
-/***********************************************************************************************/
-/***********************************************************************************************/
-/**                                                                                            */
-/**  UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer);                           */
-/**                                                                                            */
-/***********************************************************************************************/
-/***********************************************************************************************/
-
-        SECTION `.text`:CODE:NOROOT(1)
-        THUMB
-_tx_misra_char_to_uchar_pointer_convert:
-        BX       LR               ;; return
-
-
-***********************************************************************************************/
 /***********************************************************************************************/
 /**                                                                                            */
 /**  ULONG  _tx_misra_ipsr_get(void);                                                          */
@@ -992,9 +691,74 @@ _tx_misra_char_to_uchar_pointer_convert:
         THUMB
 _tx_misra_ipsr_get:
         MRS      R0, IPSR
-        BX       LR               ;; return
+        BX       LR               // return
 
 
+/***********************************************************************************************/
+/***********************************************************************************************/
+/**                                                                                            */
+/**  ULONG  _tx_misra_control_get(void);                                                       */
+/**                                                                                            */
+/***********************************************************************************************/
+/***********************************************************************************************/
+
+        SECTION `.text`:CODE:NOROOT(1)
+        THUMB
+_tx_misra_control_get:
+        MRS      R0, CONTROL
+        BX       LR               // return
+
+        
+/***********************************************************************************************/
+/***********************************************************************************************/
+/**                                                                                            */
+/**  void   _tx_misra_control_set(ULONG value);                                                */
+/**                                                                                            */
+/***********************************************************************************************/
+/***********************************************************************************************/
+
+        SECTION `.text`:CODE:NOROOT(1)
+        THUMB
+_tx_misra_control_set:
+        MSR      CONTROL, R0
+        BX       LR               // return
+
+        
+#ifdef __ARMVFP__
+
+/***********************************************************************************************/
+/***********************************************************************************************/
+/**                                                                                            */
+/**  ULONG  _tx_misra_fpccr_get(void);                                                         */
+/**                                                                                            */
+/***********************************************************************************************/
+/***********************************************************************************************/
+
+        SECTION `.text`:CODE:NOROOT(2)
+        THUMB
+_tx_misra_fpccr_get:
+        LDR      r0, =0xE000EF34  // Build FPCCR address
+        LDR      r0, [r0]         // Load FPCCR value
+        BX       LR               // return
+        
+        
+/***********************************************************************************************/
+/***********************************************************************************************/
+/**                                                                                            */
+/**  void   _tx_misra_vfp_touch(void);                                                         */
+/**                                                                                            */
+/***********************************************************************************************/
+/***********************************************************************************************/
+
+        SECTION `.text`:CODE:NOROOT(1)
+        THUMB
+_tx_misra_vfp_touch:
+        vmov.f32 s0, s0
+        BX       LR               // return
+        
+#endif
+        
+        
         SECTION `.iar_vfe_header`:DATA:NOALLOC:NOROOT(2)
         SECTION_TYPE SHT_PROGBITS, 0
         DATA

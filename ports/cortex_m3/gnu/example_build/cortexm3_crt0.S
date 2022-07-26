@@ -1,52 +1,26 @@
- .global _start
-  .extern main
-
-
+  .syntax	unified
   .section .init, "ax"
   .code 16
   .align 2
   .thumb_func
 
-
+ .global _start
 _start:
   CPSID   i
   ldr r1, =__stack_end__
   mov sp, r1
-
 
   /* Copy initialised sections into RAM if required. */
   ldr r0, =__data_load_start__
   ldr r1, =__data_start__
   ldr r2, =__data_end__
   bl crt0_memory_copy
-  ldr r0, =__text_load_start__
-  ldr r1, =__text_start__
-  ldr r2, =__text_end__
-  bl crt0_memory_copy
-  ldr r0, =__fast_load_start__
-  ldr r1, =__fast_start__
-  ldr r2, =__fast_end__
-  bl crt0_memory_copy
-  ldr r0, =__ctors_load_start__
-  ldr r1, =__ctors_start__
-  ldr r2, =__ctors_end__
-  bl crt0_memory_copy
-  ldr r0, =__dtors_load_start__
-  ldr r1, =__dtors_start__
-  ldr r2, =__dtors_end__
-  bl crt0_memory_copy
-  ldr r0, =__rodata_load_start__
-  ldr r1, =__rodata_start__
-  ldr r2, =__rodata_end__
-  bl crt0_memory_copy
-
 
   /* Zero bss. */
   ldr r0, =__bss_start__
   ldr r1, =__bss_end__
   mov r2, #0
   bl crt0_memory_set
-
 
   /* Setup heap - not recommended for Threadx but here for compatibility reasons */
   ldr r0, = __heap_start__
@@ -56,7 +30,6 @@ _start:
   str r2, [r0]
   add r0, r0, #4
   str r1, [r0]
-
 
   /* constructors in case of using C++ */
   ldr r0, =__ctors_start__
@@ -72,12 +45,10 @@ crt0_ctor_loop:
   b crt0_ctor_loop
 crt0_ctor_end:
 
-
   /* Setup call frame for main() */
   mov r0, #0
   mov lr, r0
   mov r12, sp
-
 
 start:
   /* Jump to main() */
@@ -88,27 +59,21 @@ start:
   /*  when main returns, loop forever. */
 crt0_exit_loop:
   b crt0_exit_loop
-  
-
 
   /* Startup helper functions. */
 
-
 crt0_memory_copy:
   cmp r0, r1
-  beq memory_copy_done
-  sub r2, r2, r1
   beq memory_copy_done
 memory_copy_loop:
   ldrb r3, [r0]
   add r0, r0, #1
   strb r3, [r1]
   add r1, r1, #1
-  sub r2, r2, #1
+  cmp r1, r2
   bne memory_copy_loop
 memory_copy_done:
   bx lr
-
 
 crt0_memory_set:
   cmp r0, r1
@@ -118,7 +83,6 @@ crt0_memory_set:
   b crt0_memory_set
 memory_set_done:
   bx lr
-
 
   /* Setup attibutes of stack and heap sections so they don't take up room in the elf file */
   .section .stack, "wa", %nobits

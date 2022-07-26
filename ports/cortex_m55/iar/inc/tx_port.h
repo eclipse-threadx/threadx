@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M55/IAR    */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -61,16 +61,21 @@
 /*                                            added symbol to enable      */
 /*                                            stack error handler,        */
 /*                                            resulting in version 6.1.7  */
-/*  10-15-2021     Scott Larson             Modified comment(s), improved */
+/*  10-15-2021      Scott Larson            Modified comment(s), improved */
 /*                                            stack check error handling, */
 /*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Scott Larson             Modified comment(s), unified  */
+/*  01-31-2022      Scott Larson            Modified comment(s), unified  */
 /*                                            this file across compilers, */
 /*                                            fixed predefined macro,     */
 /*                                            resulting in version 6.1.10 */
 /*  04-25-2022      Scott Larson            Modified comments and added   */
 /*                                            volatile to registers,      */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022      Scott Larson            Modified comments and changed */
+/*                                            secure stack initialization */
+/*                                            macro to port-specific,     */
+/*                                            described BASEPRI usage,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -188,6 +193,12 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
 #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
+/* By default, ThreadX for Cortex-M uses the PRIMASK register to enable/disable interrupts.
+If using BASEPRI is desired, define the following two symbols for both c and assembly files:
+TX_PORT_USE_BASEPRI - This tells ThreadX to use BASEPRI instead of PRIMASK.
+TX_PORT_BASEPRI = (priority_mask << (8 - number_priority_bits)) - this defines the maximum priority level to mask.
+Any interrupt with a higher priority than priority_mask will not be masked, thus the interrupt will run.
+*/
 
 /* Define various constants for the ThreadX Cortex-M port.  */
 
@@ -524,7 +535,7 @@ ULONG   _tx_misra_ipsr_get(VOID);
 #if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE)
 /* Initialize secure stacks for threads calling secure functions. */
 extern void    _tx_thread_secure_stack_initialize(void);
-#define TX_INITIALIZE_KERNEL_ENTER_EXTENSION            _tx_thread_secure_stack_initialize();
+#define TX_PORT_SPECIFIC_PRE_INITIALIZATION             _tx_thread_secure_stack_initialize();
 #endif
 
 /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
@@ -637,7 +648,7 @@ VOID                                            _tx_thread_interrupt_restore(UIN
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX Cortex-M55/IAR Version 6.1.10 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX Cortex-M55/IAR Version 6.1.12 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

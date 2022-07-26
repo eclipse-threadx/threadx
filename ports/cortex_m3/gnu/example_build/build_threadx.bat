@@ -1,5 +1,4 @@
 del tx.a
-arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb tx_initialize_low_level.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb ../src/tx_thread_stack_build.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb ../src/tx_thread_schedule.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb ../src/tx_thread_system_return.S
@@ -7,7 +6,7 @@ arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb ../src/tx_thread_context_save.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb ../src/tx_thread_context_restore.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb ../src/tx_thread_interrupt_control.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb ../src/tx_timer_interrupt.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb ../src/tx_thread_interrupt_control.S
+
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_allocate.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_cleanup.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_create.c
@@ -192,8 +191,8 @@ arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb -I../../../../common/inc -I../in
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_deactivate.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_delete.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-m3 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_info_get.c
+
 arm-none-eabi-ar -r tx.a tx_thread_stack_build.o tx_thread_schedule.o tx_thread_system_return.o tx_thread_context_save.o tx_thread_context_restore.o tx_timer_interrupt.o tx_thread_interrupt_control.o
-arm-none-eabi-ar -r tx.a tx_thread_interrupt_control.o tx_initialize_low_level.o
 arm-none-eabi-ar -r tx.a tx_block_allocate.o tx_block_pool_cleanup.o tx_block_pool_create.o tx_block_pool_delete.o tx_block_pool_info_get.o
 arm-none-eabi-ar -r tx.a tx_block_pool_initialize.o tx_block_pool_performance_info_get.o tx_block_pool_performance_system_info_get.o tx_block_pool_prioritize.o
 arm-none-eabi-ar -r tx.a tx_block_release.o tx_byte_allocate.o tx_byte_pool_cleanup.o tx_byte_pool_create.o tx_byte_pool_delete.o tx_byte_pool_info_get.o

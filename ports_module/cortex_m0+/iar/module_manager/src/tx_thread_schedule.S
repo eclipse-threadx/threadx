@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M0+/IAR    */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -72,6 +72,9 @@
 /*  04-25-2022      Scott Larson            Optimized MPU configuration,  */
 /*                                            change handler name,        */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022      Scott Larson            Removed the code path to skip */
+/*                                            MPU reloading,              */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -329,17 +332,6 @@ __tx_ts_restore:
     LDR     r2, [r0, r6]                            // Pickup MPU region 5 address
     CMP     r2, #0
     BEQ     skip_mpu_setup                          // Is protection required for this module? No, skip MPU setup
-
-    // Is the MPU already set up for this module?
-    MOVS    r1, #5                                  // Select region 5 from MPU
-    LDR     r3, =0xE000ED98                         // MPU_RNR register address
-    STR     r1, [r3]                                // Set region to 5
-    LDR     r1, =0xE000ED9C                         // MPU_RBAR register address
-    LDR     r3, [r1]                                // Load address stored in MPU region 5
-    MOVS	r6, #0x10
-    BICS    r2, r2, r6                              // Clear VALID bit
-    CMP     r2, r3                                  // Is module already loaded?
-    BEQ     _tx_enable_mpu                          // Yes - skip MPU reconfiguration
 
     // Initialize loop to configure MPU registers
     MOVS    r3, #0x64                               // Index of MPU register settings in thread control block

@@ -13,7 +13,6 @@ _start:
   ldr r1, =__stack_end__
   mov sp, r1
 
-
   /* Copy initialised sections into RAM if required. */
   ldr r0, =__data_load_start__
   ldr r1, =__data_start__
@@ -47,7 +46,6 @@ _start:
   mov r2, #0
   bl crt0_memory_set
 
-
   /* Setup heap - not recommended for Threadx but here for compatibility reasons */
   ldr r0, = __heap_start__
   ldr r1, = __heap_end__
@@ -56,7 +54,6 @@ _start:
   str r2, [r0]
   add r0, r0, #4
   str r1, [r0]
-
 
   /* constructors in case of using C++ */
   ldr r0, =__ctors_start__
@@ -72,12 +69,10 @@ crt0_ctor_loop:
   b crt0_ctor_loop
 crt0_ctor_end:
 
-
   /* Setup call frame for main() */
   mov r0, #0
   mov lr, r0
   mov r12, sp
-
 
 start:
   /* Jump to main() */
@@ -92,7 +87,6 @@ crt0_exit_loop:
 
 
   /* Startup helper functions. */
-
 
 crt0_memory_copy:
   cmp r0, r1
@@ -109,7 +103,6 @@ memory_copy_loop:
 memory_copy_done:
   bx lr
 
-
 crt0_memory_set:
   cmp r0, r1
   beq memory_set_done
@@ -118,7 +111,6 @@ crt0_memory_set:
   b crt0_memory_set
 memory_set_done:
   bx lr
-
 
   /* Setup attibutes of stack and heap sections so they don't take up room in the elf file */
   .section .stack, "wa", %nobits
