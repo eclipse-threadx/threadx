@@ -219,7 +219,7 @@ TX_INTERRUPT_SAVE_AREA
 UINT    status;
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 UCHAR   *stack_mem;
-INT      secure_context_index;
+INT     secure_context_index;
 
     status = TX_SUCCESS;
 
@@ -241,7 +241,6 @@ INT      secure_context_index;
 
     else
     {
-
         TX_DISABLE
 
         /* Allocate free index for secure stack info. */

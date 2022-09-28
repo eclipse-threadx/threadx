@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M4/AC6     */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -59,6 +59,9 @@
 /*  04-25-2022      Scott Larson            Modified comments and added   */
 /*                                            volatile to registers,      */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022      Scott Larson            Modified comments and         */
+/*                                            described BASEPRI usage,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -146,6 +149,12 @@ typedef unsigned short                          USHORT;
 #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
+/* By default, ThreadX for Cortex-M uses the PRIMASK register to enable/disable interrupts.
+If using BASEPRI is desired, define the following two symbols for both c and assembly files:
+TX_PORT_USE_BASEPRI - This tells ThreadX to use BASEPRI instead of PRIMASK.
+TX_PORT_BASEPRI = (priority_mask << (8 - number_priority_bits)) - this defines the maximum priority level to mask.
+Any interrupt with a higher priority than priority_mask will not be masked, thus the interrupt will run.
+*/
 
 /* Define various constants for the ThreadX Cortex-M port.  */
 
@@ -707,7 +716,7 @@ void    tx_thread_fpu_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M4/AC6 Version 6.1.11 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M4/AC6 Version 6.1.12 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

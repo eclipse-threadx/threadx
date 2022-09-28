@@ -87,7 +87,7 @@ Azure RTOS provides OEMs with components to secure communication and to create c
 
 # Adaptation layer for ThreadX
 
-Azure RTOS ThreadX is an advanced real-time operating system (RTOS) designed specifically for deeply embedded applications. To help ease application migration to Auzre RTOS, ThreadX provides [adaption layers](https://github.com/azure-rtos/threadx/tree/master/utility/rtos_compatibility_layers) for various legacy RTOS APIs (FreeRTOS, POSIX, OSEK, etc.).
+Azure RTOS ThreadX is an advanced real-time operating system (RTOS) designed specifically for deeply embedded applications. To help ease application migration to Azure RTOS, ThreadX provides [adaption layers](https://github.com/azure-rtos/threadx/tree/master/utility/rtos_compatibility_layers) for various legacy RTOS APIs (FreeRTOS, POSIX, OSEK, etc.).
 
 # Licensing
 
@@ -109,7 +109,7 @@ The following are references to additional Azure RTOS and Azure IoT in general:
 | TraceX Installer | https://aka.ms/azrtos-tracex-installer |
 | Azure RTOS Documentation and Guides: | https://docs.microsoft.com/azure/rtos |
 | Azure RTOS Website: | https://azure.microsoft.com/services/rtos/ |
-| Azure RTOS Sales Questions: | https://azure-rtos.ms-iot-contact.com/ |
+| Azure RTOS Sales Questions: | https://aka.ms/azrtos-license |
 | Azure RTOS Product Support Policy | https://aka.ms/azrtos/lts |
 | Azure RTOS Functional Safety Artifacts | https://aka.ms/azrtos/tuv |
 | For technical questions check out Microsoft Q/A for Azure IoT | https://aka.ms/QnA/azure-rtos |

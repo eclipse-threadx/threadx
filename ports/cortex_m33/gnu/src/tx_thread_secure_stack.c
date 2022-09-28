@@ -167,7 +167,7 @@ INT     index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_mode_stack_allocate             Cortex-M33/GNU    */
-/*                                                           6.1.10       */
+/*                                                           6.1.11a      */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -207,11 +207,15 @@ INT     index;
 /*  01-31-2022      Himanshu Gupta          Modified comments(s), updated */
 /*                                            secure stack allocation,    */
 /*                                            resulting in version 6.1.10 */
+/*  05-02-2022      Scott Larson            Modified comment(s), added    */
+/*                                            TX_INTERRUPT_SAVE_AREA,     */
+/*                                            resulting in version 6.1.11a*/
 /*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
 UINT    _tx_thread_secure_mode_stack_allocate(TX_THREAD *thread_ptr, ULONG stack_size)
 {
+TX_INTERRUPT_SAVE_AREA
 UINT    status;
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 UCHAR   *stack_mem;

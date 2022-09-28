@@ -29,10 +29,15 @@
 /*  01-31-2022     William E. Lamie         Modified comment(s), and      */
 /*                                            fixed compiler warnings,    */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Cindy Deng               Added simple static scheduler */
+/*                                            start flag, corrected stack */
+/*                                            allocation size,            */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
 #include <stdint.h>
+#include <limits.h>
 
 #include <tx_api.h>
 #include <tx_thread.h>
@@ -63,6 +68,7 @@ static TX_BYTE_POOL txfr_heap;
 static UINT txfr_heap_initialized;
 #if (TX_FREERTOS_AUTO_INIT == 1)
 static UINT txfr_initialized;
+static UINT txfr_scheduler_started;
 #endif // #if (TX_FREERTOS_AUTO_INIT == 1)
 
 // TODO - do something with malloc.
@@ -263,6 +269,7 @@ void vPortExitCritical(void)
 void vTaskStartScheduler(void)
 {
 #if (TX_FREERTOS_AUTO_INIT == 1)
+    txfr_scheduler_started = 1u;
     _tx_thread_schedule();
 #else
     // Nothing to do, THREADX scheduler is already started.
@@ -272,6 +279,11 @@ void vTaskStartScheduler(void)
 
 BaseType_t xTaskGetSchedulerState(void)
 {
+#if (TX_FREERTOS_AUTO_INIT == 1)
+    if(txfr_scheduler_started == 0u) {
+        return taskSCHEDULER_NOT_STARTED;
+    }
+#endif
     if(_tx_thread_preempt_disable > 0u) {
         return taskSCHEDULER_SUSPENDED;
     } else {
@@ -315,6 +327,7 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
 {
     UINT prio;
     UINT ret;
+    ULONG stack_depth_bytes;
     TX_INTERRUPT_SAVE_AREA;
 
     configASSERT(pxTaskCode != NULL);
@@ -329,6 +342,13 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
     }
 #endif
 
+    if(ulStackDepth > (ULONG_MAX / sizeof(StackType_t))) {
+        /* Integer overflow in stack depth */
+        TX_FREERTOS_ASSERT_FAIL();
+        return NULL;
+    }
+    stack_depth_bytes = ulStackDepth * sizeof(StackType_t);
+
     TX_MEMSET(pxTaskBuffer, 0, sizeof(*pxTaskBuffer));
     pxTaskBuffer->p_task_arg = pvParameters;
     pxTaskBuffer->p_task_func = pxTaskCode;
@@ -342,7 +362,7 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
     prio = txfr_prio_fr_to_tx(uxPriority);
 
     ret = tx_thread_create(&pxTaskBuffer->thread, (CHAR *)pcName, txfr_thread_wrapper, (ULONG)pvParameters,
-            puxStackBuffer, ulStackDepth, prio, prio, 0u, TX_DONT_START);
+            puxStackBuffer, stack_depth_bytes, prio, prio, 0u, TX_DONT_START);
     if(ret != TX_SUCCESS) {
         TX_FREERTOS_ASSERT_FAIL();
         return NULL;
@@ -375,6 +395,7 @@ BaseType_t xTaskCreate(TaskFunction_t pvTaskCode,
     txfr_task_t *p_task;
     UINT ret;
     UINT prio;
+    ULONG stack_depth_bytes;
     TX_INTERRUPT_SAVE_AREA;
 
     configASSERT(pvTaskCode != NULL);
@@ -387,8 +408,14 @@ BaseType_t xTaskCreate(TaskFunction_t pvTaskCode,
         tx_freertos_auto_init();
     }
 #endif
+    if((usStackDepth > (SIZE_MAX / sizeof(StackType_t)))
+        || (usStackDepth > (ULONG_MAX / sizeof(StackType_t)))) {
+        /* Integer overflow in stack depth */
+        return errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
+    }
+    stack_depth_bytes = usStackDepth * sizeof(StackType_t);
 
-    p_stack = txfr_malloc(usStackDepth);
+    p_stack = txfr_malloc((size_t)stack_depth_bytes);
     if(p_stack == NULL) {
         return errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
     }
@@ -417,7 +444,7 @@ BaseType_t xTaskCreate(TaskFunction_t pvTaskCode,
     prio = txfr_prio_fr_to_tx(uxPriority);
 
     ret = tx_thread_create(&p_task->thread, (CHAR *)pcName, txfr_thread_wrapper, (ULONG)pvParameters,
-            p_stack, usStackDepth, prio, prio, 0u, TX_DONT_START);
+            p_stack, stack_depth_bytes, prio, prio, 0u, TX_DONT_START);
     if(ret != TX_SUCCESS) {
         (void)tx_semaphore_delete(&p_task->notification_sem);
         txfr_free(p_stack);

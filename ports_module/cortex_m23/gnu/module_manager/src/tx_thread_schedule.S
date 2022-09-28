@@ -26,7 +26,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M23/GNU    */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -61,6 +61,9 @@
 /*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
 /*  04-25-2022      Scott Larson            Optimized MPU configuration,  */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022      Scott Larson            Removed the code path to skip */
+/*                                            MPU reloading,              */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -374,15 +377,6 @@ _skip_secure_restore:
     MOVS    r2, #0x74                               // Index of MPU data region
     LDR     r2, [r0, r2]                            // Pickup MPU data region address
     CBZ     r2, skip_mpu_setup                      // Is protection required for this module? No, skip MPU setup
-
-    // Is the MPU already set up for this module?
-    MOVS    r1, #2                                  // Select MPU region 2
-    LDR     r3, =0xE000ED98                         // MPU_RNR register address
-    STR     r1, [r3]                                // Set region to 2
-    LDR     r1, =0xE000ED9C                         // MPU_RBAR register address
-    LDR     r3, [r1]                                // Load address stored in MPU region 2
-    CMP     r2, r3                                  // Is module already loaded?
-    BEQ     _tx_enable_mpu                          // Yes - skip MPU reconfiguration
 
     // Initialize loop to configure MPU registers
     MOVS    r3, #0x64                               // Index of MPU register settings in thread control block

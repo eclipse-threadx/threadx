@@ -57,7 +57,7 @@ extern VOID     _txm_module_initialize(VOID *heap_base, VOID *heap_top);
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_thread_shell_entry                    Cortex-M3/AC6     */
-/*                                                           6.1.10          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
