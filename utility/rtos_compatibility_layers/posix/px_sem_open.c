@@ -32,7 +32,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    sem_open                                            PORTABLE C      */
-/*                                                           6.1.7        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -69,7 +69,9 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
+/*  10-31-2022      Scott Larson            Update comparison with NULL,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 sem_t * sem_open(const CHAR * name, ULONG oflag, ...)
@@ -110,7 +112,7 @@ mode_t            mode;
     }
 
     /* Check if semaphore exists.  */
-    if(semid= posix_find_sem( name))
+    if((semid = posix_find_sem(name)) != NULL)
     {
         if(semid->unlink_flag ==TX_TRUE )
         {

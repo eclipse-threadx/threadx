@@ -34,8 +34,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -49,21 +49,23 @@
 
     .text
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function waits for a thread control block pointer to appear in */ 
-/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-/*    in the variable, the corresponding thread is resumed.               */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */ 
-/**************************************************************************/ 
+/**************************************************************************/
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function waits for a thread control block pointer to appear in */
+/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+/*    in the variable, the corresponding thread is resumed.               */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
+/*  10-31-2022      Scott Larson            Updated EPK definitions,      */
+/*                                            resulting in version 6.2.0  */
+/*                                                                        */
+/**************************************************************************/
 
 //  VOID   _tx_thread_schedule(VOID)
 //  {
@@ -96,8 +98,8 @@ _tx_thread_schedule:
     Note on Windowed ABI:
     Callers of this don't expect it to return to them. Most use 'call0'.
     The only windowed (C) caller is _tx_initialize_kernel_enter().
-    There are no args or results to pass. So we don't really care if the 
-    window gets rotated. We can omit the 'entry' altogether and avoid the 
+    There are no args or results to pass. So we don't really care if the
+    window gets rotated. We can omit the 'entry' altogether and avoid the
     need for a special "no entry" entrypoint to this function.
     */
 
@@ -108,11 +110,11 @@ _tx_thread_schedule:
     call0   scheduler_return
     #endif
 
-    /* 
+    /*
     Wait for a thread to execute (Idle Loop).
-    First ensure interrupts (except hi-pri) are disabled so result 
+    First ensure interrupts (except hi-pri) are disabled so result
     of reading _tx_thread_execute_ptr can't change before testing.
-    While there's no thread ready, enable interrupts and wait in a 
+    While there's no thread ready, enable interrupts and wait in a
     low power state, then disable interrupts and repeat the test.
     */
     //  do
@@ -130,7 +132,7 @@ _tx_thread_schedule:
     //  while(_tx_thread_execute_ptr == TX_NULL);
 
 .L_tx_thread_schedule_ready:
-    
+
     /* Yes! We have a thread to execute.  Lockout interrupts and
        transfer control to it. Interrupts are already disabled. */
 
@@ -170,7 +172,7 @@ _tx_thread_schedule:
     //  SP =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;
     l32i    sp, a2, tx_thread_stack_ptr
 
-    #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing. */
     #ifdef __XTENSA_CALL0_ABI__
     call0   _tx_execution_thread_enter
@@ -197,8 +199,8 @@ _tx_thread_schedule:
 
     /* In Call0 ABI, restore callee-saved regs (A12, A13 already restored). */
     #ifdef __XTENSA_CALL0_ABI__
-    l32i    a14, sp, XT_STK_A14   
-    l32i    a15, sp, XT_STK_A15   
+    l32i    a14, sp, XT_STK_A14
+    l32i    a15, sp, XT_STK_A15
     #endif
 
     #if XCHAL_CP_NUM > 0
@@ -207,25 +209,25 @@ _tx_thread_schedule:
 
     /*
     This does not return to its caller, but to the selected thread.
-    Must return via the exit dispatcher corresponding to the entrypoint 
-    from which this was called. Interruptee's A0, A1, PS, PC are restored 
+    Must return via the exit dispatcher corresponding to the entrypoint
+    from which this was called. Interruptee's A0, A1, PS, PC are restored
     and the interrupt stack frame is deallocated in the exit dispatcher.
     */
-    l32i    a0,  sp, XT_STK_EXIT   
+    l32i    a0,  sp, XT_STK_EXIT
     ret
 
 .L_tx_thread_synch_return:
 
     /* Here we return from a solicited entry with a solicited stack frame. */
     movi    a0,  TX_FALSE
-    l32i    a3,  sp, XT_STK_PS   
+    l32i    a3,  sp, XT_STK_PS
     s32i    a0,  a2, tx_thread_solicited
 
     #ifdef __XTENSA_CALL0_ABI__
-    l32i    a12, sp, XT_STK_A12   
-    l32i    a13, sp, XT_STK_A13   
-    l32i    a14, sp, XT_STK_A14   
-    l32i    a15, sp, XT_STK_A15   
+    l32i    a12, sp, XT_STK_A12
+    l32i    a13, sp, XT_STK_A13
+    l32i    a14, sp, XT_STK_A14
+    l32i    a15, sp, XT_STK_A15
     #endif
 
     l32i    a0,  sp, XT_STK_PC          /* return address */

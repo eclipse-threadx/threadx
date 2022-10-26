@@ -26,8 +26,9 @@ initialization code.
 
 The ThreadX demonstration for the RXv1 utilizes CMT0 as a periodic timer interrupt 
 source. The CMT0 interrupt is typically setup for 10ms periodic interrupts and the 
-interrupt priority level is set to level 7. You may change any of the timer 
-parameters as needed.
+interrupt priority level is set to level 5 with the symbol CMT_RX_CFG_IPR in 
+r_cmt_rx_config.h of Renesas CMT timer module(r_cmt_rx). You may change any of the 
+timer parameters as needed.
 
 In addition, _tx_initialize_low_level determines the first available address for use 
 by the application, which is supplied as the sole input parameter to your application 
@@ -38,12 +39,12 @@ sections in your linker control file.
 
 4.  Context Switch, Register Usage and Stack Frames
 
-The RXv1 port for ThreadX uses the first software interrupt, SWINT, i.e., interrupt #17,
-to perform context switch. This ISR is thus reserved when using ThreadX and the SWINT
-should not be manipulated in any way by the application. The port will setup the 
-interrupt within _tx_initialize_low_level and the compiler will automatically install
-the necessary interrupt vector. As such no additional initialization is necessary by the
-application.
+The RXv1 port for ThreadX uses the first software interrupt, SWINT, i.e., interrupt #27,
+to perform context switch with the interrupt priority level 1. This ISR is thus reserved 
+when using ThreadX and the SWINT should not be manipulated in any way by the application. 
+The port will setup the interrupt within _tx_initialize_low_level and the compiler will 
+automatically install the necessary interrupt vector. As such no additional initialization 
+is necessary by the application.
 
 The following defines the saved context stack frame used by the ThreadX port. The
 state of the CPU registers at the time of a context switch is saved on the running 
@@ -93,15 +94,15 @@ is included.
 
 Timer procession is performed by calling __tx_timer_interrupt(). This should usually be done
 from within the callback of a periodic timer with a period of 100Hz. In the sample projects
-a Renesas Fit CMT periodic timer module (rx_cmt) is used as the timer source.
+a Renesas Fit CMT periodic timer module (r_cmt_rx) is used as the timer source.
 
 
 7.  Interrupt Handling
 
 Interrupt handling is unaffected by the ThreadX port as such user interrupts can be 
 written according to the toolchain's documentation. It is recommended not to use interrupt
-priority 15 as this is the priority of the context switch interrupt. However using interrupt
-priority 15 won't cause any negative side effects but doing so may slightly reduce 
+priority 1 as this is the priority of the context switch interrupt. However using interrupt
+priority 1 won't cause any negative side effects but doing so may slightly reduce 
 performance. Please refer to the toolchain documentation for additional details on how to
 define interrupt service routines.
 

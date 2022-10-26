@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    txm_module_port.h                                 Cortex-M4/AC5     */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -44,6 +44,8 @@
 /*  07-29-2022      Scott Larson            Enabled user-defined and      */
 /*                                            default MPU settings,       */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022      Scott Larson            Configure heap size,          */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -93,6 +95,11 @@ The following extensions must also be defined in tx_port.h:
 #define TX_TIMER_EXTENSION                      VOID    *tx_timer_module_instance; \
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 */
+
+/* Users can define the module heap size. */
+#ifndef TXM_MODULE_HEAP_SIZE
+#define TXM_MODULE_HEAP_SIZE                    512
+#endif
 
 /* Define the kernel stack size for a module thread.  */
 #ifndef TXM_MODULE_KERNEL_STACK_SIZE

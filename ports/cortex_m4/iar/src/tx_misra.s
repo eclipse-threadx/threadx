@@ -111,9 +111,9 @@
         PUBLIC _tx_misra_semaphore_put_notify_not_used
         PUBLIC _tx_misra_thread_entry_exit_notify_not_used
         PUBLIC _tx_misra_thread_not_used
-        
-        PUBLIC _tx_version_id
 
+#ifdef TX_MISRA_ENABLE
+        PUBLIC _tx_version_id
 
         SECTION `.data`:DATA:REORDER:NOROOT(2)
         DATA
@@ -130,6 +130,7 @@ _tx_version_id:
         DC8 20H, 43H, 6FH, 6DH, 70H, 6CH, 69H, 61H
         DC8 6EH, 74H, 20H, 2AH, 0
         DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#endif //TX_MISRA_ENABLE
 
 /**************************************************************************/
 /**************************************************************************/

@@ -26,13 +26,12 @@
 #include "pthread.h"    /* Posix API */
 #include "px_int.h"     /* Posix helper functions */
 
-
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    posix_mq_create                                     PORTABLE C      */
-/*                                                           6.1.7        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -74,7 +73,9 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
+/*  10-31-2022      Scott Larson            Add 64-bit support,           */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 POSIX_MSG_QUEUE * posix_mq_create (const CHAR * mq_name,
@@ -125,9 +126,9 @@ TX_QUEUE           *TheQ;
        to store only the message pointer and message length.  */
     temp1 = tx_queue_create((&(posix_q->queue)),
                              (CHAR *)mq_name,
-                             TX_4_ULONG,
+                             TX_POSIX_MESSAGE_SIZE,
                              posix_q->storage,
-                             (msgq_attr->mq_maxmsg * 16));
+                             (msgq_attr->mq_maxmsg * (sizeof(ULONG) * TX_POSIX_MESSAGE_SIZE)));
 
     /* Make sure it worked.  */
     if (temp1 != TX_SUCCESS)

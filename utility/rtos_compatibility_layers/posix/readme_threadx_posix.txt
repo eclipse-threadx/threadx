@@ -173,7 +173,7 @@ INT                   sched_get_priority_min(INT policy)
 
 INT                   pthread_once (pthread_once_t * once_control, VOID (*init_routine) (VOID))
 
-INT                   pthread_kill(ULONG thread_id, int sig)
+INT                   pthread_kill(ALIGN_TYPE thread_id, int sig)
 INT                   pthread_sigmask(int how, const sigset_t *newmask, sigset_t *oldmask)
 
 

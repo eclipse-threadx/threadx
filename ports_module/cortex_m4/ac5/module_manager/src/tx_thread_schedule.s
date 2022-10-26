@@ -40,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M4/AC5     */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -80,6 +80,9 @@
 /*                                            MPU reloading, optional     */
 /*                                            default MPU settings,       */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022      Scott Larson            Added low power support,      */
+/*                                            fixed label syntax,         */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -324,11 +327,25 @@ __tx_ts_wait
 #endif
     LDR     r1, [r2]                                // Pickup the next thread to execute pointer
     CBNZ    r1, __tx_ts_ready                       // If non-NULL, a new thread is ready!
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_enter                      // Possibly enter low power mode
+    POP     {r0-r3}
+#endif
+
 #ifdef TX_ENABLE_WFI
     DSB                                             // Ensure no outstanding memory transactions
     WFI                                             // Wait for interrupt
     ISB                                             // Ensure pipeline is flushed
 #endif
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_exit                       // Exit low power mode
+    POP     {r0-r3}
+#endif
+
 #ifdef TX_PORT_USE_BASEPRI
     MOV     r4, #0                                  // Disable BASEPRI masking (enable interrupts)
     MSR     BASEPRI, r4
@@ -411,11 +428,11 @@ __tx_ts_restore
 
 #ifdef TXM_MODULE_MPU_DEFAULT
     B       config_mpu                              // configure MPU for module
-default_mpu:
+default_mpu
     LDR     r0, =txm_module_default_mpu_registers   // default MPU configuration
 #endif
 
-config_mpu:
+config_mpu
     LDM     r0!,{r2-r9}                             // Load MPU regions 0-3
     STM     r1,{r2-r9}                              // Store MPU regions 0-3
     LDM     r0!,{r2-r9}                             // Load MPU regions 4-7
@@ -572,7 +589,7 @@ _tx_thread_user_return
     BIC     r3, #1                                  // Clear LSPACT
     LDR     r1, =0xE000EF34                         // Address of FPCCR
     STR     r3, [r1]                                // Save updated FPCCR
-_tx_no_lazy_clear:
+_tx_no_lazy_clear
 #endif
 
     LDR     r0, [r2, #0xB0]                         // Load the module thread stack pointer

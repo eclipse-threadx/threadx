@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    pthread_kill                                        PORTABLE C      */
-/*                                                           6.1.7        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -73,11 +73,13 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
+/*  10-31-2022      Scott Larson            Remove double parenthesis,    */
+/*                                            update argument type,       */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
-
-int   pthread_kill(ULONG thread_id, int sig)
+int   pthread_kill(ALIGN_TYPE thread_id, int sig)
 {
 
 TX_INTERRUPT_SAVE_AREA
@@ -197,7 +199,7 @@ UINT        retval;
     status =  posix_memory_allocate(new_signal_thread -> stack_size, &new_signal_thread -> stack_address);
 
     /* problem allocating stack space */
-    if ((status == ERROR))
+    if (status == ERROR)
     {
         
         /* Mark the previously allocated control block as available.  */

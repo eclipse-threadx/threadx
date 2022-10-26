@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_event_flags_get                                 PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -79,6 +79,9 @@
 /*  04-25-2022      Scott Larson            Modified comment(s),          */
 /*                                            handle 0 flags case,        */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022      Scott Larson            Modified comment(s), always   */
+/*                                            return actual flags,        */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_event_flags_get(TX_EVENT_FLAGS_GROUP *group_ptr, ULONG requested_flags,
@@ -125,6 +128,9 @@ UINT            interrupted_set_request;
     /* Pickup current flags.  */
     current_flags =  group_ptr -> tx_event_flags_group_current;
 
+    /* Return the actual event flags and apply delayed clearing.  */
+    *actual_flags_ptr =  current_flags & ~group_ptr -> tx_event_flags_group_delayed_clear;
+
     /* Apply the event flag option mask.  */
     and_request =  (get_option & TX_AND);
 
@@ -157,9 +163,6 @@ UINT            interrupted_set_request;
     /* Determine if the request is satisfied.  */
     if (flags_satisfied != ((ULONG) 0))
     {
-
-        /* Return the actual event flags that satisfied the request.  */
-        *actual_flags_ptr =  current_flags;
 
         /* Pickup the clear bit.  */
         clear_request =  (get_option & TX_EVENT_FLAGS_CLEAR_MASK);
@@ -221,9 +224,6 @@ UINT            interrupted_set_request;
 
         /* Yes, this request can be handled immediately.  */
 
-        /* Return the actual event flags that satisfied the request.  */
-        *actual_flags_ptr =  current_flags;
-
         /* Pickup the clear bit.  */
         clear_request =  (get_option & TX_EVENT_FLAGS_CLEAR_MASK);
 
@@ -274,7 +274,7 @@ UINT            interrupted_set_request;
 #endif
     else
     {
-
+        /* flags_satisfied is 0.  */
         /* Determine if the request specifies suspension.  */
         if (wait_option != TX_NO_WAIT)
         {

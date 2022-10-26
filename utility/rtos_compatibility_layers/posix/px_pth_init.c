@@ -318,7 +318,7 @@ ULONG           index;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_thread_wrapper                                PORTABLE C      */ 
-/*                                                           6.1.7        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -352,7 +352,9 @@ ULONG           index;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
+/*  10-31-2022      Scott Larson            Add 64-bit support,           */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
  VOID posix_thread_wrapper(ULONG pthr_ptr)
@@ -362,7 +364,8 @@ POSIX_TCB        *pthread_ptr;
 VOID             *value_ptr;
 
     /* The input argument is really a pointer to the pthread's control block */
-    pthread_ptr = (POSIX_TCB *) pthr_ptr; 
+    TX_THREAD_EXTENSION_PTR_GET(pthread_ptr, POSIX_TCB, pthr_ptr)
+
     /* Invoke the pthread start routine with appropriate arguments */ 
     value_ptr = (pthread_ptr->start_routine)((VOID *)pthread_ptr->entry_parameter);
  
@@ -668,7 +671,7 @@ POSIX_TCB   *pthread;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_destroy_pthread                               PORTABLE C      */ 
-/*                                                           6.1.7        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -701,19 +704,28 @@ POSIX_TCB   *pthread;
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
+/*  10-31-2022      Scott Larson            Add 64-bit support,           */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
  VOID posix_destroy_pthread(POSIX_TCB *pthread_ptr, VOID *value_ptr)
 {
 
-ULONG        request[WORK_REQ_SIZE];
-INT          status;
+ULONG       request[WORK_REQ_SIZE];
+UINT        status;
 
     /* Build the request. */ 
-   
-    request[0] = (ULONG)pthread_ptr; 
+
+#ifdef TX_64_BIT
+    request[0] = (ULONG)((ALIGN_TYPE)pthread_ptr >> 32);
+    request[1] = (ULONG)((ALIGN_TYPE)pthread_ptr);
+    request[2] = (ULONG)((ALIGN_TYPE)value_ptr >> 32);
+    request[3] = (ULONG)((ALIGN_TYPE)value_ptr);
+#else
+    request[0] = (ULONG)pthread_ptr;
     request[1] = (ULONG)value_ptr;
+#endif
 
     /* Send a message to the SysMgr supervisor thread, asking it to delete */
     /* the pthread. Since the SysMgr supervisor thread is the highest      */ 

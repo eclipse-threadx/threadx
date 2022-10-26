@@ -24,7 +24,7 @@
 /*  EKP DEFINITIONS                                        RELEASE        */
 /*                                                                        */
 /*    tx_posix.h                                          PORTABLE C      */
-/*                                                           6.1.7        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -39,7 +39,10 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
+/*  10-31-2022      Scott Larson            Update WORK_REQ_SIZE value,   */
+/*                                            update pthread_t typedef,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -65,6 +68,13 @@
 #define  MQ_FLAGS                       0
 #define  MQ_PRIO_MAX                    32              /* Maximum priority of message.    */
 
+#ifdef TX_64_BIT
+#define TX_POSIX_MESSAGE_SIZE           5
+#define TX_POSIX_QUEUE_PRIORITY_OFFSET  3
+#else
+#define TX_POSIX_MESSAGE_SIZE           4
+#define TX_POSIX_QUEUE_PRIORITY_OFFSET  2
+#endif
 /************************************************************************/
 /*                          Global Variables                            */
 /************************************************************************/
@@ -254,7 +264,7 @@ typedef  ULONG                  BOOL;
 
 /* these constants control internal working of the systemmanager thread */
 
-#define   WORK_REQ_SIZE         TX_2_ULONG
+#define   WORK_REQ_SIZE         (TX_2_ULONG * (sizeof(ALIGN_TYPE)/sizeof(ULONG)))
 #define   WORK_QUEUE_DEPTH      10
 
 #define   SYSMGR_PRIORITY       0
@@ -279,7 +289,7 @@ typedef struct pthread_attr_obj
 
 
 typedef  INT    ssize_t ;     /* this should be pulled in from sys\types.h  */
-typedef  ULONG  pthread_t;
+typedef  ALIGN_TYPE  pthread_t;
 typedef  ULONG  mode_t;
 
 

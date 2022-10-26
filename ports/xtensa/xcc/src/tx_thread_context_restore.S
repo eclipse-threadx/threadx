@@ -34,8 +34,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -51,19 +51,21 @@
 
     .text
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function restores the interrupt context if it is processing a  */ 
-/*    nested interrupt. If not, it returns to the interrupt thread if no  */ 
-/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-/*    if no thread was running, the function returns to the scheduler.    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
+/**************************************************************************/
 /*                                                                        */
-/**************************************************************************/ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function restores the interrupt context if it is processing a  */
+/*    nested interrupt. If not, it returns to the interrupt thread if no  */
+/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+/*    if no thread was running, the function returns to the scheduler.    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
+/*  10-31-2022      Scott Larson            Updated EPK definitions,      */
+/*                                            resulting in version 6.2.0  */
+/*                                                                        */
+/**************************************************************************/
 
 //  VOID   _tx_thread_context_restore(VOID)
 //  {
@@ -73,16 +75,16 @@
 _tx_thread_context_restore:
 
     /*
-    Please note: Control flow might seem strange. This is because it has been 
-    optimized to avoid taken branches in the longest normal path (the critical 
-    one for worst-case latency), presumed to be a non-nested interrupt that 
+    Please note: Control flow might seem strange. This is because it has been
+    optimized to avoid taken branches in the longest normal path (the critical
+    one for worst-case latency), presumed to be a non-nested interrupt that
     preempts) and to hide pipeline interlock cycles where possible.
     */
 
     /* Lockout interrupts.  */
     XT_INTS_DISABLE(a0)
 
-    #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the ISR exit function to indicate an ISR is complete. */
     #ifdef __XTENSA_CALL0_ABI__
     call0   _tx_execution_isr_exit
@@ -106,7 +108,7 @@ _tx_thread_context_restore:
 .Ln_tx_thread_not_nested_restore:
 
     /* Determine if a thread was interrupted and no preemption is required.  */
-    //  else if (((_tx_thread_current_ptr) 
+    //  else if (((_tx_thread_current_ptr)
     //              && (_tx_thread_current_ptr == _tx_thread_execute_ptr))
     //           || (_tx_thread_preempt_disable))
     //  {
@@ -124,7 +126,7 @@ _tx_thread_context_restore:
 
     //      /* the no-preempt case has moved down so we fall-thru to preempt */
     bgei    a3, 1, .L_tx_thread_no_preempt_restore
-    
+
     //  }
     //  else
     //  {
@@ -137,7 +139,7 @@ _tx_thread_context_restore:
     /* Store standard preserved registers.  */
     /*
     Call0 ABI callee-saved regs a12-15 need to be saved before preemption.
-    However a12-13 were saved for scratch by _tx_thread_context_save(). 
+    However a12-13 were saved for scratch by _tx_thread_context_save().
     */
     #ifdef __XTENSA_CALL0_ABI__         /* Call0: now save callee-save regs  */
     s32i    a14, a3, XT_STK_A14
@@ -151,7 +153,7 @@ _tx_thread_context_restore:
     l32i    a4, a3, 0                   /* a4 =  _tx_timer_time_slice */
     beqz    a4, .L_tx_thread_dont_save_ts
 
-    //          _tx_thread_current_ptr -> tx_thread_time_slice 
+    //          _tx_thread_current_ptr -> tx_thread_time_slice
     //              =  _tx_timer_time_slice;
     //          _tx_timer_time_slice =  0;  */
     s32i    a4, a2, tx_thread_time_slice
@@ -175,7 +177,7 @@ _tx_thread_context_restore:
 
 .L_tx_thread_idle_system_restore:
 
-    /* 
+    /*
     Return via the scheduler.
     Scheduler returns eventually to this function's caller as if called by it.
     At this point we are still on the system stack.
@@ -202,8 +204,8 @@ _tx_thread_context_restore:
     call0   _xt_context_restore
 
     /*
-    Must return via the exit dispatcher corresponding to the entrypoint 
-    from which this was called. Interruptee's A0, A1, PS, PC are restored 
+    Must return via the exit dispatcher corresponding to the entrypoint
+    from which this was called. Interruptee's A0, A1, PS, PC are restored
     and the interrupt stack frame is deallocated in the exit dispatcher.
     At this point we are on the thread's stack.
     */

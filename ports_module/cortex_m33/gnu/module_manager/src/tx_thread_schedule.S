@@ -29,7 +29,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M33/GNU    */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -76,6 +76,8 @@
 /*  07-29-2022      Scott Larson            Removed the code path to skip */
 /*                                            MPU reloading,              */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022      Scott Larson            Added low power support,      */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -345,11 +347,25 @@ __tx_ts_wait:
 #endif
     LDR     r1, [r2]                                // Pickup the next thread to execute pointer
     CBNZ    r1, __tx_ts_ready                       // If non-NULL, a new thread is ready!
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_enter                      // Possibly enter low power mode
+    POP     {r0-r3}
+#endif
+
 #ifdef TX_ENABLE_WFI
     DSB                                             // Ensure no outstanding memory transactions
     WFI                                             // Wait for interrupt
     ISB                                             // Ensure pipeline is flushed
 #endif
+
+#ifdef TX_LOW_POWER
+    PUSH    {r0-r3}
+    BL      tx_low_power_exit                       // Exit low power mode
+    POP     {r0-r3}
+#endif
+
 #ifdef TX_PORT_USE_BASEPRI
     MOV     r4, #0                                  // Disable BASEPRI masking (enable interrupts)
     MSR     BASEPRI, r4

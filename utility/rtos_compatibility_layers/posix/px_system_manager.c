@@ -31,7 +31,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    posix_system_manager_entry                          PORTABLE C      */ 
-/*                                                           6.1.7        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -63,7 +63,9 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
+/*  10-31-2022      Scott Larson            Add 64-bit support,           */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  posix_system_manager_entry(ULONG input)
@@ -72,25 +74,35 @@ VOID  posix_system_manager_entry(ULONG input)
 UINT        status;
 ULONG       request[WORK_REQ_SIZE];
 
- 
-    /* Avoid compiler warning.  */ 
-    if (input) { }
+POSIX_TCB   *pthread_ptr;
+VOID        *value_ptr;
+
+    /* Avoid compiler warning.  */
+    TX_PARAMETER_NOT_USED(input);
 
     /* Loop forever, waiting for work requests.  */ 
     while(1)
     {
-    /* Wait forever for the next work request.  */ 
+        /* Wait forever for the next work request.  */
         status = tx_queue_receive(&posix_work_queue, &request, TX_WAIT_FOREVER);
         /* Make sure we didn't encounter any trouble.  */ 
         if (status != TX_SUCCESS)
         {
-            /* Hmmmm... should not happen.                      */ 
-            /* Anywayjust go back and get the next message.  */ 
-            continue; 
+            /* Get the next message.  */
+            continue;
         }
-        /* Go delete the pthread  */    
-    posix_do_pthread_delete((POSIX_TCB *)request[0], (VOID *)request[1] );          
         
-    }    /* System Manager forever loop  */ 
+        #ifdef TX_64_BIT
+        pthread_ptr = (POSIX_TCB *)((((ALIGN_TYPE)request[0]) << 32) | request[1]);
+        value_ptr = (VOID *)((((ALIGN_TYPE)request[2]) << 32) | request[3]);
+        #else
+        pthread_ptr = (POSIX_TCB *)request[0];
+        value_ptr = (VOID *)request[1];
+        #endif
+
+        /* Delete the pthread  */
+        posix_do_pthread_delete(pthread_ptr, value_ptr);
+        
+    } /* System Manager forever loop  */
 }
 

@@ -24,7 +24,7 @@
 /*  EKP DEFINITIONS                                        RELEASE        */
 /*                                                                        */
 /*    signal.h                                            PORTABLE C      */
-/*                                                           6.1.7        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -39,7 +39,10 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
+/*  10-31-2022      Scott Larson            Update pthread_kill argument  */
+/*                                            type,                       */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -100,7 +103,7 @@ typedef struct signal_info_struct
 /* Define public POSIX routines.  */
 
 int   signal(int signo, void (*func)(int));
-int   pthread_kill(ULONG thread, int sig);
+int   pthread_kill(ALIGN_TYPE thread, int sig);
 int   sigwait(const sigset_t *set, int *sig);
 int   sigemptyset(sigset_t *set);
 int   sigaddset(sigset_t *set, int signo);

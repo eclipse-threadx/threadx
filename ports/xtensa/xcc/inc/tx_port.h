@@ -11,36 +11,39 @@
 /**************************************************************************/
 
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   Port Specific                                                       */
 /**                                                                       */
 /**************************************************************************/
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This file contains data type definitions that make the ThreadX      */ 
-/*    real-time kernel function identically on a variety of different     */ 
-/*    processor architectures.  For example, the size or number of bits   */ 
-/*    in an "int" data type vary between microprocessor architectures and */ 
-/*    even C compilers for the same microprocessor.  ThreadX does not     */ 
-/*    directly use native C data types.  Instead, ThreadX creates its     */ 
-/*    own special types that can be mapped to actual data types by this   */ 
-/*    file to guarantee consistency in the interface and functionality.   */ 
+/**************************************************************************/
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  11-09-2020     Cadence Design Systems   Initial Version 6.1.2         */ 
-/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */ 
-/*                                            macro definition,           */ 
-/*                                            resulting in version 6.1.6  */ 
-/*                                                                        */ 
-/**************************************************************************/ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This file contains data type definitions that make the ThreadX      */
+/*    real-time kernel function identically on a variety of different     */
+/*    processor architectures.  For example, the size or number of bits   */
+/*    in an "int" data type vary between microprocessor architectures and */
+/*    even C compilers for the same microprocessor.  ThreadX does not     */
+/*    directly use native C data types.  Instead, ThreadX creates its     */
+/*    own special types that can be mapped to actual data types by this   */
+/*    file to guarantee consistency in the interface and functionality.   */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  11-09-2020      Cadence Design Systems  Initial Version 6.1.2         */
+/*  04-02-2021      Bhupendra Naphade       Modified comment(s), updated  */
+/*                                            macro definition,           */
+/*                                            resulting in version 6.1.6  */
+/*  10-31-2022      Scott Larson            Modified comment(s), removed  */
+/*                                            EPK extension,              */
+/*                                            resulting in version 6.2.0  */
+/*                                                                        */
+/**************************************************************************/
 
 #ifndef TX_PORT_H
 #define TX_PORT_H
@@ -62,7 +65,7 @@
 
 /* Some generic C sources call memset() and need this (else compiler warns).
    Until the generic sources take care of this, do it here. */
-   
+
 #include <string.h>
 
 
@@ -74,7 +77,7 @@
 
     The C library reent structure can be quite large so it is placed
     at the end of TX_THREAD, and a pointer to it is defined near the
-    beginning of TX_THREAD where assembly code can easily get to it 
+    beginning of TX_THREAD where assembly code can easily get to it
     at a fixed offset.
 */
 
@@ -108,7 +111,7 @@ extern void _tx_clib_thread_setup(struct TX_THREAD_STRUCT *thread_ptr);
 #endif
 
 
-/* Define ThreadX basic types for this port.  */ 
+/* Define ThreadX basic types for this port.  */
 
 #define VOID                                    void
 typedef char                                    CHAR;
@@ -135,11 +138,11 @@ typedef unsigned short                          USHORT;
 /*
     Define the minimum stack size for a thread on this processor.
     If the size supplied during thread creation is less than TX_MINIMUM_STACK,
-    the thread create call will return an error. The minimum allows for a 
+    the thread create call will return an error. The minimum allows for a
     thread whose entry function makes no calls and needs no local frame.
-    TX_MINIMUM_STACK_BASIC allows the entry function to at least call 
-    tx_thread_relinquish(). An extra 0x10 bytes is allowed in all cases to 
-    allow for stack pointer alignment to 16 bytes. There is an additional premium 
+    TX_MINIMUM_STACK_BASIC allows the entry function to at least call
+    tx_thread_relinquish(). An extra 0x10 bytes is allowed in all cases to
+    allow for stack pointer alignment to 16 bytes. There is an additional premium
     for the stack checking functionality of TX_ENABLE_STACK_CHECKING.
     In Xtensa, all these amounts depend on the function call ABI used by the
     configuration (in general, Call0 ABI needs about 0x20 bytes less stack space
@@ -147,8 +150,8 @@ typedef unsigned short                          USHORT;
     Optimization usually requires less stack.
 
     TX_MINIMUM_STACK_BASIC is a MINIMUM for threads that call tx_thread_relinquish()
-    only. Threads that do more, and in particular call C library functions such as 
-    printf(), need much more stack space and it is up to the application developer 
+    only. Threads that do more, and in particular call C library functions such as
+    printf(), need much more stack space and it is up to the application developer
     to determine how much.
 */
 
@@ -186,15 +189,15 @@ typedef unsigned short                          USHORT;
 /*
     Minimum stack size for the ThreadX system stack on this processor.
     This is just a useful starting point for an application, it is not
-    checked by ThreadX. The minimum system stack size allows for the 
-    possible depth of interrupt nesting (XCHAL_EXCM_LEVEL-1 interrupt 
+    checked by ThreadX. The minimum system stack size allows for the
+    possible depth of interrupt nesting (XCHAL_EXCM_LEVEL-1 interrupt
     stack frames and XCHAL_EXCM_LEVEL interrupt handlers including timer),
-    assuming very basic interrupt handlers (allows 1 call12). It needs to 
-    be increased to support the application's real interrupt handlers (and 
-    timer interrupt if TX_TIMER_PROCESS_IN_ISR). The system stack is located 
-    where the stack pointer is inside tx_kernel_enter() which is usually from 
-    main(), and so is determined by the development tools. It grows downward 
-    toward the first available memory pointer passed to tx_application_define(). 
+    assuming very basic interrupt handlers (allows 1 call12). It needs to
+    be increased to support the application's real interrupt handlers (and
+    timer interrupt if TX_TIMER_PROCESS_IN_ISR). The system stack is located
+    where the stack pointer is inside tx_kernel_enter() which is usually from
+    main(), and so is determined by the development tools. It grows downward
+    toward the first available memory pointer passed to tx_application_define().
     An application should allow sufficient space for the system stack.
 
     For XEA3, allow a minimum of XCHAL_NUM_INTLEVELS nested interrupts. The stack
@@ -235,12 +238,12 @@ typedef unsigned short                          USHORT;
 #ifndef __ASSEMBLER__
 
 
-#ifndef TX_TIMER_THREAD_PRIORITY    
-#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */ 
+#ifndef TX_TIMER_THREAD_PRIORITY
+#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
 
-/* Define various constants for the ThreadX Xtensa port.  */ 
+/* Define various constants for the ThreadX Xtensa port.  */
 
 #if XCHAL_HAVE_XEA3
 #define TX_INT_DISABLE                          0x8               /* Disable interrupts value */
@@ -252,9 +255,9 @@ typedef unsigned short                          USHORT;
 
 
 /*
-    Define the clock source for trace event entry time stamp. The following 
-    two item are port specific. For example, if the time source is at the 
-    address 0x0a800024 and is 16-bits in size, the clock source constants 
+    Define the clock source for trace event entry time stamp. The following
+    two item are port specific. For example, if the time source is at the
+    address 0x0a800024 and is 16-bits in size, the clock source constants
     would be:
 
     #define TX_TRACE_TIME_SOURCE                *((ULONG *) 0x0a800024)
@@ -313,9 +316,9 @@ typedef unsigned short                          USHORT;
 
 /*
     Determine whether or not stack checking is enabled. By default, ThreadX
-    stack checking is disabled. When the following is defined, ThreadX thread 
+    stack checking is disabled. When the following is defined, ThreadX thread
     stack checking is enabled. If enabled (TX_ENABLE_STACK_CHECKING is defined),
-    the TX_DISABLE_STACK_FILLING define is canceled, thereby forcing the stack 
+    the TX_DISABLE_STACK_FILLING define is canceled, thereby forcing the stack
     fill which is necessary for the stack checking logic.
 */
 
@@ -326,7 +329,7 @@ typedef unsigned short                          USHORT;
 
 /*
     Define the TX_THREAD control block extensions for this port. The main
-    reason for the multiple macros is so that backward compatibility can 
+    reason for the multiple macros is so that backward compatibility can
     be maintained with existing ThreadX kernel awareness modules.
 */
 
@@ -350,10 +353,7 @@ typedef unsigned short                          USHORT;
 #define TX_THREAD_EXTENSION_2
 
 /* Execution profile related */
-#define TX_THREAD_EXTENSION_3 \
-    unsigned long long  tx_thread_execution_time_total; \
-    unsigned long       tx_thread_execution_time_last_start;
-
+#define TX_THREAD_EXTENSION_3
 
 /* Define the port extensions of the remaining ThreadX objects.  */
 
@@ -366,11 +366,11 @@ typedef unsigned short                          USHORT;
 #define TX_TIMER_EXTENSION
 
 
-/* Define the user extension field of the thread control block.  Nothing 
+/* Define the user extension field of the thread control block.  Nothing
    additional is needed for this port so it is defined as white space.  */
 
 #ifndef TX_THREAD_USER_EXTENSION
-#define TX_THREAD_USER_EXTENSION    
+#define TX_THREAD_USER_EXTENSION
 #endif
 
 
@@ -470,8 +470,8 @@ extern int xt_timer_intnum;
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. * Azure RTOS Xtensa Version 6.1.9 *";
+CHAR                            _tx_version_id[] =
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * Azure RTOS Xtensa Version 6.2.0 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

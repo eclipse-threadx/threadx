@@ -22,7 +22,10 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
+/*  10-31-2022      Scott Larson            Change configSTACK_DEPTH_TYPE */
+/*                                           to 32 bit instead of 16 bit, */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -52,7 +55,7 @@
 /* #define configUSE_PORT_OPTIMISED_TASK_SELECTION  0 */
 
 /* #define configMESSAGE_BUFFER_LENGTH_TYPE         size_t */
-#define configSTACK_DEPTH_TYPE                     uint16_t
+#define configSTACK_DEPTH_TYPE                     uint32_t
 
 /* #define configUSE_CO_ROUTINES                    0   */
 /* #define configMAX_CO_ROUTINE_PRIORITIES          (2) */

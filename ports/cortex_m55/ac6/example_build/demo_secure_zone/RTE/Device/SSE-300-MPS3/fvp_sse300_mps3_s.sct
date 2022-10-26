@@ -1,0 +1,78 @@
+#! armclang --target=arm-arm-none-eabi -march=armv8.1-m.main -E -xc
+
+;/*
+; * Copyright (c) 2018-2021 Arm Limited. All rights reserved.
+; *
+; * Licensed under the Apache License, Version 2.0 (the "License");
+; * you may not use this file except in compliance with the License.
+; * You may obtain a copy of the License at
+; *
+; *     http://www.apache.org/licenses/LICENSE-2.0
+; *
+; * Unless required by applicable law or agreed to in writing, software
+; * distributed under the License is distributed on an "AS IS" BASIS,
+; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; * See the License for the specific language governing permissions and
+; * limitations under the License.
+; *
+; */
+
+#include "region_defs.h"
+
+LR_CODE S_CODE_START {
+    ER_CODE S_CODE_START {
+        *.o (RESET +First)
+        .ANY (+RO)
+    }
+
+    /*
+     * Place the CMSE Veneers (containing the SG instruction) after the code, in
+     * a separate 32 bytes aligned region so that the SAU can programmed to just
+     * set this region as Non-Secure Callable. The maximum size of this
+     * executable region makes it only used the space left over by the ER_CODE
+     * region so that you can rely on code+veneer size combined will not exceed
+     * the S_CODE_SIZE value. We also substract from the available space the
+     * area used to align this section on 32 bytes boundary (for SAU conf).
+     */
+    ER_CODE_CMSE_VENEER +0 ALIGN 32 {
+        *(Veneer$$CMSE)
+    }
+    /*
+     * This dummy region ensures that the next one will be aligned on a 32 bytes
+     * boundary, so that the following region will not be mistakenly configured
+     * as Non-Secure Callable by the SAU.
+     */
+    ER_CODE_CMSE_VENEER_DUMMY +0 ALIGN 32 EMPTY 0 {}
+
+    /* This empty, zero long execution region is here to mark the limit address
+     * of the last execution region that is allocated in SRAM.
+     */
+    CODE_WATERMARK +0 EMPTY 0x0 {
+    }
+    /* Make sure that the sections allocated in the SRAM does not exceed the
+     * size of the SRAM available.
+     */
+    ScatterAssert(ImageLimit(CODE_WATERMARK) <= S_CODE_START + S_CODE_SIZE)
+
+    ER_DATA S_DATA_START {
+        .ANY (+ZI +RW)
+    }
+
+    #if HEAP_SIZE > 0
+    ARM_LIB_HEAP +0 ALIGN 8 EMPTY  HEAP_SIZE  {   ; Reserve empty region for heap
+    }
+    #endif
+
+    ARM_LIB_STACK +0 ALIGN 32 EMPTY STACK_SIZE {   ; Reserve empty region for stack
+    }
+
+    /* This empty, zero long execution region is here to mark the limit address
+     * of the last execution region that is allocated in SRAM.
+     */
+    SRAM_WATERMARK +0 EMPTY 0x0 {
+    }
+    /* Make sure that the sections allocated in the SRAM does not exceed the
+     * size of the SRAM available.
+     */
+    ScatterAssert(ImageLimit(SRAM_WATERMARK) <= S_DATA_START + S_DATA_SIZE)
+}
