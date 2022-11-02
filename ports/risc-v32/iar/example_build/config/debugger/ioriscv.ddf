@@ -1,0 +1,113 @@
+;;-------------------------------------------------------------------------
+;; Declarations of SFR registers and bits, interrupt/exception vectors,
+;; interrupt control registers, memory map information, and additional
+;; configurations for a generic (non-existent) RISC-V device.
+;;
+;; This declaration file can be used by all flavors of the IAR C-SPY
+;; Debugger for RISC-V (simulator and emulators).
+;;
+;; Copyright 2019 IAR Systems AB.
+;;-------------------------------------------------------------------------
+
+
+;;-------------------------------------------------------------------------
+;; SFR declaration file
+;;
+;; Syntax: File = Filename
+;;
+;;   Filename   Name of SFR declaration file
+;;-------------------------------------------------------------------------
+
+;; CSR
+#include weak "csr.sfr"
+
+[SfrInclude]
+File = ioriscv.sfr
+
+
+;;-------------------------------------------------------------------------
+;; Memory information
+;;
+;; Syntax: Memory[NN] = Name Zone StartAdr EndAdr AccType
+;;
+;;   NN         Optional counter
+;;   Name       Name of address space (legal characters: A-Z, a-z, 0-9, _)
+;;   Zone       Must be Memory
+;;   StartAdr   Start address of memory address space
+;;   EndAdr     End address of memory address space
+;;   AccType    Type of access, read-only (R) or read-write (RW)
+;;              (W - noncached) for SFR areas and areas that are shared,
+;;              implemented as different core-specific physical memories
+;;              in a multicore device.
+;;
+;; Used to define named memory address spaces within the 'Memory' zone.
+;;
+;;-------------------------------------------------------------------------
+;;       Name            Zone      StartAdr      EndAdr        AccType
+;;-------------------------------------------------------------------------
+
+[Memory]
+Memory = Peripherals     Memory    0x02000000    0x1FFFFFFF    W
+Memory = Flash           Memory    0x20000000    0x3FFFFFFF    R
+Memory = RAM             Memory    0x80000000    0x8003FFFF    RW
+
+TrustedRanges = true
+
+;;-------------------------------------------------------------------------
+;; Device file
+;;
+;; Syntax: File = Filename
+;;
+;;   Filename   Name of device file
+;;-------------------------------------------------------------------------
+
+[DeviceFile]
+File = <Undefined>
+
+
+;;-------------------------------------------------------------------------
+;; Device information
+;;
+;; Syntax: Item = Value
+;;
+;;   Item    Name of item
+;;   Value   Value of item
+;;-------------------------------------------------------------------------
+
+[DeviceInfo]
+DataFlash = YES
+FlashSize = 0032
+FlashType = CS Fixed2
+StartAddress = 0x02000000
+EndAddress = 0x80003FFF
+BusSize = 00
+IDCodeBitLength = 128
+CodeFlashIDCode = NO
+DataFlashIDCode = NO
+CoreNumbers = 1
+
+;;-------------------------------------------------------------------------
+;; Interrupt declarations
+;;
+;; Syntax: InterruptNN = Id Vector Type
+;;
+;;   NN          Counter
+;;   Id          Unique Interrupt 'name'
+;;   Vector      Exception Code
+;;   Controller  SiFive1
+;;   Core        Core Number
+;;   Enable      Enable bit
+;;   Pending     Pending bit
+;;   Priority    Priority level
+;;   UserLvl     (M)achine/(S)upervisor/(U)ser
+;;   Trap        '0' exception
+;;               '1' interrupt
+;;   Maskable    '0' Non Maskable
+;;               '1' Maskable
+;;-------------------------------------------------------------------------
+[InterruptList]
+Interrupt7 = TIMER  0x07  SiFive1  0x00  mie.mtie  mip.mtip  0x00  M  0x01  0x00
+
+;;-------------------------------------------------------------------------
+;; End of file
+;;-------------------------------------------------------------------------

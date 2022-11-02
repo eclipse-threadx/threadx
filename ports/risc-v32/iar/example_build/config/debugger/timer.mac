@@ -1,0 +1,64 @@
+/*
+* Copyright (C) 1996-2019 IAR Systems AB.
+*
+* Excerpt from IAR Embedded Workbench tutorial
+*
+* Macro package for the C-SPY debugger to simulate Fibonacci data input,
+* including setting an immediate breakpoint and defining a simulated
+* interrupt.
+*
+* See the file riscv/doc/licenses/IARSourceLicense.txt for detailed
+* license information.
+*
+*/
+
+__var _counter;
+__var _interruptID;
+__var _breakID;
+
+execUserSetup()
+{
+    __message "execUserSetup() called\n";
+
+    /* Call the simulation setup. */
+    SimulationSetup ();
+}
+
+execUserExit()
+{
+    __message "execUserExit() called\n";
+
+    /* Call the Simulation shutdown. */
+    SimulationShutdown();
+}
+
+
+SimulationSetup()
+{
+    /* Automatically setup the TIMER interrupt for the simulation */
+    _interruptID = __orderInterrupt("TIMER", 1000, 1000, 0, 1, 0, 100);
+    if( -1 == _interruptID )
+    {
+        __message "ERROR: failed to set up the interrupt";
+    }
+
+    /* Insert a breakpoint in the _tx_timer_interrupt entry point */
+    _breakID = __setCodeBreak( "_tx_timer_interrupt", 0, "1", "TRUE", "InterruptCSPYlogger()");
+    if( !_breakID )
+    {
+        __message "ERROR: could not set immediate breakpoint.\n" ;
+    }
+}
+
+InterruptCSPYlogger()
+{
+    _counter++;
+    __message "Entered TIMER interrupt: ", _counter, "\n";
+}
+
+
+SimulationShutdown()
+{
+    __cancelInterrupt(_interruptID);
+    __clearBreak(_breakID);
+}

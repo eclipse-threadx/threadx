@@ -1,0 +1,35 @@
+;;-------------------------------------------------------------------------
+;;      Declarations of SFR registers and SFR groups
+;;
+;;      This file is included by: ioriscv.ddf
+;;
+;;      Copyright 2019 IAR Systems AB.
+;;
+;;-------------------------------------------------------------------------
+
+;;-------------------------------------------------------------------------
+;;      NOTE:
+;;      This is an example file for a RISC-V derivative
+;;-------------------------------------------------------------------------
+
+;;-------------------------------------------------------------------------
+;; SFR declarations
+;;
+;; Syntax: sfr = "sfr name", "zone name", address, size, base=viewbase, bitRange=bit[-bit](optional), readOnly/writeOnly(optional)
+;;-------------------------------------------------------------------------
+[Sfr]
+;sfr = "FLMDPCMD",                                       "Memory", FFA00004, 4, base=16              , writeOnly
+;sfr = "FLMDPS",                                         "Memory", FFA00008, 4, base=16              , readOnly
+
+;;-------------------------------------------------------------------------
+;; SFR group declarations
+;;
+;; Syntax: group = "group name", "sfr name", "sfr name", ...
+;;-------------------------------------------------------------------------
+[SfrGroupInfo]
+;group = "Interrupt", "ICCSIH2IC_1", "ICCSIH3IC_1", "ICTAUD0I4", "ICTAUD0I6", "ICTAUD0I8", "ICCSIH3IR_1", "ICCSIH3IRE_1", "ICCSIH3IJC_1"
+;group = "Interrupt", "ICCSIH1IC_1", "ICCSIH1IR_1", "ICADCA0I0", "ICADCA0I1", "ICADCA0I2", "ICDCUTDI", "ICRCANGERR", "ICRCANGRECC"
+
+;;-------------------------------------------------------------------------
+;; End of file
+;;-------------------------------------------------------------------------

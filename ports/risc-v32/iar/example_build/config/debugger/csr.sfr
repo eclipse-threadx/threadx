@@ -1,0 +1,327 @@
+;;-------------------------------------------------------------------------
+;;      Declarations of SFR registers and SFR groups
+;;
+;;      This file is included by ddf files
+;;
+;;      Copyright 2019 IAR Systems AB.
+;;
+;;-------------------------------------------------------------------------
+
+;;-------------------------------------------------------------------------
+;;      NOTE:
+;;      This is an example file for RISC-V
+;;-------------------------------------------------------------------------
+
+;;-------------------------------------------------------------------------
+;; SFR declarations
+;;
+;; Syntax: sfr = "sfr name", "zone name", address, size, base=viewbase, bitRange=bit[-bit](optional), readOnly/writeOnly(optional)
+;;-------------------------------------------------------------------------
+[Sfr]
+
+;;User Trap Setup
+sfr = "ustatus",                                   "CSRMemory",    0x000,     1, base=16
+sfr = "uie",                                       "CSRMemory",    0x004,     1, base=16
+sfr = "utvec",                                     "CSRMemory",    0x005,     1, base=16
+
+;;User Trap Handling
+sfr = "uscratch",                                  "CSRMemory",    0x040,     1, base=16
+sfr = "uepc",                                      "CSRMemory",    0x041,     1, base=16
+sfr = "ucause",                                    "CSRMemory",    0x042,     1, base=16
+sfr = "utval",                                     "CSRMemory",    0x043,     1, base=16
+sfr = "uip",                                       "CSRMemory",    0x044,     1, base=16
+
+;;User Counter/Timers
+sfr = "cycle",                                     "CSRMemory",    0xC00,     1, base=16, readOnly
+sfr = "time",                                      "CSRMemory",    0xC01,     1, base=16, readOnly
+sfr = "instret",                                   "CSRMemory",    0xC02,     1, base=16, readOnly
+sfr = "hpmcounter3",                               "CSRMemory",    0xC03,     1, base=16, readOnly
+sfr = "hpmcounter4",                               "CSRMemory",    0xC04,     1, base=16, readOnly
+sfr = "hpmcounter5",                               "CSRMemory",    0xC05,     1, base=16, readOnly
+sfr = "hpmcounter6",                               "CSRMemory",    0xC06,     1, base=16, readOnly
+sfr = "hpmcounter7",                               "CSRMemory",    0xC07,     1, base=16, readOnly
+sfr = "hpmcounter8",                               "CSRMemory",    0xC08,     1, base=16, readOnly
+sfr = "hpmcounter9",                               "CSRMemory",    0xC09,     1, base=16, readOnly
+sfr = "hpmcounter10",                              "CSRMemory",    0xC0A,     1, base=16, readOnly
+sfr = "hpmcounter11",                              "CSRMemory",    0xC0B,     1, base=16, readOnly
+sfr = "hpmcounter12",                              "CSRMemory",    0xC0C,     1, base=16, readOnly
+sfr = "hpmcounter13",                              "CSRMemory",    0xC0D,     1, base=16, readOnly
+sfr = "hpmcounter14",                              "CSRMemory",    0xC0E,     1, base=16, readOnly
+sfr = "hpmcounter15",                              "CSRMemory",    0xC0F,     1, base=16, readOnly
+sfr = "hpmcounter16",                              "CSRMemory",    0xC10,     1, base=16, readOnly
+sfr = "hpmcounter17",                              "CSRMemory",    0xC11,     1, base=16, readOnly
+sfr = "hpmcounter18",                              "CSRMemory",    0xC12,     1, base=16, readOnly
+sfr = "hpmcounter19",                              "CSRMemory",    0xC13,     1, base=16, readOnly
+sfr = "hpmcounter20",                              "CSRMemory",    0xC14,     1, base=16, readOnly
+sfr = "hpmcounter21",                              "CSRMemory",    0xC15,     1, base=16, readOnly
+sfr = "hpmcounter22",                              "CSRMemory",    0xC16,     1, base=16, readOnly
+sfr = "hpmcounter23",                              "CSRMemory",    0xC17,     1, base=16, readOnly
+sfr = "hpmcounter24",                              "CSRMemory",    0xC18,     1, base=16, readOnly
+sfr = "hpmcounter25",                              "CSRMemory",    0xC19,     1, base=16, readOnly
+sfr = "hpmcounter26",                              "CSRMemory",    0xC1A,     1, base=16, readOnly
+sfr = "hpmcounter27",                              "CSRMemory",    0xC1B,     1, base=16, readOnly
+sfr = "hpmcounter28",                              "CSRMemory",    0xC1C,     1, base=16, readOnly
+sfr = "hpmcounter29",                              "CSRMemory",    0xC1D,     1, base=16, readOnly
+sfr = "hpmcounter30",                              "CSRMemory",    0xC1E,     1, base=16, readOnly
+sfr = "hpmcounter31",                              "CSRMemory",    0xC1F,     1, base=16
+sfr = "cycleh",                                    "CSRMemory",    0xC80,     1, base=16, readOnly
+sfr = "timeh",                                     "CSRMemory",    0xC81,     1, base=16, readOnly
+sfr = "instreth",                                  "CSRMemory",    0xC82,     1, base=16, readOnly
+sfr = "hpmcounter3h",                              "CSRMemory",    0xC83,     1, base=16, readOnly
+sfr = "hpmcounter4h",                              "CSRMemory",    0xC84,     1, base=16, readOnly
+sfr = "hpmcounter5h",                              "CSRMemory",    0xC85,     1, base=16, readOnly
+sfr = "hpmcounter6h",                              "CSRMemory",    0xC86,     1, base=16, readOnly
+sfr = "hpmcounter7h",                              "CSRMemory",    0xC87,     1, base=16, readOnly
+sfr = "hpmcounter8h",                              "CSRMemory",    0xC88,     1, base=16, readOnly
+sfr = "hpmcounter9h",                              "CSRMemory",    0xC89,     1, base=16, readOnly
+sfr = "hpmcounter10h",                             "CSRMemory",    0xC8A,     1, base=16, readOnly
+sfr = "hpmcounter11h",                             "CSRMemory",    0xC8B,     1, base=16, readOnly
+sfr = "hpmcounter12h",                             "CSRMemory",    0xC8C,     1, base=16, readOnly
+sfr = "hpmcounter13h",                             "CSRMemory",    0xC8D,     1, base=16, readOnly
+sfr = "hpmcounter14h",                             "CSRMemory",    0xC8E,     1, base=16, readOnly
+sfr = "hpmcounter15h",                             "CSRMemory",    0xC8F,     1, base=16, readOnly
+sfr = "hpmcounter16h",                             "CSRMemory",    0xC90,     1, base=16, readOnly
+sfr = "hpmcounter17h",                             "CSRMemory",    0xC91,     1, base=16, readOnly
+sfr = "hpmcounter18h",                             "CSRMemory",    0xC92,     1, base=16, readOnly
+sfr = "hpmcounter19h",                             "CSRMemory",    0xC93,     1, base=16, readOnly
+sfr = "hpmcounter20h",                             "CSRMemory",    0xC94,     1, base=16, readOnly
+sfr = "hpmcounter21h",                             "CSRMemory",    0xC95,     1, base=16, readOnly
+sfr = "hpmcounter22h",                             "CSRMemory",    0xC96,     1, base=16, readOnly
+sfr = "hpmcounter23h",                             "CSRMemory",    0xC97,     1, base=16, readOnly
+sfr = "hpmcounter24h",                             "CSRMemory",    0xC98,     1, base=16, readOnly
+sfr = "hpmcounter25h",                             "CSRMemory",    0xC99,     1, base=16, readOnly
+sfr = "hpmcounter26h",                             "CSRMemory",    0xC9A,     1, base=16, readOnly
+sfr = "hpmcounter27h",                             "CSRMemory",    0xC9B,     1, base=16, readOnly
+sfr = "hpmcounter28h",                             "CSRMemory",    0xC9C,     1, base=16, readOnly
+sfr = "hpmcounter29h",                             "CSRMemory",    0xC9D,     1, base=16, readOnly
+sfr = "hpmcounter30h",                             "CSRMemory",    0xC9E,     1, base=16, readOnly
+sfr = "hpmcounter31h",                             "CSRMemory",    0xC9F,     1, base=16, readOnly
+
+;;Supervisor Trap Setup
+sfr = "sstatus",                                   "CSRMemory",    0x100,     1, base=16
+sfr = "sedeleg",                                   "CSRMemory",    0x102,     1, base=16
+sfr = "sideleg",                                   "CSRMemory",    0x103,     1, base=16
+sfr = "sie",                                       "CSRMemory",    0x104,     1, base=16
+sfr = "stvec",                                     "CSRMemory",    0x105,     1, base=16
+sfr = "scounteren",                                "CSRMemory",    0x106,     1, base=16
+
+;;Supervisor Trap Handling
+sfr = "sscratch",                                  "CSRMemory",    0x140,     1, base=16
+sfr = "sepc",                                      "CSRMemory",    0x141,     1, base=16
+sfr = "scause",                                    "CSRMemory",    0x142,     1, base=16
+sfr = "stval",                                     "CSRMemory",    0x143,     1, base=16
+sfr = "sip",                                       "CSRMemory",    0x144,     1, base=16
+
+;;Supervisor Protection and Translation
+sfr = "satp",                                      "CSRMemory",    0x180,     1, base=16
+
+;;Machine Information Registers
+sfr = "mvendorid",                                 "CSRMemory",    0xF11,     1, base=16, readOnly
+sfr = "marchid",                                   "CSRMemory",    0xF12,     1, base=16, readOnly
+sfr = "mimpid",                                    "CSRMemory",    0xF13,     1, base=16, readOnly
+sfr = "mhartid",                                   "CSRMemory",    0xF14,     1, base=16, readOnly
+
+
+;;Machine Trap Setup
+sfr = "mstatus",                                   "CSRMemory",    0x300,     1, base=16
+sfr = "mstatus.mie",                               "CSRMemory",    0x300,     1, base=16, bitRange=3
+sfr = "mstatus.mpie",                              "CSRMemory",    0x300,     1, base=16, bitRange=7
+sfr = "mstatus.mpp",                               "CSRMemory",    0x300,     1, base=16, bitRange=11-12
+sfr = "misa",                                      "CSRMemory",    0x301,     1, base=16
+sfr = "medeleg",                                   "CSRMemory",    0x302,     1, base=16
+sfr = "mideleg",                                   "CSRMemory",    0x303,     1, base=16
+sfr = "mie",                                       "CSRMemory",    0x304,     1, base=16
+sfr = "mie.msie",                                  "CSRMemory",    0x304,     1, base=16, bitRange=3
+sfr = "mie.mtie",                                  "CSRMemory",    0x304,     1, base=16, bitRange=7
+sfr = "mie.meie",                                  "CSRMemory",    0x304,     1, base=16, bitRange=11
+sfr = "mie.lie0",                                  "CSRMemory",    0x304,     1, base=16, bitRange=16
+sfr = "mie.lie1",                                  "CSRMemory",    0x304,     1, base=16, bitRange=17
+sfr = "mie.lie2",                                  "CSRMemory",    0x304,     1, base=16, bitRange=18
+sfr = "mie.lie3",                                  "CSRMemory",    0x304,     1, base=16, bitRange=19
+sfr = "mie.lie4",                                  "CSRMemory",    0x304,     1, base=16, bitRange=20
+sfr = "mie.lie5",                                  "CSRMemory",    0x304,     1, base=16, bitRange=21
+sfr = "mie.lie6",                                  "CSRMemory",    0x304,     1, base=16, bitRange=22
+sfr = "mie.lie7",                                  "CSRMemory",    0x304,     1, base=16, bitRange=23
+sfr = "mie.lie8",                                  "CSRMemory",    0x304,     1, base=16, bitRange=24
+sfr = "mie.lie9",                                  "CSRMemory",    0x304,     1, base=16, bitRange=25
+sfr = "mie.lie10",                                 "CSRMemory",    0x304,     1, base=16, bitRange=26
+sfr = "mie.lie11",                                 "CSRMemory",    0x304,     1, base=16, bitRange=27
+sfr = "mie.lie12",                                 "CSRMemory",    0x304,     1, base=16, bitRange=28
+sfr = "mie.lie13",                                 "CSRMemory",    0x304,     1, base=16, bitRange=29
+sfr = "mie.lie14",                                 "CSRMemory",    0x304,     1, base=16, bitRange=30
+sfr = "mie.lie15",                                 "CSRMemory",    0x304,     1, base=16, bitRange=31
+sfr = "mtvec",                                     "CSRMemory",    0x305,     1, base=16
+sfr = "mtvec.mode",                                "CSRMemory",    0x305,     1, base=16, bitRange=0-1
+sfr = "mtvec.base",                                "CSRMemory",    0x305,     1, base=16, bitRange=2-31
+sfr = "mtvt",                                      "CSRMemory",    0x307,     1, base=16
+
+;;Machine Trap Handling
+sfr = "mscratch",                                  "CSRMemory",    0x340,     1, base=16
+sfr = "mepc",                                      "CSRMemory",    0x341,     1, base=16
+sfr = "mcause",                                    "CSRMemory",    0x342,     1, base=16
+sfr = "mcause.exception",                          "CSRMemory",    0x342,     1, base=16, bitRange=0-30
+sfr = "mcause.interrupt",                          "CSRMemory",    0x342,     1, base=16, bitRange=31
+sfr = "mtval",                                     "CSRMemory",    0x343,     1, base=16
+sfr = "mip",                                       "CSRMemory",    0x344,     1, base=16, readOnly
+sfr = "mip.msip",                                  "CSRMemory",    0x344,     1, base=16, bitRange=3, readOnly
+sfr = "mip.mtip",                                  "CSRMemory",    0x344,     1, base=16, bitRange=7, readOnly
+sfr = "mip.meip",                                  "CSRMemory",    0x344,     1, base=16, bitRange=11, readOnly
+sfr = "mip.lip0",                                  "CSRMemory",    0x344,     1, base=16, bitRange=16, readOnly
+sfr = "mip.lip1",                                  "CSRMemory",    0x344,     1, base=16, bitRange=17, readOnly
+sfr = "mip.lip2",                                  "CSRMemory",    0x344,     1, base=16, bitRange=18, readOnly
+sfr = "mip.lip3",                                  "CSRMemory",    0x344,     1, base=16, bitRange=19, readOnly
+sfr = "mip.lip4",                                  "CSRMemory",    0x344,     1, base=16, bitRange=20, readOnly
+sfr = "mip.lip5",                                  "CSRMemory",    0x344,     1, base=16, bitRange=21, readOnly
+sfr = "mip.lip6",                                  "CSRMemory",    0x344,     1, base=16, bitRange=22, readOnly
+sfr = "mip.lip7",                                  "CSRMemory",    0x344,     1, base=16, bitRange=23, readOnly
+sfr = "mip.lip8",                                  "CSRMemory",    0x344,     1, base=16, bitRange=24, readOnly
+sfr = "mip.lip9",                                  "CSRMemory",    0x344,     1, base=16, bitRange=25, readOnly
+sfr = "mip.lip10",                                 "CSRMemory",    0x344,     1, base=16, bitRange=26, readOnly
+sfr = "mip.lip11",                                 "CSRMemory",    0x344,     1, base=16, bitRange=27, readOnly
+sfr = "mip.lip12",                                 "CSRMemory",    0x344,     1, base=16, bitRange=28, readOnly
+sfr = "mip.lip13",                                 "CSRMemory",    0x344,     1, base=16, bitRange=29, readOnly
+sfr = "mip.lip14",                                 "CSRMemory",    0x344,     1, base=16, bitRange=30, readOnly
+sfr = "mip.lip15",                                 "CSRMemory",    0x344,     1, base=16, bitRange=31, readOnly
+sfr = "mnxti",                                     "CSRMemory",    0x345,     1, base=16
+sfr = "mintstatus",                                "CSRMemory",    0x346,     1, base=16
+sfr = "mscratchcsw",                               "CSRMemory",    0x348,     1, base=16
+sfr = "mscratchcswl",                              "CSRMemory",    0x349,     1, base=16
+
+;;Machine Protection and Translation
+sfr = "pmpcfg0",                                   "CSRMemory",    0x3A0,     1, base=16
+sfr = "pmpcfg1",                                   "CSRMemory",    0x3A1,     1, base=16
+sfr = "pmpcfg2",                                   "CSRMemory",    0x3A2,     1, base=16
+sfr = "pmpcfg3",                                   "CSRMemory",    0x3A3,     1, base=16
+sfr = "pmpaddr0",                                  "CSRMemory",    0x3B0,     1, base=16
+sfr = "pmpaddr1",                                  "CSRMemory",    0x3B1,     1, base=16
+sfr = "pmpaddr2",                                  "CSRMemory",    0x3B2,     1, base=16
+sfr = "pmpaddr3",                                  "CSRMemory",    0x3B3,     1, base=16
+sfr = "pmpaddr4",                                  "CSRMemory",    0x3B4,     1, base=16
+sfr = "pmpaddr5",                                  "CSRMemory",    0x3B5,     1, base=16
+sfr = "pmpaddr6",                                  "CSRMemory",    0x3B6,     1, base=16
+sfr = "pmpaddr7",                                  "CSRMemory",    0x3B7,     1, base=16
+sfr = "pmpaddr8",                                  "CSRMemory",    0x3B8,     1, base=16
+sfr = "pmpaddr9",                                  "CSRMemory",    0x3B9,     1, base=16
+sfr = "pmpaddr10",                                 "CSRMemory",    0x3BA,     1, base=16
+sfr = "pmpaddr11",                                 "CSRMemory",    0x3BB,     1, base=16
+sfr = "pmpaddr12",                                 "CSRMemory",    0x3BC,     1, base=16
+sfr = "pmpaddr13",                                 "CSRMemory",    0x3BD,     1, base=16
+sfr = "pmpaddr14",                                 "CSRMemory",    0x3BE,     1, base=16
+sfr = "pmpaddr15",                                 "CSRMemory",    0x3BF,     1, base=16
+
+;; Machine Counter/Timers
+sfr = "mcycle",                                    "CSRMemory",    0xB00,     1, base=16
+sfr = "minstret",                                  "CSRMemory",    0xB02,     1, base=16
+sfr = "mhpmcounter3",                              "CSRMemory",    0xB03,     1, base=16
+sfr = "mhpmcounter4",                              "CSRMemory",    0xB04,     1, base=16
+sfr = "mhpmcounter5",                              "CSRMemory",    0xB05,     1, base=16
+sfr = "mhpmcounter6",                              "CSRMemory",    0xB06,     1, base=16
+sfr = "mhpmcounter7",                              "CSRMemory",    0xB07,     1, base=16
+sfr = "mhpmcounter8",                              "CSRMemory",    0xB08,     1, base=16
+sfr = "mhpmcounter9",                              "CSRMemory",    0xB09,     1, base=16
+sfr = "mhpmcounter10",                             "CSRMemory",    0xB0A,     1, base=16
+sfr = "mhpmcounter11",                             "CSRMemory",    0xB0B,     1, base=16
+sfr = "mhpmcounter12",                             "CSRMemory",    0xB0C,     1, base=16
+sfr = "mhpmcounter13",                             "CSRMemory",    0xB0D,     1, base=16
+sfr = "mhpmcounter14",                             "CSRMemory",    0xB0E,     1, base=16
+sfr = "mhpmcounter15",                             "CSRMemory",    0xB0F,     1, base=16
+sfr = "mhpmcounter16",                             "CSRMemory",    0xB10,     1, base=16
+sfr = "mhpmcounter17",                             "CSRMemory",    0xB11,     1, base=16
+sfr = "mhpmcounter18",                             "CSRMemory",    0xB12,     1, base=16
+sfr = "mhpmcounter19",                             "CSRMemory",    0xB13,     1, base=16
+sfr = "mhpmcounter20",                             "CSRMemory",    0xB14,     1, base=16
+sfr = "mhpmcounter21",                             "CSRMemory",    0xB15,     1, base=16
+sfr = "mhpmcounter22",                             "CSRMemory",    0xB16,     1, base=16
+sfr = "mhpmcounter23",                             "CSRMemory",    0xB17,     1, base=16
+sfr = "mhpmcounter24",                             "CSRMemory",    0xB18,     1, base=16
+sfr = "mhpmcounter25",                             "CSRMemory",    0xB19,     1, base=16
+sfr = "mhpmcounter26",                             "CSRMemory",    0xB1A,     1, base=16
+sfr = "mhpmcounter27",                             "CSRMemory",    0xB1B,     1, base=16
+sfr = "mhpmcounter28",                             "CSRMemory",    0xB1C,     1, base=16
+sfr = "mhpmcounter29",                             "CSRMemory",    0xB1D,     1, base=16
+sfr = "mhpmcounter30",                             "CSRMemory",    0xB1E,     1, base=16
+sfr = "mhpmcounter31",                             "CSRMemory",    0xB1F,     1, base=16
+sfr = "mcycleh",                                   "CSRMemory",    0xB80,     1, base=16
+sfr = "minstreth",                                 "CSRMemory",    0xB82,     1, base=16
+sfr = "mhpmcounter3h",                             "CSRMemory",    0xB83,     1, base=16
+sfr = "mhpmcounter4h",                             "CSRMemory",    0xB84,     1, base=16
+sfr = "mhpmcounter5h",                             "CSRMemory",    0xB85,     1, base=16
+sfr = "mhpmcounter6h",                             "CSRMemory",    0xB86,     1, base=16
+sfr = "mhpmcounter7h",                             "CSRMemory",    0xB87,     1, base=16
+sfr = "mhpmcounter8h",                             "CSRMemory",    0xB88,     1, base=16
+sfr = "mhpmcounter9h",                             "CSRMemory",    0xB89,     1, base=16
+sfr = "mhpmcounter10h",                            "CSRMemory",    0xB8A,     1, base=16
+sfr = "mhpmcounter11h",                            "CSRMemory",    0xB8B,     1, base=16
+sfr = "mhpmcounter12h",                            "CSRMemory",    0xB8C,     1, base=16
+sfr = "mhpmcounter13h",                            "CSRMemory",    0xB8D,     1, base=16
+sfr = "mhpmcounter14h",                            "CSRMemory",    0xB8E,     1, base=16
+sfr = "mhpmcounter15h",                            "CSRMemory",    0xB8F,     1, base=16
+sfr = "mhpmcounter16h",                            "CSRMemory",    0xB90,     1, base=16
+sfr = "mhpmcounter17h",                            "CSRMemory",    0xB91,     1, base=16
+sfr = "mhpmcounter18h",                            "CSRMemory",    0xB92,     1, base=16
+sfr = "mhpmcounter19h",                            "CSRMemory",    0xB93,     1, base=16
+sfr = "mhpmcounter20h",                            "CSRMemory",    0xB94,     1, base=16
+sfr = "mhpmcounter21h",                            "CSRMemory",    0xB95,     1, base=16
+sfr = "mhpmcounter22h",                            "CSRMemory",    0xB96,     1, base=16
+sfr = "mhpmcounter23h",                            "CSRMemory",    0xB97,     1, base=16
+sfr = "mhpmcounter24h",                            "CSRMemory",    0xB98,     1, base=16
+sfr = "mhpmcounter25h",                            "CSRMemory",    0xB99,     1, base=16
+sfr = "mhpmcounter26h",                            "CSRMemory",    0xB9A,     1, base=16
+sfr = "mhpmcounter27h",                            "CSRMemory",    0xB9B,     1, base=16
+sfr = "mhpmcounter28h",                            "CSRMemory",    0xB9C,     1, base=16
+sfr = "mhpmcounter29h",                            "CSRMemory",    0xB9D,     1, base=16
+sfr = "mhpmcounter30h",                            "CSRMemory",    0xB9E,     1, base=16
+sfr = "mhpmcounter31h",                            "CSRMemory",    0xB9F,     1, base=16
+
+;;Machine Counter Setup
+sfr = "mhpmevent3",                                "CSRMemory",    0x323,     1, base=16
+sfr = "mhpmevent4",                                "CSRMemory",    0x324,     1, base=16
+sfr = "mhpmevent5",                                "CSRMemory",    0x325,     1, base=16
+sfr = "mhpmevent6",                                "CSRMemory",    0x326,     1, base=16
+sfr = "mhpmevent7",                                "CSRMemory",    0x327,     1, base=16
+sfr = "mhpmevent8",                                "CSRMemory",    0x328,     1, base=16
+sfr = "mhpmevent9",                                "CSRMemory",    0x329,     1, base=16
+sfr = "mhpmevent10",                               "CSRMemory",    0x32A,     1, base=16
+sfr = "mhpmevent11",                               "CSRMemory",    0x32B,     1, base=16
+sfr = "mhpmevent12",                               "CSRMemory",    0x32C,     1, base=16
+sfr = "mhpmevent13",                               "CSRMemory",    0x32D,     1, base=16
+sfr = "mhpmevent14",                               "CSRMemory",    0x32E,     1, base=16
+sfr = "mhpmevent15",                               "CSRMemory",    0x32F,     1, base=16
+sfr = "mhpmevent16",                               "CSRMemory",    0x330,     1, base=16
+sfr = "mhpmevent17",                               "CSRMemory",    0x331,     1, base=16
+sfr = "mhpmevent18",                               "CSRMemory",    0x332,     1, base=16
+sfr = "mhpmevent19",                               "CSRMemory",    0x333,     1, base=16
+sfr = "mhpmevent20",                               "CSRMemory",    0x334,     1, base=16
+sfr = "mhpmevent21",                               "CSRMemory",    0x335,     1, base=16
+sfr = "mhpmevent22",                               "CSRMemory",    0x336,     1, base=16
+sfr = "mhpmevent23",                               "CSRMemory",    0x337,     1, base=16
+sfr = "mhpmevent24",                               "CSRMemory",    0x338,     1, base=16
+sfr = "mhpmevent25",                               "CSRMemory",    0x339,     1, base=16
+sfr = "mhpmevent26",                               "CSRMemory",    0x33A,     1, base=16
+sfr = "mhpmevent27",                               "CSRMemory",    0x33B,     1, base=16
+sfr = "mhpmevent28",                               "CSRMemory",    0x33C,     1, base=16
+sfr = "mhpmevent29",                               "CSRMemory",    0x33D,     1, base=16
+sfr = "mhpmevent30",                               "CSRMemory",    0x33E,     1, base=16
+sfr = "mhpmevent31",                               "CSRMemory",    0x33F,     1, base=16
+
+;;Debug/Trace registers
+sfr = "tselect",                                   "CSRMemory",    0x7A0,     1, base=16
+sfr = "tdata1",                                    "CSRMemory",    0x7A1,     1, base=16
+sfr = "tdata2",                                    "CSRMemory",    0x7A2,     1, base=16
+sfr = "tdata3",                                    "CSRMemory",    0x7A3,     1, base=16
+sfr = "dcsr",                                      "CSRMemory",    0x7B0,     1, base=16
+sfr = "dpc",                                       "CSRMemory",    0x7B1,     1, base=16
+sfr = "dscratch",                                  "CSRMemory",    0x7B2,     1, base=16
+
+
+;;-------------------------------------------------------------------------
+;; SFR group declarations
+;;
+;; Syntax: group = "group name", "sfr name", "sfr name", ...
+;;-------------------------------------------------------------------------
+[SfrGroupInfo]
+group = "CSR", "ustatus", "uie", "utvec", "uscratch", "uepc", "ucause", "utval", "uip", "cycle", "time", "instret", "hpmcounter3", "hpmcounter4", "hpmcounter5", "hpmcounter6", "hpmcounter7", "hpmcounter8", "hpmcounter9", "hpmcounter10", "hpmcounter11", "hpmcounter12", "hpmcounter13", "hpmcounter14", "hpmcounter15", "hpmcounter16", "hpmcounter17", "hpmcounter18", "hpmcounter19", "hpmcounter20", "hpmcounter21", "hpmcounter22", "hpmcounter23", "hpmcounter24", "hpmcounter25", "hpmcounter26", "hpmcounter27", "hpmcounter28", "hpmcounter29", "hpmcounter30", "hpmcounter31", "cycleh", "timeh", "instreth", "hpmcounter3h", "hpmcounter4h", "hpmcounter5h", "hpmcounter6h", "hpmcounter7h", "hpmcounter8h", "hpmcounter9h", "hpmcounter10h", "hpmcounter11h", "hpmcounter12h", "hpmcounter13h", "hpmcounter14h", "hpmcounter15h", "hpmcounter16h", "hpmcounter17h", "hpmcounter18h", "hpmcounter19h", "hpmcounter20h", "hpmcounter21h", "hpmcounter22h", "hpmcounter23h", "hpmcounter24h", "hpmcounter25h", "hpmcounter26h", "hpmcounter27h", "hpmcounter28h", "hpmcounter29h", "hpmcounter30h", "hpmcounter31h", "sstatus", "sedeleg", "sideleg", "sie", "stvec", "scounteren", "sscratch", "sepc", "scause", "stval", "sip", "satp", "mvendorid", "marchid", "mimpid", "mhartid", "mstatus", "misa", "medeleg", "mideleg", "mie", "mtvec", "mtvt", "mscratch", "mepc", "mcause", "mtval", "mip", "mnxti", "mintstatus", "mscratchcsw", "mscratchcswl", "pmpcfg0", "pmpcfg1", "pmpcfg2", "pmpcfg3", "pmpaddr0", "pmpaddr1", "pmpaddr2", "pmpaddr3", "pmpaddr4", "pmpaddr5", "pmpaddr6", "pmpaddr7", "pmpaddr8", "pmpaddr9", "pmpaddr10", "pmpaddr11", "pmpaddr12", "pmpaddr13", "pmpaddr14", "pmpaddr15", "mcycle", "minstret", "mhpmcounter3", "mhpmcounter4", "mhpmcounter5", "mhpmcounter6", "mhpmcounter7", "mhpmcounter8", "mhpmcounter9", "mhpmcounter10", "mhpmcounter11", "mhpmcounter12", "mhpmcounter13", "mhpmcounter14", "mhpmcounter15", "mhpmcounter16", "mhpmcounter17", "mhpmcounter18", "mhpmcounter19", "mhpmcounter20", "mhpmcounter21", "mhpmcounter22", "mhpmcounter23", "mhpmcounter24", "mhpmcounter25", "mhpmcounter26", "mhpmcounter27", "mhpmcounter28", "mhpmcounter29", "mhpmcounter30", "mhpmcounter31", "mcycleh", "minstreth", "mhpmcounter3h", "mhpmcounter4h", "mhpmcounter5h", "mhpmcounter6h", "mhpmcounter7h", "mhpmcounter8h", "mhpmcounter9h", "mhpmcounter10h", "mhpmcounter11h", "mhpmcounter12h", "mhpmcounter13h", "mhpmcounter14h", "mhpmcounter15h", "mhpmcounter16h", "mhpmcounter17h", "mhpmcounter18h", "mhpmcounter19h", "mhpmcounter20h", "mhpmcounter21h", "mhpmcounter22h", "mhpmcounter23h", "mhpmcounter24h", "mhpmcounter25h", "mhpmcounter26h", "mhpmcounter27h", "mhpmcounter28h", "mhpmcounter29h", "mhpmcounter30h", "mhpmcounter31h", "mhpmevent3", "mhpmevent4", "mhpmevent5", "mhpmevent6", "mhpmevent7", "mhpmevent8", "mhpmevent9", "mhpmevent10", "mhpmevent11", "mhpmevent12", "mhpmevent13", "mhpmevent14", "mhpmevent15", "mhpmevent16", "mhpmevent17", "mhpmevent18", "mhpmevent19", "mhpmevent20", "mhpmevent21", "mhpmevent22", "mhpmevent23", "mhpmevent24", "mhpmevent25", "mhpmevent26", "mhpmevent27", "mhpmevent28", "mhpmevent29", "mhpmevent30", "mhpmevent31", "tselect", "tdata1", "tdata2", "tdata3", "dcsr", "dpc", "dscratch"
+
+;;-------------------------------------------------------------------------
+;; End of file
+;;-------------------------------------------------------------------------
