@@ -2,7 +2,7 @@
 name: Hardware or architecture support
 about: Suggest adding hardware or new architecture support.
 title: ''
-labels: enhancement
+labels: ''
 assignees: ''
 
 ---
