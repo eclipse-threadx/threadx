@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve Azure RTOS.
 title: ''
-labels: bug
+labels: bug, hardware
 assignees: ''
 
 ---
