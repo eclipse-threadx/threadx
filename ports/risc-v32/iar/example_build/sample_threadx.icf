@@ -33,7 +33,7 @@ else
 }
 
 define block RW_DATA with static base GPREL { rw data };
-keep { symbol __iar_cstart_init_gp }; // defined in cstartup.s
+keep symbol __iar_cstart_init_gp; // defined in cstartup.s
 
 "CSTARTUP32" : place at start of ROM_region32 { ro section .cstartup };
 
