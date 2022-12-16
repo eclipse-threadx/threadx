@@ -20,6 +20,7 @@
 /**************************************************************************/
 /**************************************************************************/
 
+#include "tx_user.h"
 
 SYSTEM_CLOCK        =     6000000
 SYSTICK_CYCLES      =     ((SYSTEM_CLOCK / 100) -1)
@@ -34,7 +35,7 @@ HEAP_SIZE           =     0x00000000
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                          Cortex-M23/GNU    */
-/*                                                           6.1          */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -68,6 +69,8 @@ HEAP_SIZE           =     0x00000000
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_initialize_low_level(VOID)

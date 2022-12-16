@@ -427,9 +427,11 @@ XSTRUCT_END(XtExcFrame)
     addi    a10,  a1, -XT_STK_FRMSZ
     s32i    a10, a11, tx_thread_stack_ptr       // save outgoing thread stack pointer
     l32i    a10, a12, 0                         // a10 <- _tx_timer_time_slice
+    beqz    a10, .Ldont_save_ts
     s32i    a10, a11, tx_thread_time_slice      // save outgoing time slice value
     movi    a10,  0
     s32i    a10, a12, 0                         // disable time slice
+.Ldont_save_ts:
     s32i    a10, a11, tx_thread_solicited       // mark as preempted
     s32i    a10,  a8, 0                         // Clear _tx_thread_current_ptr
 #if XCHAL_CP_NUM > 0

@@ -20,6 +20,7 @@
 @/**************************************************************************/
 @/**************************************************************************/
 
+#include "tx_user.h"
 
     .text 32
     .align 4
@@ -29,7 +30,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_system_return                          Cortex-M0/GNU     */
-@/*                                                           6.1          */
+@/*                                                           6.x          */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -64,6 +65,8 @@
 @/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
 @/*  09-30-2020     William E. Lamie         Modified comment(s),          */
 @/*                                            resulting in version 6.1    */
+@/*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
+@/*                                            resulting in version 6.x    */
 @/*                                                                        */
 @/**************************************************************************/
 @/* VOID   _tx_thread_system_return(VOID)

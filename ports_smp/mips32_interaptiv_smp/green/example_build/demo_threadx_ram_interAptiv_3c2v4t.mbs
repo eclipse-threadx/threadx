@@ -1,0 +1,25 @@
+// MBS_OPT="early"
+
+
+addhook -after connect { reset }
+
+// addhook -after reset { prepare_target }
+
+addhook -after download -core 0 {
+	target t 4 rw pc 0x80100000 // c1v0t0 entry point.
+	target t 8 rw pc 0x80100000 // c2v0t0 entry point.
+
+	target t 1 rw pc 0xdeadbeef // c0v1t1 "uninitialized" marker.
+	target t 5 rw pc 0xdeadbeef // c1v1t1 "uninitialized" marker.
+	target t 9 rw pc 0xdeadbeef // c2v1t1 "uninitialized" marker.
+
+	// Enable access to CPC registers.
+	*((unsigned int *) 0xbfbf8088) |= 0x1 // GCR_CPC_BASE.EN = 1
+	// Workaround old CPC not returning to PwrDwn after leaving debug mode
+	*((unsigned int *) 0xbbde2010) = (1 << 16) // CPC_CL_OTHER.CORENUM = 1
+	*((unsigned int *) 0xbbde4000) = 2 //CPC_CO_CMD.CMD = 2(PwdDwn)
+	*((unsigned int *) 0xbbde2010) = (2 << 16) // CPC_CL_OTHER.CORENUM = 2
+	*((unsigned int *) 0xbbde4000) = 2 //CPC_CO_CMD.CMD = 2(PwdDwn)
+}
+
+

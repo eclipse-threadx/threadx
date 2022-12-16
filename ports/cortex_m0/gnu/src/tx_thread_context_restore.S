@@ -20,6 +20,7 @@
 @/**************************************************************************/
 @/**************************************************************************/
 @
+#include "tx_user.h"
 @
     .global  _tx_thread_system_state
     .global  _tx_thread_current_ptr
@@ -42,7 +43,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_context_restore                        Cortex-M0/GNU     */
-@/*                                                           6.1          */
+@/*                                                           6.x          */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -80,6 +81,8 @@
 @/*  09-30-2020     Scott Larson             Modified comment(s), and      */
 @/*                                            cleaned up whitespace,      */
 @/*                                            resulting in version 6.1    */
+@/*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
+@/*                                            resulting in version 6.x    */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_context_restore(VOID)

@@ -1,0 +1,27 @@
+#!gbuild
+#component ThreadX Demo
+[Program]
+	-I.
+	-o demo_threadx.elf
+	-nostdlib
+	-Onone
+copy_c2_ram.mip
+demo_threadx.c
+tx_initialize_low_level.mip
+start.mip
+set_gpr_boot_values.mip
+init_gpr.mip
+init_tlb.mip
+init_itc.mip
+init_caches2.mip
+init_cp0.mip
+init_cm.mip
+release_mp.mip
+join_domain.mip
+init_gic.mip
+init_cpc.mip
+init_vpe1.mip
+init_CoreFPGA6_mem.mip
+tx.a
+demo_threadx_ram_interAptiv.ld
+demo_threadx_interAptiv.con

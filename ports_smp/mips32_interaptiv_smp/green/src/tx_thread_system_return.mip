@@ -1,0 +1,210 @@
+/**************************************************************************/
+/*                                                                        */
+/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
+/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+/*       and in the root directory of this software.                      */
+/*                                                                        */
+/**************************************************************************/
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Thread                                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+
+#define UserLocal     $4,2
+#define C0_TCBind     $2,2
+#define C0_TCContext  $2,5
+
+
+    .text
+    .set        noreorder
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_system_return              MIPS32_interAptiv/Green Hills */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Scott Larson, Microsoft Corporation                                 */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function is target processor specific.  It is used to transfer */
+/*    control from a thread back to the system.  Only a minimal context   */
+/*    is saved since the compiler assumes temp registers are going to get */
+/*    slicked by a function call anyway.                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_schedule                   Thread scheduling loop        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX components                                                  */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx      Scott Larson            Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+/* VOID   _tx_thread_system_return(VOID)
+{  */
+    .globl  _tx_thread_system_return
+_tx_thread_system_return:
+
+    di      $10                                 # Disable interrupts
+    ehb                                         #
+
+
+    /* Save minimal context on the stack.  */
+
+#ifdef TX_ENABLE_64BIT_FPU_SUPPORT
+    subu    $29, $29, 160                       # Allocate space on the stack
+#else
+    subu    $29, $29, 56                        # Allocate space on the stack
+#endif
+    sw      $0, ($29)                           # Solicited stack type
+    sw      $30, 4($29)                         # Save s8
+    sw      $23, 8($29)                         # Save s7
+    sw      $22, 12($29)                        # Save s6
+    sw      $21, 16($29)                        # Save s5
+    sw      $20, 20($29)                        # Save s4
+    sw      $19, 24($29)                        # Save s3
+    sw      $18, 28($29)                        # Save s2
+    sw      $17, 32($29)                        # Save s1
+    sw      $16, 36($29)                        # Save s0
+    mfhi    $8                                  # Pickup hi
+    mflo    $9                                  # Pickup lo
+    sw      $8,  40($29)                        # Save hi
+    sw      $9,  44($29)                        # Save lo
+    sw      $31, 48($29)                        # Save ra
+    sw      $10, 52($29)                        # Save SR
+
+    mfc0    $25, UserLocal                      # Pickup VPE ID
+
+
+#ifdef TX_ENABLE_64BIT_FPU_SUPPORT
+
+    /* Check if FPU is enabled for this thread. Note that threads with FPU enabled will only be
+       scheduled in VPE 0 and thus only need to be saved for TC VPE 0.  */
+
+    bne     $25, $0, _tx_skip_fpu_sync_save     # If not VPE 0, skip FPU save
+    la      $9, _tx_thread_current_ptr          # Pickup address of pointer
+    lw      $8, ($9)                            # Pickup current thread pointer
+    lw      $15, 176($8)                        # Pickup FPU enable flag
+    beq     $15, $0, _tx_skip_fpu_sync_save     # If FPU not enabled, skip FPU save
+    nop                                         #
+
+    /* Save preserved floating point registers.  */
+
+    cfc1    $8, $31                             # Pickup floating point control reg
+    sdc1    $f31, 56($29)                       # Save f31
+    sdc1    $f30, 64($29)                       # Save f30
+    sdc1    $f29, 72($29)                       # Save f29
+    sdc1    $f28, 80($29)                       # Save f28
+    sdc1    $f27, 88($29)                       # Save f27
+    sdc1    $f26, 96($29)                       # Save f26
+    sdc1    $f25, 104($29)                      # Save f25
+    sdc1    $f24, 112($29)                      # Save f24
+    sdc1    $f23, 120($29)                      # Save f23
+    sdc1    $f22, 128($29)                      # Save f22
+    sdc1    $f21, 136($29)                      # Save f21
+    sdc1    $f20, 144($29)                      # Save f20
+    sw      $8,   152($29)                      # Save fcr31
+_tx_skip_fpu_sync_save:
+
+#endif
+
+    la      $9, _tx_thread_current_ptr          # Pickup address of pointer
+    sll     $25, $25, 2                         # Build index based on VPE number
+    addu    $9, $9, $25                         # Build address of current thread pointer for this VPE
+
+    lw      $8, ($9)                            # Pickup current thread pointer
+    la      $10,_tx_thread_system_stack_ptr     # Pickup stack pointer address
+
+    /* Save current stack and switch to system stack.  */
+    /* _tx_thread_current_ptr[VPE] -> tx_thread_stack_ptr =  SP;
+    SP = _tx_thread_system_stack_ptr[VPE];  */
+
+    sw      $29, 8($8)                          # Save stack pointer
+    addu    $10, $10, $25                       # Build index to system stack pointer array
+    lw      $29, ($10)                          # Switch to system stack
+
+    /* Determine if the time-slice is active.  */
+    /* if (_tx_timer_time_slice[VPE])
+    {  */
+
+    la      $13, _tx_timer_time_slice           # Pickup time slice variable addr
+    addu    $13, $13, $25                       # Index into time-slice variable
+    lw      $11, 0($13)                         # Pickup time slice value
+    la      $12, _tx_thread_schedule            # Pickup address of scheduling loop
+    beqz    $11, _tx_thread_dont_save_ts        # If no time-slice, don't save it
+    nop                                         # Delay slot
+
+        /* Save time-slice for the thread and clear the current time-slice.  */
+        /* _tx_thread_current_ptr[VPE] -> tx_thread_time_slice =  _tx_timer_time_slice[VPE];
+        _tx_timer_time_slice[VPE] =  0;  */
+
+    sw      $11, 24($8)                         # Save time-slice for thread
+    sw      $0, ($13)                           # Clear time-slice variable
+
+    /* }  */
+_tx_thread_dont_save_ts:
+
+    /* Clear the current thread pointer.  */
+    /* _tx_thread_current_ptr[VPE] =  TX_NULL;  */
+
+    sw      $0, ($9)                            # Clear current thread pointer
+
+    /* Set bit indicating the thread is ready for scheduling.  */
+
+    lw      $9, 156($8)                         # Pickup the thread's VPE control register
+    ori     $9, $9, 0x8000                      # Set ready bit (bit 15)
+    sync
+    sw      $9, 156($8)                         # Make this thread ready for scheduling
+
+    la      $10,_tx_thread_smp_protection       # Build address of protection structure
+    lw      $9, 4($10)                          # Pickup owning thread
+
+#ifdef TX_THREAD_SMP_DEBUG_ENABLE
+_error_loop:
+    bne     $8, $9, _error_loop                 # If the owner is not this thread, we have a problem!
+    nop                                         #
+#endif
+
+    la      $13, _tx_thread_preempt_disable     # Pickup address of preempt disable
+    sw      $0, ($13)                           # Clear the preempt disable
+    li      $11, 0xFFFFFFFF                     # Build invalid VPE value
+    sw      $11, 8($10)                         # Set protection VPE to invalid
+    sw      $31, 24($10)                        # Save caller in protect structure
+
+_release_protect_loop:
+    sync
+    sw      $0, ($10)                           # Release protection
+    sync
+
+    j       $12                                 # Return to thread scheduler
+    nop
+
+/* }  */

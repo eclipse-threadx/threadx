@@ -1,0 +1,31 @@
+version = 1
+
+core {
+    # This is for a board with 3 cores, each with 4 TCs.
+    # Boot-MIPS only uses the first 2 TCs of each core.
+    "0" {
+	download = {"demo_threadx.elf"}
+	symbol = {"demo_threadx.elf"}
+	bp_share = {"empty_region"}
+    }
+    "1" {
+	symbol = {"demo_threadx.elf"}
+	bp_share = {"empty_region"}
+    }
+    "4-5" {
+	symbol = {"demo_threadx.elf"}
+	bp_share = {"empty_region"}
+    }
+    "8-9" {
+	symbol = {"demo_threadx.elf"}
+	bp_share = {"empty_region"}
+    }
+}
+
+memory {
+    # disable any-core breakpoints, which aren't supported
+    "empty_region" {
+	begin = 0;
+	end = 0;
+    }
+}

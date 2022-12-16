@@ -1,0 +1,31 @@
+#!gbuild
+macro __TOOLS_PATH=C:\ghs\comp_201313A
+primaryTarget=mips_standalone.tgt
+#component top_level_project
+[Project]
+	-DTX_THREAD_SMP_MAX_CORES=6
+	-DTX_THREAD_SMP_CORE_MASK=0x3F
+	-DTX_THREAD_SMP_INTER_CORE_INTERRUPT
+	-DnoTX_NOT_INTERRUPTABLE
+	-DnoTX_THREAD_SMP_DYNAMIC_CORE_MAX
+	-DnoTX_THREAD_SMP_ONLY_CORE_0_DEFAULT
+	-DnoTX_THREAD_SMP_DEBUG_ENABLE
+	-DnoTX_THREAD_SMP_MAX_DEBUG_ENTRIES=1000
+	-DnoTX_ENABLE_EVENT_TRACE
+	-DnoTX_ENABLE_STACK_CHECKING
+	-DnoTX_THREAD_ENABLE_PERFORMANCE_INFO
+	-DnoTX_DISABLE_PREEMPTION_THRESHOLD
+	-DnoTX_MAX_PRIORITIES=32
+	-DTX_DISABLE_ERROR_CHECKING
+	-DMALTA_DEBUG
+	-bsp malta,1004kc
+	-G
+	-object_dir=objs
+	:sourceDir=.
+	-DDENALI
+demo_threadx_ram_interAptiv_3c2v4t.ghsmc
+demo_threadx.gpj		[Program]
+tx.gpj		[Library]
+
+txe.gpj		[Library]
+demo_threadx_el.gpj		[Program]

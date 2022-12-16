@@ -1,0 +1,17 @@
+target_connection {
+     {
+        title = "GHS_Probe_interAptiv_3c2v4t"
+        type = "Green Hills Debug Probe (mpserv)"
+        short_type = "mpserv"
+        args = "  -usb"
+        command = "mpserv  -usb"
+        logfile = ""
+        mode = ""
+        setup_script = "demo_threadx_ram_interAptiv_3c2v4t.mbs"
+        run_mode_partner = ""
+        run_mode_policy = ""
+        sane = "yes"
+        log = "no"
+        timestamp = "0"
+    }
+}

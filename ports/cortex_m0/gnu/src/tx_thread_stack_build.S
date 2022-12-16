@@ -20,6 +20,7 @@
 @/**************************************************************************/
 @/**************************************************************************/
 @
+#include "tx_user.h"
 @
     .text
     .align 4
@@ -29,7 +30,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_stack_build                            Cortex-M0/GNU     */
-@/*                                                           6.1          */
+@/*                                                           6.x          */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -68,6 +69,8 @@
 @/*                                            to stack frame, clean up    */
 @/*                                            whitespace, resulting       */
 @/*                                            in version 6.1              */
+@/*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
+@/*                                            resulting in version 6.x    */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))

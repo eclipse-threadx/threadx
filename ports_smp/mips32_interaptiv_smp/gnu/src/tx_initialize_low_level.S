@@ -1,0 +1,335 @@
+/**************************************************************************/
+/*                                                                        */
+/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
+/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+/*       and in the root directory of this software.                      */
+/*                                                                        */
+/**************************************************************************/
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Initialize                                                          */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+
+#define GIC_SH_WEDGE    0xbbdc0280          /* For Inter-processor interrupts on MALTA board.  */
+
+    INITIAL_SR          =   0xFF00          # All IM bits set
+    SW_INTERRUPT_0      =   0x0100          # Software interrupt 0
+    SW_INTERRUPT_1      =   0x0200          # Software interrupt 1
+    INTERRUPT_0         =   0x0400          # Interrupt 0
+    INTERRUPT_1         =   0x0800          # Interrupt 1
+    INTERRUPT_2         =   0x1000          # Interrupt 2
+    INTERRUPT_3         =   0x2000          # Interrupt 3
+    INTERRUPT_4         =   0x4000          # Interrupt 4
+    INTERRUPT_5         =   0x8000          # Interrupt 5
+    EXCEPTION_VECTOR    =   0x00000180      # General exception vector
+    TEN_MS_COUNT        =   120000          # 10 ms clock rate
+
+    .text
+    .set        noreorder
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_initialize_low_level                      MIPS32_interAptiv/GNU */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Scott Larson, Microsoft Corporation                                 */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function is responsible for any low-level processor            */
+/*    initialization, including setting up interrupt vectors, setting     */
+/*    up a periodic timer interrupt source, saving the system stack       */
+/*    pointer for use in ISR processing later, and finding the first      */
+/*    available RAM memory address for tx_application_define.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter           ThreadX entry function        */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx      Scott Larson            Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+/* VOID   _tx_initialize_low_level(VOID)
+{  */
+    .globl  _tx_initialize_low_level
+_tx_initialize_low_level:
+
+    di                                          # Ensure interrupts are disabled
+    ehb                                         #
+    mfc0    $8, $12                             # Pickup current SR
+    ori     $8, $8, INITIAL_SR                  # Build initial SR
+    mtc0    $8, $12                             # Setup SR
+
+    /* Save the system stack pointer.  */
+    /* _tx_thread_system_stack_ptr = (VOID_PTR) (SP);  */
+
+    la      $8, _tx_thread_system_stack_ptr     # Pickup address of system
+                                        /*      #   stack pointer  */
+    sw      $29, ($8)                           # Save system stack pointer
+
+
+    /* Save the first available memory address.  */
+    /* _tx_initialize_unused_memory =  (VOID_PTR) _free_memory;  */
+
+    la      $9, _free_memory                    # Pickup first free address
+    la      $10, _tx_initialize_unused_memory   # Pickup address of unused
+                                        /*      #   memory  */
+    sw      $9, ($10)                           # Save unused memory address
+
+
+    /*  Set up the counter/compare registers to generate a periodic interrupt.  */
+
+    mtc0    $0, $9                              # Initialize CP0 timer count register to zero
+    ehb                                         #
+    li      $9,TEN_MS_COUNT                     # Default value
+    mtc0    $9, $11                             # Set timer compare register
+    ehb                                         #
+
+
+    /* Done, return to caller.  */
+
+    j       $31                                 # Return to caller
+    nop                                         # Delay slot
+/* }  */
+
+
+    /* Define the interrupt/exception handler trampoline code.  This needs to
+       be copied to address 0x80000180 cached or 0xA0000180 non-cache.  */
+
+    .globl  _tx_exception_trampoline
+_tx_exception_trampoline:
+    la      $26,_tx_exception_handler           # Pickup exception handler address
+    j       $26                                 # Jump to exception handler
+    nop                                         # Delay slot
+    nop                                         # Fill with nops....
+    nop                                         #
+    nop                                         #
+    nop                                         #
+    nop                                         #
+_tx_exception_trampoline_end:
+
+
+
+    /* Define the actual interrupt/exception handler.  Since this routine must handle
+       multiple exceptions, the context save/restore functions are called automatically.
+       Application specific ISR processing added to this routine must be inserted into
+       the proper place and use registers in accordance with the MIPS compiler, i.e.
+       $16-$23 (s0-s7) and $30 (s8) must be saved if they are used.  C functions called
+       from this area will automatically save/restore these registers if they are used.  */
+
+    .globl  _tx_exception_handler
+_tx_exception_handler:
+    mfc0    $26, $13                            # Pickup the cause register
+    ehb                                         # 
+    andi    $26, $26, 0x3C                      # Isolate the exception code
+    bne     $26, $0, _tx_error_exceptions       # If non-zero, an error exception is present
+    nop                                         # Delay slot
+
+    la      $27, _tx_thread_smp_system_error    # Build address to system error flag
+    lw      $27, ($27)                          # Pickup system error flag
+_system_error_loop:
+    bne     $27, $0, _system_error_loop         # If error, just sit here!
+    nop
+
+    /* Otherwise, an interrupt exception is present.  Call context save before we
+       process normal interrupts.  */
+
+    la      $26, _tx_thread_context_save        # Pickup address of context save function
+    jalr    $27,$26                             # Call context save
+    nop                                         # Delay slot
+
+    /* Perform interrupt processing here!  When context save returns, interrupts are
+       disabled and all compiler scratch registers are available.  Also, s0 is saved and
+       is used in this function to hold the contents of the CAUSE register.  */
+
+    mfc0    $16, $13                            # Pickup the cause register
+
+
+    /* Interrupts may be re-enabled after this point.  */
+
+    /* Check for Interrupt 0.  */
+
+    andi    $8, $16, INTERRUPT_0                # Isolate interrupt 0 flag
+    beqz    $8, _tx_not_interrupt_0             # If not set, skip interrupt 0 processing
+    nop                                         # Delay slot
+
+    /* Interrupt 0 processing goes here!  */
+
+#ifdef TX_ENABLE_EVENT_TRACE
+    li      $4,1                                # Build interrupt type
+    la      $9, _tx_trace_isr_enter_insert      # Build interrupt enter logging address
+    jal     $9                                  # Call interrupt enter event logging
+    nop                                         #
+#endif
+
+    /* Clear inter-processor interrupt (and increment counter).  */
+
+    mfc0    $8, $4,2                            # Pickup UserLocal (VPE number)
+    la      $9, _tx_thread_smp_inter_core_interrupts # Address of inter-processor interrupt
+    sll     $8, $8, 2                           # Build offset to proper counter index
+    addu    $9, $9, $8                          # Build address of this VPE's counter
+    lw      $8, 0($9)                           # Pickup current value
+    addiu   $8, $8, 1                           # Increment current value
+    sw      $8, 0($9)                           # Store value back
+
+    li      $8, GIC_SH_WEDGE                    #
+    mfc0    $9, $15, 1                          # Get cp0 EBase
+    ext     $9, $9, 0, 10                       # Extract CPUNum
+    addiu   $9, 0x20                            # Offset to base of IPI interrupts.
+    sw      $9, 0($8)                           # Clear this IPI.
+
+#ifdef TX_ENABLE_EVENT_TRACE
+    li      $4,1                                # Build interrupt type
+    la      $9, _tx_trace_isr_exit_insert       # Build interrupt exit logging address
+    jal     $9                                  # Call interrupt exit event logging
+    nop                                         #
+#endif
+
+_tx_not_interrupt_0:
+
+    /* Check for Interrupt 1.  */
+
+    andi    $8, $16, INTERRUPT_1                # Isolate interrupt 1 flag
+    beqz    $8, _tx_not_interrupt_1             # If not set, skip interrupt 1 processing
+    nop                                         # Delay slot
+
+    /* Interrupt 1 processing goes here!  */
+
+_tx_not_interrupt_1:
+
+    /* Check for Interrupt 2.  */
+
+    andi    $8, $16, INTERRUPT_2                # Isolate interrupt 2 flag
+    beqz    $8, _tx_not_interrupt_2             # If not set, skip interrupt 2 processing
+    nop                                         # Delay slot
+
+    /* Interrupt 2 processing goes here!  */
+
+_tx_not_interrupt_2:
+
+    /* Check for Interrupt 3.  */
+
+    andi    $8, $16, INTERRUPT_3                # Isolate interrupt 3 flag
+    beqz    $8, _tx_not_interrupt_3             # If not set, skip interrupt 3 processing
+    nop                                         # Delay slot
+
+    /* Interrupt 3 processing goes here!  */
+
+_tx_not_interrupt_3:
+
+    /* Check for Interrupt 4.  */
+
+    andi    $8, $16, INTERRUPT_4                # Isolate interrupt 4 flag
+    beqz    $8, _tx_not_interrupt_4             # If not set, skip interrupt 4 processing
+    nop                                         # Delay slot
+
+    /* Interrupt 4 processing goes here!  */
+
+_tx_not_interrupt_4:
+
+    /* Check for Interrupt 5.  */
+
+    andi    $8, $16, INTERRUPT_5                # Isolate interrupt 5 flag
+    beqz    $8, _tx_not_interrupt_5             # If not set, skip interrupt 5 processing
+    nop                                         # Delay slot
+
+    /* Interrupt 5 processing goes here!  */
+
+
+    /* Interrupt 5 is the count/compare timer interrupt.  */
+
+#ifdef TX_ENABLE_EVENT_TRACE
+    li      $4,0                                # Build interrupt type
+    la      $9, _tx_trace_isr_enter_insert      # Build interrupt enter logging address
+    jal     $9                                  # Call interrupt enter event logging
+    nop                                         #
+#endif
+
+
+    /* Interrupt 5 is the count/compare timer interrupt.  */
+
+    mtc0    $0, $9                              # Initialize CP0 count register to zero
+    ehb                                         #
+    li      $9, TEN_MS_COUNT                    # 10 ms @ 66 MHz
+    mtc0    $9, $11                             # Set compare register, reset count reg.
+    ehb                                         #
+
+    /* Call the ThreadX timer routine.  */
+
+    la      $8, _tx_timer_interrupt             # Build timer interrupt address
+    jal     $8                                  # Call timer interrupt handler
+    nop                                         #
+
+#ifdef TX_ENABLE_EVENT_TRACE
+    li      $4,0                                # Build interrupt type
+    la      $9, _tx_trace_isr_exit_insert       # Build interrupt exit logging address
+    jal     $9                                  # Call interrupt exit event logging
+    nop                                         #
+#endif
+
+_tx_not_interrupt_5:
+
+    /* Check for Software Interrupt 0.  */
+
+    andi    $8, $16, SW_INTERRUPT_0             # Isolate software interrupt 0 flag
+    beqz    $8, _tx_not_interrupt_sw_0          # If not set, skip sw interrupt 0 processing
+    nop                                         # Delay slot
+
+    /* Software interrupt 0 processing goes here!  */
+
+_tx_not_interrupt_sw_0:
+
+    /* Check for Software Interrupt 1.  */
+
+    andi    $8, $16, SW_INTERRUPT_1             # Isolate software interrupt 1 flag
+    beqz    $8, _tx_not_interrupt_sw_1          # If not set, skip sw interrupt 1 processing
+    nop                                         # Delay slot
+
+    /* Software interrupt 1 processing goes here!  */
+
+_tx_not_interrupt_sw_1:
+
+    la      $8, _tx_thread_context_restore      # Pickup address of context restore function
+    j       $8                                  # Jump to context restore - does not return!
+    nop                                         # Delay slot
+
+    /* Error Exception processing goes here!  */
+
+    .globl  _tx_error_exceptions
+_tx_error_exceptions:
+    b       _tx_error_exceptions                # Default error exception processing
+    nop                                         # Delay slot
+
+
+    /* Reference the build options and the version ID to ensure they are part of the image.  */
+    la      $8, _tx_build_options
+    la      $9, _tx_version_id

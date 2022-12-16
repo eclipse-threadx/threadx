@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_thread_create                   PORTABLE C      */
-/*                                                           6.1.3        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -91,6 +91,9 @@
 /*                                            added 64-bit support,       */
 /*                                            added SMP support,          */
 /*                                            resulting in version 6.1.3  */
+/*  xx-xx-xxxx      Scott Larson            Check module stack for        */
+/*                                            overlap,                    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
@@ -158,8 +161,8 @@ ULONG                   i;
         }
 
         /* Check the stack pointer to see if it overlaps with this thread's stack.  */
-        if ((((UCHAR *) ((VOID *) stack_start)) <= ((UCHAR *) ((VOID *) next_thread -> tx_thread_stack_end))) &&
-            (((UCHAR *) ((VOID *) stack_end)) >= ((UCHAR *) ((VOID *) next_thread -> tx_thread_stack_start))))
+        if ((((UCHAR *) ((VOID *) stack_start)) <= ((UCHAR *) ((VOID *) next_thread -> tx_thread_module_stack_end))) &&
+            (((UCHAR *) ((VOID *) stack_end)) >= ((UCHAR *) ((VOID *) next_thread -> tx_thread_module_stack_start))))
         {
             /* Stacks overlap, clear the stack pointer to force a stack error below.  */
             stack_start =  TX_NULL;
