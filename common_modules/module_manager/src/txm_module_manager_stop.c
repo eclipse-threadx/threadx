@@ -35,6 +35,10 @@
 #include "txm_module.h"
 #include "txm_module_manager_util.h"
 
+#ifdef TX_ENABLE_EVENT_TRACE
+#include "tx_trace.h"
+#endif
+
 #ifdef TXM_MODULE_ENABLE_FILEX
 extern UINT  _txm_module_manager_filex_stop(TXM_MODULE_INSTANCE *module_instance);
 #endif
@@ -60,7 +64,7 @@ extern UINT  _txm_module_manager_usbx_stop(TXM_MODULE_INSTANCE *module_instance)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_stop                            PORTABLE C      */
-/*                                                           6.1.5        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -112,6 +116,8 @@ extern UINT  _txm_module_manager_usbx_stop(TXM_MODULE_INSTANCE *module_instance)
 /*  03-02-2021      Scott Larson            Modified comments, fix        */
 /*                                            object delete underflow,    */
 /*                                            resulting in version 6.1.5  */
+/*  xx-xx-xxxx      Scott Larson            Added tx_trace.h include,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_stop(TXM_MODULE_INSTANCE *module_instance)

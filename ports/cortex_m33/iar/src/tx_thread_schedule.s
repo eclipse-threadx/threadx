@@ -43,7 +43,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M33/IAR    */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -84,6 +84,8 @@
 /*                                            resulting in version 6.1.7  */
 /*  04-25-2022      Scott Larson            Added BASEPRI support,        */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx      Scott Larson            Added preproc FPU option,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -374,6 +376,8 @@ _tx_svc_secure_init:
 
     PUBLIC  _tx_vfp_access
 _tx_vfp_access:
+#ifdef __ARMVFP__
     VMOV.F32 s0, s0                                 // Simply access the VFP
+#endif
     BX       lr                                     // Return to caller
     END

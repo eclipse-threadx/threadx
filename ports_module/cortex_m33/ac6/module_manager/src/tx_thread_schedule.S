@@ -30,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M33/AC6    */
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -77,6 +77,8 @@
 /*                                            resulting in version 6.1.12 */
 /*  10-31-2022      Scott Larson            Added low power support,      */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx      Scott Larson            Added preproc FPU option,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -710,6 +712,8 @@ _txm_module_user_mode_exit:
     .thumb_func
 .type _tx_vfp_access, function
 _tx_vfp_access:
+#ifdef __ARM_PCS_VFP
     VMOV.F32 s0, s0                                 // Simply access the VFP
+#endif
     BX       lr                                     // Return to caller
 .end

@@ -20,13 +20,14 @@
 /**************************************************************************/
 /**************************************************************************/
 
+#include "tx_user.h"
 
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_free                      Cortex-M85/AC6    */
-/*                                                           6.1          */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -56,6 +57,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_secure_stack_free(TX_THREAD *thread_ptr)

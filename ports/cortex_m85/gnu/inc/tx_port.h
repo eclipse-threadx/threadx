@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M85/GNU    */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -76,6 +76,8 @@
 /*                                            macro to port-specific,     */
 /*                                            described BASEPRI usage,    */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx      Scott Larson            Removed unneeded #include,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -106,10 +108,6 @@
 #include <yvals.h>
 #endif /* TX_ENABLE_IAR_LIBRARY_SUPPORT */
 #endif /* __ICCARM__ */
-
-#ifdef __ARMCOMPILER_VERSION
-#include <arm_compat.h>
-#endif
 
 
 /* Define ThreadX basic types for this port.  */
