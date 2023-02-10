@@ -1,6 +1,6 @@
 LICENSED HARDWARE LIST
 
-Last Updated: 2021-04-01
+Last Updated: 2023-02-10
 
 Microsoft has entered into OEM Agreements with manufacturers of the following
 microprocessors and microcontrollers (the “hardware”) to enable those
