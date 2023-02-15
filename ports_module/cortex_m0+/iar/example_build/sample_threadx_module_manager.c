@@ -40,7 +40,7 @@ UCHAR                   module_manager_stack[DEMO_STACK_SIZE];
 
 /* Define thread prototypes.  */
 
-void    module_manager_entry(ULONG thread_input);
+void    module_manager_entry(ALIGN_TYPE thread_input);
 
 
 /* Define fault handler.  */
@@ -81,7 +81,7 @@ CHAR    *pointer = (CHAR*)module_manager_stack;
 
 /* Define the test threads.  */
 
-void    module_manager_entry(ULONG thread_input)
+void    module_manager_entry(ALIGN_TYPE thread_input)
 {
 
     /* Initialize the module manager.   */

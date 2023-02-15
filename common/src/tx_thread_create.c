@@ -90,7 +90,7 @@
 /*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ULONG id), ULONG entry_input,
+UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ALIGN_TYPE id), ALIGN_TYPE entry_input,
                             VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                             ULONG time_slice, UINT auto_start)
 {

@@ -1222,7 +1222,7 @@ TX_THREAD      *p_thread;
 /*    GetTaskID returns the task id of the task currently running.        */
 /*    Calling GetTaskID is allowed from task level, ISR level and in      */
 /*    several hook routines. This service is intended to be used by       */
-/*    library functions and hook routines. If <TaskID> can’t be evaluated */
+/*    library functions and hook routines. If <TaskID> canï¿½t be evaluated */
 /*    (no task currently running), the service returns INVALID_TASK as    */
 /*    TaskType.                                                           */
 /*                                                                        */
@@ -1268,7 +1268,7 @@ TX_THREAD      *thread_ptr;
 
    if ((thread_ptr == TX_NULL) || (thread_ptr == &_tx_timer_thread))
    {
-       /* No task running TaskID can’t be evaluated return a special Error.  */
+       /* No task running TaskID canï¿½t be evaluated return a special Error.  */
        *TaskID = INVALID_TASK;
 
        return (E_OK);
@@ -7798,7 +7798,7 @@ UINT               index;
 /*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
-static void osek_system_timer_entry(ULONG input)
+static void osek_system_timer_entry(ALIGN_TYPE input)
 {
 TX_INTERRUPT_SAVE_AREA
 OSEK_COUNTER      *this_counter;

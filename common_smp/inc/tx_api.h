@@ -376,8 +376,8 @@ typedef struct TX_TIMER_INTERNAL_STRUCT
     ULONG               tx_timer_internal_re_initialize_ticks;
 
     /* Define the timeout function and timeout function parameter.  */
-    VOID                (*tx_timer_internal_timeout_function)(ULONG id);
-    ULONG               tx_timer_internal_timeout_param;
+    VOID                (*tx_timer_internal_timeout_function)(ALIGN_TYPE id);
+    ALIGN_TYPE          tx_timer_internal_timeout_param;
 
 
     /* Define the next and previous internal link pointers for active
@@ -512,8 +512,8 @@ typedef struct TX_THREAD_STRUCT
        is recompiled.  */
 
     /* Define the thread's entry point and input parameter.  */
-    VOID                (*tx_thread_entry)(ULONG id);
-    ULONG               tx_thread_entry_parameter;
+    VOID                (*tx_thread_entry)(ALIGN_TYPE id);
+    ALIGN_TYPE          tx_thread_entry_parameter;
 
     /* Define the thread's timer block.   This is used for thread
        sleep and timeout requests.  */
@@ -1752,7 +1752,7 @@ UINT        _txe_semaphore_put_notify(TX_SEMAPHORE *semaphore_ptr, VOID (*semaph
 VOID        _tx_thread_context_save(VOID);
 VOID        _tx_thread_context_restore(VOID);
 UINT        _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
-                VOID (*entry_function)(ULONG entry_input), ULONG entry_input,
+                VOID (*entry_function)(ALIGN_TYPE entry_input), ALIGN_TYPE entry_input,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start);
@@ -1789,7 +1789,7 @@ UINT        _tx_thread_wait_abort(TX_THREAD *thread_ptr);
    application.  */
 
 UINT        _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
-                VOID (*entry_function)(ULONG entry_input), ULONG entry_input,
+                VOID (*entry_function)(ALIGN_TYPE entry_input), ALIGN_TYPE entry_input,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start, UINT thread_control_block_size);
@@ -1816,7 +1816,7 @@ UINT        _txe_thread_wait_abort(TX_THREAD *thread_ptr);
 UINT        _tx_timer_activate(TX_TIMER *timer_ptr);
 UINT        _tx_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG reschedule_ticks);
 UINT        _tx_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr,
-                VOID (*expiration_function)(ULONG input), ULONG expiration_input,
+                VOID (*expiration_function)(ALIGN_TYPE input), ALIGN_TYPE expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate);
 UINT        _tx_timer_deactivate(TX_TIMER *timer_ptr);
 UINT        _tx_timer_delete(TX_TIMER *timer_ptr);
@@ -1837,7 +1837,7 @@ VOID        _tx_time_set(ULONG new_time);
 UINT        _txe_timer_activate(TX_TIMER *timer_ptr);
 UINT        _txe_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG reschedule_ticks);
 UINT        _txe_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr,
-                VOID (*expiration_function)(ULONG input), ULONG expiration_input,
+                VOID (*expiration_function)(ALIGN_TYPE input), ALIGN_TYPE expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size);
 UINT        _txe_timer_deactivate(TX_TIMER *timer_ptr);
 UINT        _txe_timer_delete(TX_TIMER *timer_ptr);

@@ -59,12 +59,12 @@ ULONG           thread_7_counter;
 
 /* Define thread prototypes.  */
 
-void    thread_0_entry(ULONG thread_input);
-void    thread_1_entry(ULONG thread_input);
-void    thread_2_entry(ULONG thread_input);
-void    thread_3_and_4_entry(ULONG thread_input);
-void    thread_5_entry(ULONG thread_input);
-void    thread_6_and_7_entry(ULONG thread_input);
+void    thread_0_entry(ALIGN_TYPE thread_input);
+void    thread_1_entry(ALIGN_TYPE thread_input);
+void    thread_2_entry(ALIGN_TYPE thread_input);
+void    thread_3_and_4_entry(ALIGN_TYPE thread_input);
+void    thread_5_entry(ALIGN_TYPE thread_input);
+void    thread_6_and_7_entry(ALIGN_TYPE thread_input);
 void    my_stack_error_handler(TX_THREAD *thread_ptr);
 void    my_timer_function(ULONG timer_input);
 
@@ -89,7 +89,7 @@ void    tx_application_define(void *first_unused_memory)
 CHAR    *pointer = TX_NULL;
 UINT    status;
 
-	/* Enable event tracing using the global “trace_buffer” memory and supporting
+	/* Enable event tracing using the global ï¿½trace_bufferï¿½ memory and supporting
    	   a maximum of TRACE_OBJECTS_COUNT ThreadX objects in the registry.  */
 	if ((status = tx_trace_enable(tx_trace_buffer, TRACE_BUFFER_SIZE, TRACE_OBJECTS_COUNT)) != TX_SUCCESS)
 	{
@@ -305,7 +305,7 @@ UINT    status;
 	}
 
     /* Create the periodic timer. */
-	status = tx_timer_create(&timer_0, "timer 0", my_timer_function, (ULONG) DEMO_TIMER_VALUE, DEMO_TIMER_PERIOD, DEMO_TIMER_PERIOD, TX_AUTO_ACTIVATE);
+	status = tx_timer_create(&timer_0, "timer 0", my_timer_function, (ALIGN_TYPE) DEMO_TIMER_VALUE, DEMO_TIMER_PERIOD, DEMO_TIMER_PERIOD, TX_AUTO_ACTIVATE);
 	if (status != TX_SUCCESS)
 	{
 		while (1);
@@ -316,7 +316,7 @@ UINT    status;
 
 /* Define the test threads.  */
 
-void    thread_0_entry(ULONG thread_input)
+void    thread_0_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -342,7 +342,7 @@ UINT    status;
 }
 
 
-void    thread_1_entry(ULONG thread_input)
+void    thread_1_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -368,7 +368,7 @@ UINT    status;
 }
 
 
-void    thread_2_entry(ULONG thread_input)
+void    thread_2_entry(ALIGN_TYPE thread_input)
 {
 
 ULONG   received_message;
@@ -395,7 +395,7 @@ UINT    status;
 }
 
 
-void    thread_3_and_4_entry(ULONG thread_input)
+void    thread_3_and_4_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -432,7 +432,7 @@ UINT    status;
 }
 
 
-void    thread_5_entry(ULONG thread_input)
+void    thread_5_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -457,7 +457,7 @@ ULONG   actual_flags;
 }
 
 
-void    thread_6_and_7_entry(ULONG thread_input)
+void    thread_6_and_7_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -517,7 +517,7 @@ void my_stack_error_handler(TX_THREAD *thread_ptr)
 }
 
 
-void my_timer_function(ULONG timer_input)
+void my_timer_function(ALIGN_TYPE timer_input)
 {
     /* Increment the thread counter.  */
     timer_0_counter++;

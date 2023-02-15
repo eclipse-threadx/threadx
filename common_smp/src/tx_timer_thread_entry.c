@@ -84,8 +84,8 @@ TX_TIMER_INTERNAL           *reactivate_timer;
 TX_TIMER_INTERNAL           *next_timer;
 TX_TIMER_INTERNAL           *previous_timer;
 TX_TIMER_INTERNAL           *current_timer;
-VOID                        (*timeout_function)(ULONG id);
-ULONG                       timeout_param =  ((ULONG) 0);
+VOID                        (*timeout_function)(ALIGN_TYPE id);
+ALIGN_TYPE                  timeout_param =  ((ALIGN_TYPE) 0);
 TX_THREAD                   *thread_ptr;
 #ifdef TX_REACTIVATE_INLINE
 TX_TIMER_INTERNAL           **timer_list;               /* Timer list pointer           */

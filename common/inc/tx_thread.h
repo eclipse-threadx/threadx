@@ -137,7 +137,7 @@
 
 #ifndef TX_THREAD_CREATE_TIMEOUT_SETUP
 #define TX_THREAD_CREATE_TIMEOUT_SETUP(t)    (t) -> tx_thread_timer.tx_timer_internal_timeout_function =  &(_tx_thread_timeout);                \
-                                             (t) -> tx_thread_timer.tx_timer_internal_timeout_param =     TX_POINTER_TO_ULONG_CONVERT((t));
+                                             (t) -> tx_thread_timer.tx_timer_internal_timeout_param =     TX_POINTER_TO_ALIGN_TYPE_CONVERT((t));
 #endif
 
 
