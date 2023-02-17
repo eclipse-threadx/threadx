@@ -57,7 +57,7 @@ disableGIC:
 
   // Get base address of private peripheral space
   MRC     p15, 4, r0, c15, c0, 0  // Read periph base address
-  ADD     r0, r0, #0x1000         // Add the GIC offset
+  ADD     r0, r0, #0x1000         // Add the GIC Interrupt distributor offset
 
   LDR     r1, [r0]                // Read the GIC Enable Register  (ICDDCR)
   BIC     r1, r1, #0x01           // Clear bit 0, the enable bit
