@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                         Cortex-M55/GNU    */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -76,8 +76,8 @@
 /*                                            macro to port-specific,     */
 /*                                            described BASEPRI usage,    */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx      Scott Larson            Removed unneeded #include,    */
-/*                                            resulting in version 6.x    */
+/*  03-08-2023      Scott Larson            Removed unneeded #include,    */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -646,7 +646,7 @@ VOID                                            _tx_thread_interrupt_restore(UIN
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX Cortex-M55/GNU Version 6.1.12 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX Cortex-M55/GNU Version 6.2.1 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

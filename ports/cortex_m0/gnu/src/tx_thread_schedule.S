@@ -42,7 +42,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_schedule                               Cortex-M0/GNU     */
-@/*                                                           6.x          */
+@/*                                                           6.2.1        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -81,8 +81,8 @@
 @/*  03-02-2021     Scott Larson            Modified comment(s), add       */
 @/*                                           low power code,              */
 @/*                                           resulting in version 6.1.5   */
-@/*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
-@/*                                            resulting in version 6.x    */
+@/*  03-08-2023      Scott Larson            Include tx_user.h,            */
+@/*                                            resulting in version 6.2.1  */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_schedule(VOID)

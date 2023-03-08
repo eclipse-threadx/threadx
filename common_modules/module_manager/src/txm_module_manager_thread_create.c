@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_thread_create                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -91,9 +91,9 @@
 /*                                            added 64-bit support,       */
 /*                                            added SMP support,          */
 /*                                            resulting in version 6.1.3  */
-/*  xx-xx-xxxx      Scott Larson            Check module stack for        */
+/*  03-08-2023      Scott Larson            Check module stack for        */
 /*                                            overlap,                    */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,

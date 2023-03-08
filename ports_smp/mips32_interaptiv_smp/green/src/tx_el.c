@@ -56,7 +56,7 @@ UINT                _tx_thread_interrupt_control(UINT new_posture);
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_initialize                                  PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -88,7 +88,7 @@ UINT                _tx_thread_interrupt_control(UINT new_posture);
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_initialize(VOID)
@@ -223,7 +223,7 @@ UINT    i;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_thread_register                             PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -254,7 +254,7 @@ UINT    i;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_el_thread_register(TX_THREAD *thread_ptr)
@@ -328,7 +328,7 @@ UINT    i;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_thread_unregister                           PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -359,7 +359,7 @@ UINT    i;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_el_thread_unregister(TX_THREAD *thread_ptr)
@@ -442,7 +442,7 @@ UINT    i, j;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_user_event_insert                           PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -476,7 +476,7 @@ UINT    i, j;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_user_event_insert(UINT sub_type, ULONG info_1, ULONG info_2,
@@ -565,7 +565,7 @@ UCHAR   *entry_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_thread_running                              PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -597,7 +597,7 @@ UCHAR   *entry_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_thread_running(TX_THREAD *thread_ptr)
@@ -665,7 +665,7 @@ UCHAR   *entry_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_thread_preempted                            PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -699,7 +699,7 @@ UCHAR   *entry_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_thread_preempted(TX_THREAD *thread_ptr)
@@ -768,7 +768,7 @@ UCHAR   *entry_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_interrupt                                   PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -799,7 +799,7 @@ UCHAR   *entry_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_interrupt(UINT interrupt_number)
@@ -872,7 +872,7 @@ UCHAR   *entry_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_interrupt_end                               PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -903,7 +903,7 @@ UCHAR   *entry_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_interrupt_end(UINT interrupt_number)
@@ -976,7 +976,7 @@ UCHAR   *entry_ptr;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_interrupt_control                           PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1006,7 +1006,7 @@ UCHAR   *entry_ptr;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_el_interrupt_control(UINT new_posture)
@@ -1034,7 +1034,7 @@ UINT    old_posture;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_event_log_on                                PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1063,7 +1063,7 @@ UINT    old_posture;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_event_log_on(void)
@@ -1079,7 +1079,7 @@ VOID  _tx_el_event_log_on(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_event_log_off                               PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1109,7 +1109,7 @@ VOID  _tx_el_event_log_on(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_event_log_off(void)
@@ -1125,7 +1125,7 @@ VOID  _tx_el_event_log_off(void)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_el_event_log_set                               PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -1154,7 +1154,7 @@ VOID  _tx_el_event_log_off(void)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      William E. Lamie        Initial Version 6.x           */
+/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_event_filter_set(UINT filter)

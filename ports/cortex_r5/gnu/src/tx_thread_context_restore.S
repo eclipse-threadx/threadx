@@ -19,17 +19,10 @@
 @/**                                                                       */
 @/**************************************************************************/
 @/**************************************************************************/
-@
-@
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_thread.h"
-@#include "tx_timer.h"
-@
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
     .arm
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
@@ -141,7 +134,7 @@ _tx_thread_context_restore:
 __tx_thread_not_nested_restore:
 @
 @    /* Determine if a thread was interrupted and no preemption is required.  */
-@    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr) 
+@    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr))
 @               || (_tx_thread_preempt_disable))
 @    {
 @

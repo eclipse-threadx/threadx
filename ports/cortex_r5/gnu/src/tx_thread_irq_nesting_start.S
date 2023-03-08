@@ -19,17 +19,10 @@
 @/**                                                                       */
 @/**************************************************************************/
 @/**************************************************************************/
-@
-@
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_thread.h"
-@
-@
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
 IRQ_DISABLE     =       0x80                    @ IRQ disable bit
 MODE_MASK       =       0x1F                    @ Mode mask
 SYS_MODE_BITS   =       0x1F                    @ System mode bits

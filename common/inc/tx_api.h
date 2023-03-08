@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -94,6 +94,9 @@
 /*                                            update EPK typedef,         */
 /*                                            update version numbers,     */
 /*                                            resulting in version 6.2.0  */
+/*  03-08-2023      Tiejun Zhou             Modified comment(s),          */
+/*                                            update patch number,        */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -133,7 +136,7 @@ extern   "C" {
 #define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
 #define THREADX_MINOR_VERSION           2
-#define THREADX_PATCH_VERSION           0
+#define THREADX_PATCH_VERSION           1
 
 /* Define the following symbol for backward compatibility */
 #define EL_PRODUCT_THREADX

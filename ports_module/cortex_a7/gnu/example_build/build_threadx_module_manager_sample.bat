@@ -1,0 +1,8 @@
+arm-none-eabi-gcc -c -g -O0 -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 -marm -mthumb-interwork -DTX_ENABLE_VFP_SUPPORT tx_initialize_low_level.S
+arm-none-eabi-gcc -c -g -O0 -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 -marm -mthumb-interwork -DTX_ENABLE_VFP_SUPPORT -I../inc -I../../../../common/inc -I../../../../common_modules/inc -I../../../../common_modules/module_manager/inc sample_threadx_module_manager.c
+arm-none-eabi-gcc -c -g -O0 -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 -marm -mthumb-interwork -DTX_ENABLE_VFP_SUPPORT module_code.c
+arm-none-eabi-gcc -c -g -O0 -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 -marm -mthumb-interwork -DTX_ENABLE_VFP_SUPPORT reset.S
+arm-none-eabi-gcc -c -g -O0 -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 -marm -mthumb-interwork -DTX_ENABLE_VFP_SUPPORT crt0.S
+rem arm-none-eabi-gcc -g --elf --ro 0x80000000 --first tx_initialize_low_level.o(VECTORS) --remove --map --symbols --list sample_threadx_module_manager.map tx_initialize_low_level.o sample_threadx_module_manager.o module_code.o tx.a
+rem arm-none-eabi-ld -A cortex-a7 -ereset_handler -T sample_threadx.ld tx_initialize_low_level.o module_code.o sample_threadx_module_manager.o tx.a  libc.a -o sample_threadx_module_manager.axf -M > sample_threadx_module_manager.map
+arm-none-eabi-gcc -g -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 -marm -mthumb-interwork -T sample_threadx.ld --specs=nosys.specs -o sample_threadx_module_manager.out -Wl,-Map=sample_threadx_module_manager.map module_code.o tx_initialize_low_level.o sample_threadx_module_manager.o tx.a

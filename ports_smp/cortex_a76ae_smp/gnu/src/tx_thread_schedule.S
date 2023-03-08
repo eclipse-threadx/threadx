@@ -28,7 +28,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                                ARMv8-A-SMP      */
-/*                                                           6.1.10       */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -63,8 +63,11 @@
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  01-31-2022     Andres Mlinar            Updated comments,             */
-/*                                             added ARMv8.2-A support,   */
+/*                                            added ARMv8.2-A support,    */
 /*                                            resulting in version 6.1.10 */
+/*  03-08-2023     Cindy Deng               Updated comment(s),           */
+/*                                            added memory barrier,       */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -165,7 +168,7 @@ _tx_thread_ready_for_execution:
 
     LDR     x2, =_tx_thread_current_ptr         // Pickup address of current thread
     STR     x0, [x2, x20, LSL #3]               // Setup current thread pointer
-
+    DMB     ISH
     LDR     x1, [x1, x20, LSL #3]               // Reload the execute pointer
     CMP     w0, w1                              // Did it change?
     BEQ     _execute_pointer_did_not_change     // If not, skip handling

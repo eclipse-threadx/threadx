@@ -20,6 +20,8 @@
 /**************************************************************************/
 /**************************************************************************/
 
+#include "tx_user.h"
+
     .global _tx_timer_time_slice
     .global _tx_timer_system_clock
     .global _tx_timer_current_ptr
@@ -38,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_timer_interrupt                              Cortex-M7/GNU      */
-/*                                                           6.1.10       */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -75,6 +77,8 @@
 /*  01-31-2022      Scott Larson            Modified comment(s), added    */
 /*                                            TX_NO_TIMER support,        */
 /*                                            resulting in version 6.1.10 */
+/*  03-08-2023      Scott Larson            Include tx_user.h,            */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)

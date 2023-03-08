@@ -31,7 +31,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_interrupt_control                      Cortex-M0/AC6     */
-@/*                                                           6.x          */
+@/*                                                           6.2.1        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -62,8 +62,8 @@
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-@/*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
-@/*                                            resulting in version 6.x    */
+@/*  03-08-2023      Scott Larson            Include tx_user.h,            */
+@/*                                            resulting in version 6.2.1  */
 @/*                                                                        */
 @/**************************************************************************/
 @/* UINT   _tx_thread_interrupt_control(UINT new_posture)

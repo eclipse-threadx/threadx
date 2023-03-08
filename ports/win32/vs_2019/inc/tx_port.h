@@ -419,7 +419,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Win32/Visual Studio Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Win32/Visual Studio Version 6.2.1 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
@@ -434,7 +434,7 @@ extern ULONG                                    _tx_win32_global_int_disabled_fl
 extern LARGE_INTEGER                            _tx_win32_time_stamp;
 extern ULONG                                    _tx_win32_system_error;
 extern HANDLE                                   _tx_win32_timer_handle;
-extern DWORD                                    _tx_win32_timer_id;
+extern UINT                                     _tx_win32_timer_id;
 extern LARGE_INTEGER                            _tx_win32_time_stamp;
 
 
@@ -443,7 +443,7 @@ extern LARGE_INTEGER                            _tx_win32_time_stamp;
 #endif
 
 #ifndef TX_TIMER_PERIODIC
-#define TX_TIMER_PERIODIC                       18
+#define TX_TIMER_PERIODIC                       10
 #endif
 
 #endif

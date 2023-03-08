@@ -1,6 +1,7 @@
     .text
     .align 4
     .syntax unified
+    .section .preamble
 
     /* Define public symbols.  */
     .global __txm_module_preamble

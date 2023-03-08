@@ -545,7 +545,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation * ThreadX Linux/gcc Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation * ThreadX Linux/gcc Version 6.2.1 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

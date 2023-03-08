@@ -27,7 +27,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_secure_stack_initialize                Cortex-M85/GNU    */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -61,8 +61,8 @@
 /*                                            secure stack initialization */
 /*                                            macro to port-specific,     */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
-/*                                            resulting in version 6.x    */
+/*  03-08-2023      Scott Larson            Include tx_user.h,            */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_secure_stack_initialize(VOID)

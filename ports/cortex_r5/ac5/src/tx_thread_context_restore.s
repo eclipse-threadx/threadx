@@ -140,7 +140,7 @@ _tx_thread_context_restore
 __tx_thread_not_nested_restore
 ;
 ;    /* Determine if a thread was interrupted and no preemption is required.  */
-;    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr) 
+;    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr))
 ;               || (_tx_thread_preempt_disable))
 ;    {
 ;

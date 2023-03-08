@@ -295,7 +295,7 @@ file, which is included in your distribution. The following details the revision
 information associated with this specific port of ThreadX:
 
 
-xx-xx-xxxx  Initial ThreadX version 6.x of MIPS32_interAptiv VPE/Green Hills port. 
+03-08-2023  Initial ThreadX version 6.2.1 of MIPS32_interAptiv VPE/Green Hills port. 
 
 
 Copyright(c) 1996-2020 Microsoft Corporation

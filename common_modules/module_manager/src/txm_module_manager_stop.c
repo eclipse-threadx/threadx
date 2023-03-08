@@ -64,7 +64,7 @@ extern UINT  _txm_module_manager_usbx_stop(TXM_MODULE_INSTANCE *module_instance)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_stop                            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -116,8 +116,8 @@ extern UINT  _txm_module_manager_usbx_stop(TXM_MODULE_INSTANCE *module_instance)
 /*  03-02-2021      Scott Larson            Modified comments, fix        */
 /*                                            object delete underflow,    */
 /*                                            resulting in version 6.1.5  */
-/*  xx-xx-xxxx      Scott Larson            Added tx_trace.h include,     */
-/*                                            resulting in version 6.x    */
+/*  03-08-2023      Scott Larson            Added tx_trace.h include,     */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_stop(TXM_MODULE_INSTANCE *module_instance)

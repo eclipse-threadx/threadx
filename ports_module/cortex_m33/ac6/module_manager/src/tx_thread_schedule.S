@@ -30,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                               Cortex-M33/AC6    */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -77,8 +77,8 @@
 /*                                            resulting in version 6.1.12 */
 /*  10-31-2022      Scott Larson            Added low power support,      */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx      Scott Larson            Added preproc FPU option,     */
-/*                                            resulting in version 6.x    */
+/*  03-08-2023      Scott Larson            Added preproc FPU option,     */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)

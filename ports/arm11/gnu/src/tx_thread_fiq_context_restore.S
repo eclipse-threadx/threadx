@@ -19,18 +19,10 @@
 @/**                                                                       */
 @/**************************************************************************/
 @/**************************************************************************/
-@
-@
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_thread.h"
-@#include "tx_timer.h"
-@
-@
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
 SVC_MODE        =       0xD3                    @ SVC mode
 FIQ_MODE        =       0xD1                    @ FIQ mode
 DISABLE_INTS    =       0xC0                    @ Disable IRQ/FIQ interrupts
@@ -61,7 +53,7 @@ SVC_MODE_BITS   =       0x13                    @ SVC mode value
 @/*  FUNCTION                                               RELEASE        */ 
 @/*                                                                        */ 
 @/*    _tx_thread_fiq_context_restore                      ARM11/GNU       */ 
-@/*                                                            6.1         */
+@/*                                                            6.2.1       */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -94,6 +86,9 @@ SVC_MODE_BITS   =       0x13                    @ SVC mode value
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
+@/*                                            #include tx_user.h,         */
+@/*                                            resulting in version 6.2.1  */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_fiq_context_restore(VOID)
@@ -140,7 +135,7 @@ _tx_thread_fiq_context_restore:
 __tx_thread_fiq_not_nested_restore:
 @
 @    /* Determine if a thread was interrupted and no preemption is required.  */
-@    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr) 
+@    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr))
 @               || (_tx_thread_preempt_disable))
 @    {
 @

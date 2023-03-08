@@ -18,6 +18,9 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .equ    BTA, 0x412
 
@@ -26,7 +29,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_context_restore                        ARC_HS/MetaWare   */
-;/*                                                           6.1.9        */
+;/*                                                           6.2.1        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -63,6 +66,9 @@
 ;/*                                            r25/r30 are caller saved,   */
 ;/*                                            use schedule_reenter,       */
 ;/*                                            resulting in version 6.1.9  */
+;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
+;/*                                            #include tx_user.h,         */
+;/*                                            resulting in version 6.2.1  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)

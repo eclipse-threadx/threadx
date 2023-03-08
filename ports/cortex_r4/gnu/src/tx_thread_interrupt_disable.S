@@ -19,16 +19,10 @@
 @/**                                                                       */
 @/**************************************************************************/
 @/**************************************************************************/
-@
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_thread.h"
-@
-@
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
 @/* Define the 16-bit Thumb mode veneer for _tx_thread_interrupt_disable for
 @   applications calling this function from to 16-bit Thumb mode.  */
 @

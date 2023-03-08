@@ -18,6 +18,9 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .equ    BTA, 0x412
     .equ    KSTACK_TOP,     0x264
@@ -29,7 +32,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                             ARCv2_EM/MetaWare   */
-;/*                                                           6.1.9        */
+;/*                                                           6.2.1        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */

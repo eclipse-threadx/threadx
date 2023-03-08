@@ -19,16 +19,10 @@
 @/**                                                                       */
 @/**************************************************************************/
 @/**************************************************************************/
-@
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_thread.h"
-@
-@
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
 @/* Define the 16-bit Thumb mode veneer for _tx_thread_interrupt_restore for
 @   applications calling this function from to 16-bit Thumb mode.  */
 @
@@ -53,7 +47,7 @@ $_tx_thread_interrupt_restore:
 @/*  FUNCTION                                               RELEASE        */ 
 @/*                                                                        */ 
 @/*    _tx_thread_interrupt_restore                         ARM9/GNU       */ 
-@/*                                                           6.1          */
+@/*                                                           6.2.1        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -84,6 +78,9 @@ $_tx_thread_interrupt_restore:
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
+@/*                                            #include tx_user.h,         */
+@/*                                            resulting in version 6.2.1  */
 @/*                                                                        */
 @/**************************************************************************/
 @UINT   _tx_thread_interrupt_restore(UINT old_posture)

@@ -18,6 +18,9 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .equ    BTA, 0x412
 
@@ -26,7 +29,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_schedule                               ARC_HS/MetaWare   */
-;/*                                                           6.1.9        */
+;/*                                                           6.2.1        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -63,6 +66,9 @@
 ;/*  10-15-2021     Andres Mlinar            Modified comment(s),          */
 ;/*                                            use schedule reenter,       */
 ;/*                                            resulting in version 6.1.9  */
+;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
+;/*                                            #include tx_user.h,         */
+;/*                                            resulting in version 6.2.1  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)

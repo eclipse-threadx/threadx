@@ -19,6 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
 /* Define the 16-bit Thumb mode veneer for _tx_thread_interrupt_disable for
    applications calling this function from to 16-bit Thumb mode.  */
@@ -76,6 +79,9 @@ $_tx_thread_interrupt_disable:
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  03-08-2023      Cindy Deng              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
     .global _tx_thread_interrupt_disable

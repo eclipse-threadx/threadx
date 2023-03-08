@@ -18,6 +18,9 @@
 ;/**                                                                       */
 ;/**************************************************************************/
 ;/**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .equ    BTA, 0x412
     .equ    KSTACK_TOP,     0x264
@@ -29,7 +32,7 @@
 ;/*  FUNCTION                                               RELEASE        */
 ;/*                                                                        */
 ;/*    _tx_thread_context_restore                      ARCv2_EM/MetaWare   */
-;/*                                                           6.1.9        */
+;/*                                                           6.2.1        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -69,6 +72,9 @@
 ;/*                                            support for disabling the   */
 ;/*                                            loop control feature,       */
 ;/*                                            resulting in version 6.1.9  */
+;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
+;/*                                            #include tx_user.h,         */
+;/*                                            resulting in version 6.2.1  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)

@@ -336,7 +336,7 @@ VOID  tx_thread_register_bank_assign(VOID *thread_ptr, UINT register_bank);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARC_HS/MetaWare Version 6.1.10 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARC_HS/MetaWare Version 6.2.1 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

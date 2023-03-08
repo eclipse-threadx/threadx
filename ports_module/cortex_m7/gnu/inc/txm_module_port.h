@@ -25,8 +25,8 @@
 /*                                                                        */
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
-/*    txm_module_port.h                                 Cortex-M7/GNU     */
-/*                                                           6.1.12       */
+/*    txm_module_port.h                                   Cortex-M7       */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -41,9 +41,18 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
+/*  01-31-2022      Scott Larson            Modified comments and made    */
+/*                                            heap user-configurable,     */
+/*                                            resulting in version 6.1.10 */
 /*  07-29-2022      Scott Larson            Enabled user-defined and      */
 /*                                            default MPU settings,       */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022      Scott Larson            Configure heap size,          */
+/*                                            resulting in version 6.2.0  */
+/*  03-08-2023      Scott Larson            Set default values for RBAR,  */
+/*                                            unify this file for all     */
+/*                                            compilers,                  */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -65,6 +74,22 @@
   following extensions to the ThreadX thread control block (this code should replace
   the corresponding macro define in tx_port.h):
 
+#ifdef TX_ENABLE_IAR_LIBRARY_SUPPORT
+#define TX_THREAD_EXTENSION_2               VOID    *tx_thread_module_instance_ptr;         \
+                                            VOID    *tx_thread_module_entry_info_ptr;       \
+                                            ULONG   tx_thread_module_current_user_mode;     \
+                                            ULONG   tx_thread_module_user_mode;             \
+                                            ULONG   tx_thread_module_saved_lr;              \
+                                            VOID    *tx_thread_module_kernel_stack_start;   \
+                                            VOID    *tx_thread_module_kernel_stack_end;     \
+                                            ULONG   tx_thread_module_kernel_stack_size;     \
+                                            VOID    *tx_thread_module_stack_ptr;            \
+                                            VOID    *tx_thread_module_stack_start;          \
+                                            VOID    *tx_thread_module_stack_end;            \
+                                            ULONG   tx_thread_module_stack_size;            \
+                                            VOID    *tx_thread_module_reserved;             \
+                                            VOID    *tx_thread_iar_tls_pointer;
+#else
 #define TX_THREAD_EXTENSION_2               VOID    *tx_thread_module_instance_ptr;         \
                                             VOID    *tx_thread_module_entry_info_ptr;       \
                                             ULONG   tx_thread_module_current_user_mode;     \
@@ -78,6 +103,7 @@
                                             VOID    *tx_thread_module_stack_end;            \
                                             ULONG   tx_thread_module_stack_size;            \
                                             VOID    *tx_thread_module_reserved;
+#endif
 
 The following extensions must also be defined in tx_port.h:
 
@@ -93,6 +119,11 @@ The following extensions must also be defined in tx_port.h:
 #define TX_TIMER_EXTENSION                      VOID    *tx_timer_module_instance; \
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 */
+
+/* Users can define the module heap size. */
+#ifndef TXM_MODULE_HEAP_SIZE
+#define TXM_MODULE_HEAP_SIZE                    512
+#endif
 
 /* Define the kernel stack size for a module thread.  */
 #ifndef TXM_MODULE_KERNEL_STACK_SIZE
@@ -115,14 +146,15 @@ The following extensions must also be defined in tx_port.h:
 #endif
 
 /* For Cortex-M devices with 16 MPU regions, the last four regions (12-15)
-   are not used by ThreadX. These may be defined by the user.  */
-#define TXM_MODULE_MPU_USER_DEFINED_RBAR_12     0
+   are not used by ThreadX. These may be defined by the user.
+   RBAR needs the valid bit and region number set, as MPU alias registers are used.  */
+#define TXM_MODULE_MPU_USER_DEFINED_RBAR_12     0x1C
 #define TXM_MODULE_MPU_USER_DEFINED_RASR_12     0
-#define TXM_MODULE_MPU_USER_DEFINED_RBAR_13     0
+#define TXM_MODULE_MPU_USER_DEFINED_RBAR_13     0x1D
 #define TXM_MODULE_MPU_USER_DEFINED_RASR_13     0
-#define TXM_MODULE_MPU_USER_DEFINED_RBAR_14     0
+#define TXM_MODULE_MPU_USER_DEFINED_RBAR_14     0x1E
 #define TXM_MODULE_MPU_USER_DEFINED_RASR_14     0
-#define TXM_MODULE_MPU_USER_DEFINED_RBAR_15     0
+#define TXM_MODULE_MPU_USER_DEFINED_RBAR_15     0x1F
 #define TXM_MODULE_MPU_USER_DEFINED_RASR_15     0
 
 
@@ -133,38 +165,39 @@ The following extensions must also be defined in tx_port.h:
    and the defines below are not used.
 
    If TXM_MODULE_MPU_DEFAULT is defined, the MPU is configured to the
-   below values when a thread that is not owned by a module is running.  */
-#define TXM_MODULE_MPU_DEFAULT_RBAR_0           0
+   below values when a thread that is not owned by a module is running.
+   RBAR needs the valid bit and region number set, as MPU alias registers are used.  */
+#define TXM_MODULE_MPU_DEFAULT_RBAR_0           0x10
 #define TXM_MODULE_MPU_DEFAULT_RASR_0           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_1           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_1           0x11
 #define TXM_MODULE_MPU_DEFAULT_RASR_1           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_2           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_2           0x12
 #define TXM_MODULE_MPU_DEFAULT_RASR_2           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_3           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_3           0x13
 #define TXM_MODULE_MPU_DEFAULT_RASR_3           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_4           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_4           0x14
 #define TXM_MODULE_MPU_DEFAULT_RASR_4           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_5           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_5           0x15
 #define TXM_MODULE_MPU_DEFAULT_RASR_5           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_6           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_6           0x16
 #define TXM_MODULE_MPU_DEFAULT_RASR_6           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_7           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_7           0x17
 #define TXM_MODULE_MPU_DEFAULT_RASR_7           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_8           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_8           0x18
 #define TXM_MODULE_MPU_DEFAULT_RASR_8           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_9           0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_9           0x19
 #define TXM_MODULE_MPU_DEFAULT_RASR_9           0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_10          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_10          0x1A
 #define TXM_MODULE_MPU_DEFAULT_RASR_10          0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_11          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_11          0x1B
 #define TXM_MODULE_MPU_DEFAULT_RASR_11          0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_12          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_12          0x1C
 #define TXM_MODULE_MPU_DEFAULT_RASR_12          0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_13          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_13          0x1D
 #define TXM_MODULE_MPU_DEFAULT_RASR_13          0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_14          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_14          0x1E
 #define TXM_MODULE_MPU_DEFAULT_RASR_14          0
-#define TXM_MODULE_MPU_DEFAULT_RBAR_15          0
+#define TXM_MODULE_MPU_DEFAULT_RBAR_15          0x1F
 #define TXM_MODULE_MPU_DEFAULT_RASR_15          0
 
 
@@ -218,24 +251,16 @@ The following extensions must also be defined in tx_port.h:
 
 /* Define other module port-specific constants.  */
 
-/* Define INLINE_DECLARE to inline for GNU compiler.  */
-
+/* Define INLINE_DECLARE to inline for this compiler.  */
 #define INLINE_DECLARE inline
 
-#ifdef TXM_MODULE_MANAGER_16_MPU
+#define TXM_MPU_VALID_BIT                           0x10
+#define TXM_ENABLE_REGION                           0x01
+#define TXM_MODULE_MANAGER_MPU_KERNEL_ENTRY_INDEX   0
 
-/* Define the number of MPU entries assigned to the code and data sections.
-   On some Cortex-M7 parts, there are 16 total entries. ThreadX uses one for access
-   to the kernel entry function, thus 15 remain for code and data protection.  */
-#define TXM_MODULE_MPU_TOTAL_ENTRIES        16
-#define TXM_MODULE_MPU_CODE_ENTRIES         4
-#define TXM_MODULE_MPU_DATA_ENTRIES         4
-#define TXM_MODULE_MPU_SHARED_ENTRIES       3
-
-#define TXM_MODULE_MPU_KERNEL_ENTRY_INDEX   0
-#define TXM_MODULE_MPU_SHARED_INDEX         9
-
-#define TXM_ENABLE_REGION                   0x01
+/* Shared memory region attributes.  */
+#define TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE   1
+#define TXM_MODULE_MANAGER_ATTRIBUTE_WRITE_MPU_BIT  0x01000000
 
 /* There are 2 registers to set up each MPU region: MPU_RBAR, MPU_RASR.  */
 typedef struct TXM_MODULE_MPU_INFO_STRUCT
@@ -243,44 +268,50 @@ typedef struct TXM_MODULE_MPU_INFO_STRUCT
     ULONG   txm_module_mpu_region_address;
     ULONG   txm_module_mpu_region_attribute_size;
 } TXM_MODULE_MPU_INFO;
-/* Shared memory region attributes.  */
-#define TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE   1
-#define TXM_MODULE_MANAGER_ATTRIBUTE_WRITE_MPU_BIT  0x01000000
+
+
+#ifdef TXM_MODULE_MANAGER_16_MPU
+
+/* Define the number of MPU entries assigned to the code and data sections.
+   On some Cortex-M7 parts, there are 16 total entries. ThreadX uses one for access
+   to the kernel entry function, thus 15 remain for code and data protection.  */
+#define TXM_MODULE_MANAGER_MPU_TOTAL_ENTRIES        16
+#define TXM_MODULE_MANAGER_MPU_CODE_ENTRIES         4
+#define TXM_MODULE_MANAGER_MPU_DATA_ENTRIES         4
+#define TXM_MODULE_MANAGER_MPU_SHARED_ENTRIES       3
+#define TXM_MODULE_MANAGER_MPU_SHARED_INDEX         9
+#define TXM_MODULE_MANAGER_MPU_USER_REGION_INDEX    12
+
 
 /* Define the port-extensions to the module manager instance structure.  */
 
-#define TXM_MODULE_MANAGER_PORT_EXTENSION                                                               \
-    TXM_MODULE_MPU_INFO     txm_module_instance_mpu_registers[TXM_MODULE_MPU_TOTAL_ENTRIES];            \
-    ULONG                   txm_module_instance_shared_memory_count;                                    \
-    ULONG                   txm_module_instance_shared_memory_address[TXM_MODULE_MPU_SHARED_ENTRIES];   \
-    ULONG                   txm_module_instance_shared_memory_length[TXM_MODULE_MPU_SHARED_ENTRIES];
+#define TXM_MODULE_MANAGER_PORT_EXTENSION                                                                       \
+    TXM_MODULE_MPU_INFO     txm_module_instance_mpu_registers[TXM_MODULE_MANAGER_MPU_TOTAL_ENTRIES];            \
+    ULONG                   txm_module_instance_shared_memory_count;                                            \
+    ULONG                   txm_module_instance_shared_memory_address[TXM_MODULE_MANAGER_MPU_SHARED_ENTRIES];   \
+    ULONG                   txm_module_instance_shared_memory_length[TXM_MODULE_MANAGER_MPU_SHARED_ENTRIES];
 
 #else   /* TXM_MODULE_MANAGER_16_MPU is not defined */
 
 /* Define the number of MPU entries assigned to the code and data sections.
    On Cortex-M3, M4, and some M7 parts, there are 8 total entries. ThreadX uses one for access
    to the kernel entry function, thus 7 remain for code and data protection.  */
-#define TXM_MODULE_MANAGER_CODE_MPU_ENTRIES     4
-#define TXM_MODULE_MANAGER_DATA_MPU_ENTRIES     3
-#define TXM_MODULE_MANAGER_SHARED_MPU_INDEX     8
-#define TXM_MODULE_MANAGER_SHARED_MPU_REGION    4
-
-/* Shared memory region attributes.  */
-#define TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE   1
-#define TXM_MODULE_MANAGER_ATTRIBUTE_WRITE_MPU_BIT  0x01000000
+#define TXM_MODULE_MANAGER_MPU_TOTAL_ENTRIES        8
+#define TXM_MODULE_MANAGER_CODE_MPU_ENTRIES         4
+#define TXM_MODULE_MANAGER_DATA_MPU_ENTRIES         3
+#define TXM_MODULE_MANAGER_SHARED_MPU_REGION        4
 
 /* Define the port-extensions to the module manager instance structure.  */
 
-#define TXM_MODULE_MANAGER_PORT_EXTENSION                                           \
-    ULONG               txm_module_instance_mpu_registers[16];                      \
-    ULONG               txm_module_instance_shared_memory_address;                  \
-    ULONG               txm_module_instance_shared_memory_length;
+#define TXM_MODULE_MANAGER_PORT_EXTENSION                                                               \
+    TXM_MODULE_MPU_INFO     txm_module_instance_mpu_registers[TXM_MODULE_MANAGER_MPU_TOTAL_ENTRIES];    \
+    ULONG                   txm_module_instance_shared_memory_address;                                  \
+    ULONG                   txm_module_instance_shared_memory_length;
 
 #endif  /* TXM_MODULE_MANAGER_16_MPU */
 
+
 /* Define the memory fault information structure that is populated when a memory fault occurs.  */
-
-
 typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 {
     TX_THREAD           *txm_module_manager_memory_fault_info_thread_ptr;
@@ -433,6 +464,6 @@ UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M7/GNU Version 6.1.12 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M7 Version 6.2.1 *";
 
 #endif

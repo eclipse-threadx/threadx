@@ -19,6 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
 DISABLE_INTS    =       0xC0                    // Disable IRQ/FIQ interrupts
@@ -82,6 +85,9 @@ FIQ_MODE_BITS   =       0x11                    // FIQ mode bits
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  03-08-2023      Cindy Deng              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_fiq_nesting_end

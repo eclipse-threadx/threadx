@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                             MIPS32_interAptiv/Green Hills */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,7 +47,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx      Scott Larson            Initial release version 6.x   */
+/*  03-08-2023      Scott Larson            Initial release version 6.2.1 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -515,7 +515,7 @@ THREAD_SMP_DECLARE ULONG    _tx_thread_smp_initial_fpu_control_register;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX SMP MIPS32_interAptiv/Green Hills Version 6.x *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX SMP MIPS32_interAptiv/Green Hills Version 6.2.1 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

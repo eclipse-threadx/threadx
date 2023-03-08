@@ -19,16 +19,10 @@
 @/**                                                                       */
 @/**************************************************************************/
 @/**************************************************************************/
-@
-@#define TX_SOURCE_CODE
-@
-@
-@/* Include necessary system files.  */
-@
-@#include "tx_api.h"
-@#include "tx_thread.h"
-@
-@
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
 #ifdef TX_ENABLE_FIQ_SUPPORT
 DISABLE_INTS    =           0xC0                @ IRQ & FIQ interrupts disabled
 #else
@@ -60,7 +54,7 @@ $_tx_thread_interrupt_disable:
 @/*  FUNCTION                                               RELEASE        */ 
 @/*                                                                        */ 
 @/*    _tx_thread_interrupt_disable                         ARM9/GNU       */ 
-@/*                                                           6.1          */
+@/*                                                           6.2.1        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -90,6 +84,9 @@ $_tx_thread_interrupt_disable:
 @/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
 @/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
+@/*                                            #include tx_user.h,         */
+@/*                                            resulting in version 6.2.1  */
 @/*                                                                        */
 @/**************************************************************************/
 @UINT   _tx_thread_interrupt_disable(void)

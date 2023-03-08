@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_external_memory_enable          Cortex-M4       */
-/*                                                           6.1.9        */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -71,6 +71,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
+/*  03-08-2023      Scott Larson            Update defines,               */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_external_memory_enable(TXM_MODULE_INSTANCE *module_instance,
@@ -125,7 +127,7 @@ ULONG   attributes_check = 0;
     }
     
     /* Determine if there are shared memory entries available.  */
-    if(module_instance -> txm_module_instance_shared_memory_count >= TXM_MODULE_MPU_SHARED_ENTRIES)
+    if(module_instance -> txm_module_instance_shared_memory_count >= TXM_MODULE_MANAGER_MPU_SHARED_ENTRIES)
     {
         /* Release the protection mutex.  */
         _tx_mutex_put(&_txm_module_manager_mutex);
@@ -152,19 +154,19 @@ ULONG   attributes_check = 0;
        Set up MPU registers.  */
     
     /* Pick up index into shared memory entries.  */
-    shared_index = TXM_MODULE_MPU_SHARED_INDEX + module_instance -> txm_module_instance_shared_memory_count;
+    shared_index = TXM_MODULE_MANAGER_MPU_SHARED_INDEX + module_instance -> txm_module_instance_shared_memory_count;
     
     /* Save address register with address, MPU region, set Valid bit.  */
-    module_instance -> txm_module_instance_mpu_registers[shared_index].txm_module_mpu_region_address = address | shared_index | 0x10;
+    module_instance -> txm_module_instance_mpu_registers[shared_index].txm_module_mpu_region_address = address | shared_index | TXM_MPU_VALID_BIT;
     
     /* Calculate the region size.  */
-    region_size = (_txm_module_manager_region_size_get(block_size) << 1);
+    region_size = _txm_module_manager_region_size_get(block_size);
     
     /* Calculate the subregion bits.  */
     srd_bits = _txm_module_manager_calculate_srd_bits(block_size, length);
     
     /* Generate SRD, size, and enable attributes.  */
-    size_register = srd_bits | region_size | TXM_ENABLE_REGION | TXM_MODULE_MPU_SHARED_ACCESS_CONTROL;
+    size_register = srd_bits | (region_size << 1) | TXM_ENABLE_REGION | TXM_MODULE_MPU_SHARED_ACCESS_CONTROL;
     
     /* Check for optional write attribute.  */
     if(attributes & TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE)
@@ -262,10 +264,10 @@ TXM_MODULE_PREAMBLE     *module_preamble;
     
     /* At this point, we have a valid address and block size.
        Set up MPU registers.  */
-    module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MANAGER_SHARED_MPU_INDEX] = address | TXM_MODULE_MANAGER_SHARED_MPU_REGION | 0x10;
+    module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MANAGER_SHARED_MPU_REGION].txm_module_mpu_region_address = address | TXM_MODULE_MANAGER_SHARED_MPU_REGION | TXM_MPU_VALID_BIT;
     
     /* Calculate the region size.  */
-    region_size = (_txm_module_manager_region_size_get(block_size) << 1);
+    region_size = _txm_module_manager_region_size_get(block_size);
     /* Calculate the subregion bits.  */
     subregion_bits = _txm_module_manager_calculate_srd_bits(block_size, length);
     
@@ -276,7 +278,7 @@ TXM_MODULE_PREAMBLE     *module_preamble;
     }
     
     /* Build register with attributes. */
-    module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MANAGER_SHARED_MPU_INDEX+1] = region_size | subregion_bits | attributes_check | 0x12070001;
+    module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MANAGER_SHARED_MPU_REGION].txm_module_mpu_region_attribute_size = (region_size << 1) | subregion_bits | attributes_check | TXM_MODULE_MPU_SHARED_ACCESS_CONTROL | TXM_ENABLE_REGION;
     
     /* Keep track of shared memory address and length in module instance.  */
     module_instance -> txm_module_instance_shared_memory_address = address;

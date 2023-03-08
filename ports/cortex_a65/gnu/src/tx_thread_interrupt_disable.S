@@ -19,6 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
 
     .text
@@ -60,6 +63,9 @@
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                            resulting in version 6.1.10 */
+/*  03-08-2023      Cindy Deng              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_interrupt_disable(void)

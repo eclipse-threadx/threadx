@@ -30,7 +30,7 @@
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
 @/*    _tx_thread_stack_build                            Cortex-M0/GNU     */
-@/*                                                           6.x          */
+@/*                                                           6.2.1        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
@@ -69,8 +69,8 @@
 @/*                                            to stack frame, clean up    */
 @/*                                            whitespace, resulting       */
 @/*                                            in version 6.1              */
-@/*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
-@/*                                            resulting in version 6.x    */
+@/*  03-08-2023      Scott Larson            Include tx_user.h,            */
+@/*                                            resulting in version 6.2.1  */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
