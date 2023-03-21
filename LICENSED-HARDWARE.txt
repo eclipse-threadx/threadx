@@ -38,7 +38,7 @@ Renesas:
     Synergy Platform
     RX Family of MCUs
     RA Family of MCUs
-    RZ/A, RZ/N and RZ/T Family of MPUs
+    RZ Family of MPUs
 
 --------------------------------------------------------------------------------
 
