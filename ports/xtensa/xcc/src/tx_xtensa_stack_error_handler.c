@@ -43,7 +43,9 @@
 /**************************************************************************/
 
 
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
 #include "tx_user.h"
+#endif
 
 #ifdef TX_ENABLE_STACK_CHECKING
 

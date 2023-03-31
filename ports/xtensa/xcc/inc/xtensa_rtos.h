@@ -58,7 +58,9 @@
 /*
 Include any RTOS specific definitions that are needed by this header.
 */
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
 #include "tx_user.h"
+#endif
 
 /*
 Name of RTOS (for messages).

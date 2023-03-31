@@ -20,7 +20,9 @@
 /**************************************************************************/
 /**************************************************************************/
 
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
 #include "tx_user.h"
+#endif
 
     .global _tx_thread_current_ptr
     .global _tx_thread_execute_ptr

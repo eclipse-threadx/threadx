@@ -20,7 +20,9 @@
 @/**************************************************************************/
 @/**************************************************************************/
 @
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
 #include "tx_user.h"
+#endif
 @
     .global _tx_timer_time_slice
     .global _tx_timer_system_clock
