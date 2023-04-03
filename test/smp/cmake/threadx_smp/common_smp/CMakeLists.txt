@@ -1,0 +1,220 @@
+set(CURRENT_DIR ${PROJECT_DIR}/common_smp)
+
+function(target_sources_if_not_overridden filename)
+    list(FIND TX_SRC_OVERRIDES ${filename} OVERRIDE_FOUND)
+    if( OVERRIDE_FOUND EQUAL -1 )
+        # message(STATUS "** Using original ${filename} from common/src **")
+        target_sources(${PROJECT_NAME} PRIVATE ${CURRENT_DIR}/src/${filename})
+    endif()
+endfunction()
+
+# These files can be overridden by setting them in the variable list named TX_SRC_OVERRIDES
+target_sources_if_not_overridden("tx_thread_delete.c")
+target_sources_if_not_overridden("tx_thread_reset.c")
+
+target_sources(${PROJECT_NAME}
+    PRIVATE
+    # {{BEGIN_TARGET_SOURCES}}
+	${CURRENT_DIR}/src/tx_block_allocate.c
+	${CURRENT_DIR}/src/tx_block_allocate.c
+	${CURRENT_DIR}/src/tx_block_pool_cleanup.c
+	${CURRENT_DIR}/src/tx_block_pool_create.c
+	${CURRENT_DIR}/src/tx_block_pool_delete.c
+	${CURRENT_DIR}/src/tx_block_pool_info_get.c
+	${CURRENT_DIR}/src/tx_block_pool_initialize.c
+	${CURRENT_DIR}/src/tx_block_pool_performance_info_get.c
+	${CURRENT_DIR}/src/tx_block_pool_performance_system_info_get.c
+	${CURRENT_DIR}/src/tx_block_pool_prioritize.c
+	${CURRENT_DIR}/src/tx_block_release.c
+	${CURRENT_DIR}/src/tx_byte_allocate.c
+	${CURRENT_DIR}/src/tx_byte_pool_cleanup.c
+	${CURRENT_DIR}/src/tx_byte_pool_create.c
+	${CURRENT_DIR}/src/tx_byte_pool_delete.c
+	${CURRENT_DIR}/src/tx_byte_pool_info_get.c
+	${CURRENT_DIR}/src/tx_byte_pool_initialize.c
+	${CURRENT_DIR}/src/tx_byte_pool_performance_info_get.c
+	${CURRENT_DIR}/src/tx_byte_pool_performance_system_info_get.c
+	${CURRENT_DIR}/src/tx_byte_pool_prioritize.c
+	${CURRENT_DIR}/src/tx_byte_pool_search.c
+	${CURRENT_DIR}/src/tx_byte_release.c
+	${CURRENT_DIR}/src/txe_block_allocate.c
+	${CURRENT_DIR}/src/txe_block_pool_create.c
+	${CURRENT_DIR}/src/txe_block_pool_delete.c
+	${CURRENT_DIR}/src/txe_block_pool_info_get.c
+	${CURRENT_DIR}/src/txe_block_pool_prioritize.c
+	${CURRENT_DIR}/src/txe_block_release.c
+	${CURRENT_DIR}/src/txe_byte_allocate.c
+	${CURRENT_DIR}/src/txe_byte_pool_create.c
+	${CURRENT_DIR}/src/txe_byte_pool_delete.c
+	${CURRENT_DIR}/src/txe_byte_pool_info_get.c
+	${CURRENT_DIR}/src/txe_byte_pool_prioritize.c
+	${CURRENT_DIR}/src/txe_byte_release.c
+	${CURRENT_DIR}/src/txe_event_flags_create.c
+	${CURRENT_DIR}/src/txe_event_flags_delete.c
+	${CURRENT_DIR}/src/txe_event_flags_get.c
+	${CURRENT_DIR}/src/txe_event_flags_info_get.c
+	${CURRENT_DIR}/src/txe_event_flags_set.c
+	${CURRENT_DIR}/src/txe_event_flags_set_notify.c
+	${CURRENT_DIR}/src/txe_mutex_create.c
+	${CURRENT_DIR}/src/txe_mutex_delete.c
+	${CURRENT_DIR}/src/txe_mutex_get.c
+	${CURRENT_DIR}/src/txe_mutex_info_get.c
+	${CURRENT_DIR}/src/txe_mutex_prioritize.c
+	${CURRENT_DIR}/src/txe_mutex_put.c
+	${CURRENT_DIR}/src/txe_queue_create.c
+	${CURRENT_DIR}/src/txe_queue_delete.c
+	${CURRENT_DIR}/src/txe_queue_flush.c
+	${CURRENT_DIR}/src/txe_queue_front_send.c
+	${CURRENT_DIR}/src/txe_queue_info_get.c
+	${CURRENT_DIR}/src/txe_queue_prioritize.c
+	${CURRENT_DIR}/src/txe_queue_receive.c
+	${CURRENT_DIR}/src/txe_queue_send.c
+	${CURRENT_DIR}/src/txe_queue_send_notify.c
+	${CURRENT_DIR}/src/txe_semaphore_ceiling_put.c
+	${CURRENT_DIR}/src/txe_semaphore_create.c
+	${CURRENT_DIR}/src/txe_semaphore_delete.c
+	${CURRENT_DIR}/src/txe_semaphore_get.c
+	${CURRENT_DIR}/src/txe_semaphore_info_get.c
+	${CURRENT_DIR}/src/txe_semaphore_prioritize.c
+	${CURRENT_DIR}/src/txe_semaphore_put.c
+	${CURRENT_DIR}/src/txe_semaphore_put_notify.c
+	${CURRENT_DIR}/src/txe_thread_create.c
+	${CURRENT_DIR}/src/txe_thread_delete.c
+	${CURRENT_DIR}/src/txe_thread_entry_exit_notify.c
+	${CURRENT_DIR}/src/txe_thread_info_get.c
+	${CURRENT_DIR}/src/txe_thread_preemption_change.c
+	${CURRENT_DIR}/src/txe_thread_priority_change.c
+	${CURRENT_DIR}/src/txe_thread_relinquish.c
+	${CURRENT_DIR}/src/txe_thread_reset.c
+	${CURRENT_DIR}/src/txe_thread_resume.c
+	${CURRENT_DIR}/src/txe_thread_suspend.c
+	${CURRENT_DIR}/src/txe_thread_terminate.c
+	${CURRENT_DIR}/src/txe_thread_time_slice_change.c
+	${CURRENT_DIR}/src/txe_thread_wait_abort.c
+	${CURRENT_DIR}/src/txe_timer_activate.c
+	${CURRENT_DIR}/src/txe_timer_change.c
+	${CURRENT_DIR}/src/txe_timer_create.c
+	${CURRENT_DIR}/src/txe_timer_deactivate.c
+	${CURRENT_DIR}/src/txe_timer_delete.c
+	${CURRENT_DIR}/src/txe_timer_info_get.c
+	${CURRENT_DIR}/src/tx_event_flags_cleanup.c
+	${CURRENT_DIR}/src/tx_event_flags_create.c
+	${CURRENT_DIR}/src/tx_event_flags_delete.c
+	${CURRENT_DIR}/src/tx_event_flags_get.c
+	${CURRENT_DIR}/src/tx_event_flags_info_get.c
+	${CURRENT_DIR}/src/tx_event_flags_initialize.c
+	${CURRENT_DIR}/src/tx_event_flags_performance_info_get.c
+	${CURRENT_DIR}/src/tx_event_flags_performance_system_info_get.c
+	${CURRENT_DIR}/src/tx_event_flags_set.c
+	${CURRENT_DIR}/src/tx_event_flags_set_notify.c
+	${CURRENT_DIR}/src/tx_initialize_high_level.c
+	${CURRENT_DIR}/src/tx_initialize_kernel_enter.c
+	${CURRENT_DIR}/src/tx_initialize_kernel_setup.c
+	${CURRENT_DIR}/src/tx_misra.c
+	${CURRENT_DIR}/src/tx_mutex_cleanup.c
+	${CURRENT_DIR}/src/tx_mutex_create.c
+	${CURRENT_DIR}/src/tx_mutex_delete.c
+	${CURRENT_DIR}/src/tx_mutex_get.c
+	${CURRENT_DIR}/src/tx_mutex_info_get.c
+	${CURRENT_DIR}/src/tx_mutex_initialize.c
+	${CURRENT_DIR}/src/tx_mutex_performance_info_get.c
+	${CURRENT_DIR}/src/tx_mutex_performance_system_info_get.c
+	${CURRENT_DIR}/src/tx_mutex_prioritize.c
+	${CURRENT_DIR}/src/tx_mutex_priority_change.c
+	${CURRENT_DIR}/src/tx_mutex_put.c
+	${CURRENT_DIR}/src/tx_queue_cleanup.c
+	${CURRENT_DIR}/src/tx_queue_create.c
+	${CURRENT_DIR}/src/tx_queue_delete.c
+	${CURRENT_DIR}/src/tx_queue_flush.c
+	${CURRENT_DIR}/src/tx_queue_front_send.c
+	${CURRENT_DIR}/src/tx_queue_info_get.c
+	${CURRENT_DIR}/src/tx_queue_initialize.c
+	${CURRENT_DIR}/src/tx_queue_performance_info_get.c
+	${CURRENT_DIR}/src/tx_queue_performance_system_info_get.c
+	${CURRENT_DIR}/src/tx_queue_prioritize.c
+	${CURRENT_DIR}/src/tx_queue_receive.c
+	${CURRENT_DIR}/src/tx_queue_send.c
+	${CURRENT_DIR}/src/tx_queue_send_notify.c
+	${CURRENT_DIR}/src/tx_semaphore_ceiling_put.c
+	${CURRENT_DIR}/src/tx_semaphore_cleanup.c
+	${CURRENT_DIR}/src/tx_semaphore_create.c
+	${CURRENT_DIR}/src/tx_semaphore_delete.c
+	${CURRENT_DIR}/src/tx_semaphore_get.c
+	${CURRENT_DIR}/src/tx_semaphore_info_get.c
+	${CURRENT_DIR}/src/tx_semaphore_initialize.c
+	${CURRENT_DIR}/src/tx_semaphore_performance_info_get.c
+	${CURRENT_DIR}/src/tx_semaphore_performance_system_info_get.c
+	${CURRENT_DIR}/src/tx_semaphore_prioritize.c
+	${CURRENT_DIR}/src/tx_semaphore_put.c
+	${CURRENT_DIR}/src/tx_semaphore_put_notify.c
+	${CURRENT_DIR}/src/tx_thread_create.c
+	${CURRENT_DIR}/src/tx_thread_entry_exit_notify.c
+	${CURRENT_DIR}/src/tx_thread_identify.c
+	${CURRENT_DIR}/src/tx_thread_info_get.c
+	${CURRENT_DIR}/src/tx_thread_initialize.c
+	${CURRENT_DIR}/src/tx_thread_performance_info_get.c
+	${CURRENT_DIR}/src/tx_thread_performance_system_info_get.c
+	${CURRENT_DIR}/src/tx_thread_preemption_change.c
+	${CURRENT_DIR}/src/tx_thread_priority_change.c
+	${CURRENT_DIR}/src/tx_thread_relinquish.c
+	${CURRENT_DIR}/src/tx_thread_resume.c
+	${CURRENT_DIR}/src/tx_thread_shell_entry.c
+	${CURRENT_DIR}/src/tx_thread_sleep.c
+	${CURRENT_DIR}/src/tx_thread_smp_utilities.c
+	${CURRENT_DIR}/src/tx_thread_stack_analyze.c
+	${CURRENT_DIR}/src/tx_thread_stack_error_handler.c
+	${CURRENT_DIR}/src/tx_thread_stack_error_notify.c
+	${CURRENT_DIR}/src/tx_thread_suspend.c
+	${CURRENT_DIR}/src/tx_thread_system_preempt_check.c
+	${CURRENT_DIR}/src/tx_thread_system_resume.c
+	${CURRENT_DIR}/src/tx_thread_system_suspend.c
+	${CURRENT_DIR}/src/tx_thread_terminate.c
+	${CURRENT_DIR}/src/tx_thread_timeout.c
+	${CURRENT_DIR}/src/tx_thread_time_slice.c
+	${CURRENT_DIR}/src/tx_thread_time_slice_change.c
+	${CURRENT_DIR}/src/tx_thread_wait_abort.c
+	${CURRENT_DIR}/src/tx_time_get.c
+	${CURRENT_DIR}/src/tx_timer_activate.c
+	${CURRENT_DIR}/src/tx_timer_change.c
+	${CURRENT_DIR}/src/tx_timer_create.c
+	${CURRENT_DIR}/src/tx_timer_deactivate.c
+	${CURRENT_DIR}/src/tx_timer_delete.c
+	${CURRENT_DIR}/src/tx_timer_expiration_process.c
+	${CURRENT_DIR}/src/tx_timer_info_get.c
+	${CURRENT_DIR}/src/tx_timer_initialize.c
+	${CURRENT_DIR}/src/tx_timer_performance_info_get.c
+	${CURRENT_DIR}/src/tx_timer_performance_system_info_get.c
+	${CURRENT_DIR}/src/tx_timer_system_activate.c
+	${CURRENT_DIR}/src/tx_timer_system_deactivate.c
+	${CURRENT_DIR}/src/tx_timer_thread_entry.c
+	${CURRENT_DIR}/src/tx_time_set.c
+	${CURRENT_DIR}/src/tx_trace_buffer_full_notify.c
+	${CURRENT_DIR}/src/tx_trace_disable.c
+	${CURRENT_DIR}/src/tx_trace_enable.c
+	${CURRENT_DIR}/src/tx_trace_event_filter.c
+	${CURRENT_DIR}/src/tx_trace_event_unfilter.c
+	${CURRENT_DIR}/src/tx_trace_initialize.c
+	${CURRENT_DIR}/src/tx_trace_interrupt_control.c
+	${CURRENT_DIR}/src/tx_trace_isr_enter_insert.c
+	${CURRENT_DIR}/src/tx_trace_isr_exit_insert.c
+	${CURRENT_DIR}/src/tx_trace_object_register.c
+	${CURRENT_DIR}/src/tx_trace_object_unregister.c
+	${CURRENT_DIR}/src/tx_trace_user_event_insert.c
+	${CURRENT_DIR}/src/tx_thread_smp_core_exclude.c
+	${CURRENT_DIR}/src/tx_thread_smp_core_exclude_get.c
+	${CURRENT_DIR}/src/tx_thread_smp_current_state_set.c
+	${CURRENT_DIR}/src/tx_thread_smp_debug_entry_insert.c
+	${CURRENT_DIR}/src/tx_thread_smp_high_level_initialize.c
+	${CURRENT_DIR}/src/tx_thread_smp_rebalance_execute_list.c
+	${CURRENT_DIR}/src/tx_timer_smp_core_exclude.c
+	${CURRENT_DIR}/src/tx_timer_smp_core_exclude_get.c
+
+    # {{END_TARGET_SOURCES}}
+)
+
+# Add the Common/inc directory to the project include list
+target_include_directories(${PROJECT_NAME} 
+    PUBLIC 
+    ${CURRENT_DIR}/inc
+)
+

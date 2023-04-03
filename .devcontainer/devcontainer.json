@@ -1,0 +1,4 @@
+{
+    "image": "tizho/azurertos-regression",
+    "runArgs": [ "--cap-add=NET_ADMIN"]
+}
