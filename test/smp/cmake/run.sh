@@ -1,1 +1,1 @@
-../../../tools/cmake_bootstrap.sh
+../../../scripts/cmake_bootstrap.sh
