@@ -1,0 +1,70 @@
+name: Regression
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/ci_tx.yml"
+      - "common/**"
+      - "samples/**"
+      - "test/tx/**"
+      - "utility/**"
+      - "ports/linux/gnu/**"
+
+jobs:
+  TX:
+    runs-on:
+      - ubuntu-22.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3.5.0
+      - name: Install softwares
+        run: sudo ${{ github.workspace }}/scripts/install.sh
+        shell: bash
+      - name: SDL check
+        run: "${{ github.workspace }}/scripts/sdl_check.sh"
+        shell: bash
+      - name: Build
+        run: "${{ github.workspace }}/scripts/build_tx.sh"
+        shell: bash
+      - name: Test
+        run: "${{ github.workspace }}/scripts/test_tx.sh"
+        shell: bash
+      #     # (cTest) is an unsupported test runner.
+      # The following script preserves the globbing behavior of the CopyFiles task.
+      # Refer to this transformer's documentation for an alternative that will work in simple cases.
+      # - name: Test TX (PublishTestReports)
+      #   if: success() || failure()
+      #   uses: actions/github-script@v6.4.0
+      #   env:
+      #     TARGET_FOLDER: "${{ env.ob_outputDirectory }}/test_reports_TX"
+      #     SOURCE_FOLDER: "${{ github.workspace }}/test/tx/cmake"
+      #     CONTENTS: |
+      #       build/*.txt
+      #       build/*/Testing/**/*.xml
+      #       coverage_report/**/*
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: TX Tests              # Name of the check run which will be created
+          path: ${{ github.workspace }}/test/tx/cmake/build/*/Testing/**/*.xml    # Path to test results
+          reporter: jest-junit        # Format of test results
+      - name: Generate Coverage Report
+        if: success() || failure()
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.19
+        continue-on-error: true
+        with:
+          reports: "${{ github.workspace }}/test/tx/cmake/coverage_report/default_build_coverage.xml"
+          sourcedirs: "${{ github.workspace }}/test/tx/cmake"
+          targetdir: coveragereport_${{ github.run_number }}
+          reporttypes: HtmlInline
+      # - name: Upload Test Report
+      #   if: success() || failure()
+      #   uses: actions/upload-artifact@v3.1.1
+      #   with:
+      #     name: CoverageReport
+      #     path: coveragereport_${{ github.run_number }}
