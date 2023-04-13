@@ -1,0 +1,59 @@
+trigger:
+- master
+
+pr:
+- master
+
+pool:
+  vmImage: "ubuntu-22.04"
+
+steps:
+  - bash: sudo $(Build.SourcesDirectory)/scripts/install.sh
+    displayName: 'Install softwares'
+    env:
+      INDEX_URL: $(INDEX_URL)
+
+  - task: Bash@3
+    displayName: 'SDL check'
+    inputs:
+      filePath: '$(Build.SourcesDirectory)/scripts/sdl_check.sh'
+
+  - task: Bash@3
+    displayName: 'Build SMP'
+    inputs:
+      filePath: '$(Build.SourcesDirectory)/scripts/build_smp.sh'
+
+  - task: Bash@3
+    displayName: 'Test SMP'
+    inputs:
+      filePath: '$(Build.SourcesDirectory)/scripts/test_smp.sh'
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    displayName: 'Test SMP (PublishTestResults)'
+    inputs:
+      testResultsFormat: 'cTest'
+      testResultsFiles: '*/Testing/**/*.xml'
+      searchFolder: '$(Build.SourcesDirectory)/test/smp/cmake/build'
+      testRunTitle: 'SMP-Tests'
+      buildConfiguration: 'Release'
+
+  - task: CopyFiles@2
+    condition: succeededOrFailed()
+    displayName: 'Test SMP (PublishTestReports)'
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)/test/smp/cmake'
+      Contents: |
+        build/*.txt
+        build/*/Testing/**/*.xml
+        coverage_report/**/*
+      TargetFolder: '$(ob_outputDirectory)/test_reports_SMP'
+
+  - task: PublishCodeCoverageResults@1
+    condition: succeededOrFailed()
+    displayName: 'Test SMP (PublishCodeCoverageResults)'
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: '$(Build.SourcesDirectory)/test/smp/cmake/coverage_report/default_build_coverage.xml'
+      pathToSources: '$(Build.SourcesDirectory)/test/smp/cmake'
+      reportDirectory: '$(Build.SourcesDirectory)/test/smp/cmake/coverage_report/default_build_coverage'
