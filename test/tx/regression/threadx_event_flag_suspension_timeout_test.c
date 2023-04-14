@@ -184,7 +184,7 @@ UINT    status;
     {
 
         /* Event flag error.  */
-        printf("ERROR #7\n");
+        printf("ERROR #7\nthread_1_counter = %lu, thread_2_counter = %lu\n", thread_1_counter, thread_2_counter);
         test_control_return(1);
     }
 

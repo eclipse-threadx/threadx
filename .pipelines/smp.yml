@@ -19,18 +19,18 @@ steps:
       filePath: '$(Build.SourcesDirectory)/scripts/sdl_check.sh'
 
   - task: Bash@3
-    displayName: 'Build SMP'
+    displayName: 'Build'
     inputs:
       filePath: '$(Build.SourcesDirectory)/scripts/build_smp.sh'
 
   - task: Bash@3
-    displayName: 'Test SMP'
+    displayName: 'Test'
     inputs:
       filePath: '$(Build.SourcesDirectory)/scripts/test_smp.sh'
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
-    displayName: 'Test SMP (PublishTestResults)'
+    displayName: 'PublishTestResults'
     inputs:
       testResultsFormat: 'cTest'
       testResultsFiles: '*/Testing/**/*.xml'
@@ -40,14 +40,20 @@ steps:
 
   - task: CopyFiles@2
     condition: succeededOrFailed()
-    displayName: 'Test SMP (PublishTestReports)'
+    displayName: 'CopyTestReports'
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)/test/smp/cmake'
       Contents: |
         build/*.txt
         build/*/Testing/**/*.xml
         coverage_report/**/*
-      TargetFolder: '$(ob_outputDirectory)/test_reports_SMP'
+      TargetFolder: '$(build.artifactstagingdirectory)/test_reports_SMP'
+
+  - task: PublishBuildArtifacts@1
+    condition: succeededOrFailed()
+    displayName: 'PublishBuildArtifacts'
+    inputs:
+      pathToPublish: $(build.artifactstagingdirectory)
 
   - task: PublishCodeCoverageResults@1
     condition: succeededOrFailed()
@@ -56,4 +62,3 @@ steps:
       codeCoverageTool: 'Cobertura'
       summaryFileLocation: '$(Build.SourcesDirectory)/test/smp/cmake/coverage_report/default_build_coverage.xml'
       pathToSources: '$(Build.SourcesDirectory)/test/smp/cmake'
-      reportDirectory: '$(Build.SourcesDirectory)/test/smp/cmake/coverage_report/default_build_coverage'
