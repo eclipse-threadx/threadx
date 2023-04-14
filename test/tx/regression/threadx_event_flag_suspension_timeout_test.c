@@ -179,7 +179,8 @@ UINT    status;
     tx_thread_sleep(63);
 
     /* Check the run counters.  */
-    if ((thread_1_counter != 33) || (thread_2_counter != 13))
+    if (((thread_1_counter != 32) && (thread_1_counter != 33)) || /* Depending on the starting time, thread 1 can run either 32 or 33 rounds. */
+        (thread_2_counter != 13))
     {
 
         /* Event flag error.  */
