@@ -5,14 +5,14 @@ pr:
   branches:
     include:
       - master
-    paths:
-      include: 
-        - ".pipelines/tx.yml"
-        - "common_smp/**"
-        - "samples/**"
-        - "test/tx/**"
-        - "utility/**"
-        - "ports_smp/linux/gnu/**"
+  paths:
+    include: 
+      - ".pipelines/tx.yml"
+      - "common_smp/**"
+      - "samples/**"
+      - "test/tx/**"
+      - "utility/**"
+      - "ports_smp/linux/gnu/**"
 
 
 pool:
