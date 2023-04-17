@@ -179,8 +179,16 @@ UINT    status;
     tx_thread_sleep(63);
 
     /* Check the run counters.  */
-    if (((thread_1_counter != 32) && (thread_1_counter != 33)) || /* Depending on the starting time, thread 1 can run either 32 or 33 rounds. */
-        (thread_2_counter != 13))
+    if (((thread_1_counter != 32)
+#ifdef __linux__
+          && (thread_1_counter != 33) /* Depending on the starting time, thread 1 can run either 32 or 33 rounds. */
+#endif
+        ) ||
+        ((thread_2_counter != 13)
+#ifdef __linux__
+         && (thread_2_counter != 14) /* When CPU starves, the thread 2 can run 14 ronuds. */
+#endif
+        ))
     {
 
         /* Event flag error.  */
