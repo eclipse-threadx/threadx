@@ -2,7 +2,18 @@ trigger:
 - master
 
 pr:
-- master
+  branches:
+    include:
+      - master
+    paths:
+      include: 
+        - ".pipelines/tx.yml"
+        - "common_smp/**"
+        - "samples/**"
+        - "test/tx/**"
+        - "utility/**"
+        - "ports_smp/linux/gnu/**"
+
 
 pool:
   vmImage: "ubuntu-22.04"
