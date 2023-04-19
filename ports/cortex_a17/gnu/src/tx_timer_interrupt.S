@@ -64,7 +64,7 @@ $_tx_timer_interrupt:
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_timer_interrupt                                  ARMv7-A        */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -101,9 +101,9 @@ $_tx_timer_interrupt:
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
-/*  03-08-2023      Cindy Deng              Modified comment(s), added    */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
 /*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.2.1  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
     .global _tx_timer_interrupt
