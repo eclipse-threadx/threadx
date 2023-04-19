@@ -15,11 +15,12 @@ on:
       - 'ports/**'
       - 'ports_modules/**'
       - 'ports_smp/**'
+      - 'ports_arch/**'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  # Check ports for cortex-m
+  cortex-m:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -38,8 +39,33 @@ jobs:
         scripts/copy_armv7_m.sh && scripts/copy_armv8_m.sh && scripts/copy_module_armv7_m.sh
         if [[ -n $(git status --porcelain) ]]; then
           echo "Ports for ARM architecture is not updated"
+          git status
           exit 1
         fi
+
+  cortex-a:
+    # Check ports for cortex-a
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - name: Checkout sources recursively
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.REPO_SCOPED_TOKEN }}
+        submodules: true
+
+    # Copy ports arch
+    - name: Copy ports arch
+      run: |
+        cd ports_arch/ARMv7-A
+        pwsh -Command ./update.ps1 -PortSets tx -CopyCommonFiles -CopyPortFiles -CopyExample -PatchFiles
+        if ((git status --porcelain) -ne $null) {
+          Write-Host "Ports for ARM architecture is not updated"
+          git status
+          Exit 1
+        }
 
 
 
