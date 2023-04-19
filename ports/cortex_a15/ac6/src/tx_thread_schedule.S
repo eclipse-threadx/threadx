@@ -19,6 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .global     _tx_thread_execute_ptr
     .global     _tx_thread_current_ptr
@@ -50,7 +53,7 @@ $_tx_thread_schedule:
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                                  ARMv7-A        */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -89,6 +92,9 @@ $_tx_thread_schedule:
 /*                                            resulting in version 6.1.9  */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
     .global _tx_thread_schedule

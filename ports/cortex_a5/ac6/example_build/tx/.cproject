@@ -45,7 +45,7 @@
                                 								
                                 <option id="com.arm.tool.c.compiler.v6.base.option.target.2070983899" name="Target (--target)" superClass="com.arm.tool.c.compiler.v6.base.option.target" useByScannerDiscovery="true" value="arm-arm-none-eabi" valueType="string"/>
                                 								
-                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.1346103117" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a5" valueType="string"/>
+                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.1346103117" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a7" valueType="string"/>
                                 								
                                 <option id="com.arm.tool.c.compiler.v6.base.option.fpu.90247954" name="FPU (-mfpu)" superClass="com.arm.tool.c.compiler.v6.base.option.fpu" useByScannerDiscovery="true" value="none" valueType="string"/>
                                 								
@@ -77,7 +77,7 @@
                                 								
                                 <option id="com.arm.tool.assembler.v6.base.option.target.1068198178" name="Target (--target)" superClass="com.arm.tool.assembler.v6.base.option.target" useByScannerDiscovery="false" value="arm-arm-none-eabi" valueType="string"/>
                                 								
-                                <option id="com.arm.tool.assembler.v6.base.option.cpu.452335018" name="CPU (-mcpu)" superClass="com.arm.tool.assembler.v6.base.option.cpu" useByScannerDiscovery="false" value="cortex-a5" valueType="string"/>
+                                <option id="com.arm.tool.assembler.v6.base.option.cpu.452335018" name="CPU (-mcpu)" superClass="com.arm.tool.assembler.v6.base.option.cpu" useByScannerDiscovery="false" value="cortex-a7" valueType="string"/>
                                 								
                                 <option id="com.arm.tool.assembler.v6.base.option.fpu.1016536584" name="FPU (-mfpu)" superClass="com.arm.tool.assembler.v6.base.option.fpu" useByScannerDiscovery="true" value="none" valueType="string"/>
                                 								

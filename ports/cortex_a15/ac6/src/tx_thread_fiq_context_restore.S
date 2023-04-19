@@ -19,6 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
 SVC_MODE        =       0xD3                    // SVC mode
 FIQ_MODE        =       0xD1                    // FIQ mode
@@ -48,7 +51,7 @@ IRQ_MODE_BITS   =       0x12                    // IRQ mode bits
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_fiq_context_restore                       ARMv7-A        */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -86,6 +89,9 @@ IRQ_MODE_BITS   =       0x12                    // IRQ mode bits
 /*                                            resulting in version 6.1.9  */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_fiq_context_restore

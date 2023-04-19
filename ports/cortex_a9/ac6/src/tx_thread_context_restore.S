@@ -19,6 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .arm
 
@@ -50,7 +53,7 @@ IRQ_MODE        =     0x92               // Disable IRQ, IRQ mode
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_restore                            ARMv7-A       */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -88,6 +91,9 @@ IRQ_MODE        =     0x92               // Disable IRQ, IRQ mode
 /*                                            resulting in version 6.1.9  */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
     .global _tx_thread_context_restore
