@@ -17,6 +17,5 @@ apt-get install -y \
     software-properties-common
 
 python3 -m pip install --upgrade pip
-pip3 install artifacts-keyring
-pip3 install gcovr==4.1 $INDEX_URL
+pip3 install gcovr==4.1
 
