@@ -1,0 +1,1 @@
+This is an AzureRTOS threadx trustzone example with secure and non-secure applications, which is for ARM cortex-m33 using keil and running on ArmV8-M FVP Simulator (C:\Keil_v5\ARM\FVP\MPS2_Cortex-M\FVP_MPS2_Cortex-M33_MDK.exe).

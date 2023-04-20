@@ -1,0 +1,1579 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<package schemaVersion="1.7.7" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.7/schema/PACK.xsd">
+	
+	<vendor>Microsoft</vendor>
+	<name>AzureRTOS-ThreadX</name>
+	<description>CMSIS-Pack for Azure RTOS ThreadX</description>
+	<url>https://github.com/azure-rtos/packs/</url>
+
+	<releases>
+		<release version="1.0.0" date="2023-01-22">
+			Initial release of Azure RTOS ThreadX CMSIS-PACK.
+            - Based on Azure RTOS ThreadX release v6.2.0.
+            - Support Cortex-M0/M3/M4/M7/M23/M33/M55/M85
+            - Support Cortex-A5/A7/A8/A9/A15/A17/A53/A57/A72/A73
+            - Support Cortex-R4/R5
+			- Add an ARM cortex-M4 threadx example using IAR EWARM simulator.
+			- Add an ARM cortex-M33 secure/non-secure example using Keil FVP simulator.
+		</release>
+	</releases>
+  
+    <keywords>
+        <keyword>Microsoft</keyword>
+        <keyword>Azure RTOS</keyword>
+		<keyword>ThreadX</keyword>
+    </keywords>
+
+    <conditions>
+
+		<!--CM0 Condition-->
+        <condition id="CM0 IAR Condition">
+            <description>CortexM0 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-M0"/>
+        </condition>
+        <condition id="CM0 GNU Condition">
+            <description>CortexM0 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-M0"/>
+        </condition>
+        <condition id="CM0 ARMC6 Condition">
+            <description>CortexM0 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-M0"/>
+        </condition>
+
+		<!--CM3 Condition-->
+        <condition id="CM3 IAR Condition">
+            <description>CortexM3 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-M3"/>
+        </condition>
+        <condition id="CM3 GNU Condition">
+            <description>CortexM3 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-M3"/>
+        </condition>
+        <condition id="CM3 ARMC6 Condition">
+            <description>CortexM3 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-M3"/>
+        </condition>
+
+		<!--CM4 Condition-->
+        <condition id="CM4 IAR Condition">
+            <description>CortexM4 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-M4"/>
+        </condition>
+        <condition id="CM4 GNU Condition">
+            <description>CortexM4 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-M4"/>
+        </condition>
+        <condition id="CM4 ARMC6 Condition">
+            <description>CortexM4 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-M4"/>
+        </condition>
+
+        <!--CM7 Condition-->
+        <condition id="CM7 IAR Condition">
+            <description>CortexM7 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-M7"/>
+        </condition>
+        <condition id="CM7 GNU Condition">
+            <description>CortexM7 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-M7"/>
+        </condition>
+        <condition id="CM7 ARMC6 Condition">
+            <description>CortexM7 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-M7"/>
+        </condition>
+
+		<!--CM23 Condition-->
+        <condition id="CM23 IAR Condition">
+            <description>CortexM23 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-M23"/>
+        </condition>
+        <condition id="CM23 GNU Condition">
+            <description>CortexM23 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-M23"/>
+        </condition>
+        <condition id="CM23 ARMC6 Condition">
+            <description>CortexM23 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-M23"/>
+        </condition>
+
+		<!--CM33 Condition-->
+        <condition id="CM33 IAR Condition">
+            <description>CortexM33 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-M33"/>
+        </condition>
+        <condition id="CM33 GNU Condition">
+            <description>CortexM33 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-M33"/>
+        </condition>
+        <condition id="CM33 ARMC6 Condition">
+            <description>CortexM33 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-M33"/>
+        </condition>
+
+		<!--CM55 Condition-->
+        <condition id="CM55 IAR Condition">
+            <description>CortexM55 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-M55"/>
+        </condition>
+        <condition id="CM55 GNU Condition">
+            <description>CortexM55 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-M55"/>
+        </condition>
+        <condition id="CM55 ARMC6 Condition">
+            <description>CortexM55 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-M55"/>
+        </condition>
+
+		<!--CM85 Condition-->
+        <condition id="CM85 IAR Condition">
+            <description>CortexM85 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-M85"/>
+        </condition>
+        <condition id="CM85 GNU Condition">
+            <description>CortexM85 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-M85"/>
+        </condition>
+        <condition id="CM85 ARMC6 Condition">
+            <description>CortexM85 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-M85"/>
+        </condition>
+
+		<!--CA5 Condition-->
+        <condition id="CA5 IAR Condition">
+            <description>Cortex-A5 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-A5"/>
+        </condition>
+        <condition id="CA5 GNU Condition">
+            <description>Cortex-A5 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A5"/>
+        </condition>
+        <condition id="CA5 ARMC6 Condition">
+            <description>Cortex-A5 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A5"/>
+        </condition>
+
+		<!--CA7 Condition-->
+        <condition id="CA7 IAR Condition">
+            <description>Cortex-A7 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-A7"/>
+        </condition>
+        <condition id="CA7 GNU Condition">
+            <description>Cortex-A7 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A7"/>
+        </condition>
+        <condition id="CA7 ARMC6 Condition">
+            <description>Cortex-A7 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A7"/>
+        </condition>
+
+		<!--CA8 Condition-->
+        <condition id="CA8 IAR Condition">
+            <description>Cortex-A8 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-A8"/>
+        </condition>
+        <condition id="CA8 GNU Condition">
+            <description>Cortex-A8 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A8"/>
+        </condition>
+        <condition id="CA8 ARMC6 Condition">
+            <description>Cortex-A8 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A8"/>
+        </condition>
+
+		<!--CA9 Condition-->
+        <condition id="CA9 IAR Condition">
+            <description>Cortex-A9 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-A9"/>
+        </condition>
+        <condition id="CA9 GNU Condition">
+            <description>Cortex-A9 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A9"/>
+        </condition>
+        <condition id="CA9 ARMC6 Condition">
+            <description>Cortex-A9 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A9"/>
+        </condition>
+
+		<!--CA15 Condition-->
+        <condition id="CA15 IAR Condition">
+            <description>Cortex-A15 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-A15"/>
+        </condition>
+        <condition id="CA15 GNU Condition">
+            <description>Cortex-A15 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A15"/>
+        </condition>
+        <condition id="CA15 ARMC6 Condition">
+            <description>Cortex-A15 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A15"/>
+        </condition>
+
+		<!--CA17 Condition-->
+        <condition id="CA17 GNU Condition">
+            <description>Cortex-A17 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A17"/>
+        </condition>
+        <condition id="CA17 ARMC6 Condition">
+            <description>Cortex-A17 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A17"/>
+        </condition>
+
+		<!--CA53 Condition-->
+        <condition id="CA53 GNU Condition">
+            <description>Cortex-A53 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A53"/>
+        </condition>
+        <condition id="CA53 ARMC6 Condition">
+            <description>Cortex-A53 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A53"/>
+        </condition>
+
+		<!--CA57 Condition-->
+        <condition id="CA57 GNU Condition">
+            <description>Cortex-A57 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A57"/>
+        </condition>
+        <condition id="CA57 ARMC6 Condition">
+            <description>Cortex-A57 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A57"/>
+        </condition>
+
+		<!--CA72 Condition-->
+        <condition id="CA72 GNU Condition">
+            <description>Cortex-A72 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A72"/>
+        </condition>
+        <condition id="CA72 ARMC6 Condition">
+            <description>Cortex-A72 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A72"/>
+        </condition>
+
+		<!--CA73 Condition-->
+        <condition id="CA73 GNU Condition">
+            <description>Cortex-A73 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-A73"/>
+        </condition>
+        <condition id="CA73 ARMC6 Condition">
+            <description>Cortex-A73 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-A73"/>
+        </condition>
+
+		<!--CR4 Condition-->
+        <condition id="CR4 IAR Condition">
+            <description>Cortex-R4 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-R4"/>
+        </condition>
+        <condition id="CR4 GNU Condition">
+            <description>Cortex-R4 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-R4"/>
+        </condition>
+        <condition id="CR4 ARMC6 Condition">
+            <description>Cortex-R4 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-R4"/>
+        </condition>
+
+		<!--CR5 Condition-->
+        <condition id="CR5 IAR Condition">
+            <description>Cortex-R5 / IAR compiler</description>
+            <require Tcompiler="IAR"/>
+            <require Dcore="Cortex-R5"/>
+        </condition>
+        <condition id="CR5 GNU Condition">
+            <description>Cortex-R5 / GNU compiler</description>
+            <require Tcompiler="GCC"/>
+            <require Dcore="Cortex-R5"/>
+        </condition>
+        <condition id="CR5 ARMC6 Condition">
+            <description>Cortex-R5 / ARM compiler 6</description>
+            <require Tcompiler="ARMCC"/>
+            <require Dcore="Cortex-R5"/>
+        </condition>
+
+        <!--TX common Condition-->
+		<condition id="TX common Condition">
+            <description>ThreadX common codes</description>
+            <require Cclass="RTOS" Cgroup="ThreadX" Csub="Core"/>
+        </condition>
+
+        <!--Secure Stack Condition-->
+        <condition id="Secure Stack Condition">
+		    <description>Secure Stack API to support secure application</description>
+			<deny Cclass="RTOS" Cgroup="ThreadX" Csub="Core"/>
+			<require Dtz="TZ"/>
+        </condition>
+
+    </conditions>
+
+    <components>
+        <bundle Cbundle="ThreadX" Cclass="RTOS" Cversion="6.2.0">
+            <description>Azure RTOS threadX bundle.</description>
+            <doc>../README.md</doc>
+            <component Cgroup="ThreadX" Csub="Core" maxInstances="1">
+                <description>Azure RTOS threadx core library APIs subgroub </description>
+                <RTE_Components_h>#define AZURE_RTOS_THREADX_ENABLED</RTE_Components_h>
+                <files>
+                    <!-- CPU and Compiler dependent -->
+                    <!-- CM0 IAR -->
+                    <file category="source"    condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CM0 IAR Condition" name="ports/cortex_m0/iar/inc/"/>
+                    <file category="sourceAsm" condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CM0 IAR Condition" name="ports/cortex_m0/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CM0 GNU -->
+                    <file category="include"   condition="CM0 GNU Condition" name="ports/cortex_m0/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CM0 GNU Condition" name="ports/cortex_m0/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM0 GNU Condition" name="ports/cortex_m0/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM0 GNU Condition" name="ports/cortex_m0/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM0 GNU Condition" name="ports/cortex_m0/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM0 GNU Condition" name="ports/cortex_m0/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM0 GNU Condition" name="ports/cortex_m0/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM0 GNU Condition" name="ports/cortex_m0/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CM0 AC6 -->
+                    <file category="include"   condition="CM0 ARMC6 Condition" name="ports/cortex_m0/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CM0 ARMC6 Condition" name="ports/cortex_m0/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM0 ARMC6 Condition" name="ports/cortex_m0/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM0 ARMC6 Condition" name="ports/cortex_m0/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM0 ARMC6 Condition" name="ports/cortex_m0/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM0 ARMC6 Condition" name="ports/cortex_m0/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM0 ARMC6 Condition" name="ports/cortex_m0/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM0 ARMC6 Condition" name="ports/cortex_m0/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM0 ARMC6 Condition" name="ports/cortex_m0/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM0 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CM3 IAR -->
+                    <file category="source"    condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CM3 IAR Condition" name="ports/cortex_m3/iar/inc/"/>
+                    <file category="sourceAsm" condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CM3 IAR Condition" name="ports/cortex_m3/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CM3 GNU -->
+                    <file category="include"   condition="CM3 GNU Condition" name="ports/cortex_m3/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CM3 GNU Condition" name="ports/cortex_m3/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM3 GNU Condition" name="ports/cortex_m3/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM3 GNU Condition" name="ports/cortex_m3/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM3 GNU Condition" name="ports/cortex_m3/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM3 GNU Condition" name="ports/cortex_m3/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM3 GNU Condition" name="ports/cortex_m3/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM3 GNU Condition" name="ports/cortex_m3/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CM3 AC6 -->
+                    <file category="include"   condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM3 ARMC6 Condition" name="ports/cortex_m3/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CM4 IAR -->
+                    <file category="source"    condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CM4 IAR Condition" name="ports/cortex_m4/iar/inc/"/>
+                    <file category="sourceAsm" condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CM4 IAR Condition" name="ports/cortex_m4/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CM4 GNU -->
+                    <file category="include"   condition="CM4 GNU Condition" name="ports/cortex_m4/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CM4 GNU Condition" name="ports/cortex_m4/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM4 GNU Condition" name="ports/cortex_m4/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM4 GNU Condition" name="ports/cortex_m4/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM4 GNU Condition" name="ports/cortex_m4/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM4 GNU Condition" name="ports/cortex_m4/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM4 GNU Condition" name="ports/cortex_m4/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM4 GNU Condition" name="ports/cortex_m4/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CM4 AC6 -->
+                    <file category="include"   condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM4 ARMC6 Condition" name="ports/cortex_m4/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CM7 IAR -->
+                    <file category="source"    condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CM7 IAR Condition" name="ports/cortex_m7/iar/inc/"/>
+                    <file category="sourceAsm" condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CM7 IAR Condition" name="ports/cortex_m7/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CM7 GNU -->
+                    <file category="include"   condition="CM7 GNU Condition" name="ports/cortex_m7/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CM7 GNU Condition" name="ports/cortex_m7/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM7 GNU Condition" name="ports/cortex_m7/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM7 GNU Condition" name="ports/cortex_m7/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM7 GNU Condition" name="ports/cortex_m7/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM7 GNU Condition" name="ports/cortex_m7/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM7 GNU Condition" name="ports/cortex_m7/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM7 GNU Condition" name="ports/cortex_m7/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CM7 AC6 -->
+                    <file category="include"   condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM7 ARMC6 Condition" name="ports/cortex_m7/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CM23 IAR -->
+                    <file category="source"    condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CM23 IAR Condition" name="ports/cortex_m23/iar/inc/"/>
+					<file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_initialize_low_level.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_timer_interrupt.s"/>
+
+                    <file category="source"    condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/txe_thread_secure_stack_free.c"/>
+					<file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_secure_stack_allocate.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_secure_stack_free.s"/>
+                    <file category="sourceAsm" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_secure_stack_initialize.s"/>
+
+                    <!-- CM23 GNU -->
+                    <file category="include"   condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_timer_interrupt.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_misra.S"/>
+
+					<file category="source"    condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/txe_thread_secure_stack_free.c"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_secure_stack_allocate.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_secure_stack_free.S"/>
+                    <file category="sourceAsm" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_secure_stack_initialize.S"/>
+
+                    <!-- CM23 AC6 -->
+                    <file category="include"   condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_timer_interrupt.S"/>
+
+                    <file category="source"    condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/txe_thread_secure_stack_free.c"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_secure_stack_allocate.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_secure_stack_free.S"/>
+                    <file category="sourceAsm" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_secure_stack_initialize.S"/>
+
+                    <!-- CM33 IAR -->
+                    <file category="source"    condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CM33 IAR Condition" name="ports/cortex_m33/iar/inc/"/>
+					<file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_initialize_low_level.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_timer_interrupt.s"/>
+
+                    <file category="source"    condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/txe_thread_secure_stack_free.c"/>
+					<file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_secure_stack_allocate.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_secure_stack_free.s"/>
+                    <file category="sourceAsm" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_secure_stack_initialize.s"/>
+
+                    <!-- CM33 GNU -->
+                    <file category="include"   condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_timer_interrupt.S"/>
+
+					<file category="source"    condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/txe_thread_secure_stack_free.c"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_secure_stack_allocate.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_secure_stack_free.S"/>
+                    <file category="sourceAsm" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_secure_stack_initialize.S"/>
+
+                    <!-- CM33 AC6 -->
+                    <file category="include"   condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/inc/"/>
+					<file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_timer_interrupt.S"/>
+
+                    <file category="source"    condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/txe_thread_secure_stack_free.c"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_secure_stack_allocate.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_secure_stack_free.S"/>
+                    <file category="sourceAsm" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_secure_stack_initialize.S"/>
+
+                    <!-- CM55 IAR -->
+                    <file category="source"    condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CM55 IAR Condition" name="ports/cortex_m55/iar/inc/"/>
+					<file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_initialize_low_level.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_timer_interrupt.s"/>
+
+                    <file category="source"    condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/txe_thread_secure_stack_free.c"/>
+					<file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_secure_stack_allocate.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_secure_stack_free.s"/>
+                    <file category="sourceAsm" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_secure_stack_initialize.s"/>
+
+                    <!-- CM55 GNU -->
+                    <file category="include"   condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_timer_interrupt.S"/>
+
+					<file category="source"    condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/txe_thread_secure_stack_free.c"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_secure_stack_allocate.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_secure_stack_free.S"/>
+                    <file category="sourceAsm" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_secure_stack_initialize.S"/>
+
+                    <!-- CM55 AC6 -->
+                    <file category="include"   condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_timer_interrupt.S"/>
+
+                    <file category="source"    condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/txe_thread_secure_stack_free.c"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_secure_stack_allocate.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_secure_stack_free.S"/>
+                    <file category="sourceAsm" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_secure_stack_initialize.S"/>
+
+                    <!-- CM85 IAR -->
+                    <file category="source"    condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CM85 IAR Condition" name="ports/cortex_m85/iar/inc/"/>
+					<file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_initialize_low_level.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_timer_interrupt.s"/>
+
+                    <file category="source"    condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/txe_thread_secure_stack_free.c"/>
+					<file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_secure_stack_allocate.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_secure_stack_free.s"/>
+                    <file category="sourceAsm" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_secure_stack_initialize.s"/>
+
+                    <!-- CM85 GNU -->
+                    <file category="include"   condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_timer_interrupt.S"/>
+
+					<file category="source"    condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/txe_thread_secure_stack_free.c"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_secure_stack_allocate.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_secure_stack_free.S"/>
+                    <file category="sourceAsm" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_secure_stack_initialize.S"/>
+
+                    <!-- CM85 AC6 -->
+                    <file category="include"   condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_timer_interrupt.S"/>
+
+                    <file category="source"    condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_secure_stack.c"/>
+                    <file category="source"    condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/txe_thread_secure_stack_allocate.c"/>
+                    <file category="source"    condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/txe_thread_secure_stack_free.c"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_secure_stack_allocate.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_secure_stack_free.S"/>
+                    <file category="sourceAsm" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_secure_stack_initialize.S"/>
+
+                    <!-- CA5 IAR -->
+                    <file category="source"    condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CA5 IAR Condition" name="ports/cortex_a5/iar/inc/"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_fiq_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_fiq_context_save.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_fiq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_fiq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_irq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_irq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_thread_vectored_context_save.s"/>
+                    <file category="sourceAsm" condition="CA5 IAR Condition" name="ports/cortex_a5/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CA5 GNU -->
+                    <file category="include"   condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA5 GNU Condition" name="ports/cortex_a5/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA5 AC6 -->
+                    <file category="include"   condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA5 ARMC6 Condition" name="ports/cortex_a5/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA7 IAR -->
+                    <file category="source"    condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CA7 IAR Condition" name="ports/cortex_a7/iar/inc/"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_fiq_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_fiq_context_save.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_fiq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_fiq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_irq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_irq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_thread_vectored_context_save.s"/>
+                    <file category="sourceAsm" condition="CA7 IAR Condition" name="ports/cortex_a7/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CA7 GNU -->
+                    <file category="include"   condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA7 GNU Condition" name="ports/cortex_a7/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA7 AC6 -->
+                    <file category="include"   condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA7 ARMC6 Condition" name="ports/cortex_a7/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA8 IAR -->
+                    <file category="source"    condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CA8 IAR Condition" name="ports/cortex_a8/iar/inc/"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_fiq_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_fiq_context_save.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_fiq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_fiq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_irq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_irq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_thread_vectored_context_save.s"/>
+                    <file category="sourceAsm" condition="CA8 IAR Condition" name="ports/cortex_a8/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CA8 GNU -->
+                    <file category="include"   condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA8 GNU Condition" name="ports/cortex_a8/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA8 AC6 -->
+                    <file category="include"   condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA8 ARMC6 Condition" name="ports/cortex_a8/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA9 IAR -->
+                    <file category="source"    condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CA9 IAR Condition" name="ports/cortex_a9/iar/inc/"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_fiq_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_fiq_context_save.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_fiq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_fiq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_irq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_irq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_thread_vectored_context_save.s"/>
+                    <file category="sourceAsm" condition="CA9 IAR Condition" name="ports/cortex_a9/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CA9 GNU -->
+                    <file category="include"   condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA9 GNU Condition" name="ports/cortex_a9/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA9 AC6 -->
+                    <file category="include"   condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA9 ARMC6 Condition" name="ports/cortex_a9/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA15 IAR -->
+                    <file category="source"    condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CA15 IAR Condition" name="ports/cortex_a15/iar/inc/"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_fiq_context_restore.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_fiq_context_save.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_fiq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_fiq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_irq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_irq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_thread_vectored_context_save.s"/>
+                    <file category="sourceAsm" condition="CA15 IAR Condition" name="ports/cortex_a15/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CA15 GNU -->
+                    <file category="include"   condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA15 GNU Condition" name="ports/cortex_a15/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA15 AC6 -->
+                    <file category="include"   condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA15 ARMC6 Condition" name="ports/cortex_a15/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA17 GNU -->
+                    <file category="include"   condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA17 GNU Condition" name="ports/cortex_a17/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA17 AC6 -->
+                    <file category="include"   condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CA17 ARMC6 Condition" name="ports/cortex_a17/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA53 GNU -->
+                    <file category="include"   condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_context_save.S"/>
+                    <file category="source"    condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_fp_disable.c"/>
+                    <file category="source"    condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_fp_enable.c"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA53 GNU Condition" name="ports/cortex_a53/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA53 AC6 -->
+                    <file category="include"   condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_context_save.S"/>
+                    <file category="source"    condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_fp_disable.c"/>
+                    <file category="source"    condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_fp_enable.c"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA53 ARMC6 Condition" name="ports/cortex_a53/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA57 GNU -->
+                    <file category="include"   condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_context_save.S"/>
+                    <file category="source"    condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_fp_disable.c"/>
+                    <file category="source"    condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_fp_enable.c"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA57 GNU Condition" name="ports/cortex_a57/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA57 AC6 -->
+                    <file category="include"   condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_context_save.S"/>
+                    <file category="source"    condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_fp_disable.c"/>
+                    <file category="source"    condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_fp_enable.c"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA57 ARMC6 Condition" name="ports/cortex_a57/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA72 GNU -->
+                    <file category="include"   condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_context_save.S"/>
+                    <file category="source"    condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_fp_disable.c"/>
+                    <file category="source"    condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_fp_enable.c"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA72 GNU Condition" name="ports/cortex_a72/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA72 AC6 -->
+                    <file category="include"   condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_context_save.S"/>
+                    <file category="source"    condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_fp_disable.c"/>
+                    <file category="source"    condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_fp_enable.c"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA72 ARMC6 Condition" name="ports/cortex_a72/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA73 GNU -->
+                    <file category="include"   condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_context_save.S"/>
+                    <file category="source"    condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_fp_disable.c"/>
+                    <file category="source"    condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_fp_enable.c"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA73 GNU Condition" name="ports/cortex_a73/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CA73 AC6 -->
+                    <file category="include"   condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_context_save.S"/>
+                    <file category="source"    condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_fp_disable.c"/>
+                    <file category="source"    condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_fp_enable.c"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CA73 ARMC6 Condition" name="ports/cortex_a73/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CR4 IAR -->
+                    <file category="source"    condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CR4 IAR Condition" name="ports/cortex_r4/iar/inc/"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_irq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_irq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_thread_vectored_context_save.s"/>
+                    <file category="sourceAsm" condition="CR4 IAR Condition" name="ports/cortex_r4/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CR4 GNU -->
+                    <file category="include"   condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CR4 GNU Condition" name="ports/cortex_r4/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CR4 AC6 -->
+                    <file category="include"   condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_initialize_low_level.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CR4 ARMC6 Condition" name="ports/cortex_r4/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- CR5 IAR -->
+                    <file category="source"    condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_iar.c"/>
+                    <file category="include"   condition="CR5 IAR Condition" name="ports/cortex_r5/iar/inc/"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_context_restore.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_context_save.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_interrupt_control.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_interrupt_disable.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_interrupt_restore.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_irq_nesting_end.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_irq_nesting_start.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_schedule.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_stack_build.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_system_return.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_thread_vectored_context_save.s"/>
+                    <file category="sourceAsm" condition="CR5 IAR Condition" name="ports/cortex_r5/iar/src/tx_timer_interrupt.s"/>
+
+                    <!-- CR5 GNU -->
+                    <file category="include"   condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/inc/"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CR5 GNU Condition" name="ports/cortex_r5/gnu/src/tx_timer_interrupt.S"/>
+
+                    <!-- CR5 AC6 -->
+                    <file category="include"   condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/inc/"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_context_restore.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_context_save.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_fiq_context_restore.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_fiq_context_save.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_fiq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_fiq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_interrupt_control.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_interrupt_disable.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_interrupt_restore.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_irq_nesting_end.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_irq_nesting_start.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_schedule.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_stack_build.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_system_return.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_thread_vectored_context_save.S"/>
+                    <file category="sourceAsm" condition="CR5 ARMC6 Condition" name="ports/cortex_r5/ac6/src/tx_timer_interrupt.S"/>
+
+                    <!-- threadx common source code -->
+                    <file category="include" name="common/inc/"/>
+                    <file category="source"  name="common/src/tx_initialize_high_level.c"/>
+                    <file category="source"  name="common/src/tx_initialize_kernel_enter.c"/>
+                    <file category="source"  name="common/src/tx_initialize_kernel_setup.c"/>
+                    <file category="source"  name="common/src/tx_block_allocate.c"/>
+                    <file category="source"  name="common/src/tx_block_pool_cleanup.c"/>
+                    <file category="source"  name="common/src/tx_block_pool_create.c"/>
+                    <file category="source"  name="common/src/tx_block_pool_delete.c"/>
+                    <file category="source"  name="common/src/tx_block_pool_info_get.c"/>
+                    <file category="source"  name="common/src/tx_block_pool_initialize.c"/>
+                    <file category="source"  name="common/src/tx_block_pool_prioritize.c"/>
+                    <file category="source"  name="common/src/tx_block_release.c"/>
+                    <file category="source"  name="common/src/tx_byte_allocate.c"/>
+                    <file category="source"  name="common/src/tx_byte_pool_cleanup.c"/>
+                    <file category="source"  name="common/src/tx_byte_pool_create.c"/>
+                    <file category="source"  name="common/src/tx_byte_pool_delete.c"/>
+                    <file category="source"  name="common/src/tx_byte_pool_info_get.c"/>
+                    <file category="source"  name="common/src/tx_byte_pool_initialize.c"/>
+                    <file category="source"  name="common/src/tx_byte_pool_prioritize.c"/>
+                    <file category="source"  name="common/src/tx_byte_pool_search.c"/>
+                    <file category="source"  name="common/src/tx_byte_release.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_cleanup.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_create.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_delete.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_get.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_info_get.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_initialize.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_set.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_set_notify.c"/>
+                    <file category="source"  name="common/src/tx_mutex_cleanup.c"/>
+                    <file category="source"  name="common/src/tx_mutex_create.c"/>
+                    <file category="source"  name="common/src/tx_mutex_delete.c"/>
+                    <file category="source"  name="common/src/tx_mutex_get.c"/>
+                    <file category="source"  name="common/src/tx_mutex_info_get.c"/>
+                    <file category="source"  name="common/src/tx_mutex_initialize.c"/>
+                    <file category="source"  name="common/src/tx_mutex_prioritize.c"/>
+                    <file category="source"  name="common/src/tx_mutex_priority_change.c"/>
+                    <file category="source"  name="common/src/tx_mutex_put.c"/>
+                    <file category="source"  name="common/src/tx_queue_cleanup.c"/>
+                    <file category="source"  name="common/src/tx_queue_create.c"/>
+                    <file category="source"  name="common/src/tx_queue_delete.c"/>
+                    <file category="source"  name="common/src/tx_queue_flush.c"/>
+                    <file category="source"  name="common/src/tx_queue_front_send.c"/>
+                    <file category="source"  name="common/src/tx_queue_info_get.c"/>
+                    <file category="source"  name="common/src/tx_queue_initialize.c"/>
+                    <file category="source"  name="common/src/tx_queue_prioritize.c"/>
+                    <file category="source"  name="common/src/tx_queue_receive.c"/>
+                    <file category="source"  name="common/src/tx_queue_send.c"/>
+                    <file category="source"  name="common/src/tx_queue_send_notify.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_ceiling_put.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_cleanup.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_create.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_delete.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_get.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_info_get.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_initialize.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_prioritize.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_put.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_put_notify.c"/>
+                    <file category="source"  name="common/src/tx_thread_create.c"/>
+                    <file category="source"  name="common/src/tx_thread_delete.c"/>
+                    <file category="source"  name="common/src/tx_thread_entry_exit_notify.c"/>
+                    <file category="source"  name="common/src/tx_thread_identify.c"/>
+                    <file category="source"  name="common/src/tx_thread_info_get.c"/>
+                    <file category="source"  name="common/src/tx_thread_initialize.c"/>
+                    <file category="source"  name="common/src/tx_thread_preemption_change.c"/>
+                    <file category="source"  name="common/src/tx_thread_priority_change.c"/>
+                    <file category="source"  name="common/src/tx_thread_relinquish.c"/>
+                    <file category="source"  name="common/src/tx_thread_reset.c"/>
+                    <file category="source"  name="common/src/tx_thread_resume.c"/>
+                    <file category="source"  name="common/src/tx_thread_shell_entry.c"/>
+                    <file category="source"  name="common/src/tx_thread_sleep.c"/>
+                    <file category="source"  name="common/src/tx_thread_stack_analyze.c"/>
+                    <file category="source"  name="common/src/tx_thread_stack_error_handler.c"/>
+                    <file category="source"  name="common/src/tx_thread_stack_error_notify.c"/>
+                    <file category="source"  name="common/src/tx_thread_suspend.c"/>
+                    <file category="source"  name="common/src/tx_thread_system_preempt_check.c"/>
+                    <file category="source"  name="common/src/tx_thread_system_resume.c"/>
+                    <file category="source"  name="common/src/tx_thread_system_suspend.c"/>
+                    <file category="source"  name="common/src/tx_thread_terminate.c"/>
+                    <file category="source"  name="common/src/tx_thread_time_slice.c"/>
+                    <file category="source"  name="common/src/tx_thread_time_slice_change.c"/>
+                    <file category="source"  name="common/src/tx_thread_timeout.c"/>
+                    <file category="source"  name="common/src/tx_thread_wait_abort.c"/>
+                    <file category="source"  name="common/src/tx_time_get.c"/>
+                    <file category="source"  name="common/src/tx_time_set.c"/>
+                    <file category="source"  name="common/src/txe_block_allocate.c"/>
+                    <file category="source"  name="common/src/txe_block_pool_create.c"/>
+                    <file category="source"  name="common/src/txe_block_pool_delete.c"/>
+                    <file category="source"  name="common/src/txe_block_pool_info_get.c"/>
+                    <file category="source"  name="common/src/txe_block_pool_prioritize.c"/>
+                    <file category="source"  name="common/src/txe_block_release.c"/>
+                    <file category="source"  name="common/src/txe_byte_allocate.c"/>
+                    <file category="source"  name="common/src/txe_byte_pool_create.c"/>
+                    <file category="source"  name="common/src/txe_byte_pool_delete.c"/>
+                    <file category="source"  name="common/src/txe_byte_pool_info_get.c"/>
+                    <file category="source"  name="common/src/txe_byte_pool_prioritize.c"/>
+                    <file category="source"  name="common/src/txe_byte_release.c"/>
+                    <file category="source"  name="common/src/txe_event_flags_create.c"/>
+                    <file category="source"  name="common/src/txe_event_flags_delete.c"/>
+                    <file category="source"  name="common/src/txe_event_flags_get.c"/>
+                    <file category="source"  name="common/src/txe_event_flags_info_get.c"/>
+                    <file category="source"  name="common/src/txe_event_flags_set.c"/>
+                    <file category="source"  name="common/src/txe_event_flags_set_notify.c"/>
+                    <file category="source"  name="common/src/txe_mutex_create.c"/>
+                    <file category="source"  name="common/src/txe_mutex_delete.c"/>
+                    <file category="source"  name="common/src/txe_mutex_get.c"/>
+                    <file category="source"  name="common/src/txe_mutex_info_get.c"/>
+                    <file category="source"  name="common/src/txe_mutex_prioritize.c"/>
+                    <file category="source"  name="common/src/txe_mutex_put.c"/>
+                    <file category="source"  name="common/src/txe_queue_create.c"/>
+                    <file category="source"  name="common/src/txe_queue_delete.c"/>
+                    <file category="source"  name="common/src/txe_queue_flush.c"/>
+                    <file category="source"  name="common/src/txe_queue_front_send.c"/>
+                    <file category="source"  name="common/src/txe_queue_info_get.c"/>
+                    <file category="source"  name="common/src/txe_queue_prioritize.c"/>
+                    <file category="source"  name="common/src/txe_queue_receive.c"/>
+                    <file category="source"  name="common/src/txe_queue_send.c"/>
+                    <file category="source"  name="common/src/txe_queue_send_notify.c"/>
+                    <file category="source"  name="common/src/txe_semaphore_ceiling_put.c"/>
+                    <file category="source"  name="common/src/txe_semaphore_create.c"/>
+                    <file category="source"  name="common/src/txe_semaphore_delete.c"/>
+                    <file category="source"  name="common/src/txe_semaphore_get.c"/>
+                    <file category="source"  name="common/src/txe_semaphore_info_get.c"/>
+                    <file category="source"  name="common/src/txe_semaphore_prioritize.c"/>
+                    <file category="source"  name="common/src/txe_semaphore_put.c"/>
+                    <file category="source"  name="common/src/txe_semaphore_put_notify.c"/>
+                    <file category="source"  name="common/src/txe_thread_create.c"/>
+                    <file category="source"  name="common/src/txe_thread_delete.c"/>
+                    <file category="source"  name="common/src/txe_thread_entry_exit_notify.c"/>
+                    <file category="source"  name="common/src/txe_thread_info_get.c"/>
+                    <file category="source"  name="common/src/txe_thread_preemption_change.c"/>
+                    <file category="source"  name="common/src/txe_thread_priority_change.c"/>
+                    <file category="source"  name="common/src/txe_thread_relinquish.c"/>
+                    <file category="source"  name="common/src/txe_thread_reset.c"/>
+                    <file category="source"  name="common/src/txe_thread_resume.c"/>
+                    <file category="source"  name="common/src/txe_thread_suspend.c"/>
+                    <file category="source"  name="common/src/txe_thread_terminate.c"/>
+                    <file category="source"  name="common/src/txe_thread_time_slice_change.c"/>
+                    <file category="source"  name="common/src/txe_thread_wait_abort.c"/>
+
+                    <file category="source"  name="common/src/tx_timer_activate.c"/>
+                    <file category="source"  name="common/src/tx_timer_change.c"/>
+                    <file category="source"  name="common/src/tx_timer_create.c"/>
+                    <file category="source"  name="common/src/tx_timer_deactivate.c"/>
+                    <file category="source"  name="common/src/tx_timer_delete.c"/>
+                    <file category="source"  name="common/src/tx_timer_expiration_process.c"/>
+                    <file category="source"  name="common/src/tx_timer_info_get.c"/>
+                    <file category="source"  name="common/src/tx_timer_initialize.c"/>
+                    <file category="source"  name="common/src/tx_timer_system_activate.c"/>
+                    <file category="source"  name="common/src/tx_timer_system_deactivate.c"/>
+                    <file category="source"  name="common/src/tx_timer_thread_entry.c"/>
+                    <file category="source"  name="common/src/txe_timer_activate.c"/>
+                    <file category="source"  name="common/src/txe_timer_change.c"/>
+                    <file category="source"  name="common/src/txe_timer_create.c"/>
+                    <file category="source"  name="common/src/txe_timer_deactivate.c"/>
+                    <file category="source"  name="common/src/txe_timer_delete.c"/>
+                    <file category="source"  name="common/src/txe_timer_info_get.c"/>
+                </files>
+            </component>
+            <component Cgroup="ThreadX" Csub="Secure Application Support" condition="Secure Stack Condition" maxInstances="1">
+			    <description>API to support TZ secure application</description>
+                <files>
+				    <file category="include" name="common/inc/"/>
+
+                    <file category="include" condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/inc/"/>
+                    <file category="source"  condition="CM23 ARMC6 Condition" name="ports/cortex_m23/ac6/src/tx_thread_secure_stack.c"/>
+                    <file category="include" condition="CM23 IAR Condition" name="ports/cortex_m23/iar/inc/"/>
+                    <file category="source"  condition="CM23 IAR Condition" name="ports/cortex_m23/iar/src/tx_thread_secure_stack.c"/>
+                    <file category="include" condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/inc/"/>
+                    <file category="source"  condition="CM23 GNU Condition" name="ports/cortex_m23/gnu/src/tx_thread_secure_stack.c"/>
+
+                    <file category="include" condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/inc/"/>
+                    <file category="source"  condition="CM33 ARMC6 Condition" name="ports/cortex_m33/ac6/src/tx_thread_secure_stack.c"/>
+                    <file category="include" condition="CM33 IAR Condition" name="ports/cortex_m33/iar/inc/"/>
+                    <file category="source"  condition="CM33 IAR Condition" name="ports/cortex_m33/iar/src/tx_thread_secure_stack.c"/>
+                    <file category="include" condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/inc/"/>
+                    <file category="source"  condition="CM33 GNU Condition" name="ports/cortex_m33/gnu/src/tx_thread_secure_stack.c"/>
+
+                    <file category="include" condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/inc/"/>
+                    <file category="source"  condition="CM55 ARMC6 Condition" name="ports/cortex_m55/ac6/src/tx_thread_secure_stack.c"/>
+                    <file category="include" condition="CM55 IAR Condition" name="ports/cortex_m55/iar/inc/"/>
+                    <file category="source"  condition="CM55 IAR Condition" name="ports/cortex_m55/iar/src/tx_thread_secure_stack.c"/>
+                    <file category="include" condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/inc/"/>
+                    <file category="source"  condition="CM55 GNU Condition" name="ports/cortex_m55/gnu/src/tx_thread_secure_stack.c"/>
+
+                    <file category="include" condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/inc/"/>
+                    <file category="source"  condition="CM85 ARMC6 Condition" name="ports/cortex_m85/ac6/src/tx_thread_secure_stack.c"/>
+                    <file category="include" condition="CM85 IAR Condition" name="ports/cortex_m85/iar/inc/"/>
+                    <file category="source"  condition="CM85 IAR Condition" name="ports/cortex_m85/iar/src/tx_thread_secure_stack.c"/>
+                    <file category="include" condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/inc/"/>
+                    <file category="source"  condition="CM85 GNU Condition" name="ports/cortex_m85/gnu/src/tx_thread_secure_stack.c"/>
+
+                </files>
+            </component>
+            <component Cgroup="ThreadX" Csub="Performance Info Support" condition="TX common Condition" maxInstances="1">
+                <description>Azure RTOS threadx Performance Info APIs subgroub</description>
+                <files>
+                    <file category="source"  name="common/src/tx_thread_performance_info_get.c"/>
+                    <file category="source"  name="common/src/tx_thread_performance_system_info_get.c"/>
+                    <file category="source"  name="common/src/tx_block_pool_performance_info_get.c"/>
+                    <file category="source"  name="common/src/tx_block_pool_performance_system_info_get.c"/>
+                    <file category="source"  name="common/src/tx_byte_pool_performance_info_get.c"/>
+                    <file category="source"  name="common/src/tx_byte_pool_performance_system_info_get.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_performance_info_get.c"/>
+                    <file category="source"  name="common/src/tx_event_flags_performance_system_info_get.c"/>
+                    <file category="source"  name="common/src/tx_mutex_performance_info_get.c"/>
+                    <file category="source"  name="common/src/tx_mutex_performance_system_info_get.c"/>
+                    <file category="source"  name="common/src/tx_queue_performance_info_get.c"/>
+                    <file category="source"  name="common/src/tx_queue_performance_system_info_get.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_performance_info_get.c"/>
+                    <file category="source"  name="common/src/tx_semaphore_performance_system_info_get.c"/>
+                    <file category="source"  name="common/src/tx_timer_performance_info_get.c"/>
+                    <file category="source"  name="common/src/tx_timer_performance_system_info_get.c"/>
+                </files>
+            </component>
+            <component Cgroup="ThreadX" Csub="TraceX Support" condition="TX common Condition" maxInstances="1">
+                <description>Azure RTOS threadx tracing APIs subgroub (Default API variant for optional tracing feature).</description>
+                <files>
+                    <file category="source"  name="common/src/tx_trace_buffer_full_notify.c"/>
+                    <file category="source"  name="common/src/tx_trace_disable.c"/>
+                    <file category="source"  name="common/src/tx_trace_enable.c"/>
+                    <file category="source"  name="common/src/tx_trace_event_filter.c"/>
+                    <file category="source"  name="common/src/tx_trace_event_unfilter.c"/>
+                    <file category="source"  name="common/src/tx_trace_initialize.c"/>
+                    <file category="source"  name="common/src/tx_trace_interrupt_control.c"/>
+                    <file category="source"  name="common/src/tx_trace_isr_enter_insert.c"/>
+                    <file category="source"  name="common/src/tx_trace_isr_exit_insert.c"/>
+                    <file category="source"  name="common/src/tx_trace_object_register.c"/>
+                    <file category="source"  name="common/src/tx_trace_object_unregister.c"/>
+                    <file category="source"  name="common/src/tx_trace_user_event_insert.c"/>
+                </files>
+            </component>
+            <component Cgroup="ThreadX" Csub="Low Power Support" condition="TX common Condition" maxInstances="1">
+                <description>low power Support in ThreadX</description>
+                <files>
+                    <file category="source"  name="utility/low_power/tx_low_power.c"/>
+                    <file category="include" name="utility/low_power/"/>
+                </files>
+            </component>
+        </bundle>
+    </components>
+
+    <examples>
+        <example name="AzureRTOS ThreadX Example" doc="sample_threadx/Readme.txt" folder="examples/iar">
+          <description>AzureRTOS ThreadX Example for ARM cortex-m4 using IAR</description>
+		  <board name="EWARM Simulator" vendor="iar"/>
+          <project>
+              <environment name="iar" load="sample_threadx/sample_threadx.ewp"/>
+          </project>
+          <attributes>
+              <component Cclass="RTOS" Cgroup="ThreadX" Csub="Core"/>
+              <category>Getting Started</category>
+          </attributes>
+        </example>
+        <example name="AzureRTOS ThreadX Trustzone Example" doc="cm33_threadx_sample/Readme.txt" folder="examples/keil">
+          <description>A Secure/Non-secure Example for ARM cortex-m33 using Keil</description>
+		  <board name="uVision Simulator" vendor="Keil"/>
+          <project>
+              <environment name="uv" load="cm33_threadx_sample/cm33_threadx.uvmpw"/>
+          </project>
+          <attributes>
+		      <component Cclass="CMSIS"  Cgroup="CORE"/>
+              <component Cclass="Device" Cgroup="Startup"/>
+              <component Cclass="RTOS"   Cgroup="ThreadX" Csub="Secure App support"/>
+              <category>Getting Started</category>
+          </attributes>
+        </example>
+
+    </examples>
+
+</package>
