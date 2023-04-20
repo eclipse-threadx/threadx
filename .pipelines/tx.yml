@@ -18,10 +18,15 @@ pool:
   vmImage: "ubuntu-22.04"
 
 steps:
+  - task: PipAuthenticate@1
+    displayName: 'Pip Authenticate'
+    inputs:
+      # Provide list of feed names which you want to authenticate.
+      # Project scoped feeds must include the project name in addition to the feed name.
+      artifactFeeds: 'X-Ware/X-Ware_PublicPackages'
+
   - bash: sudo $(Build.SourcesDirectory)/scripts/install.sh
     displayName: 'Install softwares'
-    env:
-      INDEX_URL: $(INDEX_URL)
 
   - task: Bash@3
     displayName: 'SDL check'
