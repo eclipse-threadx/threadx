@@ -1,0 +1,35 @@
+b main
+r
+wait
+watch thread_0_counter
+c
+wait
+c
+wait
+c
+wait
+c
+wait
+c
+wait
+c
+wait
+c
+wait
+c
+wait
+c
+wait
+c
+wait
+log file test.log
+output thread_0_counter
+output thread_1_counter
+output thread_2_counter
+output thread_3_counter
+output thread_4_counter
+output thread_5_counter
+output thread_6_counter
+output thread_7_counter
+log file
+exit

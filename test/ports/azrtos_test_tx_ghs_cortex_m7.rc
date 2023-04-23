@@ -1,0 +1,33 @@
+prepare_target -wait
+D // delete all breakpoints
+b thread_0_entry#11 // set a breakpoint in the thread_0 loop
+c // continue
+wait -stop // wait until stopped
+p /x thread_0_counter
+p /x thread_1_counter
+p /x thread_2_counter
+p /x thread_3_counter
+p /x thread_4_counter
+p /x thread_5_counter
+p /x thread_6_counter
+p /x thread_7_counter
+c
+wait -stop
+c
+wait -stop
+c
+wait -stop
+c
+wait -stop
+c
+wait -stop
+p /x thread_0_counter
+p /x thread_1_counter
+p /x thread_2_counter
+p /x thread_3_counter
+p /x thread_4_counter
+p /x thread_5_counter
+p /x thread_6_counter
+p /x thread_7_counter
+savedebugpane cmd test.log
+quit force // exit unconditionally
