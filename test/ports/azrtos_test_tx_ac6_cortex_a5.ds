@@ -1,0 +1,11 @@
+b main
+r
+wait
+watch thread_0_counter
+c
+wait
+c
+log file test.log
+output thread_0_counter
+log file
+exit

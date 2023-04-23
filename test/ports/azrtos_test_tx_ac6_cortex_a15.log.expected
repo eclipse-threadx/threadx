@@ -1,0 +1,4 @@
+>output thread_0_counter
+1
+>log file
+Stopped duplicating logging output
