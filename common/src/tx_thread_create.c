@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_create                                   PORTABLE C      */
-/*                                                           6.1.8        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -88,6 +88,10 @@
 /*                                            supported TX_MISRA_ENABLE,  */
 /*  08-02-2021      Scott Larson            Removed unneeded cast,        */
 /*                                            resulting in version 6.1.8  */
+/*  xx-xx-xxxx      Xiuwen Cai              Modified comment(s),          */
+/*                                            added option for random     */
+/*                                            number stack filling,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ULONG id), ULONG entry_input,
@@ -109,6 +113,17 @@ ALIGN_TYPE              updated_stack_start;
 #endif
 
 #ifndef TX_DISABLE_STACK_FILLING
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
+
+    /* Initialize the stack fill value to a 8-bit random value.  */
+    thread_ptr -> tx_thread_stack_fill_value = ((ULONG) TX_RAND()) & 0xFFUL;
+
+    /* Duplicate the random value in each of the 4 bytes of the stack fill value.  */
+    thread_ptr -> tx_thread_stack_fill_value = thread_ptr -> tx_thread_stack_fill_value |
+                    (thread_ptr -> tx_thread_stack_fill_value << 8) |
+                    (thread_ptr -> tx_thread_stack_fill_value << 16) |
+                    (thread_ptr -> tx_thread_stack_fill_value << 24);
+#endif
 
     /* Set the thread stack to a pattern prior to creating the initial
        stack frame.  This pattern is used by the stack checking routines
