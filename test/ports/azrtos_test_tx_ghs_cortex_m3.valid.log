@@ -1,0 +1,30 @@
+Connected to target `Simulator'.
+Target: Initializing `C:\ghs\comp_202014\simarm -cpu=cortexm3 -rom_use_entry'.
+Target: Target cpu: Cortex-M3
+Playing back from C:\ghs\comp_202014\defaults\os_aware\txarm.rc
+Target cpu: Cortex-M3
+All software breakpoints deleted
+         thread_0_entry#11:	0x149c count: 1
+Stopped by breakpoint
+thread_0_counter = 0x00000000
+thread_1_counter = 0x00000000
+thread_2_counter = 0x00000000
+thread_3_counter = 0x00000000
+thread_4_counter = 0x00000000
+thread_5_counter = 0x00000000
+thread_6_counter = 0x00000000
+thread_7_counter = 0x00000000
+Stopped by breakpoint
+Stopped by breakpoint
+Stopped by breakpoint
+Stopped by breakpoint
+Stopped by breakpoint
+thread_0_counter = 0x00000005
+thread_1_counter = 0x00003695
+thread_2_counter = 0x0000363f
+thread_3_counter = 0x0000000d
+thread_4_counter = 0x0000000d
+thread_5_counter = 0x00000005
+thread_6_counter = 0x0000000d
+thread_7_counter = 0x0000000d
+MULTI> 
