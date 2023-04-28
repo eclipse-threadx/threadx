@@ -20,6 +20,10 @@
 /**************************************************************************/
 /**************************************************************************/
 
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
     IMPORT      _tx_timer_time_slice
     IMPORT      _tx_timer_system_clock
     IMPORT      _tx_timer_current_ptr
@@ -40,7 +44,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_timer_interrupt                              Cortex-M3/AC5      */
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -77,6 +81,8 @@
 /*  01-31-2022      Scott Larson            Modified comment(s), added    */
 /*                                            TX_NO_TIMER support,        */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx      Tiejun Zhou             Included tx_user.h,           */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)

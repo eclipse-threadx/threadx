@@ -1,0 +1,18 @@
+>output thread_0_counter
+10
+>output thread_1_counter
+17765
+>output thread_2_counter
+17748
+>output thread_3_counter
+23
+>output thread_4_counter
+23
+>output thread_5_counter
+9
+>output thread_6_counter
+23
+>output thread_7_counter
+22
+>log file
+Stopped duplicating logging output

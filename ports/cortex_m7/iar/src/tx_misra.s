@@ -20,6 +20,10 @@
 /**************************************************************************/
 /**************************************************************************/
 
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
         #define SHT_PROGBITS 0x1
 
         EXTERN __aeabi_memset
