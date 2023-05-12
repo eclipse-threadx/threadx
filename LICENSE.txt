@@ -2,7 +2,6 @@ MICROSOFT SOFTWARE LICENSE TERMS
 
 MICROSOFT AZURE RTOS 
 
-Shape 
 
 These license terms are an agreement between you and Microsoft Corporation (or
 one of its affiliates). They apply to the software named above and any Microsoft
@@ -14,10 +13,11 @@ HAVE THE RIGHTS BELOW.  BY USING THE SOFTWARE, YOU ACCEPT THESE TERMS.
 
 1. INSTALLATION AND USE RIGHTS.  
 
-a) General. You may install and use the software and the included Microsoft
-applications solely for internal development, testing and evaluation purposes.
-Any distribution or production use requires a separate license as set forth in
-Section 2.  
+a) General. You may (I) install, use and modify the software and (ii) install and use the included Microsoft
+Applications (if any), each solely for internal development, testing and evaluation purposes.
+Distribution or production use is governed by the license terms set forth in
+Section 2.  You may also obtain distribution or production use rights through a separate agreement with 
+Microsoft. 
 
 b) Contributions. Microsoft welcomes contributions to this software. In the event
 that you make a contribution to this software you will be required to agree to a
@@ -25,7 +25,7 @@ Contributor License Agreement (CLA) declaring that you have the right to, and
 actually do, grant Microsoft the rights to use your contribution. For details,
 visit https://cla.microsoft.com.  
 
-c) Included Microsoft Applications. The software includes other Microsoft
+c) Included Microsoft Applications. The software may include other Microsoft
 applications which are governed by the licenses embedded in or made available
 with those applications.  
 
@@ -57,7 +57,6 @@ i. You may use the software in production (e.g. program the modified or unmodifi
 software to devices you own or control) and distribute (i.e. make available to
 third parties) the modified or unmodified binary image produced from this code.
 
-
 ii. You may permit your device distributors or developers to copy and distribute the
 binary image as programmed or to be programmed to your devices. 
 
@@ -70,17 +69,12 @@ b) Requirements. For any code you distribute, you must:
 
 i. when distributed in binary form, except as embedded in a device, include with
 such distribution the terms of this agreement;  
-
 ii. when distributed in source code form to distributors or developers of your
 devices, include with such distribution the terms of this agreement; and 
-
-iii. indemnify, defend and hold harmless Microsoft from  any claims, including
-attorneys’ fees, related to the distribution or use of your devices, except to
-the extent that any claim is based solely on the unmodified software. 
+iii. indemnify, defend and hold harmless Microsoft from any claims, including claims arising from any High Risk Uses, and inclusive of attorneys’ fees, related to the distribution or use of your devices that include the software, except to the extent that any intellectual property claim is based solely on the unmodified software.
 
 c) Restrictions. You may not: 
-
-i. use or modify the software to create a competing real time operating system
+i. use or modify the software to create competing real time operating system
 software;  
 
 ii. remove any copyright notices or licenses contained in the software; 
@@ -179,12 +173,13 @@ breach of which would endanger the purpose of this agreement and the compliance
 with which a party may constantly trust in (so-called "cardinal obligations").
 In other cases of slight negligence, Microsoft will not be liable for slight
 negligence. 
-
-12. DISCLAIMER OF WARRANTY. THE SOFTWARE IS LICENSED “AS IS.” YOU BEAR THE RISK OF
+12. DISCLAIMER OF WARRANTY. 
+a) THE SOFTWARE IS LICENSED “AS IS.” YOU BEAR THE RISK OF
 USING IT. MICROSOFT GIVES NO EXPRESS WARRANTIES, GUARANTEES, OR CONDITIONS. TO
 THE EXTENT PERMITTED UNDER APPLICABLE LAWS, MICROSOFT EXCLUDES ALL IMPLIED
 WARRANTIES, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
 NON-INFRINGEMENT. 
+b) HIGH RISK USE DISCLAIMER. WARNING: THE SOFTWARE IS NOT DESIGNED OR INTENDED FOR USE  WHERE FAILURE OR FAULT OF ANY KIND OF THE SOFTWARE COULD  RESULT IN DEATH OR SERIOUS BODILY INJURY, OR IN  PHYSICAL OR ENVIRONMENTAL DAMAGE (“collectively High Risk Use”). Accordingly, You must design and implement your hardware and software such that, in the event of any interruption, defect, error, or other failure of the software, the safety of people, property, and the environment are not reduced below a level that is reasonable, appropriate, and legal, whether in general or for a specific industry. Your High Risk Use of the software is at Your own risk. 
 
 13. LIMITATION ON AND EXCLUSION OF DAMAGES. IF YOU HAVE ANY BASIS FOR RECOVERING
 DAMAGES DESPITE THE PRECEDING DISCLAIMER OF WARRANTY, YOU CAN RECOVER FROM
@@ -203,21 +198,29 @@ possibility of the damages. The above limitation or exclusion may not apply to
 you because your state, province, or country may not allow the exclusion or
 limitation of incidental, consequential, or other damages. 
 
- 
-
-Please note: As this software is distributed in Canada, some of the clauses in
+ Please note: As this software is distributed in Canada, some of the clauses in
 this agreement are provided below in French. 
 
 Remarque: Ce logiciel étant distribué au Canada, certaines des clauses dans ce
 contrat sont fournies ci-dessous en français. 
 
-EXONÉRATION DE GARANTIE. Le logiciel visé par une licence est offert « tel quel
+EXONÉRATION DE GARANTIE. 
+a)	Le logiciel visé par une licence est offert « tel quel
 ». Toute utilisation de ce logiciel est à votre seule risque et péril. Microsoft
 n’accorde aucune autre garantie expresse. Vous pouvez bénéficier de droits
 additionnels en vertu du droit local sur la protection des consommateurs, que ce
 contrat ne peut modifier. La ou elles sont permises par le droit locale, les
 garanties implicites de qualité marchande, d’adéquation à un usage particulier
 et d’absence de contrefaçon sont exclues. 
+b)	CLAUSE D’EXCLUSION DE RESPONSABILITÉ RELATIVE À L’UTILISATION À HAUT RISQUE. 
+AVERTISSEMENT: LE LOGICIEL N’EST PAS CONÇU OU DESTINÉ À ÊTRE UTILISÉ LORSQU’UNE 
+DÉFAILLANCE OU UN DÉFAUT DE QUELQUE NATURE QUE CE SOIT POURRAIT ENTRAÎNER LA 
+MORT OU DES BLESSURES CORPORELLES GRAVES, OU DES DOMMAGES PHYSIQUES OU 
+ENVIRONNEMENTAUX (« Utilisation à haut risque »). Par conséquent, vous devez concevoir et mettre en 
+œuvre votre équipement et votre logiciel de manière à ce que, en cas d’interruption, de défaut, d’erreur 
+ou de toute autre défaillance du logiciel, la sécurité des personnes, des biens et de l’environnement ne 
+soit pas réduite en dessous d’un niveau raisonnable, approprié et légal, que ce soit en général ou pour 
+un secteur spécifique. Votre utilisation à haut risque du logiciel est à vos propres risques.
 
 LIMITATION DES DOMMAGES-INTÉRÊTS ET EXCLUSION DE RESPONSABILITÉ POUR LES
 DOMMAGES. Vous pouvez obtenir de Microsoft et de ses fournisseurs une
@@ -243,4 +246,4 @@ ci-dessus ne s’appliquera pas à votre égard.
 EFFET JURIDIQUE. Le présent contrat décrit certains droits juridiques. Vous
 pourriez avoir d’autres droits prévus par les lois de votre pays. Le présent
 contrat ne modifie pas les droits que vous confèrent les lois de votre pays si
-celles-ci ne le permettent pas. 
+celles-ci ne le permettent pas.
