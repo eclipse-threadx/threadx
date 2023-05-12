@@ -6,7 +6,7 @@ project(threadx_smp_test LANGUAGES C)
 
 # Set build configurations
 set(BUILD_CONFIGURATIONS default_build_coverage
-                         disable_notify_callbacks_build stack_checking_build
+                         disable_notify_callbacks_build stack_checking_build stack_checking_rand_fill_build
                          trace_build)
 set(CMAKE_CONFIGURATION_TYPES
     ${BUILD_CONFIGURATIONS}
@@ -26,6 +26,7 @@ message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}.")
 set(default_build_coverage "")
 set(disable_notify_callbacks_build -DTX_DISABLE_NOTIFY_CALLBACKS)
 set(stack_checking_build -DTX_ENABLE_STACK_CHECKING)
+set(stack_checking_rand_fill_build -DTX_ENABLE_STACK_CHECKING -DTX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
 set(trace_build -DTX_ENABLE_EVENT_TRACE)
 
 add_compile_options(

@@ -477,6 +477,9 @@ UINT        status;
 ULONG       flags;
 ULONG       temp;
 UINT        i, j;
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
+TX_THREAD   *thread_ptr;
+#endif
 
 
     /* Initialize the test error/success counters.  */
@@ -946,6 +949,15 @@ UINT        i, j;
     
     /* Make a fake thread with a fake stack.  */
     test_thread2.tx_thread_id =  TX_THREAD_ID;
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
+
+    /* Set the thread pointer.  */
+    thread_ptr = &(test_thread2);
+
+    /* Initialize the stack fill value.  */
+    thread_ptr -> tx_thread_stack_fill_value = (0xFEFEFEFEUL);
+
+#endif
     for (i = 0; i < (sizeof(test_thread2_stack)/sizeof(ULONG)); i++)
     {
         /* Set the fake thread stack to the fill pattern.  */
