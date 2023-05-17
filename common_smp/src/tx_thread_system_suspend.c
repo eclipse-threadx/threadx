@@ -38,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_system_suspend                          PORTABLE SMP     */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -91,6 +91,8 @@
 /*  04-25-2022      Scott Larson            Modified comments and fixed   */
 /*                                            loop to find next thread,   */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx      Tiejun Zhou             Fixed MISRA2012 rule 10.4_a,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_system_suspend(TX_THREAD *thread_ptr)
@@ -671,7 +673,7 @@ UINT                        processing_complete;
                     complex_path_possible =  possible_cores & available_cores;
 
                     /* Check if we need to loop to find the next highest priority thread.  */
-                    if (next_priority == TX_MAX_PRIORITIES)
+                    if (next_priority == (ULONG)TX_MAX_PRIORITIES)
                     {
                         loop_finished = TX_TRUE;
                     }
