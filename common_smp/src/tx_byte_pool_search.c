@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_byte_pool_search                               PORTABLE SMP     */
-/*                                                           6.1.7        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -81,6 +81,8 @@
 /*                                            calculation, and reduced    */
 /*                                            number of search resets,    */
 /*                                            resulting in version 6.1.7  */
+/*  xx-xx-xxxx      Tiejun Zhou             Fixed MISRA2012 rule 10.4_a,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UCHAR  *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size)
@@ -110,7 +112,7 @@ UINT            blocks_searched =  ((UINT) 0);
 
     /* First, determine if there are enough bytes in the pool.  */
     /* Theoretical bytes available = free bytes + ((fragments-2) * overhead of each block) */
-    total_theoretical_available = pool_ptr -> tx_byte_pool_available + ((pool_ptr -> tx_byte_pool_fragments - 2) * ((sizeof(UCHAR *)) + (sizeof(ALIGN_TYPE))));
+    total_theoretical_available = pool_ptr -> tx_byte_pool_available + ((pool_ptr -> tx_byte_pool_fragments - 2U) * ((sizeof(UCHAR *)) + (sizeof(ALIGN_TYPE))));
     if (memory_size >= total_theoretical_available)
     {
 

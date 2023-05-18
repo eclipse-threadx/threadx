@@ -826,7 +826,7 @@ TX_THREAD       *thread_remap_list[TX_THREAD_SMP_MAX_CORES];
 }
 
 
-ULONG  _tx_thread_smp_preemptable_threads_get(UINT priority, TX_THREAD *possible_preemption_list[])
+ULONG  _tx_thread_smp_preemptable_threads_get(UINT priority, TX_THREAD *possible_preemption_list[TX_THREAD_SMP_MAX_CORES])
 {
 
 UINT        i, j, k;
