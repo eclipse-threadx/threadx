@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    tx_thread.h                                        PORTABLE SMP     */
-/*                                                           6.1          */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -42,6 +42,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  xx-xx-xxxx     Tiejun Zhou              Fixed MISRA2012 rule 8.3,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -1349,7 +1351,7 @@ TX_THREAD       *thread_remap_list[TX_THREAD_SMP_MAX_CORES];
 }
 
 
-static INLINE_DECLARE ULONG  _tx_thread_smp_preemptable_threads_get(UINT priority, TX_THREAD *possible_preemption_list[])
+static INLINE_DECLARE ULONG  _tx_thread_smp_preemptable_threads_get(UINT priority, TX_THREAD *possible_preemption_list[TX_THREAD_SMP_MAX_CORES])
 {
 
 UINT        i, j, k;
@@ -1668,7 +1670,7 @@ ULONG  _tx_thread_smp_available_cores_get(void);
 ULONG  _tx_thread_smp_possible_cores_get(void);
 UINT   _tx_thread_smp_lowest_priority_get(void);
 UINT   _tx_thread_smp_remap_solution_find(TX_THREAD *schedule_thread, ULONG available_cores, ULONG thread_possible_cores, ULONG test_possible_cores);
-ULONG  _tx_thread_smp_preemptable_threads_get(UINT priority, TX_THREAD *possible_preemption_list[]);
+ULONG  _tx_thread_smp_preemptable_threads_get(UINT priority, TX_THREAD *possible_preemption_list[TX_THREAD_SMP_MAX_CORES]);
 VOID   _tx_thread_smp_simple_priority_change(TX_THREAD *thread_ptr, UINT new_priority);
 
 #endif
