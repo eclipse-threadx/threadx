@@ -157,6 +157,7 @@ __tx_swi_interrupt
 ; Unknown SVC argument
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; Unrecognized service call
+    EXPORT _tx_handler_svc_unrecognized [WEAK]
 _tx_handler_svc_unrecognized
 
 _tx_handler_svc_unrecognized_loop           ; We should never get here

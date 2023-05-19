@@ -147,6 +147,7 @@ __tx_svc_interrupt:
 /* Unknown SVC argument                                                   */
 /**************************************************************************/
     /* Unrecognized service call */
+    .weak _tx_handler_svc_unrecognized
 _tx_handler_svc_unrecognized:
 
 _tx_handler_svc_unrecognized_loop:           /* We should never get here */
