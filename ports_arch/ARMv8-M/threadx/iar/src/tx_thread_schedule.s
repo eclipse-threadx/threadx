@@ -20,6 +20,10 @@
 /**************************************************************************/
 /**************************************************************************/
 
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
     EXTERN  _tx_thread_current_ptr
     EXTERN  _tx_thread_execute_ptr
     EXTERN  _tx_timer_time_slice

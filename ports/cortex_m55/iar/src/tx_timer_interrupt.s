@@ -20,6 +20,10 @@
 /**************************************************************************/
 /**************************************************************************/
 
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
     EXTERN      _tx_timer_time_slice
     EXTERN      _tx_timer_system_clock
     EXTERN      _tx_timer_current_ptr
