@@ -196,7 +196,7 @@ typedef unsigned long long                      ALIGN_TYPE;
 /* Define various constants for the ThreadX ARM port.  */
 
 #define TX_INT_DISABLE                          0xC0        /* Disable IRQ & FIQ interrupts     */
-#define TX_INT_ENABLE                           0x00        /* Enable IRQ & FIQ interrupts            */
+#define TX_INT_ENABLE                           0x00        /* Enable IRQ & FIQ interrupts      */
 
 
 /* Define the clock source for trace event entry time stamp. The following two item are port specific.
