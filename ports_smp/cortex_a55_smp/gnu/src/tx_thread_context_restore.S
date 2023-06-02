@@ -289,6 +289,7 @@ __tx_thread_dont_save_ts:
 
     /* Set bit indicating this thread is ready for execution.  */
 
+    DMB     ISH                                 // Ensure that all accesses to shared resources have completed
     MOV     x2, #1                              // Build ready flag
     STR     w2, [x0, #260]                      // Set thread's ready flag
     DMB     ISH                                 // Ensure that accesses to shared resource have completed

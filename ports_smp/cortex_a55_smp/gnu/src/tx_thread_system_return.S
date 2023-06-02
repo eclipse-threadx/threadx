@@ -168,6 +168,7 @@ __tx_thread_dont_save_ts:
 
     /* Set ready bit in thread control block.  */
 
+    DMB     ISH                                 // Ensure that all accesses to shared resources have completed
     MOV     x3, #1                              // Build ready value
     STR     w3, [x6, #260]                      // Make the thread ready
     DMB     ISH                                 //
