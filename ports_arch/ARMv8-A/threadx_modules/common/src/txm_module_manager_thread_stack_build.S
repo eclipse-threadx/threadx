@@ -29,7 +29,7 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_thread_stack_build           Cortex-A35-SMP/AC6 */
+/*    _txm_module_manager_thread_stack_build             ARMv8-A-SMP      */
 /*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */

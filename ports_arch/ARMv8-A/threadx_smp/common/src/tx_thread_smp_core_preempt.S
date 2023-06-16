@@ -32,7 +32,7 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_core_preempt                      Cortex-A35-SMP     */
+/*    _tx_thread_smp_core_preempt                        ARMv8-A-SMP      */
 /*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */

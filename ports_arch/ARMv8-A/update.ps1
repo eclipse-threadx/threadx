@@ -81,12 +81,12 @@ $cores = @("cortex_a35", "cortex_a53", "cortex_a55", "cortex_a57", "cortex_a65",
 $compilers = @("ac6", "gnu", "iar", "ghs")
 $patches = (
     ('example_build\sample_threadx\.cproject', (
-        ('value=`"cortex-a35`"', 'value=`"cortex-$($core_short_lower)`"'),
-        ('Cortex-A35.AArch64.ARMv8.Neon.Crypto', 'Cortex-$($core_short_upper).AArch64.ARMv8.Neon.Crypto')
+        (('value="cortex-a35"'), ('value="cortex-$core_short_lower"')),
+        (('Cortex-A35.AArch64.ARMv8.Neon.Crypto'), ('Cortex-$($core_short_upper).AArch64.ARMv8.Neon.Crypto'))
     )),
     ('example_build\tx\.cproject', (
-        ('value=`"cortex-a35`"', 'value=`"cortex-$($core_short_lower)`"'),
-        ('Cortex-A35.AArch64.ARMv8.Neon.Crypto', 'Cortex-$($core_short_upper).AArch64.ARMv8.Neon.Crypto')
+        (('value="cortex-a35"'), ('value="cortex-$($core_short_lower)"')),
+        (('Cortex-A35.AArch64.ARMv8.Neon.Crypto'), ('Cortex-$($core_short_upper).AArch64.ARMv8.Neon.Crypto'))
     )),
     ('example_build\sample_threadx\sample_threadx.launch', (
         ('Debug Cortex-A35', 'Debug Cortex-$($core_short_upper)'),

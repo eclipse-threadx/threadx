@@ -61,6 +61,8 @@ jobs:
       run: |
         cd ports_arch/ARMv7-A
         pwsh -Command ./update.ps1 -PortSets tx -CopyCommonFiles -CopyPortFiles -CopyExample -PatchFiles
+        cd ../ports_arch/ARMv8-A
+        pwsh -Command ./update.ps1 -PortSets tx,tx_smp -CopyCommonFiles -CopyPortFiles -CopyExample -PatchFiles
         if ((git status --porcelain) -ne $null) {
           Write-Host "Ports for ARM architecture is not updated"
           git status
