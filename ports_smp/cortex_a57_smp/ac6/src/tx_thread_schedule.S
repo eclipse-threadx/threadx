@@ -19,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .text
     .align 3
@@ -28,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                                ARMv8-A-SMP      */
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -65,9 +67,10 @@
 /*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                            added ARMv8.2-A support,    */
 /*                                            resulting in version 6.1.10 */
-/*  03-08-2023     Cindy Deng               Updated comment(s),           */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
 /*                                            added memory barrier,       */
-/*                                            resulting in version 6.2.1  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)

@@ -19,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .text
     .align 3
@@ -28,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_restore                         ARMv8-A-SMP      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -67,6 +69,9 @@
 /*  04-25-2022      William E. Lamie        Modified comments, removed    */
 /*                                            FIFO queueing,              */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_restore(VOID)

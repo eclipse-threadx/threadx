@@ -19,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .text
     .align 3
@@ -27,8 +29,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_low_level_initialize              Cortex-A35-SMP/AC6 */
-/*                                                           6.1.10       */
+/*    _tx_thread_smp_low_level_initialize                ARMv8-A-SMP      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -61,6 +63,9 @@
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_low_level_initialize

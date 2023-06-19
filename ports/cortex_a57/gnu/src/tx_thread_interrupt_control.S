@@ -23,7 +23,6 @@
 #include "tx_user.h"
 #endif
 
-
     .text
     .align 3
 /**************************************************************************/
@@ -31,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_interrupt_control                         ARMv8-A        */
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -64,9 +63,9 @@
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                            resulting in version 6.1.10 */
-/*  03-08-2023      Cindy Deng              Modified comment(s), added    */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
 /*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.2.1  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_interrupt_control(UINT new_posture)

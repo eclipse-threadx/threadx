@@ -129,6 +129,12 @@
                         					
                     </folderInfo>
                     					
+                    <fileInfo id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.config.exe.debug.var.gcc-8.3.0-aarch64-elf.794347674.1482422597" name="tx_misra.c" rcbsApplicability="disable" resourcePath="src_generic/tx_misra.c" toolsToInvoke="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.var.gcc-8.3.0-aarch64-elf.1247168701.1451532610">
+                        						
+                        <tool id="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.var.gcc-8.3.0-aarch64-elf.1247168701.1451532610" name="GCC C Compiler 8.3.0 [aarch64-elf]" superClass="com.arm.eclipse.cdt.managedbuild.ds5.gcc.baremetal.tool.c.compiler.var.gcc-8.3.0-aarch64-elf.1247168701"/>
+                        					
+                    </fileInfo>
+                    					
                     <sourceEntries>
                         						
                         <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>

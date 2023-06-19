@@ -47,7 +47,7 @@
                                 								
                                 <option id="com.arm.tool.c.compiler.v6.base.options.debug.level.1747478037" name="Debug Level" superClass="com.arm.tool.c.compiler.v6.base.options.debug.level" useByScannerDiscovery="true" value="com.arm.tool.c.compiler.v6.base.options.debug.level.std" valueType="enumerated"/>
                                 								
-                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.1133188329" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a35" valueType="string"/>
+                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.1133188329" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a53" valueType="string"/>
                                 								
                                 <inputType id="com.arm.tool.c.compiler.v6.base.input.2103612806" superClass="com.arm.tool.c.compiler.v6.base.input"/>
                                 							
@@ -63,7 +63,7 @@
                                 								
                                 <option id="com.arm.tool.assembler.v6.base.options.debug.level.2040227767" name="Debug Level" superClass="com.arm.tool.assembler.v6.base.options.debug.level" useByScannerDiscovery="false" value="com.arm.tool.assembler.v6.base.options.debug.level.std" valueType="enumerated"/>
                                 								
-                                <option id="com.arm.tool.assembler.v6.base.option.cpu.143750331" name="CPU (-mcpu)" superClass="com.arm.tool.assembler.v6.base.option.cpu" useByScannerDiscovery="false" value="cortex-a35" valueType="string"/>
+                                <option id="com.arm.tool.assembler.v6.base.option.cpu.143750331" name="CPU (-mcpu)" superClass="com.arm.tool.assembler.v6.base.option.cpu" useByScannerDiscovery="false" value="cortex-a53" valueType="string"/>
                                 								
                                 <inputType id="com.arm.tool.assembler.v6.base.input.1316842528" superClass="com.arm.tool.assembler.v6.base.input"/>
                                 							

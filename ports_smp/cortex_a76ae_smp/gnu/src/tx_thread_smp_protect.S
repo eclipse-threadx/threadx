@@ -19,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
 /* Include macros for modifying the wait list.  */
 #include "tx_thread_smp_protection_wait_list_macros.h"
@@ -31,8 +33,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_protect                           Cortex-A35-SMP/AC6 */
-/*                                                           6.1.11       */
+/*    _tx_thread_smp_protect                             ARMv8-A-SMP      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -71,6 +73,9 @@
 /*  04-25-2022      William E. Lamie        Modified comments, removed    */
 /*                                            FIFO queueing,              */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_protect

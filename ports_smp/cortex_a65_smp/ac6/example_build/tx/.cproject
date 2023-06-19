@@ -49,7 +49,7 @@
                             							
                             <tool id="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428" name="Arm C Compiler 6" superClass="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6">
                                 								
-                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.1024278185" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a35" valueType="string"/>
+                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.1024278185" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a65" valueType="string"/>
                                 								
                                 <option id="com.arm.tool.c.compiler.v6.base.options.preproc.enableToolSpecificSettings.830475099" name="Enable tool specific settings" superClass="com.arm.tool.c.compiler.v6.base.options.preproc.enableToolSpecificSettings" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
@@ -87,7 +87,7 @@
                                 								
                                 <option id="com.arm.tool.assembler.v6.base.options.target.enableToolSpecificSettings.886405178" name="Enable tool specific settings" superClass="com.arm.tool.assembler.v6.base.options.target.enableToolSpecificSettings" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
-                                <option id="com.arm.tool.assembler.v6.base.option.cpu.503759823" name="CPU (-mcpu)" superClass="com.arm.tool.assembler.v6.base.option.cpu" useByScannerDiscovery="false" value="cortex-a35" valueType="string"/>
+                                <option id="com.arm.tool.assembler.v6.base.option.cpu.503759823" name="CPU (-mcpu)" superClass="com.arm.tool.assembler.v6.base.option.cpu" useByScannerDiscovery="false" value="cortex-a65" valueType="string"/>
                                 								
                                 <option id="com.arm.tool.assembler.v6.base.options.preproc.enableToolSpecificSettings.2108581983" name="Enable tool specific settings" superClass="com.arm.tool.assembler.v6.base.options.preproc.enableToolSpecificSettings" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
