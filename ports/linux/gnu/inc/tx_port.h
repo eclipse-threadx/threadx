@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                           Linux/GNU       */ 
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -54,6 +54,9 @@
 /*  04-25-2022     William E. Lamie         Modified comment(s), removed  */
 /*                                            useless definition,         */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Yanwu Cai                Modified comment(s), fixed    */
+/*                                            compile warnings,           */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -130,7 +133,7 @@ typedef char                                    CHAR;
 typedef unsigned char                           UCHAR;
 typedef int                                     INT;
 typedef unsigned int                            UINT;
-#if __x86_64__
+#if defined(__x86_64__) && __x86_64__
 typedef int                                     LONG;
 typedef unsigned int                            ULONG;
 #else /* __x86_64__ */
@@ -144,7 +147,7 @@ typedef uint64_t                                ULONG64;
 
 /* Override the alignment type to use 64-bit alignment and storage for pointers.  */
 
-#if __x86_64__
+#if defined(__x86_64__) && __x86_64__
 #define ALIGN_TYPE_DEFINED
 typedef unsigned long long                      ALIGN_TYPE;
 
@@ -461,7 +464,7 @@ void _tx_thread_delete_port_completion(struct TX_THREAD_STRUCT *thread_ptr, UINT
 void _tx_thread_reset_port_completion(struct TX_THREAD_STRUCT *thread_ptr, UINT tx_saved_posture);
 #define TX_THREAD_RESET_PORT_COMPLETION(thread_ptr) _tx_thread_reset_port_completion(thread_ptr, tx_saved_posture);
 
-#if __x86_64__
+#if defined(__x86_64__) && __x86_64__
 /* Define the ThreadX object deletion extensions for the remaining objects.  */
 
 #define TX_BLOCK_POOL_DELETE_EXTENSION(pool_ptr)
@@ -563,7 +566,7 @@ extern __thread int                             _tx_linux_threadx_thread;
 /* Define functions for linux thread. */
 void    _tx_linux_thread_suspend(pthread_t thread_id);
 void    _tx_linux_thread_resume(pthread_t thread_id);
-void    _tx_linux_thread_init();
+void    _tx_linux_thread_init(void);
 
 #ifndef TX_LINUX_MEMORY_SIZE
 #define TX_LINUX_MEMORY_SIZE                    64000
