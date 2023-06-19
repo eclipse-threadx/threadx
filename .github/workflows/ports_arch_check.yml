@@ -37,7 +37,7 @@ jobs:
     - name: Copy ports arch
       run: |
         scripts/copy_armv7_m.sh && scripts/copy_armv8_m.sh && scripts/copy_module_armv7_m.sh
-        if [[ -n $(git status --porcelain) ]]; then
+        if [[ -n $(git status --porcelain -uno) ]]; then
           echo "Ports for ARM architecture is not updated"
           git status
           exit 1
@@ -63,7 +63,7 @@ jobs:
         pwsh -Command ./update.ps1 -PortSets tx -CopyCommonFiles -CopyPortFiles -CopyExample -PatchFiles
         cd ../../ports_arch/ARMv8-A
         pwsh -Command ./update.ps1 -PortSets tx,tx_smp -CopyCommonFiles -CopyPortFiles -CopyExample -PatchFiles
-        if ((git status --porcelain) -ne $null) {
+        if ((git status --porcelain -uno) -ne $null) {
           Write-Host "Ports for ARM architecture is not updated"
           git status
           Exit 1
