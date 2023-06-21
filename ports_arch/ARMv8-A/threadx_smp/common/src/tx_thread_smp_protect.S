@@ -33,7 +33,7 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_protect                           Cortex-A35-SMP/AC6 */
+/*    _tx_thread_smp_protect                             ARMv8-A-SMP      */
 /*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */

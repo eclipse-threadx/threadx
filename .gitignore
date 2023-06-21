@@ -1,4 +1,6 @@
 .vscode/
+.settings/
+.metadata/
 _deps/
 build/
 Debug/

@@ -19,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .text
     .align 3
@@ -28,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_interrupt_disable                         ARMv8-A        */
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -60,6 +62,9 @@
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*                                            #include tx_user.h,         */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_interrupt_disable(void)
