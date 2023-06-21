@@ -134,6 +134,9 @@ _tx_initialize_low_level:
 @    /* Configure SysTick for 100Hz clock, or 16384 cycles if no reference.  */
 @
     LDR     r0, =0xE000E000                         @ Build address of NVIC registers
+    LDR     r1, =0
+    STR     r1, [r0, #0x10]                         // Reset SysTick Control
+    STR     r1, [r0, #0x18]                         // Reset SysTick Counter Value
     LDR     r1, =SYSTICK_CYCLES
     STR     r1, [r0, #0x14]                         // Setup SysTick Reload Value
     LDR     r1, =0x7                                // Build SysTick Control Enable Value
