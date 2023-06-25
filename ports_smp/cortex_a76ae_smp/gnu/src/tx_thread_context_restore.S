@@ -70,7 +70,8 @@
 /*                                            FIFO queueing,              */
 /*                                            resulting in version 6.1.11 */
 /*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
+/*                                            #include tx_user.h, added   */
+/*                                            memory barrier,             */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
@@ -294,6 +295,7 @@ __tx_thread_dont_save_ts:
 
     /* Set bit indicating this thread is ready for execution.  */
 
+    DMB     ISH                                 // Ensure that accesses to shared resource have completed
     MOV     x2, #1                              // Build ready flag
     STR     w2, [x0, #260]                      // Set thread's ready flag
     DMB     ISH                                 // Ensure that accesses to shared resource have completed

@@ -67,7 +67,8 @@
 /*                                             added ARMv8.2-A support,   */
 /*                                            resulting in version 6.1.10 */
 /*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
+/*                                            #include tx_user.h, added   */
+/*                                            memory barrier,             */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
@@ -173,6 +174,7 @@ __tx_thread_dont_save_ts:
 
     /* Set ready bit in thread control block.  */
 
+    DMB     ISH                                 // Ensure that accesses to shared resource have completed
     MOV     x3, #1                              // Build ready value
     STR     w3, [x6, #260]                      // Make the thread ready
     DMB     ISH                                 //
