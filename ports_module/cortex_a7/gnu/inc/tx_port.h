@@ -273,17 +273,9 @@ typedef unsigned short                          USHORT;
 /* Determine if the ARM architecture has the CLZ instruction. This is available on
    architectures v5 and above. If available, redefine the macro for calculating the
    lowest bit set.  */
-
-#if __TARGET_ARCH_ARM > 4
-
-#ifndef __thumb__
-
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       m = m & ((ULONG) (-((LONG) m))); \
                                                 asm volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) ); \
                                                 b = 31 - b;
-#endif
-#endif
-
 
 /* Define ThreadX interrupt lockout and restore macros for protection on
    access of critical kernel information.  The restore interrupt macro must
@@ -292,31 +284,38 @@ typedef unsigned short                          USHORT;
    is used to define a local function save area for the disable and restore
    macros.  */
 
-#ifdef __thumb__
-
-unsigned int   _tx_thread_interrupt_disable(void);
-unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
-
-
-#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
-
-#define TX_DISABLE                              interrupt_save =  _tx_thread_interrupt_disable();
-#define TX_RESTORE                              _tx_thread_interrupt_restore(interrupt_save);
-
-#else
-
 #define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
-#define TX_DISABLE                              asm volatile (" MRS %0,CPSR; CPSID if ": "=r" (interrupt_save) );
+
+#define TX_DISABLE \
+    { \
+      asm volatile (" MRS %0,CPSR": "=r" (interrupt_save)); \
+      asm volatile (" CPSID if"); \
+    }
+#define TX_RESTORE \
+  { \
+    if ((interrupt_save & 0x40) == 0) \
+      asm volatile (" CPSIE f"); \
+    if ((interrupt_save & 0x80) == 0) \
+      asm volatile (" CPSIE i"); \
+  }
+
+
 #else
-#define TX_DISABLE                              asm volatile (" MRS %0,CPSR; CPSID i ": "=r" (interrupt_save) );
+
+#define TX_DISABLE \
+  { \
+    asm volatile (" MRS %0,CPSR": "=r" (interrupt_save)); \
+    asm volatile (" CPSID i"); \
+  }
+#define TX_RESTORE \
+  { \
+    if ((interrupt_save & 0x80) == 0) \
+      asm volatile (" CPSIE i"); \
+  }
+
 #endif
-
-#define TX_RESTORE                              asm volatile (" MSR CPSR_c,%0 "::"r" (interrupt_save) );
-
-#endif
-
 
 /* Define VFP extension for the ARMv7-A.  Each is assumed to be called in the context of the executing
    thread.  */

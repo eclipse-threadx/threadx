@@ -19,10 +19,15 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
+    .arm
+#endif
 
     .global     _txm_module_manager_kernel_dispatch
-    .global     _txm_system_mode_enter
-    .global     _txm_system_mode_exit
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -63,19 +68,31 @@
 /**************************************************************************/
     .text
     .align 12
+
+
     .eabi_attribute Tag_ABI_align_preserved, 1
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  _txm_module_manager_user_mode_entry
     .type    _txm_module_manager_user_mode_entry, "function"
 _txm_module_manager_user_mode_entry:
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
+    .global     _txm_system_mode_enter
 _txm_system_mode_enter:
     SVC     1                               // Get out of user mode
-_txm_module_priv:
+
     // At this point, we are in system mode.
     // Save LR (and r3 for 8 byte aligned stack) and call the kernel dispatch function.
     PUSH    {r3, lr}
     BL      _txm_module_manager_kernel_dispatch
     POP     {r3, lr}
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global _txm_system_mode_exit
 _txm_system_mode_exit:
     // Trap to restore user mode while inside of ThreadX

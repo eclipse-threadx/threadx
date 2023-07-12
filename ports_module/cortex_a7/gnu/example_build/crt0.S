@@ -1,15 +1,30 @@
 
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
+    .arm
+#endif
+
 /* .text is used instead of .section .text so it works with arm-aout too.  */
     .text
-    .code 32
     .align  0
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global _mainCRTStartup
+_mainCRTStartup:
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global _start
+_start:
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global start
 start:
-_start:
-_mainCRTStartup:
 
 /* Start by setting up a stack */
     /*  Set up the stack pointer to a fixed value */
@@ -68,17 +83,9 @@ _mainCRTStartup:
 .Lfini:
     .word   _fini
 #endif  */
-    /* Return ...  */
-#ifdef __APCS_26__
-    movs    pc, lr
-#else
-#ifdef __THUMB_INTERWORK
-    bx  lr
-#else
-    mov pc, lr
-#endif
-#endif
 
+    /* Return ...  */
+    bx  lr
 
 /*  Workspace for Angel calls.  */
     .data

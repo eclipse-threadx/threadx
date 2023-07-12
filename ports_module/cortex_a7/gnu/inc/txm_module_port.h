@@ -106,7 +106,7 @@ The following extensions must also be defined in tx_port.h:
 
 /* Define the properties for this particular module port.  */
 #ifdef TXM_MODULE_MEMORY_PROTECTION_ENABLED
-#define TXM_MODULE_MEMORY_PROTECTION            0x00000001
+#define TXM_MODULE_MEMORY_PROTECTION            0x00000002
 #else
 #define TXM_MODULE_MEMORY_PROTECTION            0x00000000
 #endif
@@ -115,7 +115,7 @@ The following extensions must also be defined in tx_port.h:
 
 /* Define the supported options for this module.   */
 
-#define TXM_MODULE_MANAGER_SUPPORTED_OPTIONS    (TXM_MODULE_MEMORY_PROTECTION)
+#define TXM_MODULE_MANAGER_SUPPORTED_OPTIONS    (TXM_MODULE_USER_MODE | TXM_MODULE_MEMORY_PROTECTION)
 #define TXM_MODULE_MANAGER_REQUIRED_OPTIONS     0
 
 

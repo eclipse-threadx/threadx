@@ -19,33 +19,24 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-    .arm
 
-SVC_MODE        =       0x13                    // SVC mode
-#ifdef TX_ENABLE_FIQ_SUPPORT
-CPSR_MASK       =       0xDF                    // Mask initial CPSR, IRQ & FIQ interrupts enabled
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
 #else
-CPSR_MASK       =       0x9F                    // Mask initial CPSR, IRQ interrupts enabled
+    .arm
 #endif
 
+USR_MODE        =       0x10                    // USR mode
+SVC_MODE        =       0x13                    // SVC mode
+SYS_MODE        =       0x1F                    // SYS mode
+THUMB_MASK      =       0x20
 
-/* Define the 16-bit Thumb mode veneer for _tx_thread_stack_build for
-   applications calling this function from to 16-bit Thumb mode.  */
-
-    .text
-    .align 2
-    .thumb
-    .global $_tx_thread_stack_build
-    .type    $_tx_thread_stack_build,function
-$_tx_thread_stack_build:
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
-    .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_thread_stack_build           // Call _tx_thread_stack_build function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
-
+#ifdef TX_ENABLE_FIQ_SUPPORT
+CPSR_MASK       =       0xFF                    // Mask initial CPSR, T, IRQ & FIQ interrupts enabled
+#else
+CPSR_MASK       =       0xBF                    // Mask initial CPSR, T, IRQ interrupts enabled
+#endif
 
     .text
     .align 2
@@ -91,6 +82,9 @@ $_tx_thread_stack_build:
 /*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  _tx_thread_stack_build
     .type    _tx_thread_stack_build,function
 _tx_thread_stack_build:
@@ -128,6 +122,15 @@ _tx_thread_stack_build:
 
     MOV     r3, #1                          // Build interrupt stack type
     STR     r3, [r2, #0]                    // Store stack type
+
+    MRS     r3, CPSR                        // Pickup CPSR
+    BIC     r3, #CPSR_MASK                  // Mask mode bits of CPSR
+    ORR     r3, #SYS_MODE                   // Build CPSR, SYS mode, interrupts enabled
+    TST     r1, #1                          // Check if the initial PC is a Thumb function
+    IT      NE
+    ORRNE   r3, #THUMB_MASK                 // If the initial PC is a thumb function, CPSR must reflect this
+    STR     r3, [r2, #4]                    // Store initial CPSR
+
     MOV     r3, #0                          // Build initial register value
     STR     r3, [r2, #8]                    // Store initial r0
     STR     r3, [r2, #12]                   // Store initial r1
@@ -139,26 +142,20 @@ _tx_thread_stack_build:
     STR     r3, [r2, #36]                   // Store initial r7
     STR     r3, [r2, #40]                   // Store initial r8
     STR     r3, [r2, #44]                   // Store initial r9
-    LDR     r3, [r0, #12]                   // Pickup stack starting address
-    STR     r3, [r2, #48]                   // Store initial r10 (sl)
-    LDR     r3,=_tx_thread_schedule         // Pickup address of _tx_thread_schedule for GDB backtrace
-    STR     r3, [r2, #60]                   // Store initial r14 (lr)
-    MOV     r3, #0                          // Build initial register value
     STR     r3, [r2, #52]                   // Store initial r11
     STR     r3, [r2, #56]                   // Store initial r12
-    STR     r1, [r2, #64]                   // Store initial pc
     STR     r3, [r2, #68]                   // 0 for back-trace
-    MRS     r1, CPSR                        // Pickup CPSR
-    BIC     r1, r1, #CPSR_MASK              // Mask mode bits of CPSR
-    ORR     r3, r1, #SVC_MODE               // Build CPSR, SVC mode, interrupts enabled
-    STR     r3, [r2, #4]                    // Store initial CPSR
+
+    LDR     r3, [r0, #12]                   // Pickup stack starting address
+    STR     r3, [r2, #48]                   // Store initial r10 (sl)
+
+    LDR     r3,=_tx_thread_schedule         // Pickup address of _tx_thread_schedule for GDB backtrace
+    STR     r3, [r2, #60]                   // Store initial r14 (lr)
+
+    STR     r1, [r2, #64]                   // Store initial pc
 
     /* Setup stack pointer.  */
 
     STR     r2, [r0, #8]                    // Save stack pointer in thread's
                                             //   control block
-#ifdef __THUMB_INTERWORK
     BX      lr                              // Return to caller
-#else
-    MOV     pc, lr                          // Return to caller
-#endif

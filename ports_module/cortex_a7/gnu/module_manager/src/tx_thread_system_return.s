@@ -20,32 +20,18 @@
 /**************************************************************************/
 /**************************************************************************/
 
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
     .arm
-
+#endif
 
     .global     _tx_thread_current_ptr
     .global     _tx_timer_time_slice
     .global     _tx_thread_schedule
 
-
-
-/* Define the 16-bit Thumb mode veneer for _tx_thread_system_return for
-   applications calling this function from to 16-bit Thumb mode.  */
-
-    .text
-    .align  2
-    .global $_tx_thread_system_return
-    .type   $_tx_thread_system_return,function
-$_tx_thread_system_return:
-    .thumb
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
-    .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_thread_system_return         // Call _tx_thread_system_return function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
-
+SYS_MODE        =     0x1F            // SYS mode
 
     .text
     .align  2
@@ -94,13 +80,16 @@ $_tx_thread_system_return:
 /*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global _tx_thread_system_return
     .type   _tx_thread_system_return,function
 _tx_thread_system_return:
 
     /* Save minimal context on the stack.  */
 
-    STMDB   sp!, {r4-r11, lr}           // Save minimal context
+    PUSH    {r4-r11, lr}                // Save minimal context
 
     LDR     r4, =_tx_thread_current_ptr // Pickup address of current ptr
     LDR     r5, [r4]                    // Pickup current thread pointer
@@ -117,15 +106,16 @@ _tx_skip_solicited_vfp_save:
 #endif
 
     MOV     r0, #0                      // Build a solicited stack type
-    MRS     r1, CPSR                    // Pickup the CPSR
-    STMDB   sp!, {r0-r1}                // Save type and CPSR
-
-   /* Lockout interrupts.  */
+    MRS     r1, CPSR                    // Pickup the CPSR, T bit is always cleared by hardware
+    TST     lr, #1                      // Check if calling function is in Thumb mode
+    IT      NE
+    ORRNE   r1, #0x20                   // Set the T bit so that the correct mode is set on return
+    PUSH    {r0-r1}                     // Save type and CPSR
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
-    CPSID   if                          // Disable IRQ and FIQ interrupts
+    CPSID   if                          // Disable IRQ and FIQ
 #else
-    CPSID   i                           // Disable IRQ interrupts
+    CPSID   i                           // Disable IRQ
 #endif
 
 #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))

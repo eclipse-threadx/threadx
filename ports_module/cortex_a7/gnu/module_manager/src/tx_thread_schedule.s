@@ -20,6 +20,13 @@
 /**************************************************************************/
 /**************************************************************************/
 
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
+    .arm
+#endif
+
     .global     _tx_thread_execute_ptr
     .global     _tx_thread_current_ptr
     .global     _tx_timer_time_slice
@@ -32,14 +39,14 @@
 #define SVC_MODE    0x13            // SVC mode
 #define SYS_MODE    0x1F            // SYS mode
 
-#ifdef TX_ENABLE_FIQ_SUPPORT
-#define ENABLE_INTS 0xC0            // IRQ & FIQ Interrupts enabled mask
-#else
-#define ENABLE_INTS 0x80            // IRQ Interrupts enabled mask
-#endif
-
 #define MODE_MASK   0x1F            // Mode mask
 #define THUMB_MASK  0x20            // Thumb bit mask
+
+INT_MASK        =   0x0C0
+IRQ_MASK        =   0x080
+#ifdef TX_ENABLE_FIQ_SUPPORT
+FIQ_MASK        =   0x040
+#endif
 
     .global     _txm_system_mode_enter
     .global     _txm_system_mode_exit
@@ -90,6 +97,9 @@
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
 // {
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global _tx_thread_schedule
     .type  _tx_thread_schedule,function
 _tx_thread_schedule:
@@ -98,6 +108,7 @@ _tx_thread_schedule:
     SVC     0
 
     // We should never get here - ever!
+    BKPT    0x0000
 _tx_scheduler_fault__:
     B       _tx_scheduler_fault__
 // }
@@ -107,45 +118,45 @@ _tx_scheduler_fault__:
 // SWI_Handler
 /////////////////////////////////////////////////////////////////////
 
-    .global __tx_swi_interrupt               // Software interrupt handler
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
+    .global __tx_swi_interrupt              // Software interrupt handler
 __tx_swi_interrupt:
 
-    STMFD   sp!, {r0-r3, r12, lr}           // Store the registers
-    MOV     r1, sp                          // Set pointer to parameters
-    MRS     r0, spsr                        // Get spsr
-    STMFD   sp!, {r0, r3}                   // Store spsr onto stack and another
-                                            // register to maintain 8-byte-aligned stack
-    TST     r0, #THUMB_MASK                 // Occurred in Thumb state?
-    LDRNEH  r0, [lr,#-2]                    // Yes: Load halfword and...
-    BICNE   r0, r0, #0xFF00                 // ...extract comment field
-    LDREQ   r0, [lr,#-4]                    // No: Load word and...
-    BICEQ   r0, r0, #0xFF000000             // ...extract comment field
+    PUSH    {r0-r3, r12, lr}                // Store the registers
 
-    // r0 now contains SVC number
-    // r1 now contains pointer to stacked registers
+    MRS     r0, spsr                        // Get spsr
+    TST     r0, #THUMB_MASK                 // Occurred in Thumb state?
+    ITTEE   NE
+    LDRHNE  r1, [lr,#-2]                    // Yes: Load halfword and...
+    BICNE   r1, r1, #0xFF00                 // ...extract comment field
+    LDREQ   r1, [lr,#-4]                    // No: Load word and...
+    BICEQ   r1, r1, #0xFF000000             // ...extract comment field
+
+    // r1 now contains SVC number
 
     // The service call is handled here
 
-    CMP     r0, #0                          // Is it a schedule request?
+    CMP     r1, #0                          // Is it a schedule request?
     BEQ     _tx_handler_svc_schedule        // Yes, go there
 
-    CMP     r0, #1                          // Is it a system mode enter request?
+    CMP     r1, #1                          // Is it a system mode enter request?
     BEQ     _tx_handler_svc_super_enter     // Yes, go there
 
-    CMP     r0, #2                          // Is it a system mode exit request?
+    CMP     r1, #2                          // Is it a system mode exit request?
     BEQ     _tx_handler_svc_super_exit      // Yes, go there
 
     LDR     r2, =0x123456
-    CMP     r0, r2                          // Is it an ARM request?
+    CMP     r1, r2                          // Is it an ARM request?
     BEQ     _tx_handler_svc_arm             // Yes, go there
 
 /////////////////////////////////////////////////////////////////////
 // Unknown SVC argument
 /////////////////////////////////////////////////////////////////////
     // Unrecognized service call
-    .weak _tx_handler_svc_unrecognized
 _tx_handler_svc_unrecognized:
-
+    BKPT    0x0000
 _tx_handler_svc_unrecognized_loop:          // We should never get here
     B       _tx_handler_svc_unrecognized_loop
 
@@ -156,7 +167,12 @@ _tx_handler_svc_unrecognized_loop:          // We should never get here
 _tx_handler_svc_super_enter:
     // Make sure that we have been called from the system mode enter location (security)
     LDR     r2, =_txm_system_mode_enter     // Load the address of the known call point
-    SUB     r1, lr, #4                      // Calculate the address of the actual call
+    BIC     r2, #1                          // Clear bit 0 of the symbol address (it is 1 in Thumb mode, 0 in ARM mode)
+    MOV     r1, lr                          // Get return address
+    TST     r0, #THUMB_MASK                 // Check if we come from Thumb mode or ARM mode
+    ITE     NE
+    SUBNE   r1, #2                          // Calculate the address of the actual call (thumb mode)
+    SUBEQ   r1, #4                          // Calculate the address of the actual call (ARM mode)
     CMP     r1, r2                          // Did we come from txm_module_manager_user_mode_entry?
     BNE     _tx_handler_svc_unrecognized    // Return to where we came
 
@@ -167,7 +183,6 @@ _tx_handler_svc_super_enter:
     STR     r1, [r2, #0x9C]                 // Clear tx_thread_module_current_user_mode for thread
 
     // Now we enter the system mode and return
-    LDMFD   sp!, {r0, r3}                   // Get spsr from the stack
     BIC     r0, r0, #MODE_MASK              // clear mode field
     ORR     r0, r0, #SYS_MODE               // system mode code
     MSR     SPSR_cxsf, r0                   // Restore the spsr
@@ -187,7 +202,13 @@ _tx_handler_svc_super_enter:
     STRD    r0, r1, [r2, #0x0C]             // Set stack start and end
 #endif
 
-    LDMFD   sp!, {r0-r3, r12, pc}^          // Restore the registers and return
+    // Restore the registers and return
+#if defined(THUMB_MODE)
+    POP     {r0-r3, r12, lr}
+    SUBS    pc, lr, #0
+#else
+    LDMFD   sp!, {r0-r3, r12, pc}^
+#endif
 
 /////////////////////////////////////////////////////////////////////
 // SVC 2
@@ -196,7 +217,12 @@ _tx_handler_svc_super_enter:
 _tx_handler_svc_super_exit:
     // Make sure that we have been called from the system mode exit location (security)
     LDR     r2, =_txm_system_mode_exit      // Load the address of the known call point
-    SUB     r1, lr, #4                      // Calculate the address of the actual call
+    BIC     r2, #1                          // Clear bit 0 of the symbol address (it is 1 in Thumb mode, 0 in ARM mode)
+    MOV     r1, lr                          // Get return address
+    TST     r0, #THUMB_MASK                 // Check if we come from Thumb mode or ARM mode
+    ITE     NE
+    SUBNE   r1, #2                          // Calculate the address of the actual call (thumb mode)
+    SUBEQ   r1, #4                          // Calculate the address of the actual call (ARM mode)
     CMP     r1, r2                          // Did we come from txm_module_manager_user_mode_entry?
     BNE     _tx_handler_svc_unrecognized    // Return to where we came
 
@@ -207,7 +233,6 @@ _tx_handler_svc_super_exit:
     STR     r1, [r2, #0x9C]                 // Set tx_thread_module_current_user_mode for thread
 
     // Now we enter user mode (exit the system mode) and return
-    LDMFD   sp!, {r0, r3}                   // Get spsr from the stack
     BIC     r0, r0, #MODE_MASK              // clear mode field
     ORR     r0, r0, #USR_MODE               // user mode code
     MSR     SPSR_cxsf, r0                   // Restore the spsr
@@ -225,7 +250,6 @@ _tx_handler_svc_super_exit:
     LDRD    r0, r1, [r2, #0xB4]             // Load the module thread stack start and end
     STRD    r0, r1, [r2, #0x0C]             // Set stack start and end
 #endif
-    LDMFD   sp!, {r0-r3, r12, pc}^          // Restore the registers and return
 
 /////////////////////////////////////////////////////////////////////
 // ARM Semihosting
@@ -234,10 +258,13 @@ _tx_handler_svc_arm:
 
     // *** TODO: handle semihosting requests or ARM angel requests ***
 
-    // just return
-    LDMFD   sp!, {r0, r3}                   // Get spsr from the stack
-    MSR     SPSR_cxsf, r0                   // Restore the spsr
-    LDMFD   sp!, {r0-r3, r12, pc}^          // Restore the registers and return
+    // Restore the registers and return
+#if defined(THUMB_MODE)
+    POP     {r0-r3, r12, lr}
+    SUBS    pc, lr, #0
+#else
+    LDMFD   sp!, {r0-r3, r12, pc}^
+#endif
 
 /////////////////////////////////////////////////////////////////////
 // SVC 0
@@ -245,9 +272,7 @@ _tx_handler_svc_arm:
     // At this point we have an SVC 0: enter the scheduler.
 _tx_handler_svc_schedule:
 
-    LDMFD   sp!, {r0, r3}                   // Get spsr from stack
-    MSR     SPSR_cxsf, r0                   // Restore spsr
-    LDMFD   sp!, {r0-r3, r12, lr}           // Restore the registers
+    POP   {r0-r3, r12, lr}                  // Restore the registers
 
     // This code waits for a thread control block pointer to appear in
     // the _tx_thread_execute_ptr variable.  Once a thread pointer appears
@@ -255,10 +280,11 @@ _tx_handler_svc_schedule:
 
     /* Enable interrupts.  */
 
-    MRS     r2, CPSR                        // Pickup CPSR
-    BIC     r0, r2, #ENABLE_INTS            // Clear the disable bit(s)
-    MSR     CPSR_cxsf, r0                   // Enable interrupts
-
+#ifdef TX_ENABLE_FIQ_SUPPORT
+    CPSIE   if                              // Enable IRQ and FIQ interrupts
+#else
+    CPSIE   i                               // Enable IRQ interrupts
+#endif
 
     /* Wait for a thread to execute.  */
     // do
@@ -310,13 +336,14 @@ __tx_thread_schedule_loop:
     // Determine if an interrupt frame or a synchronous task suspension frame is present.
     CPS     #SYS_MODE                       // Enter SYS mode
     LDR     sp, [r0, #8]                    // Switch to thread stack pointer
-    LDMIA   sp!, {r4, r5}                   // Pickup the stack type and saved CPSR
+    POP     {r4, r5}                        // Pickup the stack type and saved CPSR
     CPS     #SVC_MODE                       // Enter SVC mode
 
     /////////////////////////////////////////////////////////////////////
     // Set up MMU for module.
     LDR     r2, [r0, #0x94]                 // Pickup the module pointer
     CMP     r2, #0                          // Valid module pointer?
+    IT      NE
     LDRNE   r2, [r2, #0x64]                 // Load ASID
     // Otherwise, ASID 0 & master table will be loaded.
     // Is ASID already loaded?
@@ -329,15 +356,14 @@ __tx_thread_schedule_loop:
     ISB
     // Load new ASID and TTBR
     LDR     r1, =_txm_ttbr1_page_table       // Load master TTBR
-    ORR     r1, r1, #0x48                   // OR it with #TTBR0_ATTRIBUTES
+    ORR     r1, r1, #0x9                    // OR it with #TTBR0_ATTRIBUTES
     MCR     p15, 0, r1, c2, c0, 0           // Change TTBR to master
     ISB
     DSB
     MCR     p15, 0, r2, c13, c0, 1          // Change ASID to new value
     ISB
     // Change TTBR to new value
-    MOV     r3, #14
-    ADD     r1, r1, r2, LSL r3
+    ADD     r1, r1, r2, LSL #14             // r1 = _txm_ttbr1_page_table + (asid << 14)
     MCR     p15, 0, r1, c2, c0, 0           // Change TTBR to new value
 
     // refresh TLB
@@ -377,8 +403,8 @@ _tx_skip_mmu_update:
 _tx_skip_interrupt_vfp_restore:
 #endif
 
-    LDMIA   sp!, {r0-r12, lr}               // Restore registers
-    ADD     sp, sp, #4                      // Fix stack pointer
+    POP     {r0-r12, lr}                    // Restore registers
+    ADD     sp, #4                          // Fix stack pointer (skip PC saved on stack)
     CPS     #SVC_MODE                       // Enter SVC mode
     SUBS    pc, lr, #0                      // Return to point of thread interrupt
 
@@ -397,7 +423,7 @@ _tx_solicited_return:
 _tx_skip_solicited_vfp_restore:
 #endif
 
-    LDMIA   sp!, {r4-r11, lr}               // Restore registers
+    POP     {r4-r11, lr}                    // Restore registers
     MOV     r1, lr                          // Copy lr to r1 to preserve across mode change
     CPS     #SVC_MODE                       // Enter SVC mode
     MSR     SPSR_cxsf, r2                   // Recover CPSR
@@ -408,40 +434,54 @@ _tx_skip_solicited_vfp_restore:
 // End __tx_handler_swi
 /////////////////////////////////////////////////////////////////////
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global tx_thread_vfp_enable
     .type  tx_thread_vfp_enable,function
 tx_thread_vfp_enable:
-    MRS     r2, CPSR                        // Pickup the CPSR
+    MRS     r0, CPSR                            // Pickup current CPSR
 #ifdef TX_ENABLE_FIQ_SUPPORT
-    CPSID   if                              // Enable IRQ and FIQ interrupts
+    CPSID   if                                  // Disable IRQ and FIQ
 #else
-    CPSID   i                               // Enable IRQ interrupts
+    CPSID   i                                   // Disable IRQ
 #endif
-    LDR     r0, =_tx_thread_current_ptr     // Build current thread pointer address
-    LDR     r1, [r0]                        // Pickup current thread pointer
+    LDR     r2, =_tx_thread_current_ptr     // Build current thread pointer address
+    LDR     r1, [r2]                        // Pickup current thread pointer
     CMP     r1, #0                          // Check for NULL thread pointer
-    BEQ     __tx_no_thread_to_enable        // If NULL, skip VFP enable
-    MOV     r0, #1                          // Build enable value
-    STR     r0, [r1, #144]                  // Set the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
-__tx_no_thread_to_enable:
-    MSR     CPSR_cxsf, r2                   // Recover CPSR
-    BX      LR                              // Return to caller
+    BEQ     restore_ints                    // If NULL, skip VFP enable
+    MOV     r2, #1                          // Build enable value
+    STR     r2, [r1, #144]                  // Set the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
+    B       restore_ints
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global tx_thread_vfp_disable
     .type  tx_thread_vfp_disable,function
 tx_thread_vfp_disable:
-    MRS     r2, CPSR                        // Pickup the CPSR
+    MRS     r0, CPSR                            // Pickup current CPSR
 #ifdef TX_ENABLE_FIQ_SUPPORT
-    CPSID   if                              // Enable IRQ and FIQ interrupts
+    CPSID   if                                  // Disable IRQ and FIQ
 #else
-    CPSID   i                               // Enable IRQ interrupts
+    CPSID   i                                   // Disable IRQ
 #endif
-    LDR     r0, =_tx_thread_current_ptr     // Build current thread pointer address
-    LDR     r1, [r0]                        // Pickup current thread pointer
+    LDR     r2, =_tx_thread_current_ptr     // Build current thread pointer address
+    LDR     r1, [r2]                        // Pickup current thread pointer
     CMP     r1, #0                          // Check for NULL thread pointer
-    BEQ     __tx_no_thread_to_disable       // If NULL, skip VFP disable
-    MOV     r0, #0                          // Build disable value
-    STR     r0, [r1, #144]                  // Clear the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
-__tx_no_thread_to_disable:
-    MSR     CPSR_cxsf, r2                   // Recover CPSR
-    BX      LR                              // Return to caller
+    BEQ     restore_ints                    // If NULL, skip VFP disable
+    MOV     r2, #0                          // Build disable value
+    STR     r2, [r1, #144]                  // Clear the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
+
+restore_ints:
+    TST     r0, #IRQ_MASK
+    BNE     no_irq
+    CPSIE   i
+no_irq:
+#ifdef TX_ENABLE_FIQ_SUPPORT
+    TST     r0, #FIQ_MASK
+    BNE     no_fiq
+    CPSIE   f
+no_fiq:
+#endif
+    BX      lr

@@ -20,6 +20,13 @@
 /**************************************************************************/
 /**************************************************************************/
 
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
+    .arm
+#endif
+
 #ifdef TX_ENABLE_FIQ_SUPPORT
 DISABLE_INTS    =       0xC0                    // Disable IRQ/FIQ interrupts
 #else
@@ -28,11 +35,6 @@ DISABLE_INTS    =       0x80                    // Disable IRQ interrupts
 MODE_MASK       =       0x1F                    // Mode mask
 FIQ_MODE_BITS   =       0x11                    // FIQ mode bits
 
-
-/* No 16-bit Thumb mode veneer code is needed for _tx_thread_fiq_nesting_end
-   since it will never be called 16-bit mode.  */
-
-    .arm
     .text
     .align 2
 /**************************************************************************/
@@ -84,6 +86,9 @@ FIQ_MODE_BITS   =       0x11                    // FIQ mode bits
 /*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  _tx_thread_fiq_nesting_end
     .type    _tx_thread_fiq_nesting_end,function
 _tx_thread_fiq_nesting_end:
@@ -97,8 +102,4 @@ _tx_thread_fiq_nesting_end:
     ORR     r0, r0, #FIQ_MODE_BITS              // Build IRQ mode CPSR
     MSR     CPSR_c, r0                          // Reenter IRQ mode
 
-#ifdef __THUMB_INTERWORK
     BX      r3                                  // Return to caller
-#else
-    MOV     pc, r3                              // Return to caller
-#endif

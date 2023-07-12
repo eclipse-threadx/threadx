@@ -20,7 +20,12 @@
 /**************************************************************************/
 /**************************************************************************/
 
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
     .arm
+#endif
 
 SVC_MODE        =       0xD3                    // Disable IRQ/FIQ SVC mode
 IRQ_MODE        =       0xD2                    // Disable IRQ/FIQ IRQ mode
@@ -39,24 +44,6 @@ THUMB_MASK      =       0x20                    // THUMB mode bit
     .global     _end
     .global     _sp
     .global     _stack_bottom
-
-
-/* Define the 16-bit Thumb mode veneer for _tx_initialize_low_level for
-   applications calling this function from to 16-bit Thumb mode.  */
-
-    .text
-    .align 2
-    .thumb
-    .global $_tx_initialize_low_level
-    .type   $_tx_initialize_low_level,function
-$_tx_initialize_low_level:
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
-    .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_initialize_low_level         // Call _tx_initialize_low_level function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
 
     .text
     .align 2
@@ -103,6 +90,9 @@ $_tx_initialize_low_level:
 /*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global _tx_initialize_low_level
     .type   _tx_initialize_low_level,function
 _tx_initialize_low_level:
@@ -155,28 +145,37 @@ _stack_error_loop:
     ADD     r1, r1, #8                          // Increment to next free word
     STR     r1, [r2]                            // Save first free memory address
 
-#ifdef __THUMB_INTERWORK
     BX      lr                                  // Return to caller
-#else
-    MOV     pc, lr                              // Return to caller
-#endif
 
 /* Define shells for each of the interrupt vectors.  */
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global __tx_undefined
 __tx_undefined:
     B       __tx_undefined                      // Undefined handler
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global __tx_reserved_handler
 __tx_reserved_handler:
     B       __tx_reserved_handler               // Reserved exception handler
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global __tx_irq_handler
-    .global __tx_irq_processing_return
 __tx_irq_handler:
 
     /* Jump to context save to save system context.  */
     B       _tx_thread_context_save
+
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
+    .global __tx_irq_processing_return
 __tx_irq_processing_return:
 //
     /* At this point execution is still in the IRQ mode.  The CPSR, point of
@@ -245,12 +244,18 @@ __tx_irq_processing_return:
 
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  __tx_fiq_handler
-    .global  __tx_fiq_processing_return
 __tx_fiq_handler:
-asdf
     /* Jump to fiq context save to save system context.  */
     B       _tx_thread_fiq_context_save
+
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
+    .global  __tx_fiq_processing_return
 __tx_fiq_processing_return:
 
     /* At this point execution is still in the FIQ mode.  The CPSR, point of
@@ -279,6 +284,9 @@ __tx_fiq_processing_return:
 
 
 #else
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  __tx_fiq_handler
 __tx_fiq_handler:
     B       __tx_fiq_handler                    // FIQ interrupt handler
@@ -336,9 +344,15 @@ __tx_fiq_handler:
     // EXTERN  _tx_execution_thread_exit
     // EXTERN  _tx_thread_schedule
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  __tx_prefetch_handler
-    .global  __tx_abort_handler
 __tx_prefetch_handler:
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
+    .global  __tx_abort_handler
 __tx_abort_handler:
     STMDB   sp!, {r0-r3}                        // Save some working registers
     LDR     r3, =_tx_thread_system_state        // Pickup address of system state var
