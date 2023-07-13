@@ -19,11 +19,16 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
+    .arm
+#endif
 
 SVC_MODE        =       0xD3                    // SVC mode
 FIQ_MODE        =       0xD1                    // FIQ mode
 MODE_MASK       =       0x1F                    // Mode mask
-THUMB_MASK      =       0x20                    // Thumb bit mask
 IRQ_MODE_BITS   =       0x12                    // IRQ mode bits
 
 
@@ -36,11 +41,6 @@ IRQ_MODE_BITS   =       0x12                    // IRQ mode bits
     .global     _tx_thread_preempt_disable
     .global     _tx_execution_isr_exit
 
-
-/* No 16-bit Thumb mode veneer code is needed for _tx_thread_fiq_context_restore
-   since it will never be called 16-bit mode.  */
-
-    .arm
     .text
     .align 2
 /**************************************************************************/
@@ -48,7 +48,7 @@ IRQ_MODE_BITS   =       0x12                    // IRQ mode bits
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_fiq_context_restore                       ARMv7-A        */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -86,8 +86,14 @@ IRQ_MODE_BITS   =       0x12                    // IRQ mode bits
 /*                                            resulting in version 6.1.9  */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Yajun Xia                Updated comments,             */
+/*                                            Added thumb mode support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  _tx_thread_fiq_context_restore
     .type    _tx_thread_fiq_context_restore,function
 _tx_thread_fiq_context_restore:
@@ -116,9 +122,9 @@ _tx_thread_fiq_context_restore:
     /* Just recover the saved registers and return to the point of
        interrupt.  */
 
-    LDMIA   sp!, {r0, r10, r12, lr}             // Recover SPSR, POI, and scratch regs
+    POP     {r0, r10, r12, lr}                  // Recover SPSR, POI, and scratch regs
     MSR     SPSR_cxsf, r0                       // Put SPSR back
-    LDMIA   sp!, {r0-r3}                        // Recover r0-r3
+    POP     {r0-r3}                             // Recover r0-r3
     MOVS    pc, lr                              // Return to point of interrupt
 
 __tx_thread_fiq_not_nested_restore:
@@ -153,26 +159,26 @@ __tx_thread_fiq_no_preempt_restore:
     /* Restore interrupted thread or ISR.  */
     /* Recover the saved context and return to the point of interrupt.  */
 
-    LDMIA   sp!, {r0, lr}                       // Recover SPSR, POI, and scratch regs
+    POP     {r0, lr}                            // Recover SPSR, POI, and scratch regs
     MSR     SPSR_cxsf, r0                       // Put SPSR back
-    LDMIA   sp!, {r0-r3}                        // Recover r0-r3
+    POP     {r0-r3}                             // Recover r0-r3
     MOVS    pc, lr                              // Return to point of interrupt
 
 __tx_thread_fiq_preempt_restore:
 
-    LDMIA   sp!, {r3, lr}                       // Recover temporarily saved registers
+    POP     {r3, lr}                            // Recover temporarily saved registers
     MOV     r1, lr                              // Save lr (point of interrupt)
     MOV     r2, #SVC_MODE                       // Build SVC mode CPSR
     MSR     CPSR_c, r2                          // Enter SVC mode
     STR     r1, [sp, #-4]!                      // Save point of interrupt
-    STMDB   sp!, {r4-r12, lr}                   // Save upper half of registers
+    PUSH    {r4-r12, lr}                        // Save upper half of registers
     MOV     r4, r3                              // Save SPSR in r4
     MOV     r2, #FIQ_MODE                       // Build FIQ mode CPSR
     MSR     CPSR_c, r2                          // Reenter FIQ mode
-    LDMIA   sp!, {r0-r3}                        // Recover r0-r3
+    POP     {r0-r3}                             // Recover r0-r3
     MOV     r5, #SVC_MODE                       // Build SVC mode CPSR
     MSR     CPSR_c, r5                          // Enter SVC mode
-    STMDB   sp!, {r0-r3}                        // Save r0-r3 on thread's stack
+    PUSH    {r0-r3}                             // Save r0-r3 on thread's stack
 
     LDR     r1, =_tx_thread_current_ptr         // Pickup address of current thread ptr
     LDR     r0, [r1]                            // Pickup current thread pointer
@@ -189,7 +195,7 @@ _tx_skip_fiq_vfp_save:
 #endif
 
     MOV     r3, #1                              // Build interrupt stack type
-    STMDB   sp!, {r3, r4}                       // Save interrupt stack type and SPSR
+    PUSH    {r3, r4}                            // Save interrupt stack type and SPSR
     STR     sp, [r0, #8]                        // Save stack pointer in thread control
                                                 //   block  */
     LDR     r3, =_tx_timer_time_slice           // Pickup time-slice variable address

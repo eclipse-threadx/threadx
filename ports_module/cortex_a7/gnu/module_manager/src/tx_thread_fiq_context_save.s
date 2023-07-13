@@ -19,6 +19,12 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
+    .arm
+#endif
 
     .global     _tx_thread_system_state
     .global     _tx_thread_current_ptr
@@ -29,7 +35,6 @@
 /* No 16-bit Thumb mode veneer code is needed for _tx_thread_fiq_context_save
    since it will never be called 16-bit mode.  */
 
-    .arm
     .text
     .align 2
 /**************************************************************************/
@@ -37,7 +42,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_fiq_context_save                          ARMv7-A        */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -74,8 +79,14 @@
 /*                                            resulting in version 6.1.9  */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Yajun Xia                Updated comments,             */
+/*                                            Added thumb mode support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  _tx_thread_fiq_context_save
     .type    _tx_thread_fiq_context_save,function
 _tx_thread_fiq_context_save:
@@ -85,7 +96,7 @@ _tx_thread_fiq_context_save:
 
     /* Check for a nested interrupt condition.  */
 
-    STMDB   sp!, {r0-r3}                        // Save some working registers
+    PUSH    {r0-r3}                             // Save some working registers
     LDR     r3, =_tx_thread_system_state        // Pickup address of system state variable
     LDR     r2, [r3]                            // Pickup system state
     CMP     r2, #0                              // Is this the first interrupt?
@@ -101,7 +112,7 @@ _tx_thread_fiq_context_save:
 
     MRS     r0, SPSR                            // Pickup saved SPSR
     SUB     lr, lr, #4                          // Adjust point of interrupt
-    STMDB   sp!, {r0, r10, r12, lr}             // Store other registers
+    PUSH    {r0, r10, r12, lr}                  // Store other registers
 
     /* Return to the ISR.  */
 
@@ -134,7 +145,7 @@ __tx_thread_fiq_not_nested_save:
 
     MRS     r2, SPSR                            // Pickup saved SPSR
     SUB     lr, lr, #4                          // Adjust point of interrupt
-    STMDB   sp!, {r2, lr}                       // Store other registers, Note that we don't
+    PUSH    {r2, lr}                            // Store other registers, Note that we don't
                                                 //   need to save sl and ip since FIQ has
                                                 //   copies of these registers.  Nested
                                                 //   interrupt processing does need to save
@@ -172,7 +183,7 @@ __tx_thread_fiq_idle_system_save:
 
     MRS     r0, SPSR                            // Pickup saved SPSR
     SUB     lr, lr, #4                          // Adjust point of interrupt
-    STMDB   sp!, {r0, lr}                       // Store other registers that will get used
+    PUSH    {r0, lr}                            // Store other registers that will get used
                                                 //   or stripped off the stack in context
                                                 //   restore
     B       __tx_fiq_processing_return          // Continue FIQ processing
