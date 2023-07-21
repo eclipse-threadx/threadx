@@ -1,10 +1,18 @@
 
+    .syntax unified
+#if !defined(THUMB_MODE)
+    .arm
+#else
+    .thumb
+#endif
+
     .text
     .align 4
-    .syntax unified
 
-    .global _gcc_setup
+#if defined(THUMB_MODE)
     .thumb_func
+#endif
+    .global _gcc_setup
 _gcc_setup:
 
     STMDB   sp!, {r3, r4, r5, r6, r7, lr}             // Store other preserved registers
@@ -93,7 +101,6 @@ got_setup_done:
 
   /* Startup helper functions. */
 
-    .thumb_func
 crt0_memory_copy:
 
     cmp     r0, r1
@@ -112,7 +119,6 @@ memory_copy_loop:
 memory_copy_done:
     bx      lr
 
-    .thumb_func
 crt0_memory_set:
     cmp     r0, r1
     beq     memory_set_done

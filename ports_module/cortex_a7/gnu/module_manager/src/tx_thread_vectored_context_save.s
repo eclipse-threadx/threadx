@@ -19,17 +19,21 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
+    .arm
+#endif
 
     .global     _tx_thread_system_state
     .global     _tx_thread_current_ptr
     .global     _tx_execution_isr_enter
 
 
-
 /* No 16-bit Thumb mode veneer code is needed for _tx_thread_vectored_context_save
    since it will never be called 16-bit mode.  */
 
-    .arm
     .text
     .align 2
 /**************************************************************************/
@@ -37,7 +41,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_vectored_context_save                     ARMv7-A        */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -74,8 +78,14 @@
 /*                                            resulting in version 6.1.9  */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Yajun Xia                Updated comments,             */
+/*                                            Added thumb mode support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  _tx_thread_vectored_context_save
     .type    _tx_thread_vectored_context_save,function
 _tx_thread_vectored_context_save:

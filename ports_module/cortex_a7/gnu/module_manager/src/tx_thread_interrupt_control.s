@@ -20,25 +20,18 @@
 /**************************************************************************/
 /**************************************************************************/
 
-INT_MASK        =   0x03F
-
-
-/* Define the 16-bit Thumb mode veneer for _tx_thread_interrupt_control for
-   applications calling this function from to 16-bit Thumb mode.  */
-
-    .text
-    .align 2
-    .global $_tx_thread_interrupt_control
-$_tx_thread_interrupt_control:
-        .thumb
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
     .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_thread_interrupt_control     // Call _tx_thread_interrupt_control function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
+#endif
 
+INT_MASK        =   0x0C0
+IRQ_MASK        =   0x080
+#ifdef TX_ENABLE_FIQ_SUPPORT
+FIQ_MASK        =   0x040
+#endif
 
     .text
     .align 2
@@ -47,7 +40,7 @@ $_tx_thread_interrupt_control:
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_interrupt_control                         ARMv7-A        */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -80,25 +73,35 @@ $_tx_thread_interrupt_control:
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Yajun Xia                Updated comments,             */
+/*                                            Added thumb mode support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global _tx_thread_interrupt_control
     .type   _tx_thread_interrupt_control,function
 _tx_thread_interrupt_control:
+    MRS     r1, CPSR                            // Pickup current CPSR
 
-    /* Pickup current interrupt lockout posture.  */
-
-    MRS     r3, CPSR                    // Pickup current CPSR
-    MOV     r2, #INT_MASK               // Build interrupt mask
-    AND     r1, r3, r2                  // Clear interrupt lockout bits
-    ORR     r1, r1, r0                  // Or-in new interrupt lockout bits
-
-    /* Apply the new interrupt posture.  */
-
-    MSR     CPSR_c, r1                  // Setup new CPSR
-    BIC     r0, r3, r2                  // Return previous interrupt mask
-#ifdef __THUMB_INTERWORK
-    BX      lr                          // Return to caller
+#ifdef TX_ENABLE_FIQ_SUPPORT
+    CPSID   if                                  // Disable IRQ and FIQ
 #else
-    MOV     pc, lr                      // Return to caller
+    CPSID   i                                   // Disable IRQ
 #endif
+
+    TST     r0, #IRQ_MASK
+    BNE     no_irq
+    CPSIE   i
+no_irq:
+#ifdef TX_ENABLE_FIQ_SUPPORT
+    TST     r0, #FIQ_MASK
+    BNE     no_fiq
+    CPSIE   f
+no_fiq:
+#endif
+
+    AND     r0, r1, #INT_MASK
+    BX      lr
