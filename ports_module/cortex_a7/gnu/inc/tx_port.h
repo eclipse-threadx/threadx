@@ -272,10 +272,7 @@ typedef unsigned short                          USHORT;
 #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
 
-
-/* Determine if the ARM architecture has the CLZ instruction. This is available on
-   architectures v5 and above. If available, redefine the macro for calculating the
-   lowest bit set.  */
+/* Redefine the macro for calculating the lowest bit set. */
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       m = m & ((ULONG) (-((LONG) m))); \
                                                 asm volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) ); \
                                                 b = 31 - b;
