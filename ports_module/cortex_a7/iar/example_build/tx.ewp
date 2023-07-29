@@ -354,7 +354,7 @@
                 </option>
                 <option>
                     <name>IProcessorMode2</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCOptLevel</name>
@@ -515,6 +515,7 @@
                 <option>
                     <name>ADefines</name>
                     <state>noTX_ENABLE_EXECUTION_CHANGE_NOTIFY</state>
+                    <state>THUMB_MODE</state>
                 </option>
                 <option>
                     <name>AList</name>
@@ -658,7 +659,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>0</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -1053,7 +1054,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>C:\Users\cindydeng\AzureRTOS\threadx\modules\cortex-a-port\threadx\ports_module\cortex_a7\iar\example_build\Debug\Exe\tx.a</state>
+                    <state>C:\workspace\threadx\ports_module\cortex_a7\iar\example_build\Debug\Exe\tx.a</state>
                 </option>
             </data>
         </settings>

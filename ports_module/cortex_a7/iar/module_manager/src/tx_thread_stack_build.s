@@ -30,13 +30,14 @@ CPSR_MASK       EQU     0x9F                    ; Mask initial CPSR, IRQ ints en
 
 THUMB_MASK      EQU     0x20                    ; Thumb bit (5) of CPSR/SPSR
 
+    EXTERN       _tx_thread_schedule
 
 ;/**************************************************************************/ 
 ;/*                                                                        */ 
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_stack_build                          Cortex-A7/MMU/IAR   */ 
-;/*                                                           6.1          */
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
@@ -69,13 +70,20 @@ THUMB_MASK      EQU     0x20                    ; Thumb bit (5) of CPSR/SPSR
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+;/*  xx-xx-xxxx      Yajun Xia               Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 ;{
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _tx_thread_stack_build
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _tx_thread_stack_build
 ;
 ;       
@@ -103,49 +111,51 @@ _tx_thread_stack_build
 ;
 ;    Stack Bottom: (higher memory address)  */
 ;
-    LDR     r2, [r0, #16]                       ; Pickup end of stack area
-    BIC     r2, r2, #7                          ; Ensure 8-byte alignment
-    SUB     r2, r2, #76                         ; Allocate space for the stack frame
-;
-;    /* Actually build the stack frame.  */
-;
-    MOV     r3, #1                              ; Build interrupt stack type
-    STR     r3, [r2, #0]                        ; Store stack type
-    MOV     r3, #0                              ; Build initial register value
-    STR     r3, [r2, #8]                        ; Store initial r0
-    STR     r3, [r2, #12]                       ; Store initial r1
-    STR     r3, [r2, #16]                       ; Store initial r2
-    STR     r3, [r2, #20]                       ; Store initial r3
-    STR     r3, [r2, #24]                       ; Store initial r4
-    STR     r3, [r2, #28]                       ; Store initial r5
-    STR     r3, [r2, #32]                       ; Store initial r6
-    STR     r3, [r2, #36]                       ; Store initial r7
-    STR     r3, [r2, #40]                       ; Store initial r8
-    STR     r3, [r2, #44]                       ; Store initial r9
-    LDR     r3, [r0, #12]                       ; Pickup stack starting address
-    STR     r3, [r2, #48]                       ; Store initial r10 (sl)
-    MOV     r3, #0                              ; Build initial register value
-    STR     r3, [r2, #52]                       ; Store initial r11
-    STR     r3, [r2, #56]                       ; Store initial r12
-    STR     r3, [r2, #60]                       ; Store initial lr
-    STR     r1, [r2, #64]                       ; Store initial pc
-    STR     r3, [r2, #68]                       ; 0 for back-trace
+    LDR     r2, [r0, #16]                   ; Pickup end of stack area
+    BIC     r2, r2, #7                      ; Ensure 8-byte alignment
+    SUB     r2, r2, #76                     ; Allocate space for the stack frame
 
-    MRS     r3, CPSR                            ; Pickup CPSR
-    BIC     r3, r3, #CPSR_MASK                  ; Mask mode bits of CPSR
-    ORR     r3, r3, #SYS_MODE                   ; Build CPSR, SYS mode, interrupts enabled
-    BIC     r3, r3, #THUMB_MASK                 ; Clear Thumb bit by default
-    AND     r1, r1, #1                          ; Determine if the entry function is in Thumb mode
-    CMP     r1, #1                              ; Is the Thumb bit set?
-    ORREQ   r3, r3, #THUMB_MASK                 ; Yes, set the Thumb bit
-    STR     r3, [r2, #4]                        ; Store initial CPSR
-;
-;    /* Setup stack pointer.  */
-;    thread_ptr -> tx_thread_stack_ptr =  r2;
-;
-    STR     r2, [r0, #8]                        ; Save stack pointer in thread's
-                                                ;   control block
-    BX      lr                                  ; Return to caller
+;   /* Actually build the stack frame.  */
+
+    MOV     r3, #1                          ; Build interrupt stack type
+    STR     r3, [r2, #0]                    ; Store stack type
+
+    MRS     r3, CPSR                        ; Pickup CPSR
+    BIC     r3, #CPSR_MASK                  ; Mask mode bits of CPSR
+    ORR     r3, #SYS_MODE                   ; Build CPSR, SYS mode, interrupts enabled
+    TST     r1, #1                          ; Check if the initial PC is a Thumb function
+    IT      NE
+    ORRNE   r3, #THUMB_MASK                 ; If the initial PC is a thumb function, CPSR must reflect this
+    STR     r3, [r2, #4]                    ; Store initial CPSR
+
+    MOV     r3, #0                          ; Build initial register value
+    STR     r3, [r2, #8]                    ; Store initial r0
+    STR     r3, [r2, #12]                   ; Store initial r1
+    STR     r3, [r2, #16]                   ; Store initial r2
+    STR     r3, [r2, #20]                   ; Store initial r3
+    STR     r3, [r2, #24]                   ; Store initial r4
+    STR     r3, [r2, #28]                   ; Store initial r5
+    STR     r3, [r2, #32]                   ; Store initial r6
+    STR     r3, [r2, #36]                   ; Store initial r7
+    STR     r3, [r2, #40]                   ; Store initial r8
+    STR     r3, [r2, #44]                   ; Store initial r9
+    STR     r3, [r2, #52]                   ; Store initial r11
+    STR     r3, [r2, #56]                   ; Store initial r12
+    STR     r3, [r2, #68]                   ; 0 for back-trace
+
+    LDR     r3, [r0, #12]                   ; Pickup stack starting address
+    STR     r3, [r2, #48]                   ; Store initial r10 (sl)
+
+    LDR     r3,=_tx_thread_schedule         ; Pickup address of _tx_thread_schedule for GDB backtrace
+    STR     r3, [r2, #60]                   ; Store initial r14 (lr)
+
+    STR     r1, [r2, #64]                   ; Store initial pc
+
+;   /* Setup stack pointer.  */
+
+    STR     r2, [r0, #8]                    ; Save stack pointer in thread's
+                                            ;   control block
+    BX      lr                              ; Return to caller
 
 
 ;}

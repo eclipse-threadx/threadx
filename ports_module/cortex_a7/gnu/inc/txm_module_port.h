@@ -410,7 +410,7 @@ UINT  _txm_module_manager_inside_data_check(ULONG pointer);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-A7/MMU/GNU Version 6.2.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-A7/MMU/GNU Version 6.x *";
 
 #endif
 

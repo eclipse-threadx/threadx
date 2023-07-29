@@ -21,10 +21,10 @@
 ;/**************************************************************************/
 ;
 
-#ifdef TX_ENABLE_FIQ_SUPPORT
 INT_MASK        EQU         0xC0                ; Interrupt bit mask
-#else
-INT_MASK        EQU         0x80                ; Interrupt bit mask
+IRQ_MASK        EQU         0x80                ; Interrupt bit mask
+#ifdef TX_ENABLE_FIQ_SUPPORT
+FIQ_MASK        EQU         0x40                ; Interrupt bit mask
 #endif
 ;
 ;
@@ -34,7 +34,7 @@ INT_MASK        EQU         0x80                ; Interrupt bit mask
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_interrupt_control                       Cortex-A7/IAR    */ 
-;/*                                                           6.1          */
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -65,26 +65,42 @@ INT_MASK        EQU         0x80                ; Interrupt bit mask
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;UINT   _tx_thread_interrupt_control(UINT new_posture)
 ;{
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _tx_thread_interrupt_control
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _tx_thread_interrupt_control
-;
-;    /* Pickup current interrupt lockout posture.  */
-;
-    MRS     r3, CPSR                            ; Pickup current CPSR
-    BIC     r1, r3, #INT_MASK                   ; Clear interrupt lockout bits
-    ORR     r1, r1, r0                          ; Or-in new interrupt lockout bits
-;
-;    /* Apply the new interrupt posture.  */
-;
-    MSR     CPSR_cxsf, r1                       ; Setup new CPSR
-    AND     r0, r3, #INT_MASK                   ; Return previous interrupt mask
-    BX      lr                                  ; Return to caller
+    MRS     r1, CPSR                            ; Pickup current CPSR
+
+#ifdef TX_ENABLE_FIQ_SUPPORT
+    CPSID   if                                  ; Disable IRQ and FIQ
+#else
+    CPSID   i                                   ; Disable IRQ
+#endif
+
+    TST     r0, #IRQ_MASK
+    BNE     no_irq
+    CPSIE   i
+no_irq:
+#ifdef TX_ENABLE_FIQ_SUPPORT
+    TST     r0, #FIQ_MASK
+    BNE     no_fiq
+    CPSIE   f
+no_fiq:
+#endif
+
+    AND     r0, r1, #INT_MASK
+    BX      lr
 ;
 ;}
 ;

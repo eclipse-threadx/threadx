@@ -94,9 +94,11 @@
 /*  03-08-2023      Scott Larson            Check module stack for        */
 /*                                            overlap,                    */
 /*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx      Xiuwen Cai              Modified comment(s),          */
+/*  xx-xx-xxxx      Xiuwen Cai, Yajun xia   Modified comment(s),          */
 /*                                            added option for random     */
 /*                                            number stack filling,       */
+/*                                            fixed the kernel stack      */
+/*                                            allocation issue,           */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
@@ -327,9 +329,8 @@ ULONG                   i;
     /* Initialize thread control block to all zeros.  */
     TX_MEMSET(thread_ptr, 0, sizeof(TX_THREAD));
 
-#if TXM_MODULE_MEMORY_PROTECTION
-    /* If this is a memory protected module, allocate a kernel stack.  */
-    if((module_instance -> txm_module_instance_property_flags) & TXM_MODULE_MEMORY_PROTECTION)
+    /* If the thread runs on user mode, allocate the kernel stack for syscall.  */
+    if((module_instance -> txm_module_instance_property_flags) & TXM_MODULE_USER_MODE)
     {
         ULONG status;
 
@@ -354,6 +355,7 @@ ULONG                   i;
         thread_ptr -> tx_thread_module_kernel_stack_size = TXM_MODULE_KERNEL_STACK_SIZE;
     }
 
+#if TXM_MODULE_MEMORY_PROTECTION
     /* Place the stack parameters into the thread's control block.  */
     thread_ptr -> tx_thread_module_stack_start =  stack_start;
     thread_ptr -> tx_thread_module_stack_size =   stack_size;

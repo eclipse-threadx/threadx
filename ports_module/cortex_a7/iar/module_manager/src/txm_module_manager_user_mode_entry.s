@@ -20,7 +20,6 @@
 ;/**************************************************************************/ 
 ;/**************************************************************************/ 
 ;
-    EXTERN  _tx_thread_current_ptr
     EXTERN  _txm_module_manager_kernel_dispatch
     
 
@@ -28,8 +27,8 @@
 ;/*                                                                        */ 
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
-;/*    tx             Cortex-A7/MMU/IAR   */ 
-;/*                                                           6.1          */
+;/*    tx                                              Cortex-A7/MMU/IAR   */ 
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
@@ -60,18 +59,29 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+;/*  xx-xx-xxxx      Yajun Xia               Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _txm_module_manager_user_mode_entry
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _txm_module_manager_user_mode_entry
 
     PUBLIC  _txm_system_mode_enter
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _txm_system_mode_enter
     SVC     1                               ; Get out of user mode
-_txm_module_priv
+
     ; At this point, we are in system mode.
     ; Save LR (and r3 for 8 byte aligned stack) and call the kernel dispatch function.
     PUSH    {r3, lr}
@@ -79,7 +89,11 @@ _txm_module_priv
     POP     {r3, lr}
 
     PUBLIC _txm_system_mode_exit
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _txm_system_mode_exit
     ; Trap to restore user mode while inside of ThreadX
     SVC     2

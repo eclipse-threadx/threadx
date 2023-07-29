@@ -30,7 +30,9 @@
     .global     _tx_thread_system_state
     .global     _tx_thread_current_ptr
     .global     __tx_irq_processing_return
-
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+    EXTERN      _tx_execution_isr_enter
+#endif
 
 /* No 16-bit Thumb mode veneer code is needed for _tx_thread_context_save
    since it will never be called 16-bit mode.  */

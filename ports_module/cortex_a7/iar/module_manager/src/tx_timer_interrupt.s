@@ -39,7 +39,7 @@
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_timer_interrupt                                Cortex-A7/IAR    */ 
-;/*                                                           6.1          */
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -74,13 +74,20 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_timer_interrupt(VOID)
 ;{
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _tx_timer_interrupt
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _tx_timer_interrupt
 ;
 ;    /* Upon entry to this routine, it is assumed that context save has already
@@ -193,7 +200,7 @@ __tx_timer_done
 __tx_something_expired
 ;
 ;
-    STMDB   sp!, {r0, lr}                       ; Save the lr register on the stack
+    PUSH    {r0, lr}                            ; Save the lr register on the stack
                                                 ;   and save r0 just to keep 8-byte alignment
 ;
 ;    /* Did a timer expire?  */
@@ -231,7 +238,7 @@ __tx_timer_dont_activate
 ;
 __tx_timer_not_ts_expiration
 ;
-    LDMIA   sp!, {r0, lr}                       ; Recover lr register (r0 is just there for
+    POP     {r0, lr}                            ; Recover lr register (r0 is just there for
                                                 ;   the 8-byte stack alignment
 ;
 ;    }

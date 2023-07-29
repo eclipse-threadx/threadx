@@ -232,11 +232,12 @@ void    thread_0_entry(ULONG thread_input)
 
 UINT    status;
 
+#if 0  /* TBD: Disabled external memory test as the MMU need to be refactored. */
     /* Test external/shared memory.  */
-     *(ULONG *) 0x90000000 = 0xdeadbeef;
-     *(ULONG *) 0x90000FFC = 0xfeed0add;
-     *(ULONG *) 0x90001000 = 0xfedcba01;
-    
+    *(ULONG *) 0x90000000 = 0xdeadbeef;
+    *(ULONG *) 0x90000FFC = 0xfeed0add;
+    *(ULONG *) 0x90001000 = 0xfedcba01;
+#endif
     /* This thread simply sits in while-forever-sleep loop.  */
     while(1)
     {
