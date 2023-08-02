@@ -353,7 +353,7 @@
                 </option>
                 <option>
                     <name>IProcessorMode2</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCOptLevel</name>
@@ -509,7 +509,7 @@
                 </option>
                 <option>
                     <name>ADefines</name>
-                    <state>THUMB_MODE</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>AList</name>
@@ -1052,7 +1052,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>C:\workspace\threadx\ports_module\cortex_a7\iar\example_build\Debug\Exe\txm.a</state>
+                    <state>C:\tmp\threadx\ports_module\cortex_a7\iar\example_build\Debug\Exe\txm.a</state>
                 </option>
             </data>
         </settings>

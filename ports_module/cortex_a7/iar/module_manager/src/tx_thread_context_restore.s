@@ -34,7 +34,7 @@ SYS_MODE        EQU     0x1F                    ; SYS mode
     EXTERN      _tx_timer_time_slice
     EXTERN      _tx_thread_schedule
     EXTERN      _tx_thread_preempt_disable
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     EXTERN      _tx_execution_isr_exit
 #endif
 ;
@@ -179,8 +179,10 @@ restore_and_return_from_irq:
     POP     {r0, r10, r12, lr}              ; Recover SPSR, POI, and scratch regs
     MSR     SPSR_cxsf, r0                   ; Put SPSR back
     POP     {r0-r3}                         ; Recover r0-r3
-#if defined(THUMB_MODE)
-    ; SUBS    pc, lr, #0
+#if defined(THUMB_MODE) && defined(IAR_SIMULATOR)
+
+;   /* The reason for adding this segment is that IAR's simulator
+;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
     MRS      lr, SPSR    
     STR      lr, [sp, #-4]

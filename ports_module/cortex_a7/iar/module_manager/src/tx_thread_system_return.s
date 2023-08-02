@@ -23,7 +23,7 @@
     EXTERN      _tx_thread_current_ptr
     EXTERN      _tx_timer_time_slice
     EXTERN      _tx_thread_schedule
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     EXTERN      _tx_execution_thread_exit        
 #endif
 

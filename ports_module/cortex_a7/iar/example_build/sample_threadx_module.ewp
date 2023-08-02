@@ -353,7 +353,7 @@
                 </option>
                 <option>
                     <name>IProcessorMode2</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCOptLevel</name>
@@ -509,7 +509,7 @@
                 </option>
                 <option>
                     <name>ADefines</name>
-                    <state>THUMB_MODE</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>AList</name>

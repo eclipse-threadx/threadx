@@ -24,7 +24,7 @@
     EXTERN     _tx_thread_execute_ptr
     EXTERN     _tx_thread_current_ptr
     EXTERN     _tx_timer_time_slice
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     EXTERN     _tx_execution_thread_enter
 #endif
     
@@ -209,12 +209,18 @@ _tx_handler_svc_super_enter
     ; Restore the registers and return
 #if defined(THUMB_MODE)
     POP     {r0-r3, r12, lr}
-    ; SUBS    pc, lr, #0
+#if defined(IAR_SIMULATOR)
+
+;   /* The reason for adding this segment is that IAR's simulator
+;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
     MRS      lr, SPSR    
     STR      lr, [sp, #-4]
     SUB      lr, sp, #8
     RFE      lr
+#else
+    SUBS    pc, lr, #0
+#endif
 #else
     LDMFD   sp!, {r0-r3, r12, pc}^
 #endif
@@ -272,12 +278,19 @@ _tx_handler_svc_arm
     ; Restore the registers and return
 #if defined(THUMB_MODE)
     POP     {r0-r3, r12, lr}
-    ; SUBS    pc, lr, #0
+#if defined(IAR_SIMULATOR)
+
+;   /* The reason for adding this segment is that IAR's simulator
+;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
     MRS      lr, SPSR    
     STR      lr, [sp, #-4]
     SUB      lr, sp, #8
     RFE      lr
+#else
+    SUBS    pc, lr, #0
+#endif
+
 #else
     LDMFD   sp!, {r0-r3, r12, pc}^
 #endif
@@ -425,8 +438,10 @@ _tx_skip_interrupt_vfp_restore
     ADD     sp, #4                          ; Fix stack pointer (skip PC saved on stack)
     CPS     #SVC_MODE                       ; Enter SVC mode
 
-#if defined(THUMB_MODE)
-    ; SUBS    pc, lr, #0
+#if defined(THUMB_MODE) && defined(IAR_SIMULATOR)
+
+;   /* The reason for adding this segment is that IAR's simulator
+;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
     MRS      lr, SPSR    
     STR      lr, [sp, #-4]
@@ -456,8 +471,10 @@ _tx_skip_solicited_vfp_restore
     CPS     #SVC_MODE                       ; Enter SVC mode
     MSR     SPSR_cxsf, r2                   ; Recover CPSR
     MOV     lr, r1                          ; Deprecated return via r1, so copy r1 to lr and return via lr
-#if defined(THUMB_MODE)
-    ; SUBS    pc, lr, #0
+#if defined(THUMB_MODE) && defined(IAR_SIMULATOR)
+
+;   /* The reason for adding this segment is that IAR's simulator
+;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
     MRS      lr, SPSR    
     STR      lr, [sp, #-4]

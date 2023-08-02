@@ -121,8 +121,10 @@ _tx_thread_fiq_context_restore
     POP     {r0, r10, r12, lr}                  ; Recover SPSR, POI, and scratch regs
     MSR     SPSR_cxsf, r0                       ; Put SPSR back
     POP     {r0-r3}                             ; Recover r0-r3
-#if defined(THUMB_MODE)
-    ; SUBS    pc, lr, #0
+#if defined(THUMB_MODE) && defined(IAR_SIMULATOR)
+
+;   /* The reason for adding this segment is that IAR's simulator
+;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
     MRS      lr, SPSR    
     STR      lr, [sp, #-4]
@@ -170,13 +172,15 @@ __tx_thread_fiq_no_preempt_restore
 ;    /* Pickup the saved stack pointer.  */
 ;    tmp_ptr =  _tx_thread_current_ptr -> tx_thread_stack_ptr; 
 ;
-;    /* Recover the saved context and return to the point of interrupt.  */
+;   /* Recover the saved context and return to the point of interrupt.  */
 ;
     POP     {r0, lr}                            ; Recover SPSR, POI, and scratch regs
     MSR     SPSR_cxsf, r0                       ; Put SPSR back
     POP     {r0-r3}                             ; Recover r0-r3
-#if defined(THUMB_MODE)
-    ; SUBS    pc, lr, #0
+#if defined(THUMB_MODE) && defined(IAR_SIMULATOR)
+
+;   /* The reason for adding this segment is that IAR's simulator
+;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
     MRS      lr, SPSR    
     STR      lr, [sp, #-4]
