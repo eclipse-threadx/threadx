@@ -31,7 +31,7 @@
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_vectored_context_save                   Cortex-A7/IAR    */ 
-;/*                                                           6.1          */
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -63,13 +63,20 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID  _tx_thread_vectored_context_save(VOID)
 ;{
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _tx_thread_vectored_context_save
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _tx_thread_vectored_context_save
 ;
 ;    /* Upon entry to this routine, it is assumed that IRQ interrupts are locked

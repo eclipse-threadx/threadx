@@ -20,14 +20,18 @@
 ;/**************************************************************************/
 ;/**************************************************************************/
 
-
+INT_MASK        EQU         0xC0                ; Interrupt bit mask
+IRQ_MASK        EQU         0x80                ; Interrupt bit mask
+#ifdef TX_ENABLE_FIQ_SUPPORT
+FIQ_MASK        EQU         0x40                ; Interrupt bit mask
+#endif
 
 ;/**************************************************************************/ 
 ;/*                                                                        */ 
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_interrupt_restore                       Cortex-A7/IAR    */ 
-;/*                                                           6.1          */
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -58,23 +62,36 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;void   _tx_thread_interrupt_restore(UINT old_posture)
 ;{
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _tx_thread_interrupt_restore
-    ARM
-_tx_thread_interrupt_restore
-;
-;    /* Apply the new interrupt posture.  */
-;
-    MSR     CPSR_cxsf, r0                       ; Setup new CPSR
-#ifdef TX_THUMB
-    BX      lr                                  ; Return to caller
+#ifdef THUMB_MODE
+    THUMB
 #else
-    MOV     pc, lr                              ; Return to caller
+    ARM
 #endif
+_tx_thread_interrupt_restore
+
+;   /* Apply the new interrupt posture.  */
+
+    TST     r0, #IRQ_MASK
+    BNE     no_irq
+    CPSIE   i
+no_irq:
+#ifdef TX_ENABLE_FIQ_SUPPORT
+    TST     r0, #FIQ_MASK
+    BNE     no_fiq
+    CPSIE   f
+no_fiq:
+#endif
+
+    BX      lr                                  ; Return to caller
 ;}
 ;
     END

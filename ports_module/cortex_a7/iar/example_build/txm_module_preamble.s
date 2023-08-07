@@ -32,9 +32,13 @@ __txm_module_preamble:
                                                                     ;           0 -> IAR
                                                                     ;           1 -> RVDS
                                                                     ;           2 -> GNU
-                                                                    ;   Bits 23-1: Reserved
-                                                                    ;   Bit 0:  0 -> Privileged mode execution (no MPU protection)
-                                                                    ;           1 -> User mode execution (MPU protection)
+                                                                    ;   Bits 23-3: Reserved
+                                                                    ;   Bit 2:  0 -> Disable shared/external memory access
+                                                                    ;           1 -> Enable shared/external memory access
+                                                                    ;   Bit 1:  0 -> No MPU protection
+                                                                    ;           1 -> MPU protection (must have user mode selected - bit 0 set)
+                                                                    ;   Bit 0:  0 -> Privileged mode execution
+                                                                    ;           1 -> User mode execution
         DC32      _txm_module_thread_shell_entry - . - 0            ; Module Shell Entry Point
         DC32      demo_module_start - . - 0                         ; Module Start Thread Entry Point
         DC32      0                                                 ; Module Stop Thread Entry Point 

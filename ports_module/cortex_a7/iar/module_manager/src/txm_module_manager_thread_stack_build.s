@@ -35,7 +35,7 @@ CPSR_MASK       EQU     0x9F                    ; Mask initial CPSR, IRQ ints en
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _txm_module_manager_thread_stack_build          Cortex-A7/MMU/IAR   */ 
-;/*                                                           6.1          */
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
@@ -68,13 +68,20 @@ CPSR_MASK       EQU     0x9F                    ; Mask initial CPSR, IRQ ints en
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+;/*  xx-xx-xxxx      Yajun Xia               Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _txm_module_manager_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(TX_THREAD *, TXM_MODULE_INSTANCE *))
 ;{
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _txm_module_manager_thread_stack_build
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _txm_module_manager_thread_stack_build
 ;
 ;
@@ -132,13 +139,15 @@ _txm_module_manager_thread_stack_build
     STR     r1, [r2, #64]                       ; Store initial pc
     STR     r3, [r2, #68]                       ; 0 for back-trace
     MRS     r3, CPSR                            ; Pickup CPSR
-    BIC     r3, r3, #CPSR_MASK                  ; Mask mode bits of CPSR
+    BIC     r3, #CPSR_MASK                      ; Mask mode bits of CPSR
     TST     r1, #1                              ; Test if THUMB bit set in initial PC
-    ORRNE   r3, r3, #THUMB_MASK                 ; Set T bit if set
+    IT      NE
+    ORRNE   r3, #THUMB_MASK                     ; Set T bit if set
     LDR     r1, [r0, #156]                      ; Load tx_thread_module_current_user_mode
     TST     r1, #1                              ; Test if the flag is set
-    ORREQ   r3, r3, #SYS_MODE                   ; Flag not set: Build CPSR, SYS mode, IRQ enabled
-    ORRNE   r3, r3, #USR_MODE                   ; Flag set: Build CPSR, USR mode, IRQ enabled
+    ITE     EQ
+    ORREQ   r3, #SYS_MODE                       ; Flag not set: Build CPSR, SYS mode, IRQ enabled
+    ORRNE   r3, #USR_MODE                       ; Flag set: Build CPSR, USR mode, IRQ enabled
     STR     r3, [r2, #4]                        ; Store initial CPSR
 ;
 ;    /* Setup stack pointer.  */

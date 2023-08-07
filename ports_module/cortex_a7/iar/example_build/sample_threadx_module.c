@@ -232,11 +232,6 @@ void    thread_0_entry(ULONG thread_input)
 
 UINT    status;
 
-    /* Test external/shared memory.  */
-     *(ULONG *) 0x90000000 = 0xdeadbeef;
-     *(ULONG *) 0x90000FFC = 0xfeed0add;
-     *(ULONG *) 0x90001000 = 0xfedcba01;
-    
     /* This thread simply sits in while-forever-sleep loop.  */
     while(1)
     {

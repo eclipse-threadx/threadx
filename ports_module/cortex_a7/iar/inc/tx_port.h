@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                         Cortex-A7/IAR     */ 
-/*                                                           6.1.6        */
+/*                                                           6.x          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,6 +51,9 @@
 /*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
 /*                                            macro definition,           */
 /*                                            resulting in version 6.1.6  */
+/*  xx-xx-xxxx      Yajun Xia               Modified comment(s),          */
+/*                                            Added thumb mode support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -315,21 +318,12 @@ void    __iar_Initlocks(void);
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
 
 
-/* Determine if the ARM architecture has the CLZ instruction. This is available on 
-   architectures v5 and above. If available, redefine the macro for calculating the 
-   lowest bit set.  */
+/* Redefine the macro for calculating the lowest bit set.  */
 
 #ifndef TX_DISABLE_INLINE
-
-#if __CORE__ > __ARM4TM__
-
-#if __CPU_MODE__ == 2
-   
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       m = m & ((ULONG) (-((LONG) m))); \
                                                 b = (UINT) __CLZ(m); \
                                                 b = 31 - b; 
-#endif
-#endif
 #endif
 
 
@@ -358,35 +352,41 @@ void  _tx_thread_interrupt_restore(UINT old_posture);
 #define TX_RESTORE                  _tx_thread_interrupt_restore(interrupt_save);
 
 #else
-#if __CPU_MODE__ == 2
-
-#if (__VER__ < 8002000)
-__intrinsic unsigned long __get_CPSR();
-__intrinsic void          __set_CPSR( unsigned long );
-#endif
-
-
-#if (__VER__ < 8002000)
+#if (__VER__ < 8002000) && (__CPU_MODE__ == 2)
 #define TX_INTERRUPT_SAVE_AREA      ULONG interrupt_save;
 #else
 #define TX_INTERRUPT_SAVE_AREA      UINT interrupt_save;
 #endif
 
-#define TX_DISABLE                  interrupt_save =  __get_CPSR(); \
-                                    __set_CPSR(interrupt_save | TX_INT_DISABLE);
-#define TX_RESTORE                  __set_CPSR(interrupt_save);
+#ifdef TX_ENABLE_FIQ_SUPPORT
+
+#define TX_DISABLE \
+    { \
+      asm volatile (" MRS %0,CPSR": "=r" (interrupt_save)); \
+      asm volatile (" CPSID if"); \
+    }
+#define TX_RESTORE \
+  { \
+    if ((interrupt_save & 0x40) == 0) \
+      asm volatile (" CPSIE f"); \
+    if ((interrupt_save & 0x80) == 0) \
+      asm volatile (" CPSIE i"); \
+  }
 
 
 #else
 
-UINT  _tx_thread_interrupt_disable(void);
-void  _tx_thread_interrupt_restore(UINT old_posture);
+#define TX_DISABLE \
+  { \
+    asm volatile (" MRS %0,CPSR": "=r" (interrupt_save)); \
+    asm volatile (" CPSID i"); \
+  }
+#define TX_RESTORE \
+  { \
+    if ((interrupt_save & 0x80) == 0) \
+      asm volatile (" CPSIE i"); \
+  }
 
-
-#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
-
-#define TX_DISABLE                              interrupt_save =  _tx_thread_interrupt_disable();
-#define TX_RESTORE                              _tx_thread_interrupt_restore(interrupt_save);
 #endif
 #endif
 

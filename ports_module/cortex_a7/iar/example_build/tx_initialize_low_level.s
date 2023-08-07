@@ -81,7 +81,7 @@ __tx_free_memory_start
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_initialize_low_level                           Cortex-A7/IAR    */ 
-;/*                                                           6.1          */
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -115,6 +115,9 @@ __tx_free_memory_start
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
@@ -152,11 +155,7 @@ _tx_initialize_low_level
 ;
 ;    /* Done, return to caller.  */
 ;
-#ifdef TX_THUMB
-    BX      lr                                  ; Return to caller
-#else
     MOV     pc, lr                              ; Return to caller
-#endif
 ;}
 ;
 ;/* Define shells for each of the interrupt vectors.  */

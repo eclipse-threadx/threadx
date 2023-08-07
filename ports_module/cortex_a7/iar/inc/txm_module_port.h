@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    txm_module_port.h                               Cortex-A7/MMU/IAR   */ 
-/*                                                           6.1          */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -41,6 +41,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  xx-xx-xxxx      Yajun Xia               Modified comment(s),          */
+/*                                            Added thumb mode support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -117,7 +120,7 @@ The following extensions must also be defined in tx_port.h:
 
 /* Define the properties for this particular module port.  */
 #ifdef TXM_MODULE_MEMORY_PROTECTION_ENABLED
-#define TXM_MODULE_MEMORY_PROTECTION            0x00000001
+#define TXM_MODULE_MEMORY_PROTECTION            0x00000002
 #else
 #define TXM_MODULE_MEMORY_PROTECTION            0x00000000
 #endif
@@ -126,7 +129,7 @@ The following extensions must also be defined in tx_port.h:
 
 /* Define the supported options for this module.   */
 
-#define TXM_MODULE_MANAGER_SUPPORTED_OPTIONS    (TXM_MODULE_MEMORY_PROTECTION)
+#define TXM_MODULE_MANAGER_SUPPORTED_OPTIONS    (TXM_MODULE_USER_MODE | TXM_MODULE_MEMORY_PROTECTION)
 #define TXM_MODULE_MANAGER_REQUIRED_OPTIONS     0
 
 
@@ -360,8 +363,8 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 /* Define the macro to populate the thread control block with module port-specific information.  */
 
 #define TXM_MODULE_MANAGER_THREAD_SETUP(thread_ptr, module_instance)                                                                            \
-    thread_ptr -> tx_thread_module_current_user_mode =  module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION;   \
-    thread_ptr -> tx_thread_module_user_mode =          module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION;   \
+    thread_ptr -> tx_thread_module_current_user_mode =  module_instance -> txm_module_instance_property_flags & TXM_MODULE_USER_MODE;           \
+    thread_ptr -> tx_thread_module_user_mode =          module_instance -> txm_module_instance_property_flags & TXM_MODULE_USER_MODE;           \
     if (thread_ptr -> tx_thread_module_user_mode)                                                                                               \
     {                                                                                                                                           \
         thread_entry_info -> txm_module_thread_entry_info_kernel_call_dispatcher =   _txm_module_manager_user_mode_entry;                       \
@@ -369,7 +372,7 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
     else                                                                                                                                        \
     {                                                                                                                                           \
         thread_entry_info -> txm_module_thread_entry_info_kernel_call_dispatcher =   _txm_module_manager_kernel_dispatch;                       \
-    }
+}
 
 
 /* Define the macro to populate the module control block with module port-specific information.
@@ -418,7 +421,7 @@ UINT  _txm_module_manager_inside_data_check(ULONG pointer);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-A7/MMU/iar Version 6.2.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-A7/MMU/iar Version 6.x *";
 
 #endif
 

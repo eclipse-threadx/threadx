@@ -14,14 +14,18 @@ __txm_module_preamble:
     .dc.l   0x1                                         // Module Minor Version
     .dc.l   32                                          // Module Preamble Size in 32-bit words
     .dc.l   0x12345678                                  // Module ID (application defined)
-    .dc.l   0x01000001                                  // Module Properties where:
+    .dc.l   0x02000001                                  // Module Properties where:
                                                         //   Bits 31-24: Compiler ID
                                                         //           0 -> IAR
                                                         //           1 -> RVDS
                                                         //           2 -> GNU
-                                                        //   Bits 23-1:  Reserved
-                                                        //   Bit 0:  0 -> Privileged mode execution (no MMU protection)
-                                                        //           1 -> User mode execution (MMU protection)
+                                                        //   Bits 23-3: Reserved
+                                                        //   Bit 2:  0 -> Disable shared/external memory access
+                                                        //           1 -> Enable shared/external memory access
+                                                        //   Bit 1:  0 -> No MPU protection
+                                                        //           1 -> MPU protection (must have user mode selected - bit 0 set)
+                                                        //   Bit 0:  0 -> Privileged mode execution
+                                                        //           1 -> User mode execution
     .dc.l   _txm_module_thread_shell_entry              // Module Shell Entry Point
     .dc.l   demo_module_start                           // Module Start Thread Entry Point
     .dc.l   0                                           // Module Stop Thread Entry Point 

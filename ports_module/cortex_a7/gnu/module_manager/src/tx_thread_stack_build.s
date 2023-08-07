@@ -38,6 +38,8 @@ CPSR_MASK       =       0xFF                    // Mask initial CPSR, T, IRQ & F
 CPSR_MASK       =       0xBF                    // Mask initial CPSR, T, IRQ interrupts enabled
 #endif
 
+    .global     _tx_thread_schedule
+
     .text
     .align 2
 /**************************************************************************/

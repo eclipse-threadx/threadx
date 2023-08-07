@@ -658,7 +658,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>0</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -1053,7 +1053,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>C:\Users\cindydeng\AzureRTOS\threadx\modules\cortex-a-port\threadx\ports_module\cortex_a7\iar\example_build\Debug\Exe\tx.a</state>
+                    <state>C:\tmp\threadx\ports_module\cortex_a7\iar\example_build\Debug\Exe\tx.a</state>
                 </option>
             </data>
         </settings>

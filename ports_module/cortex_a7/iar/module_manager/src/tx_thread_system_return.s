@@ -23,7 +23,7 @@
     EXTERN      _tx_thread_current_ptr
     EXTERN      _tx_timer_time_slice
     EXTERN      _tx_thread_schedule
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     EXTERN      _tx_execution_thread_exit        
 #endif
 
@@ -32,7 +32,7 @@
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_system_return                           Cortex-A7/IAR    */ 
-;/*                                                           6.1          */
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -65,73 +65,78 @@
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
 ;{
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _tx_thread_system_return
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _tx_thread_system_return
 
-;    /* Save minimal context on the stack.  */
+;   /* Save minimal context on the stack.  */
 ;
-    STMDB   sp!, {r4-r11, lr}                   ; Save minimal context
-    LDR     r5, =_tx_thread_current_ptr         ; Pickup address of current ptr
-    LDR     r6, [r5, #0]                        ; Pickup current thread pointer
+    PUSH    {r4-r11, lr}                ; Save minimal context
 
-#ifdef __ARMVFP__
-    LDR     r0, [r6, #144]                      ; Pickup the VFP enabled flag
-    CMP     r0, #0                              ; Is the VFP enabled?
-    BEQ     _tx_skip_solicited_vfp_save         ; No, skip VFP solicited save
-    VMRS    r4, FPSCR                           ; Pickup the FPSCR
-    STR     r4, [sp, #-4]!                      ; Save FPSCR
-    VSTMDB  sp!, {D16-D31}                      ; Save D16-D31
-    VSTMDB  sp!, {D8-D15}                       ; Save D8-D15
-_tx_skip_solicited_vfp_save
+    LDR     r4, =_tx_thread_current_ptr ; Pickup address of current ptr
+    LDR     r5, [r4]                    ; Pickup current thread pointer
+
+#ifdef TX_ENABLE_VFP_SUPPORT
+    LDR     r1, [r5, #144]              ; Pickup the VFP enabled flag
+    CMP     r1, #0                      ; Is the VFP enabled?
+    BEQ     _tx_skip_solicited_vfp_save ; No, skip VFP solicited save
+    VMRS    r1, FPSCR                   ; Pickup the FPSCR
+    STR     r1, [sp, #-4]!              ; Save FPSCR
+    VSTMDB  sp!, {D16-D31}              ; Save D16-D31
+    VSTMDB  sp!, {D8-D15}               ; Save D8-D15
+_tx_skip_solicited_vfp_save:
 #endif
 
-    MOV     r0, #0                              ; Build a solicited stack type
-    MRS     r1, CPSR                            ; Pickup the CPSR
-    STMDB   sp!, {r0-r1}                        ; Save type and CPSR
-;   
-;   /* Lockout interrupts.  */
-;
+    MOV     r0, #0                      ; Build a solicited stack type
+    MRS     r1, CPSR                    ; Pickup the CPSR, T bit is always cleared by hardware
+    TST     lr, #1                      ; Check if calling function is in Thumb mode
+    IT      NE
+    ORRNE   r1, #0x20                   ; Set the T bit so that the correct mode is set on return
+    PUSH    {r0-r1}                     ; Save type and CPSR
+
 #ifdef TX_ENABLE_FIQ_SUPPORT
-    CPSID   if                                  ; Disable IRQ and FIQ interrupts
+    CPSID   if                          ; Disable IRQ and FIQ
 #else
-    CPSID   i                                   ; Disable IRQ interrupts
+    CPSID   i                           ; Disable IRQ
 #endif
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-;
-;    /* Call the thread exit function to indicate the thread is no longer executing.  */
-;
-    BL      _tx_execution_thread_exit           ; Call the thread exit function
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+
+;   /* Call the thread exit function to indicate the thread is no longer executing.  */
+
+    BL      _tx_execution_thread_exit   ; Call the thread exit function
 #endif
-    LDR     r2, =_tx_timer_time_slice           ; Pickup address of time slice
-    LDR     r1, [r2, #0]                        ; Pickup current time slice
-;
-;    /* Save current stack and switch to system stack.  */
-;    _tx_thread_current_ptr -> tx_thread_stack_ptr =  sp;
-;    sp = _tx_thread_system_stack_ptr;
-;
-    STR     sp, [r6, #8]                        ; Save thread stack pointer
-;
-;    /* Determine if the time-slice is active.  */
-;    if (_tx_timer_time_slice)
-;    {
-;
-    MOV     r4, #0                              ; Build clear value
-    CMP     r1, #0                              ; Is a time-slice active?
-    BEQ     __tx_thread_dont_save_ts            ; No, don't save the time-slice
-;
-;       /* Save the current remaining time-slice.  */
-;       _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
-;       _tx_timer_time_slice =  0;
-;
-    STR     r4, [r2, #0]                        ; Clear time-slice
-    STR     r1, [r6, #24]                       ; Store current time-slice
+    MOV     r3, r4                      ; Pickup address of current ptr
+    MOV     r0, r5                      ; Pickup current thread pointer
+    LDR     r2, =_tx_timer_time_slice   ; Pickup address of time slice
+    LDR     r1, [r2]                    ; Pickup current time slice
+
+;   /* Save current stack and switch to system stack.  */
+
+    STR     sp, [r0, #8]                ; Save thread stack pointer
+
+;   /* Determine if the time-slice is active.  */
+
+    MOV     r4, #0                      ; Build clear value
+    CMP     r1, #0                      ; Is a time-slice active?
+    BEQ     __tx_thread_dont_save_ts    ; No, don't save the time-slice
+
+;   /* Save time-slice for the thread and clear the current time-slice.  */
+
+    STR     r4, [r2]                    ; Clear time-slice
+    STR     r1, [r0, #24]               ; Save current time-slice
 ;
 ;    }
 __tx_thread_dont_save_ts
@@ -139,9 +144,8 @@ __tx_thread_dont_save_ts
 ;    /* Clear the current thread pointer.  */
 ;    _tx_thread_current_ptr =  TX_NULL;
 ;
-    STR     r4, [r5, #0]                        ; Clear current thread pointer
-
-    B       _tx_thread_schedule                 ; Jump to scheduler!
+    STR     r4, [r3]                    ; Clear current thread pointer
+    B       _tx_thread_schedule         ; Jump to scheduler!
 ;
 ;}
     END

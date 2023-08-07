@@ -42,7 +42,7 @@ IRQ_MODE_BITS   EQU     0x12                    ; IRQ mode bits
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_fiq_context_restore                     Cortex-A7/IAR    */ 
-;/*                                                           6.1          */
+;/*                                                           6.x          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -75,13 +75,20 @@ IRQ_MODE_BITS   EQU     0x12                    ; IRQ mode bits
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+;/*                                            Added thumb mode support,   */
+;/*                                            resulting in version 6.x    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_fiq_context_restore(VOID)
 ;{
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _tx_thread_fiq_context_restore
+#ifdef THUMB_MODE
+    THUMB
+#else
     ARM
+#endif
 _tx_thread_fiq_context_restore
 ;
 ;    /* Lockout interrupts.  */
@@ -111,10 +118,21 @@ _tx_thread_fiq_context_restore
 ;    /* Just recover the saved registers and return to the point of 
 ;       interrupt.  */
 ;
-    LDMIA   sp!, {r0, r10, r12, lr}             ; Recover SPSR, POI, and scratch regs
+    POP     {r0, r10, r12, lr}                  ; Recover SPSR, POI, and scratch regs
     MSR     SPSR_cxsf, r0                       ; Put SPSR back
-    LDMIA   sp!, {r0-r3}                        ; Recover r0-r3
+    POP     {r0-r3}                             ; Recover r0-r3
+#if defined(THUMB_MODE) && defined(IAR_SIMULATOR)
+
+;   /* The reason for adding this segment is that IAR's simulator
+;      may not handle PC-relative instructions correctly in thumb mode.*/
+    STR      lr, [sp, #-8]
+    MRS      lr, SPSR    
+    STR      lr, [sp, #-4]
+    SUB      lr, sp, #8
+    RFE      lr
+#else
     MOVS    pc, lr                              ; Return to point of interrupt
+#endif
 ;
 ;    }
 __tx_thread_fiq_not_nested_restore
@@ -154,31 +172,42 @@ __tx_thread_fiq_no_preempt_restore
 ;    /* Pickup the saved stack pointer.  */
 ;    tmp_ptr =  _tx_thread_current_ptr -> tx_thread_stack_ptr; 
 ;
-;    /* Recover the saved context and return to the point of interrupt.  */
+;   /* Recover the saved context and return to the point of interrupt.  */
 ;
-    LDMIA   sp!, {r0, lr}                       ; Recover SPSR, POI, and scratch regs
+    POP     {r0, lr}                            ; Recover SPSR, POI, and scratch regs
     MSR     SPSR_cxsf, r0                       ; Put SPSR back
-    LDMIA   sp!, {r0-r3}                        ; Recover r0-r3
+    POP     {r0-r3}                             ; Recover r0-r3
+#if defined(THUMB_MODE) && defined(IAR_SIMULATOR)
+
+;   /* The reason for adding this segment is that IAR's simulator
+;      may not handle PC-relative instructions correctly in thumb mode.*/
+    STR      lr, [sp, #-8]
+    MRS      lr, SPSR    
+    STR      lr, [sp, #-4]
+    SUB      lr, sp, #8
+    RFE      lr
+#else
     MOVS    pc, lr                              ; Return to point of interrupt
+#endif
 ;
 ;    }
 ;    else
 ;    {
 __tx_thread_fiq_preempt_restore
 ;
-    LDMIA   sp!, {r3, lr}                       ; Recover temporarily saved registers
+    POP     {r3, lr}                            ; Recover temporarily saved registers
     MOV     r1, lr                              ; Save lr (point of interrupt)
     MOV     r2, #SVC_MODE                       ; Build SVC mode CPSR
     MSR     CPSR_c, r2                          ; Enter SVC mode
     STR     r1, [sp, #-4]!                      ; Save point of interrupt
-    STMDB   sp!, {r4-r12, lr}                   ; Save upper half of registers
+    PUSH    {r4-r12, lr}                        ; Save upper half of registers
     MOV     r4, r3                              ; Save SPSR in r4
     MOV     r2, #FIQ_MODE                       ; Build FIQ mode CPSR
     MSR     CPSR_c, r2                          ; Re-enter FIQ mode
-    LDMIA   sp!, {r0-r3}                        ; Recover r0-r3
+    POP     {r0-r3}                             ; Recover r0-r3
     MOV     r5, #SVC_MODE                       ; Build SVC mode CPSR
     MSR     CPSR_c, r5                          ; Enter SVC mode
-    STMDB   sp!, {r0-r3}                        ; Save r0-r3 on thread's stack
+    PUSH    {r0-r3}                             ; Save r0-r3 on thread's stack
 
     LDR     r1, =_tx_thread_current_ptr         ; Pickup address of current thread ptr
     LDR     r0, [r1]                            ; Pickup current thread pointer
@@ -195,7 +224,7 @@ _tx_skip_fiq_vfp_save
 #endif
 
     MOV     r3, #1                              ; Build interrupt stack type
-    STMDB   sp!, {r3, r4}                       ; Save interrupt stack type and SPSR
+    PUSH    {r3, r4}                            ; Save interrupt stack type and SPSR
     STR     sp, [r0, #8]                        ; Save stack pointer in thread control
                                                 ;   block  
 ;

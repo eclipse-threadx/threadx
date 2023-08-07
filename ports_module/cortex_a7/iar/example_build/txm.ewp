@@ -82,7 +82,7 @@
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>OGBufferedTerminalOutput</name>
@@ -99,7 +99,7 @@
                 <option>
                     <name>GBECoreSlave</name>
                     <version>31</version>
-                    <state>42</state>
+                    <state>52</state>
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
@@ -125,21 +125,21 @@
                 <option>
                     <name>FPU2</name>
                     <version>0</version>
-                    <state>3</state>
+                    <state>5</state>
                 </option>
                 <option>
                     <name>NrRegs</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>NEON</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
                     <version>31</version>
-                    <state>42</state>
+                    <state>52</state>
                 </option>
                 <option>
                     <name>OGCMSISPackSelectDevice</name>
@@ -353,7 +353,7 @@
                 </option>
                 <option>
                     <name>IProcessorMode2</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCOptLevel</name>
@@ -657,7 +657,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>0</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -1052,7 +1052,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>C:\Users\cindydeng\AzureRTOS\threadx\modules\cortex-a-port\threadx\ports_module\cortex_a7\iar\example_build\Debug\Exe\txm.a</state>
+                    <state>C:\tmp\threadx\ports_module\cortex_a7\iar\example_build\Debug\Exe\txm.a</state>
                 </option>
             </data>
         </settings>

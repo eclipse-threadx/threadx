@@ -44,11 +44,11 @@
                 </option>
                 <option>
                     <name>MemFile</name>
-                    <state>$TOOLKIT_DIR$\CONFIG\debugger\TexasInstruments\RM48L952ZWT.ddf</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>RunToEnable</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>RunToName</name>
@@ -88,7 +88,7 @@
                 </option>
                 <option>
                     <name>OCLastSavedByProductVersion</name>
-                    <state>8.50.4.26131</state>
+                    <state>9.20.4.46976</state>
                 </option>
                 <option>
                     <name>UseFlashLoader</name>
@@ -112,7 +112,7 @@
                 </option>
                 <option>
                     <name>FlashLoadersV3</name>
-                    <state>$TOOLKIT_DIR$\config\flashloader\TexasInstruments\FlashRM48L950.board</state>
+                    <state>$TOOLKIT_DIR$\config\flashloader\</state>
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck1</name>
