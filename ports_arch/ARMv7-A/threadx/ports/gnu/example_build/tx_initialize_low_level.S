@@ -41,8 +41,11 @@ SYS_STACK_SIZE  =       1024                    // System stack size
     .global     _end
     .global     _sp
     .global     _stack_bottom
-
-
+    .global     __vectors
+    .global     disableHighVecs
+    .global     enableGIC
+    .global     enableGICProcessorInterface
+    .global     enableCaches
 /* Define the 16-bit Thumb mode veneer for _tx_initialize_low_level for
    applications calling this function from to 16-bit Thumb mode.  */
 
@@ -160,6 +163,57 @@ _stack_error_loop:
     ADD     r1, r1, #8                          // Increment to next free word
     STR     r1, [r2]                            // Save first free memory address
 
+    PUSH    {lr}
+
+    /* Setup the vector table.  */
+    LDR     r0, =__vectors                      // Get address of vector table
+    MCR     p15, 0, r0, c12, c0, 0              // Write vector table address to CP15
+    BL      disableHighVecs                     // Disable high vectors
+
+    //
+    // GIC Init
+    // ---------
+    BL      enableGIC
+    BL      enableGICProcessorInterface
+
+    //
+    // Enable Private Timer for periodic IRQ
+    // --------------------------------------
+    MOV     r0, #0x1F
+    BL      setPriorityMask               // Set priority mask (local)
+
+    // [EL] Change start - don't enable interrupts here!  
+    //CPSIE   i                            // Clear CPSR I bit
+    // [EL] Change end
+
+    // Enable the Private Timer Interrupt Source
+    MOV     r0, #29
+    MOV     r1, #0
+    BL      enableIntID
+
+    // Set the priority
+    MOV     r0, #29
+    MOV     r1, #0
+    BL      setIntPriority
+
+    // Configure Timer
+    MOV       r0, #0xF0000
+    MCR       p15, 0, r0, c14, c2, 0 // Setup timeout value (CNTP_TVAL)
+    MOV       r0, #0x1
+    MCR       p15, 0, r0, c14, c2, 1 // Enable timer (CNTP_CTL)
+  
+    //
+    // Enable receipt of SGI 0
+    // ------------------------
+    MOV     r0, #0x0                  // ID
+    BL      enableIntID
+
+    // Set the priority
+    MOV     r0, #0x0                  // ID
+    MOV     r1, #0x0                  // Priority
+    BL      setIntPriority
+
+    POP    {lr}
 #ifdef __THUMB_INTERWORK
     BX      lr                                  // Return to caller
 #else
@@ -202,16 +256,17 @@ __tx_irq_processing_return:
        if nested IRQ interrupts are desired.  Interrupts may be re-enabled over
        small code sequences where lr is saved before enabling interrupts and
        restored after interrupts are again disabled.  */
+    
+    PUSH    {r4, r5}            // Save some preserved registers (r5 is saved just for 8-byte alignment)
+    BL      readIntAck
+    MOV     r4, r0
 
-    /* Interrupt nesting is allowed after calling _tx_thread_irq_nesting_start
-       from IRQ mode with interrupts disabled.  This routine switches to the
-       system mode and returns with IRQ interrupts enabled.
+    CMP     r0, #29             // If not Private Timer interrupt (ID 29), by pass
+    BNE     by_pass_timer_interrupt
 
-       NOTE:  It is very important to ensure all IRQ interrupts are cleared
-       prior to enabling nested IRQ interrupts.  */
-#ifdef TX_ENABLE_IRQ_NESTING
-    BL      _tx_thread_irq_nesting_start
-#endif
+    MOV     r0, #0xF0000
+    MCR     p15, 0, r0, c14, c2, 0 // Setup timeout value (CNTP_TVAL)
+    DSB
 
     /* For debug purpose, execute the timer interrupt processing here.  In
        a real system, some kind of status indication would have to be checked
@@ -219,13 +274,10 @@ __tx_irq_processing_return:
 
     BL     _tx_timer_interrupt                  // Timer interrupt handler
 
-
-    /* If interrupt nesting was started earlier, the end of interrupt nesting
-       service must be called before returning to _tx_thread_context_restore.
-       This routine returns in processing in IRQ mode with interrupts disabled.  */
-#ifdef TX_ENABLE_IRQ_NESTING
-    BL      _tx_thread_irq_nesting_end
-#endif
+by_pass_timer_interrupt:
+    MOV     r0, r4
+    BL      writeEOI
+    POP     {r4, r5}                            // Recover preserved registers
 
     /* Jump to context restore to restore system context.  */
     B       _tx_thread_context_restore
