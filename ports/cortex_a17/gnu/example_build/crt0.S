@@ -79,6 +79,14 @@ _mainCRTStartup:
 #endif
 #endif
 
+    .global  _fini
+    .type    _fini,function
+_fini:
+#ifdef __THUMB_INTERWORK
+    BX      lr                                  // Return to caller
+#else
+    MOV     pc, lr                              // Return to caller
+#endif
 
 /*  Workspace for Angel calls.  */
     .data
