@@ -78,7 +78,7 @@ Write-Verbose ("Patch files: $PatchFiles")
 Write-Verbose ("LogDir: $LogDir")
 
 $cores = @("cortex_a35", "cortex_a53", "cortex_a55", "cortex_a57", "cortex_a65", "cortex_a65ae", "cortex_a72", "cortex_a73", "cortex_a75", "cortex_a76", "cortex_a76ae", "cortex_a77")
-$compilers = @("ac6", "gnu", "iar", "ghs")
+$compilers = @("ac6", "gnu")
 $patches = (
     ('example_build\sample_threadx\.cproject', (
         (('value="cortex-a35"'), ('value="cortex-$core_short_lower"')),
