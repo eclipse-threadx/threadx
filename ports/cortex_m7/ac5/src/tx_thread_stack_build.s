@@ -30,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_stack_build                           Cortex-M7/AC5      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -63,8 +63,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
-/*  xx-xx-xxxx      Tiejun Zhou             Included tx_user.h,           */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023      Tiejun Zhou             Included tx_user.h,           */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))

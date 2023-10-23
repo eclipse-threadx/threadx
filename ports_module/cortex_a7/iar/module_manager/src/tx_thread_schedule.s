@@ -53,7 +53,7 @@ THUMB_MASK          EQU     0x20            ; Thumb bit mask
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_schedule                             Cortex-A7/MMU/IAR   */ 
-;/*                                                           6.x          */
+;/*                                                           6.3.0        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
@@ -87,9 +87,9 @@ THUMB_MASK          EQU     0x20            ; Thumb bit mask
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-;/*  xx-xx-xxxx      Yajun Xia               Modified comment(s),          */
+;/*  10-31-2023      Yajun Xia               Modified comment(s),          */
 ;/*                                            Added thumb mode support,   */
-;/*                                            resulting in version 6.x    */
+;/*                                            resulting in version 6.3.0  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)

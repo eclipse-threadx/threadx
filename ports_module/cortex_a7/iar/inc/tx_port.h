@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                         Cortex-A7/IAR     */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,9 +51,9 @@
 /*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
 /*                                            macro definition,           */
 /*                                            resulting in version 6.1.6  */
-/*  xx-xx-xxxx      Yajun Xia               Modified comment(s),          */
+/*  10-31-2023      Yajun Xia               Modified comment(s),          */
 /*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -411,7 +411,7 @@ void    tx_thread_vfp_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-A7/IAR Version 6.2.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-A7/IAR Version 6.3.0 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

@@ -419,7 +419,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Win32/Visual Studio Version 6.2.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Win32/Visual Studio Version 6.3.0 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_create                                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -88,10 +88,10 @@
 /*                                            supported TX_MISRA_ENABLE,  */
 /*  08-02-2021      Scott Larson            Removed unneeded cast,        */
 /*                                            resulting in version 6.1.8  */
-/*  xx-xx-xxxx      Xiuwen Cai              Modified comment(s),          */
+/*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
 /*                                            added option for random     */
 /*                                            number stack filling,       */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ULONG id), ULONG entry_input,

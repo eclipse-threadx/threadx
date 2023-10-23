@@ -49,7 +49,7 @@ TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -93,10 +93,10 @@ TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 /*  04-25-2022      Scott Larson            Modified comment(s),          */
 /*                                            added EPK initialization,   */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx      Xiuwen Cai              Modified comment(s),          */
+/*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
 /*                                            added random generator      */
 /*                                            initialization,             */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_initialize_kernel_enter(VOID)

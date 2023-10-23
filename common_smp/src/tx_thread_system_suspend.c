@@ -38,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_system_suspend                          PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -91,8 +91,8 @@
 /*  04-25-2022      Scott Larson            Modified comments and fixed   */
 /*                                            loop to find next thread,   */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx      Tiejun Zhou             Fixed MISRA2012 rule 10.4_a,  */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023      Tiejun Zhou             Fixed MISRA2012 rule 10.4_a,  */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_system_suspend(TX_THREAD *thread_ptr)

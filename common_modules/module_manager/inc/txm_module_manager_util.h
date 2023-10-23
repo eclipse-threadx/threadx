@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    txm_module_manager_util.h                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -44,9 +44,9 @@
 /*  04-02-2021      Scott Larson            Modified comment(s) and       */
 /*                                            optimized object checks,    */
 /*                                            resulting in version 6.1.6  */
-/*  xx-xx-xxxx      Tiejun Zhou             Modified comment(s) and       */
+/*  10-31-2023      Tiejun Zhou             Modified comment(s) and       */
 /*                                            improved object check,      */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

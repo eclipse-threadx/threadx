@@ -53,7 +53,7 @@ IRQ_MODE        =     0x92               // Disable IRQ, IRQ mode
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_restore                            ARMv7-A       */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -91,9 +91,9 @@ IRQ_MODE        =     0x92               // Disable IRQ, IRQ mode
 /*                                            resulting in version 6.1.9  */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
 /*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
     .global _tx_thread_context_restore

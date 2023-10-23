@@ -40,7 +40,7 @@ FIQ_MASK        =   0x040
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_interrupt_restore                         ARMv7-A        */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -73,9 +73,9 @@ FIQ_MASK        =   0x040
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Yajun Xia                Updated comments,             */
+/*  10-31-2023     Yajun Xia                Updated comments,             */
 /*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 #if defined(THUMB_MODE)

@@ -45,7 +45,7 @@ SVC_MODE        =     0x13            // SVC mode
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_restore                            ARMv7-A       */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -83,9 +83,9 @@ SVC_MODE        =     0x13            // SVC mode
 /*                                            resulting in version 6.1.9  */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Yajun Xia                Updated comments,             */
+/*  10-31-2023     Yajun Xia                Updated comments,             */
 /*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 #if defined(THUMB_MODE)

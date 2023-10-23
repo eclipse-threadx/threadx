@@ -44,7 +44,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_timer_interrupt                              Cortex-Mx/AC5      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -81,8 +81,8 @@
 /*  01-31-2022      Scott Larson            Modified comment(s), added    */
 /*                                            TX_NO_TIMER support,        */
 /*                                            resulting in version 6.1.10 */
-/*  xx-xx-xxxx      Tiejun Zhou             Included tx_user.h,           */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023      Tiejun Zhou             Included tx_user.h,           */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
