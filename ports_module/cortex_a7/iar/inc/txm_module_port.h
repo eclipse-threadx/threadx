@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    txm_module_port.h                               Cortex-A7/MMU/IAR   */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -41,9 +41,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  xx-xx-xxxx      Yajun Xia               Modified comment(s),          */
+/*  10-31-2023      Yajun Xia               Modified comment(s),          */
 /*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -421,7 +421,7 @@ UINT  _txm_module_manager_inside_data_check(ULONG pointer);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-A7/MMU/iar Version 6.x *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-A7/MMU/iar Version 6.3.0 *";
 
 #endif
 

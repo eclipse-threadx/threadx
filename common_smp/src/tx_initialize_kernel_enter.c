@@ -47,7 +47,7 @@ TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter                        PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -88,10 +88,10 @@ TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  xx-xx-xxxx      Xiuwen Cai              Modified comment(s),          */
+/*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
 /*                                            added random generator      */
 /*                                            initialization,             */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_initialize_kernel_enter(VOID)

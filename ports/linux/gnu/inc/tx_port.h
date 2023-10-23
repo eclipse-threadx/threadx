@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    tx_port.h                                           Linux/GNU       */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -54,9 +54,9 @@
 /*  04-25-2022     William E. Lamie         Modified comment(s), removed  */
 /*                                            useless definition,         */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Yanwu Cai                Modified comment(s), fixed    */
+/*  10-31-2023     Yanwu Cai                Modified comment(s), fixed    */
 /*                                            compile warnings,           */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -548,7 +548,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation * ThreadX Linux/gcc Version 6.2.1 *";
+                                    "Copyright (c) Microsoft Corporation * ThreadX Linux/gcc Version 6.3.0 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

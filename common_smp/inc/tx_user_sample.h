@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_user.h                                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -62,10 +62,10 @@
 /*                                            optimized the definition of */
 /*                                            TX_TIMER_TICKS_PER_SECOND,  */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx      Xiuwen Cai              Modified comment(s),          */
+/*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
 /*                                            added option for random     */
 /*                                            number stack filling,       */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

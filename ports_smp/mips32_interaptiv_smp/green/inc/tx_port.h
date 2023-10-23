@@ -515,7 +515,7 @@ THREAD_SMP_DECLARE ULONG    _tx_thread_smp_initial_fpu_control_register;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX SMP MIPS32_interAptiv/Green Hills Version 6.2.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX SMP MIPS32_interAptiv/Green Hills Version 6.3.0 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

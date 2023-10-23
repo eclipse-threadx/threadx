@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_thread_create                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -94,12 +94,12 @@
 /*  03-08-2023      Scott Larson            Check module stack for        */
 /*                                            overlap,                    */
 /*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx      Xiuwen Cai, Yajun xia   Modified comment(s),          */
+/*  10-31-2023      Xiuwen Cai, Yajun xia   Modified comment(s),          */
 /*                                            added option for random     */
 /*                                            number stack filling,       */
 /*                                            fixed the kernel stack      */
 /*                                            allocation issue,           */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,

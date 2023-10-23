@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_byte_pool_search                               PORTABLE SMP     */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -81,8 +81,8 @@
 /*                                            calculation, and reduced    */
 /*                                            number of search resets,    */
 /*                                            resulting in version 6.1.7  */
-/*  xx-xx-xxxx      Tiejun Zhou             Fixed MISRA2012 rule 10.4_a,  */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023      Tiejun Zhou             Fixed MISRA2012 rule 10.4_a,  */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UCHAR  *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size)

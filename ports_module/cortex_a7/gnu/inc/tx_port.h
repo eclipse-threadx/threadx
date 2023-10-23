@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                            ARMv7-A        */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -56,9 +56,9 @@
 /*  07-29-2022      Scott Larson            Updated comments, removed     */
 /*                                            unneeded temp variable,     */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Yajun Xia                Updated comments,             */
+/*  10-31-2023     Yajun Xia                Updated comments,             */
 /*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -338,7 +338,7 @@ void    tx_thread_vfp_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARMv7-A Version 6.2.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARMv7-A Version 6.3.0 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

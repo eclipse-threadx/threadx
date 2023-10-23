@@ -357,6 +357,6 @@ ALIGN_TYPE _txm_module_manager_port_dispatch(TXM_MODULE_INSTANCE *module_instanc
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX Module Cortex-M23/AC6 Version 6.2.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX Module Cortex-M23/AC6 Version 6.3.0 *";
 
 #endif

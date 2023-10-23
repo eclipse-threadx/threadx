@@ -30,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_thread_stack_build             ARMv8-A-SMP      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Andres Mlinar, Microsoft Corporation                                */
@@ -63,9 +63,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Andres Mlinar            Initial Version 6.1.10        */
-/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
 /*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_manager_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(TX_THREAD *, TXM_MODULE_INSTANCE *))

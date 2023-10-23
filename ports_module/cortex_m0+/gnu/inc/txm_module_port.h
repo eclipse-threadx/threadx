@@ -376,6 +376,6 @@ UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M0+/GNU Version 6.2.1   *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module Cortex-M0+/GNU Version 6.3.0   *";
 
 #endif

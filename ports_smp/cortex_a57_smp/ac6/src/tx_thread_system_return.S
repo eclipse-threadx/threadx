@@ -30,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_system_return                           ARMv8-A-SMP      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -66,10 +66,10 @@
 /*  01-31-2022     Andres Mlinar            Updated comments,             */
 /*                                             added ARMv8.2-A support,   */
 /*                                            resulting in version 6.1.10 */
-/*  xx-xx-xxxx     Tiejun Zhou              Modified comment(s), added    */
+/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
 /*                                            #include tx_user.h, added   */
 /*                                            memory barrier,             */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_system_return(VOID)

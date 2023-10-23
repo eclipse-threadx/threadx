@@ -31,7 +31,7 @@ FIQ_MASK        EQU         0x40                ; Interrupt bit mask
 ;/*  FUNCTION                                               RELEASE        */ 
 ;/*                                                                        */ 
 ;/*    _tx_thread_interrupt_restore                       Cortex-A7/IAR    */ 
-;/*                                                           6.x          */
+;/*                                                           6.3.0        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
@@ -62,9 +62,9 @@ FIQ_MASK        EQU         0x40                ; Interrupt bit mask
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+;/*  10-31-2023     Yajun Xia                Modified comment(s),          */
 ;/*                                            Added thumb mode support,   */
-;/*                                            resulting in version 6.x    */
+;/*                                            resulting in version 6.3.0  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;void   _tx_thread_interrupt_restore(UINT old_posture)

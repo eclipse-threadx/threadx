@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _txm_module_manager_user_mode_entry             Cortex-A7/MMU/GNU   */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -64,9 +64,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  03-08-2023      Scott Larson            Initial Version 6.2.1         */
-/*  xx-xx-xxxx      Yajun Xia               Updated comments,             */
+/*  10-31-2023      Yajun Xia               Updated comments,             */
 /*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
     .text
