@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    txm_module_manager_util.h                           PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -44,6 +44,9 @@
 /*  04-02-2021      Scott Larson            Modified comment(s) and       */
 /*                                            optimized object checks,    */
 /*                                            resulting in version 6.1.6  */
+/*  xx-xx-xxxx      Tiejun Zhou             Modified comment(s) and       */
+/*                                            improved object check,      */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -100,13 +103,15 @@
 
 /* Kernel objects should be outside the module at the very least.  */
 #define TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, obj_ptr, obj_size) \
-    ((TXM_MODULE_MANAGER_ENSURE_OUTSIDE_MODULE(module_instance, obj_ptr, obj_size)) || \
+    (TXM_MODULE_MANAGER_ENSURE_OUTSIDE_MODULE(module_instance, obj_ptr, obj_size) || \
+     (_txm_module_manager_created_object_check(module_instance, (void *)obj_ptr) == TX_FALSE) || \
      ((void *) (obj_ptr) == TX_NULL))
 
 /* When creating an object, the object must be inside the object pool.  */
 #define TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_CREATION(module_instance, obj_ptr, obj_size) \
     ((TXM_MODULE_MANAGER_ENSURE_INSIDE_OBJ_POOL(module_instance, obj_ptr, obj_size) && \
       (_txm_module_manager_object_size_check(obj_ptr, obj_size) == TX_SUCCESS)) || \
+     (_txm_module_manager_created_object_check(module_instance, (void *)obj_ptr) == TX_FALSE) || \
      ((void *) (obj_ptr) == TX_NULL))
 
 /* Strings we dereference can be in RW/RO/Shared areas.  */
