@@ -2,8 +2,11 @@
 #
 # Install necessary softwares for Ubuntu.
 
-apt-get update
-apt-get install -y \
+# Remove large folder to save space
+rm -rf /opt/hostedtoolcache
+
+sudo apt-get update
+sudo apt-get install -y \
     gcc-multilib \
     git \
     g++ \
@@ -19,3 +22,5 @@ apt-get install -y \
 python3 -m pip install --upgrade pip
 pip3 install gcovr==4.1
 
+# Upgrade cmake to the latest version.
+pip install --upgrade cmake
