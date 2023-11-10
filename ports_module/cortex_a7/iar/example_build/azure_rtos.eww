@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace>
     <project>
-        <path>$WS_DIR$\sample_threadx.ewp</path>
-    </project>
-    <project>
         <path>$WS_DIR$\sample_threadx_module.ewp</path>
     </project>
     <project>
