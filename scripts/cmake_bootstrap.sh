@@ -43,7 +43,7 @@ function test() {
     else
         repeat_fail=${CTEST_REPEAT_FAIL}
     fi
-    ctest $parallel --timeout 1000 -O $1.txt -T test --no-compress-output --test-output-size-passed 4194304 --test-output-size-failed 4194304 --output-on-failure --repeat until-pass:${repeat_fail}
+    ctest $parallel --timeout 1000 -O $1.txt -T test --no-compress-output --test-output-size-passed 4194304 --test-output-size-failed 4194304 --output-on-failure --repeat until-pass:${repeat_fail} --output-junit $1.xml
     popd
     grep -E "^(\s*[0-9]+|Total)" build/$1/$1.txt >build/$1.txt
     sed -i "s/\x1B\[[0-9;]*[JKmsu]//g" build/$1.txt
