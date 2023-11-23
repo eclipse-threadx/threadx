@@ -97,7 +97,6 @@ jobs:
       run: |
         echo "## Coverage Report ${{ inputs.result_affix }}" >> $GITHUB_STEP_SUMMARY
         cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
-        if [ "${{ inputs.result_affix }}" != "" ]; then cp code-coverage-results.md code-coverage-results${{ inputs.result_affix }}.md; fi
 
     - name: Create CheckRun for Code Coverage
       if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
@@ -114,7 +113,7 @@ jobs:
       if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
       uses: marocchino/sticky-pull-request-comment@v2
       with:
-        path: code-coverage-results${{ inputs.result_affix }}.md
+        path: code-coverage-results.md
         
   deploy_code_coverage:
     runs-on: ubuntu-latest
