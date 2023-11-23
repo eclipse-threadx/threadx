@@ -21,7 +21,19 @@ on:
         default: './test/cmake'
         required: false
         type: string
+      skip_test:
+        default: false
+        required: false
+        type: boolean
+      deploy:
+        default: true
+        required: false
+        type: boolean
       deploy_url_affix:
+        default: ''
+        required: false
+        type: string
+      deploy_list:
         default: ''
         required: false
         type: string
@@ -34,6 +46,7 @@ on:
 jobs:
   # This workflow contains a single job called "linux_job"
   run_tests:
+    if: ${{ !inputs.skip_test }}
     permissions:
       contents: read
       issues: read
@@ -117,22 +130,16 @@ jobs:
           mv ${{ inputs.cmake_path }}/coverage_report/default_build_coverage \
             ${{ inputs.cmake_path }}/coverage_report/default_build_coverage${{ inputs.deploy_url_affix }}
         fi
-        
-    # - name: Upload GitHub Pages artifact
-    #   uses: actions/upload-pages-artifact@v2.0.0
-    #   with:
-    #     path: ${{ inputs.cmake_path }}/coverage_report
-    #     name: coverage_report${{ inputs.deploy_url_affix }}
           
     - name: Upload Code Coverage
       uses: actions/upload-artifact@v3.1.3
       with:
-        name: coverage_report
+        name: github-pages
         path: ${{ inputs.cmake_path }}/coverage_report
-        
+  
   deploy_code_coverage:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && false
+    if: ${{ github.event_name == 'push' && inputs.deploy }}
     needs: run_tests
     environment:
       name: github-pages
@@ -145,9 +152,13 @@ jobs:
     - name: Deploy GitHub Pages site
       id: deployment
       uses: actions/deploy-pages@v1.2.9
-      with:
-        artifact_name: coverage_report${{ inputs.deploy_url_affix }}
 
     - name: Write Code Coverage Report URL
-      run: |
-        echo '[Open Coverage Report](${{ steps.deployment.outputs.page_url }}/default_build_coverage${{ inputs.deploy_url_affix }})' >>  $GITHUB_STEP_SUMMARY
+      run: >-
+        if [ "${{ inputs.deploy_list }}" != "" ]; then
+          for i in ${{ inputs.deploy_list }}; do            
+            echo 'Coverage report for $i:${{ steps.deployment.outputs.page_url }}/default_build_coverage_$i' >>  $GITHUB_STEP_SUMMARY
+          done
+        else
+          echo 'Coverage report: (${{ steps.deployment.outputs.page_url }}/default_build_coverage' >>  $GITHUB_STEP_SUMMARY
+        fi
