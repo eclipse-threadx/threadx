@@ -103,7 +103,7 @@ jobs:
       uses: LouisBrunner/checks-action@v1.6.2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        name: Code Coverage
+        name: Code Coverage ${{ inputs.result_affix }}
         conclusion: ${{ job.status }}
         output: |
           {"summary":"Coverage Report"}
