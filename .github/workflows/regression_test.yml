@@ -17,13 +17,20 @@ jobs:
       build_script: ./scripts/build_tx.sh
       test_script: ./scripts/test_tx.sh
       cmake_path: ./test/tx/cmake
-      deploy_url_affix: _tx
       result_affix: ThreadX
-  tx_smp:
+      skip_deploy: true
+  smp:
     uses: ./.github/workflows/regression_template.yml
     with:
       build_script: ./scripts/build_smp.sh
       test_script: ./scripts/test_smp.sh
       cmake_path: ./test/smp/cmake
-      deploy_url_affix: _smp
       result_affix: SMP
+      skip_deploy: true
+  deploy:
+    needs: [tx, smp]
+    uses: ./.github/workflows/regression_template.yml
+    with:
+      skip_test: true
+      skip_deploy: false
+      deploy_list: "ThreadX SMP"
