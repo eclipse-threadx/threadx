@@ -11,10 +11,17 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  run_tests:
+  tx:
     uses: ./.github/workflows/regression_template.yml
     with:
       build_script: ./scripts/build_tx.sh
       test_script: ./scripts/test_tx.sh
       cmake_path: ./test/tx/cmake
       deploy_url_affix: tx/
+  tx_smp:
+    uses: ./.github/workflows/regression_template.yml
+    with:
+      build_script: ./scripts/build_smp.sh
+      test_script: ./scripts/test_smp.sh
+      cmake_path: ./test/smp/cmake
+      deploy_url_affix: smp/
