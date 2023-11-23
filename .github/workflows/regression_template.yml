@@ -128,4 +128,4 @@ jobs:
 
     - name: Write Code Coverage Report URL
       run: |
-        echo '[Open Coverage Report](${{ steps.deployment.outputs.page_url }})' >>  $GITHUB_STEP_SUMMARY
+        echo '[Open Coverage Report](${{ steps.deployment.outputs.page_url }}${{ inputs.deploy_url_affix }})' >>  $GITHUB_STEP_SUMMARY
