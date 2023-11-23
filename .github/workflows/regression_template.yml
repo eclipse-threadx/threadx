@@ -71,7 +71,7 @@ jobs:
       if: success() || failure()
       uses: actions/upload-artifact@v3.1.3
       with:
-        name: test_reports
+        name: test_reports${{ inputs.deploy_url_affix }}
         path: |
           ${{ inputs.cmake_path }}/build/*.txt
           ${{ inputs.cmake_path }}/build/*/Testing/**/*.xml
@@ -122,6 +122,7 @@ jobs:
       uses: actions/upload-pages-artifact@v2.0.0
       with:
         path: ${{ inputs.cmake_path }}/coverage_report
+        name: coverage_report${{ inputs.deploy_url_affix }}
         
   deploy_code_coverage:
     runs-on: ubuntu-latest
@@ -129,7 +130,7 @@ jobs:
     needs: run_tests
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}/default_build_coverage${{ inputs.deploy_url_affix }}
     permissions:
       pages: write
       id-token: write
@@ -138,6 +139,8 @@ jobs:
     - name: Deploy GitHub Pages site
       id: deployment
       uses: actions/deploy-pages@v1.2.9
+      with:
+        artifact_name: coverage_report${{ inputs.deploy_url_affix }}
 
     - name: Write Code Coverage Report URL
       run: |
