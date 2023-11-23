@@ -25,6 +25,10 @@ on:
         default: ''
         required: false
         type: string
+      result_affix:
+        default: ''
+        required: false
+        type: string
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -59,6 +63,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2.11.0
       if: always()
       with:
+        check_name: Test Results ${{ inputs.result_affix }}
         files: |
           ${{ inputs.cmake_path }}/build/*/*.xml
           
@@ -90,7 +95,7 @@ jobs:
 
     - name: Write Code Coverage Summary
       run: |
-        echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+        echo "## Coverage Report ${{ inputs.result_affix }}" >> $GITHUB_STEP_SUMMARY
         cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
     - name: Create CheckRun for Code Coverage
