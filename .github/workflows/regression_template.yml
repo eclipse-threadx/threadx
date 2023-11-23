@@ -21,6 +21,10 @@ on:
         default: './test/cmake'
         required: false
         type: string
+      deploy_url_affix:
+        default: ''
+        required: false
+        type: string
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -112,7 +116,7 @@ jobs:
     needs: run_tests
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}${{ inputs.deploy_url_affix }}
     permissions:
       pages: write
       id-token: write

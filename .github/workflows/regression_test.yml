@@ -16,4 +16,5 @@ jobs:
     with:
       build_script: ./scripts/build_tx.sh
       test_script: ./scripts/test_tx.sh
-      cmake_path: ./test/tx
+      cmake_path: ./test/tx/cmake
+      deploy_url_affix: tx/
