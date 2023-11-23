@@ -1,0 +1,137 @@
+# This is a basic workflow that is manually triggered
+
+name: regression_template
+
+on:
+  workflow_call:
+    inputs:
+      install_script:
+        default: './scripts/install.sh'
+        required: false
+        type: string
+      build_script:
+        default: './scripts/build.sh'
+        required: false
+        type: string
+      test_script:
+        default: './scripts/test.sh'
+        required: false
+        type: string
+      cmake_path:
+        default: './test/cmake'
+        required: false
+        type: string
+      deploy_url_affix:
+        default: ''
+        required: false
+        type: string
+      result_affix:
+        default: ''
+        required: false
+        type: string
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "linux_job"
+  run_tests:
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+    
+    - name: Install softwares
+      run: ${{ inputs.install_script }}
+
+    - name: Build
+      run: ${{ inputs.build_script }}
+
+    - name: Test
+      run: ${{ inputs.test_script }}
+      
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2.11.0
+      if: always()
+      with:
+        check_name: Test Results ${{ inputs.result_affix }}
+        files: |
+          ${{ inputs.cmake_path }}/build/*/*.xml
+          
+    - name: Upload Test Results
+      if: success() || failure()
+      uses: actions/upload-artifact@v3.1.3
+      with:
+        name: test_reports
+        path: |
+          ${{ inputs.cmake_path }}/build/*.txt
+          ${{ inputs.cmake_path }}/build/*/Testing/**/*.xml
+    
+    - name: Configure GitHub Pages
+      uses: actions/configure-pages@v3.0.6
+        
+    - name: Upload GitHub Pages artifact
+      uses: actions/upload-pages-artifact@v2.0.0
+      with:
+        path: ${{ inputs.cmake_path }}/coverage_report/default_build_coverage
+
+    - name: Generate Code Coverage Results Summary
+      uses: irongut/CodeCoverageSummary@v1.3.0
+      with:
+        filename: ${{ inputs.cmake_path }}/coverage_report/default_build_coverage.xml
+        format: markdown
+        badge: true
+        hide_complexity: true
+        output: file
+
+    - name: Write Code Coverage Summary
+      run: |
+        echo "## Coverage Report ${{ inputs.result_affix }}" >> $GITHUB_STEP_SUMMARY
+        cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+
+    - name: Create CheckRun for Code Coverage
+      if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
+      uses: LouisBrunner/checks-action@v1.6.2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Code Coverage ${{ inputs.result_affix }}
+        conclusion: ${{ job.status }}
+        output: |
+          {"summary":"Coverage Report"}
+        output_text_description_file: code-coverage-results.md
+
+    - name: Add Code Coverage PR Comment
+      if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: Code Coverage ${{ inputs.result_affix }}
+        path: code-coverage-results.md
+        
+  deploy_code_coverage:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: run_tests
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}${{ inputs.deploy_url_affix }}
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:        
+    - name: Deploy GitHub Pages site
+      id: deployment
+      uses: actions/deploy-pages@v1.2.9
+
+    - name: Write Code Coverage Report URL
+      run: |
+        echo '[Open Coverage Report](${{ steps.deployment.outputs.page_url }}${{ inputs.deploy_url_affix }})' >>  $GITHUB_STEP_SUMMARY
