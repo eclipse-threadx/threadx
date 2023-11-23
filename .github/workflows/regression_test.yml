@@ -17,7 +17,7 @@ jobs:
       build_script: ./scripts/build_tx.sh
       test_script: ./scripts/test_tx.sh
       cmake_path: ./test/tx/cmake
-      deploy_url_affix: tx/
+      deploy_url_affix: _tx/
       result_affix: ThreadX
   tx_smp:
     uses: ./.github/workflows/regression_template.yml
@@ -25,5 +25,5 @@ jobs:
       build_script: ./scripts/build_smp.sh
       test_script: ./scripts/test_smp.sh
       cmake_path: ./test/smp/cmake
-      deploy_url_affix: smp/
+      deploy_url_affix: _smp/
       result_affix: SMP

@@ -78,11 +78,6 @@ jobs:
     
     - name: Configure GitHub Pages
       uses: actions/configure-pages@v3.0.6
-        
-    - name: Upload GitHub Pages artifact
-      uses: actions/upload-pages-artifact@v2.0.0
-      with:
-        path: ${{ inputs.cmake_path }}/coverage_report/default_build_coverage
 
     - name: Generate Code Coverage Results Summary
       uses: irongut/CodeCoverageSummary@v1.3.0
@@ -115,6 +110,18 @@ jobs:
       with:
         header: Code Coverage ${{ inputs.result_affix }}
         path: code-coverage-results.md
+
+    - name: Prepare GitHub Pages
+      run: >-
+        if [ "${{ inputs.deploy_url_affix }}" != "" ]; then
+          mv ${{ inputs.cmake_path }}/coverage_report/default_build_coverage \
+            ${{ inputs.cmake_path }}/coverage_report/default_build_coverage${{ inputs.deploy_url_affix }}
+        fi
+        
+    - name: Upload GitHub Pages artifact
+      uses: actions/upload-pages-artifact@v2.0.0
+      with:
+        path: ${{ inputs.cmake_path }}/coverage_report
         
   deploy_code_coverage:
     runs-on: ubuntu-latest
@@ -122,7 +129,7 @@ jobs:
     needs: run_tests
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}${{ inputs.deploy_url_affix }}
+      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       pages: write
       id-token: write
@@ -134,4 +141,4 @@ jobs:
 
     - name: Write Code Coverage Report URL
       run: |
-        echo '[Open Coverage Report](${{ steps.deployment.outputs.page_url }}${{ inputs.deploy_url_affix }})' >>  $GITHUB_STEP_SUMMARY
+        echo '[Open Coverage Report](${{ steps.deployment.outputs.page_url }}/default_build_coverage${{ inputs.deploy_url_affix }})' >>  $GITHUB_STEP_SUMMARY
