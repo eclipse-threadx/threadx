@@ -93,12 +93,12 @@ jobs:
     - name: Configure GitHub Pages
       uses: actions/configure-pages@v3.0.6
 
-  generate_code_coverage:
-    runs-on: ubuntu-latest
-    if: ${{ !inputs.skip_coverage && always() }}
-    needs: run_tests
-    
-    steps:
+    - name: Check Default Coverage Generated
+      run: |
+        if [ ! -f ${{ inputs.cmake_path }}/coverage_report/default_build_coverage.xml ]; then
+          touch ${{ inputs.cmake_path }}/coverage_report/default_build_coverage.xml
+        fi
+
     - name: Generate Code Coverage Results Summary
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
