@@ -153,7 +153,7 @@ jobs:
       run: >-
         if [ "${{ inputs.deploy_list }}" != "" ]; then
           for i in ${{ inputs.deploy_list }}; do            
-            echo 'Coverage report for $i:${{ steps.deployment.outputs.page_url }}/$i' >>  $GITHUB_STEP_SUMMARY
+            echo 'Coverage report for $$i:${{ steps.deployment.outputs.page_url }}/$$i' >>  $GITHUB_STEP_SUMMARY
           done
         else
           echo 'Coverage report: (${{ steps.deployment.outputs.page_url }}' >>  $GITHUB_STEP_SUMMARY
