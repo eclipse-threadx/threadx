@@ -97,10 +97,18 @@ jobs:
     - name: Configure GitHub Pages
       uses: actions/configure-pages@v3.0.6
 
+    - name: Decide Coverage Name
+      run: |
+        if [[ "${{ inputs.coverage_name }}" == "all" ]]; then
+          echo "coverage_name=default_build_coverage" >> $GITHUB_ENV
+        else
+          echo "coverage_name=all" >> $GITHUB_ENV
+        fi
+
     - name: Generate Code Coverage Results Summary
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}.xml
+        filename: ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }}.xml
         format: markdown
         badge: true
         hide_complexity: true
@@ -132,7 +140,7 @@ jobs:
     - name: Prepare GitHub Pages
       run: >-
         if [ "${{ inputs.result_affix }}" != "" ]; then
-          mv ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }} \
+          mv ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }} \
             ${{ inputs.cmake_path }}/coverage_report/${{ inputs.result_affix }}
         fi
           
@@ -148,7 +156,7 @@ jobs:
       uses: actions/upload-pages-artifact@v2.0.0
       if: ${{ !inputs.skip_deploy }}
       with:
-        path: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}
+        path: ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }}
   
   deploy_code_coverage:
     runs-on: ubuntu-latest
