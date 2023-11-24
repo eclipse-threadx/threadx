@@ -98,6 +98,7 @@ jobs:
       uses: actions/configure-pages@v3.0.6
 
     - name: Decide Coverage Name
+      if: (${{ !inputs.skip_coverage }})
       run: |
         if [[ "${{ inputs.coverage_name }}" == "all" ]]; then
           echo "coverage_name=default_build_coverage" >> $GITHUB_ENV
@@ -106,6 +107,7 @@ jobs:
         fi
 
     - name: Generate Code Coverage Results Summary
+      if: (${{ !inputs.skip_coverage }})
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
         filename: ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }}.xml
@@ -115,12 +117,13 @@ jobs:
         output: file
 
     - name: Write Code Coverage Summary
+      if: (${{ !inputs.skip_coverage }})
       run: |
         echo "## Coverage Report ${{ inputs.result_affix }}" >> $GITHUB_STEP_SUMMARY
         cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
     - name: Create CheckRun for Code Coverage
-      if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
+      if: ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
       uses: LouisBrunner/checks-action@v1.6.2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -131,13 +134,14 @@ jobs:
         output_text_description_file: code-coverage-results.md
 
     - name: Add Code Coverage PR Comment
-      if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
+      if: ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         header: Code Coverage ${{ inputs.result_affix }}
         path: code-coverage-results.md
 
-    - name: Prepare GitHub Pages
+    - name: Prepare Coverage GitHub Pages
+      if: (${{ !inputs.skip_coverage }})
       run: >-
         if [ "${{ inputs.result_affix }}" != "" ]; then
           mv ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }} \
@@ -146,7 +150,7 @@ jobs:
           
     - name: Upload Code Coverage Artifacts
       uses: actions/upload-artifact@v3.1.3
-      if: ${{ inputs.skip_deploy }}
+      if: ${{ inputs.skip_deploy && !inputs.skip_coverage }}
       with:
         name: coverage_report
         path: ${{ inputs.cmake_path }}/coverage_report
@@ -154,7 +158,7 @@ jobs:
           
     - name: Upload Code Coverage Pages
       uses: actions/upload-pages-artifact@v2.0.0
-      if: ${{ !inputs.skip_deploy }}
+      if: ${{ !inputs.skip_deploy && !inputs.skip_coverage }}
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }}
   
