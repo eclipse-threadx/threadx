@@ -96,6 +96,7 @@ jobs:
     - name: Check Default Coverage Generated
       run: |
         if [ ! -f ${{ inputs.cmake_path }}/coverage_report/default_build_coverage.xml ]; then
+          mkdir ${{ inputs.cmake_path }}/coverage_report
           touch ${{ inputs.cmake_path }}/coverage_report/default_build_coverage.xml
         fi
 
