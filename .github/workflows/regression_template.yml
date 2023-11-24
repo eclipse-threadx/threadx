@@ -102,7 +102,7 @@ jobs:
         if [[ "${{ inputs.coverage_name }}" == "all" ]]; then
           echo "coverage_name=default_build_coverage" >> $GITHUB_ENV
         else
-          echo "coverage_name=all" >> $GITHUB_ENV
+          echo "coverage_name=${{ inputs.coverage_name }}" >> $GITHUB_ENV
         fi
 
     - name: Generate Code Coverage Results Summary
