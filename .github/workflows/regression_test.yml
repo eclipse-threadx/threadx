@@ -32,5 +32,4 @@ jobs:
     uses: ./.github/workflows/regression_template.yml
     with:
       skip_test: true
-      skip_deploy: false
       deploy_list: "ThreadX SMP"
