@@ -134,6 +134,7 @@ jobs:
       with:
         name: coverage_report
         path: ${{ inputs.cmake_path }}/coverage_report
+        retention-days: 1
           
     - name: Upload Code Coverage Pages
       uses: actions/upload-pages-artifact@v2.0.0
@@ -172,7 +173,7 @@ jobs:
       run: >-
         if [ "${{ inputs.deploy_list }}" != "" ]; then
           for i in ${{ inputs.deploy_list }}; do            
-            echo 'Coverage report for $$i:${{ steps.deployment.outputs.page_url }}/$$i' >>  $GITHUB_STEP_SUMMARY
+            echo 'Coverage report for ' $i ':${{ steps.deployment.outputs.page_url }}'$i >>  $GITHUB_STEP_SUMMARY
           done
         else
           echo 'Coverage report: (${{ steps.deployment.outputs.page_url }}' >>  $GITHUB_STEP_SUMMARY
