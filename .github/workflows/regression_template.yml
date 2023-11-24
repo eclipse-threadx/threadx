@@ -154,14 +154,16 @@ jobs:
 
     steps:
     - uses: actions/download-artifact@v3
+      if: ${{ inputs.skip_test }}
       with:
         name: github-pages
+        path: github-pages
 
     - name: Upload Code Coverage Pages
       uses: actions/upload-pages-artifact@v2.0.0
-      if: inputs.skip_test
+      if: ${{ inputs.skip_test }}
       with:
-        path: .
+        path: github-pages
 
     - name: Deploy GitHub Pages site
       id: deployment
