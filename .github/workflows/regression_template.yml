@@ -29,6 +29,10 @@ on:
         default: false
         required: false
         type: boolean
+      coverage_name:
+        default: 'default_build_coverage'
+        required: false
+        type: string
       skip_deploy:
         default: false
         required: false
@@ -93,17 +97,10 @@ jobs:
     - name: Configure GitHub Pages
       uses: actions/configure-pages@v3.0.6
 
-    - name: Check Default Coverage Generated
-      run: |
-        if [ ! -f ${{ inputs.cmake_path }}/coverage_report/default_build_coverage.xml ]; then
-          mkdir ${{ inputs.cmake_path }}/coverage_report
-          touch ${{ inputs.cmake_path }}/coverage_report/default_build_coverage.xml
-        fi
-
     - name: Generate Code Coverage Results Summary
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: ${{ inputs.cmake_path }}/coverage_report/default_build_coverage.xml
+        filename: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}.xml
         format: markdown
         badge: true
         hide_complexity: true
@@ -135,7 +132,7 @@ jobs:
     - name: Prepare GitHub Pages
       run: >-
         if [ "${{ inputs.result_affix }}" != "" ]; then
-          mv ${{ inputs.cmake_path }}/coverage_report/default_build_coverage \
+          mv ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }} \
             ${{ inputs.cmake_path }}/coverage_report/${{ inputs.result_affix }}
         fi
           
@@ -151,7 +148,7 @@ jobs:
       uses: actions/upload-pages-artifact@v2.0.0
       if: ${{ !inputs.skip_deploy }}
       with:
-        path: ${{ inputs.cmake_path }}/coverage_report/default_build_coverage
+        path: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}
   
   deploy_code_coverage:
     runs-on: ubuntu-latest
