@@ -165,6 +165,11 @@ jobs:
       with:
         path: .
 
+    - name: Delete Duplicate Code Coverage Artifact 
+      uses: geekyeggo/delete-artifact@v2
+      with:
+          name: coverage_report
+
     - name: Deploy GitHub Pages site
       id: deployment
       uses: actions/deploy-pages@v1.2.9
