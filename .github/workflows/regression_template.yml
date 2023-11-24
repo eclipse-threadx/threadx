@@ -128,10 +128,18 @@ jobs:
             ${{ inputs.cmake_path }}/coverage_report/${{ inputs.result_affix }}
         fi
           
+    - name: Upload Code Coverage Artifacts
+      uses: actions/upload-artifact@v3.1.3
+      if: ${{ inputs.skip_deploy }}
+      with:
+        name: github-pages
+        path: ${{ inputs.cmake_path }}/coverage_report
+          
     - name: Upload Code Coverage Pages
       uses: actions/upload-pages-artifact@v2.0.0
+      if: ${{ !inputs.skip_deploy }}
       with:
-        path: ${{ inputs.cmake_path }}/coverage_report/
+        path: ${{ inputs.cmake_path }}/coverage_report/default_build_coverage
   
   deploy_code_coverage:
     runs-on: ubuntu-latest
@@ -145,6 +153,16 @@ jobs:
       id-token: write
 
     steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: github-pages
+
+    - name: Upload Code Coverage Pages
+      uses: actions/upload-pages-artifact@v2.0.0
+      if: inputs.skip_test
+      with:
+        path: .
+
     - name: Deploy GitHub Pages site
       id: deployment
       uses: actions/deploy-pages@v1.2.9
