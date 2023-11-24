@@ -144,7 +144,7 @@ jobs:
   
   deploy_code_coverage:
     runs-on: ubuntu-latest
-    if: ${{ (github.event_name == 'push') && !inputs.skip_deploy && always() }}
+    if: ${{ (github.event_name == 'push') && !inputs.skip_deploy && !failure() && !cancelled() }}
     needs: run_tests
     environment:
       name: github-pages
