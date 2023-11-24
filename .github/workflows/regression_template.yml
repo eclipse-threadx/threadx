@@ -54,6 +54,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+
+    - name: Fail
+      run: false
     - name: Check out the repository
       uses: actions/checkout@v4
       with:
