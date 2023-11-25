@@ -157,7 +157,7 @@ jobs:
           
     - name: Upload Code Coverage Pages
       uses: actions/upload-pages-artifact@v2.0.0
-      if: (!inputs.skip_deploy && !inputs.skip_coverage) || (github.event_name == 'workflow_dispatch')
+      if: (!inputs.skip_deploy && !inputs.skip_coverage)
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }}
   
