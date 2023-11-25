@@ -97,10 +97,11 @@ jobs:
     - name: Configure GitHub Pages
       uses: actions/configure-pages@v3.0.6
 
-    - name: Decide Coverage Name
+    - name: Collecting Coverage Settings
       run: |
         echo inputs.skip_coverage: ${{ inputs.skip_coverage }}
         echo inputs.coverage_name: ${{ inputs.coverage_name }}
+        echo ${{ !inputs.skip_coverage }}
         if [[ "${{ inputs.coverage_name }}" == "all" ]]; then
           echo "coverage_name=default_build_coverage" >> $GITHUB_ENV
         else
@@ -108,7 +109,7 @@ jobs:
         fi
 
     - name: Generate Code Coverage Results Summary
-      if: (${{ !inputs.skip_coverage }})
+      if: (!inputs.skip_coverage)
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
         filename: ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }}.xml
@@ -118,7 +119,7 @@ jobs:
         output: file
 
     - name: Write Code Coverage Summary
-      if: (${{ !inputs.skip_coverage }})
+      if: (!inputs.skip_coverage)
       run: |
         echo "## Coverage Report ${{ inputs.result_affix }}" >> $GITHUB_STEP_SUMMARY
         cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
@@ -142,7 +143,7 @@ jobs:
         path: code-coverage-results.md
 
     - name: Prepare Coverage GitHub Pages
-      if: (${{ !inputs.skip_coverage }})
+      if: (!inputs.skip_coverage)
       run: >-
         if [ "${{ inputs.result_affix }}" != "" ]; then
           mv ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }} \
@@ -151,7 +152,7 @@ jobs:
           
     - name: Upload Code Coverage Artifacts
       uses: actions/upload-artifact@v3.1.3
-      if: ${{ inputs.skip_deploy && !inputs.skip_coverage }}
+      if: (inputs.skip_deploy && !inputs.skip_coverage)
       with:
         name: coverage_report
         path: ${{ inputs.cmake_path }}/coverage_report
@@ -159,7 +160,7 @@ jobs:
           
     - name: Upload Code Coverage Pages
       uses: actions/upload-pages-artifact@v2.0.0
-      if: ${{ !inputs.skip_deploy && !inputs.skip_coverage }}
+      if: (!inputs.skip_deploy && !inputs.skip_coverage)
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }}
   
