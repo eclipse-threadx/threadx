@@ -122,7 +122,7 @@ jobs:
         cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
     - name: Create CheckRun for Code Coverage
-      if: ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
+      if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
       uses: LouisBrunner/checks-action@v1.6.2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -157,13 +157,13 @@ jobs:
           
     - name: Upload Code Coverage Pages
       uses: actions/upload-pages-artifact@v2.0.0
-      if: (!inputs.skip_deploy && !inputs.skip_coverage)
+      if: (!inputs.skip_deploy && !inputs.skip_coverage) || (github.event_name == 'workflow_dispatch')
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ env.coverage_name }}
   
   deploy_code_coverage:
     runs-on: ubuntu-latest
-    if: ${{ (github.event_name == 'push') && !inputs.skip_coverage && !inputs.skip_deploy && always() }}
+    if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && always()
     needs: run_tests
     environment:
       name: github-pages
