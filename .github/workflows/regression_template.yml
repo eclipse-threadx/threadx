@@ -99,9 +99,6 @@ jobs:
 
     - name: Collecting Coverage Settings
       run: |
-        echo inputs.skip_coverage: ${{ inputs.skip_coverage }}
-        echo inputs.coverage_name: ${{ inputs.coverage_name }}
-        echo ${{ !inputs.skip_coverage }}
         if [[ "${{ inputs.coverage_name }}" == "all" ]]; then
           echo "coverage_name=default_build_coverage" >> $GITHUB_ENV
         else
