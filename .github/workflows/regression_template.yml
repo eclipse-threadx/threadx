@@ -98,8 +98,9 @@ jobs:
       uses: actions/configure-pages@v3.0.6
 
     - name: Decide Coverage Name
-      if: (${{ !inputs.skip_coverage }})
       run: |
+        echo inputs.skip_coverage: ${{ inputs.skip_coverage }}
+        echo inputs.coverage_name: ${{ inputs.coverage_name }}
         if [[ "${{ inputs.coverage_name }}" == "all" ]]; then
           echo "coverage_name=default_build_coverage" >> $GITHUB_ENV
         else
