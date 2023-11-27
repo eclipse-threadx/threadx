@@ -155,7 +155,7 @@ jobs:
   
   deploy_code_coverage:
     runs-on: ubuntu-latest
-    if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && always()
+    if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && !failure() && !cancelled()
     needs: run_tests
     environment:
       name: github-pages
