@@ -23,7 +23,12 @@
 #include "tx_user.h"
 #endif
 
+    .syntax unified
+#if defined(ARM_MODE)
     .arm
+#else
+    .thumb
+#endif
 
 SVC_MODE        =       0xD3                    // Disable IRQ/FIQ SVC mode
 IRQ_MODE        =       0xD2                    // Disable IRQ/FIQ IRQ mode
@@ -48,22 +53,7 @@ SYS_STACK_SIZE  =       1024                    // System stack size
     .global     enableCaches
     .global     init_private_timer
     .global     start_private_timer
-/* Define the 16-bit Thumb mode veneer for _tx_initialize_low_level for
-   applications calling this function from to 16-bit Thumb mode.  */
 
-    .text
-    .align 2
-    .thumb
-    .global $_tx_initialize_low_level
-    .type   $_tx_initialize_low_level,function
-$_tx_initialize_low_level:
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
-    .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_initialize_low_level         // Call _tx_initialize_low_level function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
 
     .text
     .align 2
@@ -113,6 +103,9 @@ $_tx_initialize_low_level:
 /*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global _tx_initialize_low_level
     .type   _tx_initialize_low_level,function
 _tx_initialize_low_level:
@@ -201,34 +194,48 @@ _stack_error_loop:
     BL      start_private_timer
 
     POP    {lr}
-#ifdef __THUMB_INTERWORK
     BX      lr                                  // Return to caller
-#else
-    MOV     pc, lr                              // Return to caller
-#endif
+
 
 /* Define shells for each of the interrupt vectors.  */
-
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global __tx_undefined
 __tx_undefined:
     B       __tx_undefined                      // Undefined handler
 
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global __tx_swi_interrupt
 __tx_swi_interrupt:
     B       __tx_swi_interrupt                  // Software interrupt handler
 
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global __tx_prefetch_handler
 __tx_prefetch_handler:
     B       __tx_prefetch_handler               // Prefetch exception handler
 
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global __tx_abort_handler
 __tx_abort_handler:
     B       __tx_abort_handler                  // Abort exception handler
 
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global __tx_reserved_handler
 __tx_reserved_handler:
     B       __tx_reserved_handler               // Reserved exception handler
 
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global __tx_irq_handler
     .global __tx_irq_processing_return
 __tx_irq_handler:
@@ -302,6 +309,9 @@ by_pass_timer_interrupt:
 
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global  __tx_fiq_handler
     .global  __tx_fiq_processing_return
 __tx_fiq_handler:
@@ -336,6 +346,9 @@ __tx_fiq_processing_return:
 
 
 #else
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global  __tx_fiq_handler
 __tx_fiq_handler:
     B       __tx_fiq_handler                    // FIQ interrupt handler

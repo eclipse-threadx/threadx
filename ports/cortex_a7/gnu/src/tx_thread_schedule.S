@@ -23,28 +23,16 @@
 #include "tx_user.h"
 #endif
 
+    .syntax unified
+#if defined(ARM_MODE)
+    .arm
+#else
+    .thumb
+#endif
+
     .global     _tx_thread_execute_ptr
     .global     _tx_thread_current_ptr
     .global     _tx_timer_time_slice
-
-
-/* Define the 16-bit Thumb mode veneer for _tx_thread_schedule for
-   applications calling this function from to 16-bit Thumb mode.  */
-
-    .text
-    .align  2
-    .global $_tx_thread_schedule
-    .type   $_tx_thread_schedule,function
-$_tx_thread_schedule:
-         .thumb
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
-    .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_thread_schedule              // Call _tx_thread_schedule function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
-
 
     .text
     .align 2
@@ -97,6 +85,9 @@ $_tx_thread_schedule:
 /*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global _tx_thread_schedule
     .type  _tx_thread_schedule,function
 _tx_thread_schedule:
@@ -187,14 +178,13 @@ _tx_skip_solicited_vfp_restore:
 #endif
     MSR     CPSR_cxsf, r5                   // Recover CPSR
     LDMIA   sp!, {r4-r11, lr}               // Return to thread synchronously
-#ifdef __THUMB_INTERWORK
     BX      lr                              // Return to caller
-#else
-    MOV     pc, lr                          // Return to caller
-#endif
 
 #ifdef TX_ENABLE_VFP_SUPPORT
 
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global tx_thread_vfp_enable
     .type  tx_thread_vfp_enable,function
 tx_thread_vfp_enable:
@@ -214,6 +204,9 @@ __tx_no_thread_to_enable:
     MSR     CPSR_cxsf, r2                   // Recover CPSR
     BX      LR                              // Return to caller
 
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global tx_thread_vfp_disable
     .type  tx_thread_vfp_disable,function
 tx_thread_vfp_disable:

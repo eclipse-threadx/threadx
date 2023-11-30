@@ -23,22 +23,11 @@
 #include "tx_user.h"
 #endif
 
-/* Define the 16-bit Thumb mode veneer for _tx_thread_interrupt_disable for
-   applications calling this function from to 16-bit Thumb mode.  */
-
-    .text
-    .align 2
-    .global $_tx_thread_interrupt_disable
-$_tx_thread_interrupt_disable:
-        .thumb
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
+#if defined(ARM_MODE)
     .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_thread_interrupt_disable     // Call _tx_thread_interrupt_disable function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
-
+#else
+    .thumb
+#endif
 
     .text
     .align 2
@@ -84,6 +73,9 @@ $_tx_thread_interrupt_disable:
 /*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global _tx_thread_interrupt_disable
     .type   _tx_thread_interrupt_disable,function
 _tx_thread_interrupt_disable:
@@ -100,8 +92,4 @@ _tx_thread_interrupt_disable:
     CPSID   i                                   // Disable IRQ
 #endif
 
-#ifdef __THUMB_INTERWORK
     BX      lr                                  // Return to caller
-#else
-    MOV     pc, lr                              // Return to caller
-#endif

@@ -1,15 +1,30 @@
 
+    .syntax unified
+#if defined(ARM_MODE)
+    .arm
+#else
+    .thumb
+#endif
+
 /* .text is used instead of .section .text so it works with arm-aout too.  */
     .text
-    .code 32
     .align  0
 
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global _mainCRTStartup
+_mainCRTStartup:
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global _start
+_start:
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global start
 start:
-_start:
-_mainCRTStartup:
 
 /* Start by setting up a stack */
     /*  Set up the stack pointer to a fixed value */
@@ -69,15 +84,7 @@ _mainCRTStartup:
     .word   _fini
 #endif  */
     /* Return ...  */
-#ifdef __APCS_26__
-    movs    pc, lr
-#else
-#ifdef __THUMB_INTERWORK
     bx  lr
-#else
-    mov pc, lr
-#endif
-#endif
 
     .global  _fini
     .type    _fini,function

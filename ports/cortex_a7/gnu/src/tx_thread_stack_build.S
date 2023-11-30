@@ -23,7 +23,12 @@
 #include "tx_user.h"
 #endif
 
+    .syntax unified
+#if defined(ARM_MODE)
     .arm
+#else
+    .thumb
+#endif
 
 SVC_MODE        =       0x13                    // SVC mode
 #ifdef TX_ENABLE_FIQ_SUPPORT
@@ -31,25 +36,6 @@ CPSR_MASK       =       0xDF                    // Mask initial CPSR, IRQ & FIQ 
 #else
 CPSR_MASK       =       0x9F                    // Mask initial CPSR, IRQ interrupts enabled
 #endif
-
-
-/* Define the 16-bit Thumb mode veneer for _tx_thread_stack_build for
-   applications calling this function from to 16-bit Thumb mode.  */
-
-    .text
-    .align 2
-    .thumb
-    .global $_tx_thread_stack_build
-    .type    $_tx_thread_stack_build,function
-$_tx_thread_stack_build:
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
-    .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_thread_stack_build           // Call _tx_thread_stack_build function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
-
 
     .text
     .align 2
@@ -98,6 +84,9 @@ $_tx_thread_stack_build:
 /*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
+#if !defined(ARM_MODE)
+    .thumb_func
+#endif
     .global  _tx_thread_stack_build
     .type    _tx_thread_stack_build,function
 _tx_thread_stack_build:
@@ -164,8 +153,4 @@ _tx_thread_stack_build:
 
     STR     r2, [r0, #8]                    // Save stack pointer in thread's
                                             //   control block
-#ifdef __THUMB_INTERWORK
     BX      lr                              // Return to caller
-#else
-    MOV     pc, lr                          // Return to caller
-#endif
