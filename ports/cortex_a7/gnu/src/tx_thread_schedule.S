@@ -23,31 +23,36 @@
 #include "tx_user.h"
 #endif
 
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
+    .arm
+#endif
+
     .global     _tx_thread_execute_ptr
     .global     _tx_thread_current_ptr
     .global     _tx_timer_time_slice
 
-
-/* Define the 16-bit Thumb mode veneer for _tx_thread_schedule for
-   applications calling this function from to 16-bit Thumb mode.  */
-
-    .text
-    .align  2
-    .global $_tx_thread_schedule
-    .type   $_tx_thread_schedule,function
-$_tx_thread_schedule:
-         .thumb
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
-    .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_thread_schedule              // Call _tx_thread_schedule function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
-
-
     .text
     .align 2
+
+#define IRQ_MODE    0x12            // IRQ mode
+#define SVC_MODE    0x13            // SVC mode
+
+/**************************************************************************/
+/* SVC exception */
+/**************************************************************************/
+/* SVC is only used by the ModuleManager but the symbol is needed even if it is not used. */
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
+    .global __tx_swi_interrupt
+__tx_swi_interrupt:
+    BKPT    0x0000
+__tx_swi_interrupt_loop:
+    B       __tx_swi_interrupt_loop
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -97,6 +102,9 @@ $_tx_thread_schedule:
 /*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global _tx_thread_schedule
     .type  _tx_thread_schedule,function
 _tx_thread_schedule:
@@ -140,38 +148,58 @@ __tx_thread_schedule_loop:
 
     /* Setup time-slice, if present.  */
 
-    LDR     r2, =_tx_timer_time_slice       // Pickup address of time-slice
-                                            //   variable
-    LDR     sp, [r0, #8]                    // Switch stack pointers
+    LDR     r2, =_tx_timer_time_slice       // Pickup address of time-slice variable
     STR     r3, [r2]                        // Setup time-slice
+
+    LDR     sp, [r0, #8]                    // Switch stack pointers
 
 #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 
-    /* Call the thread entry function to indicate the thread is executing.  */
+    /* Call the thread entry function to indicate the thread is executing. */
 
     MOV     r5, r0                          // Save r0
     BL      _tx_execution_thread_enter      // Call the thread execution enter function
     MOV     r0, r5                          // Restore r0
 #endif
 
-    /* Determine if an interrupt frame or a synchronous task suspension frame
-       is present.  */
+    /* Determine if an interrupt frame or a synchronous task suspension frame is present. */
 
-    LDMIA   sp!, {r4, r5}                   // Pickup the stack type and saved CPSR
+    POP     {r4, r5}                        // Pickup the stack type and saved CPSR
     CMP     r4, #0                          // Check for synchronous context switch
     BEQ     _tx_solicited_return
+
+#if !defined(THUMB_MODE)
     MSR     SPSR_cxsf, r5                   // Setup SPSR for return
+#else
+    CPS     #IRQ_MODE                       // Enter IRQ mode
+    MSR     SPSR_cxsf, r5                   // Setup SPSR for return
+    LDR     r1, [r0, #8]                    // Get thread SP
+    LDR     lr, [r1, #0x40]                 // Get thread PC
+    CPS     #SVC_MODE                       // Enter SVC mode
+#endif
+
 #ifdef TX_ENABLE_VFP_SUPPORT
-    LDR     r1, [r0, #144]                  // Pickup the VFP enabled flag
-    CMP     r1, #0                          // Is the VFP enabled?
+    LDR     r2, [r0, #144]                  // Pickup the VFP enabled flag
+    CMP     r2, #0                          // Is the VFP enabled?
     BEQ     _tx_skip_interrupt_vfp_restore  // No, skip VFP interrupt restore
     VLDMIA  sp!, {D0-D15}                   // Recover D0-D15
     VLDMIA  sp!, {D16-D31}                  // Recover D16-D31
     LDR     r4, [sp], #4                    // Pickup FPSCR
     VMSR    FPSCR, r4                       // Restore FPSCR
+    CPS     #IRQ_MODE                       // Enter IRQ mode
+    LDR     lr, [r1, #0x144]                // Get thread PC
+    CPS     #SVC_MODE                       // Enter SVC mode
 _tx_skip_interrupt_vfp_restore:
 #endif
-    LDMIA   sp!, {r0-r12, lr, pc}^          // Return to point of thread interrupt
+
+#if !defined(THUMB_MODE)
+    LDMIA   sp!, {r0-r12, lr}^              // Return to point of thread interrupt
+#else
+    POP     {r0-r12, lr}                    // Restore registers
+    ADD     sp, #4                          // Fix stack pointer (skip PC saved on stack)
+    CPS     #IRQ_MODE                       // Enter IRQ mode
+    SUBS    pc, lr, #0                      // Return to point of thread interrupt
+#endif
 
 _tx_solicited_return:
 
@@ -185,52 +213,63 @@ _tx_solicited_return:
     VMSR    FPSCR, r4                       // Restore FPSCR
 _tx_skip_solicited_vfp_restore:
 #endif
+
     MSR     CPSR_cxsf, r5                   // Recover CPSR
-    LDMIA   sp!, {r4-r11, lr}               // Return to thread synchronously
-#ifdef __THUMB_INTERWORK
+    POP     {r4-r11, lr}                    // Restore registers
     BX      lr                              // Return to caller
-#else
-    MOV     pc, lr                          // Return to caller
-#endif
 
 #ifdef TX_ENABLE_VFP_SUPPORT
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global tx_thread_vfp_enable
     .type  tx_thread_vfp_enable,function
 tx_thread_vfp_enable:
-    MRS     r2, CPSR                        // Pickup the CPSR
+    MRS     r0, CPSR                            // Pickup current CPSR
 #ifdef TX_ENABLE_FIQ_SUPPORT
-    CPSID   if                              // Enable IRQ and FIQ interrupts
+    CPSID   if                                  // Disable IRQ and FIQ
 #else
-    CPSID   i                               // Enable IRQ interrupts
+    CPSID   i                                   // Disable IRQ
 #endif
-    LDR     r0, =_tx_thread_current_ptr     // Build current thread pointer address
-    LDR     r1, [r0]                        // Pickup current thread pointer
+    LDR     r2, =_tx_thread_current_ptr     // Build current thread pointer address
+    LDR     r1, [r2]                        // Pickup current thread pointer
     CMP     r1, #0                          // Check for NULL thread pointer
-    BEQ     __tx_no_thread_to_enable        // If NULL, skip VFP enable
-    MOV     r0, #1                          // Build enable value
-    STR     r0, [r1, #144]                  // Set the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
-__tx_no_thread_to_enable:
-    MSR     CPSR_cxsf, r2                   // Recover CPSR
-    BX      LR                              // Return to caller
+    BEQ     restore_ints                    // If NULL, skip VFP enable
+    MOV     r2, #1                          // Build enable value
+    STR     r2, [r1, #144]                  // Set the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
+    B       restore_ints
 
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global tx_thread_vfp_disable
     .type  tx_thread_vfp_disable,function
 tx_thread_vfp_disable:
-    MRS     r2, CPSR                        // Pickup the CPSR
+    MRS     r0, CPSR                            // Pickup current CPSR
 #ifdef TX_ENABLE_FIQ_SUPPORT
-    CPSID   if                              // Enable IRQ and FIQ interrupts
+    CPSID   if                                  // Disable IRQ and FIQ
 #else
-    CPSID   i                               // Enable IRQ interrupts
+    CPSID   i                                   // Disable IRQ
 #endif
-    LDR     r0, =_tx_thread_current_ptr     // Build current thread pointer address
-    LDR     r1, [r0]                        // Pickup current thread pointer
+    LDR     r2, =_tx_thread_current_ptr     // Build current thread pointer address
+    LDR     r1, [r2]                        // Pickup current thread pointer
     CMP     r1, #0                          // Check for NULL thread pointer
-    BEQ     __tx_no_thread_to_disable       // If NULL, skip VFP disable
-    MOV     r0, #0                          // Build disable value
-    STR     r0, [r1, #144]                  // Clear the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
-__tx_no_thread_to_disable:
-    MSR     CPSR_cxsf, r2                   // Recover CPSR
-    BX      LR                              // Return to caller
+    BEQ     restore_ints                    // If NULL, skip VFP disable
+    MOV     r2, #0                          // Build disable value
+    STR     r2, [r1, #144]                  // Clear the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
+
+restore_ints:
+    TST     r0, #IRQ_MASK
+    BNE     no_irq
+    CPSIE   i
+no_irq:
+#ifdef TX_ENABLE_FIQ_SUPPORT
+    TST     r0, #FIQ_MASK
+    BNE     no_fiq
+    CPSIE   f
+no_fiq:
+#endif
+    BX      lr
 
 #endif

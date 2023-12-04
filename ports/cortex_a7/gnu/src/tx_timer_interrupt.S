@@ -23,8 +23,12 @@
 #include "tx_user.h"
 #endif
 
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
     .arm
-
+#endif
 
 /* Define Assembly language external references...  */
 
@@ -36,26 +40,6 @@
     .global     _tx_timer_expired_time_slice
     .global     _tx_timer_expired
     .global     _tx_thread_time_slice
-
-
-
-/* Define the 16-bit Thumb mode veneer for _tx_timer_interrupt for
-   applications calling this function from to 16-bit Thumb mode.  */
-
-    .text
-    .align 2
-    .thumb
-    .global $_tx_timer_interrupt
-    .type   $_tx_timer_interrupt,function
-$_tx_timer_interrupt:
-     BX        pc                               // Switch to 32-bit mode
-     NOP                                        //
-    .arm
-     STMFD     sp!, {lr}                        // Save return address
-     BL        _tx_timer_interrupt              // Call _tx_timer_interrupt function
-     LDMFD     sp!, {lr}                        // Recover saved return address
-     BX        lr                               // Return to 16-bit caller
-
 
     .text
     .align 2
@@ -101,11 +85,11 @@ $_tx_timer_interrupt:
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*  04-25-2022     Zhen Kong                Updated comments,             */
 /*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global _tx_timer_interrupt
     .type   _tx_timer_interrupt,function
 _tx_timer_interrupt:
@@ -197,7 +181,7 @@ __tx_timer_done:
 
 __tx_something_expired:
 
-    STMDB   sp!, {r0, lr}                       // Save the lr register on the stack
+    PUSH    {r0, lr}                            // Save the lr register on the stack
                                                 //   and save r0 just to keep 8-byte alignment
 
     /* Did a timer expire?  */
@@ -225,13 +209,9 @@ __tx_timer_dont_activate:
 
 __tx_timer_not_ts_expiration:
 
-    LDMIA   sp!, {r0, lr}                       // Recover lr register (r0 is just there for
+    POP     {r0, lr}                            // Recover lr register (r0 is just there for
                                                 //   the 8-byte stack alignment
 
 __tx_timer_nothing_expired:
 
-#ifdef __THUMB_INTERWORK
     BX      lr                                  // Return to caller
-#else
-    MOV     pc, lr                              // Return to caller
-#endif
