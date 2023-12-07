@@ -1,6 +1,6 @@
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 reset.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 crt0.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a7 tx_initialize_low_level.S
+arm-none-eabi-gcc -c -g -DTHUMB_MODE -mthumb-interwork -mthumb -mcpu=cortex-a7 tx_initialize_low_level.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 MP_GIC.s
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 MP_PrivateTimer.s
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 V7.s
