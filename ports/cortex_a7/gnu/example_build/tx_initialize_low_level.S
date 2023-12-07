@@ -208,13 +208,6 @@ __tx_undefined:
 #if defined(THUMB_MODE)
     .thumb_func
 #endif
-    .global __tx_swi_interrupt
-__tx_swi_interrupt:
-    B       __tx_swi_interrupt                  // Software interrupt handler
-
-#if defined(THUMB_MODE)
-    .thumb_func
-#endif
     .global __tx_prefetch_handler
 __tx_prefetch_handler:
     B       __tx_prefetch_handler               // Prefetch exception handler

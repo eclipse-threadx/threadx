@@ -186,14 +186,11 @@ __tx_thread_schedule_loop:
     VLDMIA  sp!, {D16-D31}                  // Recover D16-D31
     LDR     r4, [sp], #4                    // Pickup FPSCR
     VMSR    FPSCR, r4                       // Restore FPSCR
-    CPS     #IRQ_MODE                       // Enter IRQ mode
-    LDR     lr, [r1, #0x144]                // Get thread PC
-    CPS     #SVC_MODE                       // Enter SVC mode
 _tx_skip_interrupt_vfp_restore:
 #endif
 
 #if !defined(THUMB_MODE)
-    LDMIA   sp!, {r0-r12, lr}^              // Return to point of thread interrupt
+    LDMIA   sp!, {r0-r12, lr, pc}^          // Return to point of thread interrupt
 #else
     POP     {r0-r12, lr}                    // Restore registers
     ADD     sp, #4                          // Fix stack pointer (skip PC saved on stack)
