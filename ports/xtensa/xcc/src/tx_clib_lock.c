@@ -35,6 +35,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
+/*  xx-xx-xxxx     Xiuwen Cai               Modified comment(s), and      */
+/*                                            added error handling in     */
+/*                                            lock initialization,        */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -155,6 +159,8 @@ _Mtxinit (_Rmtx * mtx)
 
     if (lcnt >= XT_NUM_CLIB_LOCKS) {
         /* Fatal error */
+        *mtx = NULL;
+        return;
     }
 
     lock = &(xclib_locks[lcnt]);
