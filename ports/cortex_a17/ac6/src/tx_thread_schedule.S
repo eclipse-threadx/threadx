@@ -41,19 +41,6 @@
 #define SVC_MODE    0x13            // SVC mode
 
 /**************************************************************************/
-/* SVC exception */
-/**************************************************************************/
-/* SVC is only used by the ModuleManager but the symbol is needed even if it is not used. */
-#if defined(THUMB_MODE)
-    .thumb_func
-#endif
-    .global __tx_swi_interrupt
-__tx_swi_interrupt:
-    BKPT    0x0000
-__tx_swi_interrupt_loop:
-    B       __tx_swi_interrupt_loop
-
-/**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
