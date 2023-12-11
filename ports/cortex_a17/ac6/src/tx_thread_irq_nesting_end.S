@@ -23,6 +23,13 @@
 #include "tx_user.h"
 #endif
 
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
+#else
+    .arm
+#endif
+
 #ifdef TX_ENABLE_FIQ_SUPPORT
 DISABLE_INTS    =       0xC0                    // Disable IRQ/FIQ interrupts
 #else
@@ -31,11 +38,6 @@ DISABLE_INTS    =       0x80                    // Disable IRQ interrupts
 MODE_MASK       =       0x1F                    // Mode mask
 IRQ_MODE_BITS   =       0x12                    // IRQ mode bits
 
-
-/* No 16-bit Thumb mode veneer code is needed for _tx_thread_irq_nesting_end
-   since it will never be called 16-bit mode.  */
-
-    .arm
     .text
     .align 2
 /**************************************************************************/
@@ -43,7 +45,7 @@ IRQ_MODE_BITS   =       0x12                    // IRQ mode bits
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_irq_nesting_end                           ARMv7-A        */
-/*                                                           6.3.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -88,8 +90,14 @@ IRQ_MODE_BITS   =       0x12                    // IRQ mode bits
 /*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
 /*                                            #include tx_user.h,         */
 /*                                            resulting in version 6.3.0  */
+/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*                                            Added thumb mode support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
+#if defined(THUMB_MODE)
+    .thumb_func
+#endif
     .global  _tx_thread_irq_nesting_end
     .type    _tx_thread_irq_nesting_end,function
 _tx_thread_irq_nesting_end:
@@ -102,8 +110,4 @@ _tx_thread_irq_nesting_end:
     BIC     r0, r0, #MODE_MASK                  // Clear mode bits
     ORR     r0, r0, #IRQ_MODE_BITS              // Build IRQ mode CPSR
     MSR     CPSR_c, r0                          // Reenter IRQ mode
-#ifdef __THUMB_INTERWORK
     BX      r3                                  // Return to caller
-#else
-    MOV     pc, r3                              // Return to caller
-#endif
