@@ -131,11 +131,12 @@ jobs:
         header: Code Coverage ${{ inputs.result_affix }}
         path: code-coverage-results.md
 
+    # Add sudo to move coverage folder created by root user
     - name: Prepare Coverage GitHub Pages
       if: (!inputs.skip_coverage)
       run: >-
         if [ "${{ inputs.result_affix }}" != "" ] && ${{ inputs.skip_deploy }}; then
-          mv ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }} \
+          sudo mv ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }} \
             ${{ inputs.cmake_path }}/coverage_report/${{ inputs.result_affix }}
         fi
           
