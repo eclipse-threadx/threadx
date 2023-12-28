@@ -23,15 +23,15 @@
 #include "tx_user.h"
 #endif
 
-    .arm
-
-#ifdef TX_ENABLE_FIQ_SUPPORT
-SVC_MODE        =     0xD3               // Disable IRQ/FIQ, SVC mode
-IRQ_MODE        =     0xD2               // Disable IRQ/FIQ, IRQ mode
+    .syntax unified
+#if defined(THUMB_MODE)
+    .thumb
 #else
-SVC_MODE        =     0x93               // Disable IRQ, SVC mode
-IRQ_MODE        =     0x92               // Disable IRQ, IRQ mode
+    .arm
 #endif
+
+SVC_MODE        =     0x13               // SVC mode
+IRQ_MODE        =     0x12               // IRQ mode
 
     .global     _tx_thread_system_state
     .global     _tx_thread_current_ptr
@@ -45,7 +45,6 @@ IRQ_MODE        =     0x92               // Disable IRQ, IRQ mode
 /* No 16-bit Thumb mode veneer code is needed for _tx_thread_context_restore
    since it will never be called 16-bit mode.  */
 
-    .arm
     .text
     .align 2
 /**************************************************************************/
@@ -53,7 +52,7 @@ IRQ_MODE        =     0x92               // Disable IRQ, IRQ mode
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_restore                            ARMv7-A       */
-/*                                                           6.3.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -94,6 +93,9 @@ IRQ_MODE        =     0x92               // Disable IRQ, IRQ mode
 /*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
 /*                                            #include tx_user.h,         */
 /*                                            resulting in version 6.3.0  */
+/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*                                            Added thumb mode support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
     .global _tx_thread_context_restore
@@ -129,9 +131,9 @@ _tx_thread_context_restore:
     /* Just recover the saved registers and return to the point of
        interrupt.  */
 
-    LDMIA   sp!, {r0, r10, r12, lr}         // Recover SPSR, POI, and scratch regs
+    POP     {r0, r10, r12, lr}              // Recover SPSR, POI, and scratch regs
     MSR     SPSR_cxsf, r0                   // Put SPSR back
-    LDMIA   sp!, {r0-r3}                    // Recover r0-r3
+    POP     {r0-r3}                         // Recover r0-r3
     MOVS    pc, lr                          // Return to point of interrupt
 
 __tx_thread_not_nested_restore:
@@ -160,26 +162,23 @@ __tx_thread_no_preempt_restore:
    /* Pickup the saved stack pointer.  */
 
    /* Recover the saved context and return to the point of interrupt.  */
-    LDMIA   sp!, {r0, r10, r12, lr}         // Recover SPSR, POI, and scratch regs
+    POP     {r0, r10, r12, lr}              // Recover SPSR, POI, and scratch regs
     MSR     SPSR_cxsf, r0                   // Put SPSR back
-    LDMIA   sp!, {r0-r3}                    // Recover r0-r3
+    POP     {r0-r3}                         // Recover r0-r3
     MOVS    pc, lr                          // Return to point of interrupt
 
 __tx_thread_preempt_restore:
 
-    LDMIA   sp!, {r3, r10, r12, lr}         // Recover temporarily saved registers
+    POP     {r3, r10, r12, lr}              // Recover temporarily saved registers
     MOV     r1, lr                          // Save lr (point of interrupt)
-    MOV     r2, #SVC_MODE                   // Build SVC mode CPSR
-    MSR     CPSR_c, r2                      // Enter SVC mode
+    CPS     #SVC_MODE                       // Enter SVC mode
     STR     r1, [sp, #-4]!                  // Save point of interrupt
-    STMDB   sp!, {r4-r12, lr}               // Save upper half of registers
+    PUSH    {r4-r12, lr}                    // Save upper half of registers
     MOV     r4, r3                          // Save SPSR in r4
-    MOV     r2, #IRQ_MODE                   // Build IRQ mode CPSR
-    MSR     CPSR_c, r2                      // Enter IRQ mode
-    LDMIA   sp!, {r0-r3}                    // Recover r0-r3
-    MOV     r5, #SVC_MODE                   // Build SVC mode CPSR
-    MSR     CPSR_c, r5                      // Enter SVC mode
-    STMDB   sp!, {r0-r3}                    // Save r0-r3 on thread's stack
+    CPS     #IRQ_MODE                       // Enter IRQ mode
+    POP     {r0-r3}                         // Recover r0-r3
+    CPS     #SVC_MODE                       // Enter SVC mode
+    PUSH    {r0-r3}                         // Save r0-r3 on thread's stack
 
     LDR     r1, =_tx_thread_current_ptr     // Pickup address of current thread ptr
     LDR     r0, [r1]                        // Pickup current thread pointer
@@ -192,13 +191,11 @@ __tx_thread_preempt_restore:
     STR     r2, [sp, #-4]!                  // Save FPSCR
     VSTMDB  sp!, {D16-D31}                  // Save D16-D31
     VSTMDB  sp!, {D0-D15}                   // Save D0-D15
-
 _tx_skip_irq_vfp_save:
-
 #endif
 
     MOV     r3, #1                          // Build interrupt stack type
-    STMDB   sp!, {r3, r4}                   // Save interrupt stack type and SPSR
+    PUSH    {r3, r4}                        // Save interrupt stack type and SPSR
     STR     sp, [r0, #8]                    // Save stack pointer in thread control
                                             //   block
 
@@ -223,6 +220,5 @@ __tx_thread_dont_save_ts:
 __tx_thread_idle_system_restore:
 
     /* Just return back to the scheduler!  */
-    MOV     r0, #SVC_MODE                   // Build SVC mode CPSR
-    MSR     CPSR_c, r0                      // Enter SVC mode
+    CPS     #SVC_MODE                       // Enter SVC mode
     B       _tx_thread_schedule             // Return to scheduler
