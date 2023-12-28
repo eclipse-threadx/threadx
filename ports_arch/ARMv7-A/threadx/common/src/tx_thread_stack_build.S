@@ -47,7 +47,7 @@ CPSR_MASK       =       0xBF                    // Mask initial CPSR, T, IRQ int
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_stack_build                               ARMv7-A        */
-/*                                                           6.x          */
+/*                                                           6.4.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -85,9 +85,9 @@ CPSR_MASK       =       0xBF                    // Mask initial CPSR, T, IRQ int
 /*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
 /*                                            #include tx_user.h,         */
 /*                                            resulting in version 6.3.0  */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*  12-31-2023     Yajun Xia                Modified comment(s),          */
 /*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.4.0  */
 /*                                                                        */
 /**************************************************************************/
 #if defined(THUMB_MODE)

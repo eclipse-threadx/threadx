@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE SMP    */
-/*                                                           6.x          */
+/*                                                           6.4.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -89,9 +89,9 @@
 /*                                            added option for random     */
 /*                                            number stack filling,       */
 /*                                            resulting in version 6.3.0  */
-/*  xx-xx-xxxx      Tiejun Zhou             Modified comment(s),          */
+/*  12-31-2023      Tiejun Zhou             Modified comment(s),          */
 /*                                            update version number,      */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.4.0  */
 /*                                                                        */
 /**************************************************************************/
 

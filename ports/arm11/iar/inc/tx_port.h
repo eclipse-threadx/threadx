@@ -375,7 +375,7 @@ void  _tx_thread_interrupt_restore(UINT old_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARM11/IAR Version 6.3.0 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARM11/IAR Version 6.4.0 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];
