@@ -289,7 +289,7 @@ ULONG64                                         _tx_thread_interrupt_control(uns
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX RISC-V64/GNU Version 6.3.0 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * ThreadX RISC-V64/GNU Version 6.4.0 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

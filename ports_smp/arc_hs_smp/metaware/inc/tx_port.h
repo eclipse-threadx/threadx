@@ -404,7 +404,7 @@ typedef struct TX_THREAD_SMP_PROTECT_STRUCT
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX SMP/ARC_HS/MetaWare Version 6.3.0 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX SMP/ARC_HS/MetaWare Version 6.4.0 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

@@ -424,7 +424,7 @@ VOID    tx_thread_fp_disable(VOID);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 1996-2019 Express Logic Inc. * ThreadX Cortex-A5x-SMP/AC6 Version 6.3.0 *";
+                                    "Copyright (c) 1996-2019 Express Logic Inc. * ThreadX Cortex-A5x-SMP/AC6 Version 6.4.0 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
