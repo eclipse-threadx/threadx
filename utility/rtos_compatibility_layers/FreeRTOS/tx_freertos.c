@@ -33,10 +33,10 @@
 /*                                            start flag, corrected stack */
 /*                                            allocation size,            */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Xiuwen Cai               Modified comment(s), and      */
+/*  12-31-2023     Xiuwen Cai               Modified comment(s), and      */
 /*                                            added check for overflow in */
 /*                                            queue size calculation,     */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.4.0  */
 /*                                                                        */
 /**************************************************************************/
 
