@@ -35,10 +35,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*  xx-xx-xxxx     Xiuwen Cai               Modified comment(s), and      */
+/*  12-31-2023     Xiuwen Cai               Modified comment(s), and      */
 /*                                            added error handling in     */
 /*                                            lock initialization,        */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.4.0  */
 /*                                                                        */
 /**************************************************************************/
 
