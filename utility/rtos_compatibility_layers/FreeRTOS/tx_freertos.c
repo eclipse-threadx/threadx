@@ -33,6 +33,10 @@
 /*                                            start flag, corrected stack */
 /*                                            allocation size,            */
 /*                                            resulting in version 6.1.12 */
+/*  12-31-2023     Xiuwen Cai               Modified comment(s), and      */
+/*                                            added check for overflow in */
+/*                                            queue size calculation,     */
+/*                                            resulting in version 6.4.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -1526,6 +1530,13 @@ QueueHandle_t xQueueCreate(UBaseType_t uxQueueLength, UBaseType_t uxItemSize)
     }
 #endif
 
+    if ((uxQueueLength > (SIZE_MAX / uxItemSize)) ||
+        (uxQueueLength > (ULONG_MAX / uxItemSize))) {
+
+        /* Integer overflow in queue size */
+        return NULL;
+    }
+
     p_queue = txfr_malloc(sizeof(txfr_queue_t));
     if(p_queue == NULL) {
         return NULL;
@@ -2691,6 +2702,13 @@ QueueSetHandle_t xQueueCreateSet(const UBaseType_t uxEventQueueLength)
         tx_freertos_auto_init();
     }
 #endif
+
+    if ((uxEventQueueLength > (SIZE_MAX / sizeof(void *))) ||
+        (uxEventQueueLength > (ULONG_MAX / sizeof(void *)))) {
+
+        /* Integer overflow in queue size */
+        return NULL;
+    }
 
     p_set = txfr_malloc(sizeof(txfr_queueset_t));
     if(p_set == NULL) {
