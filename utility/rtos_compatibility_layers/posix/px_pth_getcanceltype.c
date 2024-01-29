@@ -1,13 +1,12 @@
-/**************************************************************************/
-/*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-/*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
-/*                                                                        */
-/**************************************************************************/
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation 
+ * 
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ * 
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
 
 /**************************************************************************/
 /**                                                                       */ 
@@ -38,7 +37,7 @@
 /*  DESCRIPTION                                                           */ 
 /*                                                                        */
 /*    The pthread_fetcancelstate()function shall atomically both get the  */
-/*    calling thread’s cancelability type to the indicated type and    */
+/*    calling threadï¿½s cancelability type to the indicated type and    */
 /*    return the previous cancelability type at the location referenced   */
 /*    by oldtype. Legal values for type are PTHREAD_CANCEL_DEFERRED and   */
 /*    PTHREAD_CANCEL_ASYNCHRONOUS.                                        */

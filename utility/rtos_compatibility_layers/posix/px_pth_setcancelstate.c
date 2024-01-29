@@ -1,13 +1,12 @@
-/**************************************************************************/
-/*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-/*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
-/*                                                                        */
-/**************************************************************************/
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation 
+ * 
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ * 
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
 
 
 /**************************************************************************/
@@ -40,7 +39,7 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    The pthread_setcancelstate()function shall atomically both set the  */
-/*    calling thread’s cancelability state to the indicated state and  */
+/*    calling threadï¿½s cancelability state to the indicated state and  */
 /*    return the previous cancelability state at the location referenced  */
 /*    by oldstate.Legal values for state are PTHREAD_CANCEL_ENABLE and    */
 /*    PTHREAD_CANCEL_DISABLE.                                             */

@@ -1,13 +1,12 @@
-/**************************************************************************/
-/*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-/*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
-/*                                                                        */
-/**************************************************************************/
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation 
+ * 
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ * 
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
 
 
 /**************************************************************************/
@@ -43,7 +42,7 @@
 /*    called with mutex locked by the calling thread or undefined behavior*/
 /*    results.These functions atomically release the mutex and cause the  */
 /*    calling thread to block on the condition variable cond; atomically  */
-/*    here means ‘‘atomically with respect to access by another     */
+/*    here means ï¿½ï¿½atomically with respect to access by another     */
 /*    thread to the mutex and then the request for semaphore.             */
 /*                                                                        */
 /*    Upon successful return, the mutex shall have been locked and shall  */

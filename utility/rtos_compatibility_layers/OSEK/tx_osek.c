@@ -1,13 +1,12 @@
-/**************************************************************************/
-/*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-/*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
-/*                                                                        */
-/**************************************************************************/
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation 
+ * 
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ * 
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
@@ -1222,7 +1221,7 @@ TX_THREAD      *p_thread;
 /*    GetTaskID returns the task id of the task currently running.        */
 /*    Calling GetTaskID is allowed from task level, ISR level and in      */
 /*    several hook routines. This service is intended to be used by       */
-/*    library functions and hook routines. If <TaskID> can’t be evaluated */
+/*    library functions and hook routines. If <TaskID> canï¿½t be evaluated */
 /*    (no task currently running), the service returns INVALID_TASK as    */
 /*    TaskType.                                                           */
 /*                                                                        */
@@ -1268,7 +1267,7 @@ TX_THREAD      *thread_ptr;
 
    if ((thread_ptr == TX_NULL) || (thread_ptr == &_tx_timer_thread))
    {
-       /* No task running TaskID can’t be evaluated return a special Error.  */
+       /* No task running TaskID canï¿½t be evaluated return a special Error.  */
        *TaskID = INVALID_TASK;
 
        return (E_OK);
