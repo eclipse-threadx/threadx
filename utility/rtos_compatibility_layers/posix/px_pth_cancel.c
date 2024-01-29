@@ -1,13 +1,12 @@
-/**************************************************************************/
-/*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-/*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
-/*                                                                        */
-/**************************************************************************/
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation 
+ * 
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ * 
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
@@ -39,7 +38,7 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    The pthread_cancel function shall request that thread be  canceled. */
-/*    The target thread’s cancelability state and type determines when */
+/*    The target threadï¿½s cancelability state and type determines when */
 /*    the cancellation takes effect. When the cancellation is acted on,   */
 /*    the cancelation cleanup handlers for thread shall be called. When   */
 /*    the last cancelation cleanup handler returns, the thread-specific   */

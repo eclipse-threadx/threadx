@@ -1,13 +1,12 @@
-/**************************************************************************/
-/*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-/*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
-/*                                                                        */
-/**************************************************************************/
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation 
+ * 
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ * 
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
@@ -41,7 +40,7 @@
 /*     This function sets the thread creation stack attributes stackaddr  */
 /*     and stacksize in the attr object.                                  */
 /*     The stack attributes specify the area of storage to be used for the*/
-/*     created thread’s stack. The base  (lowest addressable byte) of  */
+/*     created threadï¿½s stack. The base  (lowest addressable byte) of  */
 /*     the storage shall be stackaddr , and the size of the storage shall */
 /*     be stacksize bytes.                                                */ 
 /*                                                                        */
