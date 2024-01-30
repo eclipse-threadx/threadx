@@ -349,7 +349,7 @@ __istate_t interrupt_save;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Cortex-M0/IAR Version 6.4.0 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-M0/IAR Version 6.4.0 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];
