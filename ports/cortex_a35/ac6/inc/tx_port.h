@@ -369,7 +369,7 @@ VOID    tx_thread_fp_disable(VOID);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX ARMv8-A Version 6.4.0 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX ARMv8-A Version 6.4.0 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

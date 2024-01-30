@@ -1,6 +1,6 @@
 ;/**************************************************************************/
 ;/*                                                                        */
-;/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+;/*       Copyright (c) 2024 Microsoft Corporation.        */
 ;/*                                                                        */
 ;/*       This software is licensed under the Microsoft Software License   */
 ;/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */

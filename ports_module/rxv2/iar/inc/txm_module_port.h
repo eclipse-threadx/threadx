@@ -395,6 +395,6 @@ VOID  _txm_module_manager_setup_mpu_registers(TXM_MODULE_INSTANCE *module_instan
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) Microsoft Corporation. All rights reserved.  *  ThreadX Module RXv2/IAR Version 6.4.0 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module RXv2/IAR Version 6.4.0 *";
 
 #endif
