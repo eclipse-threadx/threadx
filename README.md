@@ -14,9 +14,6 @@ We also provide [getting started guide](https://github.com/eclipse-threadx/getti
 
 See [Overview of Azure RTOS ThreadX](https://learn.microsoft.com/en-us/azure/rtos/threadx/overview-threadx) for the high-level overview, and all documentation and APIs can be found in: [Azure RTOS ThreadX documentation](https://learn.microsoft.com/en-us/azure/rtos/threadx/). 
 
-Also there is dedicated [learning path of Azure RTOS ThreadX](https://learn.microsoft.com/training/paths/azure-rtos-threadx/) for learning systematically.
-
-
 ## Repository Structure and Usage
 ### Directory layout
 
