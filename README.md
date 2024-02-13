@@ -1,6 +1,6 @@
-# Azure RTOS ThreadX
+# Eclipse ThreadX
 
-This advanced real-time operating system (RTOS) is designed specifically for deeply embedded applications. Among the multiple benefits it provides are advanced scheduling facilities, message passing, interrupt management, and messaging services. Azure RTOS ThreadX has many advanced features, including picokernel architecture, preemption threshold, event chaining, and a rich set of system services.
+This advanced real-time operating system (RTOS) is designed specifically for deeply embedded applications. Among the multiple benefits it provides are advanced scheduling facilities, message passing, interrupt management, and messaging services. ThreadX has many advanced features, including picokernel architecture, preemption threshold, event chaining, and a rich set of system services.
 
 Here are the key features and modules of ThreadX:
 
@@ -8,11 +8,11 @@ Here are the key features and modules of ThreadX:
 
 ## Getting Started
 
-Azure RTOS has been integrated to the semiconductor's SDKs and development environment. You can develop using the tools of choice from [STMicroelectronics](https://www.st.com/content/st_com/en/campaigns/x-cube-azrtos-azure-rtos-stm32.html), [NXP](https://www.nxp.com/design/software/embedded-software/azure-rtos-for-nxp-microcontrollers:AZURE-RTOS), [Renesas](https://github.com/renesas/azure-rtos) and [Microchip](https://mu.microchip.com/get-started-simplifying-your-iot-design-with-azure-rtos).
+Eclipse ThreadX has been integrated to the semiconductor's SDKs and development environment. You can develop using the tools of choice from [STMicroelectronics](https://www.st.com/content/st_com/en/campaigns/x-cube-azrtos-azure-rtos-stm32.html), [NXP](https://www.nxp.com/design/software/embedded-software/azure-rtos-for-nxp-microcontrollers:AZURE-RTOS), [Renesas](https://github.com/renesas/azure-rtos) and [Microchip](https://mu.microchip.com/get-started-simplifying-your-iot-design-with-azure-rtos).
 
 We also provide [getting started guide](https://github.com/eclipse-threadx/getting-started) and [samples](https://github.com/eclipse-threadx/samples) using hero development boards from semiconductors you can build and test with.
 
-See [Overview of Azure RTOS ThreadX](https://learn.microsoft.com/en-us/azure/rtos/threadx/overview-threadx) for the high-level overview, and all documentation and APIs can be found in: [Azure RTOS ThreadX documentation](https://learn.microsoft.com/en-us/azure/rtos/threadx/). 
+See [Overview of ThreadX](https://learn.microsoft.com/en-us/azure/rtos/threadx/overview-threadx) for the high-level overview, and all documentation and APIs can be found in: [ThreadX documentation](https://learn.microsoft.com/en-us/azure/rtos/threadx/). 
 
 ## Repository Structure and Usage
 ### Directory layout
@@ -118,7 +118,7 @@ xtensa      cortex_a65ae
 ```
 
 ### ThreadX Modules
-[Azure RTOS ThreadX Modules](https://learn.microsoft.com/azure/rtos/threadx-modules/chapter1) component provides an infrastructure for applications to dynamically load modules that are built separately from the resident portion of the application.
+[ThreadX Modules](https://learn.microsoft.com/azure/rtos/threadx-modules/chapter1) component provides an infrastructure for applications to dynamically load modules that are built separately from the resident portion of the application.
 ```
 cortex_a35
 cortex_a35_smp
@@ -134,7 +134,7 @@ rxv2
 ```
 
 ### ThreadX SMP
-[Azure RTOS ThreadX SMP](https://learn.microsoft.com/azure/rtos/threadx/threadx-smp/chapter1) is a high-performance real-time SMP kernel designed specifically for embedded applications.
+[ThreadX SMP](https://learn.microsoft.com/azure/rtos/threadx/threadx-smp/chapter1) is a high-performance real-time SMP kernel designed specifically for embedded applications.
 ```
 arc_hs_smp
 cortex_a34_smp
@@ -219,7 +219,7 @@ The following are references to additional ThreadX RTOS resources:
 - **Licensing and sales questions**: https://aka.ms/azrtos-license
 - **Product roadmap and support policy**: https://aka.ms/azrtos/lts
 - **Blogs and videos**: http://msiotblog.com and https://aka.ms/iotshow
-- **Azure RTOS TraceX Installer**: https://aka.ms/azrtos-tracex-installer
+- **TraceX Installer**: https://aka.ms/azrtos-tracex-installer
 
 You can also check [previous questions](https://stackoverflow.com/questions/tagged/threadx-rtos+threadx) or ask new ones on StackOverflow using the `threadx-rtos` and `threadx` tags.
 
