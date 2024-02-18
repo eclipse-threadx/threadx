@@ -56,7 +56,7 @@ static volatile ULONG   destination =  0;
 static ULONG            start_time;
 static ULONG            lower_bound;
 static ULONG            upper_bound;
-static ULONG            current_itterations;
+static ULONG            current_iterations;
 #ifdef DEBUG_1
 static ULONG            last_loop_count;
 #endif
@@ -106,8 +106,8 @@ ULONG i;
         if (upper_bound > max_loop_count)
             lower_bound = max_loop_count;
 
-        if ((current_itterations < lower_bound) || (current_itterations > upper_bound))
-            current_itterations =  lower_bound;
+        if ((current_iterations < lower_bound) || (current_iterations > upper_bound))
+            current_iterations =  lower_bound;
         
 #ifdef DEBUG_1
         /* Last loop count.  */
@@ -350,7 +350,7 @@ ULONG   i;
         lower_bound = lower_bound - 5;
     upper_bound =  max_loop_count + 5;
 
-    current_itterations =  lower_bound;
+    current_iterations =  lower_bound;
 
     /* This thread simply suspends over and over...  */
     while(1)
@@ -366,20 +366,20 @@ ULONG   i;
             /* Call delay function.  */
             delay_function();
             loop_count++;
-        } while (loop_count < current_itterations);      
+        } while (loop_count < current_iterations);      
 
         /* Suspend this thread.  */
         tx_semaphore_get(&semaphore_1, TX_WAIT_FOREVER);
 
-        /* Adjust the current itterations.  */
-        current_itterations++;
-        if (current_itterations > upper_bound)
+        /* Adjust the current iterations.  */
+        current_iterations++;
+        if (current_iterations > upper_bound)
         {
             if (lower_bound > min_loop_count)
                 lower_bound--;
             if (upper_bound < max_loop_count)
                 upper_bound++;
-            current_itterations =  lower_bound;
+            current_iterations =  lower_bound;
         }
 
         /* Increment the thread counter.  */

@@ -244,7 +244,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Delete thread 1 (thread 1 alread terminated) and 2.  */
+    /* Delete thread 1 (thread 1 alreadyterminated) and 2.  */
     status =  tx_thread_delete(&thread_2);
 
     /* Check for status.  */
