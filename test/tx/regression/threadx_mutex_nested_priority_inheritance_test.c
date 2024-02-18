@@ -404,7 +404,7 @@ UINT    status;
 
             tx_mutex_put(&mutex_2);     
 
-            /* Should reurn us back to priority 15.  */
+            /* Should return us back to priority 15.  */
             if (thread_0.tx_thread_priority != 15)
             {
 
@@ -441,7 +441,7 @@ UINT    status;
 
             tx_mutex_put(&mutex_2);     
 
-            /* Should reurn us back to priority 8.  */
+            /* Should return us back to priority 8.  */
             if (thread_0.tx_thread_priority != 8)
             {
 
