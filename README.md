@@ -215,7 +215,7 @@ The following are references to additional ThreadX RTOS resources:
 
 - **Product introduction**: https://github.com/eclipse-threadx/rtos-docs
 - **Product issues and bugs, or feature requests**: https://github.com/eclipse-threadx/threadx/issues
-- **Azure RTOS TraceX Installer**: https://aka.ms/azrtos-tracex-installer
+- **TraceX Installer**: https://aka.ms/azrtos-tracex-installer
 
 You can also check [previous questions](https://stackoverflow.com/questions/tagged/threadx-rtos+threadx) or ask new ones on StackOverflow using the `threadx-rtos` and `threadx` tags.
 
