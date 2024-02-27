@@ -326,7 +326,7 @@ void    tx_thread_vfp_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-A7/AC5 Version 6.4.0 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-A7/AC5 Version 6.4.1 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
