@@ -715,7 +715,7 @@ void    tx_thread_fpu_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-M7/AC6 Version 6.4.0 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-M7/AC6 Version 6.4.1 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];
