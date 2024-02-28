@@ -275,7 +275,7 @@ void    tx_thread_fpu_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX RXv3/IAR Version 6.4.0 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX RXv3/IAR Version 6.4.1 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

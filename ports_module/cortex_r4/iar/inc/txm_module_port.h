@@ -340,7 +340,7 @@ UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module Cortex-R4/MPU/IAR Version 6.4.0 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module Cortex-R4/MPU/IAR Version 6.4.1 *";
 
 #endif
 
