@@ -1,0 +1,1553 @@
+                                            ThreadX
+                                            
+For version 6 and higher, please refer to the release notes on GitHub at https://github.com/eclipse-threadx/threadx/releases.
+Below is the revision history for 5.x.
+
+1. ThreadX:
+
+02-01-2019  ThreadX generic code version 5.9. This release includes the following modifications:
+
+            tx_api.h                                        Changed minor version constant, and added 
+                                                            a macro to disable warning of parameter 
+                                                            not used.
+            tx_event_flags_cleanup.c                        Added reset of suspension list processing 
+                                                            when event flag set is interrupted.
+            tx_event_flags_set.c                            Moved setup of notify callback so that it 
+                                                            is under interrupt protection and before any 
+                                                            preemption, and changed increment of reset 
+                                                            search flag to a simple set to true.
+            tx_event_flags_set_notify.c                     Removed the warning of parameter not used.
+            tx_mutex_get.c                                  Changed logic to update the priority inheritance
+                                                            priority level.
+            tx_mutex_priority_change.c                      Removed update of the priority inheritance
+                                                            priority level.
+            tx_mutex_put.c                                  Changed logic to properly update the priority 
+                                                            inheritance priority level.
+            tx_queue_send_notify.c                          Removed the warning of parameter not used.
+            tx_semaphore_put_notify.c                       Removed the warning of parameter not used.
+            tx_thread_entry_exit_notify.c                   Removed the warning of parameter not used.
+            tx_thread_suspend.c                             Refined error checking for self suspension to 
+                                                            ensure thread context. Modified to use system
+                                                            state macro instead of direct variable access.
+
+
+06-01-2017  ThreadX generic code version 5.8. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Changed minor version constant, added 
+                                                            suspension sequence to verify cleanup 
+                                                            is still necessary, made MISRA compatibility 
+                                                            changes, added alignment type for memory pools, 
+                                                            corrected compiler warnings in macro definitions, 
+                                                            added support for optional extensions.
+            tx_block_pool.h                                 Added suspension sequence to verify cleanup 
+                                                            is still necessary, made MISRA compatibility 
+                                                            changes, and added macro for extending block 
+                                                            pool delete.
+            tx_byte_pool.h                                  Added suspension sequence to verify cleanup 
+                                                            is still necessary, made MISRA compatibility 
+                                                            changes, added conditionals around the byte 
+                                                            pool configuration defines, and added macro 
+                                                            for extending the byte pool delete.
+            tx_event_flags.h                                Added suspension sequence to verify cleanup 
+                                                            is still necessary, made MISRA compatibility 
+                                                            changes, and added macro for extending event 
+                                                            flag group delete.
+            tx_initialize.h                                 Made MISRA compatibility changes.
+            tx_mutex.h                                      Added suspension sequence to verify cleanup is 
+                                                            still necessary, made MISRA compatibility 
+                                                            changes, and added macro for extending mutex 
+                                                            delete.
+            tx_queue.h                                      Added suspension sequence to verify cleanup is 
+                                                            still necessary, made MISRA compatibility changes,  
+                                                            and added macro for extending queue delete.
+            tx_semaphore.h                                  Added suspension sequence to verify cleanup 
+                                                            is still necessary, made MISRA compatibility 
+                                                            changes, and added macros for extending semaphore 
+                                                            delete.
+            tx_thread.h                                     Made MISRA compatibility changes, added 
+                                                            default macro definition for setting 
+                                                            up timeout, added default macro definition for 
+                                                            setting up thread timeout pointer, and added 
+                                                            macros for extending the thread create, delete,  
+                                                            and reset processing.
+            tx_timer.h                                      Made MISRA compatibility changes, added 
+                                                            macro for extending timer delete, and 
+                                                            added the global variable _tx_timer_expired_ptr 
+                                                            which is needed by timer info get.                                                   
+            tx_trace.h                                      Made MISRA compatibility changes, and utilized 
+                                                            macros for system state and current thread  
+                                                            pointer retrieval.
+            tx_user.h                                       Modified comment(s).
+            tx_block_allocate.c                             Added suspension sequence to verify cleanup is still 
+                                                            necessary, added protection against self suspension 
+                                                            with the preempt-disable flag set, changed logic to  
+                                                            set return pointer to NULL when no memory is available, 
+                                                            and modified code for MISRA compliance.
+            tx_block_pool_cleanup.c                         Added suspension sequence to verify cleanup is 
+                                                            still necessary, and modified code for MISRA 
+                                                            compliance.
+            tx_block_pool_create.c                          Modified code for MISRA compliance, added 
+                                                            use of alignment type for creating the block 
+                                                            pool, and modified code to properly handle case 
+                                                            where the supplied memory is too small for one block.
+            tx_block_pool_delete.c                          Added macro for port specific post processing.
+            tx_block_release.c                              Modified code for MISRA compliance.
+            tx_byte_allocate.c                              Added suspension sequence to verify cleanup is still 
+                                                            necessary, added protection against self suspension 
+                                                            with the preempt-disable flag set, added processing 
+                                                            extension, changed logic to set return pointer to NULL 
+                                                            when no memory is available, and added use of alignment 
+                                                            type for allocating from byte pool.
+            tx_byte_pool_cleanup.c                          Added suspension sequence to verify cleanup is still 
+                                                            necessary, and modified code for MISRA compliance.
+            tx_byte_pool_create.c                           Modified code for MISRA compliance, and added 
+                                                            use of alignment type for creating byte pool.
+            tx_byte_pool_delete.c                           Added macro for port specific post processing.
+            tx_byte_pool_search.c                           Modified code for MISRA compliance, added 
+                                                            use of alignment type for searching byte pool, 
+                                                            and modified logic to ensure the integrity of the 
+                                                            search pointer.
+            tx_byte_release.c                               Added processing extension, modified code for MISRA 
+                                                            compliance, and added use of alignment type for 
+                                                            releasing memory to byte pool.
+            tx_event_flags_cleanup.c                        Added suspension sequence to verify cleanup is still
+                                                            necessary, and modified code for MISRA compliance.
+            tx_event_flags_delete.c                         Added macro for port specific post processing.
+            tx_event_flags_get.c                            Added suspension sequence to verify cleanup is still 
+                                                            necessary, and added protection against self 
+                                                            suspension with the preempt-disable flag set.
+            tx_event_flags_set.c                            Removed unnecessary code, and modified code 
+                                                            for MISRA compliance.
+            tx_initialize_kernel_enter.c                    Added processing extension, and modified code 
+                                                            for MISRA compliance.
+            tx_mutex_cleanup.c                              Added suspension sequence to verify cleanup is 
+                                                            still necessary, and modified code for MISRA 
+                                                            compliance.
+            tx_mutex_delete.c                               Added macro for port specific post processing.
+            tx_mutex_get.c                                  Added suspension sequence to verify cleanup is still
+                                                            necessary, and added protection against self 
+                                                            suspension with the preempt-disable flag set.
+            tx_mutex_prioritize.c                           Modified code for MISRA compliance.
+            tx_mutex_priority_change.c                      Added processing extension.
+            tx_mutex_put.c                                  Removed unnecessary code, and added processing 
+                                                            extension.
+            tx_queue_cleanup.c                              Added suspension sequence to verify cleanup is 
+                                                            still necessary, and modified code for MISRA 
+                                                            compliance.
+            tx_queue_create.c                               Modified code for MISRA compliance.
+            tx_queue_delete.c                               Added macro for port specific post processing.
+            tx_queue_front_send.c                           Added suspension sequence to verify cleanup is 
+                                                            still necessary, added protection against self 
+                                                            suspension with the preempt-disable flag set, 
+                                                            and modified code for MISRA compliance.
+            tx_queue_receive.c                              Added suspension sequence to verify cleanup is 
+                                                            still necessary, added protection against self 
+                                                            suspension with the preempt-disable flag set, 
+                                                            and modified code for MISRA compliance.
+            tx_queue_send.c                                 Added suspension sequence to verify cleanup is 
+                                                            still necessary, added protection against self 
+                                                            suspension with the preempt-disable flag set, 
+                                                            and modified code for MISRA compliance.
+            tx_semaphore_cleanup.c                          Added suspension sequence to verify cleanup is 
+                                                            still necessary, and modified code for MISRA 
+                                                            compliance.
+            tx_semaphore_delete.c                           Added macro for port specific post processing.
+            tx_semaphore_get.c                              Added suspension sequence to verify cleanup is 
+                                                            still necessary, and added protection against 
+                                                            self suspension with the preempt-disable flag set.
+            tx_thread_create.c                              Modified code for MISRA compliance, added 
+                                                            optional internal thread extension macro, 
+                                                            added macro for setting up the thread timeout, and
+                                                            corrected problem restoring preemption-threshold 
+                                                            during initialization.
+            tx_thread_delete.c                              Added macro for port specific post processing.
+            tx_thread_initialize.c                          Modified code for MISRA compliance.
+            tx_thread_reset.c                               Removed extraneous TX_RESTORE, and added macro for 
+                                                            port specific processing.
+            tx_thread_resume.c                              Corrected problem restoring preemption-threshold 
+                                                            during initialization.
+            tx_thread_sleep.c                               Added protection against self suspension with the 
+                                                            preempt-disable flag set.
+            tx_thread_stack_analyze.c                       Added processing extension, and modified code for 
+                                                            MISRA compliance.
+            tx_thread_suspend.c                             Added protection against self suspension with the 
+                                                            preempt-disable flag set, and added TX_DISABLE to 
+                                                            match TX_RESTORE before returning.
+            tx_thread_system_resume.c                       Changed logic to ensure deactivation is called with  
+                                                            interrupt protection.
+            tx_thread_system_suspend.c                      Ensured that time-slice is properly reset in 
+                                                            non-interruptible code path, changed logic to perform 
+                                                            activation with protection in force, and corrected 
+                                                            problem setting up the trace information 4 field.
+            tx_thread_terminate.c                           Added suspension sequence to verify cleanup is still 
+                                                            necessary, changed logic to ensure no mutexes are added 
+                                                            to this thread after the check for owned mutexes, and 
+                                                            changed logic to ensure deactivation is called with  
+                                                            interrupt protection.
+            tx_thread_timeout.c                             Added suspension sequence to verify cleanup is still 
+                                                            necessary, and added macro for setting up the thread 
+                                                            pointer.
+            tx_thread_wait_abort.c                          Added suspension sequence to verify cleanup is still 
+                                                            necessary.
+            tx_timer_activate.c                             Changed logic to perform activation with protection 
+                                                            in force.
+            tx_timer_create.c                               Kept protection over timer activation.
+            tx_timer_deactivate.c                           Modified code for MISRA compliance, added 
+                                                            logic for accurate remaining time calculation.
+            tx_timer_delete.c                               Added macro for port specific post processing, and 
+                                                            changed logic to ensure deactivation is called with  
+                                                            interrupt protection.
+            tx_timer_expiration_process.c                   Modified code for MISRA compliance, ensure timer is 
+                                                            not accessed after timeout unless 
+                                                            reactivation is necessary, set pointer to indicate 
+                                                            timer being processed, and perform reactivation with 
+                                                            protection.
+            tx_timer_info_get.c                             Added logic for accurate remaining time calculation.
+            tx_timer_initialize.c                           Modified code for MISRA compliance, added 
+                                                            initialization for timer expired pointer, and 
+                                                            added check for TX_NO_TIMER option.
+            tx_timer_system_activate.c                      Modified code for MISRA compliance, removed 
+                                                            protection logic since protection is now 
+                                                            required by the caller.
+            tx_timer_system_deactivate.c                    Removed protection logic since protection is now  
+                                                            required by the caller.
+            tx_timer_thread_entry.c                         Modified code for MISRA compliance, ensure timer 
+                                                            is not accessed after timeout unless 
+                                                            reactivation is necessary, set pointer to indicate 
+                                                            timer being processed, and perform reactivation with 
+                                                            protection.
+            tx_trace_enable.c                               Added initial running events to ensure buffer is not 
+                                                            empty for TraceX, and modified code for MISRA 
+                                                            compliance.
+            tx_trace_object_register.c                      Modified code for MISRA compliance.
+            tx_trace_object_unregister.c                    Modified code for MISRA compliance.
+            txe_block_release.c                             Modified code for MISRA compliance.
+            txe_thread_create.c                             Modified code for MISRA compliance.
+
+
+05-01-2015  ThreadX generic code version 5.7. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Modified code for MISRA compliance, 
+                                                            modified minor version define, added 
+                                                            thread start macro for performing port
+                                                            and/or user specified processing when 
+                                                            a thread starts, and added constant 
+                                                            TX_TIMER_TICKS_PER_SECOND for use by 
+                                                            other middleware components as a common 
+                                                            time reference.
+            tx_byte_pool_search.c                           Modified code for MISRA compliance, 
+                                                            added code to assert pool ownership 
+                                                            after protection is obtained to ensure 
+                                                            no changes to the pool or the pool 
+                                                            search pointer are made without ownership.
+            tx_byte_release.c                               Modified code for MISRA compliance,
+                                                            added code to assert pool ownership 
+                                                            after protection is obtained to ensure 
+                                                            no changes to the pool or the pool 
+                                                            search pointer are made without ownership.
+            tx_mutex_cleanup.c                              Modified code for MISRA compliance, and 
+                                                            modified logic to use the thread's owned 
+                                                            mutex list for releasing mutexes.
+            tx_mutex_delete.c                               Modified code for MISRA compliance,
+                                                            and modified logic to call _tx_mutex_put 
+                                                            if the mutex is owned.
+            tx_mutex_get.c                                  Modified code for MISRA compliance,  
+                                                            and added logic to place non-priority 
+                                                            inheritance mutexes on the owned list.
+            tx_mutex_put.c                                  Modified code for MISRA compliance, 
+                                                            modified logic to remove non-priority 
+                                                            inheritance mutex from owned mutex list, 
+                                                            and added logic to handle releasing a mutex
+                                                            during initialization.
+            tx_thread_shell_entry.c                         Added thread start macro for performing port 
+                                                            and/or user specified processing when a 
+                                                            thread starts.
+            tx*.h                                           Modified comment(s) and modified code for 
+                                                            MISRA compliance.
+            tx*.c                                           Modified comment(s) and modified code for 
+                                                            MISRA compliance.
+
+
+11-01-2012  ThreadX generic code version 5.6. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Modified minor version define.
+            tx_mutex.h                                      Added new prototype.
+            tx_thread.h                                     Added function pointer for releasing any owned mutexes 
+                                                            when thread completes or is terminated.
+            tx_timer.h                                      Removed unused constants.
+            tx_trace.h                                      Added conditional around Trace function prototypes.
+            tx_mutex_cleanup.c                              Added new internal function to release any mutexes 
+                                                            owned by a terminated or completed thread.
+            tx_mutex_create.c                               Setup thread mutex release function pointer.
+            tx_mutex_priority_change.c                      Removed unnecessary code, and added logic to place thread 
+                                                            at the front of the execution list at updated priority.
+            tx_mutex_put.c                                  Added logic to allow mutex put to be called from another 
+                                                            thread for mutex cleanup, and adjusted priority restoration 
+                                                            search to start at user priority.
+            tx_thread_initialize.c                          Added initialization of thread mutex release function 
+                                                            pointer.
+            tx_thread_priority_change.c                     Added logic to place thread at the front of the execution list 
+                                                            at updated priority.
+            tx_thread_shell_entry.c                         Added logic to remove all mutexes owned by thread when it 
+                                                            completes.
+            tx_thread_terminate.c                           Added logic to remove all mutexes owned by thread when it is 
+                                                            terminated.
+            tx_timer_expiration_process.c                   Corrected problem with nested timer interrupts.
+            txe_mutex_get.c                                 Allow timers to call this service.
+            txe_mutex_put.c                                 Allow timers to call this service.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+07-15-2011  ThreadX generic code version 5.5. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Added defines for major/minor version information, 
+                                                            and removed unused original threshold mutex structure
+                                                            member.
+            tx_mutex.h                                      Removed unnecessary parameter in in mutex priority change.
+            tx_thread.h                                     Added interrupt protection to stack checking macro.
+            tx_trace.h                                      Added variables for object registry optimizations.
+            tx_mutex_get.c                                  Removed saving original threshold, and removed unnecessary 
+                                                            parameter to mutex priority change.
+            tx_mutex_priority_change.c                      Removed unused new threshold parameter, and added logic 
+                                                            to handle a lower or equal priority thread from 
+                                                            preempting an executing thread changing priority.
+            tx_mutex_put.c                                  Removed saving original threshold, removed unnecessary  
+                                                            parameter to mutex priority change, and added logic to  
+                                                            check for necessary priority changes.
+            tx_thread_create.c                              Corrected problem with TX_THREAD_CREATE_EXTENSION 
+                                                            macro not being used if the thread is not auto started.
+            tx_thread_initialize.c                          Added bit for indicating execution profiling enabled  
+                                                            in _tx_build_options.
+            tx_thread_priority_change.c                     Added logic to handle a lower or equal priority thread 
+                                                            from preempting an executing thread changing priority.
+            tx_thread_reset.c                               Changed memset to TX_MEMSET so it can be redefined.
+            tx_thread_stack_analyze.c                       Added logic to check for thread validity before 
+                                                            updating highest stack pointer.
+            tx_thread_system_preempt_check.c                Removed redundant conditional in stack checking.
+            tx_thread_system_resume.c                       Corrected problem with delayed suspension from an 
+                                                            interrupt during the middle of a thread suspending.
+            tx_thread_time_slice.c                          Removed redundant conditional in stack checking, and 
+                                                            moved stack checking to be called with interrupts enabled.
+            tx_trace_enable.c                               Added initialization for variables used for object 
+            tx_trace_object_register.c                      Added optimization for adding registry entries.
+            tx_trace_object_unregister.c                    Added support for optimizing adding registry entries.
+                                                            registry optimizations.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+12-12-2009  ThreadX generic code version 5.4. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Changed the definition of TX_NULL to a pointer type, 
+                                                            added TX_MEMSET macro, modified priority-inheritance 
+                                                            struct members in TX_THREAD, changed user event 
+                                                            comments, added callback for tracking thread scheduling, 
+                                                            merged event logging and MULTI run-time error checking 
+                                                            support, changed type of all internal structure members 
+                                                            used for counting to UINT, and added safety critical 
+                                                            exception logic.
+            tx_byte_pool.h                                  Removed unused constant TX_BYTE_BLOCK_ALLOC.
+            tx_thread.h                                     Removed type conversion in lowest set bit macro, added 
+                                                            macro to get the system state, and removed redundant 
+                                                            prototype.
+            tx_timer.h                                      Removed the unnecessary status return on system timer 
+                                                            activate/deactivate.
+            tx_trace.h                                      Added defines for default source, and added logic to 
+                                                            insert the thread's preemption-threshold along with its
+                                                            priority.
+            tx_block_allocate.c                             Removed compound conditionals, added explicit value checking,
+                                                            added logic to explicitly check for valid pointer, adjusted 
+                                                            the trace enable conditional to include the trace insert 
+                                                            macro, changed some counting variables to type UINT, merged 
+                                                            event logging support, and added void pointer cast in pointer
+                                                            type conversions.
+            tx_block_pool_cleanup.c                         Removed compound conditionals, changed some counting 
+                                                            variables to type UINT, and added logic to explicitly 
+                                                            check for valid pointer.
+            tx_block_pool_create.c                          Added explicit compare of blocks, removed pointer comparison,
+                                                            changed memset to macro, eliminated created_count local 
+                                                            variable, changed some counting variables to type UINT, 
+                                                            merged event logging support, and added void pointer cast in 
+                                                            pointer type conversions.
+            tx_block_pool_delete.c                          Merged event logging support, eliminated created_count local 
+                                                            variable, and changed some counting variables to type UINT.
+            tx_block_pool_info_get.c                        Casted UINT counting values to ULONG where necessary, merged
+                                                            event logging support, and added logic to explicitly check 
+                                                            for valid pointer.
+            tx_block_pool_performance_info_get.c            Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, merged event logging support, and 
+                                                            added code to ensure that input parameters are accessed in 
+                                                            non-enabled case (default).
+            tx_block_pool_performance_system_info_get.c     Added logic to explicitly check for valid pointer, merged  
+                                                            event logging support, and added code to ensure that input 
+                                                            parameters are accessed in non-enabled case (default).
+            tx_block_pool_prioritize.c                      Merged event logging support, and changed some counting  
+                                                            variables to type UINT.
+            tx_block_release.c                              Added logic to explicitly check for valid pointer, changed 
+                                                            some counting variables to type UINT, merged event logging 
+                                                            support, and added void pointer cast in pointer type 
+                                                            conversions.
+            tx_byte_allocate.c                              Removed compound conditionals, added explicit value checking, 
+                                                            explicit check for wait option, changed some counting 
+                                                            variables to type UINT, merged event logging support, and 
+                                                            added logic to explicitly check for valid pointer.
+            tx_byte_pool_cleanup.c                          Removed compound conditionals, changed some counting 
+                                                            variables to type UINT, and added logic to explicitly check 
+                                                            for valid pointer.
+            tx_byte_pool_create.c                           Removed unused constant TX_BYTE_BLOCK_ALLOC, added void 
+                                                            pointer cast in pointer type conversions, changed memset to 
+                                                            macro, eliminated created_count local variable, merged event
+                                                            logging support, and added parentheses in calculation of 
+                                                            per-block overhead.
+            tx_byte_pool_delete.c                           Merged event logging support, eliminated created_count local
+                                                            variable, and changed some counting variables to type UINT.
+            tx_byte_pool_info_get.c                         Casted UINT counting values to ULONG where necessary, 
+                                                            merged event logging support, and added logic to explicitly 
+                                                            check for valid pointer.
+            tx_byte_pool_performance_info_get.c             Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, merged event logging support, and 
+                                                            added code to ensure that input parameters are accessed in 
+                                                            non-enabled case (default).
+            tx_byte_pool_performance_system_info_get.c      Added logic to explicitly check for valid pointer, merged 
+                                                            event logging support, and added code to ensure that input 
+                                                            parameters are accessed in non-enabled case (default).
+            tx_byte_pool_prioritize.c                       Merged event logging support, and changed some counting 
+                                                            variables to type UINT.
+            tx_byte_pool_search.c                           Added explicit checks for examined blocks and available 
+                                                            bytes, added void pointer cast in pointer type conversions, 
+                                                            changed some counting variables to type UINT, and added 
+                                                            parentheses in calculation of available bytes.
+            tx_byte_release.c                               Added logic to explicitly check for valid pointer, added 
+                                                            void pointer cast in pointer type conversions, changed 
+                                                            some counting variables to type UINT, merged event logging
+                                                            support, and added parentheses in calculation of available
+                                                            bytes.
+            tx_event_flags_cleanup.c                        Removed compound conditionals, added explicit check for 
+                                                            suspend count, changed some counting variables to type UINT, 
+                                                            and added logic to explicitly check for valid pointer.
+            tx_event_flags_create.c                         Changed memset to macro, merged event logging support, and 
+                                                            eliminated created_count local variable.
+            tx_event_flags_delete.c                         Merged event logging support, eliminated created_count local 
+                                                            variable, and changed some counting variables to type UINT.
+            tx_event_flags_get.c                            Removed compound conditionals, changed some counting 
+                                                            variables to type UINT, merged event logging support, and 
+                                                            added explicit value checks.
+            tx_event_flags_info_get.c                       Casted UINT counting values to ULONG where necessary, merged
+                                                            event logging support, and added logic to explicitly check 
+                                                            for valid pointer.
+            tx_event_flags_performance_info_get.c           Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, merged event logging support, and 
+                                                            added code to ensure that input parameters are accessed in
+                                                            non-enabled case (default).
+            tx_event_flags_performance_system_info_get.c    Added logic to explicitly check for valid pointer, merged 
+                                                            event logging support, and added code to ensure that input 
+                                                            parameters are accessed in non-enabled case (default).
+            tx_event_flags_set.c                            Removed compound conditionals, added explicit value checks, 
+                                                            added logic to explicitly check for valid pointer, fixed 
+                                                            logic in consuming events, changed some counting variables 
+                                                            to type UINT, merged event logging support, and added check 
+                                                            for a NULL last satisfied pointer.
+            tx_event_flags_set_notify.c                     Merged event logging support.
+            tx_initialize_high_level.c                      Merged event logging support.
+            tx_initialize_kernel_enter.c                    Added macro for defining safety critical exception handler 
+                                                            if necessary, and added safety critical exception if the 
+                                                            call to the _tx_thread_schedule function returns.
+            tx_mutex_cleanup.c                              Removed compound conditionals, changed some counting  
+                                                            variables to type UINT, and added logic to explicitly  
+                                                            check for valid pointer.
+            tx_mutex_create.c                               Changed memset to macro, merged event logging support, and 
+                                                            eliminated created_count local variable.
+            tx_mutex_delete.c                               Removed compound conditionals, added explicit value checking,
+                                                            changed some counting variables to type UINT, merged event 
+                                                            logging support, eliminated created_count local variable, and
+                                                            added logic to explicitly check for valid pointer.
+            tx_mutex_get.c                                  Removed compound conditionals, added explicit value checking, 
+                                                            changed priority-inheritance logic to distinguish user 
+                                                            priority changes from mutex priority-inheritance, changed 
+                                                            some counting variables to type UINT, merged event logging  
+                                                            support, and added logic to explicitly check for valid 
+                                                            pointer.
+            tx_mutex_info_get.c                             Casted UINT counting values to ULONG where necessary, merged
+                                                            event logging support, and added logic to explicitly check for 
+                                                            valid pointer.
+            tx_mutex_performance_info_get.c                 Removed compound conditionals, added logic to explicitly check 
+                                                            for valid pointer, merged event logging support, and added 
+                                                            code to ensure that input parameters are accessed in 
+                                                            non-enabled case (default).
+            tx_mutex_performance_system_info_get.c          Added logic to explicitly check for valid pointer, merged  
+                                                            event logging support, and added code to ensure that input 
+                                                            parameters are accessed in non-enabled case (default).
+            tx_mutex_prioritize.c                           Merged event logging support, and changed some counting  
+                                                            variables to type UINT.
+            tx_mutex_priority_change.c                      Changed priority-inheritance logic to distinguish user  
+                                                            priority changes from mutex priority-inheritance.
+            tx_mutex_put.c                                  Removed compound conditionals, added explicit value checking,
+                                                            added logic to explicitly check for valid pointer, changed 
+                                                            priority-inheritance logic to distinguish user priority 
+                                                            changes from mutex priority-inheritance, changed some 
+                                                            counting variables to type UINT, merged event logging support,
+                                                            and added return value check for calls to prioritize.
+            tx_queue_cleanup.c                              Removed compound conditionals, added explicit value checking,  
+                                                            changed some counting variables to type UINT, and added logic 
+                                                            to explicitly check for valid pointer.
+            tx_queue_create.c                               Changed memset to macro, casted ULONG counting values to UINT
+                                                            where necessary, merged event logging support, and eliminated
+                                                            created_count local variable.
+            tx_queue_delete.c                               Merged event logging support, eliminated created_count local 
+                                                            variable, and changed some counting variables to type UINT.
+            tx_queue_flush.c                                Removed compound conditionals, added explicit value checking, 
+                                                            changed some counting variables to type UINT, merged event 
+                                                            logging support, and added logic to check for null thread 
+                                                            pointer.
+            tx_queue_front_send.c                           Removed compound conditionals, added explicit value checking,
+                                                            added logic to explicitly check for valid pointer, changed 
+                                                            some counting variables to type UINT, merged event logging 
+                                                            support, and removed unnecessary casting.
+            tx_queue_info_get.c                             Merged event logging support, and casted UINT counting 
+                                                            values to ULONG where necessary.
+            tx_queue_performance_info_get.c                 Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, merged event logging support, and 
+                                                            added code to ensure that input parameters are accessed in 
+                                                            non-enabled case (default).
+            tx_queue_performance_system_info_get.c          Added logic to explicitly check for valid pointer, merged 
+                                                            event logging support, and added code to ensure that input
+                                                            parameters are accessed in non-enabled case (default).
+            tx_queue_prioritize.c                           Merged event logging support, and changed some counting 
+                                                            variables to type UINT.
+            tx_queue_receive.c                              Removed compound conditionals, added explicit value 
+                                                            checking, added logic to explicitly check for valid pointer,
+                                                            added null check for thread pointer, changed pointer 
+                                                            comparison to check for equal pointers, changed some 
+                                                            counting variables to type UINT, merged event logging 
+                                                            support, and removed unnecessary casting.
+            tx_queue_send.c                                 Removed compound conditionals, added explicit value 
+                                                            checking, added logic to explicitly check for valid pointer,
+                                                            changed pointer comparison to check for equal pointers,
+                                                            changed some counting variables to type UINT, merged event 
+                                                            logging support, and removed unnecessary casting.
+            tx_queue_send_notify.c                          Merged event logging support.
+            tx_semaphore_ceiling_put.c                      Changed some counting variables to type UINT, merged event
+                                                            logging support, and added logic to explicitly check for 
+                                                            valid pointer.
+            tx_semaphore_cleanup.c                          Removed compound conditionals, changed some counting
+                                                            variables to type UINT, and added logic to explicitly check
+                                                            for valid pointer.
+            tx_semaphore_create.c                           Changed memset to macro, merged event logging support, and 
+                                                            eliminated created_count local variable.
+            tx_semaphore_delete.c                           Merged event logging support, eliminated created_count 
+                                                            local variable, and changed some counting variables to 
+                                                            type UINT.
+            tx_semaphore_get.c                              Changed some counting variables to type UINT, merged event
+                                                            logging support, and added explicit value checking.
+            tx_semaphore_info_get.c                         Casted UINT counting values to ULONG where necessary, merged
+                                                            event logging support, and added logic to explicitly check 
+                                                            for valid pointer.
+            tx_semaphore_performance_info_get.c             Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, merged event logging support, and 
+                                                            added code to ensure that input parameters are accessed in 
+                                                            non-enabled case (default).
+            tx_semaphore_performance_system_info_get.c      Added logic to explicitly check for valid pointer, merged  
+                                                            event logging support, and added code to ensure that input 
+                                                            parameters are accessed in non-enabled case (default).
+            tx_semaphore_prioritize.c                       Merged event logging support, and changed some counting 
+                                                            variables to type UINT.
+            tx_semaphore_put.c                              Changed some counting variables to type UINT, merged event 
+                                                            logging support, and added logic to explicitly check for 
+                                                            valid pointer.
+            tx_semaphore_put_notify.c                       Merged event logging support.
+            tx_thread_create.c                              Added explicit value checking, changed logic to use a macro 
+                                                            to get the system state, added code to initialize 
+                                                            priority-inheritance info, changed memset to macro,
+                                                            eliminated created_count local variable, merged event 
+                                                            logging support, and added logic to explicitly check for 
+                                                            valid pointer.
+            tx_thread_delete.c                              Merged event logging support, removed compound conditionals, 
+                                                            and eliminated created_count local variable.
+            tx_thread_entry_exit_notify.c                   Merged event logging support.
+            tx_thread_identify.c                            Merged event logging support.
+            tx_thread_info_get.c                            Merged event logging support, added logic to return the 
+                                                            user-specified priority and preemption-threshold, and added 
+                                                            logic to explicitly check for valid pointer.
+            tx_thread_initialize.c                          Changed memset to macro, and added logic to omit the port 
+                                                            specific build options if it is 0.
+            tx_thread_performance_info_get.c                Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, merged event logging support, and 
+                                                            added code to ensure that input parameters are accessed in 
+                                                            non-enabled case (default).
+            tx_thread_performance_system_info_get.c         Added logic to explicitly check for valid pointer, merged
+                                                            event logging support, and added code to ensure that
+                                                            input parameters are accessed in non-enabled case (default).
+            tx_thread_preemption_change.c                   Changed logic to use a macro to get the system state, 
+                                                            changed logic to ensure the highest preemption-threshold, 
+                                                            merged event logging support, and  removed compound 
+                                                            conditionals.
+            tx_thread_priority_change.c                     Changed priority logic to account for priority-inheritance,
+                                                            and merged event logging support.
+            tx_thread_relinquish.c                          Merged event logging support, and added logic to reset the 
+                                                            time-slice.
+            tx_thread_reset.c                               Merged event logging support, and removed compound 
+                                                            conditionals.
+            tx_thread_resume.c                              Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, changed logic to use a macro to 
+                                                            get the system state, merged event logging support, and 
+                                                            adjusted logic to check for system state or preempt disable.
+            tx_thread_shell_entry.c                         Added logic to explicitly check for valid pointer, and  
+                                                            safety critical exception if control returns after the 
+                                                            thread enters the completed state.
+            tx_thread_sleep.c                               Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the system 
+                                                            state, merged event logging support, and added logic to 
+                                                            explicitly check for valid pointer.
+            tx_thread_stack_analyze.c                       Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, and added ULONG cast.
+            tx_thread_stack_error_handler.c                 Added logic to explicitly check for valid pointer, and 
+                                                            added code to ensure that the input parameter is accessed
+                                                            in non-enabled case (default).
+            tx_thread_stack_error_notify.c                  Merged event logging support, and added code to ensure 
+                                                            that the input parameter is accessed in non-enabled 
+                                                            case (default).
+            tx_thread_suspend.c                             Removed compound conditionals, added explicit value 
+                                                            checking, added logic to explicitly check for valid 
+                                                            pointer, added logic to reset the time-slice, changed 
+                                                            logic to use a macro to get the system state, merged event
+                                                            logging support, and adjusted logic to check for system 
+                                                            state or preempt disable.
+            tx_thread_system_preempt_check.c                Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, changed logic to use a macro to 
+                                                            get the system state, and adjusted logic to check for 
+                                                            system state or preempt disable.
+            tx_thread_system_resume.c                       Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, changed logic to use a macro to 
+                                                            get the system state, merged event logging support, and 
+                                                            adjusted logic to check for system state or preempt 
+                                                            disable.
+            tx_thread_system_suspend.c                      Removed compound conditionals, added explicit value 
+                                                            checking, added logic to explicitly check for valid 
+                                                            pointer, added logic to reset the time-slice, changed 
+                                                            logic to use a macro to get the system state, merged 
+                                                            event logging support, and adjusted logic to check for 
+                                                            system state or preempt disable.
+            tx_thread_terminate.c                           Removed compound conditionals, merged event logging 
+                                                            support, and added logic to explicitly check for valid 
+                                                            pointer.
+            tx_thread_time_slice.c                          Removed compound conditionals, changed logic to use a 
+                                                            macro to get the system state, and added logic to 
+                                                            explicitly check for valid pointer.
+            tx_thread_time_slice_change.c                   Merged event logging support.
+            tx_thread_timeout.c                             Added logic to explicitly check for valid pointer.
+            tx_thread_wait_abort.c                          Merged event logging support, and added logic to 
+                                                            explicitly check for valid pointer.
+            tx_time_get.c                                   Merged event logging support.
+            tx_time_set.c                                   Merged event logging support.
+            tx_timer_activate.c                             Removed compound conditionals, added logic to 
+                                                            explicitly check for valid ticks, merged event 
+                                                            logging support, and added logic to explicitly 
+                                                            check for valid pointer.
+            tx_timer_change.c                               Merged event logging support, and added logic to 
+                                                            explicitly check for valid pointer.
+            tx_timer_create.c                               Changed memset to macro, eliminated created_count local 
+                                                            variable, merged event logging support, and added 
+                                                            explicit value check.
+            tx_timer_deactivate.c                           Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, merged event logging support, 
+                                                            and added ULONG casting.
+            tx_timer_delete.c                               Merged event logging support, eliminated created_count 
+                                                            local variable, and added logic to explicitly check 
+                                                            for valid pointer.
+            tx_timer_expiration_process.c                   Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            tx_timer_info_get.c                             Removed compound conditionals, added logic to explicitly 
+                                                            check for valid pointer, merged event logging support, 
+                                                            and added ULONG casting.
+            tx_timer_initialize.c                           Corrected memory initialize value to memset, changed 
+                                                            memset to macro, and added safety critical error 
+                                                            exception.
+            tx_timer_performance_info_get.c                 Removed compound conditionals, added logic to 
+                                                            explicitly check for valid pointer, merged event 
+                                                            logging support, and added code to ensure that input 
+                                                            parameters are accessed in non-enabled case (default).
+            tx_timer_performance_system_info_get.c          Added logic to explicitly check for valid pointer, 
+                                                            merged event logging support, and added code to ensure 
+                                                            that input parameters are accessed in non-enabled  
+                                                            case (default).
+            tx_timer_system_activate.c                      Removed compound conditionals, added explicit value 
+                                                            checking, and removed unnecessary status return.
+            tx_timer_system_deactivate.c                    Added logic to explicitly check for valid pointer, 
+                                                            and removed unnecessary status return.
+            tx_timer_thread_entry.c                         Added logic to explicitly check for valid pointer, 
+                                                            added explicit check for expired flag, moved 
+                                                            while-forever to top of the loop, and added safety 
+                                                            critical exception if control returns after the 
+                                                            thread's while-forever processing loop.
+            tx_trace_buffer_full_notify.c                   Added logic to access parameter.
+            tx_trace_enable.c                               Added logic to explicitly check for valid pointer, and
+                                                            added code to ensure that input parameters are accessed 
+                                                            in non-enabled case (default).
+            tx_trace_event_filter.c                         Added logic to access parameter.
+            tx_trace_event_unfilter.c                       Added logic to access parameter.
+            tx_trace_isr_enter_insert.c                     Added logic to access parameter, and changed logic to 
+                                                            use a macro to get system state.
+            tx_trace_isr_exit_insert.c                      Added logic to access parameter, and changed logic to 
+                                                            use a macro to get system state.
+            tx_trace_object_register.c                      Added explicit value check, added logic to access 
+                                                            parameter, and added logic to store thread's priority 
+                                                            in the reserved bytes.
+            tx_trace_object_unregister.c                    Added logic to access parameter.
+            tx_trace_user_event_insert.c                    Added logic to access parameter.
+            txe_block_allocate.c                            Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_block_pool_create.c                         Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_block_pool_delete.c                         Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_block_pool_info_get.c                       Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_block_pool_prioritize.c                     Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_block_release.c                             Removed compound conditionals, added logic to 
+                                                            explicitly check for valid pointer, and added void 
+                                                            pointer cast in pointer type conversions.
+            txe_byte_allocate.c                             Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_byte_pool_create.c                          Removed compound conditionals, added  explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_byte_pool_delete.c                          Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check 
+                                                            for valid pointer.
+            txe_byte_pool_info_get.c                        Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_byte_pool_prioritize.c                      Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_byte_release.c                              Added explicit value checking, changed logic to use 
+                                                            a macro to get the system state, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_event_flags_create.c                        Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check 
+                                                            for valid pointer.
+            txe_event_flags_delete.c                        Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check 
+                                                            for valid pointer.
+            txe_event_flags_get.c                           Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check 
+                                                            for valid pointer.
+            txe_event_flags_info_get.c                      Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_event_flags_set.c                           Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_event_flags_set_notify.c                    Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_mutex_create.c                              Removed compound conditionals, changed logic to use 
+                                                            a macro to get the system state, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_mutex_delete.c                              Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check 
+                                                            for valid pointer.
+            txe_mutex_get.c                                 Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_mutex_info_get.c                            Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_mutex_prioritize.c                          Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_mutex_put.c                                 Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check 
+                                                            for valid pointer.
+            txe_queue_create.c                              Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check 
+                                                            for valid pointer.
+            txe_queue_delete.c                              Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_queue_flush.c                               Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_queue_front_send.c                          Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_queue_info_get.c                            Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_queue_prioritize.c                          Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_queue_receive.c                             Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_queue_send.c                                Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_queue_send_notify.c                         Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_semaphore_ceiling_put.c                     Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_semaphore_create.c                          Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_semaphore_delete.c                          Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_semaphore_get.c                             Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_semaphore_info_get.c                        Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_semaphore_prioritize.c                      Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_semaphore_put.c                             Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_semaphore_put_notify.c                      Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_thread_create.c                             Removed compound conditionals, added explicit value 
+                                                            checking, added logic to explicitly check for valid 
+                                                            pointer, changed logic to use a macro to get the 
+                                                            system state, and added void pointer cast in pointer
+                                                            type conversions.
+            txe_thread_delete.c                             Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_thread_entry_exit_notify.c                  Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_thread_info_get.c                           Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_thread_preemption_change.c                  Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to examine user specified 
+                                                            priority, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_thread_priority_change.c                    Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_thread_relinquish.c                         Removed compound conditionals, added logic to 
+                                                            explicitly compare the system state, changed logic to 
+                                                            use a macro to get the system state, and added logic 
+                                                            to explicitly check for valid pointer.
+            txe_thread_reset.c                              Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_thread_resume.c                             Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_thread_suspend.c                            Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_thread_terminate.c                          Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_thread_time_slice_change.c                  Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for 
+                                                            valid pointer.
+            txe_thread_wait_abort.c                         Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_timer_activate.c                            Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_timer_change.c                              Removed compound conditionals, added explicit check 
+                                                            on the supplied initial ticks, changed logic to use 
+                                                            a macro to get the system state, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_timer_create.c                              Removed compound conditionals, added explicit value 
+                                                            checking, added explicit check for initial ticks, 
+                                                            changed logic to use a macro to get the system state, 
+                                                            and added logic to explicitly check for valid pointer.
+            txe_timer_deactivate.c                          Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            txe_timer_delete.c                              Removed compound conditionals, added explicit value 
+                                                            checking, changed logic to use a macro to get the 
+                                                            system state, and added logic to explicitly check for
+                                                            valid pointer.
+            txe_timer_info_get.c                            Removed compound conditionals, and added logic to 
+                                                            explicitly check for valid pointer.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+07-04-2009  ThreadX generic code version 5.3. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Changed the start of user trace events to 4096.
+            tx_thread_system_resume.c                       Fixed problem of not clearing a pending timer 
+                                                            registration when a thread suspension is interrupted.
+            tx_trace.h                                      Removed FileX & NetX event IDs since they are defined 
+                                                            elsewhere, and corrected priority assignment in event 
+                                                            trace.
+            tx_trace_buffer_full_notify.c                   Added conditional so that the function is only compiled once.
+            tx_trace_enable.c                               Added trace include source define, and changed trace buffer 
+                                                            initialization so partial trace buffers are processed properly.
+            tx_trace_event_filter.c                         Added conditional so that the function is only compiled once.
+            tx_trace_event_unfilter.c                       Added conditional so that the function is only compiled once.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+12-12-2008  ThreadX generic code version 5.2. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Added various trace constants.
+            tx_initialize.h                                 Added new macro for defining port-specific data 
+                                                            and port-specific initialization processing.
+            tx_queue.h                                      Added macro for copying queue message.
+            tx_thread.h                                     Added new system resume and suspend function 
+                                                            prototypes, changed macro MOD32 to TX_MOD32_BIT_SET, 
+                                                            added TX_DIV32_BIT_SET macro, removed old lowest bit 
+                                                            set table, added new state change macro, added macro 
+                                                            to pickup current thread, added macro to clear the 
+                                                            current thread, added stack checking macro, and added 
+                                                            new macro for calculating the lowest bit set.
+            tx_trace.h                                      Added new event definitions, changed types 
+                                                            to ensure the trace has universal format, 
+                                                            optimized event macro, and added filter 
+                                                            logic and new function prototypes.
+            tx_user.h                                       Added new defines, and removed TX_USE_PRESET_DATA
+                                                            since it is no longer required.
+            tx_block_allocate.c                             Added macro to get current thread, added filter 
+                                                            option to trace insert, added optional logic for 
+                                                            non-interruptible operation, and made several 
+                                                            optimizations.
+            tx_block_pool_cleanup.c                         Added logic to keep suspension list in order, 
+                                                            added optional logic for non-interruptible operation, 
+                                                            and made several optimizations.
+            tx_block_pool_create.c                          Added parameter to trace registry, added filter option 
+                                                            to trace insert, treat the zero blocks situation as an 
+                                                            error, and made several optimizations.
+            tx_block_pool_delete.c                          Added filter option to trace insert, added optional 
+                                                            logic for non-interruptible operation, and made several  
+                                                            optimizations.
+            tx_block_pool_info_get.c                        Added filter option to trace insert.
+            tx_block_pool_performance_info_get.c            Added filter option to trace insert.
+            tx_block_pool_performance_system_info_get.c     Added filter option to trace insert.
+            tx_block_pool_prioritize.c                      Added filter option to trace insert, and made several 
+                                                            optimizations.
+            tx_block_release.c                              Added filter option to trace insert, added optional  
+                                                            logic for non-interruptable operation, and made several  
+                                                            optimizations.
+            tx_byte_allocate.c                              Added macro to get current thread, added filter option 
+                                                            to trace insert, added optional logic for non-interruptable 
+                                                            operation, and made several optimizations.
+            tx_byte_pool_cleanup.c                          Added logic to keep suspension list in order, added 
+                                                            optional logic for non-interruptable operation, and made 
+                                                            several optimizations.
+            tx_byte_pool_create.c                           Added filter option to trace insert, and made several  
+                                                            optimizations.
+            tx_byte_pool_delete.c                           Added filter option to trace insert, added optional logic 
+                                                            for non-interruptable operation, and made several  
+                                                            optimizations.
+            tx_byte_pool_info_get.c                         Added filter option to trace insert.
+            tx_byte_pool_performance_info_get.c             Added filter option to trace insert.
+            tx_byte_pool_performance_system_info_get.c      Added filter option to trace insert.
+            tx_byte_pool_prioritize.c                       Added filter option to trace insert, and made several 
+                                                            optimizations.
+            tx_byte_pool_search.c                           Added macro to get current thread, and made several 
+                                                            optimizations.
+            tx_byte_release.c                               Added macro to get current thread, added filter option 
+                                                            to trace insert, added optional logic for 
+                                                            non-interruptable operation, and made several  
+                                                            optimizations.
+            tx_event_flags_cleanup.c                        Added logic to handle wait aborts on event flag 
+                                                            suspension from ISRs, added logic to keep suspension 
+                                                            list in order, added optional logic for non-interruptable 
+                                                            operation, and made several optimizations.
+            tx_event_flags_create.c                         Added filter option to trace insert, and made several  
+                                                            optimizations.
+            tx_event_flags_delete.c                         Added filter option to trace insert, added optional  
+                                                            logic for non-interruptable operation, and made 
+                                                            several optimizations.
+            tx_event_flags_get.c                            Added macro to get current thread, added filter 
+                                                            option to trace insert, added optional logic for 
+                                                            non-interruptable operation, and made several  
+                                                            optimizations.
+            tx_event_flags_info_get.c                       Added filter option to trace insert.
+            tx_event_flags_performance_info_get.c           Added filter option to trace insert.
+            tx_event_flags_performance_system_info_get.c    Added filter option to trace insert.
+            tx_event_flags_set.c                            Added filter option to trace insert, added check for  
+                                                            threads whose suspension was aborted from an ISR  
+                                                            during the search for satisfied requests, added  
+                                                            optional logic for non-interruptable operation, 
+                                                            and made several optimizations.
+            tx_event_flags_set_notify.c                     Added filter option to trace insert.
+            tx_initialize_kernel_enter.c                    Added macros for port-specific initialization use.
+            tx_initialize_kernel_setup.c                    Added macros for port-specific initialization use.
+            tx_mutex_cleanup.c                              Added logic to keep suspension list in order, added 
+                                                            optional logic for non-interruptable operation, 
+                                                            and made several optimizations.
+            tx_mutex_create.c                               Added filter option to trace insert, and made 
+                                                            several optimizations.
+            tx_mutex_delete.c                               Added filter option to trace insert, added optional  
+                                                            logic for non-interruptable operation, and made 
+                                                            several optimizations.
+            tx_mutex_get.c                                  Added macro to get current thread, added filter 
+                                                            option to trace insert, added optional logic for 
+                                                            non-interruptable operation, and made several  
+                                                            optimizations.
+            tx_mutex_info_get.c                             Added filter option to trace insert.
+            tx_mutex_performance_info_get.c                 Added filter option to trace insert.
+            tx_mutex_performance_system_info_get.c          Added filter option to trace insert.
+            tx_mutex_prioritize.c                           Added filter option to trace insert, and made 
+                                                            several optimizations.
+            tx_mutex_priority_change.c                      Added optional logic for non-interruptable operation, 
+                                                            and made several optimizations.
+            tx_mutex_put.c                                  Added macro to get current thread, optimized the 
+                                                            normal no priority-inheritance path, added filter 
+                                                            option to trace insert, added optional logic for  
+                                                            non-interruptable operation, and made several other
+                                                            optimizations.
+            tx_queue_cleanup.c                              Added logic to keep suspension list in order, added 
+                                                            optional logic for non-interruptable operation, 
+                                                            and made several optimizations.
+            tx_queue_create.c                               Added parameter to trace registry, added filter  
+                                                            option to trace insert, and made several 
+                                                            optimizations.
+            tx_queue_delete.c                               Added filter option to trace insert, added optional 
+                                                            logic for non-interruptable operation, and made 
+                                                            several optimizations.
+            tx_queue_flush.c                                Added optional logic for non-interruptable operation, 
+                                                            and added filter option to trace insert.
+            tx_queue_front_send.c                           Added macro to get current thread, made several 
+                                                            optimizations, added filter option to trace insert, 
+                                                            added optional logic for non-interruptable 
+                                                            operation, and added macros for message copying.
+            tx_queue_info_get.c                             Added filter option to trace insert.
+            tx_queue_performance_info_get.c                 Added filter option to trace insert.
+            tx_queue_performance_system_info_get.c          Added filter option to trace insert.
+            tx_queue_prioritize.c                           Added filter option to trace insert, and made 
+                                                            several optimizations.
+            tx_queue_receive.c                              Added macro to get current thread, made several 
+                                                            optimizations, corrected the performance 
+                                                            information names, added filter option to trace  
+                                                            insert, added optional logic for non-interruptable  
+                                                            operation, and added macros for message copying.
+            tx_queue_send.c                                 Added macro to get current thread, made several 
+                                                            optimizations, added filter option to trace 
+                                                            insert, added optional logic for non-interruptable  
+                                                            operation, and added macros for message copying.
+            tx_queue_send_notify.c                          Added filter option to trace insert.
+            tx_semaphore_ceiling_put.c                      Added filter option to trace insert, added optional 
+                                                            logic for non-interruptable operation, and made 
+                                                            several optimizations.
+            tx_semaphore_cleanup.c                          Added logic to keep suspension list in order, added 
+                                                            optional logic for non-interruptable operation, 
+                                                            and made several optimizations.
+            tx_semaphore_create.c                           Added filter option to trace insert, and made 
+                                                            several optimizations.
+            tx_semaphore_delete.c                           Added filter option to trace insert, added optional 
+                                                            logic for non-interruptable operation, and made 
+                                                            several optimizations.
+            tx_semaphore_get.c                              Added macro to get current thread, added filter 
+                                                            option to trace insert, added optional logic for 
+                                                            non-interruptable operation, and made several  
+                                                            optimizations.
+            tx_semaphore_info_get.c                         Added filter option to trace insert.
+            tx_semaphore_performance_info_get.c             Added filter option to trace insert.
+            tx_semaphore_performance_system_info_get.c      Added filter option to trace insert.
+            tx_semaphore_prioritize.c                       Added filter option to trace insert, and made 
+                                                            several optimizations.
+            tx_semaphore_put.c                              Added filter option to trace insert, added optional  
+                                                            logic for non-interruptable operation, and made 
+                                                            several optimizations.
+            tx_semaphore_put_notify.c                       Added filter option to trace insert.
+            tx_thread_create.c                              Added filter option to trace insert, moved extension 
+                                                            processing to interrupt enabled area, added logic  
+                                                            to align stack pointers for stack checking, added  
+                                                            optional logic for non-interruptable operation, 
+                                                            and made several optimizations.
+            tx_thread_delete.c                              Added filter option to trace insert, moved extension
+                                                            processing to interrupt enabled area, and made  
+                                                            several optimizations.
+            tx_thread_entry_exit_notify.c                   Added filter option to trace insert.
+            tx_thread_identify.c                            Added filter option to trace insert, expanded interrupt
+                                                            disable area, and added macro to get current thread.
+            tx_thread_info_get.c                            Added filter option to trace insert.
+            tx_thread_initialize.c                          Added macro to set current thread, added new bit 
+                                                            assignments for _tx_build_options, and removed logic 
+                                                            to setup the lowest bit set table since it is no 
+                                                            longer required.
+            tx_thread_performance_info_get.c                Added filter option to trace insert.
+            tx_thread_performance_system_info_get.c         Added filter option to trace insert.
+            tx_thread_preemption_change.c                   Added filter option to trace insert, changed MOD32 
+                                                            macro to new TX_MOD32_BIT_SET macro, removed code 
+                                                            for interrupt preemption performance counter updates, 
+                                                            added logic to handle restoring preemption-threshold 
+                                                            values during priority inheritance, and added 
+                                                            TX_DIV32_BIT_SET macro.
+            tx_thread_priority_change.c                     Added filter option to trace insert, added optional 
+                                                            logic for non-interruptable operation, and made 
+                                                            several optimizations.
+            tx_thread_relinquish.c                          Added macro to get current thread, moved relinquish 
+                                                            trace event, added next thread parameter, added 
+                                                            filter option to trace insert, added stack check
+                                                            macro, and removed unnecessary code.
+            tx_thread_reset.c                               Added filter option to trace insert, and added 
+                                                            macro to get current thread.
+            tx_thread_resume.c                              Added macro to get current thread, added state 
+                                                            change macro, added filter option to trace insert, 
+                                                            added optional logic for non-interruptable 
+                                                            operation, and added optional in-line thread 
+                                                            suspension logic.
+            tx_thread_shell_entry.c                         Added macro to get current thread, added state 
+                                                            change macro, cleared the timeout value to avoid 
+                                                            a timeout on a completed thread, moved extension 
+                                                            processing to interrupt enabled area, added 
+                                                            optional logic for non-interruptable operation, 
+                                                            and made several optimizations.
+            tx_thread_sleep.c                               Added filter option to trace insert, added 
+                                                            optional logic for non-interruptable operation, 
+                                                            and added macro to get current thread.
+            tx_thread_stack_analyze.c                       Made optimization.
+            tx_thread_stack_error_handler.c                 Removed spin loop.
+            tx_thread_stack_error_notify.c                  Added filter option to trace insert.
+            tx_thread_suspend.c                             Added macro to get current thread, added filter 
+                                                            option to trace insert, added state change macro, 
+                                                            added optional logic for non-interruptable 
+                                                            operation, and added optional in-line thread 
+                                                            suspension logic.
+            tx_thread_system_preempt_check.c                Added macro to get current thread, added null next 
+                                                            thread check, added stack check macro, and optimized 
+                                                            flag processing.
+            tx_thread_system_resume.c                       Added macro to get current thread, added state 
+                                                            change macro, added optional logic for 
+                                                            non-interruptable operation, added filter option 
+                                                            to trace insert, added next thread to system 
+                                                            resume trace entry, changed MOD32 macro to new 
+                                                            TX_MOD32_BIT_SET macro, added TX_DIV32_BIT_SET 
+                                                            macro, added stack check macro, and optimized 
+                                                            code for typical path processing.
+            tx_thread_system_suspend.c                      Added macro to get current thread, added state 
+                                                            change macro, added filter option to trace
+                                                            insert, added optional logic for non-interruptable  
+                                                            operation, changed MOD32 macro to new 
+                                                            TX_MOD32_BIT_SET macro, added TX_DIV32_BIT_SET 
+                                                            macro, optimized lowest set bit logic, added 
+                                                            stack check macro, and optimized code for typical 
+                                                            path processing.
+            tx_thread_terminate.c                           Added state change macro, added filter option 
+                                                            to trace insert, moved extension processing 
+                                                            to interrupt enabled area, added optional logic 
+                                                            for non-interruptable operation, and made 
+                                                            several optimizations.
+            tx_thread_time_slice.c                          Added macro to get current thread, added event 
+                                                            trace call, added filter option to trace insert, 
+                                                            added stack check macro, and added thread pointer 
+                                                            check in stack checking logic.
+            tx_thread_time_slice_change.c                   Added filter option to trace insert, and added 
+                                                            macro to get current thread.
+            tx_thread_timeout.c                             Added optional logic for non-interruptable 
+                                                            operation.
+            tx_thread_wait_abort.c                          Added optional logic for non-interruptable 
+                                                            operation, and added filter option to trace 
+                                                            insert.
+            tx_time_get.c                                   Added filter option to trace insert.
+            tx_time_set.c                                   Added filter option to trace insert.
+            tx_timer_activate.c                             Added filter option to trace insert.
+            tx_timer_change.c                               Added filter option to trace insert.
+            tx_timer_create.c                               Added filter option to trace insert, and 
+                                                            made several optimizations.
+            tx_timer_deactivate.c                           Added filter option to trace insert, and  
+                                                            made several optimizations.
+            tx_timer_delete.c                               Added filter option to trace insert, and 
+                                                            made several optimizations.
+            tx_timer_expiration.c                           Added optional logic for non-interruptable 
+                                                            operation, and made several optimizations.
+            tx_timer_info_get.c                             Added filter option to trace insert.
+            tx_timer_performance_info_get.c                 Added filter option to trace insert.
+            tx_timer_performance_system_info_get.c          Added filter option to trace insert.
+            tx_timer_system_activate.c                      Made several optimizations.
+            tx_timer_system_deactivate.c                    Made several optimizations.
+            tx_timer_thread_entry.c                         Added optional logic for non-interruptable 
+                                                            operation, and made several optimizations.
+            tx_trace_buffer_full_notify.c                   Added new trace function.
+            tx_trace_enable.c                               Added logic to setup event filter, and 
+                                                            modified code to ensure universal trace 
+                                                            format.
+            tx_trace_event_filter.c                         Added new trace function.
+            tx_trace_event_unfilter.c                       Added new trace function. 
+            tx_trace_interrupt_control.c                    Added filter option to trace insert.
+            tx_trace_isr_enter_insert.c                     Added parameters to ISR trace event.
+            tx_trace_isr_exit_insert.c                      Added parameters to ISR trace event.
+            tx_trace_object_register.c                      Modified code to ensure universal trace format.
+            tx_trace_object_unregister.c                    Modified code to ensure universal trace format.
+            tx_trace_user_event_insert.c                    Added interrupt restore in error path, and  
+                                                            added filter option to trace insert.
+            txe_block_allocate.c                            Added macro to get current thread.
+            txe_block_pool_create.c                         Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_block_pool_delete.c                         Added macro to get current thread.
+            txe_byte_allocate.c                             Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_byte_pool_create.c                          Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_byte_pool_delete.c                          Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_byte_release.c                              Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_event_flags_create.c                        Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_event_flags_delete.c                        Added macro to get current thread.
+            txe_event_flags_get.c                           Added macro to get current thread.
+            txe_mutex_create.c                              Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_mutex_delete.c                              Added macro to get current thread.
+            txe_mutex_get.c                                 Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_mutex_put.c                                 Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_queue_create.c                              Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_queue_delete.c                              Added macro to get current thread.
+            txe_queue_front_send.c                          Added macro to get current thread.
+            txe_queue_receive.c                             Added macro to get current thread.
+            txe_queue_send.c                                Added macro to get current thread.
+            txe_semaphore_create.c                          Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_semaphore_delete.c                          Added macro to get current thread.
+            txe_semaphore_get.c                             Added macro to get current thread.
+            txe_thread_create.c                             Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_thread_delete.c                             Made optimization to caller checking.
+            txe_thread_preemption_change.c                  Made optimization to caller checking, added 
+                                                            logic to handle restoring preemption- 
+                                                            threshold values during priority inheritance.
+            txe_thread_priority_change.c                    Made optimization to caller checking.
+            txe_thread_relinquish.c                         Added macro to get current thread.
+            txe_thread_reset.c                              Added macro to get current thread, and added 
+                                                            logic to detect calls from timer thread.
+            txe_thread_terminate.c                          Made optimization to caller checking.
+            txe_thread_time_slice_change.c                  Made optimization to caller checking.
+            txe_timer_change.c                              Made optimization to caller checking.
+            txe_timer_create.c                              Made optimization to timer thread checking, 
+                                                            and added macro to get current thread.
+            txe_timer_delete.c                              Added macro to get current thread.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+04-02-2007  ThreadX generic code version 5.1. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Replaced UL constant modifier with ULONG cast.
+            tx_block_pool.h                                 Replaced UL constant modifier with ULONG cast.
+            tx_byte_pool.h                                  Replaced UL constant modifier with ULONG cast.
+            tx_event_flags.h                                Replaced UL constant modifier with ULONG cast.
+            tx_initialize.h                                 Replaced UL constant modifier with ULONG cast.
+            tx_mutex.h                                      Replaced UL constant modifier with ULONG cast.
+            tx_queue.h                                      Replaced UL constant modifier with ULONG cast.
+            tx_semaphore.h                                  Replaced UL constant modifier with ULONG cast.
+            tx_thread.h                                     Replaced UL constant modifier with ULONG cast
+                                                            and added logic to use preset global C data.
+            tx_timer.h                                      Replaced UL constant modifier with ULONG cast.
+            tx_user.h                                       Added two new conditional build options, 
+                                                            TX_NO_TIMER and TX_USE_PRESET_DATA.
+            tx_byte_pool_search.c                           Added optimization for memory search pointer
+                                                            update.
+            tx_byte_release.c                               Added optimization for memory search pointer
+                                                            update.
+            tx_event_flags_get.c                            Added logic for calling from ISRs.
+            tx_event_flags_info_get.c                       Added logic to accurately report the currently 
+                                                            set flags in the group.
+            tx_event_flags_set.c                            Corrected problem clearing event flags from ISRs.
+            tx_initialize_high_level.c                      Added logic to remove the timer logic.
+            tx_queue_front_send.c                           Modify code to not remove the oldest message 
+                                                            from the queue in order to avoid losing messages
+                                                            during timeout processing and optimized message
+                                                            copying.
+            tx_queue_receive.c                              Check for queue front send suspension request
+                                                            and optimized message copying.
+            tx_queue_send.c                                 Initialize suspension option field to indicate 
+                                                            type of suspension and optimized message
+                                                            copying.
+            tx_thread_create.c                              Added setup for original priority and threshold.
+            tx_thread_initialize.c                          Added logic to use preset global C data.
+            tx_thread_preemption_change.c                   Added logic to update and use the original preemption-
+                                                            threshold, and corrected problem of not setting 
+                                                            preemption-threshold bit when lowering the thread 
+                                                            preemption-threshold.
+            tx_thread_priority_change.c                     Added logic to update and use the original priority.
+            tx_thread_stack_error_notify.c                  Added included of tx_trace.h.
+            tx_thread_system_resume.c                       Fixed conditional declaration of map_index, and
+                                                            added logic to remove the timer logic.
+            tx_thread_system_suspend.c                      Fixed conditional declaration of map_index, and
+                                                            added logic to remove the timer logic.
+            txe_timer_change.c                              Replaced UL constant modifier with ULONG cast.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+12-12-2005  Initial ThreadX generic code version 5.0. This release includes the 
+            the following fixes from generic code version 4.0c:
+
+            tx_mutex_create.c                               Properly initialize mutex owner field to NULL.
+            tx_mutex_put.c                                  Set the mutex owner to NULL on put operation.
+
+
+2. ThreadX SMP
+
+02-01-2019  ThreadX generic code version 5.9. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Changed minor version constant, and added a 
+                                                            macro to disable warning of parameter not 
+                                                            used.
+            tx_mutex_priority_change.c                      Removed update of the priority inheritance
+                                                            priority level.
+            tx_thread_priority_change.c                     Corrected optimization when no change in the 
+                                                            effective priority is necessary.
+            tx_thread_relinquish.c                          Added logic to evaluate mapped core instead of 
+                                                            the current core in evaluating the next thread 
+                                                            replacement, added logic to call rebalance when
+                                                            the next thread is excluded from running on the 
+                                                            mapped core, and added optimization when thread 
+                                                            at the end of the priority list is the thread 
+                                                            performing the relinquish.
+            tx_thread_suspend.c                             Refined error checking for self suspension to 
+                                                            ensure thread context.
+            tx_thread_time_slice.c                          Added logic to call rebalance when the next 
+                                                            thread is excluded from running on the mapped 
+                                                            core, and added optimization when thread at the 
+                                                            end of the priority list is the thread being 
+                                                            time-sliced.
+
+
+06-01-2017  ThreadX generic code version 5.8. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Changed minor version constant, added 
+                                                            suspension sequence to verify cleanup 
+                                                            is still necessary, modified code for MISRA 
+                                                            compliance, added alignment type for memory 
+                                                            pools, corrected compiler warnings in macro 
+                                                            definitions, added support for optional 
+                                                            extensions.
+            tx_thread.h                                     Modified code for MISRA compliance, added 
+                                                            default macro definition for setting up timeout, 
+                                                            added default macro definition for setting up
+                                                            thread timeout pointer, and added macros for 
+                                                            extending the thread create, delete, and reset 
+                                                            processing.
+            tx_timer.h                                      Modified code for MISRA compliance, added macro 
+                                                            for extending timer delete, and removed 
+                                                            unnecessary defines.
+            tx_trace.h                                      Modified code for MISRA compliance.
+            tx_byte_pool_search.c                           Modified code for MISRA compliance, added use of 
+                                                            alignment type for searching byte pool.
+            tx_event_flags_set.c                            Removed unnecessary code, and modified code for 
+                                                            MISRA compliance.
+            tx_initialize_kernel_enter.c                    Added processing extension, and modified code 
+                                                            for MISRA compliance.
+            tx_mutex_priority_change.c                      Removed unnecessary code, modified code for MISRA 
+                                                            compliance, and added processing extension.
+            tx_thread_create.c                              Modified code for MISRA compliance, added optional 
+                                                            internal thread extension macro, added macro for 
+                                                            setting up the thread timeout, and corrected problem 
+                                                            restoring preemption-threshold during initialization.
+            tx_thread_initialize.c                          Modified code for MISRA compliance.
+            tx_thread_preemption_change.c                   Modified code for MISRA compliance.
+            tx_thread_priority_change.c                     Added processing extension, and modified code for 
+                                                            MISRA compliance.
+            tx_thread_relinquish.c                          Modified code for MISRA compliance.
+            tx_thread_resume.c                              Modified code for MISRA compliance.
+            tx_thread_smp_core_exclude.c                    Modified code for MISRA compliance.
+            tx_thread_smp_core_exclude_get.c                Modified code for MISRA compliance.
+            tx_thread_smp_current_state_get.c               Modified code for MISRA compliance.
+            tx_thread_smp_debug_entry_insert.c              Modified code for MISRA compliance.
+            tx_thread_smp_high_level_initialize.c           Modified code for MISRA compliance.
+            tx_thread_smp_rebalance_execute_list.c          Modified code for MISRA compliance.
+            tx_thread_smp_utilities.c                       Added new file for SMP utilities when in-line is disabled.
+            tx_thread_suspend.c                             Modified code for MISRA compliance, and added protection 
+                                                            against self suspension with the preempt-disable flag set.
+            tx_thread_system_preempt_check.c                Modified code for MISRA compliance.                                             
+            tx_thread_system_resume.c                       Removed unnecessary code, corrected issue with resuming a 
+                                                            thread that was previously in the middle of suspending with 
+                                                            an additional suspension request, corrected issue resuming 
+                                                            a thread with no available cores, and modified code for 
+                                                            MISRA compliance.
+            tx_thread_system_suspend.c                      Corrected issue with self-suspending thread not at the head 
+                                                            of its priority list, modified code for MISRA compliance, 
+                                                            and corrected problem setting up the trace information 4 
+                                                            field.
+            tx_thread_time_slice.c                          Modified code for MISRA compliance.
+            tx_thread_time_slice_change.c                   Modified code for MISRA compliance.
+            tx_thread_timeout.c                             Modified code for MISRA compliance, added suspension 
+                                                            sequence to verify cleanup is still necessary, and added 
+                                                            macro for setting up the thread pointer.
+            tx_timer_create.c                               Modified code for MISRA compliance.
+            tx_timer_initialize.c                           Modified code for MISRA compliance, added initialization for
+                                                            timer expired pointer, and added check for TX_NO_TIMER  
+                                                            option.
+            tx_timer_smp_core_exclude.c                     Modified code for MISRA compliance.
+            tx_timer_smp_core_exclude_get.c                 Modified code for MISRA compliance.
+            tx_timer_thread_entry.c                         Modified code for MISRA compliance.
+
+
+08-03-2016  ThreadX generic code version 5.7.2. This release includes the following 
+            modifications (also includes ThreadX 5.7 SP1 non-SMP source):
+
+            tx_api.h                                        Corrected compiler warnings in macro definitions.
+            tx_timer.h                                      Added the global variable _tx_timer_expired_ptr 
+                                                            which is needed by timer info get.
+            tx_byte_pool_search.c                           Modified logic to ensure the integrity of 
+                                                            the search pointer.
+            tx_mutex_priority_change.c                      Added logic to reverse preemption-threshold while 
+                                                            the thread's priority is changed.
+            tx_thread_priority_change.c                     Added logic to reverse preemption-threshold while 
+                                                            the thread's priority is changed.
+            tx_thread_smp_rebalance_execute_list.c          Corrected the update of possible cores.
+            tx_thread_system_resume.c                       Added performance optimization for the simple
+                                                            preemption case.
+            tx_thread_system_suspend.c                      Corrected the update of possible cores, and 
+                                                            added performance optimization by determining
+                                                            if nontrivial scheduling is possible before full 
+                                                            examination.
+            tx_timer_create.c                               Kept protection over timer activation.
+            tx_timer_initialize.c                           Added initialization for timer expired pointer, and
+                                                            added check for TX_NO_TIMER option.
+            tx_timer_thread_entry.c                         Ensure timer is not accessed after timeout unless 
+                                                            reactivation is necessary, set pointer to indicate 
+                                                            timer being processed, and perform reactivation with
+                                                            protection.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+04-01-2016  ThreadX generic code version 5.7.1. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Added core excluded/allowed members to the 
+                                                            TX_THREAD structure, and changed member name 
+                                                            control to excluded for internal timer struct.
+            tx_event_flags_set.c                            Moved notify function pointer setup before any 
+                                                            thread resumption.
+            tx_mutex_priority_change.c                      Added logic to not place thread at head of list 
+                                                            when lowering priority if the priority level has 
+                                                            a thread with preemption-threshold in force, and 
+                                                            optimized processing.
+            tx_thread.h                                     Added optimized in-line helper functions, and 
+                                                            added preemption-threshold list.
+            tx_thread_create.c                              Added clearing of the thread preemption-threshold 
+                                                            list, changed the name of core control to core 
+                                                            excluded in internal timer setup, and added setup 
+                                                            for the new TX_THREAD cores excluded and allowed 
+                                                            members.
+            tx_thread_initialize.c                          Added initialization of the preemption-threshold 
+                                                            list.
+            tx_thread_preemption_change.c                   Corrected problem disabling preemption-threshold.
+            tx_thread_priority_change.c                     Added logic to not place thread at head of list 
+                                                            when lowering priority if the priority level has 
+                                                            a thread with preemption-threshold in force, and 
+                                                            optimized processing.
+            tx_thread_relinquish.c                          Corrected preemption-threshold issue, and utilized 
+                                                            new cores allowed member in TX_THREAD.
+            tx_thread_smp_core_exclude.c                    Added logic to ensure the core mapped information is 
+                                                            consistent with the new core exclusion.
+            tx_thread_smp_core_exclude_get.c                Utilized new cores excluded member in TX_THREAD.
+            tx_thread_smp_rebalance_execute_list.c          Corrected problem with schedule thread not being 
+                                                            updated in one optimization case, added setup of 
+                                                            the preempted list for preemption-threshold, and 
+                                                            simplified code via in-line functions.
+            tx_thread_system_resume.c                       Optimized processing for simple case, and simplified 
+                                                            code via in-line functions.
+            tx_thread_system_suspend.c                      Optimized processing for simple case, corrected problem 
+                                                            disabling preemption-threshold, and simplified code via 
+                                                            in-line functions.
+            tx_thread_time_slice.c                          Corrected preemption-threshold issue, and utilized new 
+                                                            cores allowed member in TX_THREAD.
+            tx_timer_create.c                               Changed the name of core control to core excluded in 
+                                                            internal timer setup.
+            tx_timer_info_get.c                             Added check for proper remaining time calculation.
+            tx_timer_smp_core_exclude.c                     Changed the name of core control to core excluded in 
+                                                            internal timer setup.
+            tx_timer_smp_core_exclude_get.c                 Changed the name of core control to core excluded in 
+                                                            internal timer setup.
+            tx_timer_thread_entry.c                         Changed the name of core control to core excluded in 
+                                                            internal timer setup.
+            tx_trace.h                                      Modified code to sync with standard ThreadX tx_trace.h.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+09-01-2015  ThreadX generic code version 5.7. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Modified code for ThreadX 5.7 compatibility, added 
+                                                            default for port-specific memory synchronization primitive,  
+                                                            modified minor version define, added thread start 
+                                                            macro for performing port and/or user specified
+                                                            processing when a thread starts, and added constant
+                                                            TX_TIMER_TICKS_PER_SECOND for use by other middleware
+                                                            components as a common time reference.
+            tx_thread.h                                     Corrected next priority find for priority levels
+                                                            greater than 32.
+            tx_byte_pool_search.c                           Added code to assert pool ownership after protection 
+                                                            is obtained to ensure no changes to the pool or the 
+                                                            pool search pointer are made without ownership.
+            tx_initialize_kernel_enter.c                    Removed TX_INITIALIZE_INIT since it is no longer needed, 
+                                                            and added memory synchronization macros.
+            tx_thread_preemption_change.c                   Added optimization to avoid calling rebalance algorithm.
+            tx_thread_smp_rebalance_execute_list.c          Corrected problem scheduling thread on excluded core, 
+                                                            and added various optimizations.
+            tx_thread_system_resume.c                       Added protection after the call to _tx_thread_system_return
+                                                            when the build option TX_NOT_INTERRUPTABLE is used, and added 
+                                                            optimization to avoid calling rebalance algorithm.
+            tx_thread_system_suspend.c                      Added protection after the call to _tx_thread_system_return
+                                                            when the build option TX_NOT_INTERRUPTABLE is used, 
+                                                            corrected problem scheduling thread on excluded core, and 
+                                                            added optimization to avoid unnecessary priority search.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+05-01-2014  ThreadX generic code version 5.6.2. This release includes the following 
+            modifications:
+
+            tx_api.h                                        Added timeout sequence information to the 
+                                                            thread control block.
+            tx_thread.h                                     Made the release cores flag volatile, and 
+                                                            removed unnecessary prototypes.
+            tx_byte_pool_search.c                           Added SMP-specific version.
+            tx_thread_create.c                              Added logic to initialize the thread's 
+                                                            executing core.
+            tx_thread_system_resume.c                       Added optimization in resuming a thread with
+                                                            core(s) excluded.
+            tx_thread_system_suspend.c                      Changed code to eliminate a compiler warning, 
+                                                            added sequence counters for timeouts and 
+                                                            suspension, and corrected problem 
+                                                            suspending the last thread with preemption-
+                                                            threshold in force.
+            tx_thread_smp_high_level_initialize.c           Updated protection structure member name.
+            tx_thread_timeout.c                             Added SMP-specific version.
+            tx_thread_time_slice.c                          Added quick check for no time-slice expiration, 
+                                                            and removed protection logic since this function 
+                                                            is called under protection.
+            tx_timer_thread_entry.c                         Released protection over timeout call.
+            tx*.c                                           Changed comments and copyright header.
+            tx*.h                                           Changed comments and copyright header.
+
+
+12-12-2012  Initial ThreadX SMP generic code version 5.6.1.
