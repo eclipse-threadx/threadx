@@ -101,7 +101,7 @@ VOID        _tx_byte_pool_initialize(VOID);
 
 /* Define internal byte memory pool management function prototypes.  */
 
-UCHAR       *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size);
+UCHAR       *_tx_byte_pool_search(volatile TX_BYTE_POOL *pool_ptr, ULONG memory_size);
 VOID        _tx_byte_pool_cleanup(TX_THREAD *thread_ptr, ULONG suspension_sequence);
 
 
