@@ -11,6 +11,9 @@ endif()
 if(NOT DEFINED THREADX_TOOLCHAIN)
     message(FATAL_ERROR "Error: THREADX_TOOLCHAIN not defined")
 endif()
+
+set(SMP _smp)
+
 message(STATUS "THREADX_ARCH: ${THREADX_ARCH}")
 message(STATUS "THREADX_TOOLCHAIN: ${THREADX_TOOLCHAIN}")
 
@@ -25,11 +28,11 @@ set(CUSTOM_INC_DIR ${CMAKE_CURRENT_BINARY_DIR}/custom_inc)
 if(DEFINED THREADX_CUSTOM_PORT)
     add_subdirectory(${THREADX_CUSTOM_PORT} threadx_port)
 else()
-    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN})
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ports${SMP}/${THREADX_ARCH}${SMP}/${THREADX_TOOLCHAIN})
 endif()
 
 # Pick up the common stuff
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common${SMP})
 
 # Define the FreeRTOS adaptation layer
 add_library(freertos-threadx EXCLUDE_FROM_ALL)
@@ -46,7 +49,7 @@ target_link_libraries(freertos-threadx PUBLIC threadx)
 # If the user provided an override, copy it to the custom directory
 if (NOT TX_USER_FILE)
     message(STATUS "Using default tx_user.h file")
-    set(TX_USER_FILE ${CMAKE_CURRENT_LIST_DIR}/common/inc/tx_user_sample.h)
+    set(TX_USER_FILE ${CMAKE_CURRENT_LIST_DIR}/common${SMP}/inc/tx_user_sample.h)
 else()
     message(STATUS "Using custom tx_user.h file from ${TX_USER_FILE}")
 endif()    
