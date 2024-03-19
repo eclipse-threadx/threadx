@@ -7797,7 +7797,7 @@ UINT               index;
 /*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
-static void osek_system_timer_entry(ULONG input)
+static void osek_system_timer_entry(ALIGN_TYPE input)
 {
 TX_INTERRUPT_SAVE_AREA
 OSEK_COUNTER      *this_counter;

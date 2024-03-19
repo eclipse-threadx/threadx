@@ -24,7 +24,7 @@ ULONG                   memory_faults;
 
 /* Define thread prototypes.  */
 
-void    module_manager_entry(ULONG thread_input);
+void    module_manager_entry(ALIGN_TYPE thread_input);
 
 
 /* Define fault handler.  */
@@ -60,7 +60,7 @@ void    tx_application_define(void *first_unused_memory)
 
 /* Define the test threads.  */
 
-void    module_manager_entry(ULONG thread_input)
+void    module_manager_entry(ALIGN_TYPE thread_input)
 {
     
     /* Initialize the module manager.   */

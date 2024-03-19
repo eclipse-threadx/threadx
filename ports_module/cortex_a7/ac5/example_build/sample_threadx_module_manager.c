@@ -15,7 +15,7 @@ TX_THREAD               module_manager;
 
 /* Define thread prototypes.  */
 
-void    module_manager_entry(ULONG thread_input);
+void    module_manager_entry(ALIGN_TYPE thread_input);
 
 /* Define the module object pool area.  */
 UCHAR   object_memory[16384];
@@ -66,7 +66,7 @@ void    tx_application_define(void *first_unused_memory)
 
 /* Define the test threads.  */
 
-void    module_manager_entry(ULONG thread_input)
+void    module_manager_entry(ALIGN_TYPE thread_input)
 {
 
     /* Initialize the module manager.   */
