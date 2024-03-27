@@ -132,7 +132,7 @@ extern   "C" {
 #ifndef TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH
 #define TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH    20
 #endif
-#ifndef TX_BTYE_POOL_DELAY_VALUE
+#ifndef TX_BYTE_POOL_DELAY_VALUE
 #define TX_BYTE_POOL_DELAY_VALUE              3
 #endif
 
