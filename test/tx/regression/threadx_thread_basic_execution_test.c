@@ -813,7 +813,7 @@ VOID            (*temp_mutex_release)(TX_THREAD *thread_ptr);
         test_control_return(1);
     }
 
-    /* Attempt a thread termiante with a NULL pointer.  */
+    /* Attempt a thread terminate with a NULL pointer.  */
     status = tx_thread_terminate(TX_NULL);
     
     /* Check for status.  */
@@ -836,7 +836,7 @@ VOID            (*temp_mutex_release)(TX_THREAD *thread_ptr);
         test_control_return(1);
     }
 
-    /* Attempt a thread time-slice chagne with a NULL pointer.  */
+    /* Attempt a thread time-slice change with a NULL pointer.  */
     status = tx_thread_time_slice_change(TX_NULL, 1, &old_time_slice);
     
     /* Check for status.  */

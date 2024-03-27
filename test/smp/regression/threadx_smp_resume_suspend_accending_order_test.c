@@ -1,4 +1,4 @@
-/* Define the ThreadX SMP resume and suspend threads in accending order test.  */
+/* Define the ThreadX SMP resume and suspend threads in ascending order test.  */
 
 #include   <stdio.h>
 #include   "tx_api.h"
@@ -71,7 +71,7 @@ static void   delay(UINT i)
 #ifdef CTEST
 void test_application_define(void *first_unused_memory)
 #else
-void    threadx_smp_resume_suspend_accending_order_test(void *first_unused_memory)
+void    threadx_smp_resume_suspend_ascending_order_test(void *first_unused_memory)
 #endif
 {
 
@@ -969,7 +969,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(1);
     status =   tx_thread_suspend(&thread_1);
 
@@ -983,7 +983,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(2);
     status =   tx_thread_suspend(&thread_2);
 
@@ -997,7 +997,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(3);
     status =   tx_thread_suspend(&thread_3);
 
@@ -1011,7 +1011,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(4);
     status =   tx_thread_suspend(&thread_4);
 
@@ -1025,7 +1025,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(5);
     status =   tx_thread_suspend(&thread_5);
 
@@ -1039,7 +1039,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(6);
     status =   tx_thread_suspend(&thread_6);
 
@@ -1053,7 +1053,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(7);
     status =   tx_thread_suspend(&thread_7);
 
@@ -1067,7 +1067,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(8);
     status =   tx_thread_suspend(&thread_8);
 
@@ -1081,7 +1081,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(9);
     status =   tx_thread_suspend(&thread_9);
 
@@ -1095,7 +1095,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(10);
     status =   tx_thread_suspend(&thread_10);
 
@@ -1109,7 +1109,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(11);
     status =   tx_thread_suspend(&thread_11);
 
@@ -1123,7 +1123,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(12);
     status =   tx_thread_suspend(&thread_12);
 
@@ -1137,7 +1137,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(13);
     status =   tx_thread_suspend(&thread_13);
 
@@ -1151,7 +1151,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(14);
     status =   tx_thread_suspend(&thread_14);
 
@@ -1165,7 +1165,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(15);
     status =   tx_thread_suspend(&thread_15);
 
@@ -1179,7 +1179,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(16);
     status =   tx_thread_suspend(&thread_16);
 
@@ -1193,7 +1193,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(17);
     status =   tx_thread_suspend(&thread_17);
 
@@ -1207,7 +1207,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(18);
     status =   tx_thread_suspend(&thread_18);
 
@@ -1221,7 +1221,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(19);
     status =   tx_thread_suspend(&thread_19);
 
@@ -1235,7 +1235,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(20);
     status =   tx_thread_suspend(&thread_20);
 
@@ -1249,7 +1249,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(21);
     status =   tx_thread_suspend(&thread_21);
 
@@ -1263,7 +1263,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(22);
     status =   tx_thread_suspend(&thread_22);
 
@@ -1277,7 +1277,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(23);
     status =   tx_thread_suspend(&thread_23);
 
@@ -1291,7 +1291,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(24);
     status =   tx_thread_suspend(&thread_24);
 
@@ -1305,7 +1305,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(25);
     status =   tx_thread_suspend(&thread_25);
 
@@ -1319,7 +1319,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(26);
     status =   tx_thread_suspend(&thread_26);
 
@@ -1333,7 +1333,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(27);
     status =   tx_thread_suspend(&thread_27);
 
@@ -1347,7 +1347,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(28);
     status =   tx_thread_suspend(&thread_28);
 
@@ -1361,7 +1361,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(29);
     status =   tx_thread_suspend(&thread_29);
 
@@ -1375,7 +1375,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(30);
     status =   tx_thread_suspend(&thread_30);
 
@@ -1389,7 +1389,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     delay(31);
     status =   tx_thread_suspend(&thread_31);
  

@@ -1,4 +1,4 @@
-/* Define the ThreadX SMP resume and suspend threads in accending order test.  */
+/* Define the ThreadX SMP resume and suspend threads in ascending order test.  */
 
 #include   <stdio.h>
 #include   "tx_api.h"
@@ -71,7 +71,7 @@ static void   delay(UINT i)
 #ifdef CTEST
 void test_application_define(void *first_unused_memory)
 #else
-void    threadx_smp_resume_suspend_decending_order_test(void *first_unused_memory)
+void    threadx_smp_resume_suspend_descending_order_test(void *first_unused_memory)
 #endif
 {
 
@@ -96,7 +96,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #1\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #1\n");
         test_control_return(1);
     }
 
@@ -110,7 +110,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #2\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #2\n");
         test_control_return(1);
     }
 
@@ -124,7 +124,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #3\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #3\n");
         test_control_return(1);
     }
 
@@ -138,7 +138,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #4\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #4\n");
         test_control_return(1);
     }
 
@@ -152,7 +152,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #5\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #5\n");
         test_control_return(1);
     }
 
@@ -166,7 +166,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #6\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #6\n");
         test_control_return(1);
     }
 
@@ -180,7 +180,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #7\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #7\n");
         test_control_return(1);
     }
 
@@ -194,7 +194,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #8\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #8\n");
         test_control_return(1);
     }
 
@@ -208,7 +208,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #9\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #9\n");
         test_control_return(1);
     }
 
@@ -222,7 +222,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #9\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #9\n");
         test_control_return(1);
     }
 
@@ -236,7 +236,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #11\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #11\n");
         test_control_return(1);
     }
 
@@ -250,7 +250,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #12\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #12\n");
         test_control_return(1);
     }
 
@@ -264,7 +264,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #13\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #13\n");
         test_control_return(1);
     }
 
@@ -278,7 +278,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #14\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #14\n");
         test_control_return(1);
     }
 
@@ -292,7 +292,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #15\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #15\n");
         test_control_return(1);
     }
 
@@ -306,7 +306,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #16\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #16\n");
         test_control_return(1);
     }
 
@@ -320,7 +320,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #17\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #17\n");
         test_control_return(1);
     }
 
@@ -334,7 +334,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #18\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #18\n");
         test_control_return(1);
     }
 
@@ -348,7 +348,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #19\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #19\n");
         test_control_return(1);
     }
 
@@ -362,7 +362,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #20\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #20\n");
         test_control_return(1);
     }
 
@@ -376,7 +376,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #21\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #21\n");
         test_control_return(1);
     }
 
@@ -390,7 +390,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #22\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #22\n");
         test_control_return(1);
     }
 
@@ -404,7 +404,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #23\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #23\n");
         test_control_return(1);
     }
 
@@ -418,7 +418,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #24\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #24\n");
         test_control_return(1);
     }
 
@@ -432,7 +432,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #25\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #25\n");
         test_control_return(1);
     }
 
@@ -446,7 +446,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #26\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #26\n");
         test_control_return(1);
     }
 
@@ -460,7 +460,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #27\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #27\n");
         test_control_return(1);
     }
 
@@ -474,7 +474,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #28\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #28\n");
         test_control_return(1);
     }
 
@@ -488,7 +488,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #29\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #29\n");
         test_control_return(1);
     }
 
@@ -502,7 +502,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #30\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #30\n");
         test_control_return(1);
     }
 
@@ -516,7 +516,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #31\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #31\n");
         test_control_return(1);
     }
 
@@ -530,7 +530,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #32\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #32\n");
         test_control_return(1);
     }
 
@@ -547,7 +547,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Decending Priority Order Test............ ERROR #33\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #33\n");
         test_control_return(1);
     }
 }
@@ -564,7 +564,7 @@ UINT    status;
 
 
     /* Inform user.  */
-    printf("Running SMP Resume-Suspend Decending Priority Order Test............ ");
+    printf("Running SMP Resume-Suspend descending Priority Order Test............ ");
 
     /* Resume all the threads.  */
     status =  tx_thread_resume(&thread_31);
@@ -999,7 +999,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in decending priority.  */
+    /* Suspend thread in descending priority.  */
     status =   tx_thread_suspend(&thread_31);
 
     /* Check for the correct results.  */
@@ -1012,7 +1012,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_30);
 
     /* Check for the correct results.  */
@@ -1025,7 +1025,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_29);
 
     /* Check for the correct results.  */
@@ -1038,7 +1038,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_28);
 
     /* Check for the correct results.  */
@@ -1051,7 +1051,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_27);
 
     /* Check for the correct results.  */
@@ -1064,7 +1064,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_26);
 
     /* Check for the correct results.  */
@@ -1077,7 +1077,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_25);
 
     /* Check for the correct results.  */
@@ -1090,7 +1090,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_24);
 
     /* Check for the correct results.  */
@@ -1103,7 +1103,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_23);
 
     /* Check for the correct results.  */
@@ -1116,7 +1116,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_22);
 
     /* Check for the correct results.  */
@@ -1129,7 +1129,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_21);
 
     /* Check for the correct results.  */
@@ -1142,7 +1142,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_20);
 
     /* Check for the correct results.  */
@@ -1155,7 +1155,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_19);
 
     /* Check for the correct results.  */
@@ -1168,7 +1168,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_18);
 
     /* Check for the correct results.  */
@@ -1181,7 +1181,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_17);
 
     /* Check for the correct results.  */
@@ -1194,7 +1194,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_16);
 
     /* Check for the correct results.  */
@@ -1207,7 +1207,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_15);
 
     /* Check for the correct results.  */
@@ -1220,7 +1220,7 @@ UINT    status;
         test_control_return(1);
     }
     
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_14);
 
     /* Check for the correct results.  */
@@ -1233,7 +1233,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_13);
 
     /* Check for the correct results.  */
@@ -1246,7 +1246,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_12);
 
     /* Check for the correct results.  */
@@ -1259,7 +1259,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_11);
 
     /* Check for the correct results.  */
@@ -1272,7 +1272,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_10);
 
     /* Check for the correct results.  */
@@ -1285,7 +1285,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_9);
 
     /* Check for the correct results.  */
@@ -1298,7 +1298,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_8);
 
     /* Check for the correct results.  */
@@ -1311,7 +1311,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_7);
 
     /* Check for the correct results.  */
@@ -1324,7 +1324,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_6);
 
     /* Check for the correct results.  */
@@ -1337,7 +1337,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_5);
 
     /* Check for the correct results.  */
@@ -1350,7 +1350,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_4);
 
     /* Check for the correct results.  */
@@ -1363,7 +1363,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_3);
 
     /* Check for the correct results.  */
@@ -1376,7 +1376,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_2);
 
     /* Check for the correct results.  */
@@ -1389,7 +1389,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_1);
  
     /* Check for the correct results.  */

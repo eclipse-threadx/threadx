@@ -74,8 +74,8 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_smp_random_resume_suspend_test.c
     ${SOURCE_DIR}/threadx_smp_rebalance_exclusion_test.c
     ${SOURCE_DIR}/threadx_smp_relinquish_test.c
-    ${SOURCE_DIR}/threadx_smp_resume_suspend_accending_order_test.c
-    ${SOURCE_DIR}/threadx_smp_resume_suspend_decending_order_test.c
+    ${SOURCE_DIR}/threadx_smp_resume_suspend_ascending_order_test.c
+    ${SOURCE_DIR}/threadx_smp_resume_suspend_descending_order_test.c
     ${SOURCE_DIR}/threadx_smp_time_slice_test.c
     ${SOURCE_DIR}/threadx_smp_two_threads_one_core_test.c
     ${SOURCE_DIR}/threadx_thread_basic_execution_test.c

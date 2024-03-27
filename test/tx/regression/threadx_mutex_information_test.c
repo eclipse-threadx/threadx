@@ -312,7 +312,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the performance inforamtion.  */
+    /* Now get the performance information.  */
     status =  tx_mutex_performance_info_get(&mutex_2, &puts, &gets, &suspensions, &timeouts, &inversions, &inheritances);
     
     /* Check status.  */
@@ -326,7 +326,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
     
-    /* Now get the system performance inforamtion.  */
+    /* Now get the system performance information.  */
     status =  tx_mutex_performance_system_info_get(&puts, &gets, &suspensions, &timeouts, &inversions, &inheritances);
     
     /* Check status.  */
@@ -342,7 +342,7 @@ ULONG       inheritances;
 
 #else
 
-    /* Now get the performance inforamtion.  */
+    /* Now get the performance information.  */
     status =  tx_mutex_performance_info_get(&mutex_2, &puts, &gets, &suspensions, &timeouts, &inversions, &inheritances);
 
     /* Check status.  */
@@ -354,7 +354,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the performance inforamtion.  */
+    /* Now get the performance information.  */
     status =  tx_mutex_performance_info_get(TX_NULL, &puts, &gets, &suspensions, &timeouts, &inversions, &inheritances);
 
     /* Check status.  */
@@ -366,7 +366,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the performance inforamtion.  */
+    /* Now get the performance information.  */
     status =  tx_mutex_performance_info_get(TX_NULL, TX_NULL, &gets, &suspensions, &timeouts, &inversions, &inheritances);
 
     /* Check status.  */
@@ -378,7 +378,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the performance inforamtion.  */
+    /* Now get the performance information.  */
     status =  tx_mutex_performance_info_get(TX_NULL, TX_NULL, TX_NULL, &suspensions, &timeouts, &inversions, &inheritances);
 
     /* Check status.  */
@@ -390,7 +390,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the performance inforamtion.  */
+    /* Now get the performance information.  */
     status =  tx_mutex_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, &timeouts, &inversions, &inheritances);
 
     /* Check status.  */
@@ -402,7 +402,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the performance inforamtion.  */
+    /* Now get the performance information.  */
     status =  tx_mutex_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &inversions, &inheritances);
 
     /* Check status.  */
@@ -414,7 +414,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the performance inforamtion.  */
+    /* Now get the performance information.  */
     status =  tx_mutex_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &inheritances);
 
     /* Check status.  */
@@ -426,7 +426,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the performance inforamtion.  */
+    /* Now get the performance information.  */
     status =  tx_mutex_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
 
     /* Check status.  */
@@ -438,7 +438,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the system performance inforamtion.  */
+    /* Now get the system performance information.  */
     status =  tx_mutex_performance_system_info_get(&puts, &gets, &suspensions, &timeouts, &inversions, &inheritances);
 
     /* Check status.  */
@@ -450,7 +450,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the system performance inforamtion.  */
+    /* Now get the system performance information.  */
     status =  tx_mutex_performance_system_info_get(TX_NULL, &gets, &suspensions, &timeouts, &inversions, &inheritances);
 
     /* Check status.  */
@@ -462,7 +462,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the system performance inforamtion.  */
+    /* Now get the system performance information.  */
     status =  tx_mutex_performance_system_info_get(TX_NULL, TX_NULL, &suspensions, &timeouts, &inversions, &inheritances);
 
     /* Check status.  */
@@ -474,7 +474,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the system performance inforamtion.  */
+    /* Now get the system performance information.  */
     status =  tx_mutex_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, &timeouts, &inversions, &inheritances);
 
     /* Check status.  */
@@ -486,7 +486,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the system performance inforamtion.  */
+    /* Now get the system performance information.  */
     status =  tx_mutex_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, &inversions, &inheritances);
 
     /* Check status.  */
@@ -498,7 +498,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the system performance inforamtion.  */
+    /* Now get the system performance information.  */
     status =  tx_mutex_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &inheritances);
 
     /* Check status.  */
@@ -510,7 +510,7 @@ ULONG       inheritances;
         test_control_return(1);
     }
 
-    /* Now get the system performance inforamtion.  */
+    /* Now get the system performance information.  */
     status =  tx_mutex_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
 
     /* Check status.  */

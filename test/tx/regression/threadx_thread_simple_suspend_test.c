@@ -25,7 +25,7 @@ void  test_control_return(UINT status);
 #ifdef CTEST
 void test_application_define(void *first_unused_memory)
 #else
-void    threadx_thread_simple_supsend_application_define(void *first_unused_memory)
+void    threadx_thread_simple_suspend_application_define(void *first_unused_memory)
 #endif
 {
 
