@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve Eclipse ThreadX.
 title: ''
-labels: bug, hardware
+labels: new, bug, hardware
 assignees: ''
 
 ---
