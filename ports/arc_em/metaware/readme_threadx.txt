@@ -1,11 +1,11 @@
-                     Microsoft's Azure RTOS ThreadX for ARC EM
+                     Eclipse ThreadX RTOS for ARC EM
 
                              Using the MetaWare Tools
 
-1. Open the Azure RTOS Workspace 
+1. Open the Eclipse ThreadX RTOS Workspace 
 
 In order to build the ThreadX library and the ThreadX demonstration first load 
-the Azure RTOS Workspace, which is located inside the "example_build" directory. 
+the Eclipse ThreadX RTOS Workspace, which is located inside the "example_build" directory. 
 
 
 2. Building the ThreadX run-time Library
@@ -227,5 +227,5 @@ information associated with this specific port of ThreadX:
 Copyright(c) 1996-2021 Microsoft Corporation
 
 
-https://azure.com/rtos
+https://threadx.io/
 

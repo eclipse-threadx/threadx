@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve Azure RTOS.
+about: Create a report to help us improve Eclipse ThreadX.
 title: ''
 labels: bug, hardware
 assignees: ''
@@ -13,7 +13,7 @@ A clear and concise description of what the bug is.
 Please also mention any information which could help others to understand
 the problem you're facing:
 - What target device are you using?
-- Which version of Azure RTOS?
+- Which version of Eclipse ThreadX?
 - What toolchain and environment?
 - What have you tried to diagnose or workaround this issue?
 

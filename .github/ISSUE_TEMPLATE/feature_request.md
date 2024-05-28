@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea or enhancement to existing feature for Azure RTOS.
+about: Suggest an idea or enhancement to existing feature for Eclipse ThreadX.
 title: ''
 labels: feature
 assignees: ''
