@@ -20,3 +20,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC "-D_GNU_SOURCE -DTX_LINUX_DEBUG_ENABLE")
+
+if(THREADX_SAMPLE)
+  add_subdirectory(example_build)
+endif()
