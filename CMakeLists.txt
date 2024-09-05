@@ -14,7 +14,14 @@ endif()
 
 message(STATUS "THREADX_ARCH:      ${THREADX_ARCH}")
 message(STATUS "THREADX_TOOLCHAIN: ${THREADX_TOOLCHAIN}")
+message(STATUS "THREADX_SMP:       ${THREADX_SMP}")
 message(STATUS "THREADX_SAMPLE:    ${THREADX_SAMPLE}")
+
+if(DEFINED THREADX_SMP)
+    set(THREADX_SMP "_smp")
+else()
+    set(THREADX_SMP "")
+endif()
 
 # Define our target library and an alias for consumers
 add_library(${PROJECT_NAME})
@@ -27,11 +34,11 @@ set(CUSTOM_INC_DIR ${CMAKE_CURRENT_BINARY_DIR}/custom_inc)
 if(DEFINED THREADX_CUSTOM_PORT)
     add_subdirectory(${THREADX_CUSTOM_PORT} threadx_port)
 else()
-    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN})
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ports${THREADX_SMP}/${THREADX_ARCH}/${THREADX_TOOLCHAIN})
 endif()
 
 # Pick up the common stuff
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common${THREADX_SMP})
 
 # Define the FreeRTOS adaptation layer
 add_library(freertos-threadx EXCLUDE_FROM_ALL)
