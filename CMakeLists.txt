@@ -11,8 +11,10 @@ endif()
 if(NOT DEFINED THREADX_TOOLCHAIN)
     message(FATAL_ERROR "Error: THREADX_TOOLCHAIN not defined")
 endif()
-message(STATUS "THREADX_ARCH: ${THREADX_ARCH}")
+
+message(STATUS "THREADX_ARCH:      ${THREADX_ARCH}")
 message(STATUS "THREADX_TOOLCHAIN: ${THREADX_TOOLCHAIN}")
+message(STATUS "THREADX_SAMPLE:    ${THREADX_SAMPLE}")
 
 # Define our target library and an alias for consumers
 add_library(${PROJECT_NAME})
