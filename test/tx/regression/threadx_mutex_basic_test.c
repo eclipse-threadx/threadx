@@ -58,7 +58,7 @@ static void    thread_2_entry(ULONG thread_input);
 static void    thread_3_entry(ULONG thread_input);
 static void    thread_4_entry(ULONG thread_input);
 
-UINT        _txe_mutex_create(TX_MUTEX *mutex_ptr, CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size);
+UINT        _txe_mutex_create(TX_MUTEX *mutex_ptr, const CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size);
 
 
 /* Prototype for test control return.  */

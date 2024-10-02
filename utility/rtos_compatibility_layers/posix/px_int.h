@@ -166,7 +166,7 @@ VOID                  posix_putback_queue(TX_QUEUE * qid);
 
 sem_t                *posix_find_sem(const CHAR * name);
 
-VOID                  posix_set_sem_name(sem_t * sem, CHAR *name);
+VOID                  posix_set_sem_name(sem_t * sem, const CHAR *name);
 
 TX_SEMAPHORE         *posix_get_new_sem(VOID);
 

@@ -72,7 +72,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_mutex_create(TX_MUTEX *mutex_ptr, CHAR *name_ptr, UINT inherit)
+UINT  _tx_mutex_create(TX_MUTEX *mutex_ptr, const CHAR *name_ptr, UINT inherit)
 {
 
 TX_INTERRUPT_SAVE_AREA
