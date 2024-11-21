@@ -44,16 +44,16 @@ jobs:
       id: cache-arm-gcc
       uses: actions/cache@v1
       with:
-        path: $HOME/arm-none-eabi-gcc-9-2019-q4
-        key: ${{ runner.os }}-arm-gcc-9-2019-q4
+        path: $HOME/arm-none-eabi-gcc-13
+        key: ${{ runner.os }}-arm-gcc-13
 
     # Get the arm-non-eabi-gcc toolchain   
     - name: Install arm-none-eabi-gcc
-      uses: fiam/arm-none-eabi-gcc@v1
+      uses: carlosperate/arm-none-eabi-gcc-action@v1
       if: steps.cache-arm-gcc.outputs.cache-hit != 'true'
       with:
-          release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
-          directory: $HOME/arm-none-eabi-gcc-9-2019-q4
+          release: '13.3.Rel1' # The arm-none-eabi-gcc release to use.
+          directory: $HOME/arm-none-eabi-gcc-13
 
     # Get CMake into the environment
     - name: Install cmake 3.19.1
@@ -67,11 +67,9 @@ jobs:
     - name: Prepare build system
       run: cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m${{ matrix.port }}.cmake -GNinja .
       env:
-        PATH: "$HOME/arm-none-eabi-gcc-9-2019-q4/bin:$PATH"
+        PATH: "$HOME/arm-none-eabi-gcc-13/bin:$PATH"
 
     - name: Compile and link
       run: cmake --build ./build
       env:
-        PATH: "$HOME/arm-none-eabi-gcc-9-2019-q4/bin:$PATH"
-
-
+        PATH: "$HOME/arm-none-eabi-gcc-13/bin:$PATH"
