@@ -3,10 +3,10 @@
 name: ports_arch_check
 
 # Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
+# events but only for the dev branch
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ dev ]
     paths:
       - ".github/workflows/ports_arch_check.yml"
       - 'common/**'
@@ -28,7 +28,7 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Checkout sources recursively
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.REPO_SCOPED_TOKEN }}
         submodules: true
@@ -38,7 +38,7 @@ jobs:
       run: |
         scripts/copy_armv7_m.sh && scripts/copy_armv8_m.sh && scripts/copy_module_armv7_m.sh
         if [[ -n $(git status --porcelain -uno) ]]; then
-          echo "Ports for ARM architecture is not updated"
+          echo "Ports for Arm architecture is not updated"
           git status
           exit 1
         fi
@@ -51,7 +51,7 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Checkout sources recursively
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.REPO_SCOPED_TOKEN }}
         submodules: true
@@ -64,10 +64,7 @@ jobs:
         cd ../../ports_arch/ARMv8-A
         pwsh -Command ./update.ps1 -PortSets tx,tx_smp -CopyCommonFiles -CopyPortFiles -CopyExample -PatchFiles
         if ((git status --porcelain -uno) -ne $null) {
-          Write-Host "Ports for ARM architecture is not updated"
+          Write-Host "Ports for Arm architecture is not updated"
           git status
           Exit 1
         }
-
-
-
