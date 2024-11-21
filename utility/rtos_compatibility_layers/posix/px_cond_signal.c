@@ -89,7 +89,7 @@ TX_SEMAPHORE        *semaphore_ptr;
 UINT                 status;
 
     /* Get the condition variable's internal semaphore.  */
-    /* Simply convert the COndition variable control block into a semaphore  a cast */ 
+    /* Simply convert the condition variable control block into a semaphore using casting */
     semaphore_ptr = (&( cond->cond_semaphore ));
     if ( semaphore_ptr->tx_semaphore_suspended_count)
     {
