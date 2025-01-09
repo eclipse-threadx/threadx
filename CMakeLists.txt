@@ -43,6 +43,9 @@ target_sources(freertos-threadx
 )
 target_link_libraries(freertos-threadx PUBLIC threadx)
 
+
+set(TX_USER_FILE "${CMAKE_CURRENT_LIST_DIR}/custom_tx_user.h" CACHE PATH "Path to custom tx_user.h")
+
 # If the user provided an override, copy it to the custom directory
 if (NOT TX_USER_FILE)
     message(STATUS "Using default tx_user.h file")
@@ -55,7 +58,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC 
     ${CUSTOM_INC_DIR}
 )
-target_compile_definitions(${PROJECT_NAME} PUBLIC "TX_INCLUDE_USER_DEFINE_FILE" )
+target_compile_definitions(${PROJECT_NAME} PUBLIC "TX_INCLUDE_USER_DEFINE_FILE" "TX_ENABLE_THREAD_SYSTEM_RESUME_EXTENSION")
 
 # Enable a build target that produces a ZIP file of all sources
 set(CPACK_SOURCE_GENERATOR "ZIP")

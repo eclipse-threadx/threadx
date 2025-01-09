@@ -182,6 +182,9 @@ UINT            map_index;
                 /* Log the thread status change.  */
                 TX_EL_THREAD_STATUS_CHANGE_INSERT(thread_ptr, TX_READY)
 
+                /* Handle the thread resume extension, if defined*/
+                TX_THREAD_SYSTEM_RESUME_EXTENSION(thread_ptr);
+
 #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
 
                 /* Increment the total number of thread resumptions.  */
@@ -435,6 +438,9 @@ UINT            map_index;
 
                     /* Log the thread status change.  */
                     TX_EL_THREAD_STATUS_CHANGE_INSERT(thread_ptr, TX_READY)
+
+                    /* Handle the thread resume extension, if defined*/
+                    TX_THREAD_SYSTEM_RESUME_EXTENSION(thread_ptr);
                 }
                 else
                 {
@@ -600,6 +606,9 @@ UINT            state;
                 /* Log the thread status change.  */
                 TX_EL_THREAD_STATUS_CHANGE_INSERT(thread_ptr, TX_READY)
 
+                /* Handle the thread resume extension, if defined*/
+                TX_THREAD_SYSTEM_RESUME_EXTENSION(thread_ptr);
+
 #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
 
                 /* Increment the total number of thread resumptions.  */
@@ -701,6 +710,9 @@ UINT            map_index;
 
             /* Log the thread status change.  */
             TX_EL_THREAD_STATUS_CHANGE_INSERT(thread_ptr, TX_READY)
+
+            /* Handle the thread resume extension, if defined*/
+            TX_THREAD_SYSTEM_RESUME_EXTENSION(thread_ptr);
 
             /* Pickup priority of thread.  */
             priority =  thread_ptr -> tx_thread_priority;

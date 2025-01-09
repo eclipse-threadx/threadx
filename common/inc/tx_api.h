@@ -25,7 +25,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE C      */
-/*                                                           6.4.1        */
+/*                                                           6.4.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -106,7 +106,10 @@
 /*  03-01-2024      Tiejun Zhou             Modified comment(s),          */
 /*                                            update version number,      */
 /*                                            resulting in version 6.4.1  */
-/*                                                                        */
+/*  XX-XX-2025      Greg Link               Modified comment(s),          */
+/*                                            update version number,      */
+/*                                            add resume/suspend hooks,   */
+/*                                            resulting in version 6.4.2  */
 /**************************************************************************/
 
 #ifndef TX_API_H
@@ -1779,6 +1782,22 @@ UINT        _tx_thread_terminate(TX_THREAD *thread_ptr);
 UINT        _tx_thread_time_slice_change(TX_THREAD *thread_ptr, ULONG new_time_slice, ULONG *old_time_slice);
 UINT        _tx_thread_wait_abort(TX_THREAD *thread_ptr);
 
+/* Two alternative ways to include the proposed extensions of Issue 426.
+   The first expects the extension to always have the same function prototype, 
+   but it is a proper function, while the second uses a #define in tx_user.h
+   to extend the functionality instead. */
+
+#ifdef TX_ENABLE_THREAD_SYSTEM_RESUME_EXTENSION
+UINT _tx_thread_system_resume_extension(TX_THREAD *thread_ptr);
+#define TX_THREAD_SYSTEM_RESUME_EXTENSION(a) _tx_thread_system_resume_extension(a)
+#else
+#warning TX_ENABLE_THREAD_SYSTEM_RESUME_EXTENSION is disabled
+#define TX_THREAD_SYSTEM_RESUME_EXTENSION(a) ((void)(a))
+#endif
+
+#ifndef TX_THREAD_SYSTEM_SUSPEND_EXTENSION
+#define TX_THREAD_SYSTEM_SUSPEND_EXTENSION(a) ((void)(a))
+#endif
 
 /* Define error checking shells for API services.  These are only referenced by the
    application.  */

@@ -101,6 +101,7 @@ target_sources(${PROJECT_NAME}
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_stack_error_handler.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_stack_error_notify.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_suspend.c
+	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_suspend_resume_extension.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_system_preempt_check.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_system_resume.c
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_system_suspend.c

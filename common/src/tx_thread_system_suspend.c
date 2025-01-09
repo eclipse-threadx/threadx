@@ -169,6 +169,9 @@ ULONG                       time_stamp =  ((ULONG) 0);
         /* Log the thread status change.  */
         TX_EL_THREAD_STATUS_CHANGE_INSERT(thread_ptr, thread_ptr -> tx_thread_state)
 
+        /* Handle the thread suspend extension, if defined*/
+        TX_THREAD_SYSTEM_SUSPEND_EXTENSION(thread_ptr);
+
 #ifdef TX_ENABLE_EVENT_TRACE
 
         /* If trace is enabled, save the current event pointer.  */
@@ -760,6 +763,9 @@ ULONG                       time_stamp =  ((ULONG) 0);
 
     /* Log the thread status change.  */
     TX_EL_THREAD_STATUS_CHANGE_INSERT(thread_ptr, thread_ptr -> tx_thread_state)
+
+    /* Handle the thread suspend extension, if defined*/
+    TX_THREAD_SYSTEM_SUSPEND_EXTENSION(thread_ptr);
 
 #ifdef TX_ENABLE_EVENT_TRACE
 
