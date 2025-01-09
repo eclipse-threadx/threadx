@@ -229,14 +229,24 @@ _tx_thread_schedule:
     rsync                               /* ensure wsr.CPENABLE has completed */
     #endif
 
+    /* De-allocate the remainder of the frame before reenabling interrupts
+     * to avoid overrunning a task stack of TX_MINIMUM_STACK bytes, which
+     * can only handle one XT_STK_FRMSZ.
+     */
+    #ifdef __XTENSA_CALL0_ABI__
+    /* 'addi sp, sp, imm' could turn into 'addmi, addi' sequence and make */
+    /* the sp briefly point to an illegal stack location. Avoid that.     */
+    addi    a2,  sp, XT_STK_FRMSZ       /* fully deallocate stack frame */
+    mov     sp,  a2
+    #else
+    addi    a2,  sp, XT_STK_FRMSZ - 48  /* initial SP at solicited entry; */
+    movsp   sp,  a2                     /* retw will deallocate remainder */
+    #endif
+
     wsr     a3,  PS                     /* no need to sync PS, delay is OK */
 
     /* This does not return to its caller, but to the selected thread. */
     #ifdef __XTENSA_CALL0_ABI__
-    /* 'addi sp, sp, imm' could turn into 'addmi, addi' sequence and make */
-    /* the sp briefly point to an illegal stack location. Avoid that.     */
-    addi    a2,  sp, XT_STK_FRMSZ
-    mov     sp,  a2
     ret
     #else
     retw
