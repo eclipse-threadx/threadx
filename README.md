@@ -223,3 +223,14 @@ Eclipse ThreadX provides OEMs with components to secure communication and to cre
 ## Contribution
 
 Please follow the instructions provided in the [CONTRIBUTING.md](./CONTRIBUTING.md) for the corresponding repository.
+## AI-generated ProductMaps
+
+
+
+| Github file | ProductMap |
+|-------------|------------|
+| [demo_threadx.c](https://github.com/eclipse-threadx/threadx/blob/master/samples/demo_threadx.c) | [Link to Map](https://product-map.ai/app/public?url=https://github.com/eclipse-threadx/threadx/blob/master/samples/demo_threadx.c) |
+
+Contact ProductMap if you have any questions at [juan@product-map.ai](juan@product-map.ai).
+
+Last updated on Mon Feb 03 22:54:47 UTC 2025.
