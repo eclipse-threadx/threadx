@@ -201,6 +201,10 @@ _tx_thread_schedule_loop:
     LOAD    t0, 30*REGBYTES(sp)                         // Recover mepc
     csrw    mepc, t0                                    // Store mepc
     li      t0, 0x1880                                  // Prepare MPIP
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    li      t1, 1<<13
+    or      t0, t1, t0
+#endif
     csrw    mstatus, t0                                 // Enable MPIP
 
     LOAD    x1,  28*REGBYTES(sp)                        // Recover RA
