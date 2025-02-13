@@ -86,7 +86,7 @@ jobs:
           
     - name: Upload Test Results
       if: success() || failure()
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@v4.6.0
       with:
         name: test_reports ${{ inputs.result_affix }}
         path: |
@@ -141,7 +141,7 @@ jobs:
         fi
           
     - name: Upload Code Coverage Artifacts
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@v4.6.0
       if: (inputs.skip_deploy && !inputs.skip_coverage)
       with:
         name: coverage_report
