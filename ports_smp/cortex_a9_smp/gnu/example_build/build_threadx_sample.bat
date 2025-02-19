@@ -1,4 +1,4 @@
-arm-none-eabi-gcc -c -g -I../../../../common_smp/inc -I../inc -mcpu=cortex-a5 sample_threadx.c
+arm-none-eabi-gcc -c -g -I../../../../common_smp/inc -I../inc -mcpu=cortex-a9 sample_threadx.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-a9 startup.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a9 MP_GIC.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a9 MP_SCU.S
