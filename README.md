@@ -197,7 +197,7 @@ Instruction for building the ThreadX as static library using Arm GNU Toolchain a
     An example of building the library for Cortex-M4:
 
     ```bash
-    $ cmake -Bbuild -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_m4.cmake .
+    $ cmake -Bbuild -GNinja --toolchain cmake/cortex_m4.cmake .
 
     $ cmake --build ./build
     ```
