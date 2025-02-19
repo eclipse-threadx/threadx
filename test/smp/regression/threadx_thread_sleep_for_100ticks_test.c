@@ -42,7 +42,7 @@ static ULONG                    array_delay[ARRAY_SIZE];
 static ULONG                    start_time;
 static ULONG                    lower_bound;
 static ULONG                    upper_bound;
-static ULONG                    current_itterations;
+static ULONG                    current_iterations;
 #ifdef DEBUG_1
 static ULONG                    last_loop_count;
 #endif
@@ -108,8 +108,8 @@ ULONG i;
         if (upper_bound > max_loop_count)
             lower_bound = max_loop_count;
 
-        if ((current_itterations < lower_bound) || (current_itterations > upper_bound))
-            current_itterations =  lower_bound;
+        if ((current_iterations < lower_bound) || (current_iterations > upper_bound))
+            current_iterations =  lower_bound;
         
 #ifdef DEBUG_1
         /* Last loop count.  */
@@ -218,7 +218,7 @@ CHAR    *pointer;
     min_loop_count =       0xFFFFFFFF;
     max_loop_count =       0;
     loop_count =           0xFFFFFFFF;
-    current_itterations =  0;
+    current_iterations =  0;
 #ifdef DEBUG_1
     last_loop_count =      0x0;
 #endif 
@@ -305,7 +305,7 @@ volatile ULONG       value = 0;
     upper_bound =  max_loop_count;
 #endif
 
-    current_itterations =  lower_bound;
+    current_iterations =  lower_bound;
 #ifdef DEBUG
     i =  0;
 #endif
@@ -323,7 +323,7 @@ volatile ULONG       value = 0;
             /* Call delay function.  */
             delay_function();
             loop_count++;
-        } while (loop_count < current_itterations);      
+        } while (loop_count < current_iterations);      
 
         /* Check for a timer interrupt... if so, just skip the semaphore get.  */
         if (start_time != _tx_timer_system_clock)
@@ -332,15 +332,15 @@ volatile ULONG       value = 0;
         /* Suspend on the semaphore for 20 ticks...  */
         tx_semaphore_get(&test_semaphore, 20);
         
-        /* Adjust the current itterations.  */
-        current_itterations++;
-        if (current_itterations > upper_bound)
+        /* Adjust the current iterations.  */
+        current_iterations++;
+        if (current_iterations > upper_bound)
         {
             if (lower_bound > min_loop_count)
                 lower_bound--;
             if (upper_bound < max_loop_count)
                 upper_bound++;
-            current_itterations =  lower_bound;
+            current_iterations =  lower_bound;
         }
 
         /* Set the tick count simply to use value.  */
@@ -355,7 +355,7 @@ volatile ULONG       value = 0;
             printf("loop count:      NA\n");
             else
             printf("loop count:      %lu\n", loop_count);
-            printf("current:         %lu\n", current_itterations);
+            printf("current:         %lu\n", current_iterations);
             printf("last loop count: %lu\n", last_loop_count);
             printf("minimum:         %lu\n", min_loop_count);
             printf("maximum:         %lu\n", max_loop_count);
@@ -373,7 +373,7 @@ volatile ULONG       value = 0;
     printf("loop count:      NA\n");
     else
     printf("loop count:      %lu\n", loop_count);
-    printf("current:         %lu\n", current_itterations);
+    printf("current:         %lu\n", current_iterations);
     printf("last loop count: %lu\n", last_loop_count);
     printf("minimum:         %lu\n", min_loop_count);
     printf("maximum:         %lu\n", max_loop_count);
