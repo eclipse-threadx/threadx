@@ -83,7 +83,7 @@
 /*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
-UCHAR  *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size)
+UCHAR  *_tx_byte_pool_search(volatile TX_BYTE_POOL *pool_ptr, ULONG memory_size)
 {
 
 TX_INTERRUPT_SAVE_AREA
