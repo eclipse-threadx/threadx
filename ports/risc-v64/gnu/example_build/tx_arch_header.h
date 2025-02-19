@@ -1,0 +1,19 @@
+#ifndef TX_ARCH_HEADER_H
+#define TX_ARCH_HEADER_H
+
+#ifdef __ASSEMBLER__
+#define CONS(NUM, TYPE)NUM
+#else
+#define CONS(NUM, TYPE)NUM##TYPE
+#endif /* __ASSEMBLER__ */
+
+#define THEAD_C906
+
+#define CLINT_ADDR			CONS(0x74000000, UL)
+#define CLINT_MSIP			CONS(0x0000, UL)
+#define CLINT_MTIMECMP		CONS(0x4000, UL)
+#undef CLINT_MTIME
+#define configMTIMECMP_BASE_ADDRESS		( CLINT_ADDR + CLINT_MTIMECMP )
+#define PRIM_HART			0
+
+#endif // !TX_ARCH_HEADER_H
