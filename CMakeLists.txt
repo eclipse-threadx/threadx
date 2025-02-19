@@ -55,7 +55,8 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC 
     ${CUSTOM_INC_DIR}
 )
-target_compile_definitions(${PROJECT_NAME} PUBLIC "TX_INCLUDE_USER_DEFINE_FILE" )
+target_compile_definitions(${PROJECT_NAME} PUBLIC "TX_INCLUDE_USER_DEFINE_FILE" ${THREADX_COMPILE_DEFINITIONS} )
+target_compile_options(${PROJECT_NAME} PUBLIC ${THREADX_COMPILE_OPTIONS} )
 
 # Enable a build target that produces a ZIP file of all sources
 set(CPACK_SOURCE_GENERATOR "ZIP")
