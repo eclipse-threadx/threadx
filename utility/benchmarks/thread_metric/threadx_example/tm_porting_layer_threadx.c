@@ -107,7 +107,7 @@ void            (*tm_initialization_function)(void);
 
 /* Define our shell entry function to match ThreadX.  */
 
-VOID  tm_thread_entry(ULONG thread_input);
+VOID  tm_thread_entry(ALIGN_TYPE thread_input);
 
 
 /* This function called from main performs basic RTOS initialization, 
@@ -384,7 +384,7 @@ UINT    status;
 
 /* This is the ThreadX thread entry.  It is going to call the Thread-Metric
    entry function saved earlier.  */
-VOID  tm_thread_entry(ULONG thread_input)
+VOID  tm_thread_entry(ALIGN_TYPE thread_input)
 {
 
 void (*entry_function)(void);

@@ -90,8 +90,8 @@ UINT                        expiration_time;            /* Value used for pointe
 ULONG                       delta;
 #endif
 TX_TIMER_INTERNAL           *current_timer;
-VOID                        (*timeout_function)(ULONG id);
-ULONG                       timeout_param =  ((ULONG) 0);
+VOID                        (*timeout_function)(ALIGN_TYPE id);
+ALIGN_TYPE                  timeout_param =  ((ALIGN_TYPE) 0);
 #ifdef TX_TIMER_ENABLE_PERFORMANCE_INFO
 TX_TIMER                    *timer_ptr;
 #endif

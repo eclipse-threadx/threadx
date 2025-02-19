@@ -2038,8 +2038,8 @@ ALIGN_TYPE return_value;
         (TX_THREAD *) param_0,
         (CHAR *) param_1,
         module_instance -> txm_module_instance_shell_entry_function,
-        (VOID (*)(ULONG entry_input)) extra_parameters[0],
-        (ULONG) extra_parameters[1],
+        (VOID (*)(ALIGN_TYPE entry_input)) extra_parameters[0],
+        (ALIGN_TYPE) extra_parameters[1],
         (VOID *) extra_parameters[2],
         (ULONG) extra_parameters[3],
         (UINT) extra_parameters[4],
@@ -2767,7 +2767,7 @@ static ALIGN_TYPE _txm_module_manager_tx_timer_create_dispatch(TXM_MODULE_INSTAN
 
 ALIGN_TYPE return_value;
 TX_TIMER *timer_ptr;
-VOID (*expiration_function)(ULONG);
+VOID (*expiration_function)(ALIGN_TYPE);
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {

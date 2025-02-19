@@ -2258,7 +2258,7 @@ EventBits_t xEventGroupGetBitsFromISR(EventGroupHandle_t xEventGroup)
 }
 
 
-void txfr_timer_callback_wrapper(ULONG id)
+void txfr_timer_callback_wrapper(ALIGN_TYPE id)
 {
     txfr_timer_t *p_timer;
 
@@ -2310,7 +2310,7 @@ TimerHandle_t xTimerCreate(const char * const pcTimerName,
         resch_ticks = 0u;
     }
 
-    ret = tx_timer_create(&p_timer->timer, (char *)pcTimerName, txfr_timer_callback_wrapper, (ULONG)p_timer, xTimerPeriod, resch_ticks, TX_NO_ACTIVATE);
+    ret = tx_timer_create(&p_timer->timer, (char *)pcTimerName, txfr_timer_callback_wrapper, (ALIGN_TYPE)p_timer, xTimerPeriod, resch_ticks, TX_NO_ACTIVATE);
     if(ret != TX_SUCCESS) {
         txfr_free(p_timer);
         return NULL;
@@ -2351,7 +2351,7 @@ TimerHandle_t xTimerCreateStatic(const char * const pcTimerName,
         resch_ticks = 0u;
     }
 
-    ret = tx_timer_create(&pxTimerBuffer->timer, (char *)pcTimerName, txfr_timer_callback_wrapper, (ULONG)pxTimerBuffer, xTimerPeriod, resch_ticks, TX_NO_ACTIVATE);
+    ret = tx_timer_create(&pxTimerBuffer->timer, (char *)pcTimerName, txfr_timer_callback_wrapper, (ALIGN_TYPE)pxTimerBuffer, xTimerPeriod, resch_ticks, TX_NO_ACTIVATE);
     if(ret != TX_SUCCESS) {
         return NULL;
     }
