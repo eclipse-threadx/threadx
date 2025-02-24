@@ -69,6 +69,7 @@ __tx_free_memory_start:
 /* VOID   _tx_initialize_low_level(VOID)
 {  */
     .global  _tx_initialize_low_level
+    .weak    _tx_initialize_low_level
 _tx_initialize_low_level:
     sd      sp, _tx_thread_system_stack_ptr, t0     // Save system stack pointer
 

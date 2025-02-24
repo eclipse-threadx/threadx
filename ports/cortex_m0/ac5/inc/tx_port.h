@@ -323,7 +323,7 @@ unsigned int          was_masked;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-M0/AC5 Version 6.4.1 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-M0/AC5 Version 6.4.2 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

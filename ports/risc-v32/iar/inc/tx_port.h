@@ -265,7 +265,7 @@ unsigned int                                    _tx_thread_interrupt_control(uns
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX RISC-V32/IAR Version G6.4.1 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX RISC-V32/IAR Version G6.4.2 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
