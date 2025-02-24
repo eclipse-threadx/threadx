@@ -368,7 +368,7 @@ unsigned int interrupt_save;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-M0/GNU Version 6.4.1 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-M0/GNU Version 6.4.2 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

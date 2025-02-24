@@ -633,7 +633,7 @@ void                        _tx_thread_smp_debug_entry_insert(ULONG id, ULONG su
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX SMP/Linux/gcc Version 6.4.1 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX SMP/Linux/gcc Version 6.4.2 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
