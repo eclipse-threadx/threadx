@@ -79,7 +79,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txe_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size,
+UINT  _txe_queue_create(TX_QUEUE *queue_ptr, const CHAR *name_ptr, UINT message_size,
                         VOID *queue_start, ULONG queue_size, UINT queue_control_block_size)
 {
 

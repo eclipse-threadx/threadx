@@ -52,7 +52,7 @@ static void    thread_1_entry(ULONG thread_input);
 static void    timer_0_expiration(ULONG timer_input);
 static void    timer_1_expiration(ULONG timer_input);
 
-UINT        _txe_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr, 
+UINT        _txe_timer_create(TX_TIMER *timer_ptr, const CHAR *name_ptr, 
                 VOID (*expiration_function)(ULONG), ULONG expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size);
 

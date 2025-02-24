@@ -72,7 +72,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_byte_pool_create(TX_BYTE_POOL *pool_ptr, CHAR *name_ptr, VOID *pool_start, ULONG pool_size)
+UINT  _tx_byte_pool_create(TX_BYTE_POOL *pool_ptr, const CHAR *name_ptr, VOID *pool_start, ULONG pool_size)
 {
 
 TX_INTERRUPT_SAVE_AREA
