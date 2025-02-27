@@ -77,7 +77,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR *name_ptr, UINT event_control_block_size)
+UINT  _txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, const CHAR *name_ptr, UINT event_control_block_size)
 {
 
 TX_INTERRUPT_SAVE_AREA

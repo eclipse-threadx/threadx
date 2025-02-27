@@ -46,7 +46,7 @@ static TX_EVENT_FLAGS_GROUP group_3;
 
 static void    thread_0_entry(ULONG thread_input);
 static void    thread_1_entry(ULONG thread_input);
-UINT        _txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR *name_ptr, UINT event_control_block_size);
+UINT        _txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, const CHAR *name_ptr, UINT event_control_block_size);
 
 
 /* Prototype for test control return.  */

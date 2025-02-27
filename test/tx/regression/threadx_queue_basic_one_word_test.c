@@ -40,7 +40,7 @@ static void    thread_0_entry(ULONG thread_input);
 static void    thread_1_entry(ULONG thread_input);
 
 
-UINT        _txe_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size, 
+UINT        _txe_queue_create(TX_QUEUE *queue_ptr, const CHAR *name_ptr, UINT message_size, 
                         VOID *queue_start, ULONG queue_size, UINT queue_control_block_size);
 
 
