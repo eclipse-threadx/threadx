@@ -40,7 +40,7 @@ ULONG                   memory_faults = 0;
 
 /* Define thread prototypes.  */
 
-void    module_manager_entry(ULONG thread_input);
+void    module_manager_entry(ALIGN_TYPE thread_input);
 
 
 #ifdef TX_ENABLE_EVENT_TRACE
@@ -70,7 +70,7 @@ ULONG simple_thread_counter = 0;
 TX_THREAD simple_thread;
 #define SIMPLE_THREAD_STACK_SIZE (1024 * 4)
 ALIGN_TYPE simple_thread_stack[SIMPLE_THREAD_STACK_SIZE / sizeof(ALIGN_TYPE)];
-void simple_thread_entry(ULONG thread_input)
+void simple_thread_entry(ALIGN_TYPE thread_input)
 {
     while(1)
     {
@@ -105,7 +105,7 @@ void tx_application_define(void *first_unused_memory)
 
 /* Define the test threads.  */
 
-void module_manager_entry(ULONG thread_input)
+void module_manager_entry(ALIGN_TYPE thread_input)
 {
 
     /* Initialize the module manager.   */

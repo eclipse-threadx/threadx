@@ -52,12 +52,12 @@ ULONG                   thread_7_counter;
 
 /* Define thread prototypes.  */
 
-void    thread_0_entry(ULONG thread_input);
-void    thread_1_entry(ULONG thread_input);
-void    thread_2_entry(ULONG thread_input);
-void    thread_3_and_4_entry(ULONG thread_input);
-void    thread_5_entry(ULONG thread_input);
-void    thread_6_and_7_entry(ULONG thread_input);
+void    thread_0_entry(ALIGN_TYPE thread_input);
+void    thread_1_entry(ALIGN_TYPE thread_input);
+void    thread_2_entry(ALIGN_TYPE thread_input);
+void    thread_3_and_4_entry(ALIGN_TYPE thread_input);
+void    thread_5_entry(ALIGN_TYPE thread_input);
+void    thread_6_and_7_entry(ALIGN_TYPE thread_input);
 
 
 #ifdef TX_ENABLE_EVENT_TRACE
@@ -196,7 +196,7 @@ CHAR    *pointer = TX_NULL;
 
 /* Define the test threads.  */
 
-void    thread_0_entry(ULONG thread_input)
+void    thread_0_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -222,7 +222,7 @@ UINT    status;
 }
 
 
-void    thread_1_entry(ULONG thread_input)
+void    thread_1_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -248,7 +248,7 @@ UINT    status;
 }
 
 
-void    thread_2_entry(ULONG thread_input)
+void    thread_2_entry(ALIGN_TYPE thread_input)
 {
 
 ULONG   received_message;
@@ -275,7 +275,7 @@ UINT    status;
 }
 
 
-void    thread_3_and_4_entry(ULONG thread_input)
+void    thread_3_and_4_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -312,7 +312,7 @@ UINT    status;
 }
 
 
-void    thread_5_entry(ULONG thread_input)
+void    thread_5_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -337,7 +337,7 @@ ULONG   actual_flags;
 }
 
 
-void    thread_6_and_7_entry(ULONG thread_input)
+void    thread_6_and_7_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;

@@ -48,11 +48,11 @@ UCHAR                   queue_0_area[DEMO_QUEUE_SIZE*sizeof(ULONG)];
 
 /* Define thread prototypes.  */
 
-void    thread_0_entry(ULONG thread_input);
-void    thread_1_entry(ULONG thread_input);
-void    thread_2_entry(ULONG thread_input);
-void    thread_3_and_4_entry(ULONG thread_input);
-void    thread_5_entry(ULONG thread_input);
+void    thread_0_entry(ALIGN_TYPE thread_input);
+void    thread_1_entry(ALIGN_TYPE thread_input);
+void    thread_2_entry(ALIGN_TYPE thread_input);
+void    thread_3_and_4_entry(ALIGN_TYPE thread_input);
+void    thread_5_entry(ALIGN_TYPE thread_input);
 
 
 volatile unsigned int bootloop;
@@ -122,7 +122,7 @@ void    tx_application_define(void *first_unused_memory)
 
 /* Define the test threads.  */
 
-void    thread_0_entry(ULONG thread_input)
+void    thread_0_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -147,7 +147,7 @@ UINT    status;
 }
 
 
-void    thread_1_entry(ULONG thread_input)
+void    thread_1_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -173,7 +173,7 @@ UINT    status;
 }
 
 
-void    thread_2_entry(ULONG thread_input)
+void    thread_2_entry(ALIGN_TYPE thread_input)
 {
 
 ULONG   received_message;
@@ -200,7 +200,7 @@ UINT    status;
 }
 
 
-void    thread_3_and_4_entry(ULONG thread_input)
+void    thread_3_and_4_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;
@@ -237,7 +237,7 @@ UINT    status;
 }
 
 
-void    thread_5_entry(ULONG thread_input)
+void    thread_5_entry(ALIGN_TYPE thread_input)
 {
 
 UINT    status;

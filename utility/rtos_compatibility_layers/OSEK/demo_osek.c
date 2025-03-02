@@ -101,7 +101,7 @@ CHAR    * pointer;
     DemoISR = CreateISR("Demo ISR", ISREntry(DemoISR), CATEGORY2, 1024);
 
     /* Create a ThreadX timer to simulate an ISR.  */
-    tx_timer_create(&demo_isr_timer, "Demo ISR timer", demo_isr_timer_entry, DemoISR,
+    tx_timer_create(&demo_isr_timer, "Demo ISR timer", demo_isr_timer_entry, (ALIGN_TYPE)DemoISR,
                      1000, 1000, TX_AUTO_ACTIVATE);
     
     /* Start OSEK  */
@@ -150,7 +150,7 @@ static void ErrorHook(StatusType Error)
 }
 
 /* ThreadX timer handler to simulate an ISR.  */
-VOID demo_isr_timer_entry(ULONG arg)
+VOID demo_isr_timer_entry(ALIGN_TYPE arg)
 {
     /* Call OSEK to process the ISR.  */
     process_ISR2(arg);
