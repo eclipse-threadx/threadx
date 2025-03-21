@@ -178,8 +178,8 @@ TX_THREAD       *thread_ptr;
             status =  TX_SIZE_ERROR;
         }
 
-        /* Check for an invalid message size - greater than 16.  */
-        else if (message_size > TX_16_ULONG)
+        /* Check for an invalid message size - greater than TX_QUEUE_MESSAGE_MAX_SIZE 16 by default.  */
+        else if (message_size > TX_QUEUE_MESSAGE_MAX_SIZE)
         {
 
             /* Invalid message size specified.  */

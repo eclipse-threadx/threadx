@@ -117,6 +117,13 @@
 #define TX_TIMER_THREAD_PRIORITY                ????
 */
 
+/* Define the maximum size of a message in the a queue. the Default value is TX_ULONG_16.
+   the new value must be a multiple of ULONG. */
+
+/*
+#define TX_QUEUE_MESSAGE_MAX_SIZE              TX_ULONG_16
+*/
+
 /* Define the common timer tick reference for use by other middleware components. The default
    value is 10ms (i.e. 100 ticks, defined in tx_api.h), but may be replaced by a port-specific
    version in tx_port.h or here.

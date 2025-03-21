@@ -328,6 +328,12 @@ extern   "C" {
 #define TX_TIMER_TICKS_PER_SECOND       (100UL)
 #endif
 
+/* Define the default maximum message size in a queue. The default value is TX_16_ULONG, but may
+   be customized in tx_user.h or as a compilation option. */
+
+#ifndef TX_QUEUE_MESSAGE_MAX_SIZE
+#define TX_QUEUE_MESSAGE_MAX_SIZE           TX_16_ULONG
+#endif
 
 /* Event numbers 0 through 4095 are reserved by Azure RTOS. Specific event assignments are:
 

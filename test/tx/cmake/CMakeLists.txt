@@ -22,11 +22,11 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}.")
-set(default_build_coverage "")
-set(disable_notify_callbacks_build -DTX_DISABLE_NOTIFY_CALLBACKS)
-set(stack_checking_build -DTX_ENABLE_STACK_CHECKING)
-set(stack_checking_rand_fill_build -DTX_ENABLE_STACK_CHECKING -DTX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
-set(trace_build -DTX_ENABLE_EVENT_TRACE)
+set(default_build_coverage -DTX_QUEUE_MESSAGE_MAX_SIZE=32)
+set(disable_notify_callbacks_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_DISABLE_NOTIFY_CALLBACKS)
+set(stack_checking_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_ENABLE_STACK_CHECKING)
+set(stack_checking_rand_fill_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_ENABLE_STACK_CHECKING -DTX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
+set(trace_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_ENABLE_EVENT_TRACE)
 
 add_compile_options(
   -m32
