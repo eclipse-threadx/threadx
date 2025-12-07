@@ -46,7 +46,7 @@
 
 /* Define the counters used in the demo application...  */
 
-unsigned long   tm_basic_processing_counter;
+volatile unsigned long   tm_basic_processing_counter;
 
 
 /* Test array.  We will just do a series of calculations on the 
