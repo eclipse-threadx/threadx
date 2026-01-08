@@ -78,7 +78,11 @@ _tx_thread_schedule:
     la      t0, _tx_thread_execute_ptr                  // Pickup address of execute ptr
 _tx_thread_schedule_loop:
     LOAD    t1, 0(t0)                                   // Pickup next thread to execute
-    beqz    t1, _tx_thread_schedule_loop                // If NULL, wait for thread to execute
+    bnez    t1, _tx_thread_ready                        // If not NULL, break loop
+    wfi                                                 // Wait for interrupt
+    j       _tx_thread_schedule_loop                    // Wait for interrupt
+
+_tx_thread_ready:
 
     /* }
     while(_tx_thread_execute_ptr == TX_NULL);  */

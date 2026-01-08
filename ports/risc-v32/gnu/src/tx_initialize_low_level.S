@@ -71,6 +71,7 @@ __tx_free_memory_start:
     .global  _tx_initialize_low_level
     .weak    _tx_initialize_low_level
 _tx_initialize_low_level:
+    andi    sp, sp, -16                             // Align stack pointer to 16 bytes
     la      t0, _tx_thread_system_stack_ptr         // Pickup address of system stack ptr
     sw      sp, 0(t0)                               // Save system stack pointer
 
