@@ -30,7 +30,7 @@ extern UINT            test_byte_pool_create_init;
 
 extern VOID    (*test_isr_dispatch)(void);
 
-UINT        _txe_byte_pool_create(TX_BYTE_POOL *pool_ptr, CHAR *name_ptr, VOID *pool_start,
+UINT        _txe_byte_pool_create(TX_BYTE_POOL *pool_ptr, const CHAR *name_ptr, VOID *pool_start,
                     ULONG pool_size, UINT pool_control_block_size);
 
 

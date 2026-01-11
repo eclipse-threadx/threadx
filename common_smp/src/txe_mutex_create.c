@@ -78,7 +78,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txe_mutex_create(TX_MUTEX *mutex_ptr, CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size)
+UINT  _txe_mutex_create(TX_MUTEX *mutex_ptr, const CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size)
 {
 
 TX_INTERRUPT_SAVE_AREA

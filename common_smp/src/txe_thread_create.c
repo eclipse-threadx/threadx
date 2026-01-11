@@ -86,7 +86,7 @@
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT    _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+UINT    _txe_thread_create(TX_THREAD *thread_ptr, const CHAR *name_ptr,
                 VOID (*entry_function)(ULONG id), ULONG entry_input,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
