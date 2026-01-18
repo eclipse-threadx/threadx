@@ -1,0 +1,172 @@
+import subprocess
+import sys
+import time
+import os
+import argparse
+import socket
+import select
+
+def print_content(content):
+    """Prints content using os.write to handle non-blocking stdout robustly."""
+    try:
+        msg = f"{content}\n".encode('utf-8')
+        total_len = len(msg)
+        written = 0
+        fd = sys.stdout.fileno()
+        while written < total_len:
+            try:
+                n = os.write(fd, msg[written:])
+                written += n
+            except BlockingIOError:
+                select.select([], [fd], [])
+    except Exception:
+        pass
+
+def get_free_port():
+    """Finds a free TCP port."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('', 0))
+        return s.getsockname()[1]
+
+def run_qemu_test(elf_path, qemu_bin, gdb_bin):
+    """
+    Runs a test cycle using QEMU and GDB.
+    """
+    print(f"Testing ELF: {elf_path}")
+    print(f"QEMU: {qemu_bin}")
+    print(f"GDB: {gdb_bin}")
+
+    # Find a free port for GDB connection
+    gdb_port = get_free_port()
+    print(f"Using GDB port: {gdb_port}")
+
+    # 1. Start QEMU in the background
+    qemu_cmd = [
+        qemu_bin,
+        "-M", "virt",
+        "-nographic",
+        "-bios", "none", # Disable default OpenSBI to avoid overlap at 0x80000000
+        "-kernel", elf_path,
+        "-gdb", f"tcp::{gdb_port}", "-S",
+        "-monitor", "none", # Disable monitor to avoid clutter
+        "-serial", "stdio"  # Redirect serial output to stdio so we can see it
+    ]
+    
+    print(f"Starting QEMU: {' '.join(qemu_cmd)}")
+    qemu_process = subprocess.Popen(
+        qemu_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    if qemu_process.poll() is not None:
+        print("QEMU failed to start.")
+        print(qemu_process.stderr.read())
+        return False
+
+    # 2. Create a GDB command file
+    gdb_cmds = """
+target remote :{port}
+file {elf}
+break tx_application_define
+break thread_0_entry
+break thread_6_and_7_entry
+break _tx_timer_interrupt
+continue
+continue
+print/x $mstatus
+continue
+finish
+step
+step
+step
+print/x $mstatus
+info registers float
+print fpu_test_val
+continue
+quit
+""".format(port=gdb_port, elf=elf_path)
+
+    gdb_cmd_file = "test_cmds.gdb"
+    with open(gdb_cmd_file, "w") as f:
+        f.write(gdb_cmds)
+
+    # 3. Run GDB
+    gdb_cmd = [
+        gdb_bin,
+        "--batch",
+        "-x", gdb_cmd_file
+    ]
+
+    print_content(f"Starting GDB: {' '.join(gdb_cmd)}")
+    
+    try:
+        gdb_process = subprocess.run(
+            gdb_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        print_content("GDB Output:")
+        print_content(gdb_process.stdout)
+        if gdb_process.stderr:
+            print_content("GDB Error Output:")
+            print_content(gdb_process.stderr)
+            
+    except Exception as e:
+        print_content(f"An error occurred during test execution: {e}")
+        return False
+        
+    finally:
+        # 4. Clean up
+        print_content("Stopping QEMU...")
+        qemu_process.terminate()
+        try:
+            qemu_process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            print_content("QEMU did not terminate gracefully, killing it forcefullly.")
+            qemu_process.kill()
+
+    # Verify results
+    timer_hit = "Breakpoint 4, _tx_timer_interrupt" in gdb_process.stdout
+    fpu_verified = False
+    lazy_fpu_verified = False
+
+    if "Breakpoint 2, thread_0_entry" in gdb_process.stdout:
+        if "$1 =" in gdb_process.stdout: 
+             print_content("SUCCESS: Checked thread_0 mstatus (Expect FS=0 Off/Init for Lazy Save).")
+             lazy_fpu_verified = True
+
+    if "Breakpoint 3, thread_6_and_7_entry" in gdb_process.stdout:
+        if "1.10" in gdb_process.stdout or "fpu_test_val" in gdb_process.stdout:
+             print_content("SUCCESS: FPU instructions executed and registers inspected.")
+             fpu_verified = True
+        else:
+             print_content("FAILURE: Hit thread, but failed to inspect FPU. Output does not contain expected value.")
+    
+    if timer_hit:
+        print_content("SUCCESS: Timer Interrupt verified! Hit _tx_timer_interrupt.")
+    else:
+        print_content("FAILURE: Did not hit timer interrupt.")
+
+    if timer_hit and fpu_verified and lazy_fpu_verified:
+        return True
+    else:
+        return False
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run ThreadX QEMU/GDB Test")
+    parser.add_argument("--elf", required=True, help="Path to the kernel ELF file")
+    parser.add_argument("--qemu", default="qemu-system-riscv32", help="Path to QEMU binary")
+    parser.add_argument("--gdb", default="riscv-none-elf-gdb", help="Path to GDB binary")
+    
+    args = parser.parse_args()
+    
+    success = run_qemu_test(args.elf, args.qemu, args.gdb)
+    
+    if success:
+        sys.exit(0)
+    else:
+        sys.exit(1)

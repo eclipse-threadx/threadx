@@ -99,3 +99,19 @@ target_link_options(kernel.elf PRIVATE
     -nostartfiles
     -Wl,-Map=kernel.map
 )
+
+# QEMU Test Runner Target
+find_package(Python3 COMPONENTS Interpreter)
+if(Python3_FOUND)
+    add_custom_target(check-functional-riscv32
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/test/ports/azrtos_test_tx_gnu_riscv32_qemu.py 
+            --elf $<TARGET_FILE:kernel.elf>
+            --qemu qemu-system-riscv32
+            --gdb gdb
+        DEPENDS kernel.elf
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Running QEMU/GDB Test Runner..."
+    )
+else()
+    message(WARNING "Python3 not found, run_qemu_test target will not be available.")
+endif()

@@ -337,6 +337,7 @@ ULONG   actual_flags;
     }
 }
 
+float   fpu_test_val = 0.0f;
 
 void    thread_6_and_7_entry(ULONG thread_input)
 {
@@ -362,6 +363,9 @@ UINT    status;
         /* Check status.  */
         if (status != TX_SUCCESS)
             break;
+
+        /* FPU Test*/
+        fpu_test_val += 1.1f;
 
         /* Get the mutex again with suspension.  This shows
            that an owning thread may retrieve the mutex it
