@@ -7751,7 +7751,7 @@ UINT               index;
    if (index >= OSEK_MAX_COUNTERS)
    {
        /* No more Counters available - user configuration error.  */
-       return ((CounterType) E_OS_SYS_STACK);
+       return ((CounterType) 0u);
    }
 
    /* Found one.  */

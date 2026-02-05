@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -135,9 +135,10 @@ extern   "C" {
 #ifndef TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH
 #define TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH    20
 #endif
-#ifndef TX_BTYE_POOL_DELAY_VALUE
+
+#ifndef TX_BYTE_POOL_DELAY_VALUE
 #define TX_BYTE_POOL_DELAY_VALUE              3
-#endif
+#endif /* TX_BYTE_POOL_DELAY_VALUE */
 
 
 /* Define basic constants for the ThreadX kernel.  */
@@ -149,9 +150,9 @@ extern   "C" {
 #define AZURE_RTOS_THREADX
 #define THREADX_MAJOR_VERSION           6
 #define THREADX_MINOR_VERSION           4
-#define THREADX_PATCH_VERSION           3
-#define THREADX_BUILD_VERSION           202503
-#define THREADX_HOTFIX_VERSION          ''
+#define THREADX_PATCH_VERSION           5
+#define THREADX_BUILD_VERSION           202504
+#define THREADX_HOTFIX_VERSION          ' '
 
 
 /* Define the following symbol for backward compatibility */
@@ -659,7 +660,7 @@ typedef struct TX_THREAD_STRUCT
     ULONG               tx_thread_suspension_sequence;
 
 #if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
-       
+
     /* Define the random stack fill number. This can be used to detect stack overflow.  */
     ULONG               tx_thread_stack_fill_value;
 #endif
