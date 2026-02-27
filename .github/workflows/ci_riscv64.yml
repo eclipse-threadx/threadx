@@ -1,0 +1,40 @@
+name: riscv64
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    paths:
+      - ".github/workflows/ci_riscv64.yml"
+      - 'common/**'
+      - 'utility/**'
+      - 'ports/risc-v64/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: RISC-V64 build
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Install RISC-V toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-riscv64-unknown-elf
+
+    - name: Install cmake 3.19.1
+      uses: lukka/get-cmake@v3.19.1
+
+    - name: Install ninja-build
+      uses: seanmiddleditch/gha-setup-ninja@v3
+
+    - name: Prepare build system
+      run: cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/riscv64_gnu.cmake -GNinja .
+
+    - name: Compile and link
+      run: cmake --build ./build
