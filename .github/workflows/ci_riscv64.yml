@@ -30,8 +30,6 @@ jobs:
     - name: Install cmake 3.19.1
       uses: lukka/get-cmake@v3.19.1
 
-    - name: Install ninja-build
-      uses: seanmiddleditch/gha-setup-ninja@v3
 
     - name: Prepare build system
       run: cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/riscv64_gnu.cmake -GNinja .
