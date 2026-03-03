@@ -112,9 +112,6 @@ _xt_interrupt_table:
 #if XCHAL_HAVE_XEA3
     .word   xt_interrupt_wrapper
     .word   0
-#elif XT_USE_INT_WRAPPER
-    .word   0
-    .word   0
 #endif
 
     .set    i, 0

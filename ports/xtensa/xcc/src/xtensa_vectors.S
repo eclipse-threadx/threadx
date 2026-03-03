@@ -150,7 +150,10 @@
     .macro  call_exec_isr_entry_fn
     #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     #ifdef __XTENSA_CALL0_ABI__
+    /* Preserve a2 across the call, a12 is callee-saved for call0 ABI. */
+    mov     a12, a2
     call0   _tx_execution_isr_enter
+    mov     a2, a12
     #else
     call4   _tx_execution_isr_enter
     #endif

@@ -93,7 +93,7 @@ typedef struct xt_handler_table_entry {
     void * arg;
 } xt_handler_table_entry;
 
-#if (XT_USE_INT_WRAPPER || XCHAL_HAVE_XEA3)
+#if XCHAL_HAVE_XEA3
 extern xt_handler_table_entry _xt_interrupt_table[XCHAL_NUM_INTERRUPTS + 1];
 #else
 extern xt_handler_table_entry _xt_interrupt_table[XCHAL_NUM_INTERRUPTS];
@@ -131,7 +131,7 @@ xt_handler xt_set_interrupt_handler(uint32_t n, xt_handler f, void * arg)
     }
 #endif
 
-#if (XT_USE_INT_WRAPPER || XCHAL_HAVE_XEA3)
+#if XCHAL_HAVE_XEA3
     entry = _xt_interrupt_table + n + 1;
 #else
     entry = _xt_interrupt_table + n;

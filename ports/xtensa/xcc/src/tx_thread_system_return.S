@@ -83,7 +83,12 @@ _tx_thread_system_return:
 #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing. */
 #ifdef __XTENSA_CALL0_ABI__
+    /* Preserve a0 across the call. */
+#if !XCHAL_HAVE_XEA3
+    s32i    a0, sp, 0
+#endif
     call0   _tx_execution_thread_exit
+    l32i    a0, sp, 0
 #else
     call8   _tx_execution_thread_exit
 #endif
