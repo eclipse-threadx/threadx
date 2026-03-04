@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -74,6 +75,7 @@ void *_tx_linux_thread_entry(void *ptr);
 /*                                                                        */ 
 /*    _tx_thread_create                     Create thread service         */
 /*    _tx_thread_reset                      Reset thread service          */ 
+/*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 {

@@ -52,6 +52,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ISRs                                  Interrupt Service Routines    */
+/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_context_restore(VOID)
 {  */

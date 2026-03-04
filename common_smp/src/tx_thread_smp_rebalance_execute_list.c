@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -81,6 +82,7 @@
 /*    _tx_thread_system_resume              Thread system resume          */
 /*    _tx_thread_system_suspend             Thread suspend                */
 /*    _tx_thread_time_slice                 Thread time-slice             */
+/*                                                                        */
 /**************************************************************************/
 void  _tx_thread_smp_rebalance_execute_list(UINT core_index)
 {

@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -38,6 +39,7 @@
 /*    ThreadX library are built with TX_INCLUDE_USER_DEFINE_FILE defined. */
 /*    Note that all the defines in this file may also be made on the      */
 /*    command line when building ThreadX library and application objects. */
+/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_USER_H

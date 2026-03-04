@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -79,6 +80,7 @@
 /*    _txm_module_manager_start             Initiate module's start thread*/
 /*    _txm_module_manager_stop              Initiate module's stop thread */
 /*    _txm_module_manager_kernel_dispatch   Kernel dispatch function      */
+/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
                             VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),

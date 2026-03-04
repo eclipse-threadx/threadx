@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -72,6 +73,7 @@ extern TXM_MODULE_THREAD_ENTRY_INFO    *_txm_module_entry_info;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Initial thread stack frame                                          */
+/*                                                                        */
 /**************************************************************************/
 VOID _txm_module_callback_request_thread_entry(ULONG id)
 {

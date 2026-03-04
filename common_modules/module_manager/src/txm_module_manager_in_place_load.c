@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -64,6 +65,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
+/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_in_place_load(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location)
 {

@@ -26,6 +26,7 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*  Xtensa-specific interrupt handler wrapper.                            */
+/*                                                                        */
 /**************************************************************************/
 
 

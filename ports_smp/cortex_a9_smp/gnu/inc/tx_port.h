@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -41,6 +42,7 @@
 /*    directly use native C data types.  Instead, ThreadX creates its     */ 
 /*    own special types that can be mapped to actual data types by this   */ 
 /*    file to guarantee consistency in the interface and functionality.   */ 
+/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_PORT_H

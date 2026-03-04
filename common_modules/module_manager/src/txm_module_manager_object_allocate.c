@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -60,6 +61,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
+/*                                                                        */
 /**************************************************************************/
 UINT _txm_module_manager_object_allocate(VOID **object_ptr_ptr, ULONG object_size, TXM_MODULE_INSTANCE *module_instance)
 {

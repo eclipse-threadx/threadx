@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -62,6 +63,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _txm_module_manager_kernel_dispatch   Kernel dispatch function      */
+/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_object_memory_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG object_size)
 {

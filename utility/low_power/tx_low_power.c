@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -70,6 +71,7 @@ UINT    tx_low_power_entered;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_thread_schedule                   Thread scheduling loop        */
+/*                                                                        */
 /**************************************************************************/
 VOID  tx_low_power_enter(VOID)
 {

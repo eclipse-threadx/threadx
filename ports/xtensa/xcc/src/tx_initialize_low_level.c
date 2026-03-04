@@ -47,6 +47,7 @@ int32_t xt_timer_intnum = -1;
 /*    pointer for use in ISR processing later, and finding the first      */
 /*    available RAM memory address for tx_application_define.             */
 /*    It also sets the default heap region for the optional C library.    */
+/*                                                                        */
 /**************************************************************************/
 VOID   _tx_initialize_low_level(VOID)
 {

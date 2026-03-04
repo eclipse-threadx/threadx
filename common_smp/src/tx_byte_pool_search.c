@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -70,6 +71,7 @@
 /*                                                                        */
 /*    _tx_byte_allocate                 Allocate bytes of memory          */
 /*    _tx_byte_release                  Release bytes of memory           */
+/*                                                                        */
 /**************************************************************************/
 UCHAR  *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size)
 {

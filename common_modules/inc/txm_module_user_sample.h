@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -38,6 +39,7 @@
 /*    defined. Note that all the defines in this file may also be made on */
 /*    the command line when building Modules library and application      */
 /*    objects.                                                            */
+/*                                                                        */
 /**************************************************************************/
 
 #ifndef TXM_MODULE_USER_H

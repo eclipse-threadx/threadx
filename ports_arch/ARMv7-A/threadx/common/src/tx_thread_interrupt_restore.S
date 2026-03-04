@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -66,6 +67,7 @@ FIQ_MASK        =   0x040
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
+/*                                                                        */
 /**************************************************************************/
 #if defined(THUMB_MODE)
     .thumb_func

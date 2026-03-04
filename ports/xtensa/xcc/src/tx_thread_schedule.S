@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -55,6 +56,7 @@
 /*    This function waits for a thread control block pointer to appear in */
 /*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
 /*    in the variable, the corresponding thread is resumed.               */
+/*                                                                        */
 /**************************************************************************/
 
 //  VOID   _tx_thread_schedule(VOID)

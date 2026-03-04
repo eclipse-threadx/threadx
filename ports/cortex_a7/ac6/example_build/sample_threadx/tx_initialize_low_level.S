@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -90,6 +91,7 @@ $_tx_initialize_low_level:
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
+/*                                                                        */
 /**************************************************************************/
     .global _tx_initialize_low_level
     .type   _tx_initialize_low_level,function

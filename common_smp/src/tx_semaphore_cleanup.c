@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -64,6 +65,7 @@
 /*    _tx_thread_timeout                Thread timeout processing         */
 /*    _tx_thread_terminate              Thread terminate processing       */
 /*    _tx_thread_wait_abort             Thread wait abort processing      */
+/*                                                                        */
 /**************************************************************************/
 VOID  _tx_semaphore_cleanup(TX_THREAD *thread_ptr, ULONG suspension_sequence)
 {

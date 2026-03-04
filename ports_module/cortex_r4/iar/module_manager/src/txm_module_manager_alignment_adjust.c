@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -55,6 +56,7 @@
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    _txm_module_manager_alignment_adjust  Adjust alignment for Cortex-R */ 
+/*                                                                        */
 /**************************************************************************/
 ULONG  _txm_power_of_two_block_size(ULONG size)
 {

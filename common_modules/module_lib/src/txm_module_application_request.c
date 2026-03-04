@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -55,6 +56,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Module application code                                             */
+/*                                                                        */
 /**************************************************************************/
 UINT txm_module_application_request(ULONG request, ALIGN_TYPE param_1, ALIGN_TYPE param_2, ALIGN_TYPE param_3)
 {

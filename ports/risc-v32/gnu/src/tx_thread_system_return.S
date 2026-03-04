@@ -53,6 +53,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX components                                                  */
+/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_system_return(VOID)
 {  */

@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -97,6 +98,7 @@ static INT tx_head_free_index = 0U;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter                                         */
+/*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry, optimize(0)))
 UINT    _tx_thread_secure_mode_stack_initialize(void)

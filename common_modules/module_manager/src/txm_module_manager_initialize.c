@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -128,6 +129,7 @@ ULONG                   _txm_module_manager_callback_error_count;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
+/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_memory_size)
 {

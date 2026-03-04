@@ -27,6 +27,7 @@
 /*                                                                        */
 /*    Xtensa coprocessor handling routines. This code is only active if   */
 /*    one or more coprocessors are present.                               */
+/*                                                                        */
 /**************************************************************************/
 
 

@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -117,6 +118,7 @@ ULONG                           _tx_thread_smp_debug_info_current_index;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Internal routines                                                   */
+/*                                                                        */
 /**************************************************************************/
 void  _tx_thread_smp_debug_entry_insert(ULONG id, ULONG suspend, VOID *thread_void_ptr)
 {

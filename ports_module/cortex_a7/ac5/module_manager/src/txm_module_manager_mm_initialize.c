@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -87,6 +88,7 @@ __align(1024) ULONG _txm_level2_external_page_pool[TXM_LEVEL2_EXTERNAL_POOL_PAGE
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    Application code                                                    */ 
+/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_mm_initialize(VOID)
 {

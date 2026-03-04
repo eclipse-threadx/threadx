@@ -26,6 +26,7 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*  Xtensa overlay manager OS hooks for ThreadX. XEA2 only.               */
+/*                                                                        */
 /**************************************************************************/
 
 

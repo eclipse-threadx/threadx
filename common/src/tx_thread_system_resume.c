@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -67,6 +68,7 @@
 /*    _tx_thread_timeout                    Thread timeout                */
 /*    _tx_thread_wait_abort                 Thread wait abort             */
 /*    Other ThreadX Components                                            */
+/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_system_resume(TX_THREAD *thread_ptr)
 #ifndef TX_NOT_INTERRUPTABLE

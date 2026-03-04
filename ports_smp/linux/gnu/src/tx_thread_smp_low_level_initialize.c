@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -63,6 +64,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_high_level            ThreadX high-level init        */
+/*                                                                        */
 /**************************************************************************/
 void  _tx_thread_smp_low_level_initialize(UINT number_of_cores)
 {

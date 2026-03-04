@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -70,6 +71,7 @@ TXM_MODULE_MANAGER_FAULT_INFO
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Fault handler                                                       */
+/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_memory_fault_handler(VOID)
 {

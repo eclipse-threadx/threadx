@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -58,6 +59,7 @@
 /*    time slice and/or timer expiration.  If either is found, the        */ 
 /*    interrupt context save/restore functions are called along with the  */ 
 /*    expiration functions.                                               */ 
+/*                                                                        */
 /**************************************************************************/ 
 
 //  VOID   _tx_timer_interrupt(VOID)

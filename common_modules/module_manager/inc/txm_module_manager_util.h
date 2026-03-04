@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -34,6 +35,7 @@
 /*                                                                        */
 /*    This file declares prototypes of utility functions used by the      */
 /*    module manager.                                                     */
+/*                                                                        */
 /**************************************************************************/
 
 #ifndef TXM_MODULE_MANAGER_UTIL_H

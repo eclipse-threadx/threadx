@@ -41,6 +41,7 @@
 /*    directly use native C data types.  Instead, ThreadX creates its     */
 /*    own special types that can be mapped to actual data types by this   */
 /*    file to guarantee consistency in the interface and functionality.   */
+/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_PORT_H

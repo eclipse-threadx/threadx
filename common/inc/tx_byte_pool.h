@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -35,6 +36,7 @@
 /*    This file defines the ThreadX byte memory management component,     */
 /*    including all data types and external references.  It is assumed    */
 /*    that tx_api.h and tx_port.h have already been included.             */
+/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_BYTE_POOL_H

@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -37,6 +38,7 @@
 /*    and data structure definitions are defined in this file.            */
 /*    Please note that basic data type definitions and other architecture-*/
 /*    specific information is contained in the file tx_port.h.            */
+/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_API_H

@@ -74,6 +74,7 @@
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    _txm_module_thread_shell_entry        Start module thread           */ 
+/*                                                                        */
 /**************************************************************************/
 /* VOID   _txm_module_initialize(VOID *heap_base, VOID *heap_top) */
     .global _txm_module_initialize

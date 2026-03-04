@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -59,6 +60,7 @@
 /*    _tx_thread_suspend                    Application thread suspend    */
 /*    _tx_thread_terminate                  Thread terminate              */
 /*    Other ThreadX Components                                            */
+/*                                                                        */
 /**************************************************************************/
 UINT _txm_module_thread_system_suspend(TX_THREAD *thread_ptr)
 {

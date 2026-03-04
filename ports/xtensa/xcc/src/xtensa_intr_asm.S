@@ -27,6 +27,7 @@
 /*                                                                        */
 /*    Xtensa interrupt handling data and assembly routines.               */
 /*    Also see xtensa_intr.c.                                             */
+/*                                                                        */
 /**************************************************************************/
 
 

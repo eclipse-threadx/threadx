@@ -29,6 +29,7 @@
 /*    This file contains the interface functions to provide thread-safe   */
 /*    operation of the C library. Both newlib and the Xtensa C Library    */
 /*    are supported.                                                      */
+/*                                                                        */
 /**************************************************************************/
 
 #include "tx_api.h"     /* TX_THREAD_SAFE_CLIB may be defined by tx_port.h */

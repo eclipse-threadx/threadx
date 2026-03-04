@@ -51,6 +51,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
+/*                                                                        */
 /**************************************************************************/
 /* UINT   _tx_thread_interrupt_control(UINT new_posture)
 {  */

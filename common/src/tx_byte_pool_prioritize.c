@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -61,6 +62,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
+/*                                                                        */
 /**************************************************************************/
 UINT  _tx_byte_pool_prioritize(TX_BYTE_POOL *pool_ptr)
 {

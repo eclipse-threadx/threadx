@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -123,6 +124,7 @@ EXECUTION_TIME_SOURCE_TYPE          _tx_execution_idle_time_last_start[TX_THREAD
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_thread_schedule               Thread scheduling                 */
+/*                                                                        */
 /**************************************************************************/
 VOID  _tx_execution_thread_enter(void)
 {

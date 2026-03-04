@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -86,6 +87,7 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
+/*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_performance_system_info_get(ULONG *resumptions, ULONG *suspensions,
                 ULONG *solicited_preemptions, ULONG *interrupt_preemptions, ULONG *priority_inversions,

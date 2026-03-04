@@ -21,6 +21,7 @@
 /*    Structure offsets depend on the compiler, so are tools-specific,    */
 /*    which usually means port-specific since a compiler's struct         */
 /*    packing rules depend on properties of the target architecture.      */
+/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_API_ASM_H

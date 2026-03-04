@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -324,6 +325,7 @@ static void tx_caches_enable(void)
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_low_level           ThreadX low level initialization */
+/*                                                                        */
 /**************************************************************************/
 void _tx_platform_initialize_low_level(void)
 {

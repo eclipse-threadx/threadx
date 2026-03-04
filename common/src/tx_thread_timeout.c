@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (C) 2026-present Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -65,6 +66,7 @@
 /*                                                                        */
 /*    _tx_timer_expiration_process          Timer expiration function     */
 /*    _tx_timer_thread_entry                Timer thread function         */
+/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_timeout(ULONG timeout_input)
 {
