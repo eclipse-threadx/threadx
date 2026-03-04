@@ -1,4 +1,4 @@
-/* This test is designed to test multi-level preemption threshold. The protection placed 
+/* This test is designed to test multi-level preemption threshold. The protection placed
    by a thread must be preserved after higher-priority thread preemption that is above the threshold.  */
 
 #include   <stdio.h>
@@ -139,8 +139,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             (TX_MAX_PRIORITIES-1), (TX_MAX_PRIORITIES/2), TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -154,8 +154,8 @@ CHAR    *pointer;
 
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD /* skip this test and pretend it passed */
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             (TX_MAX_PRIORITIES/2), (TX_MAX_PRIORITIES/2), TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -167,8 +167,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 10, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -180,8 +180,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2a, "thread 2a", thread_2a_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2a, "thread 2a", thread_2a_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -193,8 +193,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             11, 11, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -206,8 +206,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             9, 9, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -221,8 +221,8 @@ CHAR    *pointer;
 
     /* Create new cascading preemption-threshold test threads.  */
 
-    status =  tx_thread_create(&thread_30_29, "thread 30-29", thread_30_29_entry, 30,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_30_29, "thread 30-29", thread_30_29_entry, 30,
+            pointer, TEST_STACK_SIZE_PRINTF,
             30, 29, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -234,8 +234,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_28_27, "thread 28-27", thread_28_27_entry, 28,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_28_27, "thread 28-27", thread_28_27_entry, 28,
+            pointer, TEST_STACK_SIZE_PRINTF,
             28, 27, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -247,8 +247,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_26_25, "thread 26-25", thread_26_25_entry, 26,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_26_25, "thread 26-25", thread_26_25_entry, 26,
+            pointer, TEST_STACK_SIZE_PRINTF,
             26, 25, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -260,8 +260,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_24_23, "thread 24-23", thread_24_23_entry, 24,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_24_23, "thread 24-23", thread_24_23_entry, 24,
+            pointer, TEST_STACK_SIZE_PRINTF,
             24, 23, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -273,8 +273,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_22_21, "thread 22-21", thread_22_21_entry, 22,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_22_21, "thread 22-21", thread_22_21_entry, 22,
+            pointer, TEST_STACK_SIZE_PRINTF,
             22, 21, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -286,8 +286,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_20_19, "thread 20-19", thread_20_19_entry, 20,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_20_19, "thread 20-19", thread_20_19_entry, 20,
+            pointer, TEST_STACK_SIZE_PRINTF,
             20,19, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -299,8 +299,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_18_17, "thread 18-17", thread_18_17_entry, 18,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_18_17, "thread 18-17", thread_18_17_entry, 18,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 17, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -312,8 +312,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_16_15, "thread 16-15", thread_16_15_entry, 16,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_16_15, "thread 16-15", thread_16_15_entry, 16,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 15, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -325,8 +325,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_14_13, "thread 14-13", thread_14_13_entry, 14,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_14_13, "thread 14-13", thread_14_13_entry, 14,
+            pointer, TEST_STACK_SIZE_PRINTF,
             14, 13, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -338,8 +338,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_12_11, "thread 12-11", thread_12_11_entry, 12,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_12_11, "thread 12-11", thread_12_11_entry, 12,
+            pointer, TEST_STACK_SIZE_PRINTF,
             12, 11, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -352,7 +352,7 @@ CHAR    *pointer;
     }
 
     status =  tx_thread_create(&thread_10_9, "thread 10-9", thread_10_9_entry, 10,
-            pointer, TEST_STACK_SIZE_PRINTF, 
+            pointer, TEST_STACK_SIZE_PRINTF,
             10, 9, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -364,8 +364,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_8_7, "thread 8-7", thread_8_7_entry, 8,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_8_7, "thread 8-7", thread_8_7_entry, 8,
+            pointer, TEST_STACK_SIZE_PRINTF,
             8, 7, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -377,8 +377,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_6_5, "thread 6-5", thread_6_5_entry, 6,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_6_5, "thread 6-5", thread_6_5_entry, 6,
+            pointer, TEST_STACK_SIZE_PRINTF,
             6, 5, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -390,8 +390,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_4_3, "thread 4-3", thread_4_3_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4_3, "thread 4-3", thread_4_3_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             4, 3, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -403,8 +403,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_3_2, "thread 3-2", thread_3_2_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3_2, "thread 3-2", thread_3_2_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             3, 2, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -416,8 +416,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2_1, "thread 2-1", thread_2_1_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2_1, "thread 2-1", thread_2_1_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             2, 1, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -429,8 +429,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1_0, "thread 1-0", thread_1_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1_0, "thread 1-0", thread_1_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             1, 1, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -443,7 +443,7 @@ CHAR    *pointer;
     }
 
     status =  tx_timer_create(&timer_0, "timer 0", timer_0_entry, 0, 1, 0, TX_NO_ACTIVATE);
-    
+
     /* Check for status.  */
     if (status != TX_SUCCESS)
     {
@@ -451,7 +451,7 @@ CHAR    *pointer;
         printf("Running Thread Multi-Level Preemption Threshold Test................ ERROR #24\n");
         test_control_return(1);
     }
-    
+
 #endif
 
 }
@@ -522,7 +522,7 @@ UINT old_preempt;
 
     /* Set preemption threshold to keep new test threads from running.  */
     status =  tx_thread_preemption_change(&thread_0, 17, &old_preempt);
-    
+
     /* Now wakup the lowest priority preemption-threshold thread.  */
     status += tx_thread_resume(&thread_30_29);
 
@@ -537,7 +537,7 @@ UINT old_preempt;
 
     /* Now, self suspend.  */
     status =  tx_thread_suspend(&thread_0);
-    
+
     /* Check to make sure all the preemption-threshold threads ran.  */
     if ((thread_1_0_counter !=  1) ||
         (thread_2_1_counter !=  1) ||
@@ -606,7 +606,7 @@ UINT    status;
         (thread_4_counter != 1))
         return;
 
-    /* Relinquish to the other thread at this priority level.  This should 
+    /* Relinquish to the other thread at this priority level.  This should
        clear the preemption threshold condition and allow thread 3 to run. */
     tx_thread_relinquish();
 
@@ -648,7 +648,7 @@ static void    timer_0_entry(ULONG id)
 
     /* Pretend like a preemption occurred on a thread priority of 1 with preemption-threshold set to 0.  */
     _tx_thread_preempted_maps[0] =  _tx_thread_preempted_maps[0] | 2;
-    
+
     /* Set the thread's preemption threshold as well.  */
     thread_1_0.tx_thread_preempt_threshold =  0;
 
@@ -665,16 +665,16 @@ UINT    status;
 
     /* Activate the timer to force a priority 0 thread to interrupt.  */
     status =  tx_timer_activate(&timer_0);
-    
+
     /* Loop to wait until timer 0 runs.  */
     while (timer_0_counter == 0)
     {
     }
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-      
+
         /* Increment this thread's counter.  */
         thread_1_0_counter++;
     }
@@ -697,11 +697,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_1_0);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_3_2_counter++;
     }
@@ -716,11 +716,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_2_1);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_4_3_counter++;
     }
@@ -736,16 +736,16 @@ UINT    status;
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_4_3);
 
-    /* In this particular case, we have two different preemptions to make 
+    /* In this particular case, we have two different preemptions to make
        sure we exercise all the code.  */
 
     /* Now resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_3_2);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_6_5_counter++;
     }
@@ -760,11 +760,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_6_5);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_8_7_counter++;
     }
@@ -779,11 +779,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_8_7);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_10_9_counter++;
     }
@@ -797,11 +797,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_10_9);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_12_11_counter++;
     }
@@ -816,11 +816,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_12_11);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_14_13_counter++;
     }
@@ -835,11 +835,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_14_13);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_16_15_counter++;
     }
@@ -854,11 +854,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_16_15);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_18_17_counter++;
     }
@@ -873,11 +873,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_18_17);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_20_19_counter++;
     }
@@ -892,11 +892,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_20_19);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_22_21_counter++;
     }
@@ -911,11 +911,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_22_21);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_24_23_counter++;
     }
@@ -929,11 +929,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_24_23);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_26_25_counter++;
     }
@@ -947,11 +947,11 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_26_25);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_28_27_counter++;
     }
@@ -965,15 +965,15 @@ UINT    status;
 
     /* Resume next highest priority thread.  */
     status =  tx_thread_resume(&thread_28_27);
-    
+
     /* Check for good status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Increment this thread's counter.  */
         thread_30_29_counter++;
     }
-    
+
     /* Resume thread_0.  */
     tx_thread_resume(&thread_0);
 }

@@ -44,7 +44,7 @@ do
         echo "$source_inc_folder -> $target"
         cp -rf $source_inc_folder/* $target
         find $target -type f -exec sed -i "s/$source_string/$target_string_pre${mcu: -1}/g" {} \;
-        
+
         # Copy common files
         source=$source_folder/$source_common_folder;
         target=$ports_module_folder/$mcu/$ide/$target_common_folder

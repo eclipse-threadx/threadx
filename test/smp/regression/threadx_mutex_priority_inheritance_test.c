@@ -1,4 +1,4 @@
-/* This test is designed to test the mutex suspension and priority inheritance with another 
+/* This test is designed to test the mutex suspension and priority inheritance with another
    thread resuming the higher priority thread by doing a mutex put.  Higher-priority thread should preempt.  */
 
 #include   <stdio.h>
@@ -74,16 +74,16 @@ CHAR    *pointer;
     /* Test for an error creating/using a mutex from initialization.  */
     if (test_mutex_from_init != TX_SUCCESS)
     {
-    
+
         printf("Running Mutex Priority Inheritance Test............................. ERROR #0\n");
         test_control_return(1);
-    }    
+    }
 
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -95,8 +95,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -108,8 +108,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             14, 14, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -123,8 +123,8 @@ CHAR    *pointer;
 
     /* Create a high-priority thread that will get all the priority inheritance mutexes and return from
        it's entry function in order to test the auto delete feature.  */
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             10, 10, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -137,8 +137,8 @@ CHAR    *pointer;
     }
 
     /* Create a higher-priority thread that is used to get thread 4 into a priority inheritance state.  */
-    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,
+            pointer, TEST_STACK_SIZE_PRINTF,
             8, 8, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -152,8 +152,8 @@ CHAR    *pointer;
 
 
     /* Create a higher-priority thread that is used to suspend on priority inheritance mutex 3.  */
-    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,
+            pointer, TEST_STACK_SIZE_PRINTF,
             6, 6, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -167,8 +167,8 @@ CHAR    *pointer;
 
 
     /* Create a higher-priority thread that is used to suspend on priority inheritance mutex 3.  */
-    status =  tx_thread_create(&thread_7, "thread 7", thread_7_entry, 7,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_7, "thread 7", thread_7_entry, 7,
+            pointer, TEST_STACK_SIZE_PRINTF,
             7, 7, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -246,7 +246,7 @@ UINT    status;
 
     /* Resume thread 4 to test the automatic release of the mutexes.  */
     tx_thread_resume(&thread_4);
-    
+
     /* Determine if thread 4 was able to get the mutexes before completion... and
        have its original priority restored after the priority inheritance.  */
     if ((thread_4_counter != 1) || (thread_5_counter != 1) || (thread_4.tx_thread_priority != 10) ||
@@ -274,10 +274,10 @@ UINT    status;
         printf("ERROR #13\n");
         test_control_return(1);
     }
-    
+
     /* Release mutex 2 to be compatible with original test.  */
     tx_mutex_put(&mutex_2);
-    
+
     /* Now resume the higher priority thread to cause suspension.  */
     tx_thread_resume(&thread_1);
 
@@ -314,8 +314,8 @@ UINT    status;
         printf("ERROR #16\n");
         test_control_return(1);
     }
-    
-    /* Now sleep for 20 ticks in order to test the priority inheritance change of a 
+
+    /* Now sleep for 20 ticks in order to test the priority inheritance change of a
        non-ready thread.  */
     tx_thread_sleep(20);
 
@@ -330,10 +330,10 @@ UINT    status;
 
     /* Resume thread 2 in order to get two threads suspended on the mutex.  */
     tx_thread_resume(&thread_2);
-    
+
     /* Now do a mutex put to release both threads suspended on this mutex.  */
     status =  tx_mutex_put(&mutex_0);
-    
+
     /* The other thread should now be suspended on the mutex.  */
     if ((status != TX_SUCCESS) || (thread_1_counter != 4) || (thread_2_counter != 2) || (thread_0.tx_thread_priority != 16))
     {
@@ -342,7 +342,7 @@ UINT    status;
         printf("ERROR #18\n");
         test_control_return(1);
     }
-    
+
     /* At this point, get the mutex again.  */
     status =  tx_mutex_get(&mutex_0, TX_NO_WAIT);
 
@@ -354,7 +354,7 @@ UINT    status;
         printf("ERROR #19\n");
         test_control_return(1);
     }
-    
+
     /* Abort the sleep.  */
     tx_thread_wait_abort(&thread_1);
     tx_thread_wait_abort(&thread_2);
@@ -362,10 +362,10 @@ UINT    status;
     /* Now both threads are suspended again on mutex... and then terminate them.  */
     tx_thread_terminate(&thread_1);
     tx_thread_terminate(&thread_2);
-    
+
     /* Now do a mutex put to release both threads suspended on this mutex.  */
     status =  tx_mutex_put(&mutex_0);
-    
+
     /* The other thread should now be suspended on the mutex.  */
     if ((status != TX_SUCCESS) || (thread_1_counter != 5) || (thread_2_counter != 3) || (thread_0.tx_thread_priority != 16))
     {
@@ -376,21 +376,21 @@ UINT    status;
     }
 
     /* Now test the timeout on the suspension list of a priority inheritance mutex.  */
-    
+
     /* First, obtain priority inheritance mutex 3.  */
     status =  tx_mutex_get(&mutex_3, TX_WAIT_FOREVER);
-    
+
     /* Next resume threads 6 and 7 so they will block on trying to get this mutex forever.  */
     status += tx_thread_resume(&thread_7);
     status += tx_thread_resume(&thread_6);
-    
+
     /* Now set the flag which will cause the last thread in the suspension list to timeout (abort)
        resulting in a NULL suspension list and covering that branch condition in tx_mutex_put  */
     test_forced_mutex_timeout =  1;
-    
+
     /* Perform a mutex put to release the mutex.  */
     status += tx_mutex_put(&mutex_3);
-    
+
     /* Now check for errors.  */
 #ifndef TX_MISRA_ENABLE
 #ifndef TX_MANUAL_TEST
@@ -404,9 +404,9 @@ UINT    status;
 #endif
 #else
     if ((status != TX_SUCCESS) || (thread_6_counter != 1))
-#endif     
+#endif
     {
-    
+
         /* Mutex error.  */
         printf("ERROR #21\n");
         test_control_return(1);
@@ -429,7 +429,7 @@ UINT    status;
 
     while(1)
     {
-    
+
         /* Increment thread run counter.  */
         thread_1_counter++;
 
@@ -440,9 +440,9 @@ UINT    status;
         /* Did we get the right status?  */
         if (status == TX_SUCCESS)
             thread_1_counter++;
-        
+
         /* Sleep for 10 ticks... to delay.  */
-        tx_thread_sleep(10);  
+        tx_thread_sleep(10);
     }
 }
 
@@ -458,7 +458,7 @@ UINT    status;
 
     while(1)
     {
-    
+
         /* Increment thread run counter.  */
         thread_2_counter++;
 
@@ -469,9 +469,9 @@ UINT    status;
         /* Did we get the right status?  */
         if (status == TX_SUCCESS)
             thread_2_counter++;
-        
+
         /* Sleep for 10 ticks... to delay.  */
-        tx_thread_sleep(10);  
+        tx_thread_sleep(10);
     }
 }
 
@@ -482,7 +482,7 @@ static void    thread_4_entry(ULONG thread_input)
 UINT    status;
 UINT    old_priority;
 
-     
+
     /* Get mutex to cause additional ownership linked-list processing.  */
     status =  tx_mutex_get(&mutex_0, TX_WAIT_FOREVER);
     status += tx_mutex_get(&mutex_1, TX_WAIT_FOREVER);
@@ -493,7 +493,7 @@ UINT    old_priority;
     /* Resume thread 5 to get into priority inheritance.  */
     tx_thread_resume(&thread_5);
 
-    /* Determine if all the mutex gets were successful... and we have 
+    /* Determine if all the mutex gets were successful... and we have
        inherited priority 8.  */
     if ((status == TX_SUCCESS) && (thread_4.tx_thread_priority == 8))
     {
@@ -501,10 +501,10 @@ UINT    old_priority;
         /* Yes, increment the thread counter.  */
         thread_4_counter++;
     }
-    
+
     /* Now, attempt to manually set this thread's priority to the same priority.  */
     status =  tx_thread_priority_change(&thread_4, 8, &old_priority);
-    
+
     /* Determine if there is an error.  */
     if ((status != TX_SUCCESS) || (thread_4.tx_thread_user_priority != 8) || (old_priority != 10))
     {
@@ -515,7 +515,7 @@ UINT    old_priority;
 
     /* Now attempt to manually set the same thread priority.  */
     status =  tx_thread_priority_change(&thread_4, 8, &old_priority);
-    
+
     /* Determine if there is an error.  */
     if ((status != TX_SUCCESS) || (thread_4.tx_thread_user_priority != 8) || (old_priority != 8))
     {
@@ -523,10 +523,10 @@ UINT    old_priority;
         /* Clear the counter, which will signal an error to the thread above.  */
         thread_4_counter =  0;
     }
-    
+
     /* Now restore the original user priority of 10.  */
     status =  tx_thread_priority_change(&thread_4, 10, &old_priority);
-    
+
     /* Determine if there is an error.  */
     if ((status != TX_SUCCESS) || (thread_4.tx_thread_user_priority != 10) || (old_priority != 8))
     {
@@ -535,7 +535,7 @@ UINT    old_priority;
         thread_4_counter =  0;
     }
 
-    /* Now fall through and make sure the mutex cleanup function 
+    /* Now fall through and make sure the mutex cleanup function
        releases all the mutexes.  */
 }
 
@@ -545,7 +545,7 @@ static void    thread_5_entry(ULONG thread_input)
 
 UINT    status;
 
-     
+
     /* Get mutex to cause priority inheritance in thread 4.  */
     status =  tx_mutex_get(&mutex_0, TX_WAIT_FOREVER);
 
@@ -557,7 +557,7 @@ UINT    status;
         thread_5_counter++;
     }
 
-    /* Now fall through and make sure the mutex cleanup function 
+    /* Now fall through and make sure the mutex cleanup function
        releases all the mutexes.  */
 }
 
@@ -567,7 +567,7 @@ static void    thread_6_entry(ULONG thread_input)
 
 UINT    status;
 
-     
+
     /* Get mutex to cause priority inheritance in thread 0.  */
     status =  tx_mutex_get(&mutex_3, TX_WAIT_FOREVER);
 
@@ -579,7 +579,7 @@ UINT    status;
         thread_6_counter++;
     }
 
-    /* Now fall through and make sure the mutex cleanup function 
+    /* Now fall through and make sure the mutex cleanup function
        releases all the mutexes.  */
 }
 
@@ -589,7 +589,7 @@ static void    thread_7_entry(ULONG thread_input)
 
 UINT    status;
 
-     
+
     /* Get mutex to cause priority inheritance in thread 0.  */
     status =  tx_mutex_get(&mutex_3, TX_WAIT_FOREVER);
 
@@ -601,7 +601,7 @@ UINT    status;
         thread_7_counter++;
     }
 
-    /* Now fall through and make sure the mutex cleanup function 
+    /* Now fall through and make sure the mutex cleanup function
        releases all the mutexes.  */
 }
 

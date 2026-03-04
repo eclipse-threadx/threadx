@@ -45,8 +45,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -185,7 +185,7 @@ ULONG           timeouts;
 
     /* Attempt to get from semaphore with an instance.  Should be successful.  */
     status =  tx_semaphore_get(&semaphore_1, TX_NO_WAIT);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -198,10 +198,10 @@ ULONG           timeouts;
     /* Get semaphore information.  */
     status =   tx_semaphore_info_get(&semaphore_0, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status +=  tx_semaphore_info_get(&semaphore_0, &name, &current_value, &first_suspended, &suspended_count, &next_semaphore);
-    
+
     /* Check status.  */
-    if ((status != TX_SUCCESS) || (current_value != semaphore_0.tx_semaphore_count) || 
-        (first_suspended != semaphore_0.tx_semaphore_suspension_list) || (suspended_count != semaphore_0.tx_semaphore_suspended_count) || 
+    if ((status != TX_SUCCESS) || (current_value != semaphore_0.tx_semaphore_count) ||
+        (first_suspended != semaphore_0.tx_semaphore_suspension_list) || (suspended_count != semaphore_0.tx_semaphore_suspended_count) ||
         (next_semaphore != semaphore_0.tx_semaphore_created_next))
     {
 
@@ -227,9 +227,9 @@ ULONG           timeouts;
     /* Get semaphore performance information.  */
     status =  tx_semaphore_performance_info_get(&semaphore_0, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_semaphore_performance_info_get(&semaphore_0, &puts, &gets, &suspensions, &timeouts);
-    
+
     /* Check status.  */
-    if ((status != TX_SUCCESS) || (puts != semaphore_0.tx_semaphore_performance_put_count) || (gets != semaphore_0.tx_semaphore_performance_get_count) || 
+    if ((status != TX_SUCCESS) || (puts != semaphore_0.tx_semaphore_performance_put_count) || (gets != semaphore_0.tx_semaphore_performance_get_count) ||
         (suspensions != semaphore_0.tx_semaphore_performance_suspension_count) || (timeouts != semaphore_0.tx_semaphore_performance_timeout_count))
     {
 
@@ -237,13 +237,13 @@ ULONG           timeouts;
         printf("ERROR #13\n");
         test_control_return(1);
     }
-    
+
     /* Get semaphore system performance information.  */
     status =  tx_semaphore_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_semaphore_performance_system_info_get(&puts, &gets, &suspensions, &timeouts);
-    
+
     /* Check status.  */
-    if ((status != TX_SUCCESS) || (puts != _tx_semaphore_performance_put_count) || (gets != _tx_semaphore_performance_get_count) || 
+    if ((status != TX_SUCCESS) || (puts != _tx_semaphore_performance_put_count) || (gets != _tx_semaphore_performance_get_count) ||
         (suspensions != _tx_semaphore_performance_suspension_count) || (timeouts != _tx_semaphore_performance_timeout_count))
     {
 

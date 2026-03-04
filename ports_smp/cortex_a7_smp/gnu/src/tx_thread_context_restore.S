@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread                                                              */
 @/**                                                                       */
@@ -63,43 +63,43 @@ IRQ_MODE        =     0x92               @ Disable IRQ, IRQ mode
 @
 @/* No 16-bit Thumb mode veneer code is needed for _tx_thread_context_restore
 @   since it will never be called 16-bit mode.  */
-@ 
+@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_context_restore                      SMP/Cortex-A7/GNU   */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_context_restore                      SMP/Cortex-A7/GNU   */
 @/*                                                            6.1         */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function restores the interrupt context if it is processing a  */ 
-@/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-@/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-@/*    if no thread was running, the function returns to the scheduler.    */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
-@/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    ISRs                                  Interrupt Service Routines    */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*    This function restores the interrupt context if it is processing a  */
+@/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+@/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+@/*    if no thread was running, the function returns to the scheduler.    */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    _tx_thread_schedule                   Thread scheduling routine     */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    ISRs                                  Interrupt Service Routines    */
+@/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_context_restore(VOID)
 @{
@@ -136,13 +136,13 @@ _tx_thread_context_restore:
     ADD     r3, r3, r12                         @ Build array offset
     LDR     r2, [r3, #0]                        @ Pickup system state
     SUB     r2, r2, #1                          @ Decrement the counter
-    STR     r2, [r3, #0]                        @ Store the counter 
+    STR     r2, [r3, #0]                        @ Store the counter
     CMP     r2, #0                              @ Was this the first interrupt?
     BEQ     __tx_thread_not_nested_restore      @ If so, not a nested restore
 @
 @    /* Interrupts are nested.  */
 @
-@    /* Just recover the saved registers and return to the point of 
+@    /* Just recover the saved registers and return to the point of
 @       interrupt.  */
 @
     LDMIA   sp!, {r0, r10, r12, lr}             @ Recover SPSR, POI, and scratch regs
@@ -154,7 +154,7 @@ _tx_thread_context_restore:
 __tx_thread_not_nested_restore:
 @
 @    /* Determine if a thread was interrupted and no preemption is required.  */
-@    else if (((_tx_thread_current_ptr[core]) && (_tx_thread_current_ptr[core] == _tx_thread_execute_ptr[core]) 
+@    else if (((_tx_thread_current_ptr[core]) && (_tx_thread_current_ptr[core] == _tx_thread_execute_ptr[core])
 @               || (_tx_thread_preempt_disable))
 @    {
 @
@@ -343,7 +343,7 @@ __tx_thread_dont_save_ts:
 @
 @    /* Set bit indicating this thread is ready for execution.  */
 @
-    LDR     r2, [r0, #152]                      @ Pickup the ready bit 
+    LDR     r2, [r0, #152]                      @ Pickup the ready bit
     ORR     r2, r2, #0x8000                     @ Set ready bit (bit 15)
     STR     r2, [r0, #152]                      @ Make this thread ready for executing again
     DMB                                         @ Ensure that accesses to shared resource have completed

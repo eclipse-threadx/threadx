@@ -1,11 +1,11 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
  * Copyright (c) 2025 Eclipse ThreadX Contributors
- * 
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -2393,7 +2393,7 @@ ALIGN_TYPE return_value;
     if (param_1 < module_instance -> txm_module_instance_maximum_priority)
     {
         return(TX_THRESH_ERROR);
-    }    
+    }
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
@@ -2427,7 +2427,7 @@ ALIGN_TYPE return_value;
     if (param_1 < module_instance -> txm_module_instance_maximum_priority)
     {
         return(TX_PRIORITY_ERROR);
-    }    
+    }
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {

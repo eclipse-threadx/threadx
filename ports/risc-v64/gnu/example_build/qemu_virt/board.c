@@ -12,7 +12,7 @@ void *memset(const void *des, int c,size_t n)
     int i;
     for(i=0;i<n;i++)
         t[i]=c;
-    return t; 
+    return t;
 }
 
 

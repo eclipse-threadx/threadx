@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -20,7 +20,7 @@
 ;/**************************************************************************/
 ;
 ;
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))         
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     IMPORT  _tx_execution_isr_enter
 #endif
 ;
@@ -66,7 +66,7 @@
 ;{
     EXPORT  _tx_thread_context_save
 _tx_thread_context_save
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))   
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 ;
 ;    /* Call the ISR enter function to indicate an ISR is executing.  */
 ;

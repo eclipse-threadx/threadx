@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -27,39 +27,39 @@
 #include "px_int.h"     /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    pthread_attr_init                                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    pthread_attr_init                                   PORTABLE C      */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This function initializes a pthread attributes object to default    */
 /*    values,if the object is already created this call will reinitialize */
-/*    it else it will create a new attr object and initializes it.        */  
+/*    it else it will create a new attr object and initializes it.        */
 /*                                                                        */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*    attr                           Address of the thread attributes     */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*     0                             if successful                        */ 
-/*     Value                         in case of any error                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*     0                             if successful                        */
+/*     Value                         in case of any error                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    set_default_pthread_attr       to reset with defualt parameters     */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 INT pthread_attr_init(pthread_attr_t *attr)
@@ -68,7 +68,7 @@ INT pthread_attr_init(pthread_attr_t *attr)
 TX_INTERRUPT_SAVE_AREA
 
     TX_DISABLE
-    
+
     /* Check this attributes object exists ? */
     if (attr->inuse  == TX_FALSE)
         attr->inuse = TX_TRUE;

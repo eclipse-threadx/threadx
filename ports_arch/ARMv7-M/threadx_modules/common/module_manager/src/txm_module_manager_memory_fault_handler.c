@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -84,7 +84,7 @@ TX_THREAD               *thread_ptr;
 
     /* Initialize the module instance pointer to NULL.  */
     module_instance_ptr =  TX_NULL;
-    
+
     /* Is there a thread?  */
     if (thread_ptr)
     {
@@ -94,7 +94,7 @@ TX_THREAD               *thread_ptr;
         /* Terminate the current thread.  */
         _tx_thread_terminate(_tx_thread_current_ptr);
     }
-    
+
     /* Determine if there is a user memory fault notification callback.  */
     if (_txm_module_manager_fault_notify)
     {

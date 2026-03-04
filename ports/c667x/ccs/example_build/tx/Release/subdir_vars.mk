@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-# Add inputs and outputs from these tool invocations to the build variables 
+# Add inputs and outputs from these tool invocations to the build variables
 ASM_SRCS += \
 ../tx_thread_context_restore.asm \
 ../tx_thread_context_save.asm \
@@ -12,7 +12,7 @@ ASM_SRCS += \
 ../tx_thread_schedule.asm \
 ../tx_thread_stack_build.asm \
 ../tx_thread_system_return.asm \
-../tx_timer_interrupt.asm 
+../tx_timer_interrupt.asm
 
 C_SRCS += \
 ../tx_block_allocate.c \
@@ -198,7 +198,7 @@ C_SRCS += \
 ../txe_timer_create.c \
 ../txe_timer_deactivate.c \
 ../txe_timer_delete.c \
-../txe_timer_info_get.c 
+../txe_timer_info_get.c
 
 C_DEPS += \
 ./tx_block_allocate.d \
@@ -384,7 +384,7 @@ C_DEPS += \
 ./txe_timer_create.d \
 ./txe_timer_deactivate.d \
 ./txe_timer_delete.d \
-./txe_timer_info_get.d 
+./txe_timer_info_get.d
 
 OBJS += \
 ./tx_block_allocate.obj \
@@ -577,7 +577,7 @@ OBJS += \
 ./txe_timer_create.obj \
 ./txe_timer_deactivate.obj \
 ./txe_timer_delete.obj \
-./txe_timer_info_get.obj 
+./txe_timer_info_get.obj
 
 ASM_DEPS += \
 ./tx_thread_context_restore.d \
@@ -586,7 +586,7 @@ ASM_DEPS += \
 ./tx_thread_schedule.d \
 ./tx_thread_stack_build.d \
 ./tx_thread_system_return.d \
-./tx_timer_interrupt.d 
+./tx_timer_interrupt.d
 
 OBJS__QUOTED += \
 "tx_block_allocate.obj" \
@@ -779,7 +779,7 @@ OBJS__QUOTED += \
 "txe_timer_create.obj" \
 "txe_timer_deactivate.obj" \
 "txe_timer_delete.obj" \
-"txe_timer_info_get.obj" 
+"txe_timer_info_get.obj"
 
 C_DEPS__QUOTED += \
 "tx_block_allocate.d" \
@@ -965,7 +965,7 @@ C_DEPS__QUOTED += \
 "txe_timer_create.d" \
 "txe_timer_deactivate.d" \
 "txe_timer_delete.d" \
-"txe_timer_info_get.d" 
+"txe_timer_info_get.d"
 
 ASM_DEPS__QUOTED += \
 "tx_thread_context_restore.d" \
@@ -974,7 +974,7 @@ ASM_DEPS__QUOTED += \
 "tx_thread_schedule.d" \
 "tx_thread_stack_build.d" \
 "tx_thread_system_return.d" \
-"tx_timer_interrupt.d" 
+"tx_timer_interrupt.d"
 
 C_SRCS__QUOTED += \
 "../tx_block_allocate.c" \
@@ -1160,7 +1160,7 @@ C_SRCS__QUOTED += \
 "../txe_timer_create.c" \
 "../txe_timer_deactivate.c" \
 "../txe_timer_delete.c" \
-"../txe_timer_info_get.c" 
+"../txe_timer_info_get.c"
 
 ASM_SRCS__QUOTED += \
 "../tx_thread_context_restore.asm" \
@@ -1169,6 +1169,6 @@ ASM_SRCS__QUOTED += \
 "../tx_thread_schedule.asm" \
 "../tx_thread_stack_build.asm" \
 "../tx_thread_system_return.asm" \
-"../tx_timer_interrupt.asm" 
+"../tx_timer_interrupt.asm"
 
 

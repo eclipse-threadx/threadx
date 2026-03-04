@@ -412,7 +412,7 @@ void *Osal_srioDataBufferMalloc(uint32_t numBytes);
 
 
 /*------------ Osal_srioDataBufferFree() function ------------------------*//**
- * @brief  Function is used to clean up a previously allocated data buffer 
+ * @brief  Function is used to clean up a previously allocated data buffer
  * block. All data buffers are in the global address space.
  *
  * @param[in]  ptr - pointer to the memory block to be cleaned up

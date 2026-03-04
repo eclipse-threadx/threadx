@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -49,9 +49,9 @@
 #define TX_PORT_H
 
 
-/* Remove volatile for ThreadX source on the ARC. This is because the ARC 
-   compiler generates different non-cache r/w access when using volatile 
-   that is different from the assembly language access of the same 
+/* Remove volatile for ThreadX source on the ARC. This is because the ARC
+   compiler generates different non-cache r/w access when using volatile
+   that is different from the assembly language access of the same
    global variables in ThreadX.  */
 
 #ifdef TX_SOURCE_CODE
@@ -76,7 +76,7 @@
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
 
 
-/* Yes, include the user defines in tx_user.h. The defines in this file may 
+/* Yes, include the user defines in tx_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
@@ -89,7 +89,7 @@
 #include <string.h>
 
 
-/* Define ThreadX basic types for this port.  */ 
+/* Define ThreadX basic types for this port.  */
 
 #define VOID                                    void
 typedef char                                    CHAR;
@@ -125,8 +125,8 @@ typedef unsigned short                          USHORT;
 #define TX_TIMER_THREAD_STACK_SIZE              2048        /* Default timer thread stack size  */
 #endif
 
-#ifndef TX_TIMER_THREAD_PRIORITY    
-#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */ 
+#ifndef TX_TIMER_THREAD_PRIORITY
+#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
 
@@ -136,8 +136,8 @@ typedef unsigned short                          USHORT;
 #define TX_INT_DISABLE_MASK                     0x00000000  /* Disable all interrupts           */
 
 
-/* Define the clock source for trace event entry time stamp. The following two item are port specific.  
-   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
+/* Define the clock source for trace event entry time stamp. The following two item are port specific.
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
 #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
@@ -182,7 +182,7 @@ void    _tx_initialize_start_interrupts(void);
 #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION                       _tx_initialize_start_interrupts();
 
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -196,15 +196,15 @@ void    _tx_initialize_start_interrupts(void);
 
 
 /* Define the TX_THREAD control block extensions for this port. The main reason
-   for the multiple macros is so that backward compatibility can be maintained with 
+   for the multiple macros is so that backward compatibility can be maintained with
    existing ThreadX kernel awareness modules.  */
 
 #define TX_THREAD_EXTENSION_0       VOID        *__mw_threadx_tls; \
                                     int         __mw_errnum; \
                                     VOID        (*__mw_thread_exit)(struct TX_THREAD_STRUCT *);
-#define TX_THREAD_EXTENSION_1                  
-#define TX_THREAD_EXTENSION_2          
-#define TX_THREAD_EXTENSION_3          
+#define TX_THREAD_EXTENSION_1
+#define TX_THREAD_EXTENSION_2
+#define TX_THREAD_EXTENSION_3
 
 
 /* Define the port extensions of the remaining ThreadX objects.  */
@@ -218,11 +218,11 @@ void    _tx_initialize_start_interrupts(void);
 #define TX_TIMER_EXTENSION
 
 
-/* Define the user extension field of the thread control block.  Nothing 
+/* Define the user extension field of the thread control block.  Nothing
    additional is needed for this port so it is defined as white space.  */
 
 #ifndef TX_THREAD_USER_EXTENSION
-#define TX_THREAD_USER_EXTENSION    
+#define TX_THREAD_USER_EXTENSION
 #endif
 
 
@@ -231,16 +231,16 @@ void    _tx_initialize_start_interrupts(void);
 
 #if __HIGHC__
 
-/* The MetaWare thread safe C/C++ runtime library needs space to 
+/* The MetaWare thread safe C/C++ runtime library needs space to
    store thread specific information.  In addition, a function pointer
-   is also supplied so that certain thread-specific resources may be 
+   is also supplied so that certain thread-specific resources may be
    released upon thread termination and/or thread completion.  */
 
 #define TX_THREAD_CREATE_EXTENSION(thread_ptr)          \
                                                         thread_ptr -> __mw_threadx_tls = 0; \
                                                         thread_ptr -> __mw_errnum = 0; \
-                                                        thread_ptr -> __mw_thread_exit =  TX_NULL;                                
-#define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  
+                                                        thread_ptr -> __mw_thread_exit =  TX_NULL;
+#define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)       \
                                                         if (thread_ptr -> __mw_thread_exit) \
                                                             (thread_ptr -> __mw_thread_exit) (thread_ptr);
@@ -250,10 +250,10 @@ void    _tx_initialize_start_interrupts(void);
 
 #else
 
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)          
-#define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  
-#define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)       
-#define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)      
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+#define TX_THREAD_DELETE_EXTENSION(thread_ptr)
+#define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
+#define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
 
 #endif
 
@@ -280,9 +280,9 @@ void    _tx_initialize_start_interrupts(void);
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
 
 
-/* Define ThreadX interrupt lockout and restore macros for protection on 
-   access of critical kernel information.  The restore interrupt macro must 
-   restore the interrupt posture of the running thread prior to the value 
+/* Define ThreadX interrupt lockout and restore macros for protection on
+   access of critical kernel information.  The restore interrupt macro must
+   restore the interrupt posture of the running thread prior to the value
    present prior to the disable macro.  In most cases, the save area macro
    is used to define a local function save area for the disable and restore
    macros.  */
@@ -307,7 +307,7 @@ void    _tx_initialize_start_interrupts(void);
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
+CHAR                            _tx_version_id[] =
                                     "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX ARCv2_EM/MetaWare Version 6.5.0.202601 *";
 #else
 #ifdef TX_MISRA_ENABLE

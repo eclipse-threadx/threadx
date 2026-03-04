@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -41,41 +41,41 @@
 
     section .text:CODE:ROOT
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_schedule                                  RXv2/IAR       */
 ;/*                                                           6.1.11       */
-;/*  AUTHOR                                                                */ 
-;/*                                                                        */ 
+;/*  AUTHOR                                                                */
+;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
-;/*                                                                        */ 
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function waits for a thread control block pointer to appear in */ 
-;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-;/*    in the variable, the corresponding thread is resumed.               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function waits for a thread control block pointer to appear in */
+;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+;/*    in the variable, the corresponding thread is resumed.               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-;/*    _tx_thread_system_return             Return to system from thread   */ 
-;/*    _tx_thread_context_restore           Restore thread's context       */ 
-;/*                                                                        */ 
-;/**************************************************************************/ 
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+;/*    _tx_thread_system_return             Return to system from thread   */
+;/*    _tx_thread_context_restore           Restore thread's context       */
+;/*                                                                        */
+;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
 ;{
     public __tx_thread_schedule
@@ -93,7 +93,7 @@ __tx_thread_schedule_loop:
     MOV.L    [R1],R2                             ; Pickup next thread to execute
     CMP      #0,R2                               ; Is it NULL?
     BNE      __tx_thread_thread_ready            ; Not NULL, schedule the thread
-                                                 ; Idle system - no thread is ready    
+                                                 ; Idle system - no thread is ready
 #if (TX_LOW_POWER == 1)
     MOV.L    #__tx_thread_preempt_disable, R1    ; Load prempt disable flag.
     MOV.L    [R1], R2
@@ -122,7 +122,7 @@ __tx_thread_thread_ready:
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr == TX_NULL);
-;    
+;
 ;    /* Yes! We have a thread to execute. Note that interrupts are locked out at this point.  */
 ;
 ;    /* Setup the current thread pointer.  */
@@ -158,14 +158,14 @@ __tx_thread_thread_ready:
     MVTACLO R3, A1
     MVTACHI R2, A1
     MVTACGU R1, A1
-    
+
     POPM   R6-R13                                ; Recover interrupt stack frame
-    POPC   FPSW 
+    POPC   FPSW
     POPM   R14-R15
     POPM   R3-R5
-    POPM   R1-R2    
+    POPM   R1-R2
     RTE                                          ; Return to point of interrupt, this restores PC and PSW
- 
+
 ;}
 
     extern __tx_thread_context_save

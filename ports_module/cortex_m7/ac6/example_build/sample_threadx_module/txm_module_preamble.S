@@ -2,7 +2,7 @@
     .align 4
     .syntax unified
     .section Init
-    
+
     // Define public symbols
     .global __txm_module_preamble
 

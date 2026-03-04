@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Initialize                                                          */
 ;/**                                                                       */
@@ -93,7 +93,7 @@ __tx_vectors
     DCD     __tx_IntHandler                         ; Int 1
     DCD     __tx_IntHandler                         ; Int 2
     DCD     __tx_IntHandler                         ; Int 3
-        
+
 ;
 ;
     AREA ||.text||, CODE, READONLY
@@ -111,40 +111,40 @@ Reset_Handler
     BX      r0
 
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_low_level                        Cortex-M3/MPU/AC5   */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_initialize_low_level                        Cortex-M3/MPU/AC5   */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function is responsible for any low-level processor            */ 
-;/*    initialization, including setting up interrupt vectors, setting     */ 
-;/*    up a periodic timer interrupt source, saving the system stack       */ 
-;/*    pointer for use in ISR processing later, and finding the first      */ 
-;/*    available RAM memory address for tx_application_define.             */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
-;/*                                                                        */ 
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function is responsible for any low-level processor            */
+;/*    initialization, including setting up interrupt vectors, setting     */
+;/*    up a periodic timer interrupt source, saving the system stack       */
+;/*    pointer for use in ISR processing later, and finding the first      */
+;/*    available RAM memory address for tx_application_define.             */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter           ThreadX entry function        */
+;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
 ;{
@@ -156,24 +156,24 @@ _tx_initialize_low_level
     CPSID   i
 ;
 ;    /* Set base of available memory to end of non-initialised RAM area.  */
-;     
+;
     LDR     r0, =_tx_initialize_unused_memory       ; Build address of unused memory pointer
     LDR     r1, =|Image$$ZI$$Limit|                 ; Build first free address
-    ADD     r1, r1, #4                              ; 
+    ADD     r1, r1, #4                              ;
     STR     r1, [r0]                                ; Setup first unused memory pointer
 ;
 ;    /* Setup Vector Table Offset Register.  */
-;    
+;
     MOV     r0, #0xE000E000                         ; Build address of NVIC registers
     LDR     r1, =__tx_vectors                       ; Pickup address of vector table
-    STR     r1, [r0, #0xD08]                        ; Set vector table address   
+    STR     r1, [r0, #0xD08]                        ; Set vector table address
 ;
 ;    /* Enable the cycle count register.  */
 ;
 ;    LDR     r0, =0xE0001000                         ; Build address of DWT register
 ;    LDR     r1, [r0]                                ; Pickup the current value
 ;    ORR     r1, r1, #1                              ; Set the CYCCNTENA bit
-;    STR     r1, [r0]                                ; Enable the cycle count register 
+;    STR     r1, [r0]                                ; Enable the cycle count register
 ;
 ;    /* Set system stack pointer from vector value.  */
 ;
@@ -204,11 +204,11 @@ _tx_initialize_low_level
                                                     ; Note: PnSV must be lowest priority, which is 0xFF
 ;
 ;    /* Return to caller.  */
-;    
-    BX      lr 
+;
+    BX      lr
 ;}
 ;
-;       
+;
 ;/* Define initial heap/stack routine for the ARM RVCT startup code.
 ;   This routine will set the initial stack and heap locations */
 ;
@@ -224,19 +224,19 @@ __user_initial_stackheap
 ;/* Define shells for each of the unused vectors.  */
 ;
     EXPORT  __tx_BadHandler
-__tx_BadHandler 
+__tx_BadHandler
     B       __tx_BadHandler
 
 ;    EXPORT  __tx_SVCallHandler
 ;__tx_SVCallHandler
-;    B       __tx_SVCallHandler 
+;    B       __tx_SVCallHandler
 
     EXPORT  __tx_IntHandler
 __tx_IntHandler
 ; VOID InterruptHandler (VOID)
 ; {
     PUSH    {lr}
-        
+
 ;    /* Do interrupt handler work here */
 ;    /* .... */
 
@@ -255,7 +255,7 @@ __tx_SysTickHandler
     BX      LR
 ; }
 
-    EXPORT  __tx_NMIHandler 
+    EXPORT  __tx_NMIHandler
 __tx_NMIHandler
     B       __tx_NMIHandler
 
@@ -274,5 +274,5 @@ _tx_execution_thread_exit
     ALIGN
     LTORG
     END
-                
+
 

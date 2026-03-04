@@ -81,12 +81,12 @@ static void    test_isr(void)
         }
         else
         {
-        
+
             /* Abort the wait of thread 5.  */
             tx_thread_wait_abort(&thread_5);
 
             /* End the ISR processing.  */
-            test_status =  2;    
+            test_status =  2;
             test_isr_dispatch =  TX_NULL;
         }
     }
@@ -112,8 +112,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -125,8 +125,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -138,8 +138,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -152,8 +152,8 @@ CHAR    *pointer;
     }
 
 
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             3, 3, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -165,8 +165,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             4, 4, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -178,8 +178,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,
+            pointer, TEST_STACK_SIZE_PRINTF,
             5, 5, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -191,8 +191,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,
+            pointer, TEST_STACK_SIZE_PRINTF,
             6, 6, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -220,7 +220,7 @@ CHAR    *pointer;
     status =  tx_queue_send_notify(&queue_0, queue_notify);
 
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
-    
+
     /* Check for status.  */
     if (status != TX_SUCCESS)
     {
@@ -335,7 +335,7 @@ UINT    status;
         printf("ERROR #15\n");
         test_control_return(1);
     }
-    
+
     /* At this point we are going to get more than 2 threads suspended.  */
     tx_thread_resume(&thread_1);
     tx_thread_resume(&thread_2);
@@ -343,7 +343,7 @@ UINT    status;
     tx_thread_resume(&thread_4);
     tx_thread_resume(&thread_5);
     tx_thread_resume(&thread_6);
-    
+
     /* Prioritize the queue suspension list.  */
     status =  tx_queue_prioritize(&queue_0);
 
@@ -355,10 +355,10 @@ UINT    status;
         printf("ERROR #16\n");
         test_control_return(1);
     }
-    
+
     /* Now loop to test the interrupt of the prioritize loop logic.  */
     test_status =  1;
-    test_isr_dispatch =  test_isr;  
+    test_isr_dispatch =  test_isr;
     do
     {
 
@@ -375,10 +375,10 @@ UINT    status;
         }
 
     } while (test_status == 1);
-    
+
     /* Now determine if thread 4 is at the front of the list... It should be!  */
     if (queue_0.tx_queue_suspension_list != &thread_4)
-    {    
+    {
 
         /* Queue error.  */
         printf("ERROR #18\n");

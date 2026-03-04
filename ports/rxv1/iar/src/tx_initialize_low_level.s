@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -68,7 +68,7 @@ __tx_initialize_low_level:
 ;    _tx_initialize_unused_memory =  (VOID_PTR) &free_mem_start;
 ;
     MOV.L    #__tx_free_memory_start, R1        ; Pickup unused memory address
-    MOV.L    #__tx_initialize_unused_memory,R2                
+    MOV.L    #__tx_initialize_unused_memory,R2
     MOV.L    R1,[R2]                            ; Save first free memory address
 
 ;   /* Set priority of SWINT to 1. */

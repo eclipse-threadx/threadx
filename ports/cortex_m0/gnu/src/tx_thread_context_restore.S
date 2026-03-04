@@ -1,10 +1,10 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
@@ -31,7 +31,7 @@
     .global  _tx_thread_schedule
     .global  _tx_thread_preempt_disable
     .global _tx_execution_isr_exit
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                        
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     .global  _tx_execution_isr_exit
 #endif
 @

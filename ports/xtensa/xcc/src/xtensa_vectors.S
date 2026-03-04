@@ -291,7 +291,7 @@
 /*
 --------------------------------------------------------------------------------
   Panic handler.
-  Should be reached by call0 (preferable) or jump only. If call0, a0 says where 
+  Should be reached by call0 (preferable) or jump only. If call0, a0 says where
   from. If on simulator, display panic message and abort, else loop indefinitely.
 --------------------------------------------------------------------------------
 */
@@ -325,7 +325,7 @@ _xt_panic_message:
 --------------------------------------------------------------------------------
     Hooks to dynamically install handlers for exceptions and interrupts.
     Allows automated regression frameworks to install handlers per test.
-    Consists of an array of function pointers indexed by interrupt level, 
+    Consists of an array of function pointers indexed by interrupt level,
     with index 0 containing the entry for user exceptions.
     Initialized with all 0s, meaning no handler is installed at each level.
     See comment in xtensa_rtos.h for more details.
@@ -357,7 +357,7 @@ _xt_intexc_hooks:
   the appropriate stack frame, saves a few vector-specific registers and
   calls XT_RTOS_INT_ENTER to save the rest of the interrupted context
   and enter the RTOS, then sets up a C environment. It then calls the
-  user's interrupt handler code (which may be coded in C) and finally 
+  user's interrupt handler code (which may be coded in C) and finally
   calls XT_RTOS_INT_EXIT to transfer control to the RTOS for scheduling.
 
   While XT_RTOS_INT_EXIT does not return directly to the interruptee,
@@ -736,7 +736,7 @@ _xt_syscall_exc:
 -------------------------------------------------------------------------------
 */
 
-    .text   
+    .text
     .type       _xt_lowint1,@function
     .align      4
 
@@ -756,12 +756,12 @@ _xt_lowint1:
     /* Save rest of interrupt context and enter RTOS. */
     call0   XT_RTOS_INT_ENTER               /* common RTOS interrupt entry */
 
-    /* !! We are now on the RTOS system stack !! */ 
+    /* !! We are now on the RTOS system stack !! */
 
     /* Set up PS for C, enable interrupts above this level and clear EXCM. */
     #ifdef __XTENSA_CALL0_ABI__
     movi    a0, PS_INTLEVEL(1) | PS_UM
-    #else 
+    #else
     movi    a0, PS_INTLEVEL(1) | PS_UM | PS_WOE
     #endif
     wsr     a0, PS
@@ -793,7 +793,7 @@ _xt_lowint1:
   the appropriate stack frame, saves a few vector-specific registers and
   calls XT_RTOS_INT_ENTER to save the rest of the interrupted context
   and enter the RTOS, then sets up a C environment. It then calls the
-  user's interrupt handler code (which may be coded in C) and finally 
+  user's interrupt handler code (which may be coded in C) and finally
   calls XT_RTOS_INT_EXIT to transfer control to the RTOS for scheduling.
 
   While XT_RTOS_INT_EXIT does not return directly to the interruptee,
@@ -1175,7 +1175,7 @@ and used for purposes requiring very short service times.
 
 Here are templates for high priority (level 2+) interrupt vectors.
 They assume only one interrupt per level to avoid the burden of identifying
-which interrupts at this level are pending and enabled. This allows for 
+which interrupts at this level are pending and enabled. This allows for
 minimum latency and avoids having to save/restore a2 in addition to a0.
 If more than one interrupt per high priority level is configured, this burden
 is on the handler which in any case must provide a way to save and restore
@@ -1438,12 +1438,12 @@ _xt_nmi:
 
 WINDOW OVERFLOW AND UNDERFLOW EXCEPTION VECTORS AND ALLOCA EXCEPTION HANDLER
 
-Here is the code for each window overflow/underflow exception vector and 
+Here is the code for each window overflow/underflow exception vector and
 (interspersed) efficient code for handling the alloca exception cause.
 Window exceptions are handled entirely in the vector area and are very
-tight for performance. The alloca exception is also handled entirely in 
+tight for performance. The alloca exception is also handled entirely in
 the window vector area so comes at essentially no cost in code size.
-Users should never need to modify them and Cadence Design Systems recommends 
+Users should never need to modify them and Cadence Design Systems recommends
 they do not.
 
 Window handlers go at predetermined vector locations according to the

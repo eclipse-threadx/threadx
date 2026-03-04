@@ -22,7 +22,7 @@ _gcc_setup:
     mov     r5,r0
 
     /* Copy GOT table. */
-  
+
     ldr     r0, =__got_load_start__
     sub     r0,r0,r3
     add     r0,r0,r5
@@ -50,13 +50,13 @@ flash_area:
 address_built:
     str     r6, [r1]        // Store in new GOT table
     add     r0, r0, #4      // Move to next entry
-    add     r1, r1, #4      // 
+    add     r1, r1, #4      //
     b       new_got_setup   // Continue at the top of the loop
 got_setup_done:
 
 
     /* Copy initialised sections into RAM if required. */
-  
+
     ldr     r0, =__data_load_start__
     sub     r0,r0,r3
     add     r0,r0,r5
@@ -67,9 +67,9 @@ got_setup_done:
     sub     r2,r2,r4
     add     r2,r2,r9
     bl      crt0_memory_copy
-  
+
     /* Zero bss. */
-    
+
     ldr     r0, =__bss_start__
     sub     r0,r0,r4
     add     r0,r0,r9
@@ -93,10 +93,10 @@ got_setup_done:
     str     r2, [r0]
     add     r0, r0, #4
     str     r1, [r0]
-    
+
     LDMIA   sp!, {r3, r4, r5, r6, r7, lr}       // Store other preserved registers
     bx      lr                                  // Return to caller
-  
+
     .align 4
 
   /* Startup helper functions. */
@@ -130,4 +130,3 @@ memory_set_done:
 
     /* Setup attibutes of heap section so it doesn't take up room in the elf file */
     .section .heap, "wa", %nobits
-  

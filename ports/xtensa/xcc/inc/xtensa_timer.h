@@ -64,12 +64,12 @@ select timer 0.
 #else /* XEA2 */
 
 /*
-Select timer to use for periodic tick, and determine its interrupt number 
+Select timer to use for periodic tick, and determine its interrupt number
 and priority. User may specify a timer by defining XT_TIMER_INDEX with -D,
-in which case its validity is checked (it must exist in this core and must 
+in which case its validity is checked (it must exist in this core and must
 not be on a high priority interrupt - an error will be reported in invalid).
 Otherwise select the first low or medium priority interrupt timer available.
-*/  
+*/
 #ifndef XT_TIMER_INDEX
   #if XCHAL_TIMER3_INTERRUPT != XTHAL_TIMER_UNCONFIGURED
     #if XCHAL_INT_LEVEL(XCHAL_TIMER3_INTERRUPT) <= XCHAL_EXCM_LEVEL

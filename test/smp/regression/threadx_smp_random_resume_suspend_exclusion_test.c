@@ -2114,9 +2114,9 @@ UINT        status;
     pointer =  (CHAR *) first_unused_memory;
 
     /* Create a control thread to run the test.  */
-    status =  tx_thread_create(&control_thread, "control thread", control_thread_entry, 0,  
-            pointer, 1024, 
-            0, 0, TX_NO_TIME_SLICE, TX_AUTO_START);     
+    status =  tx_thread_create(&control_thread, "control thread", control_thread_entry, 0,
+            pointer, 1024,
+            0, 0, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -2157,10 +2157,10 @@ UINT        status;
     {
 
         /* Create each thread.  */
-        status +=  tx_thread_create(_smp_randomized_source_array[i], "test thread", thread_entry, i,  
-//            (void *) pointer, 512, 
+        status +=  tx_thread_create(_smp_randomized_source_array[i], "test thread", thread_entry, i,
+//            (void *) pointer, 512,
             malloc(1024), 1024,
-            priority, priority, TX_NO_TIME_SLICE, TX_DONT_START);     
+            priority, priority, TX_NO_TIME_SLICE, TX_DONT_START);
 //        pointer =  pointer + 512;
 
         /* Check status.  */
@@ -2175,7 +2175,7 @@ UINT        status;
         /* Move to next entry/priority.  */
         i++;
         priority++;
-        
+
         /* Should priority be reset?  */
 		if (priority >= TX_MAX_PRIORITIES)
 		{
@@ -2199,8 +2199,8 @@ UINT        status;
         for (i = 0; i < (TX_THREAD_SMP_MAX_CORES*2); i++)
         {
             _smp_randomized_test_array[i] = TX_NULL;
-        }        
- 
+        }
+
 		/* Build the randomized test array.  */
         for (i = 0; i < (TX_THREAD_SMP_MAX_CORES*2); i++)
         {
@@ -2208,7 +2208,7 @@ UINT        status;
             {
 
                 source_index =  (rand())%1024;
-                
+
                 /* Determine if this index has repeated.  */
                 thread_ptr = _smp_randomized_source_array[source_index];
 
@@ -2222,19 +2222,19 @@ UINT        status;
                     {
                         j =  (TX_THREAD_SMP_MAX_CORES*2);
                     }
-                    
+
                     /* Determine if we have a duplicate.  */
                     if (_smp_randomized_test_array[j] == thread_ptr)
 						thread_ptr =  TX_NULL;
-                
+
                     j++;
                 }
-              
+
              } while (thread_ptr == TX_NULL);
-            
+
             /* Clear run counter.  */
             thread_ptr -> tx_thread_run_count =  0;
-            
+
             /* Setup the exclusion for this thread.  */
             exclusions =  (ULONG) (rand()%15);
             tx_thread_smp_core_exclude(thread_ptr, exclusions);
@@ -2242,44 +2242,44 @@ UINT        status;
             /* Save the thread pointer.  */
             _smp_randomized_test_array[i] =  thread_ptr;
         }
-    
+
         /* Now make all the random threads ready.  */
         for (i = 0; i < (TX_THREAD_SMP_MAX_CORES*2); i++)
         {
             status =  tx_thread_resume(_smp_randomized_test_array[i]);
 
-            /* Check for an error.  */  
+            /* Check for an error.  */
             if (status != TX_SUCCESS)
             {
-                          
+
                 printf("ERROR #3\n");
                 test_control_return(1);
 				break;
-            } 
+            }
         }
-        
+
         /* Check the status.  */
         if (status)
             break;
-        
+
         /* Move to the lowest priority.  */
         status    +=  tx_thread_priority_change(current_thread, TX_MAX_PRIORITIES-1, &original_priority);
 		tx_thread_relinquish();
-            
+
         /* At this point all the threads have run, or should have.  */
-        
+
         /* Restore priority.  */
         status   +=  tx_thread_priority_change(current_thread, original_priority, &original_priority);
-             
+
         /* Was there an error?  */
         if (status != TX_SUCCESS)
         {
-                          
+
              printf("ERROR #4\n");
              test_control_return(1);
              break;
-        } 
-                   
+        }
+
         /* Determine if all the threads in the the random sample ran.  */
         for (i = 0; i < (TX_THREAD_SMP_MAX_CORES*2); i++)
         {
@@ -2312,21 +2312,21 @@ UINT        status;
 				/* Wait for the thread to complete!  */
 				tx_thread_relinquish();
 			}
-            
+
             /* Reset the exclusion for this thread.  */
             tx_thread_smp_core_exclude(thread_ptr, 0);
-            
+
             /* Check for mapping error.  */
             if (mapping_error)
             {
-            
+
 				 /* No, this thread ran on inccorect core!  */
                  printf("ERROR #6\n");
                  test_control_return(1);
                  break;
             }
-        }         
-                  
+        }
+
         /* Increment the pass counter.  */
         pass++;
 
@@ -2351,17 +2351,17 @@ TX_THREAD   *thread_ptr;
 
         /* Get thread.  */
         thread_ptr =  _smp_randomized_source_array[id];
-        
+
         /* Determine if this thread is running on a valid core.  */
         core =  tx_thread_smp_core_get();
-        
+
         /* Build a bit map for this core.  */
         core_bit_map =  (((ULONG) 1) << core);
-        
+
         /* Is this a valid core?  */
         if (core_bit_map & thread_ptr -> tx_thread_smp_cores_excluded)
         {
-        
+
             /* Invalid core, set error flag.  */
             mapping_error =  TX_TRUE;
         }

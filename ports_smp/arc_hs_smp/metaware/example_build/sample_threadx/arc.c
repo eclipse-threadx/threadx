@@ -79,7 +79,7 @@ void arc_cpu_init(void)
 {
 	extern char VECT_TABLE_BASE[];  // from sample_threadx.lcf
 	_sr((unsigned int)VECT_TABLE_BASE, AUX_IVT_BASE);
-	
+
 	/* 0xc000_0000 in uncached */
 	_sr(0xc0000000, AUX_VOL);
 
@@ -141,7 +141,7 @@ void arc_ici_handler(void)
 
 
 	__mcip_cmd(CMD_ICI_CHECK_SOURCE, 0);
-	
+
 	senders = _lr(AUX_MCIP_READBK);	/* 1,2,4,8... */
 
 	/* No support interrupt coalescing yet */

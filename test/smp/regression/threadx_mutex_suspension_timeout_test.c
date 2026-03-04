@@ -17,7 +17,7 @@ static TX_THREAD       low_priority;
 
 static TX_MUTEX        mutex_0;
 static TX_MUTEX        mutex_1;
-extern UINT            mutex_priority_change_extension_selection; 
+extern UINT            mutex_priority_change_extension_selection;
 
 
 /* Define thread prototypes.  */
@@ -44,7 +44,7 @@ extern TEST_FLAG    threadx_mutex_suspension_priority_test;
 #endif
 
 
-/* This test routine is used to get NULL suspension lists in various parts of tx_mutex_put.  This is hooked up to IRQ 0 on this simulation and is entered manually at the 
+/* This test routine is used to get NULL suspension lists in various parts of tx_mutex_put.  This is hooked up to IRQ 0 on this simulation and is entered manually at the
    correct time.  */
 void  abort_all_threads_suspended_on_mutex(void)
 {
@@ -56,7 +56,7 @@ TX_THREAD       *thread_ptr;
     {
        if (thread_ptr -> tx_thread_state == TX_MUTEX_SUSP)
            tx_thread_wait_abort(thread_ptr);
-       
+
        thread_ptr =  thread_ptr -> tx_thread_created_next;
        if (thread_ptr == _tx_thread_created_ptr)
             break;
@@ -64,7 +64,7 @@ TX_THREAD       *thread_ptr;
 }
 
 
-/* This test routine is used to get a thread of a non ready state into _tx_mutex_change, called froim _tx_mutex_put.  This is hooked up to IRQ 1 on this simulation and is entered manually at the 
+/* This test routine is used to get a thread of a non ready state into _tx_mutex_change, called froim _tx_mutex_put.  This is hooked up to IRQ 1 on this simulation and is entered manually at the
    correct time.  */
 void  suspend_lowest_priority(void)
 {
@@ -77,7 +77,7 @@ TX_THREAD   *thread_ptr;
     /* Determine which extension to perform...   to get to the different error checks in _tx_mutex_priority_change.  */
     if (mutex_priority_change_extension_selection == 0)
     {
-    
+
         /* Setup the thread pointer.  */
         thread_ptr =  &thread_0;
 
@@ -114,7 +114,7 @@ TX_THREAD   *thread_ptr;
     }
     else if (mutex_priority_change_extension_selection == 1)
     {
-    
+
         /* Make the mapped core field to be invalid to exercise the error checking branch for core_index.  */
         thread_0.tx_thread_smp_core_mapped =  TX_THREAD_SMP_MAX_CORES;
     }
@@ -140,28 +140,28 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             1, 1, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             2, 2, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             3, 3, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             4, 4, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&low_priority, "low priority", low_priority_entry, 30,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&low_priority, "low priority", low_priority_entry, 30,
+            pointer, TEST_STACK_SIZE_PRINTF,
             30, 30, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -225,7 +225,7 @@ UINT        status;
 
     /* Get the mutex.  */
      status =  tx_mutex_get(&mutex_1, TX_WAIT_FOREVER);
-        
+
      /* Make sure the three higher priority threads suspend on the mutex.  */
      tx_thread_resume(&thread_4);
      tx_thread_resume(&thread_3);
@@ -245,16 +245,16 @@ UINT        status;
 #endif
 
      /* Now some hand testing for tx_mutex_priority_change.  */
-     
-     /* Resume the low priority thread.  */    
+
+     /* Resume the low priority thread.  */
      tx_thread_resume(&low_priority);
-     
+
 	 /* Disable interrupts.  */
 	 TX_DISABLE
 
      /* Simulate a call from inside of mutex put, but doing it here makes life easier.  */
      _tx_thread_preempt_disable++;
-     
+
 	 /* Move the current thread to a lower priority.  */
 	 _tx_mutex_priority_change(&thread_0, 15);
 	 _tx_mutex_priority_change(&thread_0, 16);
@@ -263,16 +263,16 @@ UINT        status;
 	 _tx_mutex_priority_change(&low_priority, 28);
 	 _tx_mutex_priority_change(&low_priority, 29);
 	 _tx_mutex_priority_change(&low_priority, 30);
-     
+
      /* Change the priority of the current thread, such that we should have reverse the preemption-threshold issue.  */
 	 thread_0.tx_thread_user_priority =  30;
 	 thread_0.tx_thread_user_preempt_threshold =  30;
-     _tx_mutex_priority_change(&thread_0, 30);    
+     _tx_mutex_priority_change(&thread_0, 30);
 
      /* Change to an even lower priority.  */
 	 thread_0.tx_thread_user_priority =  31;
 	 thread_0.tx_thread_user_preempt_threshold =  31;
-     _tx_mutex_priority_change(&thread_0, 31);        
+     _tx_mutex_priority_change(&thread_0, 31);
 
 	 /* Move back to a higher-priority.  */
 	 thread_0.tx_thread_user_priority =  30;
@@ -284,31 +284,31 @@ UINT        status;
      /* Set BP here and step into code and step through the code until the internal thread resume function returns, then issue an IRQ 1 to cause an ISR to suspend the thread and test the first condition.  */
      _tx_mutex_priority_change(&thread_0, 30);
 #else
-     
+
      /* Set the flag to suspend the thread and test the first condition after internal resume is called.  */
      mutex_priority_change_extension_selection =  0;
      threadx_mutex_suspension_priority_test =  1;
      _tx_mutex_priority_change(&thread_0, 30);
 #endif
-    
+
      /* Resume this thread.  */
      tx_thread_resume(&thread_0);
 	 _tx_mutex_priority_change(&thread_0, 16);
-    
+
      /* Change to an even lower priority.  */
 	 thread_0.tx_thread_user_priority =  27;
 	 thread_0.tx_thread_user_preempt_threshold =  27;
-     _tx_mutex_priority_change(&thread_0, 28);        
+     _tx_mutex_priority_change(&thread_0, 28);
 
      /* Setup the low priority thread infromation.  */
 	 low_priority.tx_thread_user_priority =  30;
 	 low_priority.tx_thread_user_preempt_threshold =  29;
      _tx_mutex_priority_change(&low_priority, 31);
-     
+
      /* Change to an even lower priority.  */
 	 thread_0.tx_thread_user_priority =  30;
 	 thread_0.tx_thread_user_preempt_threshold =  29;
-     _tx_mutex_priority_change(&thread_0, 26);        
+     _tx_mutex_priority_change(&thread_0, 26);
 
 #ifdef TX_MANUAL_TEST
 
@@ -317,30 +317,30 @@ UINT        status;
      _tx_mutex_priority_change(&thread_0, 30);
      thread_0.tx_thread_smp_core_mapped =  0;
 #else
-     
+
      /* Set the flag to suspend the thread and test the first condition after internal resume is called.  */
      mutex_priority_change_extension_selection =  1;
      threadx_mutex_suspension_priority_test =  1;
      _tx_mutex_priority_change(&thread_0, 30);
      thread_0.tx_thread_smp_core_mapped =  0;
-#endif    
+#endif
 
     /* Move the thread back to priority 28.  */
     _tx_mutex_priority_change(&thread_0, 28);
-    
+
 #ifdef TX_MANUAL_TEST
 
      /* Set BP here and step into code and step through the code until the internal thread resume function returns, and then issue the IRQ that modifies the original priority.  */
      mutex_priority_change_extension_selection =  2;
      _tx_mutex_priority_change(&thread_0, 29);
 #else
-     
+
      /* Set the flag to suspend the thread and test the first condition after internal resume is called.  */
      mutex_priority_change_extension_selection =  2;
      threadx_mutex_suspension_priority_test =  1;
      _tx_mutex_priority_change(&thread_0, 29);
      _tx_thread_execute_ptr[0] =  &thread_0;
-#endif    
+#endif
 
 #ifdef TX_MANUAL_TEST
 
@@ -348,12 +348,12 @@ UINT        status;
      mutex_priority_change_extension_selection =  3;
      _tx_mutex_priority_change(&thread_0, 30);
 #else
-     
+
      /* Set the flag to suspend the thread and test the first condition after internal resume is called.  */
      mutex_priority_change_extension_selection =  3;
      threadx_mutex_suspension_priority_test =  1;
      _tx_mutex_priority_change(&thread_0, 30);
-#endif    
+#endif
 
 #ifdef TX_MANUAL_TEST
 
@@ -363,14 +363,14 @@ UINT        status;
      _tx_mutex_priority_change(&thread_0, 31);
      _tx_thread_preemption__threshold_scheduled =  temp_thread;
 #else
-     
+
      /* Set the flag to suspend the thread and test the first condition after internal resume is called.  */
      temp_thread =  _tx_thread_preemption__threshold_scheduled;
      mutex_priority_change_extension_selection =  4;
      threadx_mutex_suspension_priority_test =  1;
      _tx_mutex_priority_change(&thread_0, 31);
      _tx_thread_preemption__threshold_scheduled =  temp_thread;
-#endif    
+#endif
 
      /* Just change to same priority to ensure that path is executed.  */
      mutex_priority_change_extension_selection =  0;
@@ -378,18 +378,18 @@ UINT        status;
 	 thread_0.tx_thread_user_priority =  31;
 	 thread_0.tx_thread_user_preempt_threshold =  30;
 	 thread_0.tx_thread_priority =  31;
-	 thread_0.tx_thread_preempt_threshold =  30;    
+	 thread_0.tx_thread_preempt_threshold =  30;
      _tx_mutex_priority_change(&thread_0, 31);
 	 thread_0.tx_thread_user_priority =  31;
 	 thread_0.tx_thread_user_preempt_threshold =  31;
 	 thread_0.tx_thread_priority =  31;
-	 thread_0.tx_thread_preempt_threshold =  31;    
+	 thread_0.tx_thread_preempt_threshold =  31;
 	 _tx_mutex_priority_change(&thread_0, 31);
      tx_thread_resume(&thread_0);
 
-     /* Restore the preempt disable flag.  */ 
+     /* Restore the preempt disable flag.  */
      _tx_thread_preempt_disable--;
-     
+
 	 /* Restore interrupts.  */
 	 TX_RESTORE
 

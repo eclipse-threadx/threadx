@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -52,7 +52,7 @@ ULONG posix_abs_time_to_rel_ticks(struct timespec *abs_timeout)
    current_ticks = tx_time_get();
    /* convert ns to ticks (will lose any ns < 1 tick) */
    ticks_ns = abs_timeout->tv_nsec / NANOSECONDS_IN_CPU_TICK;
-   /* 
+   /*
     * if ns < 1 tick were lost, bump up to next tick so the delay is never
     * less than what was specified.
     */

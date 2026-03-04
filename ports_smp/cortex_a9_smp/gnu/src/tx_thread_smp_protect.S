@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread - Low Level SMP Support                                      */
 @/**                                                                       */
@@ -46,42 +46,42 @@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_smp_protect                          SMP/Cortex-A9/GNU   */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_smp_protect                          SMP/Cortex-A9/GNU   */
 @/*                                                           6.1          */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function gets protection for running inside the ThreadX        */ 
-@/*    source. This is acomplished by a combination of a test-and-set      */ 
-@/*    flag and periodically disabling interrupts.                         */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*    This function gets protection for running inside the ThreadX        */
+@/*    source. This is acomplished by a combination of a test-and-set      */
+@/*    flag and periodically disabling interrupts.                         */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    Previous Status Register                                            */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    Previous Status Register                                            */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
 @/*    ThreadX Source                                                      */
-@/*                                                                        */ 
+@/*                                                                        */
 @/**************************************************************************/
     .global _tx_thread_smp_protect
     .type _tx_thread_smp_protect,function
-_tx_thread_smp_protect: 
+_tx_thread_smp_protect:
 @VOID  _tx_thread_smp_protect(VOID)
 @{
 @
@@ -120,7 +120,7 @@ _tx_thread_smp_protect:
 
     B       _return
 
-_protection_not_owned: 
+_protection_not_owned:
 @
 @    /* Is the lock available?  */
 @    if (_tx_thread_smp_protection.tx_thread_smp_protect_in_force == 0)
@@ -158,7 +158,7 @@ _protection_not_owned:
 
     B       _return
 
-_list_not_empty: 
+_list_not_empty:
 @
 @    /* Are we at the front of the list?  */
 @    if (this_core == _tx_thread_smp_protect_wait_list[_tx_thread_smp_protect_wait_list_head])
@@ -199,7 +199,7 @@ _list_not_empty:
 
     B       _return
 
-_start_waiting: 
+_start_waiting:
 @
 @    /* For one reason or another, we didn't get the lock.  */
 @
@@ -225,7 +225,7 @@ _start_waiting:
 @
 @    }
 @
-_already_in_list0: 
+_already_in_list0:
 @
 @    /* Restore interrupts. */
 @
@@ -238,7 +238,7 @@ _already_in_list0:
 @    while (1)
 @    {
 @
-_try_to_get_lock: 
+_try_to_get_lock:
 @
 @    /* Disable interrupts so we don't get preempted.  */
 @
@@ -301,7 +301,7 @@ _try_to_get_lock:
 
     B       _got_lock_after_waiting
 
-_did_not_get_lock: 
+_did_not_get_lock:
 @
 @    /* For one reason or another, we didn't get the lock.  */
 @
@@ -330,7 +330,7 @@ _did_not_get_lock:
 @
 @    }
 @
-_already_in_list1: 
+_already_in_list1:
 @
 @    /* Restore interrupts and try again.  */
 @
@@ -340,7 +340,7 @@ _already_in_list1:
 #endif
     B       _try_to_get_lock                    @ On waking, restart the protection attempt
 
-_got_lock_after_waiting: 
+_got_lock_after_waiting:
 @
 @    /* We're no longer waiting.  */
 @    _tx_thread_smp_protect_wait_counts[this_core]--;
@@ -353,7 +353,7 @@ _got_lock_after_waiting:
 @
 @    /* Restore link register and return.  */
 @
-_return: 
+_return:
 
     POP     {r4-r6}                             @ Restore registers
 
@@ -363,4 +363,4 @@ _return:
     MOV     pc, lr                              @ Return to caller
 #endif
 
-    
+

@@ -97,7 +97,7 @@ ULONG i;
         if (loop_count < min_loop_count)
             min_loop_count =  loop_count;
         if (loop_count > max_loop_count)
-            max_loop_count =  loop_count;   
+            max_loop_count =  loop_count;
 
         lower_bound = loop_count - 1;
         upper_bound = loop_count + 1;
@@ -108,38 +108,38 @@ ULONG i;
 
         if ((current_itterations < lower_bound) || (current_itterations > upper_bound))
             current_itterations =  lower_bound;
-        
+
 #ifdef DEBUG_1
         /* Last loop count.  */
     last_loop_count =  loop_count;
 #endif
-    
+
         /* Reset the loop count to all ones!  */
         loop_count =  0xFFFFFFFF;
     }
     count++;
     for (i = 0; i < (count%32); i++)
-        destination++;            
+        destination++;
 
     /* Check to see if the interrupt occurred in the middle of the suspension.  */
     if ((thread_2.tx_thread_suspending) && (delayed_suspend_set == 0))
     {
-    
+
         /* Yes, we have taken the interrupt in the middle of a thread suspension.  */
-        
+
         /* Indicate we have got the condition.  */
         delayed_suspend_set =  1;
 
         /* Capture the current thread 2 counter.  */
         thread_2_counter_capture =  thread_2_counter;
-        
+
         /* Now attempt to set the delayed suspension.  */
         tx_thread_suspend(&thread_2);
-        
+
         /* Check for the delayed suspension flag being set.  */
         if (thread_2.tx_thread_delayed_suspend != 1)
         {
-        
+
             /* Error!  Setup the counters to indicate an error.  */
             thread_2_counter =  0xEEEEEEEE;
             thread_2_counter_capture =  0xFFFFFFFF;
@@ -147,11 +147,11 @@ ULONG i;
 
         /* Now, abort the suspension for thread 2... the thread should switch to a pure suspended state.  */
         tx_thread_wait_abort(&thread_2);
-        
+
         /* Check for the proper state.  */
         if (thread_2.tx_thread_state != TX_SUSPENDED)
         {
-        
+
             /* Error!  Setup the counters to indicate an error.  */
             thread_2_counter =  0xEEEEEEEE;
             thread_2_counter_capture =  0xFFFFFFFF;
@@ -181,14 +181,14 @@ CHAR    *pointer;
        create information.  */
 
     /* Create the main thread.  */
-    tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, DEMO_STACK_SIZE,
             2, 2, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + DEMO_STACK_SIZE;
 
     /* Create threads 1 and 2.  */
-    tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, DEMO_STACK_SIZE,
             2, 2, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + DEMO_STACK_SIZE;
 
@@ -197,8 +197,8 @@ CHAR    *pointer;
 
 #ifndef TX_NOT_INTERRUPTABLE
 
-    tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, DEMO_STACK_SIZE,
             1, 1, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + DEMO_STACK_SIZE;
 
@@ -232,7 +232,7 @@ UINT    status;
     tx_thread_relinquish();
 
     /* At this point thread 1 has suspended on the semaphore.  */
-    
+
     /* Suspend the already suspended thread.  */
     tx_thread_suspend(&thread_1);
 
@@ -277,20 +277,20 @@ UINT    status;
         /* Just relinquish.  */
         tx_thread_relinquish();
     }
-    
+
     /* Relinquish one more time to make sure thread 2 could run if it is ready.  */
     tx_thread_relinquish();
-    
+
     /* At this point, check for an error.  */
     if (thread_2_counter != thread_2_counter_capture)
     {
-    
+
         /* Delayed suspension error... thread kept running!  */
         printf("ERROR #2\n");
         test_control_return(1);
     }
 #endif
-    
+
     /* Successful test.  */
     printf("SUCCESS!\n");
     test_control_return(0);
@@ -327,10 +327,10 @@ ULONG   i;
     /* Callibrate the loop count from thread sleep.  */
     for (i = 0; i < 10; i++)
     {
-    
+
         /* Sleep to get a fresh time.  */
         tx_thread_sleep(1);
-        
+
         start_time =  _tx_timer_system_clock;
         do
         {
@@ -339,7 +339,7 @@ ULONG   i;
             delay_function();
             loop_count++;
         } while (start_time == _tx_timer_system_clock);
-        
+
         /* Wait to reset the loop count.  */
         tx_thread_sleep(1);
     }
@@ -358,7 +358,7 @@ ULONG   i;
 
         /* Sleep to get a fresh starting time.  */
         tx_thread_sleep(1);
-        
+
         loop_count =  0;
         start_time =  _tx_timer_system_clock;
         do
@@ -366,7 +366,7 @@ ULONG   i;
             /* Call delay function.  */
             delay_function();
             loop_count++;
-        } while (loop_count < current_itterations);      
+        } while (loop_count < current_itterations);
 
         /* Suspend this thread.  */
         tx_semaphore_get(&semaphore_1, TX_WAIT_FOREVER);

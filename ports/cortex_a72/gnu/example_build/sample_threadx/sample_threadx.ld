@@ -1,7 +1,7 @@
 /* Linker script to place sections and symbol values.
  * It references following symbols, which must be defined in code:
  *   start64 : Entry point
- * 
+ *
  * It defines following symbols, which code can use without definition:
  *   __cs3_peripherals
  *   __code_start

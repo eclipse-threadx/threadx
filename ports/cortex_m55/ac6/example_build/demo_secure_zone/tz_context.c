@@ -24,7 +24,7 @@
  * Title:        Context Management for ARMv8-M TrustZone - Sample implementation
  *
  *---------------------------------------------------------------------------*/
- 
+
 #include "RTE_Components.h"
 #include CMSIS_device_header
 #include "tz_context.h"

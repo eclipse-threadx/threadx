@@ -64,8 +64,8 @@ UINT    i;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             0, 0, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_0, 0xE);      /* Core 0 only! */
@@ -78,8 +78,8 @@ UINT    i;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             1, 1, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_1, 0);      /* Any core! */
@@ -92,8 +92,8 @@ UINT    i;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_5, "thread 5", thread_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             5, 5, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_5, 0);      /* Any core! */
@@ -106,8 +106,8 @@ UINT    i;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_16, "thread 16", thread_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_16, "thread 16", thread_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_16, 0);      /* Any core! */
@@ -120,8 +120,8 @@ UINT    i;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_16_pt5, "thread 16 PT5", thread_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_16_pt5, "thread 16 PT5", thread_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 5, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_16_pt5, 0);      /* Any core! */
@@ -134,8 +134,8 @@ UINT    i;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_18, "thread 18", thread_entry, 5,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_18, "thread 18", thread_entry, 5,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_18, 0);      /* Any core! */
@@ -148,8 +148,8 @@ UINT    i;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_23_pt17, "thread 23 PT17", thread_entry, 6,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_23_pt17, "thread 23 PT17", thread_entry, 6,
+            pointer, TEST_STACK_SIZE_PRINTF,
             23, 17, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_23_pt17, 0);      /* Any core! */
@@ -162,8 +162,8 @@ UINT    i;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_25, "thread 25", thread_entry, 7,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_25, "thread 25", thread_entry, 7,
+            pointer, TEST_STACK_SIZE_PRINTF,
             25, 25, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_25, 0);      /* Any core! */
@@ -176,8 +176,8 @@ UINT    i;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_27_pt24, "thread 27 PT24", thread_entry, 8,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_27_pt24, "thread 27 PT24", thread_entry, 8,
+            pointer, TEST_STACK_SIZE_PRINTF,
             27, 24, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_27_pt24, 0);      /* Any core! */
@@ -190,8 +190,8 @@ UINT    i;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_31, "thread 31", thread_entry, 9,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_31, "thread 31", thread_entry, 9,
+            pointer, TEST_STACK_SIZE_PRINTF,
             31, 31, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_31, 0);      /* Any core! */
@@ -237,27 +237,27 @@ UINT    status;
     printf("Running SMP Preemption-Threshold Test............................... ");
 
 	/* This test is only useful when preemption-threshold is enabled.  */
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD 
+#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
 	/* Resume thread.  */
     status =  tx_thread_resume(&thread_31);
     delay(9);
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_31)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
         printf("ERROR #12\n");
         test_control_return(1);
     }
-    
+
     /* Resume thread.  */
     status =  tx_thread_resume(&thread_27_pt24);
     delay(8);
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_27_pt24)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -270,7 +270,7 @@ UINT    status;
     delay(6);
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_23_pt17)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -283,7 +283,7 @@ UINT    status;
     delay(4);
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16_pt5)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -295,7 +295,7 @@ UINT    status;
     status =  tx_thread_resume(&thread_16);
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16_pt5)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -307,7 +307,7 @@ UINT    status;
     status =  tx_thread_resume(&thread_25);
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16_pt5)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -319,7 +319,7 @@ UINT    status;
     status =  tx_thread_resume(&thread_18);
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16_pt5)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -331,7 +331,7 @@ UINT    status;
     status =  tx_thread_resume(&thread_5);
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16_pt5)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -343,7 +343,7 @@ UINT    status;
     status =  tx_thread_resume(&thread_1);
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16_pt5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -353,29 +353,29 @@ UINT    status;
 
     /* Suspend Thread 16 pt5.  */
     status =  tx_thread_suspend(&thread_16_pt5);
-    
+
     delay(2);
     delay(3);
 
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_16)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_16))
     {
 
         /* Execution error.  */
         printf("ERROR #21\n");
         test_control_return(1);
     }
-    
+
 
     /* Suspend Thread 16.  */
     status =  tx_thread_suspend(&thread_16);
-   
+
     delay(6);
 
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_23_pt17)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_23_pt17))
     {
 
         /* Execution error.  */
@@ -385,12 +385,12 @@ UINT    status;
 
     /* Suspend Thread 23 pt 17.  */
     status =  tx_thread_suspend(&thread_23_pt17);
-   
+
     delay(5);
 
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_18)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_18))
     {
 
         /* Execution error.  */
@@ -401,12 +401,12 @@ UINT    status;
 
     /* Suspend Thread 18.  */
     status =  tx_thread_suspend(&thread_18);
-   
+
     delay(8);
 
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_27_pt24)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_27_pt24))
     {
 
         /* Execution error.  */
@@ -416,12 +416,12 @@ UINT    status;
 
     /* Suspend Thread 27 pt 24.  */
     status =  tx_thread_suspend(&thread_27_pt24);
-   
+
     delay(7);
 
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_25)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_25))
     {
 
         /* Execution error.  */
@@ -431,12 +431,12 @@ UINT    status;
 
     /* Suspend Thread 25.  */
     status =  tx_thread_suspend(&thread_25);
-   
+
     delay(9);
 
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_31)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_31))
     {
 
         /* Execution error.  */
@@ -446,23 +446,23 @@ UINT    status;
 
     /* Resume thread 16 pt 5.  */
     status =  tx_thread_resume(&thread_16_pt5);
-    
+
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_31)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_31))
     {
 
         /* Execution error.  */
         printf("ERROR #27\n");
         test_control_return(1);
     }
-    
+
     /* Suspend thread 16 pt 5.  */
     status =  tx_thread_suspend(&thread_16_pt5);
-    
+
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_31)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != &thread_31))
     {
 
         /* Execution error.  */
@@ -472,10 +472,10 @@ UINT    status;
 
     /* Suspend thread 31.  */
     status =  tx_thread_suspend(&thread_31);
-    
+
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -485,10 +485,10 @@ UINT    status;
 
     /* Suspend thread 1.  */
     status =  tx_thread_suspend(&thread_1);
-    
+
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_5)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -498,10 +498,10 @@ UINT    status;
 
     /* Suspend thread 5.  */
     status =  tx_thread_suspend(&thread_5);
-    
+
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != TX_NULL)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -512,7 +512,7 @@ UINT    status;
 
     /* Successful test.  */
     printf("SUCCESS!\n");
-        
+
     test_control_return(0);
 }
 
@@ -525,8 +525,8 @@ static void    thread_entry(ULONG thread_input)
 
     while(1)
     {
-    
-        tx_thread_identify();   
+
+        tx_thread_identify();
 
 		/* Indicate the thread is running... */
         thread_run_counter[thread_input]++;

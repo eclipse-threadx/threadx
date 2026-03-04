@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -36,41 +36,41 @@
 DWORD WINAPI _tx_win32_thread_entry(LPVOID p);
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_stack_build                            Win32/Visual      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_stack_build                            Win32/Visual      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function builds a stack frame on the supplied thread's stack.  */
 /*    The stack frame results in a fake interrupt return to the supplied  */
-/*    function pointer.                                                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*    function pointer.                                                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    thread_ptr                            Pointer to thread control blk */
 /*    function_ptr                          Pointer to return function    */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    CreateThread                          Win32 create thread           */ 
-/*    ResumeThread                          Win32 resume thread           */ 
-/*    SetThreadPriority                     Win32 set thread priority     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    CreateThread                          Win32 create thread           */
+/*    ResumeThread                          Win32 resume thread           */
+/*    SetThreadPriority                     Win32 set thread priority     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    _tx_thread_create                     Create thread service         */
-/*    _tx_thread_reset                      Reset thread service          */ 
+/*    _tx_thread_reset                      Reset thread service          */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -78,7 +78,7 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 
     /* Create a Win32 thread for the application thread.  */
     thread_ptr -> tx_thread_win32_thread_handle =
-        CreateThread(NULL, 0, _tx_win32_thread_entry, (LPVOID) thread_ptr, CREATE_SUSPENDED, 
+        CreateThread(NULL, 0, _tx_win32_thread_entry, (LPVOID) thread_ptr, CREATE_SUSPENDED,
                         &(thread_ptr -> tx_thread_win32_thread_id));
 
     /* Check for a good thread create.  */
@@ -111,11 +111,11 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
         }
     }
 
-    /* Setup the thread suspension type to solicited thread suspension.  
+    /* Setup the thread suspension type to solicited thread suspension.
        Pseudo interrupt handlers will suspend with this field set to 1.  */
     thread_ptr -> tx_thread_win32_suspension_type =  0;
 
-    /* Clear the disabled count that will keep track of the 
+    /* Clear the disabled count that will keep track of the
        tx_interrupt_control nesting.  */
     thread_ptr -> tx_thread_win32_int_disabled_flag =  0;
 

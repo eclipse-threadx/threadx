@@ -29,10 +29,10 @@ SECTIONS
     // ROM startup code sections must be the
     // same in both the ROM and RAM copies.
     .ROM.boottext   		        ROM(.boottext ) : > flash_memory
-    .ROM.syscall 		          ROM(.syscall) : > . 
+    .ROM.syscall 		          ROM(.syscall) : > .
 
     .rodata 					        : > flash_memory
-    .secinfo 					        : > . 
+    .secinfo 					        : > .
     .fixaddr 					        : > .
     .fixtype 					        : > .
 
@@ -70,7 +70,7 @@ SECTIONS
     __ghs_rombootcodestart  =  ADDR(.ROM.boottext);
     __ghs_rombootcodeend    =  ENDADDR(.fixtype);
     __ghs_rambootcodestart  =  ADDR(.boottext);
-    __ghs_rambootcodeend    =  ENDADDR(.stack);	
+    __ghs_rambootcodeend    =  ENDADDR(.stack);
 
 //
 // These special symbols mark the bounds of RAM and ROM memory.

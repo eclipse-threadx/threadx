@@ -1,4 +1,4 @@
-  
+
   px_abs_time_to_rel_ticks.c        Casted size_t to ULONG.
 
   px_clock_gettime.c        Casted size_t to ULONG.
@@ -12,18 +12,18 @@
   tx_posix.h        Reduced default object pool sizes, added posix_initialize prototype.
                         Improved default stack size symbol name
 
-  px_memory_release.c 	When thread completes and posix_do_pthread_delete() is called, 
-                            posix_memory_release() returns with error if stack was not 
+  px_memory_release.c 	When thread completes and posix_do_pthread_delete() is called,
+                            posix_memory_release() returns with error if stack was not
                             allocated from the posix pool but rather stack is a static array.
 
-  px_mq_open.c		Fixed bug to handle a NULL attribute in mq_open(). 
+  px_mq_open.c		Fixed bug to handle a NULL attribute in mq_open().
 
   px_pth_create.c       Call to pthread_create() with pthread_attr_t set to NULL or with the
                             default values as set by pthread_attr_init() has unexpected behavior.
     			    Fixed by adding code to use defaults.
 
-  px_pth_init.c         Fixed memory leak when threads are released or killed by 
-  			    calling posix_reset_pthread after posix_destroy_pthread() 
+  px_pth_init.c         Fixed memory leak when threads are released or killed by
+  			    calling posix_reset_pthread after posix_destroy_pthread()
                             which was not returning memory to the TCB pool
 
 			Fixed bug when trying to join threads from ThreadX context when

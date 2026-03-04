@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread - Low Level SMP Support                                      */
 @/**                                                                       */
@@ -38,43 +38,43 @@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_smp_unprotect                        SMP/Cortex-A9/GNU   */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_smp_unprotect                        SMP/Cortex-A9/GNU   */
 @/*                                                           6.1          */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function releases previously obtained protection. The supplied */ 
-@/*    previous SR is restored. If the value of _tx_thread_system_state    */ 
-@/*    and _tx_thread_preempt_disable are both zero, then multithreading   */ 
-@/*    is enabled as well.                                                 */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    Previous Status Register                                            */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*    This function releases previously obtained protection. The supplied */
+@/*    previous SR is restored. If the value of _tx_thread_system_state    */
+@/*    and _tx_thread_preempt_disable are both zero, then multithreading   */
+@/*    is enabled as well.                                                 */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    Previous Status Register                                            */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
 @/*    ThreadX Source                                                      */
-@/*                                                                        */ 
+@/*                                                                        */
 @/**************************************************************************/
     .global _tx_thread_smp_unprotect
     .type _tx_thread_smp_unprotect,function
-_tx_thread_smp_unprotect: 
+_tx_thread_smp_unprotect:
 @
 @    /* Lockout interrupts.  */
 @
@@ -124,8 +124,8 @@ _tx_thread_smp_unprotect:
     SEV                                         @ Send event to other CPUs, wakes anyone waiting on the protection (using WFE)
 #endif
 
-_still_protected: 
-    MSR     CPSR_c, r0                          @ Restore CPSR 
+_still_protected:
+    MSR     CPSR_c, r0                          @ Restore CPSR
 
 #ifdef __THUMB_INTERWORK
     BX      lr                                  @ Return to caller
@@ -133,4 +133,4 @@ _still_protected:
     MOV     pc, lr                              @ Return to caller
 #endif
 
-    
+

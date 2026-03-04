@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -85,7 +85,7 @@ _tx_thread_schedule:
 ;
 #ifdef __VFP__
     MRS     r0, CONTROL                             ; Pickup current CONTROL register
-    BIC     r0, r0, #4                              ; Clear the FPCA bit 
+    BIC     r0, r0, #4                              ; Clear the FPCA bit
     MSR     CONTROL, r0                             ; Setup new CONTROL register
 #endif
 ;
@@ -118,8 +118,8 @@ PendSV_Handler:
 __tx_PendSVHandler:
 ;
 ;    /* Get current thread value and new thread pointer.  */
-;       
-__tx_ts_handler: 
+;
+__tx_ts_handler:
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 ;
@@ -137,7 +137,7 @@ __tx_ts_handler:
     LDR     r1, [r0]                                ; Pickup current thread pointer
 ;
 ;    /* Determine if there is a current thread to finish preserving.  */
-;       
+;
     CBZ     r1, __tx_ts_new                         ; If NULL, skip preservation
 ;
 ;    /* Recover PSP and preserve current thread context.  */
@@ -212,7 +212,7 @@ __tx_ts_restore:
     LDR.W   LR, [r12], #4                           ; Pickup LR
 #ifdef __VFP__
     TST     LR, #0x10                               ; Determine if the VFP extended frame is present
-    BNE     _skip_vfp_restore                       ; If not, skip VFP restore 
+    BNE     _skip_vfp_restore                       ; If not, skip VFP restore
     VLDMIA  r12!, {s16-s31}                         ; Yes, restore additional VFP registers
 _skip_vfp_restore:
 #endif
@@ -224,7 +224,7 @@ _skip_vfp_restore:
     BX      lr                                      ; Return to thread!
 ;
 ;    /* The following is the idle wait processing... in this case, no threads are ready for execution and the
-;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts 
+;       system will simply be idle until an interrupt occurs that makes a thread ready. Note that interrupts
 ;       are disabled to allow use of WFI for waiting for a thread to arrive.  */
 ;
 __tx_ts_wait:
@@ -254,13 +254,13 @@ __tx_ts_wait:
     CPSIE   i                                       ; Enable interrupts
     B       __tx_ts_wait                            ; Loop to continue waiting
 ;
-;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are 
+;    /* At this point, we have a new thread ready to go. Clear any newly pended PendSV - since we are
 ;       already in the handler!  */
 ;
 __tx_ts_ready:
     MOV     r7, #0x08000000                         ; Build clear PendSV value
     MOV     r8, #0xE000E000                         ; Build base NVIC address
-    STR     r7, [r8, #0xD04]                        ; Clear any PendSV 
+    STR     r7, [r8, #0xD04]                        ; Clear any PendSV
 ;
 ;    /* Re-enable interrupts and restore new thread.  */
 ;
@@ -269,14 +269,14 @@ __tx_ts_ready:
 ;}
 ;
    .type __tx_PendSVHandler,$function
-   .size __tx_PendSVHandler,.-__tx_PendSVHandler  
+   .size __tx_PendSVHandler,.-__tx_PendSVHandler
 
 #ifdef __VFP__
 
         .globl  tx_thread_fpu_enable
 tx_thread_fpu_enable:
 ;
-;    /* Automatic VPF logic is supported, this function is present only for 
+;    /* Automatic VPF logic is supported, this function is present only for
 ;       backward compatibility purposes and therefore simply returns.  */
 ;
     BX      LR                                      ; Return to caller
@@ -287,12 +287,12 @@ tx_thread_fpu_enable:
         .global  tx_thread_fpu_disable
 tx_thread_fpu_disable:
 ;
-;    /* Automatic VPF logic is supported, this function is present only for 
+;    /* Automatic VPF logic is supported, this function is present only for
 ;       backward compatibility purposes and therefore simply returns.  */
 ;
     BX      LR                                      ; Return to caller
 
    .type tx_thread_fpu_disable,$function
-   .size tx_thread_fpu_disable,.-tx_thread_fpu_disable  
+   .size tx_thread_fpu_disable,.-tx_thread_fpu_disable
 
 #endif

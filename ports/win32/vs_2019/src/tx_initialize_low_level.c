@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Initialize                                                          */
 /**                                                                       */
@@ -44,7 +44,7 @@ extern TX_THREAD                *_tx_thread_current_ptr;
 
 
 /* Define simulated timer interrupt.  This is done inside a thread, which is
-   how other interrupts may be defined as well.  See code below for an 
+   how other interrupts may be defined as well.  See code below for an
    example.  */
 
 UINT                            _tx_win32_timer_id;
@@ -116,22 +116,22 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_current_thread =     _tx_thread_current_ptr;
     if (_tx_thread_current_ptr)
         _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_current_thread_id =  _tx_thread_current_ptr -> tx_thread_win32_thread_id;
-    else 
+    else
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_current_thread_id =  0;
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_execute_thread =     _tx_thread_execute_ptr;
     if (_tx_thread_execute_ptr)
         _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_execute_thread_id =  _tx_thread_execute_ptr -> tx_thread_win32_thread_id;
-    else 
+    else
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_execute_thread_id =  0;
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_running_id =         GetCurrentThreadId();
 
     /* Now move to the next entry.  */
     _tx_win32_debug_entry_index++;
-    
+
     /* Determine if we need to wrap the list.  */
     if (_tx_win32_debug_entry_index >= TX_WIN32_DEBUG_EVENT_SIZE)
     {
-    
+
         /* Yes, wrap the list!  */
         _tx_win32_debug_entry_index =  0;
     }
@@ -157,44 +157,44 @@ VOID            _tx_thread_context_restore(VOID);
 extern VOID     *_tx_initialize_unused_memory;
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_initialize_low_level                          Win32/Visual      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_initialize_low_level                          Win32/Visual      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is responsible for any low-level processor            */ 
-/*    initialization, including setting up interrupt vectors, setting     */ 
-/*    up a periodic timer interrupt source, saving the system stack       */ 
-/*    pointer for use in ISR processing later, and finding the first      */ 
-/*    available RAM memory address for tx_application_define.             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    CreateMutex                           Win32 create mutex            */ 
-/*    CreateThread                          Win32 create thread           */ 
-/*    CreateSemaphore                       Win32 create semaphore        */ 
-/*    GetCurrentThreadId                    Win32 get current thread ID   */ 
-/*    SetProcessAffinityMask                Win32 process affinity set    */ 
-/*    SetThreadPriority                     Win32 set thread priority     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
+/*                                                                        */
+/*    This function is responsible for any low-level processor            */
+/*    initialization, including setting up interrupt vectors, setting     */
+/*    up a periodic timer interrupt source, saving the system stack       */
+/*    pointer for use in ISR processing later, and finding the first      */
+/*    available RAM memory address for tx_application_define.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    CreateMutex                           Win32 create mutex            */
+/*    CreateThread                          Win32 create thread           */
+/*    CreateSemaphore                       Win32 create semaphore        */
+/*    GetCurrentThreadId                    Win32 get current thread ID   */
+/*    SetProcessAffinityMask                Win32 process affinity set    */
+/*    SetThreadPriority                     Win32 set thread priority     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter           ThreadX entry function        */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_initialize_low_level(VOID)
@@ -208,7 +208,7 @@ VOID   _tx_initialize_low_level(VOID)
     /* Limit this ThreadX simulation on Win32 to a single core.  */
     if (SetProcessAffinityMask( GetCurrentProcess(), 1 ) == 0)
     {
-    
+
         /* Error restricting the process to one core.  */
         printf("ThreadX Win32 error restricting the process to one core!\n");
         while(1)
@@ -230,7 +230,7 @@ VOID   _tx_initialize_low_level(VOID)
     _tx_win32_critical_section.tx_win32_critical_section_mutex_handle =  CreateMutex(NULL, FALSE, NULL);
     _tx_win32_critical_section.tx_win32_critical_section_nested_count =  0;
     _tx_win32_critical_section.tx_win32_critical_section_owner =         0;
-       
+
     /* Create the semaphore that regulates when the scheduler executes.  */
     _tx_win32_scheduler_semaphore =  CreateSemaphore(NULL, 0, 1, NULL);
 
@@ -242,7 +242,7 @@ VOID   _tx_initialize_low_level(VOID)
 
 
 /* This routine is called after initialization is complete in order to start
-   all interrupt threads.  Interrupt threads in addition to the timer may 
+   all interrupt threads.  Interrupt threads in addition to the timer may
    be added to this routine as well.  */
 
 void _tx_initialize_start_interrupts(void)

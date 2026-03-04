@@ -6,9 +6,9 @@
   .global _vectors
 
 _vectors:
-  .word __stack_end__ 
-  .word reset_handler 
-  .word __tx_NMIHandler 
+  .word __stack_end__
+  .word reset_handler
+  .word __tx_NMIHandler
   .word __tx_HardfaultHandler
   .word MemManage_Handler
   .word BusFault_Handler
@@ -20,7 +20,7 @@ _vectors:
   .word __tx_SVCallHandler //_SVC_Handler - used by Threadx scheduler //
   .word __tx_DBGHandler
   .word 0 // Reserved
-  .word __tx_PendSVHandler 
+  .word __tx_PendSVHandler
   .word __tx_SysTickHandler   // Used by Threadx timer functionality
   .word __tx_BadHandler       // Populate with user Interrupt handler
   .word __tx_BadHandler

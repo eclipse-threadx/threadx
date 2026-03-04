@@ -41,8 +41,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -54,8 +54,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -96,7 +96,7 @@ CHAR    *pointer;
 
     /* Increment the thread counter.  */
     thread_0_counter++;
-        
+
     /* Allocate memory from the pool.  Only one block of this size will fit.   */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer, 60, TX_NO_WAIT);
 
@@ -114,7 +114,7 @@ CHAR    *pointer;
 
     /* Terminate the other thread.  */
     status =  tx_thread_terminate(&thread_1);
- 
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -147,7 +147,7 @@ CHAR    *pointer;
         printf("ERROR #7\n");
         test_control_return(1);
     }
-    
+
     /* Successful test.  */
     printf("SUCCESS!\n");
     test_control_return(0);

@@ -48,7 +48,7 @@ SECTIONS
   KEEP(*startup.o(*.vectors))
   KEEP(*vectors.o(*.text))
   KEEP(*whetstone.o(*.text))
-  KEEP(*startup.S.obj(*.text))  
+  KEEP(*startup.S.obj(*.text))
   KEEP(*startup.S.obj(*.vectors))
   KEEP(*vectors.S.obj(*.text))
   KEEP(*whetstone.c.obj(*.text))

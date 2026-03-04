@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   Port Specific                                                       */
@@ -21,11 +21,11 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
-/*                                                                        */ 
-/*    tx_port.h                                         Cortex-A8/IAR     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+/*                                                                        */
+/*    tx_port.h                                         Cortex-A8/IAR     */
 /*                                                           6.1.6        */
 /*                                                                        */
 /*  AUTHOR                                                                */
@@ -33,15 +33,15 @@
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file contains data type definitions that make the ThreadX      */ 
-/*    real-time kernel function identically on a variety of different     */ 
-/*    processor architectures.  For example, the size or number of bits   */ 
-/*    in an "int" data type vary between microprocessor architectures and */ 
-/*    even C compilers for the same microprocessor.  ThreadX does not     */ 
-/*    directly use native C data types.  Instead, ThreadX creates its     */ 
-/*    own special types that can be mapped to actual data types by this   */ 
-/*    file to guarantee consistency in the interface and functionality.   */ 
+/*                                                                        */
+/*    This file contains data type definitions that make the ThreadX      */
+/*    real-time kernel function identically on a variety of different     */
+/*    processor architectures.  For example, the size or number of bits   */
+/*    in an "int" data type vary between microprocessor architectures and */
+/*    even C compilers for the same microprocessor.  ThreadX does not     */
+/*    directly use native C data types.  Instead, ThreadX creates its     */
+/*    own special types that can be mapped to actual data types by this   */
+/*    file to guarantee consistency in the interface and functionality.   */
 /*                                                                        */
 /**************************************************************************/
 
@@ -54,7 +54,7 @@
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
 
 
-/* Yes, include the user defines in tx_user.h. The defines in this file may 
+/* Yes, include the user defines in tx_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
@@ -71,7 +71,7 @@
 #endif
 
 
-/* Define ThreadX basic types for this port.  */ 
+/* Define ThreadX basic types for this port.  */
 
 #define VOID                                    void
 typedef char                                    CHAR;
@@ -107,12 +107,12 @@ typedef unsigned short                          USHORT;
 #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
 #endif
 
-#ifndef TX_TIMER_THREAD_PRIORITY    
-#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */ 
+#ifndef TX_TIMER_THREAD_PRIORITY
+#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
 
-/* Define various constants for the ThreadX ARM port.  */ 
+/* Define various constants for the ThreadX ARM port.  */
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
 #define TX_INT_DISABLE                          0xC0        /* Disable IRQ & FIQ interrupts     */
@@ -122,8 +122,8 @@ typedef unsigned short                          USHORT;
 #define TX_INT_ENABLE                           0x00        /* Enable IRQ interrupts            */
 
 
-/* Define the clock source for trace event entry time stamp. The following two item are port specific.  
-   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
+/* Define the clock source for trace event entry time stamp. The following two item are port specific.
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
 #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
@@ -180,7 +180,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #endif
 
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -194,18 +194,18 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 
 /* Define the TX_THREAD control block extensions for this port. The main reason
-   for the multiple macros is so that backward compatibility can be maintained with 
+   for the multiple macros is so that backward compatibility can be maintained with
    existing ThreadX kernel awareness modules.  */
 
-#define TX_THREAD_EXTENSION_0          
-#define TX_THREAD_EXTENSION_1                  
+#define TX_THREAD_EXTENSION_0
+#define TX_THREAD_EXTENSION_1
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
 #define TX_THREAD_EXTENSION_2                               ULONG       tx_thread_vfp_enable; \
-                                                            VOID        *tx_thread_iar_tls_pointer;          
+                                                            VOID        *tx_thread_iar_tls_pointer;
 #else
 #define TX_THREAD_EXTENSION_2                               ULONG       tx_thread_vfp_enable;
 #endif
-#define TX_THREAD_EXTENSION_3          
+#define TX_THREAD_EXTENSION_3
 
 
 /* Define the port extensions of the remaining ThreadX objects.  */
@@ -219,11 +219,11 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #define TX_TIMER_EXTENSION
 
 
-/* Define the user extension field of the thread control block.  Nothing 
+/* Define the user extension field of the thread control block.  Nothing
    additional is needed for this port so it is defined as white space.  */
 
 #ifndef TX_THREAD_USER_EXTENSION
-#define TX_THREAD_USER_EXTENSION    
+#define TX_THREAD_USER_EXTENSION
 #endif
 
 
@@ -233,23 +233,23 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
 #if (__VER__ < 8000000)
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  __iar_dlib_perthread_allocate();                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  __iar_dlib_perthread_allocate();
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate(thread_ptr -> tx_thread_iar_tls_pointer); \
-                                                                    thread_ptr -> tx_thread_iar_tls_pointer =  TX_NULL;            
+                                                                    thread_ptr -> tx_thread_iar_tls_pointer =  TX_NULL;
 #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
 #else
 void    *_tx_iar_create_per_thread_tls_area(void);
 void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
 void    __iar_Initlocks(void);
 
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  _tx_iar_create_per_thread_tls_area();                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  _tx_iar_create_per_thread_tls_area();
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_tls_area(thread_ptr -> tx_thread_iar_tls_pointer); \
                                                                         thread_ptr -> tx_thread_iar_tls_pointer =  TX_NULL; } while(0);
-#define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0); 
+#define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0);
 #endif
 #else
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                                  
-#define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+#define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #endif
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
 #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
@@ -277,8 +277,8 @@ void    __iar_Initlocks(void);
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
 
 
-/* Determine if the ARM architecture has the CLZ instruction. This is available on 
-   architectures v5 and above. If available, redefine the macro for calculating the 
+/* Determine if the ARM architecture has the CLZ instruction. This is available on
+   architectures v5 and above. If available, redefine the macro for calculating the
    lowest bit set.  */
 
 #ifndef TX_DISABLE_INLINE
@@ -289,22 +289,22 @@ void    __iar_Initlocks(void);
 
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       m = m & ((ULONG) (-((LONG) m))); \
                                                 b = (UINT) __CLZ(m); \
-                                                b = 31 - b; 
+                                                b = 31 - b;
 #endif
 #endif
 #endif
 
 
-/* Define ThreadX interrupt lockout and restore macros for protection on 
-   access of critical kernel information.  The restore interrupt macro must 
-   restore the interrupt posture of the running thread prior to the value 
+/* Define ThreadX interrupt lockout and restore macros for protection on
+   access of critical kernel information.  The restore interrupt macro must
+   restore the interrupt posture of the running thread prior to the value
    present prior to the disable macro.  In most cases, the save area macro
    is used to define a local function save area for the disable and restore
    macros.  */
 
 
 /* First, check and see what mode the file is being compiled in. The IAR compiler
-   defines __CPU_MODE__ to 1, if the Thumb mode is present, and 2 if ARM 32-bit mode 
+   defines __CPU_MODE__ to 1, if the Thumb mode is present, and 2 if ARM 32-bit mode
    is present.  If ARM 32-bit mode is present, the fast CPSR manipulation macros
    are available. Otherwise, if Thumb mode is present, we must use function calls.  */
 
@@ -374,7 +374,7 @@ void    tx_thread_vfp_disable(void);
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
+CHAR                            _tx_version_id[] =
                                     "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Cortex-A8/IAR Version 6.5.0.202601 *";
 #else
 #ifdef TX_MISRA_ENABLE

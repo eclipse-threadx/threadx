@@ -46,8 +46,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 3, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -89,13 +89,13 @@ TX_TIMER_INTERNAL   **current_list_head;
 
     /* Call the timer thread entry function with an invalid value to make sure the code simply returns.  */
     _tx_timer_thread_entry(0);
-#endif   
-    
+#endif
+
 #ifndef TX_TIMER_PROCESS_IN_ISR
 
     tx_thread_resume(&_tx_timer_thread);
 #endif
-      
+
     /* Call the internal timer activate function with 0 remaining time.  */
     test_timer.tx_timer_internal_remaining_ticks =  0;
     _tx_timer_system_activate(&test_timer);
@@ -105,7 +105,7 @@ TX_TIMER_INTERNAL   **current_list_head;
     list_head =  TX_NULL;
     test_timer.tx_timer_internal_list_head =  &list_head;
     _tx_timer_system_activate(&test_timer);
-    
+
     /* Call the internal timer deactivate function to ensure the list head is not updated unless valid.  */
     list_head =  TX_NULL;
     test_timer.tx_timer_internal_list_head =   &list_head;
@@ -115,8 +115,8 @@ TX_TIMER_INTERNAL   **current_list_head;
     /* Call timer info get with a timer setup to exercise a path not possible, in order to exercise all
        conditionals.  */
     test_app_timer.tx_timer_internal.tx_timer_internal_list_head =  (_tx_timer_list_end + 1);
-    status =  _tx_timer_info_get(&test_app_timer, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL); 
-     
+    status =  _tx_timer_info_get(&test_app_timer, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
+
     /* Deactivate and activate the timer.  */
     test_app_timer.tx_timer_internal.tx_timer_internal_active_next =  &test_app_timer.tx_timer_internal;
     status +=  _tx_timer_deactivate(&test_app_timer);
@@ -160,7 +160,7 @@ TX_TIMER_INTERNAL   **current_list_head;
     /* Sleep for a 14 ticks.  */
     tx_thread_sleep(14);
 
-    /* At this point the initial expiration of the timer should have 
+    /* At this point the initial expiration of the timer should have
        happened.  */
     if (timer_0_counter != 1)
     {
@@ -174,7 +174,7 @@ TX_TIMER_INTERNAL   **current_list_head;
        again!  */
     tx_thread_sleep(24);
 
-    /* At this point the timer counter should still be 1.  */ 
+    /* At this point the timer counter should still be 1.  */
     if (timer_0_counter != 1)
     {
 
@@ -205,27 +205,27 @@ TX_TIMER_INTERNAL   **current_list_head;
     timer_2.tx_timer_id =  TX_TIMER_ID;
     timer_2.tx_timer_internal.tx_timer_internal_list_head =  (TX_TIMER_INTERNAL **) &current_list_head;
     current_list_head =  (struct TX_TIMER_INTERNAL_STRUCT **) &(timer_2.tx_timer_internal);
-    timer_2.tx_timer_internal.tx_timer_internal_remaining_ticks =  TX_TIMER_ENTRIES*2; 
+    timer_2.tx_timer_internal.tx_timer_internal_remaining_ticks =  TX_TIMER_ENTRIES*2;
     timer_2.tx_timer_internal.tx_timer_internal_active_next =  &(timer_2.tx_timer_internal);
     status =  tx_timer_deactivate(&timer_2);
 
     /* Check for error.  */
     if ((status != TX_SUCCESS) || (timer_2.tx_timer_internal.tx_timer_internal_remaining_ticks != TX_TIMER_ENTRIES))
     {
-    
+
         /* Application timer error.  */
         printf("ERROR #8a\n");
         test_control_return(1);
     }
 
 
-    /* Sleep for twice the expiration time to make sure the timer 
+    /* Sleep for twice the expiration time to make sure the timer
        doesn't automatically reschedule.  */
     tx_thread_sleep(47);
 
     /* Check for an error.  */
 
-    /* At this point the timer counter should still be 1.  */ 
+    /* At this point the timer counter should still be 1.  */
     if (timer_0_counter != 1)
     {
 

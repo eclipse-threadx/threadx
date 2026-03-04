@@ -47,8 +47,8 @@ CHAR    *pointer;
        create information.  */
 
     /* Create thread 0.  */
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -61,8 +61,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 1.  */
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -75,8 +75,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 2.  */
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -89,8 +89,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 3.  */
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -172,7 +172,7 @@ static void    thread_3_entry(ULONG thread_input)
 
     /* Immediate response relinquish.  */
     tx_thread_relinquish();
-    
+
     /* All other threads should be completed now.  */
     if ((thread_0.tx_thread_state != TX_COMPLETED) || (thread_1.tx_thread_state != TX_COMPLETED) ||
         (thread_2.tx_thread_state != TX_COMPLETED))

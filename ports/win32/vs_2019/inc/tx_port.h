@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   Port Specific                                                       */
@@ -21,11 +21,11 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
-/*                                                                        */ 
-/*    tx_port.h                                          Win32/Visual     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+/*                                                                        */
+/*    tx_port.h                                          Win32/Visual     */
 /*                                                           6.1          */
 /*                                                                        */
 /*  AUTHOR                                                                */
@@ -33,15 +33,15 @@
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file contains data type definitions that make the ThreadX      */ 
-/*    real-time kernel function identically on a variety of different     */ 
-/*    processor architectures.  For example, the size or number of bits   */ 
-/*    in an "int" data type vary between microprocessor architectures and */ 
-/*    even C compilers for the same microprocessor.  ThreadX does not     */ 
-/*    directly use native C data types.  Instead, ThreadX creates its     */ 
-/*    own special types that can be mapped to actual data types by this   */ 
-/*    file to guarantee consistency in the interface and functionality.   */ 
+/*                                                                        */
+/*    This file contains data type definitions that make the ThreadX      */
+/*    real-time kernel function identically on a variety of different     */
+/*    processor architectures.  For example, the size or number of bits   */
+/*    in an "int" data type vary between microprocessor architectures and */
+/*    even C compilers for the same microprocessor.  ThreadX does not     */
+/*    directly use native C data types.  Instead, ThreadX creates its     */
+/*    own special types that can be mapped to actual data types by this   */
+/*    file to guarantee consistency in the interface and functionality.   */
 /*                                                                        */
 /**************************************************************************/
 
@@ -54,7 +54,7 @@
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
 
 
-/* Yes, include the user defines in tx_user.h. The defines in this file may 
+/* Yes, include the user defines in tx_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
@@ -109,7 +109,7 @@
 #endif
 
 
-/* Define ThreadX basic types for this port.  */ 
+/* Define ThreadX basic types for this port.  */
 
 #define VOID                                    void
 typedef char                                    CHAR;
@@ -123,7 +123,7 @@ typedef unsigned short                          USHORT;
 
 
 /* Add Win32 debug insert prototype.  */
- 
+
 void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long line);
 
 #ifndef TX_WIN32_DEBUG_ENABLE
@@ -150,7 +150,7 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
                                                         *ptr++ =  value;                \
                                                     }                                   \
                                                 }
-                                               
+
 
 /* Include windows include file.  */
 
@@ -180,19 +180,19 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
 #define TX_TIMER_THREAD_STACK_SIZE              400         /* Default timer thread stack size - Not used in Win32 port!  */
 #endif
 
-#ifndef TX_TIMER_THREAD_PRIORITY    
-#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */ 
+#ifndef TX_TIMER_THREAD_PRIORITY
+#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
 
-/* Define various constants for the ThreadX  port.  */ 
+/* Define various constants for the ThreadX  port.  */
 
 #define TX_INT_DISABLE                          1           /* Disable interrupts               */
 #define TX_INT_ENABLE                           0           /* Enable interrupts                */
 
 
-/* Define the clock source for trace event entry time stamp. The following two item are port specific.  
-   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
+/* Define the clock source for trace event entry time stamp. The following two item are port specific.
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
 #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
@@ -210,7 +210,7 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
 
 /* Define the port-specific trace extension to pickup the Windows timer.  */
 
-#define TX_TRACE_PORT_EXTENSION                 QueryPerformanceCounter((LARGE_INTEGER *)&_tx_win32_time_stamp); 
+#define TX_TRACE_PORT_EXTENSION                 QueryPerformanceCounter((LARGE_INTEGER *)&_tx_win32_time_stamp);
 
 
 /* Define the port specific options for the _tx_build_options variable. This variable indicates
@@ -233,7 +233,7 @@ void    _tx_initialize_start_interrupts(void);
 #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION                       _tx_initialize_start_interrupts();
 
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -245,7 +245,7 @@ void    _tx_initialize_start_interrupts(void);
 
 
 /* Define the TX_THREAD control block extensions for this port. The main reason
-   for the multiple macros is so that backward compatibility can be maintained with 
+   for the multiple macros is so that backward compatibility can be maintained with
    existing ThreadX kernel awareness modules.  */
 
 #define TX_THREAD_EXTENSION_0                                               HANDLE tx_thread_win32_thread_handle; \
@@ -253,9 +253,9 @@ void    _tx_initialize_start_interrupts(void);
                                                                             HANDLE tx_thread_win32_thread_run_semaphore; \
                                                                             UINT   tx_thread_win32_suspension_type; \
                                                                             UINT   tx_thread_win32_int_disabled_flag;
-#define TX_THREAD_EXTENSION_1                  
-#define TX_THREAD_EXTENSION_2          
-#define TX_THREAD_EXTENSION_3          
+#define TX_THREAD_EXTENSION_1
+#define TX_THREAD_EXTENSION_2
+#define TX_THREAD_EXTENSION_3
 
 
 /* Define the port extensions of the remaining ThreadX objects.  */
@@ -269,11 +269,11 @@ void    _tx_initialize_start_interrupts(void);
 #define TX_TIMER_EXTENSION
 
 
-/* Define the user extension field of the thread control block.  Nothing 
+/* Define the user extension field of the thread control block.  Nothing
    additional is needed for this port so it is defined as white space.  */
 
 #ifndef TX_THREAD_USER_EXTENSION
-#define TX_THREAD_USER_EXTENSION    
+#define TX_THREAD_USER_EXTENSION
 #endif
 
 
@@ -281,10 +281,10 @@ void    _tx_initialize_start_interrupts(void);
    tx_thread_shell_entry, and tx_thread_terminate.  */
 
 
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
-#define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)                              
+#define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
 
 
 /* Define the ThreadX object creation extensions for the remaining objects.  */
@@ -382,9 +382,9 @@ HANDLE          threadhandle;                                                   
 }
 
 
-/* Define ThreadX interrupt lockout and restore macros for protection on 
-   access of critical kernel information.  The restore interrupt macro must 
-   restore the interrupt posture of the running thread prior to the value 
+/* Define ThreadX interrupt lockout and restore macros for protection on
+   access of critical kernel information.  The restore interrupt macro must
+   restore the interrupt posture of the running thread prior to the value
    present prior to the disable macro.  In most cases, the save area macro
    is used to define a local function save area for the disable and restore
    macros.  */
@@ -412,7 +412,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
+CHAR                            _tx_version_id[] =
                                     "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Win32/Visual Studio Version 6.5.0.202601 *";
 #else
 extern  CHAR                    _tx_version_id[];

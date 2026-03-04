@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread - Low Level SMP Support                                      */
 @/**                                                                       */
@@ -33,36 +33,36 @@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_smp_core_get                         SMP/Cortex-A7/GNU   */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_smp_core_get                         SMP/Cortex-A7/GNU   */
 @/*                                                            6.1         */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function gets the currently running core number and returns it.*/ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*    This function gets the currently running core number and returns it.*/
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    Core ID                                                             */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    Core ID                                                             */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
 @/*    ThreadX Source                                                      */
-@/*                                                                        */ 
+@/*                                                                        */
 @/**************************************************************************/
     .global _tx_thread_smp_core_get
     .type   _tx_thread_smp_core_get,function

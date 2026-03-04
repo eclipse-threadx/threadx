@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -78,7 +78,7 @@ __tx_thread_context_restore:
      MOV.L    [R1], R2
      SUB      #1, R2
      MOV.L    R2,[R1]
-     BEQ      __tx_thread_not_nested_restore 
+     BEQ      __tx_thread_not_nested_restore
 
 ;
 ;    /* Interrupts are nested.  */
@@ -99,17 +99,17 @@ __tx_thread_not_nested_restore:
 ;    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr))
 ;               || (_tx_thread_preempt_disable))
 ;    {
-    
+
      MOV.L    #__tx_thread_current_ptr, R1       ; Pickup current thread ptr address
      MOV.L    [R1], R2
      CMP      #0, R2
-     BEQ      __tx_thread_idle_system_restore 
-     
+     BEQ      __tx_thread_idle_system_restore
+
      MOV.L    #__tx_thread_preempt_disable, R3   ; Pick up preempt disable flag
      MOV.L    [R3], R3
      CMP      #0, R3
      BNE      __tx_thread_no_preempt_restore     ; If pre-empt disable flag set, we simply return to the original point of interrupt regardless
-     
+
      MOV.L    #__tx_thread_execute_ptr, R3       ; (_tx_thread_current_ptr != _tx_thread_execute_ptr)
      CMP      [R3], R2
      BNE      __tx_thread_preempt_restore        ; Jump to pre-empt restoring
@@ -149,11 +149,11 @@ __tx_thread_dont_save_ts:
 
      SETPSW   U                                  ; User stack
      PUSHM    R6-R13
-     
+
      MVFACHI   R5
      MVFACMI   R6
      PUSHM     R5-R6
-     
+
 ;
 ;    /* Clear the current task pointer.  */
 ;    _tx_thread_current_ptr =  TX_NULL;

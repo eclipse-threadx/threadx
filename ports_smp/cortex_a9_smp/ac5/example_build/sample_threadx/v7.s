@@ -19,7 +19,7 @@ enable_caches  PROC
   MCR     p15, 0, r0, c1, c0, 0   ; Write System Control Register configuration data
   BX      lr
   ENDP
-  
+
 
   EXPORT disable_caches
   ; void disable_caches(void)
@@ -36,7 +36,7 @@ disable_caches  PROC
   ; void clean_dcache(void);
 clean_dcache  PROC
   PUSH    {r4-r12}
-  
+
   ;
   ; Based on code example given in section 11.2.4 of ARM DDI 0406B
   ;
@@ -86,12 +86,12 @@ clean_dcache_finished
 
   BX      lr
   ENDP
-  
+
   EXPORT clean_invalidate_dcache
   ; void clean_invalidate_dcache(void);
 clean_invalidate_dcache  PROC
   PUSH    {r4-r12}
-  
+
   ;
   ; Based on code example given in section 11.2.4 of ARM DDI 0406B
   ;
@@ -147,7 +147,7 @@ clean_invalidate_dcache_finished
   ; void invalidate_caches(void);
 invalidate_caches PROC
   PUSH    {r4-r12}
-  
+
   ;
   ; Based on code example given in section B2.2.4/11.2.4 of ARM DDI 0406B
   ;
@@ -199,7 +199,7 @@ invalidate_caches_finished
   POP     {r4-r12}
   BX      lr
   ENDP
-  
+
 
   EXPORT invalidate_caches_is
   ; void invalidate_caches_is(void);
@@ -295,7 +295,7 @@ disable_branch_prediction PROC
   MCR     p15, 0,r0, c1, c0, 0                  ; Write SCTLR
   BX      lr
   ENDP
-  
+
   EXPORT invalidate_branch_target_cache
   ; void invalidate_branch_target_cache(void)
 invalidate_branch_target_cache PROC
@@ -351,7 +351,7 @@ set_context_id PROC
   MCR     p15, 0, r0, c13, c0, 1 ; Write Context ID Register
   BX      lr
   ENDP
-  
+
 ; ------------------------------------------------------------
 ; ID registers
 ; ------------------------------------------------------------
@@ -362,7 +362,7 @@ get_MIDR PROC
   MRC     p15, 0, r0, c0, c0, 0 ; Read Main ID Register (MIDR)
   BX      lr
   ENDP
-  
+
   EXPORT get_MPIDR
   ; uint32_t get_MPIDR(void);
 get_MPIDR PROC

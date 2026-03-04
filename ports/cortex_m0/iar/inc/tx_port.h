@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -53,7 +53,7 @@
 
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
 
-/* Yes, include the user defines in tx_user.h. The defines in this file may 
+/* Yes, include the user defines in tx_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
@@ -106,7 +106,7 @@ typedef unsigned short                          USHORT;
 #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
 #endif
 
-#ifndef TX_TIMER_THREAD_PRIORITY    
+#ifndef TX_TIMER_THREAD_PRIORITY
 #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
@@ -117,8 +117,8 @@ typedef unsigned short                          USHORT;
 #define TX_INT_ENABLE                           0           /* Enable interrupts                */
 
 
-/* Define the clock source for trace event entry time stamp. The following two item are port specific.  
-   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
+/* Define the clock source for trace event entry time stamp. The following two item are port specific.
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
 #define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0x0a800024)
@@ -157,7 +157,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #endif
 
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -171,17 +171,17 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 
 /* Define the TX_THREAD control block extensions for this port. The main reason
-   for the multiple macros is so that backward compatibility can be maintained with 
+   for the multiple macros is so that backward compatibility can be maintained with
    existing ThreadX kernel awareness modules.  */
 
-#define TX_THREAD_EXTENSION_0          
-#define TX_THREAD_EXTENSION_1                  
+#define TX_THREAD_EXTENSION_0
+#define TX_THREAD_EXTENSION_1
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
-#define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;          
+#define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;
 #else
-#define TX_THREAD_EXTENSION_2          
+#define TX_THREAD_EXTENSION_2
 #endif
-#define TX_THREAD_EXTENSION_3          
+#define TX_THREAD_EXTENSION_3
 
 
 /* Define the port extensions of the remaining ThreadX objects.  */
@@ -195,11 +195,11 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #define TX_TIMER_EXTENSION
 
 
-/* Define the user extension field of the thread control block.  Nothing 
+/* Define the user extension field of the thread control block.  Nothing
    additional is needed for this port so it is defined as white space.  */
 
 #ifndef TX_THREAD_USER_EXTENSION
-#define TX_THREAD_USER_EXTENSION    
+#define TX_THREAD_USER_EXTENSION
 #endif
 
 
@@ -209,23 +209,23 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
 #if (__VER__ < 8000000)
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  __iar_dlib_perthread_allocate();                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  __iar_dlib_perthread_allocate();
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate(thread_ptr -> tx_thread_iar_tls_pointer); \
-                                                                    thread_ptr -> tx_thread_iar_tls_pointer =  TX_NULL;            
+                                                                    thread_ptr -> tx_thread_iar_tls_pointer =  TX_NULL;
 #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
 #else
 void    *_tx_iar_create_per_thread_tls_area(void);
 void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
 void    __iar_Initlocks(void);
 
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  _tx_iar_create_per_thread_tls_area();                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  _tx_iar_create_per_thread_tls_area();
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_tls_area(thread_ptr -> tx_thread_iar_tls_pointer); \
                                                                         thread_ptr -> tx_thread_iar_tls_pointer =  TX_NULL; } while(0);
-#define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0); 
+#define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0);
 #endif
 #else
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                                  
-#define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+#define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #endif
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
 #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
@@ -254,7 +254,7 @@ void    __iar_Initlocks(void);
 
 
 /* Define the get system state macro.   */
-   
+
 #ifndef TX_THREAD_GET_SYSTEM_STATE
 #ifndef TX_MISRA_ENABLE
 #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_IPSR())
@@ -271,19 +271,19 @@ ULONG   _tx_misra_ipsr_get(VOID);
    zero after initialization for Cortex-M ports. */
 
 #ifndef TX_THREAD_SYSTEM_RETURN_CHECK
-#define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable); 
+#define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
 #endif
 
 
-/* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to 
+/* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
    prevent early scheduling on Cortex-M parts.  */
-   
+
 #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
 
 
-/* Define ThreadX interrupt lockout and restore macros for protection on 
-   access of critical kernel information.  The restore interrupt macro must 
-   restore the interrupt posture of the running thread prior to the value 
+/* Define ThreadX interrupt lockout and restore macros for protection on
+   access of critical kernel information.  The restore interrupt macro must
+   restore the interrupt posture of the running thread prior to the value
    present prior to the disable macro.  In most cases, the save area macro
    is used to define a local function save area for the disable and restore
    macros.  */
@@ -337,7 +337,7 @@ __istate_t interrupt_save;
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
+CHAR                            _tx_version_id[] =
                                     "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Cortex-M0/IAR Version 6.5.0.202601 *";
 #else
 #ifdef TX_MISRA_ENABLE

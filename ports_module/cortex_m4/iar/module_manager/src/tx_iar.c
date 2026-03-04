@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -38,31 +38,31 @@
 #include "tx_mutex.h"
 
 
-/* This implementation requires that the following macros are defined in the 
+/* This implementation requires that the following macros are defined in the
    tx_port.h file and <yvals.h> is included with the following code segments:
-   
+
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
 #include <yvals.h>
 #endif
 
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
-#define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;          
+#define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;
 #else
-#define TX_THREAD_EXTENSION_2          
+#define TX_THREAD_EXTENSION_2
 #endif
 
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  __iar_dlib_perthread_allocate();                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  __iar_dlib_perthread_allocate();
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate(thread_ptr -> tx_thread_iar_tls_pointer); \
-                                                                    thread_ptr -> tx_thread_iar_tls_pointer =  TX_NULL;            
+                                                                    thread_ptr -> tx_thread_iar_tls_pointer =  TX_NULL;
 #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
 #else
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                                  
-#define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+#define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #endif
 
-    This should be done automatically if TX_ENABLE_IAR_LIBRARY_SUPPORT is defined while building the ThreadX library and the 
-    application.  
+    This should be done automatically if TX_ENABLE_IAR_LIBRARY_SUPPORT is defined while building the ThreadX library and the
+    application.
 
     Finally, the project options General Options -> Library Configuration should have the "Enable thread support in library" box selected.
 */
@@ -91,7 +91,7 @@ void _DLIB_TLS_MEMORY *__iar_dlib_perthread_access(void _DLIB_TLS_MEMORY *symbp)
 {
 
 char _DLIB_TLS_MEMORY   *p = 0;
-    
+
     /* Is there a current thread?  */
     if (_tx_thread_current_ptr)
       p = (char _DLIB_TLS_MEMORY *) _tx_thread_current_ptr -> tx_thread_iar_tls_pointer;
@@ -118,19 +118,19 @@ TX_MUTEX    *mutex_ptr;
 
         /* Setup a pointer to the start of the next free mutex.  */
         mutex_ptr =  &__tx_iar_system_lock_mutexes[__tx_iar_system_lock_next_free_mutex++];
-    
+
         /* Check for wrap-around on the next free mutex.  */
         if (__tx_iar_system_lock_next_free_mutex >= _MAX_LOCK)
         {
-        
+
             /* Yes, set the free index back to 0.  */
             __tx_iar_system_lock_next_free_mutex =  0;
         }
-    
+
         /* Is this mutex free?  */
         if (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID)
         {
-        
+
             /* Yes, this mutex is free, get out of the loop!  */
             break;
         }
@@ -139,35 +139,35 @@ TX_MUTEX    *mutex_ptr;
     /* Determine if a free mutex was found.   */
     if (i >= _MAX_LOCK)
     {
-    
+
         /* Error!  No more free mutexes!  */
-        
+
         /* Increment the no mutexes error counter.  */
         __tx_iar_system_lock_no_mutexes++;
-        
+
         /* Set return pointer to NULL.  */
         *m =  TX_NULL;
-        
+
         /* Return.  */
         return;
     }
-    
+
     /* Now create the ThreadX mutex for the IAR library.  */
     status =  _tx_mutex_create(mutex_ptr, "IAR System Library Lock", TX_NO_INHERIT);
-    
+
     /* Determine if the creation was successful.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Yes, successful creation, return mutex pointer.  */
         *m =  (VOID *) mutex_ptr;
     }
     else
     {
-    
+
         /* Increment the internal error counter.  */
         __tx_iar_system_lock_internal_errors++;
-    
+
         /* Return a NULL pointer to indicate an error.  */
         *m =  TX_NULL;
     }
@@ -186,25 +186,25 @@ void __iar_system_Mtxlock(__iar_Rmtx *m)
 UINT    status;
 
 
-    /* Determine the caller's context. Mutex locks are only available from initialization and 
+    /* Determine the caller's context. Mutex locks are only available from initialization and
        threads.  */
     if ((_tx_thread_system_state == 0) || (_tx_thread_system_state >= TX_INITIALIZE_IN_PROGRESS))
     {
-    
+
         /* Get the mutex.  */
         status =  _tx_mutex_get((TX_MUTEX *) *m, TX_WAIT_FOREVER);
 
         /* Check the status of the mutex release.  */
         if (status)
         {
-        
+
             /* Internal error, increment the counter.  */
             __tx_iar_system_lock_internal_errors++;
         }
     }
     else
     {
-        
+
         /* Increment the ISR caller error.  */
         __tx_iar_system_lock_isr_caller++;
     }
@@ -216,25 +216,25 @@ void __iar_system_Mtxunlock(__iar_Rmtx *m)
 UINT    status;
 
 
-    /* Determine the caller's context. Mutex unlocks are only available from initialization and 
+    /* Determine the caller's context. Mutex unlocks are only available from initialization and
        threads.  */
     if ((_tx_thread_system_state == 0) || (_tx_thread_system_state >= TX_INITIALIZE_IN_PROGRESS))
     {
-    
+
         /* Release the mutex.  */
         status =  _tx_mutex_put((TX_MUTEX *) *m);
-        
+
         /* Check the status of the mutex release.  */
         if (status)
         {
-        
+
             /* Internal error, increment the counter.  */
             __tx_iar_system_lock_internal_errors++;
         }
     }
     else
     {
-        
+
         /* Increment the ISR caller error.  */
         __tx_iar_system_lock_isr_caller++;
     }
@@ -268,19 +268,19 @@ TX_MUTEX    *mutex_ptr;
 
         /* Setup a pointer to the start of the next free mutex.  */
         mutex_ptr =  &__tx_iar_file_lock_mutexes[__tx_iar_file_lock_next_free_mutex++];
-    
+
         /* Check for wrap-around on the next free mutex.  */
         if (__tx_iar_file_lock_next_free_mutex >= _MAX_LOCK)
         {
-        
+
             /* Yes, set the free index back to 0.  */
             __tx_iar_file_lock_next_free_mutex =  0;
         }
-    
+
         /* Is this mutex free?  */
         if (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID)
         {
-        
+
             /* Yes, this mutex is free, get out of the loop!  */
             break;
         }
@@ -289,35 +289,35 @@ TX_MUTEX    *mutex_ptr;
     /* Determine if a free mutex was found.   */
     if (i >= _MAX_LOCK)
     {
-    
+
         /* Error!  No more free mutexes!  */
-        
+
         /* Increment the no mutexes error counter.  */
         __tx_iar_file_lock_no_mutexes++;
-        
+
         /* Set return pointer to NULL.  */
         *m =  TX_NULL;
-        
+
         /* Return.  */
         return;
     }
-    
+
     /* Now create the ThreadX mutex for the IAR library.  */
     status =  _tx_mutex_create(mutex_ptr, "IAR File Library Lock", TX_NO_INHERIT);
-    
+
     /* Determine if the creation was successful.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Yes, successful creation, return mutex pointer.  */
         *m =  (VOID *) mutex_ptr;
     }
     else
     {
-    
+
         /* Increment the internal error counter.  */
         __tx_iar_file_lock_internal_errors++;
-    
+
         /* Return a NULL pointer to indicate an error.  */
         *m =  TX_NULL;
     }
@@ -336,25 +336,25 @@ void __iar_file_Mtxlock(__iar_Rmtx *m)
 UINT    status;
 
 
-    /* Determine the caller's context. Mutex locks are only available from initialization and 
+    /* Determine the caller's context. Mutex locks are only available from initialization and
        threads.  */
     if ((_tx_thread_system_state == 0) || (_tx_thread_system_state >= TX_INITIALIZE_IN_PROGRESS))
     {
-    
+
         /* Get the mutex.  */
         status =  _tx_mutex_get((TX_MUTEX *) *m, TX_WAIT_FOREVER);
 
         /* Check the status of the mutex release.  */
         if (status)
         {
-        
+
             /* Internal error, increment the counter.  */
             __tx_iar_file_lock_internal_errors++;
         }
     }
     else
     {
-        
+
         /* Increment the ISR caller error.  */
         __tx_iar_file_lock_isr_caller++;
     }
@@ -366,25 +366,25 @@ void __iar_file_Mtxunlock(__iar_Rmtx *m)
 UINT    status;
 
 
-    /* Determine the caller's context. Mutex unlocks are only available from initialization and 
+    /* Determine the caller's context. Mutex unlocks are only available from initialization and
        threads.  */
     if ((_tx_thread_system_state == 0) || (_tx_thread_system_state >= TX_INITIALIZE_IN_PROGRESS))
     {
-    
+
         /* Release the mutex.  */
         status =  _tx_mutex_put((TX_MUTEX *) *m);
-        
+
         /* Check the status of the mutex release.  */
         if (status)
         {
-        
+
             /* Internal error, increment the counter.  */
             __tx_iar_file_lock_internal_errors++;
         }
     }
     else
     {
-        
+
         /* Increment the ISR caller error.  */
         __tx_iar_file_lock_isr_caller++;
     }
@@ -405,17 +405,17 @@ UINT    status;
 #include "tx_thread.h"
 #include "tx_mutex.h"
 
-/* This implementation requires that the following macros are defined in the 
+/* This implementation requires that the following macros are defined in the
    tx_port.h file and <yvals.h> is included with the following code segments:
-   
+
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
 #include <yvals.h>
 #endif
 
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
-#define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;          
+#define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;
 #else
-#define TX_THREAD_EXTENSION_2          
+#define TX_THREAD_EXTENSION_2
 #endif
 
 #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
@@ -423,17 +423,17 @@ void    *_tx_iar_create_per_thread_tls_area(void);
 void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
 void    __iar_Initlocks(void);
 
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  __iar_dlib_perthread_allocate();                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls_pointer =  __iar_dlib_perthread_allocate();
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {__iar_dlib_perthread_deallocate(thread_ptr -> tx_thread_iar_tls_pointer); \
                                                                         thread_ptr -> tx_thread_iar_tls_pointer =  TX_NULL; } while(0);
 #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0);
 #else
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                                  
-#define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+#define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #endif
 
-    This should be done automatically if TX_ENABLE_IAR_LIBRARY_SUPPORT is defined while building the ThreadX library and the 
-    application.  
+    This should be done automatically if TX_ENABLE_IAR_LIBRARY_SUPPORT is defined while building the ThreadX library and the
+    application.
 
     Finally, the project options General Options -> Library Configuration should have the "Enable thread support in library" box selected.
 */
@@ -457,7 +457,7 @@ void * __aeabi_read_tp(void)
   TX_THREAD *thread_ptr = _tx_thread_current_ptr;
   if (thread_ptr)
   {
-    p = thread_ptr->tx_thread_iar_tls_pointer;      
+    p = thread_ptr->tx_thread_iar_tls_pointer;
   }
   else
   {
@@ -470,9 +470,9 @@ void * __aeabi_read_tp(void)
 
 void* _tx_iar_create_per_thread_tls_area()
 {
-  UINT tls_size = __iar_tls_size();  
-  
-  /* Get memory for TLS.  */  
+  UINT tls_size = __iar_tls_size();
+
+  /* Get memory for TLS.  */
   void *p = malloc(tls_size);
 
   /* Initialize TLS-area and run constructors for objects in TLS */
@@ -484,7 +484,7 @@ void _tx_iar_destroy_per_thread_tls_area(void *tls_ptr)
 {
   /* Destroy objects living in TLS */
   __call_thread_dtors();
-  free(tls_ptr);  
+  free(tls_ptr);
 }
 
 #ifndef _MAX_LOCK
@@ -518,19 +518,19 @@ TX_MUTEX    *mutex_ptr;
 
         /* Setup a pointer to the start of the next free mutex.  */
         mutex_ptr =  &__tx_iar_system_lock_mutexes[__tx_iar_system_lock_next_free_mutex++];
-    
+
         /* Check for wrap-around on the next free mutex.  */
         if (__tx_iar_system_lock_next_free_mutex >= _MAX_LOCK)
         {
-        
+
             /* Yes, set the free index back to 0.  */
             __tx_iar_system_lock_next_free_mutex =  0;
         }
-    
+
         /* Is this mutex free?  */
         if (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID)
         {
-        
+
             /* Yes, this mutex is free, get out of the loop!  */
             break;
         }
@@ -539,35 +539,35 @@ TX_MUTEX    *mutex_ptr;
     /* Determine if a free mutex was found.   */
     if (i >= _MAX_LOCK)
     {
-    
+
         /* Error!  No more free mutexes!  */
-        
+
         /* Increment the no mutexes error counter.  */
         __tx_iar_system_lock_no_mutexes++;
-        
+
         /* Set return pointer to NULL.  */
         *m =  TX_NULL;
-        
+
         /* Return.  */
         return;
     }
-    
+
     /* Now create the ThreadX mutex for the IAR library.  */
     status =  _tx_mutex_create(mutex_ptr, "IAR System Library Lock", TX_NO_INHERIT);
-    
+
     /* Determine if the creation was successful.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Yes, successful creation, return mutex pointer.  */
         *m =  (VOID *) mutex_ptr;
     }
     else
     {
-    
+
         /* Increment the internal error counter.  */
         __tx_iar_system_lock_internal_errors++;
-    
+
         /* Return a NULL pointer to indicate an error.  */
         *m =  TX_NULL;
     }
@@ -583,28 +583,28 @@ void __iar_system_Mtxdst(__iar_Rmtx *m)
 void __iar_system_Mtxlock(__iar_Rmtx *m)
 {
   if (*m)
-  {  
+  {
     UINT    status;
 
-    /* Determine the caller's context. Mutex locks are only available from initialization and 
+    /* Determine the caller's context. Mutex locks are only available from initialization and
        threads.  */
     if ((_tx_thread_system_state == 0) || (_tx_thread_system_state >= TX_INITIALIZE_IN_PROGRESS))
     {
-    
+
         /* Get the mutex.  */
         status =  _tx_mutex_get((TX_MUTEX *) *m, TX_WAIT_FOREVER);
 
         /* Check the status of the mutex release.  */
         if (status)
         {
-        
+
             /* Internal error, increment the counter.  */
             __tx_iar_system_lock_internal_errors++;
         }
     }
     else
     {
-        
+
         /* Increment the ISR caller error.  */
         __tx_iar_system_lock_isr_caller++;
     }
@@ -617,25 +617,25 @@ void __iar_system_Mtxunlock(__iar_Rmtx *m)
   {
     UINT    status;
 
-    /* Determine the caller's context. Mutex unlocks are only available from initialization and 
+    /* Determine the caller's context. Mutex unlocks are only available from initialization and
        threads.  */
     if ((_tx_thread_system_state == 0) || (_tx_thread_system_state >= TX_INITIALIZE_IN_PROGRESS))
     {
-    
+
         /* Release the mutex.  */
         status =  _tx_mutex_put((TX_MUTEX *) *m);
-        
+
         /* Check the status of the mutex release.  */
         if (status)
         {
-        
+
             /* Internal error, increment the counter.  */
             __tx_iar_system_lock_internal_errors++;
         }
     }
     else
     {
-        
+
         /* Increment the ISR caller error.  */
         __tx_iar_system_lock_isr_caller++;
     }
@@ -676,19 +676,19 @@ TX_MUTEX    *mutex_ptr;
 
         /* Setup a pointer to the start of the next free mutex.  */
         mutex_ptr =  &__tx_iar_file_lock_mutexes[__tx_iar_file_lock_next_free_mutex++];
-    
+
         /* Check for wrap-around on the next free mutex.  */
         if (__tx_iar_file_lock_next_free_mutex >= _MAX_LOCK)
         {
-        
+
             /* Yes, set the free index back to 0.  */
             __tx_iar_file_lock_next_free_mutex =  0;
         }
-    
+
         /* Is this mutex free?  */
         if (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID)
         {
-        
+
             /* Yes, this mutex is free, get out of the loop!  */
             break;
         }
@@ -697,35 +697,35 @@ TX_MUTEX    *mutex_ptr;
     /* Determine if a free mutex was found.   */
     if (i >= _MAX_LOCK)
     {
-    
+
         /* Error!  No more free mutexes!  */
-        
+
         /* Increment the no mutexes error counter.  */
         __tx_iar_file_lock_no_mutexes++;
-        
+
         /* Set return pointer to NULL.  */
         *m =  TX_NULL;
-        
+
         /* Return.  */
         return;
     }
-    
+
     /* Now create the ThreadX mutex for the IAR library.  */
     status =  _tx_mutex_create(mutex_ptr, "IAR File Library Lock", TX_NO_INHERIT);
-    
+
     /* Determine if the creation was successful.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Yes, successful creation, return mutex pointer.  */
         *m =  (VOID *) mutex_ptr;
     }
     else
     {
-    
+
         /* Increment the internal error counter.  */
         __tx_iar_file_lock_internal_errors++;
-    
+
         /* Return a NULL pointer to indicate an error.  */
         *m =  TX_NULL;
     }
@@ -744,25 +744,25 @@ void __iar_file_Mtxlock(__iar_Rmtx *m)
 UINT    status;
 
 
-    /* Determine the caller's context. Mutex locks are only available from initialization and 
+    /* Determine the caller's context. Mutex locks are only available from initialization and
        threads.  */
     if ((_tx_thread_system_state == 0) || (_tx_thread_system_state >= TX_INITIALIZE_IN_PROGRESS))
     {
-    
+
         /* Get the mutex.  */
         status =  _tx_mutex_get((TX_MUTEX *) *m, TX_WAIT_FOREVER);
 
         /* Check the status of the mutex release.  */
         if (status)
         {
-        
+
             /* Internal error, increment the counter.  */
             __tx_iar_file_lock_internal_errors++;
         }
     }
     else
     {
-        
+
         /* Increment the ISR caller error.  */
         __tx_iar_file_lock_isr_caller++;
     }
@@ -774,25 +774,25 @@ void __iar_file_Mtxunlock(__iar_Rmtx *m)
 UINT    status;
 
 
-    /* Determine the caller's context. Mutex unlocks are only available from initialization and 
+    /* Determine the caller's context. Mutex unlocks are only available from initialization and
        threads.  */
     if ((_tx_thread_system_state == 0) || (_tx_thread_system_state >= TX_INITIALIZE_IN_PROGRESS))
     {
-    
+
         /* Release the mutex.  */
         status =  _tx_mutex_put((TX_MUTEX *) *m);
-        
+
         /* Check the status of the mutex release.  */
         if (status)
         {
-        
+
             /* Internal error, increment the counter.  */
             __tx_iar_file_lock_internal_errors++;
         }
     }
     else
     {
-        
+
         /* Increment the ISR caller error.  */
         __tx_iar_file_lock_isr_caller++;
     }

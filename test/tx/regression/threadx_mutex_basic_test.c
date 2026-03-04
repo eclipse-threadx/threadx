@@ -77,7 +77,7 @@ UINT    status;
 
     /* Attempt to create a mutex from a timer.  */
     status =  tx_mutex_create(&mutex_4, "mutex 4", TX_NO_INHERIT);
-    
+
     /* Check status.  */
     if (status != TX_CALLER_ERROR)
     {
@@ -96,7 +96,7 @@ UINT    status;
         /* Error!  */
         error++;
     }
-    
+
     /* Attempt to get from mutex from a timer with suspension.   */
     status =  tx_mutex_get(&mutex_2, 100);
 
@@ -124,7 +124,7 @@ UINT    status;
 
     /* Attempt to create a mutex from an ISR.  */
     status =  tx_mutex_create(&mutex_4, "mutex 4", TX_NO_INHERIT);
-    
+
     /* Check status.  */
     if (status != TX_CALLER_ERROR)
     {
@@ -201,29 +201,29 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
 
-    status +=  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
-    status +=  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
-    status +=  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
-    status +=  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -309,11 +309,11 @@ UINT    status;
     mutex_memory.second =       0x55667788;
     mutex_memory.next_to_last = 0x99aabbcc;
     mutex_memory.last =         0xddeeff00;
-    
+
     /* Create the semaphore.  */
     status =  tx_mutex_create(&mutex_memory.mutex, "mutex memory", TX_INHERIT);
     tx_mutex_delete(&mutex_memory.mutex);
-    
+
     /* Check for status.  */
     if ((status != TX_SUCCESS) ||
         (mutex_memory.first != 0x11223344) ||
@@ -326,7 +326,7 @@ UINT    status;
         printf("ERROR #6\n");
         test_control_return(1);
     }
-    
+
     /* Increment thread 0 counter.  */
     thread_0_counter++;
 
@@ -334,7 +334,7 @@ UINT    status;
 
     /* Attempt to create a mutex with a NULL pointer.  */
     status =  tx_mutex_create(TX_NULL, "mutex 2", TX_INHERIT);
-    
+
     /* Check status.  */
     if (status != TX_MUTEX_ERROR)
     {
@@ -346,7 +346,7 @@ UINT    status;
 
     /* Attempt to create a mutex with a bad size.  */
     status =  _txe_mutex_create(&mutex_5, "mutex 5", TX_INHERIT, (sizeof(TX_MUTEX)+1));
-    
+
     /* Check status.  */
     if (status != TX_MUTEX_ERROR)
     {
@@ -358,7 +358,7 @@ UINT    status;
 
     /* Attempt to create a mutex that has already been created.  */
     status =  tx_mutex_create(&mutex_2, "mutex 2", TX_INHERIT);
-    
+
     /* Check status.  */
     if (status != TX_MUTEX_ERROR)
     {
@@ -370,7 +370,7 @@ UINT    status;
 
     /* Attempt to create a mutex with a bad inheritance option.  */
     status =  tx_mutex_create(&mutex_4, "mutex 4", 14);
-    
+
     /* Check status.  */
     if (status != TX_INHERIT_ERROR)
     {
@@ -509,7 +509,7 @@ UINT    status;
 
     /* Attempt to get the mutex.  Should be unsuccessful.  */
     status =  tx_mutex_get(&mutex_1, TX_NO_WAIT);
-    
+
     /* Check status.  */
     if (status != TX_NOT_AVAILABLE)
     {
@@ -535,7 +535,7 @@ UINT    status;
     }
 
     status =  tx_mutex_delete(&mutex_1);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -592,7 +592,7 @@ UINT    status;
     /* Test for error.  */
     if ((error) || (timer_executed != 1) || (isr_executed != 1))
     {
-    
+
         /* Block memory error.  */
         printf("ERROR #26\n");
         test_control_return(1);
@@ -603,7 +603,7 @@ UINT    status;
     /* Release mutex multiple times.  */
     status =  tx_mutex_put(&mutex_2);
     status += tx_mutex_put(&mutex_2);
-    
+
     /* Check status.  */
     if (status != TX_NOT_OWNED)
     {
@@ -624,7 +624,7 @@ UINT    status;
         printf("ERROR #28\n");
         test_control_return(1);
     }
-    
+
     /* Delete mutex.  */
     status =  tx_mutex_delete(&mutex_2);
 
@@ -639,14 +639,14 @@ UINT    status;
 
     /* Get mutex 8.  */
     status =  tx_mutex_get(&mutex_8, TX_WAIT_FOREVER);
-    
+
     /* Start thread 3 and 4.  */
     status += tx_thread_resume(&thread_3);
     status += tx_thread_resume(&thread_4);
-    
+
     /* Sleep to let thread 3 suspend on the mutex.  */
     tx_thread_sleep(2);
-    
+
     /* Now, put the mutex to give it to thread 3.  */
     status += tx_mutex_put(&mutex_8);
 
@@ -660,7 +660,7 @@ UINT    status;
     }
 
     status =  tx_mutex_delete(&mutex_3);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -713,14 +713,14 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Create and obtain a couple mutexes so the thread completion can release them.  */ 
+    /* Create and obtain a couple mutexes so the thread completion can release them.  */
     status =  tx_mutex_create(&mutex_6, "mutex 6", TX_NO_INHERIT);
     status += tx_mutex_create(&mutex_7, "mutex 7", TX_NO_INHERIT);
     status += tx_mutex_get(&mutex_6, TX_NO_WAIT);
     status += tx_mutex_get(&mutex_7, TX_NO_WAIT);
     status += tx_mutex_get(&mutex_6, TX_NO_WAIT);
     status += tx_mutex_get(&mutex_7, TX_NO_WAIT);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -738,7 +738,7 @@ static void    thread_2_entry(ULONG thread_input)
     while(1)
     {
 
-        tx_thread_relinquish();    
+        tx_thread_relinquish();
     }
 }
 
@@ -748,7 +748,7 @@ static void    thread_3_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         tx_mutex_get(&mutex_8, TX_WAIT_FOREVER);
         tx_mutex_put(&mutex_8);
     }
@@ -760,7 +760,7 @@ static void    thread_4_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         tx_mutex_get(&mutex_8, TX_WAIT_FOREVER);
         tx_mutex_put(&mutex_8);
     }

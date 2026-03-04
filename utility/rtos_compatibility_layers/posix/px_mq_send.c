@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -69,13 +69,13 @@
 /*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
-INT  mq_send( mqd_t mqdes, const CHAR * msg_ptr, size_t msg_len, 
+INT  mq_send( mqd_t mqdes, const CHAR * msg_ptr, size_t msg_len,
                 ULONG msg_prio )
 {
 
-TX_QUEUE           *Queue; 
-UINT                temp1; 
-POSIX_MSG_QUEUE    *q_ptr; 
+TX_QUEUE           *Queue;
+UINT                temp1;
+POSIX_MSG_QUEUE    *q_ptr;
 VOID               *bp;
 UCHAR              *source;
 UCHAR              *destination;
@@ -83,9 +83,9 @@ UCHAR              *save_ptr;
 ULONG               mycount;
 ULONG               msg[TX_POSIX_MESSAGE_SIZE];
 
-    /* Assign a temporary variable for clarity.  */ 
-    Queue = &(mqdes->f_data->queue); 
-    q_ptr = (POSIX_MSG_QUEUE * )mqdes->f_data; 
+    /* Assign a temporary variable for clarity.  */
+    Queue = &(mqdes->f_data->queue);
+    q_ptr = (POSIX_MSG_QUEUE * )mqdes->f_data;
 
     /* First, check for an invalid queue pointer.  */
     if ( (!q_ptr) || ( (q_ptr -> px_queue_id) != PX_QUEUE_ID))
@@ -97,9 +97,9 @@ ULONG               msg[TX_POSIX_MESSAGE_SIZE];
         /* Return ERROR.  */
         return(ERROR);
     }
-    /* Make sure if we're calling this routine from a ISR timeout 
-        is set to zero.  */ 
-    if (!(tx_thread_identify())) 
+    /* Make sure if we're calling this routine from a ISR timeout
+        is set to zero.  */
+    if (!(tx_thread_identify()))
     {
         /* POSIX doesn't have error for this, hence give default.  */
         posix_errno = EINTR ;
@@ -159,7 +159,7 @@ ULONG               msg[TX_POSIX_MESSAGE_SIZE];
         return(ERROR);
     }
 
-    /* Now try to allocate memory to save the message from the 
+    /* Now try to allocate memory to save the message from the
       queue's byte pool.  */
     temp1 = tx_byte_allocate((TX_BYTE_POOL * )&(q_ptr->vq_message_area), &bp,
                              msg_len, TX_NO_WAIT);
@@ -167,8 +167,8 @@ ULONG               msg[TX_POSIX_MESSAGE_SIZE];
     if (temp1 != TX_SUCCESS)
     {
     posix_internal_error(9999);
-    }   
-    /* Got the memory , Setup source and destination pointers 
+    }
+    /* Got the memory , Setup source and destination pointers
        Cast them in UCHAR as message length is in bytes.  */
     source      =  (UCHAR * ) msg_ptr;
     destination =  (UCHAR * ) bp;

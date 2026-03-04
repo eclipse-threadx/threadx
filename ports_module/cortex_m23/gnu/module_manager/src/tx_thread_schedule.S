@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -158,7 +158,7 @@ BusFault_Handler:
     STR     r0, [r2, #88]                           // Save xPSR
 
     MRS     r0, CONTROL                             // Pickup current CONTROL register
-    MOVW    r1, #0x1                                // 
+    MOVW    r1, #0x1                                //
     BICS    r0, r0, r1                              // Clear the UNPRIV bit
     MSR     CONTROL, r0                             // Setup new CONTROL register
 
@@ -400,7 +400,7 @@ _tx_enable_mpu:
     MOVS    r1, #5                                  // Build enable value with background region enabled
     STR     r1, [r0]                                // Enable MPU
     MOV     r1, r8                                  // Get copied thread ptr
-    
+
 skip_mpu_setup:
 
     // Restore the thread context and PSP
@@ -512,7 +512,7 @@ _tx_entry_continue:
 
 _tx_skip_kernel_stack_enter:
     MRS     r0, CONTROL                             // Pickup current CONTROL register
-    MOVW    r1, #0x1                                // 
+    MOVW    r1, #0x1                                //
     BICS    r0, r0, r1                              // Clear the UNPRIV bit
     MSR     CONTROL, r0                             // Setup new CONTROL register
     BX      lr                                      // Return to thread
@@ -593,7 +593,7 @@ _tx_alloc_continue:
     STR     r0, [r1]                                // Store function return value
     MOV     lr, r2
     BX      lr
-    
+
 _tx_svc_secure_free:
     LDR     r2, =_tx_free_return                    // Load address of where we should have come from
     CMP     r1, r2                                  // Did we come from _tx_thread_secure_stack_free?

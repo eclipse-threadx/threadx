@@ -6,7 +6,7 @@
 ; Using a scatter-file with ARM_LIB_STACKHEAP eliminates the need to set stack-limit or heap-base in the debugger.
 
 
-SDRAM 0x80000000 
+SDRAM 0x80000000
 {
     VECTORS +0
     {

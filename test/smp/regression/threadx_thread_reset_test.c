@@ -35,7 +35,7 @@ static void   entry_exit_notify(TX_THREAD *thread_ptr, UINT type)
     /* Check for the appropriate thread.  */
     if (thread_ptr != &thread_0)
         return;
-        
+
     /* Check for type.  */
     if (type == TX_THREAD_ENTRY)
         thread_0_enter++;
@@ -63,8 +63,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-                        pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+                        pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -94,8 +94,8 @@ CHAR    *pointer;
 #endif
 
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-                        pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+                        pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -107,8 +107,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-                        pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+                        pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -150,11 +150,11 @@ UINT    status;
 
     /* Attempt to delete thread 2, which is in the wrong stat for deleting.  */
     status =  tx_thread_delete(&thread_2);
-    
+
     /* Check for the proper status.  */
     if (status != TX_DELETE_ERROR)
     {
-    
+
         /* Thread delete error.  */
         printf("ERROR #5\n");
         test_control_return(1);
@@ -177,11 +177,11 @@ UINT    status;
 
     /* Call thread reset on thread 2, which should result in an error.  */
     status = tx_thread_reset(&thread_2);
-    
+
     /* Check for proper status.  */
     if (status != TX_NOT_DONE)
     {
-    
+
         /* Thread reset error.  */
         printf("ERROR #7\n");
         test_control_return(1);
@@ -206,12 +206,12 @@ UINT    status;
 
     /* Terminate thread 0.  */
     status =  tx_thread_terminate(&thread_0);
-    status += tx_thread_reset(&thread_0); 
-    
-    
+    status += tx_thread_reset(&thread_0);
+
+
     /* Now resume thread 0 to let it run.  */
     status +=  tx_thread_resume(&thread_0);
-    
+
     /* Determine if the first Thread has run and if it's current state is
        finished.  */
     if ((thread_0.tx_thread_state != TX_COMPLETED) || (thread_0_counter != 2) ||
@@ -228,7 +228,7 @@ UINT    status;
     }
     else
     {
-    
+
 
         /* Successful thread finish test.  */
         printf("SUCCESS!\n");

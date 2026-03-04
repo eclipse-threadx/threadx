@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -708,7 +708,7 @@ _tx_misra_control_get:
         MRS      R0, CONTROL
         BX       LR               // return
 
-        
+
 /***********************************************************************************************/
 /***********************************************************************************************/
 /**                                                                                            */
@@ -723,7 +723,7 @@ _tx_misra_control_set:
         MSR      CONTROL, R0
         BX       LR               // return
 
-        
+
 #ifdef __ARMVFP__
 
 /***********************************************************************************************/
@@ -740,8 +740,8 @@ _tx_misra_fpccr_get:
         LDR      r0, =0xE000EF34  // Build FPCCR address
         LDR      r0, [r0]         // Load FPCCR value
         BX       LR               // return
-        
-        
+
+
 /***********************************************************************************************/
 /***********************************************************************************************/
 /**                                                                                            */
@@ -755,10 +755,10 @@ _tx_misra_fpccr_get:
 _tx_misra_vfp_touch:
         vmov.f32 s0, s0
         BX       LR               // return
-        
+
 #endif
-        
-        
+
+
         SECTION `.iar_vfe_header`:DATA:NOALLOC:NOROOT(2)
         SECTION_TYPE SHT_PROGBITS, 0
         DATA

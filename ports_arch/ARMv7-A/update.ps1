@@ -104,7 +104,7 @@ If (-Not (Test-Path -Path $LogDir -PathType Container)) {
 
 Function Copy-FilesVerbose {
     [CmdletBinding()] Param (
-        [string] $source, 
+        [string] $source,
         [string] $destination_directory
     )
     Write-Verbose ("Copying common files...")
@@ -126,9 +126,9 @@ ForEach ($PortSet in $PortSets) {
             $compiler_directory = $core_directory + "\" + $compiler
             Write-Verbose ("Compiler directory: $compiler_directory")
             $compiler_directory_object = New-Item -Path $compiler_directory -ItemType "directory" -Force
-    
+
             $destination_directory = $compiler_directory
-    
+
             If ($CopyCommonFiles) {
                 Copy-FilesVerbose -source "threadx\common\*" -destination_directory $destination_directory
             }
@@ -136,7 +136,7 @@ ForEach ($PortSet in $PortSets) {
             If ($CopyPortFiles) {
                 Copy-FilesVerbose -source "threadx\ports\$compiler\*" -destination_directory $destination_directory
             }
-    
+
             If ($PortSet -eq 'tx_smp') {
                 If ($CopyCommonFiles) {
                     Copy-FilesVerbose -source "threadx_smp\common\*" -destination_directory $destination_directory

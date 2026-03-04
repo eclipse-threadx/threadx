@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -149,7 +149,7 @@
 
 /* Determine if random number is used for stack filling. By default, ThreadX uses a fixed
    pattern for stack filling. When the following is defined, ThreadX uses a random number
-   for stack filling. This is effective only when TX_ENABLE_STACK_CHECKING is defined.  */ 
+   for stack filling. This is effective only when TX_ENABLE_STACK_CHECKING is defined.  */
 
 /*
 #define TX_ENABLE_RANDOM_NUMBER_STACK_FILLING

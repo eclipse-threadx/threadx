@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread - Low Level SMP Support                                      */
 @/**                                                                       */
@@ -44,38 +44,38 @@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_smp_protect                          SMP/Cortex-A7/GNU   */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_smp_protect                          SMP/Cortex-A7/GNU   */
 @/*                                                            6.1.12      */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function gets protection for running inside the ThreadX        */ 
-@/*    source. This is ccomplished by a combination of a test-and-set      */ 
-@/*    flag and periodically disabling interrupts.                         */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*    This function gets protection for running inside the ThreadX        */
+@/*    source. This is ccomplished by a combination of a test-and-set      */
+@/*    flag and periodically disabling interrupts.                         */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    Previous Status Register                                            */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    Previous Status Register                                            */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
 @/*    ThreadX Source                                                      */
-@/*                                                                        */ 
+@/*                                                                        */
 @/**************************************************************************/
     .global _tx_thread_smp_protect
     .type   _tx_thread_smp_protect,function

@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -173,7 +173,7 @@ _stack_error_loop:
     MOV     r0, #0x1F
     BL      setPriorityMask               // Set priority mask (local)
 
-    // [EL] Change start - don't enable interrupts here!  
+    // [EL] Change start - don't enable interrupts here!
     //CPSIE   i                            // Clear CPSR I bit
     // [EL] Change end
 
@@ -192,7 +192,7 @@ _stack_error_loop:
     MOV     r1, #0x0
     BL      init_private_timer
     BL      start_private_timer
-  
+
     //
     // Enable receipt of SGI 0
     // ------------------------
@@ -247,7 +247,7 @@ __tx_irq_processing_return:
        if nested IRQ interrupts are desired.  Interrupts may be re-enabled over
        small code sequences where lr is saved before enabling interrupts and
        restored after interrupts are again disabled.  */
-    
+
     PUSH    {r4, r5}            // Save some preserved registers (r5 is saved just for 8-byte alignment)
     BL      readIntAck
     MOV     r4, r0

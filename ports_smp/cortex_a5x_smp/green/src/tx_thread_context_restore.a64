@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -25,7 +25,7 @@
 
 /* Include necessary system files.  */
 
-/* 
+/*
 #include "tx_api.h"
 #include "tx_thread.h"
 #include "tx_timer.h"
@@ -35,41 +35,41 @@
 
     .text
     .align 3
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_context_restore                       Cortex-A5x-SMP/GHS */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_context_restore                       Cortex-A5x-SMP/GHS */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function restores the interrupt context if it is processing a  */ 
-/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-/*    if no thread was running, the function returns to the scheduler.    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISRs                                  Interrupt Service Routines    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function restores the interrupt context if it is processing a  */
+/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+/*    if no thread was running, the function returns to the scheduler.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_schedule                   Thread scheduling routine     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISRs                                  Interrupt Service Routines    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -93,7 +93,7 @@ _tx_thread_context_restore:
 #endif
 
     /* Pickup the CPU ID.   */
-    
+
     MRS     x8, MPIDR_EL1                       // Pickup the core ID
     UBFX    x8, x8, #0, #8                      // Isolate and right justify core ID
 
@@ -104,13 +104,13 @@ _tx_thread_context_restore:
     LDR     x3, =_tx_thread_system_state        // Pickup address of system state var
     LDR     w2, [x3, x8, LSL #2]                // Pickup system state
     SUB     w2, w2, #1                          // Decrement the counter
-    STR     w2, [x3, x8, LSL #2]                // Store the counter 
+    STR     w2, [x3, x8, LSL #2]                // Store the counter
     CMP     w2, #0                              // Was this the first interrupt?
     B.EQ    __tx_thread_not_nested_restore      // If so, not a nested restore
 
     /* Interrupts are nested.  */
 
-    /* Just recover the saved registers and return to the point of 
+    /* Just recover the saved registers and return to the point of
        interrupt.  */
 
     LDP     x4, x5, [sp], #16                   // Pickup saved SPSR/DAIF and ELR_EL
@@ -143,7 +143,7 @@ _tx_thread_context_restore:
 __tx_thread_not_nested_restore:
 
     /* Determine if a thread was interrupted and no preemption is required.  */
-    /* else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr) 
+    /* else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr)
                || (_tx_thread_preempt_disable))
     { */
 
@@ -154,7 +154,7 @@ __tx_thread_not_nested_restore:
     LDR     x3, =_tx_thread_execute_ptr         // Pickup address of execute thread ptr
     LDR     x2, [x3, x8, LSL #3]                // Pickup actual execute thread pointer
     CMP     x0, x2                              // Is the same thread highest priority?
-    B.EQ    __tx_thread_no_preempt_restore      // Same thread in the execute list, 
+    B.EQ    __tx_thread_no_preempt_restore      // Same thread in the execute list,
                                                 //   no preemption needs to happen
     LDR     x3, =_tx_thread_smp_protection      // Build address to protection structure
     LDR     w3, [x3, #4]                        // Pickup the owning core
@@ -283,7 +283,7 @@ __tx_thread_dont_save_ts:
 
     MOV     x2, #1                              // Build ready flag
     DMB     ISH                                 // Ensure that accesses to shared resource have completed
-    STR     w2, [x0, #260]                      // Set thread's ready flag 
+    STR     w2, [x0, #260]                      // Set thread's ready flag
 
     /* Return to the scheduler.  */
     /* _tx_thread_schedule();  */

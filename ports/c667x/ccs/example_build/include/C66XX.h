@@ -52,7 +52,7 @@
 
 	3.	This file is best viewed with the TAB setting set to '4'.
 
-	4.	This header file is externally controlled from user C-code by run-time 
+	4.	This header file is externally controlled from user C-code by run-time
 		compiler keys definitions in order to apply DSP-type specific
 		definitions to refer to particular definitions included for different
 		DSP type:

@@ -6,4 +6,4 @@ macro __BINDIR=%expand_path(bin/release)
 	-object_dir=objs/release
 	:outputDir=objs/release
 	:binDir=${__BINDIR}
-	
+

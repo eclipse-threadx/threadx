@@ -326,7 +326,7 @@
 //     <0=>Secure
 //     <1=>Non-Secure
 //   <i> Value for SCB->ICSR register bit STTNS
-//   <i> only for single SysTick implementation 
+//   <i> only for single SysTick implementation
 */
 #define SCB_ICSR_STTNS_VAL  0
 

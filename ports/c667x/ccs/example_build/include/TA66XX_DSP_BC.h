@@ -11,7 +11,7 @@
 
 	Description:
 	------------
-	This file contains definitions, macros and API functions for TORNADO AMC 
+	This file contains definitions, macros and API functions for TORNADO AMC
 	modules on-board DSP environment and must be included in the user
 	C-application for TORNADO AMC modules.
 

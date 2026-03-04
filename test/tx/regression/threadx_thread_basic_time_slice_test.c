@@ -1,4 +1,4 @@
-/* This test is designed to see if a thread can be created with a time-slice.  
+/* This test is designed to see if a thread can be created with a time-slice.
    No time-slice occurs, only the processing to check for time-slicing.  */
 
 #include   <stdio.h>
@@ -30,8 +30,8 @@ UINT     status;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            first_unused_memory, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            first_unused_memory, TEST_STACK_SIZE_PRINTF,
             16, 16, 1, TX_AUTO_START);
 
     /* Check for status.  */

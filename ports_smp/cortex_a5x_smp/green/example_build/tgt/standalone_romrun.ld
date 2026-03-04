@@ -31,14 +31,14 @@ SECTIONS
     .secinfo 					        : > .
     .fixaddr 					        : > .
     .fixtype 					        : > .
-    
+
     .CROM.data 	                            CROM(.data) : > .
 
 //
 // RAM SECTIONS
 //
 
-    .data 					        : > dram_memory	
+    .data 					        : > dram_memory
     .bss 					        : > .
     .ghcovfz					  CLEAR : > .
     .ghcovcz					  CLEAR : > .

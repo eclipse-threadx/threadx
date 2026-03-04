@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Initialize                                                          */
 @/**                                                                       */
@@ -65,11 +65,11 @@ SWI:
     .word  __tx_swi_interrupt               @ Software interrupt handler
 PREFETCH:
     .word  __tx_prefetch_handler            @ Prefetch exception handler
-ABORT:                             
+ABORT:
     .word  __tx_abort_handler               @ Abort exception handler
-RESERVED:                            
+RESERVED:
     .word  __tx_reserved_handler            @ Reserved exception handler
-IRQ:                                  
+IRQ:
     .word  __tx_irq_handler                 @ IRQ interrupt handler
 FIQ:
     .word  __tx_fiq_handler                 @ FIQ interrupt handler

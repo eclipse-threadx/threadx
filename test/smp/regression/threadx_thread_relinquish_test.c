@@ -73,8 +73,8 @@ CHAR    *pointer;
        create information.  */
 
     /* Create thread 0.  */
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -87,8 +87,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 1.  */
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -101,8 +101,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 2.  */
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -115,8 +115,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 3.  */
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -129,8 +129,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 4.  */
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             31, 31, 1, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -143,8 +143,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 5.  */
-    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,
+            pointer, TEST_STACK_SIZE_PRINTF,
             31, 15, 1, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -157,8 +157,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 6.  */
-    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,
+            pointer, TEST_STACK_SIZE_PRINTF,
             31, 31, 1, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -171,8 +171,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 7.  */
-    status =  tx_thread_create(&thread_7, "thread 7", thread_7_entry, 7,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_7, "thread 7", thread_7_entry, 7,
+            pointer, TEST_STACK_SIZE_PRINTF,
             31, 31, 1, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -185,8 +185,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 8.  */
-    status =  tx_thread_create(&thread_8, "thread 8", thread_8_entry, 8,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_8, "thread 8", thread_8_entry, 8,
+            pointer, TEST_STACK_SIZE_PRINTF,
             31, 31, 1, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -199,8 +199,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 9.  */
-    status =  tx_thread_create(&thread_9, "thread 9", thread_9_entry, 9,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_9, "thread 9", thread_9_entry, 9,
+            pointer, TEST_STACK_SIZE_PRINTF,
             31, 31, 1, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -280,7 +280,7 @@ UINT    old_priority;
         (thread_2_counter != 1) || (thread_0.tx_thread_state != TX_READY) ||
         (thread_1.tx_thread_state != TX_READY) || (thread_2.tx_thread_state != TX_READY))
     {
-    
+
         /* Thread Relinquish error.  */
         printf("ERROR #11\n");
         test_control_return(1);
@@ -291,7 +291,7 @@ UINT    old_priority;
 
     /* Immediate response relinquish.  */
     tx_thread_relinquish();
-    
+
     /* All other threads should be completed now.  */
     if ((thread_0.tx_thread_state != TX_COMPLETED) || (thread_1.tx_thread_state != TX_COMPLETED) ||
         (thread_2.tx_thread_state != TX_COMPLETED))
@@ -304,20 +304,20 @@ UINT    old_priority;
 
     /* Execute immediate response relinquish.  */
     tx_thread_relinquish();
-    
+
     /* Move to the lowest default priority.  */
-    status =  tx_thread_priority_change(&thread_3, 31, &old_priority);   
-    
+    status =  tx_thread_priority_change(&thread_3, 31, &old_priority);
+
     /* Temporarily make enable preemption-threshold with this thread.  */
     status += tx_thread_preemption_change(&thread_3, 3, &old_threshold);
-    
+
     /* Execute immediate response, bypassing the error checking.  */
 	_tx_thread_preemption__threshold_scheduled =  TX_NULL;
     _tx_thread_relinquish();
 
     /* Restore the preemtion-threshold and priority.  */
     status += tx_thread_preemption_change(&thread_3, old_threshold, &old_threshold);
-    
+
     /* Enable all cores for all threads.  */
     status += tx_thread_smp_core_exclude(&thread_4, 0);
     status += tx_thread_smp_core_exclude(&thread_5, 0);
@@ -325,8 +325,8 @@ UINT    old_priority;
     status += tx_thread_smp_core_exclude(&thread_7, 0);
     status += tx_thread_smp_core_exclude(&thread_8, 0);
     status += tx_thread_smp_core_exclude(&thread_9, 0);
-    
-    /* Now lets resume threads 4 through 9. Thread 5 has preemption-threshold set which will excercise 
+
+    /* Now lets resume threads 4 through 9. Thread 5 has preemption-threshold set which will excercise
        the preemption-threshold logic.  */
     status += tx_thread_resume(&thread_4);
     status += tx_thread_resume(&thread_5);
@@ -334,17 +334,17 @@ UINT    old_priority;
     status += tx_thread_resume(&thread_7);
     status += tx_thread_resume(&thread_8);
     status += tx_thread_resume(&thread_9);
-    
+
     /* Now relinquish to let these other threads run.  */
     tx_thread_relinquish();
-    
+
     /* Sleep for 20 ticks to test the paths.  */
     tx_thread_sleep(20);
-    
+
     /* Now see if the results are as expected.  */
     if (status != TX_SUCCESS)
     {
-    
+
         /* Thread Relinquish error.  */
         printf("ERROR #13\n");
         test_control_return(1);

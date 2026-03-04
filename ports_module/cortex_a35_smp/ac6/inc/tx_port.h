@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -75,12 +75,12 @@
 
 /* Define ThreadX SMP initialization macro.  */
 
-#define TX_PORT_SPECIFIC_PRE_INITIALIZATION                 
+#define TX_PORT_SPECIFIC_PRE_INITIALIZATION
 
 
 /* Define ThreadX SMP pre-scheduler initialization.  */
 
-#define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION       
+#define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION
 
 
 /* Enable the inter-core interrupt logic.  */
@@ -121,7 +121,7 @@
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
 
 
-/* Yes, include the user defines in tx_user.h. The defines in this file may 
+/* Yes, include the user defines in tx_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
@@ -182,19 +182,19 @@ typedef unsigned long long                      ALIGN_TYPE;
 #define TX_TIMER_THREAD_STACK_SIZE              4096        /* Default timer thread stack size  */
 #endif
 
-#ifndef TX_TIMER_THREAD_PRIORITY    
+#ifndef TX_TIMER_THREAD_PRIORITY
 #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
 
-/* Define various constants for the ThreadX Cortex ARMv8 port.  */ 
+/* Define various constants for the ThreadX Cortex ARMv8 port.  */
 
 #define TX_INT_DISABLE                          0xC0        /* Disable IRQ & FIQ interrupts     */
 #define TX_INT_ENABLE                           0x00        /* Enable IRQ & FIQ interrupts            */
 
 
-/* Define the clock source for trace event entry time stamp. The following two item are port specific.  
-   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
+/* Define the clock source for trace event entry time stamp. The following two item are port specific.
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
 #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
@@ -252,7 +252,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #endif
 
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -266,7 +266,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 
 /* Define the TX_THREAD control block extensions for this port. The main reason
-   for the multiple macros is so that backward compatibility can be maintained with 
+   for the multiple macros is so that backward compatibility can be maintained with
    existing ThreadX kernel awareness modules.  */
 
 #define TX_THREAD_EXTENSION_0
@@ -306,11 +306,11 @@ ULONG   _tx_misra_time_stamp_get(VOID);
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 
 
-/* Define the user extension field of the thread control block.  Nothing 
+/* Define the user extension field of the thread control block.  Nothing
    additional is needed for this port so it is defined as white space.  */
 
 #ifndef TX_THREAD_USER_EXTENSION
-#define TX_THREAD_USER_EXTENSION    
+#define TX_THREAD_USER_EXTENSION
 #endif
 
 
@@ -318,8 +318,8 @@ ULONG   _tx_misra_time_stamp_get(VOID);
    tx_thread_shell_entry, and tx_thread_terminate.  */
 
 
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                                  
-#define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+#define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
 #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
 
@@ -346,8 +346,8 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
 
 
-/* Determine if the ARM architecture has the CLZ instruction. This is available on 
-   architectures v5 and above. If available, redefine the macro for calculating the 
+/* Determine if the ARM architecture has the CLZ instruction. This is available on
+   architectures v5 and above. If available, redefine the macro for calculating the
    lowest bit set.  */
 
 #ifndef TX_DISABLE_INLINE
@@ -359,7 +359,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 /* Define the internal timer extension to also hold the thread pointer such that _tx_thread_timeout
    can figure out what thread timeout to process.  */
-   
+
 #define TX_TIMER_INTERNAL_EXTENSION             VOID    *tx_timer_internal_thread_timeout_ptr;
 
 
@@ -389,14 +389,14 @@ typedef struct TX_THREAD_SMP_PROTECT_STRUCT
     ULONG           tx_thread_smp_protect_count;
     ULONG           tx_thread_smp_protect_pad_0;
     ULONG           tx_thread_smp_protect_pad_1;
-    ULONG           tx_thread_smp_protect_pad_2;    
-    ULONG           tx_thread_smp_protect_pad_3;    
+    ULONG           tx_thread_smp_protect_pad_2;
+    ULONG           tx_thread_smp_protect_pad_3;
 } TX_THREAD_SMP_PROTECT;
 
 
-/* Define ThreadX interrupt lockout and restore macros for protection on 
-   access of critical kernel information.  The restore interrupt macro must 
-   restore the interrupt posture of the running thread prior to the value 
+/* Define ThreadX interrupt lockout and restore macros for protection on
+   access of critical kernel information.  The restore interrupt macro must
+   restore the interrupt posture of the running thread prior to the value
    present prior to the disable macro.  In most cases, the save area macro
    is used to define a local function save area for the disable and restore
    macros.  */
@@ -434,7 +434,7 @@ VOID    tx_thread_fp_disable(VOID);
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
+CHAR                            _tx_version_id[] =
                                     "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Modules Cortex-A35-SMP/AC6 Version 6.5.0.202601 *";
 #else
 extern  CHAR                    _tx_version_id[];

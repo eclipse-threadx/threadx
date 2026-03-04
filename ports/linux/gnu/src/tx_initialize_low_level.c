@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Initialize                                                          */
 /**                                                                       */
@@ -43,18 +43,18 @@ sem_t               _tx_linux_semaphore_no_idle;
 ULONG               _tx_linux_global_int_disabled_flag;
 struct timespec     _tx_linux_time_stamp;
 __thread int        _tx_linux_threadx_thread = 0;
- 
+
 /* Define signals for linux thread. */
 #define SUSPEND_SIG SIGUSR1
 #define RESUME_SIG  SIGUSR2
 
 static sigset_t     _tx_linux_thread_wait_mask;
-static __thread int _tx_linux_thread_suspended; 
+static __thread int _tx_linux_thread_suspended;
 static sem_t        _tx_linux_thread_timer_wait;
 static sem_t        _tx_linux_thread_other_wait;
 
 /* Define simulated timer interrupt.  This is done inside a thread, which is
-   how other interrupts may be defined as well.  See code below for an 
+   how other interrupts may be defined as well.  See code below for an
    example.  */
 
 pthread_t           _tx_linux_timer_id;
@@ -137,11 +137,11 @@ pthread_mutex_t        temp_copy;
 
     /* Now move to the next entry.  */
     _tx_linux_debug_entry_index++;
-    
+
     /* Determine if we need to wrap the list.  */
     if (_tx_linux_debug_entry_index >= TX_LINUX_DEBUG_EVENT_SIZE)
     {
-    
+
         /* Yes, wrap the list!  */
         _tx_linux_debug_entry_index =  0;
     }
@@ -170,48 +170,48 @@ VOID    _tx_thread_context_restore(VOID);
 extern VOID     *_tx_initialize_unused_memory;
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_initialize_low_level                            Linux/GNU       */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_initialize_low_level                            Linux/GNU       */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is responsible for any low-level processor            */ 
-/*    initialization, including setting up interrupt vectors, setting     */ 
-/*    up a periodic timer interrupt source, saving the system stack       */ 
-/*    pointer for use in ISR processing later, and finding the first      */ 
-/*    available RAM memory address for tx_application_define.             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    sched_setaffinity                                                   */ 
-/*    getpid                                                              */ 
-/*    _tx_linux_thread_init                                               */ 
-/*    pthread_setschedparam                                               */ 
-/*    pthread_mutexattr_init                                              */ 
-/*    pthread_mutex_init                                                  */ 
-/*    _tx_linux_thread_suspend                                            */ 
-/*    sem_init                                                            */ 
-/*    pthread_create                                                      */ 
-/*    printf                                                              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
+/*                                                                        */
+/*    This function is responsible for any low-level processor            */
+/*    initialization, including setting up interrupt vectors, setting     */
+/*    up a periodic timer interrupt source, saving the system stack       */
+/*    pointer for use in ISR processing later, and finding the first      */
+/*    available RAM memory address for tx_application_define.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    sched_setaffinity                                                   */
+/*    getpid                                                              */
+/*    _tx_linux_thread_init                                               */
+/*    pthread_setschedparam                                               */
+/*    pthread_mutexattr_init                                              */
+/*    pthread_mutex_init                                                  */
+/*    _tx_linux_thread_suspend                                            */
+/*    sem_init                                                            */
+/*    pthread_create                                                      */
+/*    printf                                                              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter           ThreadX entry function        */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_initialize_low_level(VOID)
@@ -233,7 +233,7 @@ cpu_set_t mask;
         CPU_SET(rand() % get_nprocs(), &mask);
         if (sched_setaffinity(getpid(), sizeof(mask), &mask) != 0)
         {
-        
+
             /* Error restricting the process to one core.  */
             printf("ThreadX Linux error restricting the process to one core!\n");
             while(1)
@@ -255,7 +255,7 @@ cpu_set_t mask;
     sp.sched_priority = TX_LINUX_PRIORITY_SCHEDULE;
     pthread_setschedparam(pthread_self(), SCHED_FIFO, &sp);
 
-    /* Create the system critical section.  This is used by the 
+    /* Create the system critical section.  This is used by the
        scheduler thread (which is the main thread) to block all
        other stuff out.  */
     pthread_mutexattr_init(&attr);
@@ -268,10 +268,10 @@ cpu_set_t mask;
 
     /* Initialize the global interrupt disabled flag.  */
     _tx_linux_global_int_disabled_flag =  TX_FALSE;
-    
+
     /* Create semaphore for timer thread. */
     sem_init(&_tx_linux_timer_semaphore, 0, 0);
-    
+
     /* Create semaphore for ISR thread. */
     sem_init(&_tx_linux_isr_semaphore, 0, 0);
 
@@ -297,7 +297,7 @@ cpu_set_t mask;
 
 
 /* This routine is called after initialization is complete in order to start
-   all interrupt threads.  Interrupt threads in addition to the timer may 
+   all interrupt threads.  Interrupt threads in addition to the timer may
    be added to this routine as well.  */
 
 void    _tx_initialize_start_interrupts(void)
@@ -372,7 +372,7 @@ int err;
 
         tx_linux_mutex_unlock(_tx_linux_mutex);
 #endif /* TX_LINUX_NO_IDLE_ENABLE */
-    } 
+    }
 }
 
 /* Define functions for linux thread. */
@@ -390,11 +390,11 @@ void    _tx_linux_thread_suspend_handler(int sig)
     else
         tx_linux_sem_post_nolock(&_tx_linux_thread_other_wait);
 
-    if(_tx_linux_thread_suspended) 
+    if(_tx_linux_thread_suspended)
         return;
 
     _tx_linux_thread_suspended = 1;
-    sigsuspend(&_tx_linux_thread_wait_mask); 
+    sigsuspend(&_tx_linux_thread_wait_mask);
     _tx_linux_thread_suspended = 0;
 }
 

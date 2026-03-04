@@ -328,7 +328,7 @@ el1_entry_aarch64:
     //
     // Cortex-A processors automatically invalidate their caches on reset
     // (unless suppressed with the DBGL1RSTDISABLE or L2RSTDISABLE pins).
-    // It is therefore not necessary for software to invalidate the caches 
+    // It is therefore not necessary for software to invalidate the caches
     // on startup, however, this is done here in case of a warm reset.
     bl  InvalidateUDCaches
     tlbi VMALLE1

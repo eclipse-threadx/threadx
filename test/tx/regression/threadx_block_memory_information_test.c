@@ -39,7 +39,7 @@ static TX_THREAD       thread_6;
 
 static TX_BLOCK_POOL   block_pool_0;
 static TX_BLOCK_POOL   block_pool_2;
-#ifdef TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO  
+#ifdef TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO
 static TX_BLOCK_POOL   block_pool_1;
 #endif
 
@@ -57,8 +57,8 @@ static void    thread_5_entry(ULONG thread_input);
 static void    thread_6_entry(ULONG thread_input);
 
 /* Direct core function to bypass the error checking shell.  */
-UINT  _tx_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, CHAR **name, ULONG *available_blocks, 
-                    ULONG *total_blocks, TX_THREAD **first_suspended, 
+UINT  _tx_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, CHAR **name, ULONG *available_blocks,
+                    ULONG *total_blocks, TX_THREAD **first_suspended,
                     ULONG *suspended_count, TX_BLOCK_POOL **next_pool);
 
 /* Prototype for test control return.  */
@@ -78,7 +78,7 @@ static void    test_isr(void)
         tx_thread_wait_abort(&thread_3);
 
         /* End the ISR processing.  */
-        test_status =  2;    
+        test_status =  2;
         test_isr_dispatch =  TX_NULL;
     }
 }
@@ -103,8 +103,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -116,8 +116,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -129,8 +129,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -142,8 +142,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             3, 3, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -155,8 +155,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             4, 4, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -168,8 +168,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,
+            pointer, TEST_STACK_SIZE_PRINTF,
             5, 5, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -181,8 +181,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,
+            pointer, TEST_STACK_SIZE_PRINTF,
             6, 6, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -197,7 +197,7 @@ CHAR    *pointer;
     /* Create the block_pool with one block.  */
     status =  tx_block_pool_create(&block_pool_0, "block_pool 0", 30, pointer, 40);
     pointer = pointer + 40;
-    
+
     /* Check for status.  */
     if (status != TX_SUCCESS)
     {
@@ -282,7 +282,7 @@ ULONG           timeouts;
     tx_thread_resume(&thread_4);
     tx_thread_resume(&thread_5);
     tx_thread_resume(&thread_6);
-    
+
     /* Prioritize the block pool suspension list.  */
     status =  tx_block_pool_prioritize(&block_pool_0);
 
@@ -294,10 +294,10 @@ ULONG           timeouts;
         printf("ERROR #12\n");
         test_control_return(1);
     }
-    
+
     /* Now loop to test the interrupt of the prioritize loop logic.  */
     test_status =  1;
-    test_isr_dispatch =  test_isr;  
+    test_isr_dispatch =  test_isr;
     do
     {
 
@@ -314,10 +314,10 @@ ULONG           timeouts;
         }
 
     } while (test_status == 1);
-    
+
     /* Now determine if thread 4 is at the front of the list... It should be!  */
     if (block_pool_0.tx_block_pool_suspension_list != &thread_4)
-    {    
+    {
 
         /* Block Pool error.  */
         printf("ERROR #14\n");
@@ -352,13 +352,13 @@ ULONG           timeouts;
     }
 
 #endif
-    
+
     /* Now use the information services in order to test them.  */
     status =  tx_block_pool_info_get(&block_pool_0, TX_NULL, TX_NULL,  TX_NULL,       TX_NULL,          TX_NULL,          TX_NULL);
     status +=  tx_block_pool_info_get(&block_pool_0, &name, &available, &total_blocks, &first_suspended, &suspended_count, &next_pool);
-    
+
     /* Check for an error condition.  */
-    if ((status) || (available != block_pool_0.tx_block_pool_available) || (total_blocks != block_pool_0.tx_block_pool_total) || 
+    if ((status) || (available != block_pool_0.tx_block_pool_available) || (total_blocks != block_pool_0.tx_block_pool_total) ||
         (first_suspended != &thread_4) || (suspended_count != block_pool_0.tx_block_pool_suspended_count) || (next_pool != &block_pool_0))
     {
 
@@ -367,11 +367,11 @@ ULONG           timeouts;
         test_control_return(1);
     }
 
-#ifdef TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO  
+#ifdef TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO
 
      /* Call the core block pool info get function with a NULL pointer.  */
     status =  _tx_block_pool_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
-    
+
     /* Check for the proper error code.  */
     if (status != TX_PTR_ERROR)
     {
@@ -383,7 +383,7 @@ ULONG           timeouts;
 
    /* Call the core block pool info get function with a non-initialized pool.  */
     status =  _tx_block_pool_performance_info_get(&block_pool_1, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
-    
+
     /* Check for the proper error code.  */
     if (status != TX_PTR_ERROR)
     {
@@ -396,11 +396,11 @@ ULONG           timeouts;
     /* Now get the pool performance information.   */
     status =  tx_block_pool_performance_info_get(&block_pool_0, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_block_pool_performance_info_get(&block_pool_0, &allocates, &releases, &suspensions, &timeouts);
-    
+
     /* Check for an error condition.  */
-    if ((status) || (allocates != block_pool_0.tx_block_pool_performance_allocate_count) || 
-        (releases != block_pool_0.tx_block_pool_performance_release_count) || 
-        (suspensions != block_pool_0.tx_block_pool_performance_suspension_count) || 
+    if ((status) || (allocates != block_pool_0.tx_block_pool_performance_allocate_count) ||
+        (releases != block_pool_0.tx_block_pool_performance_release_count) ||
+        (suspensions != block_pool_0.tx_block_pool_performance_suspension_count) ||
         (timeouts != block_pool_0.tx_block_pool_performance_timeout_count))
     {
 
@@ -412,9 +412,9 @@ ULONG           timeouts;
     /* Now get the system pool performance information.  */
     status =  tx_block_pool_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_block_pool_performance_system_info_get(&allocates, &releases, &suspensions, &timeouts);
-    
+
     /* Check for an error condition.  */
-    if ((status) || (allocates != _tx_block_pool_performance_allocate_count) || (releases != _tx_block_pool_performance_release_count) || 
+    if ((status) || (allocates != _tx_block_pool_performance_allocate_count) || (releases != _tx_block_pool_performance_release_count) ||
         (suspensions != _tx_block_pool_performance_suspension_count) || (timeouts != _tx_block_pool_performance_timeout_count))
     {
 
@@ -433,7 +433,7 @@ ULONG           timeouts;
 
     /* Call the block pool performance info get function.  */
     status =  tx_block_pool_performance_info_get(&block_pool_0, &allocates, &releases, &suspensions, &timeouts);
-    
+
     /* Check for the proper error code.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
@@ -445,7 +445,7 @@ ULONG           timeouts;
 
     /* Call the block pool performance info get function.  */
     status =  tx_block_pool_performance_info_get(TX_NULL, &allocates, &releases, &suspensions, &timeouts);
-    
+
     /* Check for the proper error code.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
@@ -457,7 +457,7 @@ ULONG           timeouts;
 
     /* Call the block pool performance info get function.  */
     status =  tx_block_pool_performance_info_get(TX_NULL, TX_NULL, &releases, &suspensions, &timeouts);
-    
+
     /* Check for the proper error code.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
@@ -469,7 +469,7 @@ ULONG           timeouts;
 
     /* Call the block pool performance info get function.  */
     status =  tx_block_pool_performance_info_get(TX_NULL, TX_NULL, TX_NULL, &suspensions, &timeouts);
-    
+
     /* Check for the proper error code.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
@@ -481,7 +481,7 @@ ULONG           timeouts;
 
     /* Call the block pool performance info get function.  */
     status =  tx_block_pool_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, &timeouts);
-    
+
     /* Check for the proper error code.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
@@ -493,7 +493,7 @@ ULONG           timeouts;
 
     /* Call the block pool performance info get function.  */
     status =  tx_block_pool_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
-    
+
     /* Check for the proper error code.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {

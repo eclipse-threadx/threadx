@@ -1,4 +1,4 @@
-   
+
 .file "vectors.s"
 .section .ivt,text
 ;; This directive forces this section to stay resident even if stripped out by the -zpurgetext linker option

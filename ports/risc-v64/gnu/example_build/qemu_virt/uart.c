@@ -54,13 +54,13 @@ int     uart_init(void)
 
   // enable transmit and receive interrupts.
   // WriteReg(IER, IER_TX_ENABLE | IER_RX_ENABLE);
-  
+
   //enable UART0 in PLIC
   plic_irq_enable(UART0_IRQ);
 
   //set UART0 priority in PLIC
   plic_prio_set(UART0_IRQ, 1);
-  
+
   //register callback for UART0
   //plic_register_callback(UART0_IRQ, uart_intr);
   puts("[UART0] : Uart Init Done, this is Test output!");

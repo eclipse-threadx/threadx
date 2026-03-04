@@ -1,6 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
- * Copyright (C) 2026-present Eclipse ThreadX contributors
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -24,7 +24,7 @@
 #define MSTATUS_FS		(1L << 13)
 
 // Machine-mode Interrupt Enable
-#define MIE_MTIE		(1L << 7)  
+#define MIE_MTIE		(1L << 7)
 #define MIE_MSIE		(1L << 3)
 #define MIE_MEIE		(1L << 11)
 #define MIE_STIE 		(1L << 5)  // supervisor timer

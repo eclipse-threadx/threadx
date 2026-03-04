@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -31,39 +31,39 @@
 #include "tx_timer.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_context_save                           Win32/Visual      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_context_save                           Win32/Visual      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function saves the context of an executing thread in the       */ 
-/*    beginning of interrupt processing.  The function also ensures that  */ 
-/*    the system stack is used upon return to the calling ISR.            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    SuspendThread                         Win32 thread suspend          */ 
-/*    _tx_win32_critical_section_obtain     Obtain critical section       */ 
-/*    _tx_win32_critical_section_release    Release critical section      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISRs                                                                */ 
+/*                                                                        */
+/*    This function saves the context of an executing thread in the       */
+/*    beginning of interrupt processing.  The function also ensures that  */
+/*    the system stack is used upon return to the calling ISR.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    SuspendThread                         Win32 thread suspend          */
+/*    _tx_win32_critical_section_obtain     Obtain critical section       */
+/*    _tx_win32_critical_section_release    Release critical section      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISRs                                                                */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_context_save(VOID)

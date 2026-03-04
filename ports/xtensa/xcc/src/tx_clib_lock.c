@@ -127,7 +127,7 @@ __env_unlock (struct _reent * ptr)
 
 #include <errno.h>
 #include <sys/reent.h>
-    
+
 #define XT_NUM_CLIB_LOCKS      (_MAX_LOCK + FOPEN_MAX)
 
 typedef TX_MUTEX * _Rmtx;

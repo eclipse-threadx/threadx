@@ -9,7 +9,7 @@
 /* Define the ThreadX object control blocks...  */
 
 static TX_THREAD               thread_0;
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD 
+#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 static TX_THREAD               thread_1;
 static TX_THREAD               thread_2;
 static TX_THREAD               thread_3;
@@ -37,7 +37,7 @@ static ULONG           thread_6_counter;
 /* Define thread prototypes.  */
 
 static void    thread_0_entry(ULONG thread_input);
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD 
+#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 static void    thread_1_entry(ULONG thread_input);
 static void    thread_2_entry(ULONG thread_input);
 static void    thread_3_entry(ULONG thread_input);
@@ -66,8 +66,8 @@ UINT    status;
     pointer =  (CHAR *) first_unused_memory;
 
     /* Create thread.  */
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, DEMO_STACK_SIZE,
             16, 1, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + DEMO_STACK_SIZE;
 
@@ -79,11 +79,11 @@ UINT    status;
         test_control_return(1);
     }
 
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD 
-    
+#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
+
     /* Create thread.  */
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, DEMO_STACK_SIZE,
             8, 8, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + DEMO_STACK_SIZE;
 
@@ -96,8 +96,8 @@ UINT    status;
     }
 
     /* Create thread.  */
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, DEMO_STACK_SIZE,
             4, 4, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + DEMO_STACK_SIZE;
 
@@ -110,8 +110,8 @@ UINT    status;
     }
 
     /* Create thread.  */
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, DEMO_STACK_SIZE,
             30, 1, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + DEMO_STACK_SIZE;
 
@@ -124,8 +124,8 @@ UINT    status;
     }
 
     /* Create thread.  */
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, DEMO_STACK_SIZE,
             4, 4, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + DEMO_STACK_SIZE;
 
@@ -138,8 +138,8 @@ UINT    status;
     }
 
     /* Create thread.  */
-    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,  
-            pointer, DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,
+            pointer, DEMO_STACK_SIZE,
             2, 2, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + DEMO_STACK_SIZE;
 
@@ -152,8 +152,8 @@ UINT    status;
     }
 
     /* Create thread.  */
-    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,  
-            pointer, DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,
+            pointer, DEMO_STACK_SIZE,
             30, 30, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + DEMO_STACK_SIZE;
 
@@ -188,7 +188,7 @@ UINT    status;
 static void    thread_0_entry(ULONG thread_input)
 {
 
-#ifdef TX_DISABLE_PREEMPTION_THRESHOLD 
+#ifdef TX_DISABLE_PREEMPTION_THRESHOLD
 
     /* Preemption threshold is not enabled, skip this test.  */
 
@@ -196,8 +196,8 @@ static void    thread_0_entry(ULONG thread_input)
     printf("Running Mutex Nested Priority Inheritance Test...................... SUCCESS!\n");
     test_control_return(0);
 
-#else  
-  
+#else
+
 UINT    test_case =  0;
 UINT    loop_count =  0;
 UINT    priority;
@@ -238,7 +238,7 @@ UINT    status;
             test_control_return(1);
         }
 
-        /* Release the mutexes... Depending on the order they are released should dictate 
+        /* Release the mutexes... Depending on the order they are released should dictate
            the thread's returned to priority.  */
         if (test_case == 0)
         {
@@ -267,7 +267,7 @@ UINT    status;
             }
 
             tx_mutex_put(&mutex_0);
- 
+
             /* No change.  */
             if (thread_0.tx_thread_priority != 15)
             {
@@ -281,7 +281,7 @@ UINT    status;
         {
 
             priority =  thread_0.tx_thread_priority;
-            tx_mutex_put(&mutex_0);     
+            tx_mutex_put(&mutex_0);
 
             /* Should have no change in priority since nothing was inherited for this mutex.  */
             if (thread_0.tx_thread_priority != priority)
@@ -292,7 +292,7 @@ UINT    status;
                 test_control_return(4);
             }
 
-            tx_mutex_put(&mutex_1);     
+            tx_mutex_put(&mutex_1);
 
             /* Should not do anything since mutex 2 elevated to a higher priority.  */
             if (thread_0.tx_thread_priority != priority)
@@ -303,7 +303,7 @@ UINT    status;
                 test_control_return(5);
             }
 
-            tx_mutex_put(&mutex_2);     
+            tx_mutex_put(&mutex_2);
 
             /* Should go back to priority 15.  */
             if (thread_0.tx_thread_priority != 15)
@@ -317,7 +317,7 @@ UINT    status;
         else if (test_case == 2)
         {
 
-            tx_mutex_put(&mutex_2);     
+            tx_mutex_put(&mutex_2);
 
             /* Should go back to priority 8.  */
             if (thread_0.tx_thread_priority != 8)
@@ -328,7 +328,7 @@ UINT    status;
                 test_control_return(7);
             }
 
-            tx_mutex_put(&mutex_0);     
+            tx_mutex_put(&mutex_0);
 
             /* Should not do anything.  */
             if (thread_0.tx_thread_priority != 8)
@@ -339,7 +339,7 @@ UINT    status;
                 test_control_return(8);
             }
 
-            tx_mutex_put(&mutex_1);     
+            tx_mutex_put(&mutex_1);
 
             /* Should go back to priority 15.  */
             if (thread_0.tx_thread_priority != 15)
@@ -354,7 +354,7 @@ UINT    status;
         {
 
             priority =  thread_0.tx_thread_priority;
-            tx_mutex_put(&mutex_1);     
+            tx_mutex_put(&mutex_1);
 
             /* Should not do anything since mutex 2 is still owned.  */
             if (thread_0.tx_thread_priority != priority)
@@ -366,7 +366,7 @@ UINT    status;
             }
 
             tx_mutex_put(&mutex_0);
-                 
+
             /* Should not do anything.  */
             if (thread_0.tx_thread_priority != priority)
             {
@@ -376,7 +376,7 @@ UINT    status;
                 test_control_return(11);
             }
 
-            tx_mutex_put(&mutex_2);     
+            tx_mutex_put(&mutex_2);
 
             /* Should finally go back to priority 15.  */
             if (thread_0.tx_thread_priority != 15)
@@ -391,7 +391,7 @@ UINT    status;
         {
 
             priority =  thread_0.tx_thread_priority;
-            tx_mutex_put(&mutex_1);     
+            tx_mutex_put(&mutex_1);
 
             /* Should not do anything since mutex 2 is still owned.  */
             if (thread_0.tx_thread_priority != priority)
@@ -402,7 +402,7 @@ UINT    status;
                 test_control_return(13);
             }
 
-            tx_mutex_put(&mutex_2);     
+            tx_mutex_put(&mutex_2);
 
             /* Should reurn us back to priority 15.  */
             if (thread_0.tx_thread_priority != 15)
@@ -413,7 +413,7 @@ UINT    status;
                 test_control_return(14);
             }
 
-            tx_mutex_put(&mutex_0);     
+            tx_mutex_put(&mutex_0);
 
             /* Should not do anything.  */
             if (thread_0.tx_thread_priority != 15)
@@ -428,7 +428,7 @@ UINT    status;
         {
 
             priority =  thread_0.tx_thread_priority;
-            tx_mutex_put(&mutex_0);     
+            tx_mutex_put(&mutex_0);
 
             /* Should not do anything since mutex 2 is still owned.  */
             if (thread_0.tx_thread_priority != priority)
@@ -439,7 +439,7 @@ UINT    status;
                 test_control_return(16);
             }
 
-            tx_mutex_put(&mutex_2);     
+            tx_mutex_put(&mutex_2);
 
             /* Should reurn us back to priority 8.  */
             if (thread_0.tx_thread_priority != 8)
@@ -451,7 +451,7 @@ UINT    status;
             }
 
             tx_mutex_put(&mutex_1);
-                 
+
             /* Should return us back to priority 15.  */
             if (thread_0.tx_thread_priority != 15)
             {
@@ -470,60 +470,60 @@ UINT    status;
     /* Check for thread 3 running... this should not happen!  */
     if (thread_3_counter != 50)
     {
-    
+
         printf("ERROR #25\n");
         test_control_return(19);
     }
 
     /* At this point, mutex 3 owned by this thread.  */
-    
+
     /* Resume thread 6, lowest priority thread.  */
     status =  tx_thread_resume(&thread_6);
-    
+
     /* Check for an error.  */
     if ((status != TX_SUCCESS) || (thread_0.tx_thread_priority != 15) || (thread_6_counter != 0))
     {
-    
+
         printf("ERROR #27\n");
         test_control_return(19);
     }
-      
+
     /* Now resume thread 4.  */
     status =  tx_thread_resume(&thread_4);
-    
+
     /* Check for an error.  */
     if ((status != TX_SUCCESS) || (thread_0.tx_thread_priority != 4) || (thread_6_counter != 0))
     {
-    
+
         printf("ERROR #28\n");
         test_control_return(19);
     }
-    
+
     /* Now resume thread 5.  */
     status =  tx_thread_resume(&thread_5);
-    
+
     /* Check for an error.  */
     if ((status != TX_SUCCESS) || (thread_0.tx_thread_priority != 2) || (thread_6_counter != 0))
     {
-    
+
         printf("ERROR #29\n");
         test_control_return(19);
     }
-    
+
     /* Sleep to let thread 6 run, which is lower priority.  */
     tx_thread_sleep(1);
-    
+
     /* Now release the mutex.  */
     status =  tx_mutex_put(&mutex_3);
 
     /* Check for an error.  */
     if ((status != TX_SUCCESS) || (thread_0.tx_thread_priority != 15) || (thread_6_counter != 0) || (thread_4_counter != 1) || (thread_5_counter != 1))
     {
-    
+
         printf("ERROR #30\n");
         test_control_return(19);
     }
-    
+
     /* Sleep to let thread 6 run and release the mutex.  */
     tx_thread_sleep(2);
 
@@ -534,7 +534,7 @@ UINT    status;
 #endif
 }
 
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD 
+#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
 static void    thread_1_entry(ULONG thread_input)
 {
@@ -551,8 +551,8 @@ UINT    old_threshold;
 
         /* Update the thread priority and thread preemption-threshold of thread 0.  */
         tx_thread_priority_change(&thread_0, 15, &old_priority);
-        tx_thread_preemption_change(&thread_0, 14, &old_threshold);        
-    
+        tx_thread_preemption_change(&thread_0, 14, &old_threshold);
+
         /* Get mutex.  */
         tx_mutex_get(&mutex_1, TX_WAIT_FOREVER);
         tx_mutex_put(&mutex_1);
@@ -564,8 +564,8 @@ UINT    old_threshold;
 
         /* Update the thread priority and thread preemption-threshold of thread 0.  */
         tx_thread_priority_change(&thread_0, 15, &old_priority);
-        tx_thread_preemption_change(&thread_0, 8, &old_threshold);        
-    
+        tx_thread_preemption_change(&thread_0, 8, &old_threshold);
+
         /* Get mutex.  */
         tx_mutex_get(&mutex_1, TX_WAIT_FOREVER);
         tx_mutex_put(&mutex_1);
@@ -638,7 +638,7 @@ static void    thread_4_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         /* Get priority inherit mutex.  */
         tx_mutex_get(&mutex_3, TX_WAIT_FOREVER);
 

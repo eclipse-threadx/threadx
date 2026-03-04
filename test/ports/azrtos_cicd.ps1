@@ -219,7 +219,7 @@ ForEach ($f in $CsvFile) {
                 If (-not ($i.Name -match $m)) {
                     Write-Verbose ("Name mismatch: " + $m)
                     $match = $false;
-                } 
+                }
             }
         }
 
@@ -229,11 +229,11 @@ ForEach ($f in $CsvFile) {
                 Write-Verbose ("Matching " + $m)
                 If (-not ($i.Keywords -match $m)) {
                     Write-Verbose ("Keywords mismatch: " + $m)
-                    $match = $false 
-                } 
+                    $match = $false
+                }
             }
         }
-        
+
         If ($MatchPath.Count -ne 0) {
             Write-Verbose ("Matching path...")
             ForEach ($m in $MatchPath) {
@@ -241,7 +241,7 @@ ForEach ($f in $CsvFile) {
                 If (-not ($i.Path -match $m)) {
                     Write-Verbose ("Path mismatch: " + $m)
                     $match = $false
-                } 
+                }
             }
         }
 
@@ -281,7 +281,7 @@ ForEach ($f in $CsvFile) {
         }
 
         If ($Clean -and ($i.CleanScript -ne "")) {
-            Write-Progress -Activity $f -Status ($Stats.CurrentCsv.ToString() + "/" + $t.Count.ToString()) -CurrentOperation $i.Name -PercentComplete (1.0 * $Stats.CurrentCsv / $t.Count * 100) 
+            Write-Progress -Activity $f -Status ($Stats.CurrentCsv.ToString() + "/" + $t.Count.ToString()) -CurrentOperation $i.Name -PercentComplete (1.0 * $Stats.CurrentCsv / $t.Count * 100)
             $result = Invoke-CustomScript "Clean" $i.Name (Join-Path $ScriptDir $i.CleanEnvScript) (Join-Path $ScriptDir $i.CleanScript)
             if ($result -ne 0) {
                 $Stats.CleanScriptERROR++
@@ -291,7 +291,7 @@ ForEach ($f in $CsvFile) {
         }
 
         If ($Build -and ($i.BuildScript -ne "")) {
-            Write-Progress -Activity $f -Status ($Stats.CurrentCsv.ToString() + "/" + $t.Count.ToString()) -CurrentOperation $i.Name -PercentComplete (1.0 * $Stats.CurrentCsv / $t.Count * 100) 
+            Write-Progress -Activity $f -Status ($Stats.CurrentCsv.ToString() + "/" + $t.Count.ToString()) -CurrentOperation $i.Name -PercentComplete (1.0 * $Stats.CurrentCsv / $t.Count * 100)
             $result = Invoke-CustomScript "Build" $i.Name (Join-Path $ScriptDir $i.BuildEnvScript) (Join-Path $ScriptDir $i.BuildScript)
             if ($result -ne 0) {
                 $Stats.BuildScriptERROR++
@@ -301,7 +301,7 @@ ForEach ($f in $CsvFile) {
         }
 
         If ($Test -and ($i.TestScript -ne "")) {
-            Write-Progress -Activity $f -Status ($Stats.CurrentCsv.ToString() + "/" + $t.Count.ToString()) -CurrentOperation $i.Name -PercentComplete (1.0 * $Stats.CurrentCsv / $t.Count * 100) 
+            Write-Progress -Activity $f -Status ($Stats.CurrentCsv.ToString() + "/" + $t.Count.ToString()) -CurrentOperation $i.Name -PercentComplete (1.0 * $Stats.CurrentCsv / $t.Count * 100)
             $result = Invoke-CustomScript "Test" $i.Name (Join-Path $ScriptDir $i.TestEnvScript) (Join-Path $ScriptDir $i.TestScript)
             if ($result -ne 0) {
                 $Stats.TestScriptERROR++

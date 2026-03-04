@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -59,10 +59,10 @@
     public __tx_thread_stack_build
 __tx_thread_stack_build:
 ;
-;       
+;
 ;    /* Build an interrupt frame.  The form of the fake interrupt stack
 ;       on the Renesas RX should look like the following after it is built:
-;       
+;
 ;  Stack Top:           ACC0
 ;                       ACC1
 ;                       R6
@@ -125,11 +125,11 @@ __tx_thread_stack_build:
     MOV.L R4,[-R3]
 
 ;    /* Setup stack pointer.  */
-;    thread_ptr -> tx_thread_stack_ptr =  R1;   
+;    thread_ptr -> tx_thread_stack_ptr =  R1;
     MOV.L R3, 8[R1]
                                                  ; Store initial SP in thread control block
     RTS
-                                 
+
 ;}
 
     END

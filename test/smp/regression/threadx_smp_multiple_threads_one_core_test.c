@@ -67,8 +67,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             0, 0, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_0, 0xE);      /* Core 0 only! */
@@ -81,8 +81,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             1, 1, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_1, 0xD);      /* Only core 1! */
@@ -95,8 +95,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             2, 2, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_2, 0xB);      /* Only core 2! */
@@ -109,8 +109,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             2, 2, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_3, 0x7);      /* Only core 3! */
@@ -123,8 +123,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             2, 2, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_4, 0xE);      /* Only core 0! */
@@ -137,8 +137,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             2, 2, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_5, 0xD);      /* Only core 1! */
@@ -151,8 +151,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             2, 2, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_6, 0xB);      /* Only core 2! */
@@ -165,8 +165,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_7, "thread 7", thread_7_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_7, "thread 7", thread_7_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             2, 2, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_7, 0x7);      /* Only core 3! */
@@ -219,7 +219,7 @@ UINT    status;
 
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (error) || (thread_1_counter != 1) || (tx_thread_smp_core_get() != 0) ||
-        (thread_2_counter != 1) || (thread_3_counter != 1) || (thread_4_counter != 1) || 
+        (thread_2_counter != 1) || (thread_3_counter != 1) || (thread_4_counter != 1) ||
         (thread_5_counter != 1) || (thread_6_counter != 1) || (thread_7_counter != 1))
     {
 
@@ -229,7 +229,7 @@ UINT    status;
     }
     else
     {
-    
+
         /* Successful test.  */
         printf("SUCCESS!\n");
         test_control_return(0);
@@ -245,7 +245,7 @@ static void    thread_1_entry(ULONG thread_input)
         /* Ensure this thread is on the correct core.  */
         if (tx_thread_smp_core_get() != 1)
             error++;
-    
+
         thread_1_counter++;
         tx_thread_suspend(&thread_1);
     }
@@ -257,7 +257,7 @@ static void    thread_2_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         /* Ensure this thread is on the correct core.  */
         if (tx_thread_smp_core_get() != 2)
             error++;
@@ -273,7 +273,7 @@ static void    thread_3_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         /* Ensure this thread is on the correct core.  */
         if (tx_thread_smp_core_get() != 3)
             error++;
@@ -289,7 +289,7 @@ static void    thread_4_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         /* Ensure this thread is on the correct core.  */
         if (tx_thread_smp_core_get() != 0)
             error++;
@@ -305,7 +305,7 @@ static void    thread_5_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         /* Ensure this thread is on the correct core.  */
         if (tx_thread_smp_core_get() != 1)
             error++;
@@ -321,7 +321,7 @@ static void    thread_6_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         /* Ensure this thread is on the correct core.  */
         if (tx_thread_smp_core_get() != 2)
             error++;
@@ -337,7 +337,7 @@ static void    thread_7_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         /* Ensure this thread is on the correct core.  */
         if (tx_thread_smp_core_get() != 3)
             error++;

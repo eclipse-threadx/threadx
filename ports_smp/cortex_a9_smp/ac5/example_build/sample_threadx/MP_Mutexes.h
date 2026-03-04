@@ -9,9 +9,9 @@
 #define _CORTEXA_MUTEX_
 
 // Struct
-// 0xFF=unlocked  0x0 = Locked by CPU 0, 
-//                0x1 = Locked by CPU 1, 
-//                0x2 = Locked by CPU 2, 
+// 0xFF=unlocked  0x0 = Locked by CPU 0,
+//                0x1 = Locked by CPU 1,
+//                0x2 = Locked by CPU 2,
 //                0x3 = Locked by CPU 3
 typedef struct
 {

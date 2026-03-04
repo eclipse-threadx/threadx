@@ -6,8 +6,8 @@
 
 	.section  VECTORS,"ax"
 	.align 12
-  
- 
+
+
 	.global el3_vectors
 el3_vectors:
 
@@ -59,7 +59,7 @@ serror_current_el_spx:
 
 	.balign 128
 sync_lower_el_aarch64:
-   B        .                    
+   B        .
 
 	.balign 128
 irq_lower_el_aarch64:
@@ -103,7 +103,7 @@ irqFirstLevelHandler:
   BL       irqHandler
 
   B        _tx_thread_context_restore
-  
+
 fiqFirstLevelHandler:
   STP      x29, x30, [sp, #-16]!
   STP      x18, x19, [sp, #-16]!

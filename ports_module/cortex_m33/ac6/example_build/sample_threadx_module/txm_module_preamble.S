@@ -2,7 +2,7 @@
     .align 4
     .syntax unified
     .section RESET
-    
+
     // Define public symbols
     .global __txm_module_preamble
 

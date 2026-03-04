@@ -14,7 +14,7 @@ FILE    *array_file;
 #define ELF_EXECUTABLE          2
 
 
-typedef struct ELF_HEADER_STRUCT 
+typedef struct ELF_HEADER_STRUCT
 {
     unsigned char   elf_header_id_string[ELF_ID_STRING_SIZE];
     unsigned short  elf_header_file_type;
@@ -114,12 +114,12 @@ unsigned char   *buffer;
     for (i = 0; i < object_size; i++)
     {
         alpha =  fgetc(source_file);
-        
+
         if (alpha == EOF)
             return(1);
-            
+
         buffer[i] =  (unsigned char) alpha;
-    }    
+    }
 
     /* Return success.  */
     return(0);
@@ -140,7 +140,7 @@ CODE_SECTION_ENTRY		code_section_temp;
 
 
     /* Determine if the proper number of files are provided.  */
-    if (argc != 3) 
+    if (argc != 3)
     {
 
         /* Print an error message out and wait for user key hit.  */
@@ -163,7 +163,7 @@ CODE_SECTION_ENTRY		code_section_temp;
         printf("            File: %s   ", argv[1]);
         return(2);
     }
-    
+
     /* Attempt to open the dump file for writing.  */
     array_file =  fopen(argv[2], "w");
 
@@ -192,7 +192,7 @@ CODE_SECTION_ENTRY		code_section_temp;
 
     /* Allocate memory for the program header(s).  */
     program_header =  malloc(sizeof(ELF_PROGRAM_HEADER)*header.elf_header_program_header_entries);
-	
+
     /* Read the program header(s).  */
     elf_object_read(header.elf_header_program_header_offset, program_header, (sizeof(ELF_PROGRAM_HEADER)*header.elf_header_program_header_entries));
 
@@ -204,7 +204,7 @@ CODE_SECTION_ENTRY		code_section_temp;
 
 
     /* Alocate memory for the section string table.  */
-    section_string_table =  malloc(section_header[header.elf_header_section_string_index].elf_section_header_size);   
+    section_string_table =  malloc(section_header[header.elf_header_section_string_index].elf_section_header_size);
 
     /* Read the section string table.  */
     elf_object_read(section_header[header.elf_header_section_string_index].elf_section_header_offset, section_string_table, section_header[header.elf_header_section_string_index].elf_section_header_size);
@@ -260,7 +260,7 @@ CODE_SECTION_ENTRY		code_section_temp;
         printf("**** Error: No code sections found! **** \n");
 
 		fprintf(array_file, "unsigned char  module_code[] = {0x00};\n\n");
-		
+
 		/* Close files.  */
 		fclose(source_file);
 		fclose(array_file);
@@ -337,7 +337,7 @@ CODE_SECTION_ENTRY		code_section_temp;
 
 		/* Write out the contents of this program area.  */
 		size =  code_section_array[i].code_section_size;
-		
+
 		j =  0;
 		k =  0;
 		while (size)
@@ -372,7 +372,7 @@ CODE_SECTION_ENTRY		code_section_temp;
 
 			/* Move address forward.  */
 			address++;
-			
+
 			/* Decrement size.  */
 			size--;
 

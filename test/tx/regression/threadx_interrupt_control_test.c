@@ -1,4 +1,4 @@
-/* This test is designed to test the interrupt control service call avaialbe to the 
+/* This test is designed to test the interrupt control service call avaialbe to the
    application.  */
 
 #include   <stdio.h>
@@ -36,8 +36,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 

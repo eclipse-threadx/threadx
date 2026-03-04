@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -325,8 +325,8 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                 /* Disable preemption while we process the suspended list.  */
                 _tx_thread_preempt_disable++;
 
-                /* Since we have temporarily disabled preemption globally, set the preempt 
-                   check flag to check for any preemption condition - including from 
+                /* Since we have temporarily disabled preemption globally, set the preempt
+                   check flag to check for any preemption condition - including from
                    unrelated ISR processing.  */
                 preempt_check =  TX_TRUE;
 

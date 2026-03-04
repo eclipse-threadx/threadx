@@ -1,10 +1,10 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
@@ -73,7 +73,7 @@
 @
 @    }
 @
-_store_new_head\@:    
+_store_new_head\@:
 
     STR     r5, [r4]                            @ Store the new head
 @
@@ -90,7 +90,7 @@ _store_new_head\@:
 @    while (1)
 @    {
 @
-_tx_thread_smp_protect_wait_list_lock_get__try_to_get_lock\@:    
+_tx_thread_smp_protect_wait_list_lock_get__try_to_get_lock\@:
 @
 @    /* Is the list lock available?  */
 @    _tx_thread_smp_protect_wait_list_lock_protect_in_force = load_exclusive(&_tx_thread_smp_protect_wait_list_lock_protect_in_force);
@@ -158,7 +158,7 @@ _tx_thread_smp_protect_wait_list_lock_get__try_to_get_lock\@:
 @
 @    }
 @
-_tx_thread_smp_protect_wait_list_add__no_wrap\@:    
+_tx_thread_smp_protect_wait_list_add__no_wrap\@:
 
     STR     r4, [r3]                            @ Store the new tail value.
 @
@@ -185,7 +185,7 @@ _tx_thread_smp_protect_wait_list_add__no_wrap\@:
 @
 @    {
 @
-_tx_thread_smp_protect_wait_list_remove__check_cur_core\@:    
+_tx_thread_smp_protect_wait_list_remove__check_cur_core\@:
 @
 @    /* Is this the core?  */
 @    if (_tx_thread_smp_protect_wait_list[core_index] == core)
@@ -194,7 +194,7 @@ _tx_thread_smp_protect_wait_list_remove__check_cur_core\@:
 @
     LDR     r3, [r2, r1, LSL #2]                @ Get the value at the current index
     CMP     r3, r0                              @ Did we find the core?
-    BEQ     _tx_thread_smp_protect_wait_list_remove__found_core\@     
+    BEQ     _tx_thread_smp_protect_wait_list_remove__found_core\@
 @
 @    }
 @
@@ -203,7 +203,7 @@ _tx_thread_smp_protect_wait_list_remove__check_cur_core\@:
 @
 @    }
 @
-_tx_thread_smp_protect_wait_list_remove__found_core\@:    
+_tx_thread_smp_protect_wait_list_remove__found_core\@:
 @
 @    /* We're about to modify the list. Get the lock. We need the lock because another
 @       core could be simultaneously adding (a core is simultaneously trying to get
@@ -221,12 +221,12 @@ _tx_thread_smp_protect_wait_list_remove__found_core\@:
 @    while (core_index != _tx_thread_smp_protect_wait_list_tail)
 @    {
 @
-_tx_thread_smp_protect_wait_list_remove__compare_index_to_tail\@:    
+_tx_thread_smp_protect_wait_list_remove__compare_index_to_tail\@:
 
     LDR     r2, =_tx_thread_smp_protect_wait_list_tail @ Load tail address
     LDR     r2, [r2]                            @ Load tail value
     CMP     r1, r2                              @ Compare cur index and tail
-    BEQ     _tx_thread_smp_protect_wait_list_remove__removed\@     
+    BEQ     _tx_thread_smp_protect_wait_list_remove__removed\@
 @
 @    UINT next_index = core_index + 1;
 @
@@ -239,7 +239,7 @@ _tx_thread_smp_protect_wait_list_remove__compare_index_to_tail\@:
     LDR     r3, =_tx_thread_smp_protect_wait_list_size
     LDR     r3, [r3]
     CMP     r2, r3
-    BNE     _tx_thread_smp_protect_wait_list_remove__next_index_no_wrap\@     
+    BNE     _tx_thread_smp_protect_wait_list_remove__next_index_no_wrap\@
 @
 @    next_index = 0;
 @
@@ -247,7 +247,7 @@ _tx_thread_smp_protect_wait_list_remove__compare_index_to_tail\@:
 @
 @    }
 @
-_tx_thread_smp_protect_wait_list_remove__next_index_no_wrap\@:    
+_tx_thread_smp_protect_wait_list_remove__next_index_no_wrap\@:
 @
 @    list_cores[core_index] = list_cores[next_index];
 @
@@ -259,11 +259,11 @@ _tx_thread_smp_protect_wait_list_remove__next_index_no_wrap\@:
 @
     MOV     r1, r2
 
-    B       _tx_thread_smp_protect_wait_list_remove__compare_index_to_tail\@     
+    B       _tx_thread_smp_protect_wait_list_remove__compare_index_to_tail\@
 @
 @    }
 @
-_tx_thread_smp_protect_wait_list_remove__removed\@:    
+_tx_thread_smp_protect_wait_list_remove__removed\@:
 @
 @    /* Now update the tail.  */
 @    if (_tx_thread_smp_protect_wait_list_tail == 0)
@@ -272,7 +272,7 @@ _tx_thread_smp_protect_wait_list_remove__removed\@:
     LDR     r0, =_tx_thread_smp_protect_wait_list_tail @ Load tail address
     LDR     r1, [r0]                            @ Load tail value
     CMP     r1, #0
-    BNE     _tx_thread_smp_protect_wait_list_remove__tail_not_zero\@     
+    BNE     _tx_thread_smp_protect_wait_list_remove__tail_not_zero\@
 @
 @    _tx_thread_smp_protect_wait_list_tail = _tx_thread_smp_protect_wait_list_size;
 @
@@ -281,7 +281,7 @@ _tx_thread_smp_protect_wait_list_remove__removed\@:
 @
 @    }
 @
-_tx_thread_smp_protect_wait_list_remove__tail_not_zero\@:    
+_tx_thread_smp_protect_wait_list_remove__tail_not_zero\@:
 @
 @    _tx_thread_smp_protect_wait_list_tail--;
 @

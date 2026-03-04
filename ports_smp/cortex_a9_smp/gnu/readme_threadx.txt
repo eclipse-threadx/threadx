@@ -4,16 +4,16 @@
 
 1.  Building the ThreadX run-time Library
 
-First make sure you are in the "example_build" directory. Also, make sure that 
-you have setup your path and other environment variables necessary for the GNU 
-development environment. 
+First make sure you are in the "example_build" directory. Also, make sure that
+you have setup your path and other environment variables necessary for the GNU
+development environment.
 
-At this point you may run the build_threadx.bat batch file. This will build the 
-ThreadX run-time environment in the "example_build" directory. 
+At this point you may run the build_threadx.bat batch file. This will build the
+ThreadX run-time environment in the "example_build" directory.
 
-You should observe assembly and compilation of a series of ThreadX source 
-files. At the end of the batch file, they are all combined into the 
-run-time library file: tx.a. This file must be linked with your 
+You should observe assembly and compilation of a series of ThreadX source
+files. At the end of the batch file, they are all combined into the
+run-time library file: tx.a. This file must be linked with your
 application in order to use ThreadX.
 
 
@@ -21,49 +21,49 @@ application in order to use ThreadX.
 
 The ThreadX demonstration is designed to execute under the ARM Cortex-A9x4 FVP.
 
-Building the demonstration is easy; simply execute the build_threadx_sample.bat 
-batch file while inside the "example_build" directory. 
+Building the demonstration is easy; simply execute the build_threadx_sample.bat
+batch file while inside the "example_build" directory.
 
-You should observe the compilation of sample_threadx.c (which is the demonstration 
-application) and linking with TX.A. The resulting file DEMO is a binary file 
+You should observe the compilation of sample_threadx.c (which is the demonstration
+application) and linking with TX.A. The resulting file DEMO is a binary file
 that can be downloaded and executed.
 
 
 3.  System Initialization
 
-The entry point in ThreadX for the Cortex-A9 using GNU tools is at label 
+The entry point in ThreadX for the Cortex-A9 using GNU tools is at label
 Reset_Handler in startup.s. After the basic core initialization is complete,
-control will transfer to __main, which is where all static and global pre-set 
+control will transfer to __main, which is where all static and global pre-set
 C variable initialization processing takes place.
 
-The ThreadX tx_initialize_low_level.s file is responsible for setting up 
-various system data structures, the vector area, and a periodic timer interrupt 
-source. By default, the vector area is defined to be located in the Init area, 
-which is defined at the top of tx_initialize_low_level.s. This area is typically 
-located at 0. In situations where this is impossible, the vectors at the beginning 
+The ThreadX tx_initialize_low_level.s file is responsible for setting up
+various system data structures, the vector area, and a periodic timer interrupt
+source. By default, the vector area is defined to be located in the Init area,
+which is defined at the top of tx_initialize_low_level.s. This area is typically
+located at 0. In situations where this is impossible, the vectors at the beginning
 of the Init area should be copied to address 0.
 
 This is also where initialization of a periodic timer interrupt source
 should take place.
 
-In addition, _tx_initialize_low_level determines the first available 
-address for use by the application, which is supplied as the sole input 
+In addition, _tx_initialize_low_level determines the first available
+address for use by the application, which is supplied as the sole input
 parameter to your application definition function, tx_application_define.
 
 
 4.  Register Usage and Stack Frames
 
-The GNU compiler assumes that registers r0-r3 (a1-a4) and r12 (ip) are scratch 
-registers for each function. All other registers used by a C function must 
-be preserved by the function. ThreadX takes advantage of this in situations 
-where a context switch happens as a result of making a ThreadX service call 
-(which is itself a C function). In such cases, the saved context of a thread 
+The GNU compiler assumes that registers r0-r3 (a1-a4) and r12 (ip) are scratch
+registers for each function. All other registers used by a C function must
+be preserved by the function. ThreadX takes advantage of this in situations
+where a context switch happens as a result of making a ThreadX service call
+(which is itself a C function). In such cases, the saved context of a thread
 is only the non-scratch registers.
 
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
 All suspended threads have one of these two types of stack frames. The top
-of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the 
+of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the
 associated thread control block TX_THREAD.
 
 
@@ -81,39 +81,39 @@ associated thread control block TX_THREAD.
      0x20                   r6  (v3)                    r10 (v7)
      0x24                   r7  (v4)                    r11 (fp)
      0x28                   r8  (v5)                    r14 (lr)
-     0x2C                   r9  (v6)                        
-     0x30                   r10 (v7)                        
-     0x34                   r11 (fp)                        
-     0x38                   r12 (ip)                         
+     0x2C                   r9  (v6)
+     0x30                   r10 (v7)
+     0x34                   r11 (fp)
+     0x38                   r12 (ip)
      0x3C                   r14 (lr)
-     0x40                   PC 
+     0x40                   PC
 
 
 5.  Improving Performance
 
-The distribution version of ThreadX is built without any compiler 
-optimizations. This makes it easy to debug because you can trace or set 
-breakpoints inside of ThreadX itself. Of course, this costs some 
-performance. To make it run faster, you can change the build_threadx.bat file to 
-remove the -g option and enable all compiler optimizations. 
+The distribution version of ThreadX is built without any compiler
+optimizations. This makes it easy to debug because you can trace or set
+breakpoints inside of ThreadX itself. Of course, this costs some
+performance. To make it run faster, you can change the build_threadx.bat file to
+remove the -g option and enable all compiler optimizations.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined.
 
 
 6.  Interrupt Handling
 
 ThreadX provides complete and high-performance interrupt handling for Cortex-A9
-targets. There are a certain set of requirements that are defined in the 
+targets. There are a certain set of requirements that are defined in the
 following sub-sections:
 
 
 6.1  Vector Area
 
 The Cortex-A9 vectors start at address zero. The demonstration system startup
-Init area contains the vectors and is loaded at address zero. On actual 
-hardware platforms, this area might have to be copied to address 0. 
+Init area contains the vectors and is loaded at address zero. On actual
+hardware platforms, this area might have to be copied to address 0.
 
 
 6.2  IRQ ISRs
@@ -124,12 +124,12 @@ IRQ interrupts. The following sub-sections define the IRQ capabilities.
 
 6.2.1 Standard IRQ ISRs
 
-The standard ARM IRQ mechanism has a single interrupt vector at address 0x18. This IRQ 
-interrupt is managed by the __tx_irq_handler code in tx_initialize_low_level. The following 
+The standard ARM IRQ mechanism has a single interrupt vector at address 0x18. This IRQ
+interrupt is managed by the __tx_irq_handler code in tx_initialize_low_level. The following
 is the default IRQ handler defined in tx_initialize_low_level.s:
 
     EXPORT  __tx_irq_handler
-    EXPORT  __tx_irq_processing_return      
+    EXPORT  __tx_irq_processing_return
 __tx_irq_handler
 ;
 ;    /* Jump to context save to save system context.  */
@@ -137,7 +137,7 @@ __tx_irq_handler
 __tx_irq_processing_return
 ;
 ;    /* At this point execution is still in the IRQ mode. The CPSR, point of
-;       interrupt, and all C scratch registers are available for use. Note 
+;       interrupt, and all C scratch registers are available for use. Note
 ;       that IRQ interrupts are still disabled upon return from the context
 ;       save function.  */
 ;
@@ -149,12 +149,12 @@ __tx_irq_processing_return
 
 6.3  FIQ Interrupts
 
-By default, Cortex-A9 FIQ interrupts are left alone by ThreadX. Of course, this 
-means that the application is fully responsible for enabling the FIQ interrupt 
-and saving/restoring any registers used in the FIQ ISR processing. To globally 
-enable FIQ interrupts, the application should enable FIQ interrupts at the 
-beginning of each thread or before any threads are created in tx_application_define. 
-In addition, the application must ensure that no ThreadX service calls are made 
+By default, Cortex-A9 FIQ interrupts are left alone by ThreadX. Of course, this
+means that the application is fully responsible for enabling the FIQ interrupt
+and saving/restoring any registers used in the FIQ ISR processing. To globally
+enable FIQ interrupts, the application should enable FIQ interrupts at the
+beginning of each thread or before any threads are created in tx_application_define.
+In addition, the application must ensure that no ThreadX service calls are made
 from default FIQ ISRs, which is located in tx_initialize_low_level.s.
 
 
@@ -163,7 +163,7 @@ from default FIQ ISRs, which is located in tx_initialize_low_level.s.
 Full ThreadX management of FIQ interrupts is provided if the ThreadX sources
 are built with the TX_ENABLE_FIQ_SUPPORT defined. If the library is built
 this way, the FIQ interrupt handlers are very similar to the IRQ interrupt
-handlers defined previously. The following is default FIQ handler 
+handlers defined previously. The following is default FIQ handler
 defined in tx_initialize_low_level.s:
 
 
@@ -186,29 +186,29 @@ __tx_fiq_processing_return:
 
 7.  ThreadX Timer Interrupt
 
-ThreadX requires a periodic interrupt source to manage all time-slicing, 
-thread sleeps, timeouts, and application timers. Without such a timer 
+ThreadX requires a periodic interrupt source to manage all time-slicing,
+thread sleeps, timeouts, and application timers. Without such a timer
 interrupt source, these services are not functional. However, all other
 ThreadX services are operational without a periodic timer source.
 
-To add the timer interrupt processing, simply make a call to 
+To add the timer interrupt processing, simply make a call to
 _tx_timer_interrupt in the IRQ processing. An example of this can be
 found in the file tx_initialize_low_level.s in the Integrator sub-directories.
 
 
 8.  Thumb/Cortex-A9 Mixed Mode
 
-By default, ThreadX is setup for running in Cortex-A9 32-bit mode. This is 
-also true for the demonstration system. It is possible to build any 
-ThreadX file and/or the application in Thumb mode. If any Thumb code 
-is used the entire ThreadX source- both C and assembly - should be built 
+By default, ThreadX is setup for running in Cortex-A9 32-bit mode. This is
+also true for the demonstration system. It is possible to build any
+ThreadX file and/or the application in Thumb mode. If any Thumb code
+is used the entire ThreadX source- both C and assembly - should be built
 with the "-apcs /interwork" option.
 
 
 9. VFP Support
 
 By default, VFP support is disabled for each thread. If saving the context of the VFP registers
-is needed, the following API call must be made from the context of the application thread - before 
+is needed, the following API call must be made from the context of the application thread - before
 the VFP usage:
 
 void    tx_thread_vfp_enable(void);

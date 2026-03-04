@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread - Low Level SMP Support                                      */
 @/**                                                                       */
@@ -38,39 +38,39 @@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_smp_unprotect                        SMP/Cortex-A7/GNU   */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_smp_unprotect                        SMP/Cortex-A7/GNU   */
 @/*                                                            6.1         */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function releases previously obtained protection. The supplied */ 
-@/*    previous SR is restored. If the value of _tx_thread_system_state    */ 
-@/*    and _tx_thread_preempt_disable are both zero, then multithreading   */ 
-@/*    is enabled as well.                                                 */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    Previous Status Register                                            */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*    This function releases previously obtained protection. The supplied */
+@/*    previous SR is restored. If the value of _tx_thread_system_state    */
+@/*    and _tx_thread_preempt_disable are both zero, then multithreading   */
+@/*    is enabled as well.                                                 */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    Previous Status Register                                            */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
 @/*    ThreadX Source                                                      */
-@/*                                                                        */ 
+@/*                                                                        */
 @/**************************************************************************/
     .global _tx_thread_smp_unprotect
     .type   _tx_thread_smp_unprotect,function

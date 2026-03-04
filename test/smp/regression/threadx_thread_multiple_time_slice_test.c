@@ -1,4 +1,4 @@
-/* This test is designed to see if two threads can be created and execute with a time-slice.  
+/* This test is designed to see if two threads can be created and execute with a time-slice.
    Thread 7 should run twice as long because it has more of a time-slice. */
 
 #include   <stdio.h>
@@ -50,8 +50,8 @@ CHAR    *pointer;
 
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 2, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -63,8 +63,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 4, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -77,8 +77,8 @@ CHAR    *pointer;
     }
 
     /* Create control thread.  */
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -92,10 +92,10 @@ CHAR    *pointer;
 
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
-    /* Create threads with preemption-threshold and time-slice, such and make sure time-slice is defeated by 
+    /* Create threads with preemption-threshold and time-slice, such and make sure time-slice is defeated by
        preemption-threshold.  */
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 17, 2, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -107,8 +107,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, 4, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -161,7 +161,7 @@ static void    thread_1_entry(ULONG thread_input)
 
 static void    thread_2_entry(ULONG thread_input)
 {
-  
+
 unsigned long   counter_sum;
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 UINT            status;
@@ -177,7 +177,7 @@ UINT            status;
     /* Increment thread 2 counter.  */
     thread_2_counter++;
 
-    /* Compute the delta. Should be twice as much, but some test environments (Windows/Linux) are 
+    /* Compute the delta. Should be twice as much, but some test environments (Windows/Linux) are
        not as good in terms of real time processing.  */
     counter_sum =  thread_0_counter;
     counter_sum =  counter_sum + (thread_0_counter/4);
@@ -187,19 +187,19 @@ UINT            status;
         /* Thread Time-slice error.  */
         printf("ERROR #6\n");
         test_control_return(1);
-    }  
+    }
 #ifdef TX_DISABLE_PREEMPTION_THRESHOLD
     else
     {
         /* Successful Thread Time-slice test.  */
         printf("SUCCESS!\n");
         test_control_return(0);
-    }  
+    }
 #else
     /* Now suspend threads 0 and 1 so we can let 3 and 4 run.  */
     status =  tx_thread_suspend(&thread_0);
     status += tx_thread_suspend(&thread_1);
-    
+
     /* Check status.  */
     if (status)
     {
@@ -207,7 +207,7 @@ UINT            status;
         printf("ERROR #7\n");
         test_control_return(1);
     }
-    
+
     /* Now sleep and see if thread 4 ever runs.  */
     tx_thread_sleep(4);
 
@@ -257,7 +257,7 @@ static void    thread_4_entry(ULONG thread_input)
     {
 
         /* We should never get here!  */
-        
+
         /* Increment thread 4 counter.  */
         thread_4_counter++;
 

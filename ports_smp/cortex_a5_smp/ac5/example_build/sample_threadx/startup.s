@@ -3,7 +3,7 @@
 ;
 ; Copyright (c) 2011-2018 Arm Limited (or its affiliates). All rights reserved.
 ; Use, modification and redistribution of this file is subject to your possession of a
-; valid End User License Agreement for the Arm Product of which these examples are part of 
+; valid End User License Agreement for the Arm Product of which these examples are part of
 ; and your compliance with all applicable terms and conditions of such licence agreement.
 ; ------------------------------------------------------------
 
@@ -159,7 +159,7 @@ by_pass
 ;  MRC     p15, 0, r0, c0, c0, 5     ; Read CPU ID register
 ;  ANDS    r0, r0, #0x03             ; Mask off, leaving the CPU ID field
 ;  BNE     by_pass2
-;  
+;
 ;  MOV     r0, #0x04 ; Code for SYS_WRITE0
 ;  LDR     r1, =irq_handler_message1
 ;  SVC     0x123456
@@ -293,7 +293,7 @@ Reset_Handler PROC {}
   ; 0     - C   0x0 (Inner Noncachable)
   LDR     r0, =||Image$$PAGETABLES$$ZI$$Base||
   MSR     TTBR0, r0
- 
+
 
   ;
   ; Activate VFP/NEON, if required
@@ -341,7 +341,7 @@ primaryCPUInit PROC
 
   ; Translation tables
   ; -------------------
-  ; The translation tables are generated at boot time.  
+  ; The translation tables are generated at boot time.
   ; First the table is zeroed.  Then the individual valid
   ; entries are written in
   ;
@@ -434,7 +434,7 @@ ttb_zero_loop
   MOV     r0, #0x1F
   BL      setPriorityMask               ; Set priority mask (local)
 
-  ; [EL] Change start - don't enable interrupts here!  
+  ; [EL] Change start - don't enable interrupts here!
   ;CPSIE   i                            ; Clear CPSR I bit
   ; [EL] Change end
 
@@ -453,7 +453,7 @@ ttb_zero_loop
   MOV     r1, #0x0
   BL      init_private_timer
   BL      start_private_timer
-  
+
   ;
   ; Enable receipt of SGI 0
   ; ------------------------

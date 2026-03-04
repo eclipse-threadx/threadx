@@ -48,7 +48,7 @@ For simplicity only a selected set of the usual configuration defines are suppor
 | configMAX_PRIORITIES | - | Maximum number of priorities. Must be less than or equal to the configured number of ThreadX priorities. |
 | configMINIMAL_STACK_SIZE | 512u | Minimum stack size, used as the stack size of the idle task if `TX_FREERTOS_IDLE_STACK` is not defined.
 | configTOTAL_HEAP_SIZE | - | Amount of internal memory allocated to the adaptation layer when creating FreeRTOS objects. Can be set to 0 to disable dynamic allocation. |
-| INCLUDE_vTaskDelete | 1 | Set to 0 to disable the task delete API. When disabled the adaptation layer will not create the idle task to save resources. | 
+| INCLUDE_vTaskDelete | 1 | Set to 0 to disable the task delete API. When disabled the adaptation layer will not create the idle task to save resources. |
 | TX_FREERTOS_IDLE_STACK |	512u | Stack size of the idle task. |
 | TX_FREERTOS_ASSERT_FAIL | | Define to a macro invoked on internal assertion failures from within the adaptation layer |
 | configASSERT | | Define to a macro invoked for invalid arguments |
@@ -148,16 +148,16 @@ The task API represents the core of the adaptation layer enabling creation and c
 | Name | Notes |
 |------|-------|
 | taskSCHEDULER_SUSPENDED
-| taskSCHEDULER_NOT_STARTED	
-| taskSCHEDULER_RUNNING	
-| taskENTER_CRITICAL()	
-| taskEXIT_CRITICAL()	
-| taskENTER_CRITICAL_FROM_ISR()	
-| taskEXIT_CRITICAL_FROM_ISR()	
-| taskDISABLE_INTERRUPTS()	
-| taskENABLE_INTERRUPTS()	
-| tskIDLE_PRIORITY	
-| taskYIELD()	
+| taskSCHEDULER_NOT_STARTED
+| taskSCHEDULER_RUNNING
+| taskENTER_CRITICAL()
+| taskEXIT_CRITICAL()
+| taskENTER_CRITICAL_FROM_ISR()
+| taskEXIT_CRITICAL_FROM_ISR()
+| taskDISABLE_INTERRUPTS()
+| taskENABLE_INTERRUPTS()
+| tskIDLE_PRIORITY
+| taskYIELD()
 | taskYIELD_FROM_ISR()	| Has no effect, ThreadX will automatically pre-empt when a higher priority task is available to run upon returning from an ISR. |
 
 ### Functions
@@ -171,18 +171,18 @@ The task API represents the core of the adaptation layer enabling creation and c
 | xTaskCreate()
 | uxTaskGetNumberOfTasks() | Only returns the number of task created by either `xTaskCreate()` or `xTaskcreateStatic()`. Task created internally by ThreadX or by the application using `tx_thread_create()` are not counted. |
 | vTaskDelete()
-| vTaskDelay()	
+| vTaskDelay()
 | vTaskDelayUntil() | The implementation of `vTaskDelayUntil()` cannot perform a wait in an atomic fashion. As such there might be additional jitter when using this function with the adaptation layer. The implementation will, however, not accumulate any drift. |
 | xTaskGetCurrentTaskHandle() | This will only work when called from a task created by either `xTaskCreate()` or `xTaskcreateStatic()`. |
 | vTaskSuspend()
-| vTaskResume()	
-| xTaskResumeFromISR()	
-| xTaskAbortDelay()	
-| uxTaskPriorityGet()	
-| uxTaskPriorityGetFromISR()	
-| vTaskPrioritySet()	
-| pcTaskGetName()	
-| eTaskGetState()	
+| vTaskResume()
+| xTaskResumeFromISR()
+| xTaskAbortDelay()
+| uxTaskPriorityGet()
+| uxTaskPriorityGetFromISR()
+| vTaskPrioritySet()
+| pcTaskGetName()
+| eTaskGetState()
 | uxTaskGetStackHighWaterMark() | Not implemented. |
 | uxTaskGetStackHighWaterMark2() | Not implemented. |
 | xTaskCallApplicationTaskHook() | Not implemented. |
@@ -197,68 +197,68 @@ Task notifications are fully implemented.
 
 | Name | Notes |
 |------|-------|
-| xTaskNotifyGive()	
-| vTaskNotifyGiveFromISR()	
-| ulTaskNotifyTake()	
-| xTaskNotifyWait()	
-| xTaskNotify()	
-| xTaskNotifyFromISR()	
-| xTaskNotifyAndQuery()	
-| xTaskGenericNotify()	
-| xTaskNotifyAndQueryFromISR()	
-| xTaskGenericNotifyFromISR()	
-| xTaskNotifyStateClear()	
-| ulTaskNotifyValueClear()	
+| xTaskNotifyGive()
+| vTaskNotifyGiveFromISR()
+| ulTaskNotifyTake()
+| xTaskNotifyWait()
+| xTaskNotify()
+| xTaskNotifyFromISR()
+| xTaskNotifyAndQuery()
+| xTaskGenericNotify()
+| xTaskNotifyAndQueryFromISR()
+| xTaskGenericNotifyFromISR()
+| xTaskNotifyStateClear()
+| ulTaskNotifyValueClear()
 
 ## Semaphore and Mutex
 Semaphores, either counting or binary as well as Mutexes are fully implemented. Mutexes under the adaptation layer cannot be taken or given from an ISR as this is not allowed in ThreadX as well as recent version of FreeRTOS. Due to differences between ThreadX and FreeRTOS it is possible that the ordering task wakeup may slightly differ.
 
 | Name | Notes |
 |------|-------|
-| xSemaphoreCreateCounting()	
-| xSemaphoreCreateCountingStatic()	
-| xSemaphoreCreateBinary()	
-| xSemaphoreCreateBinaryStatic()	
-| xSemaphoreCreateMutex()	
-| xSemaphoreCreateMutexStatic()	
-| xSemaphoreCreateRecursiveMutex()	
-| xSemaphoreCreateRecursiveMutexStatic()	
-| vSemaphoreDelete()	
-| xSemaphoreTake()	
+| xSemaphoreCreateCounting()
+| xSemaphoreCreateCountingStatic()
+| xSemaphoreCreateBinary()
+| xSemaphoreCreateBinaryStatic()
+| xSemaphoreCreateMutex()
+| xSemaphoreCreateMutexStatic()
+| xSemaphoreCreateRecursiveMutex()
+| xSemaphoreCreateRecursiveMutexStatic()
+| vSemaphoreDelete()
+| xSemaphoreTake()
 | xSemaphoreTakeFromISR() | It’s not possible to take a mutex from an ISR. |
-| xSemaphoreTakeRecursive()	
-| xSemaphoreGive()	
-| xSemaphoreGiveFromISR()	
+| xSemaphoreTakeRecursive()
+| xSemaphoreGive()
+| xSemaphoreGiveFromISR()
 | xSemaphoreGiveRecursive() | It’s not possible to give a mutex from an ISR. |
 | uxSemaphoreGetCount()
-| xSemaphoreGetMutexHolder()	
-| xSemaphoreGetMutexHolderFromISR()	
+| xSemaphoreGetMutexHolder()
+| xSemaphoreGetMutexHolderFromISR()
 | vSemaphoreCreateBinary() | Not implemented since it’s marked as deprecated in the FreeRTOS documentation. |
 
 ## Queue
-The FreeRTOS queue API is implemented with the help of ThreadX semaphores and is designed to mimic the behaviour of FreeRTOS queues. Due to differences between ThreadX and FreeRTOS it is possible that the ordering task wakeup may slightly differ. 
+The FreeRTOS queue API is implemented with the help of ThreadX semaphores and is designed to mimic the behaviour of FreeRTOS queues. Due to differences between ThreadX and FreeRTOS it is possible that the ordering task wakeup may slightly differ.
 
 | Name | Notes |
 |------|-------|
 | xQueueCreate() |
 | xQueueCreateStatic() |
-| vQueueDelete()	
-| xQueueSend()	
-| xQueueSendFromISR()	
-| xQueueSendToBack()	
-| xQueueSendToBackFromISR()	
+| vQueueDelete()
+| xQueueSend()
+| xQueueSendFromISR()
+| xQueueSendToBack()
+| xQueueSendToBackFromISR()
 | xQueueSendToFront() |
 | xQueueSendToFrontFromISR() |
 | xQueueReceive()
-| xQueueReceiveFromISR()	
+| xQueueReceiveFromISR()
 | xQueuePeek() |
 | xQueuePeekFromISR() |
 | uxQueueMessagesWaiting() |
 | uxQueueMessagesWaitingFromISR() |
 | uxQueueSpacesAvailable() |
-| xQueueIsQueueEmptyFromISR()	
-| xQueueIsQueueFullFromISR()	
-| xQueueReset()	
+| xQueueIsQueueEmptyFromISR()
+| xQueueIsQueueFullFromISR()
+| xQueueReset()
 | xQueueOverwrite() |
 | xQueueOverwriteFromISR() |
 | pcQueueGetName() | Not implemented. |
@@ -268,27 +268,27 @@ Queue sets are implemented with support for adding queues, semaphores and mutexe
 
 | Name | Notes |
 |------|-------|
-| xQueueCreateSet()	
-| xQueueAddToSet()	
-| xQueueRemoveFromSet()	
-| xQueueSelectFromSet()	
-| xQueueSelectFromSetFromISR()	
+| xQueueCreateSet()
+| xQueueAddToSet()
+| xQueueRemoveFromSet()
+| xQueueSelectFromSet()
+| xQueueSelectFromSetFromISR()
 
 ## Event Group
 Event groups are implemented using ThreadX’s event flags. It is important to note however that `xEventGroupSync()` is not atomic.
 
 | Name | Notes|
 |------|-------|
-| xEventGroupCreate()	
-| xEventGroupCreateStatic()	
-| vEventGroupDelete()	
-| xEventGroupWaitBits()	
-| xEventGroupSetBits()	
-| xEventGroupSetBitsFromISR()	
-| xEventGroupClearBits()	
-| xEventGroupClearBitsFromISR()	
-| xEventGroupGetBits()	
-| xEventGroupGetBitsFromISR()	
+| xEventGroupCreate()
+| xEventGroupCreateStatic()
+| vEventGroupDelete()
+| xEventGroupWaitBits()
+| xEventGroupSetBits()
+| xEventGroupSetBitsFromISR()
+| xEventGroupClearBits()
+| xEventGroupClearBitsFromISR()
+| xEventGroupGetBits()
+| xEventGroupGetBitsFromISR()
 | xEventGroupSync() | Not atomic. |
 
 ## Timer
@@ -296,25 +296,25 @@ The timer API is fully implemented except for the pend function all functionalit
 
 | Name | Notes |
 |------|-------|
-| xTimerCreate()	
-| xTimerCreateStatic()	
-| xTimerDelete()	
-| xTimerIsTimerActive()	
-| xTimerStart()	
-| xTimerStop()	
-| xTimerChangePeriod()	
-| xTimerReset()	
-| xTimerStartFromISR()	
-| xTimerStopFromISR()	
-| xTimerChangePeriodFromISR()	
-| xTimerResetFromISR()	
-| pvTimerGetTimerID()	
-| vTimerSetTimerID()	
-| vTimerSetReloadMode()	
-| pcTimerGetName()	
-| xTimerGetPeriod()	
-| xTimerGetExpiryTime()	
-| uxTimerGetReloadMode()	
+| xTimerCreate()
+| xTimerCreateStatic()
+| xTimerDelete()
+| xTimerIsTimerActive()
+| xTimerStart()
+| xTimerStop()
+| xTimerChangePeriod()
+| xTimerReset()
+| xTimerStartFromISR()
+| xTimerStopFromISR()
+| xTimerChangePeriodFromISR()
+| xTimerResetFromISR()
+| pvTimerGetTimerID()
+| vTimerSetTimerID()
+| vTimerSetReloadMode()
+| pcTimerGetName()
+| xTimerGetPeriod()
+| xTimerGetExpiryTime()
+| uxTimerGetReloadMode()
 | xTimerPendFunctionCall() | Not implemented. |
 | xTimerPendFunctionCallFromISR() | Not implemented. |
 | xTimerGetTimerDaemonTaskHandle() | Not implemented. |

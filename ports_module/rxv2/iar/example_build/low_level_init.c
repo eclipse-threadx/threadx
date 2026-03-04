@@ -31,7 +31,7 @@ __intrinsic
 int __low_level_init ( void )
 {
   hardware_setup();
-  
+
   /*==================================*/
   /* Choose if segment initialization */
   /* should be done or not.           */

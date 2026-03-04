@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -23,42 +23,42 @@
     EXTERN      _tx_timer_time_slice
     EXTERN      _tx_thread_schedule
 #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
-    EXTERN      _tx_execution_thread_exit        
+    EXTERN      _tx_execution_thread_exit
 #endif
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_system_return                           Cortex-A7/IAR    */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_system_return                           Cortex-A7/IAR    */
 ;/*                                                           6.3.0        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function is target processor specific.  It is used to transfer */ 
-;/*    control from a thread back to the ThreadX system.  Only a           */ 
-;/*    minimal context is saved since the compiler assumes temp registers  */ 
-;/*    are going to get slicked by a function call anyway.                 */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                   Thread scheduling loop        */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ThreadX components                                                  */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function is target processor specific.  It is used to transfer */
+;/*    control from a thread back to the ThreadX system.  Only a           */
+;/*    minimal context is saved since the compiler assumes temp registers  */
+;/*    are going to get slicked by a function call anyway.                 */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_schedule                   Thread scheduling loop        */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ThreadX components                                                  */
+;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
 ;{

@@ -1,40 +1,40 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module Interface (API)                                              */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Interface (API)                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
-/*                                                                        */ 
-/*    txm_module_port.h                               Cortex-A7/MMU/IAR   */ 
+/**************************************************************************/
+/*                                                                        */
+/*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
+/*                                                                        */
+/*    txm_module_port.h                               Cortex-A7/MMU/IAR   */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This file defines the basic module constants, interface structures, */ 
-/*    and function prototypes.                                            */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This file defines the basic module constants, interface structures, */
+/*    and function prototypes.                                            */
 /*                                                                        */
 /**************************************************************************/
 
@@ -46,13 +46,13 @@
 #ifdef TXM_MODULE_INCLUDE_USER_DEFINE_FILE
 
 
-/* Yes, include the user defines in txm_module_user.h. The defines in this file may 
+/* Yes, include the user defines in txm_module_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "txm_module_user.h"
 #endif
 
-/* It is assumed that the base ThreadX tx_port.h file has been modified to add the 
+/* It is assumed that the base ThreadX tx_port.h file has been modified to add the
   following extensions to the ThreadX thread control block (this code should replace
   the corresponding macro define in tx_port.h):
 
@@ -92,10 +92,10 @@ The following extensions must also be defined in tx_port.h:
 #endif
 
 /* Defined, this option enables the MMU hardware and requires memory protected
-   module objects to be allocated from the module manager object pool. 
-   If this is undefined, module objects can be created in the module's data area 
-   or in the module manager object pool. If this is not defined (MMU hardware 
-   is disabled), a module requiring memory protection will not run (the load 
+   module objects to be allocated from the module manager object pool.
+   If this is undefined, module objects can be created in the module's data area
+   or in the module manager object pool. If this is not defined (MMU hardware
+   is disabled), a module requiring memory protection will not run (the load
    functions will return a TXM_MODULE_INVALID_PROPERTIES error).
    Default setting for this value is defined.  */
 #define TXM_MODULE_MEMORY_PROTECTION_ENABLED
@@ -302,7 +302,7 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
     TXM_MODULE_MANAGER_MEMORY_FAULT_INFO    _txm_module_manager_memory_fault_info;
 
 /* Define the macro to check the stack available in dispatch.  */
-#define TXM_MODULE_MANAGER_CHECK_STACK_AVAILABLE 
+#define TXM_MODULE_MANAGER_CHECK_STACK_AVAILABLE
 
 
 /* Define the macro to check the code alignment.  */

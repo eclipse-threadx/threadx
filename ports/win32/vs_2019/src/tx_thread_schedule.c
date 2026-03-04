@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -31,42 +31,42 @@
 #include "tx_timer.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_schedule                               Win32/Visual      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_schedule                               Win32/Visual      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function waits for a thread control block pointer to appear in */ 
-/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-/*    in the variable, the corresponding thread is resumed.               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function waits for a thread control block pointer to appear in */
+/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+/*    in the variable, the corresponding thread is resumed.               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    ReleaseSemaphore                      Win32 release semaphore       */ 
-/*    ResumeThread                          Win32 resume thread           */ 
-/*    Sleep                                 Win32 thread sleep            */ 
-/*    WaitForSingleObject                   Win32 wait on a semaphore     */ 
-/*    _tx_win32_critical_section_obtain     Obtain critical section       */ 
-/*    _tx_win32_critical_section_release    Release critical section      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    ReleaseSemaphore                      Win32 release semaphore       */
+/*    ResumeThread                          Win32 resume thread           */
+/*    Sleep                                 Win32 thread sleep            */
+/*    WaitForSingleObject                   Win32 wait on a semaphore     */
+/*    _tx_win32_critical_section_obtain     Obtain critical section       */
+/*    _tx_win32_critical_section_release    Release critical section      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_schedule(VOID)
@@ -88,7 +88,7 @@ VOID   _tx_thread_schedule(VOID)
             /* Debug entry.  */
             _tx_win32_debug_entry_insert("SCHEDULE-wake_up", __FILE__, __LINE__);
 
-            /* Determine if there is a thread ready to execute AND all ISRs 
+            /* Determine if there is a thread ready to execute AND all ISRs
                are complete.  */
             if ((_tx_thread_execute_ptr != TX_NULL) && (_tx_thread_system_state == 0))
             {
@@ -106,8 +106,8 @@ VOID   _tx_thread_schedule(VOID)
                 Sleep(2);
             }
         }
-        
-        /* Yes! We have a thread to execute. Note that the critical section is already 
+
+        /* Yes! We have a thread to execute. Note that the critical section is already
            active from the scheduling loop above.  */
 
         /* Setup the current thread pointer.  */
@@ -163,12 +163,12 @@ TX_THREAD     *thread_ptr;
     /* Is the protection owned?  */
     if (critical_section -> tx_win32_critical_section_owner == GetCurrentThreadId())
     {
-    
+
         /* Simply increment the nested counter.  */
         critical_section -> tx_win32_critical_section_nested_count++;
     }
     else
-    {        
+    {
 
         /* Pickup the current thread pointer.  */
         thread_ptr =  _tx_thread_current_ptr;
@@ -177,12 +177,12 @@ TX_THREAD     *thread_ptr;
         while (WaitForSingleObject(critical_section -> tx_win32_critical_section_mutex_handle, 3) != WAIT_OBJECT_0)
         {
         }
-    
+
         /* At this point we have the mutex.  */
-    
+
         /* Increment the nesting counter.  */
         critical_section -> tx_win32_critical_section_nested_count =  1;
-    
+
         /* Remember the owner.  */
         critical_section -> tx_win32_critical_section_owner =  GetCurrentThreadId();
     }
@@ -196,25 +196,25 @@ void    _tx_win32_critical_section_release(TX_WIN32_CRITICAL_SECTION *critical_s
     /* Ensure the caller is the mutex owner.  */
     if (critical_section -> tx_win32_critical_section_owner == GetCurrentThreadId())
     {
-    
+
         /* Determine if there is protection.  */
         if (critical_section -> tx_win32_critical_section_nested_count)
         {
-    
+
             /* Decrement the nesting counter.  */
             critical_section -> tx_win32_critical_section_nested_count--;
-    
+
             /* Determine if the critical section is now being released.  */
             if (critical_section -> tx_win32_critical_section_nested_count == 0)
             {
-        
+
                 /* Yes, it is being released clear the owner.  */
                 critical_section -> tx_win32_critical_section_owner =  0;
 
                 /* Finally, release the mutex.  */
                 if (ReleaseMutex(critical_section -> tx_win32_critical_section_mutex_handle) != TX_TRUE)
                 {
-                
+
                     /* Increment the system error counter.  */
                     _tx_win32_system_error++;
                 }
@@ -234,7 +234,7 @@ void    _tx_win32_critical_section_release(TX_WIN32_CRITICAL_SECTION *critical_s
     }
     else
     {
-    
+
         /* Increment the system error counter.  */
         _tx_win32_system_error++;
     }
@@ -247,14 +247,14 @@ void    _tx_win32_critical_section_release_all(TX_WIN32_CRITICAL_SECTION    *cri
     /* Ensure the caller is the mutex owner.  */
     if (critical_section -> tx_win32_critical_section_owner == GetCurrentThreadId())
     {
-    
+
         /* Determine if there is protection.  */
         if (critical_section -> tx_win32_critical_section_nested_count)
         {
-    
+
             /* Clear the nesting counter.  */
             critical_section -> tx_win32_critical_section_nested_count =  0;
-    
+
             /* Yes, it is being release clear the owner.  */
             critical_section -> tx_win32_critical_section_owner =  0;
 
@@ -265,7 +265,7 @@ void    _tx_win32_critical_section_release_all(TX_WIN32_CRITICAL_SECTION    *cri
                 /* Increment the system error counter.  */
                 _tx_win32_system_error++;
             }
-            
+
             /* Just in case, make sure there the mutex is not owned.  */
             while (ReleaseMutex(critical_section -> tx_win32_critical_section_mutex_handle) == TX_TRUE)
             {
@@ -277,7 +277,7 @@ void    _tx_win32_critical_section_release_all(TX_WIN32_CRITICAL_SECTION    *cri
     }
     else
     {
-    
+
         /* Increment the system error counter.  */
         _tx_win32_system_error++;
     }

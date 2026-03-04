@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread                                                              */
 @/**                                                                       */
@@ -39,10 +39,10 @@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
 @/*    _tx_thread_vectored_context_save                SMP/Cortex-A5/GNU   */
 @/*                                                           6.1          */
 @/*  AUTHOR                                                                */
@@ -50,33 +50,33 @@
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function saves the context of an executing thread in the       */ 
-@/*    beginning of interrupt processing.  The function also ensures that  */ 
-@/*    the system stack is used upon return to the calling ISR.            */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    ISRs                                                                */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*    This function saves the context of an executing thread in the       */
+@/*    beginning of interrupt processing.  The function also ensures that  */
+@/*    the system stack is used upon return to the calling ISR.            */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    ISRs                                                                */
+@/*                                                                        */
 @/**************************************************************************/
 @VOID  _tx_thread_vectored_context_save(VOID)
 @{
     .global _tx_thread_vectored_context_save
     .type _tx_thread_vectored_context_save,function
-_tx_thread_vectored_context_save: 
+_tx_thread_vectored_context_save:
 @
 @    /* Upon entry to this routine, it is assumed that IRQ interrupts are locked
 @       out, we are in IRQ mode, and all registers are intact.  */
@@ -127,7 +127,7 @@ _tx_thread_vectored_context_save:
     MOV     pc, lr                              @ Return to caller
 #endif
 @
-__tx_thread_not_nested_save: 
+__tx_thread_not_nested_save:
 @    }
 @
 @    /* Otherwise, not nested, check to see if a thread was running.  */
@@ -140,7 +140,7 @@ __tx_thread_not_nested_save:
     ADD     r1, r1, r12                         @ Build index into current thread ptr
     LDR     r0, [r1, #0]                        @ Pickup current thread pointer
     CMP     r0, #0                              @ Is it NULL?
-    BEQ     __tx_thread_idle_system_save        @ If so, interrupt occurred in 
+    BEQ     __tx_thread_idle_system_save        @ If so, interrupt occurred in
                                                 @   scheduling loop - nothing needs saving!
 @
 @    /* Note: Minimal context of interrupted thread is already saved.  */
@@ -172,11 +172,11 @@ __tx_thread_not_nested_save:
 @    else
 @    {
 @
-__tx_thread_idle_system_save: 
+__tx_thread_idle_system_save:
 @
 @    /* Interrupt occurred in the scheduling loop.  */
 @
-@    /* Not much to do here, just adjust the stack pointer, and return to IRQ 
+@    /* Not much to do here, just adjust the stack pointer, and return to IRQ
 @       processing.  */
 @
     MOV     r10, #0                             @ Clear stack limit

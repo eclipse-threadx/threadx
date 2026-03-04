@@ -57,8 +57,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             0, 0, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_0, 0xE);      /* Only allow core 0 for now */
@@ -71,8 +71,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             1, 1, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_1, 0x9);      /* Exclude core 2 and 1 */
@@ -85,8 +85,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             2, 2, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_2, 0xB);      /* Exclude core 3, 1 and 0 */
@@ -99,8 +99,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             3, 3, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
     status +=   tx_thread_smp_core_exclude(&thread_3, 0xE);      /* Exclude core  0 */
@@ -156,7 +156,7 @@ UINT    original_threshold;
 
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -169,7 +169,7 @@ UINT    original_threshold;
 
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -182,7 +182,7 @@ UINT    original_threshold;
 
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -195,7 +195,7 @@ UINT    original_threshold;
 
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_3) || (_tx_thread_execute_ptr[1] != &thread_0)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -206,21 +206,21 @@ UINT    original_threshold;
     /* Now suspend threads 3 and 1.  */
     status =  tx_thread_suspend(&thread_3);
     status += tx_thread_suspend(&thread_1);
-    
+
     /* Use preemption-threshold to test the rebalance routine.  */
     status += tx_thread_preemption_change(&thread_3, 2, &original_threshold);
 
     /* Move thread 0 back to core 0 and then allow core 1 again.  */
     status += tx_thread_smp_core_exclude(&thread_0, 0xE);
     status += tx_thread_smp_core_exclude(&thread_0, 0xC);
-    
+
     /* Make sure threads 1 defaults to core 1.  */
     status += tx_thread_smp_core_exclude(&thread_1, 0xD);
     status += tx_thread_smp_core_exclude(&thread_1, 0x9);
 
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != TX_NULL)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -233,7 +233,7 @@ UINT    original_threshold;
 
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -246,7 +246,7 @@ UINT    original_threshold;
 
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -259,7 +259,7 @@ UINT    original_threshold;
 
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -270,16 +270,16 @@ UINT    original_threshold;
     /* Suspend thread 2 and cause a rebalance of the execution list.  */
     status =  tx_thread_suspend(&thread_2);
 
-	/* With preemption-threshold disabled, thread_3 can not run since preemption-threshold is set to 0 and there is already a 
+	/* With preemption-threshold disabled, thread_3 can not run since preemption-threshold is set to 0 and there is already a
 	   zero priority thread running.  */
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD 
+#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 	/* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_3) || (_tx_thread_execute_ptr[1] != &thread_0)
-                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != &thread_1) || (_tx_thread_execute_ptr[3] != TX_NULL))
 #else
 	/* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
 #endif
 	{
 
@@ -292,14 +292,14 @@ UINT    original_threshold;
     status =  tx_thread_suspend(&thread_3);
     status += tx_thread_suspend(&thread_1);
 
-#ifndef TX_DISABLE_PREEMPTION_THRESHOLD 
+#ifndef TX_DISABLE_PREEMPTION_THRESHOLD
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != TX_NULL) || (_tx_thread_execute_ptr[1] != &thread_0)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
 #else
     /* Determine if the test was successful or there was an error.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != TX_NULL)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL)) 
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
 #endif
 	{
 
@@ -309,7 +309,7 @@ UINT    original_threshold;
     }
     else
     {
-    
+
         /* Successful test.  */
         printf("SUCCESS!\n");
         test_control_return(0);

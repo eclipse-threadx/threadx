@@ -19,7 +19,7 @@
 // r1:  Increment value (ignored if auto_increment != 0)
 void init_global_timer(unsigned int auto_increment, unsigned int increment_value)
 
-// Sets the comparator value for this CPU 
+// Sets the comparator value for this CPU
 void set_global_timer_comparator(unsigned int top, unsigned int bottom);
 
 // Starts the private timer

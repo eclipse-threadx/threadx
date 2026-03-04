@@ -21,7 +21,7 @@
 #error "THREADX_MAJOR_VERSION"
 #endif /* Check THREADX_MAJOR_VERSION */
 
-#if defined(EXPECTED_MINOR_VERSION) && ( !defined(THREADX_MINOR_VERSION) || THREADX_MINOR_VERSION != EXPECTED_MINOR_VERSION) 
+#if defined(EXPECTED_MINOR_VERSION) && ( !defined(THREADX_MINOR_VERSION) || THREADX_MINOR_VERSION != EXPECTED_MINOR_VERSION)
 #error "THREADX_MINOR_VERSION"
 #endif /* Check THREADX_MINOR_VERSION */
 
@@ -64,7 +64,7 @@ TEST_FLAG               threadx_delete_timer_thread;
 #endif
 TX_TIMER_INTERNAL 	    **_timer_list_start_backup;
 TEST_FLAG               test_stack_analyze_flag;
-TEST_FLAG               test_initialize_flag; 
+TEST_FLAG               test_initialize_flag;
 TX_BLOCK_POOL           fake_block_pool;
 TX_BYTE_POOL            fake_byte_pool;
 TX_EVENT_FLAGS_GROUP    fake_event_flags;
@@ -236,7 +236,7 @@ void    test_application_define(void *first_unused_memory);
 
 /* Define the array of test entry points.  */
 
-TEST_ENTRY  test_control_tests[] = 
+TEST_ENTRY  test_control_tests[] =
 {
 #if CTEST
     test_application_define,
@@ -256,7 +256,7 @@ TEST_ENTRY  test_control_tests[] =
     threadx_byte_memory_thread_terminate_application_define,
     threadx_byte_memory_prioritize_application_define,
     threadx_byte_memory_thread_contention_application_define,
-    threadx_byte_memory_information_application_define, 
+    threadx_byte_memory_information_application_define,
 
     threadx_event_flag_basic_application_define,
     threadx_event_flag_suspension_application_define,
@@ -339,14 +339,14 @@ TEST_ENTRY  test_control_tests[] =
     threadx_thread_stack_checking_application_define,
 
     threadx_time_get_set_application_define,
-    
+
     threadx_timer_simple_application_define,
     threadx_timer_activate_deactivate_application_define,
     threadx_timer_deactivate_accuracy_application_define,
     threadx_timer_large_timer_accuracy_application_define,
     threadx_timer_multiple_application_define,
     threadx_timer_multiple_accuracy_application_define,
-    threadx_timer_information_application_define, 
+    threadx_timer_information_application_define,
 
     threadx_trace_basic_application_define,
 #endif
@@ -411,7 +411,7 @@ void test_interrupt_dispatch(void)
     if (test_isr_dispatch)
     {
 
-        (test_isr_dispatch)();    
+        (test_isr_dispatch)();
     }
 }
 
@@ -449,7 +449,7 @@ void main()
     /* Test the pre-initialize path through _tx_initialize_kernel_enter.  */
     _tx_thread_system_state =  TX_INITIALIZE_ALMOST_DONE;
     test_initialize_flag =     1;
-    
+
     /* Call the internal kernel enter function to exercise two paths.  */
     _tx_initialize_kernel_enter();
     _tx_thread_system_state =  0;
@@ -490,29 +490,29 @@ TX_THREAD   *thread_ptr;
     test_control_system_errors =     0;
 
     /* Setup a pointer to the first unused memory.  */
-    pointer =  (UCHAR *)   &test_control_memory[0];  //first_unused_memory; 
+    pointer =  (UCHAR *)   &test_control_memory[0];  //first_unused_memory;
 
     /* Create the test control thread.  */
-    tx_thread_create(&test_control_thread, "test control thread", test_control_thread_entry, 0,  
-            pointer, TEST_STACK_SIZE, 
+    tx_thread_create(&test_control_thread, "test control thread", test_control_thread_entry, 0,
+            pointer, TEST_STACK_SIZE,
             17, 15, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE;
 
     /* Create the test thread.  */
-    tx_thread_create(&test_thread, "test thread", test_thread_entry, 0,  
-            pointer, TEST_STACK_SIZE, 
+    tx_thread_create(&test_thread, "test thread", test_thread_entry, 0,
+            pointer, TEST_STACK_SIZE,
             15, 15, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE;
 
     /* Create the second test thread.  */
-    tx_thread_create(&test_thread1, "test thread 1", test_thread_entry1, 0,  
-            pointer, TEST_STACK_SIZE, 
+    tx_thread_create(&test_thread1, "test thread 1", test_thread_entry1, 0,
+            pointer, TEST_STACK_SIZE,
             15, 15, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE;
 
     /* Suspend the test thread temporarily.  */
     tx_thread_suspend(&test_thread);
-    
+
     /* Resume the test thread again to exercise the resume code fully.  */
     tx_thread_resume(&test_thread);
 
@@ -531,26 +531,26 @@ TX_THREAD   *thread_ptr;
     test_mutex_from_init += tx_mutex_get(&init_mutex_inherit, TX_NO_WAIT);
     test_mutex_from_init += tx_mutex_put(&init_mutex_inherit);
     test_mutex_from_init += tx_mutex_put(&init_mutex_inherit);
-    
+
 #ifndef TX_DISABLE_ERROR_CHECKING
 
     /* Test timer create from initialization.  */
     test_block_pool_create_init =  tx_block_pool_create(&init_block_pool, "init block pool", 10, init_block_pool_area, sizeof(init_block_pool_area));
-    
+
     /* Test byte pool create from initialization.  */
     test_byte_pool_create_init =   tx_byte_pool_create(&init_byte_pool, "init byte pool", init_byte_pool_area, sizeof(init_byte_pool_area));
     test_byte_pool_create_init +=  tx_byte_allocate(&init_byte_pool, (VOID **) &pointer, 20, TX_NO_WAIT);
     test_byte_pool_create_init +=  tx_byte_release(pointer);
-    
+
     /* Test event flag create from initialization.  */
     test_event_flags_from_init =  tx_event_flags_create(&init_event_flags, "init events");
-    
+
     /* Test queue create from initialization.  */
     test_queue_from_init =  tx_queue_create(&init_queue, "init queue", TX_1_ULONG, init_queue_area, sizeof(init_queue_area));
-        
+
     /* Test semaphore create from initialization.  */
     test_semaphore_from_init =  tx_semaphore_create(&init_semaphore, "init semaphore", 0);
-    
+
     /* Test timer creat from initialization.  */
     test_timer_create_init =  tx_timer_create(&init_timer, "init timer", init_timer_entry, 0x5678,
                         100, 200, TX_AUTO_ACTIVATE);
@@ -561,7 +561,7 @@ TX_THREAD   *thread_ptr;
 
     /* Remember the free memory pointer.  */
     test_free_memory_ptr =  &tests_memory[0]; //pointer;
-    
+
     /* Clear the ISR dispatch.  */
     test_isr_dispatch =  TX_NULL;
 
@@ -571,12 +571,12 @@ TX_THREAD   *thread_ptr;
     /* Test to make sure _tx_thread_time_slice can handle a none-ready thread.  */
     init_test_thread.tx_thread_state =                              TX_IO_DRIVER;
     init_test_thread.tx_thread_new_time_slice =                     0;
-    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;  
+    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;
     init_test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     init_test_thread.tx_thread_suspending =                         TX_TRUE;
-    _tx_thread_current_ptr =  &init_test_thread;                    
+    _tx_thread_current_ptr =  &init_test_thread;
     _tx_thread_time_slice();
-    
+
     /* Test to make sure _tx_thread_time_slice can handle preemption-threshold set.  */
     init_test_thread.tx_thread_state =                              TX_READY;
     init_test_thread.tx_thread_new_time_slice =                     0;
@@ -592,7 +592,7 @@ TX_THREAD   *thread_ptr;
     temp_thread =         _tx_thread_execute_ptr;
     _tx_thread_mutex_release =  TX_NULL;
     init_test_thread.tx_thread_state =                              TX_READY;
-    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;  
+    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;
     init_test_thread.tx_thread_new_time_slice =                     0;
     init_test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     init_test_thread.tx_thread_suspending =                         TX_FALSE;
@@ -601,15 +601,15 @@ TX_THREAD   *thread_ptr;
     _tx_thread_current_ptr =  &init_test_thread;
     _tx_thread_execute_ptr =  &init_test_thread;
     _tx_thread_entry_exit_notify(&init_test_thread, test_exit_notify);
-    _tx_thread_shell_entry();    
+    _tx_thread_shell_entry();
     _tx_thread_current_ptr =  TX_NULL;
     _tx_thread_execute_ptr =  temp_thread;
     _tx_thread_mutex_release =  temp_mutex_release;     /* Recover Mutex release pointer.  */
-    
+
     /* Test _tx_thread_system_suspend when not current, preemption is needed but disabled.  */
     temp_thread =         _tx_thread_execute_ptr;
     init_test_thread.tx_thread_state =                              TX_READY;
-    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;  
+    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;
     init_test_thread.tx_thread_new_time_slice =                     0;
     init_test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     init_test_thread.tx_thread_suspending =                         TX_FALSE;
@@ -619,13 +619,13 @@ TX_THREAD   *thread_ptr;
 #ifndef TX_NOT_INTERRUPTABLE
     _tx_thread_preempt_disable++;
 #endif
-    _tx_thread_system_suspend(&init_test_thread); 
+    _tx_thread_system_suspend(&init_test_thread);
     _tx_thread_execute_ptr =  temp_thread;
-    
+
     /* Test _tx_thread_system_resume when not current, suspending and in a COMPLETED state.  */
     temp_thread =         _tx_thread_execute_ptr;
     init_test_thread.tx_thread_state =                              TX_COMPLETED;
-    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;  
+    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;
     init_test_thread.tx_thread_new_time_slice =                     0;
     init_test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     init_test_thread.tx_thread_suspending =                         TX_TRUE;
@@ -633,14 +633,14 @@ TX_THREAD   *thread_ptr;
     init_test_thread.tx_thread_entry =                              test_thread_entry1;
     _tx_thread_preempt_disable++;
     _tx_thread_execute_ptr =  &init_test_thread;
-    _tx_thread_system_resume(&init_test_thread); 
+    _tx_thread_system_resume(&init_test_thread);
     _tx_thread_execute_ptr =  temp_thread;
 
-    
+
     /* Test _tx_thread_system_resume when not current, not suspending and already in a TX_READY state.  */
     temp_thread =         _tx_thread_execute_ptr;
     init_test_thread.tx_thread_state =                              TX_READY;
-    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;  
+    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;
     init_test_thread.tx_thread_new_time_slice =                     0;
     init_test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     init_test_thread.tx_thread_suspending =                         TX_FALSE;
@@ -648,13 +648,13 @@ TX_THREAD   *thread_ptr;
     init_test_thread.tx_thread_entry =                              test_thread_entry1;
     _tx_thread_preempt_disable++;
     _tx_thread_execute_ptr =  &init_test_thread;
-    _tx_thread_system_resume(&init_test_thread); 
+    _tx_thread_system_resume(&init_test_thread);
     _tx_thread_execute_ptr =  temp_thread;
 
     /* Test _tx_thread_system_resume when not current, suspending and in a TERMINATED state.  */
     temp_thread =         _tx_thread_execute_ptr;
     init_test_thread.tx_thread_state =                              TX_TERMINATED;
-    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;  
+    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;
     init_test_thread.tx_thread_new_time_slice =                     0;
     init_test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     init_test_thread.tx_thread_suspending =                         TX_TRUE;
@@ -662,9 +662,9 @@ TX_THREAD   *thread_ptr;
     init_test_thread.tx_thread_entry =                              test_thread_entry1;
     _tx_thread_preempt_disable++;
     _tx_thread_execute_ptr =  &init_test_thread;
-    _tx_thread_system_resume(&init_test_thread); 
+    _tx_thread_system_resume(&init_test_thread);
     _tx_thread_execute_ptr =  temp_thread;
-  
+
     /* Test tx_thread_resume to test the saved_thread_ptr being NULL.  */
     temp_thread =         _tx_thread_execute_ptr;
     _tx_thread_execute_ptr =  TX_NULL;
@@ -674,7 +674,7 @@ TX_THREAD   *thread_ptr;
 
     /* Test preemption change when the new priority is the same as the threshold.  */
     init_test_thread.tx_thread_state =                              TX_SUSPENDED;
-    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;  
+    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;
     init_test_thread.tx_thread_new_time_slice =                     0;
     init_test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     init_test_thread.tx_thread_suspending =                         TX_FALSE;
@@ -685,9 +685,9 @@ TX_THREAD   *thread_ptr;
     init_test_thread.tx_thread_preempt_threshold =                  10;
     init_test_thread.tx_thread_entry =                              test_thread_entry1;
     _tx_thread_preemption_change(&init_test_thread, 10, &old_preemption);
-    
+
 #ifndef TX_NOT_INTERRUPTABLE
-    
+
     /* Test semaphore cleanup with an invalid semaphore ID.  */
     init_test_thread.tx_thread_suspend_control_block =  (VOID *) &cleanup_semaphore;
     init_test_thread.tx_thread_suspend_cleanup =        &(_tx_semaphore_cleanup);
@@ -703,7 +703,7 @@ TX_THREAD   *thread_ptr;
     cleanup_semaphore.tx_semaphore_suspended_count =    0;
     init_test_thread.tx_thread_suspension_sequence =    0;
     _tx_semaphore_cleanup(&init_test_thread, 1);
-    
+
     /* Test semaphore cleanup with a NULL semaphore pointer.  */
     init_test_thread.tx_thread_suspend_control_block =  TX_NULL;
     init_test_thread.tx_thread_suspend_cleanup =        &(_tx_semaphore_cleanup);
@@ -751,7 +751,7 @@ TX_THREAD   *thread_ptr;
     cleanup_queue.tx_queue_suspended_count =            0;
     init_test_thread.tx_thread_suspension_sequence =    0;
     _tx_queue_cleanup(&init_test_thread, 1);
-    
+
     /* Test queue cleanup with an valid queue ID but a suspension count of 0.  */
     init_test_thread.tx_thread_suspend_control_block =  (VOID *) &cleanup_queue;
     init_test_thread.tx_thread_suspend_cleanup =        &(_tx_queue_cleanup);
@@ -791,7 +791,7 @@ TX_THREAD   *thread_ptr;
     cleanup_mutex.tx_mutex_suspended_count =            0;
     init_test_thread.tx_thread_suspension_sequence =    0;
     _tx_mutex_cleanup(&init_test_thread, 1);
-    
+
     /* Test mutex cleanup with an valid mutex ID but a suspension count of 0.  */
     init_test_thread.tx_thread_suspend_control_block =  (VOID *) &cleanup_mutex;
     init_test_thread.tx_thread_suspend_cleanup =        &(_tx_mutex_cleanup);
@@ -799,7 +799,7 @@ TX_THREAD   *thread_ptr;
     cleanup_mutex.tx_mutex_suspended_count =            0;
     init_test_thread.tx_thread_suspension_sequence =    0;
     _tx_mutex_cleanup(&init_test_thread, 0);
-    
+
     /* Test event flag cleanup with a NULL cleanup pointer.  */
     init_test_thread.tx_thread_suspend_control_block =  (VOID *) &cleanup_event_flags;
     init_test_thread.tx_thread_suspend_cleanup =        TX_NULL;
@@ -823,7 +823,7 @@ TX_THREAD   *thread_ptr;
     cleanup_event_flags.tx_event_flags_group_suspended_count =  0;
     init_test_thread.tx_thread_suspension_sequence =    0;
     _tx_event_flags_cleanup(&init_test_thread, 0);
-    
+
     /* Test event flag cleanup with an invalid suspension sequence.  */
     init_test_thread.tx_thread_suspend_control_block =  (VOID *) &cleanup_event_flags;
     init_test_thread.tx_thread_suspend_cleanup =        &(_tx_event_flags_cleanup);
@@ -839,7 +839,7 @@ TX_THREAD   *thread_ptr;
     cleanup_event_flags.tx_event_flags_group_suspended_count =  0;
     init_test_thread.tx_thread_suspension_sequence =    0;
     _tx_event_flags_cleanup(&init_test_thread, 0);
-    
+
     /* Test block pool cleanup with a NULL cleanup pointer.  */
     init_test_thread.tx_thread_suspend_control_block =  (VOID *) &cleanup_block_pool;
     init_test_thread.tx_thread_suspend_cleanup =        TX_NULL;
@@ -871,7 +871,7 @@ TX_THREAD   *thread_ptr;
     cleanup_block_pool.tx_block_pool_suspended_count =  0;
     init_test_thread.tx_thread_suspension_sequence =    0;
     _tx_block_pool_cleanup(&init_test_thread, 1);
-    
+
     /* Test block pool cleanup with an valid ID but a suspension count of 0.  */
     init_test_thread.tx_thread_suspend_control_block =  (VOID *) &cleanup_block_pool;
     init_test_thread.tx_thread_suspend_cleanup =        &(_tx_block_pool_cleanup);
@@ -911,7 +911,7 @@ TX_THREAD   *thread_ptr;
     cleanup_byte_pool.tx_byte_pool_suspended_count =    0;
     init_test_thread.tx_thread_suspension_sequence =    0;
     _tx_byte_pool_cleanup(&init_test_thread, 1);
-    
+
     /* Test byte pool cleanup with an valid ID but a suspension count of 0.  */
     init_test_thread.tx_thread_suspend_control_block =  (VOID *) &cleanup_byte_pool;
     init_test_thread.tx_thread_suspend_cleanup =        &(_tx_byte_pool_cleanup);
@@ -920,7 +920,7 @@ TX_THREAD   *thread_ptr;
     init_test_thread.tx_thread_suspension_sequence =    0;
     _tx_byte_pool_cleanup(&init_test_thread, 0);
 #endif
-    
+
 #ifndef TX_ENABLE_EVENT_TRACE
 
     /* Call ISR trace events when trace is not enabled.  */
@@ -945,10 +945,10 @@ TX_THREAD   *thread_ptr;
     _tx_timer_delete(&test_timer);
 
     /* Test the stack analyze function with a dummy thread.  */
-    
+
     /* Clear the test stack analyze flag.  */
     test_stack_analyze_flag =  0;
-    
+
     /* Make a fake thread with a fake stack.  */
     test_thread2.tx_thread_id =  TX_THREAD_ID;
 #if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
@@ -965,30 +965,30 @@ TX_THREAD   *thread_ptr;
         /* Set the fake thread stack to the fill pattern.  */
         test_thread2_stack[i] = TX_STACK_FILL;
     }
-    
+
     /* Setup index to last point.  */
     i =  (sizeof(test_thread2_stack)/sizeof(ULONG)) - 1;
-    
+
     /* Setup the stack start and end pointers.  */
     test_thread2.tx_thread_stack_start =        &(test_thread2_stack[0]);
     test_thread2.tx_thread_stack_end =          &(test_thread2_stack[i]);
     test_thread2.tx_thread_stack_size =         sizeof(test_thread2_stack);
     test_thread2.tx_thread_stack_highest_ptr =  test_thread2.tx_thread_stack_end;
     test_thread2.tx_thread_stack_ptr =          test_thread2.tx_thread_stack_start;
-    
+
     /* Fill 20 words of stack.  */
     for (j = 0; j < 20; j++)
     {
         /* Fill the stack with 0s.  */
         test_thread2_stack[i--] =  0;
     }
-            
+
     /* Call the analyze stack function.  */
     _tx_thread_stack_analyze(&test_thread2);
-    
+
     /* Call it again for no change coverage.  */
     _tx_thread_stack_analyze(&test_thread2);
-       
+
     /* Fill 99 words of stack.  */
     for (j = 0; j < 99; j++)
     {
@@ -998,40 +998,40 @@ TX_THREAD   *thread_ptr;
 
     /* Call the analyze stack function.  */
     _tx_thread_stack_analyze(&test_thread2);
-    
+
     /* Call it again for no change coverage.  */
     _tx_thread_stack_analyze(&test_thread2);
 
 #ifndef TX_MANUAL_TEST
-    
+
     /* Now set the flag to 1 to cause the thread ID to be cleared.  */
     test_stack_analyze_flag =  1;
-    
+
     /* Call stack analyze with an ID that is cleared in the middle.  */
     _tx_thread_stack_analyze(&test_thread2);
-    
+
     /* Restore the ID.  */
     test_thread2.tx_thread_id =  TX_THREAD_ID;
-    
+
     /* Now set the flag to 2 to cause the stack ptr to be equal to the start of the stack.  */
     test_stack_analyze_flag =  2;
-    
+
     /* Call stack analyze with an ID that is cleared in the middle.  */
     _tx_thread_stack_analyze(&test_thread2);
     test_thread2.tx_thread_stack_highest_ptr =  test_thread2.tx_thread_stack_end;
 
     /* Now set the flag to 3 to cause the stack pointer to not have the fill pattern.  */
     test_stack_analyze_flag =  3;
-    
+
     /* Call stack analyze with an ID that is cleared in the middle.  */
     _tx_thread_stack_analyze(&test_thread2);
 #endif
-    
+
     /* Test error condition on _tx_queue_flush.  */
     test_queue.tx_queue_enqueued =         1;
     test_queue.tx_queue_suspended_count =  1;
     test_queue.tx_queue_suspension_list =  TX_NULL;
-    
+
     /* Call _tx_queue_flush to test the thread NULL check.  */
     _tx_queue_flush(&test_queue);
 
@@ -1042,8 +1042,8 @@ TX_THREAD   *thread_ptr;
 
     /* Increment the preempt disable flag.  */
     _tx_thread_preempt_disable++;
-  
-    /* Build a thread control block with fake info.  */  
+
+    /* Build a thread control block with fake info.  */
     test_thread3.tx_thread_suspending =                         TX_TRUE;
     test_thread3.tx_thread_state =                              TX_SUSPENDED;
     test_thread3.tx_thread_delayed_suspend =                    TX_FALSE;
@@ -1060,25 +1060,25 @@ TX_THREAD   *thread_ptr;
 
     /* Increment the preempt disable flag.  */
     _tx_thread_preempt_disable++;
-    
+
     /* Test block pool suspenson safeguard.  */
     fake_block_pool.tx_block_pool_available =  0;
     status =  _tx_block_allocate(&fake_block_pool, (VOID **) &pointer, TX_WAIT_FOREVER);
     if (status != TX_NO_MEMORY)
-        test_control_system_errors++;    
+        test_control_system_errors++;
 
     /* Test byte pool suspension safeguard.  */
     fake_byte_pool.tx_byte_pool_fragments =  2;
     fake_byte_pool.tx_byte_pool_available =  0;
     status =  _tx_byte_allocate(&fake_byte_pool, (VOID **) &pointer, 1000, TX_WAIT_FOREVER);
     if (status != TX_NO_MEMORY)
-        test_control_system_errors++;    
+        test_control_system_errors++;
 
     /* Test event flags suspension safeguard.  */
     fake_event_flags.tx_event_flags_group_current =  0;
     status =  _tx_event_flags_get(&fake_event_flags, 1, TX_AND, &flags, TX_WAIT_FOREVER);
     if (status != TX_NO_EVENTS)
-        test_control_system_errors++;    
+        test_control_system_errors++;
 
     /* Test mutex suspension safeguard.  */
     fake_mutex.tx_mutex_ownership_count =  1;
@@ -1086,31 +1086,31 @@ TX_THREAD   *thread_ptr;
     fake_mutex.tx_mutex_owner =  &init_test_thread;
     status =  _tx_mutex_get(&fake_mutex, TX_WAIT_FOREVER);
     if (status != TX_NOT_AVAILABLE)
-        test_control_system_errors++;    
+        test_control_system_errors++;
 
     /* Test queue front send suspension safeguard.  */
     fake_queue.tx_queue_available_storage =  0;
     status =  _tx_queue_front_send(&fake_queue, (VOID *) pointer, TX_WAIT_FOREVER);
     if (status != TX_QUEUE_FULL)
-        test_control_system_errors++;    
-    
+        test_control_system_errors++;
+
     /* Test queue receive suspension safeguard.  */
     fake_queue.tx_queue_enqueued =  0;
     status =  _tx_queue_receive(&fake_queue, (VOID **) &pointer, TX_WAIT_FOREVER);
     if (status != TX_QUEUE_EMPTY)
-        test_control_system_errors++;    
+        test_control_system_errors++;
 
     /* Test queue send suspension safeguard.  */
     fake_queue.tx_queue_available_storage =  0;
     status =  _tx_queue_send(&fake_queue, (VOID *) pointer, TX_WAIT_FOREVER);
     if (status != TX_QUEUE_FULL)
-        test_control_system_errors++;    
-        
+        test_control_system_errors++;
+
     /* Test semaphore suspension safeguard.  */
     fake_semaphore.tx_semaphore_count =  0;
     status =  _tx_semaphore_get(&fake_semaphore, TX_WAIT_FOREVER);
     if (status != TX_NO_INSTANCE)
-        test_control_system_errors++;    
+        test_control_system_errors++;
 
     /* Test thread sleep suspension safeguard.  */
     _tx_thread_current_ptr =  &init_test_thread;
@@ -1118,24 +1118,24 @@ TX_THREAD   *thread_ptr;
     _tx_thread_system_state =  0;
     status =  _tx_thread_sleep(10);
     if (status != TX_CALLER_ERROR)
-        test_control_system_errors++;    
+        test_control_system_errors++;
 
     /* Test thread suspend suspension safeguard.  */
     init_test_thread.tx_thread_state =  TX_READY;
     status =  _tx_thread_suspend(&init_test_thread);
     if (status != TX_SUSPEND_ERROR)
-        test_control_system_errors++;    
+        test_control_system_errors++;
     _tx_thread_system_state =  temp;
     _tx_thread_current_ptr =  TX_NULL;
 
-    
+
     /* Decrement the preempt disable flag.  */
     _tx_thread_preempt_disable--;
 }
 
 
 
-/* Define the test control thread.  This thread is responsible for dispatching all of the 
+/* Define the test control thread.  This thread is responsible for dispatching all of the
    tests in the ThreadX test suite.  */
 
 void  test_control_thread_entry(ULONG thread_input)
@@ -1174,7 +1174,7 @@ UINT    i;
 
         /* Suspend control test to allow test to run.  */
         tx_thread_suspend(&test_control_thread);
-    
+
         /* Test finished, cleanup in preparation for the next test.  */
         test_control_cleanup();
     }
@@ -1186,7 +1186,7 @@ UINT    i;
     exit(test_control_failed_tests + test_control_system_errors);
 #else
     external_exit(test_control_failed_tests + test_control_system_errors);
-#endif 
+#endif
 }
 
 
@@ -1210,11 +1210,11 @@ UINT    old_posture =  TX_INT_ENABLE;
         test_control_successful_tests++;
 
     /* Now check for system errors.  */
-    
+
     /* Is preempt disable flag set?  */
     if (_tx_thread_preempt_disable)
     {
-    
+
         /* System error - preempt disable should never be set inside of a thread!  */
         printf("    ***** SYSTEM ERROR ***** _tx_thread_preempt_disable is non-zero!\n");
         test_control_system_errors++;
@@ -1223,16 +1223,16 @@ UINT    old_posture =  TX_INT_ENABLE;
     /* Is system state set?  */
     if (_tx_thread_system_state)
     {
-    
+
         /* System error - system state should never be set inside of a thread!  */
         printf("    ***** SYSTEM ERROR ***** _tx_thread_system_state is non-zero!\n");
         test_control_system_errors++;
     }
 
-    /* Are interrupts disabled?  */    
+    /* Are interrupts disabled?  */
     if (old_posture == TX_INT_DISABLE)
     {
-    
+
         /* System error - interrupts should alwasy be enabled in our test threads!  */
         printf("    ***** SYSTEM ERROR ***** test returned with interrupts disabled!\n");
         test_control_system_errors++;
@@ -1383,18 +1383,18 @@ void  test_thread_entry(ULONG thread_input)
     /* Suspend this thread but with preemption disabled, so we will actually return.  */
     _tx_thread_preempt_disable++;
     tx_thread_suspend(&test_thread);
-    
+
     /* Now perform a fake thread resume to cause preemption and exercise the path in _tx_thread_system_resume that returns to the scheduler.  */
     init_test_thread.tx_thread_state =                              TX_TERMINATED;
-    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;  
+    init_test_thread.tx_thread_suspend_cleanup =                    TX_NULL;
     init_test_thread.tx_thread_new_time_slice =                     0;
     init_test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     init_test_thread.tx_thread_suspending =                         TX_TRUE;
     init_test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     init_test_thread.tx_thread_entry =                              test_thread_entry1;
-    _tx_thread_system_resume(&init_test_thread); 
+    _tx_thread_system_resume(&init_test_thread);
 
-    /* We should not get back here!  */    
+    /* We should not get back here!  */
 }
 
 
@@ -1409,7 +1409,7 @@ void   test_exit_notify(TX_THREAD *thread_ptr, UINT type)
 {
 
     /* Clear the suspending flag to short-circuit the suspension.  */
-    thread_ptr -> tx_thread_suspending = TX_FALSE;   
+    thread_ptr -> tx_thread_suspending = TX_FALSE;
 }
 
 

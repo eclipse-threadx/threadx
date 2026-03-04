@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -79,7 +79,7 @@ INT pthread_once (pthread_once_t * once_control, VOID (*init_routine) (VOID))
     }
     else
     {
-        if ( once_control->state==PTH_ONCE_DONE) 
+        if ( once_control->state==PTH_ONCE_DONE)
         {
             result = 0;
         }
@@ -101,7 +101,7 @@ INT pthread_once (pthread_once_t * once_control, VOID (*init_routine) (VOID))
             once_control->state=PTH_ONCE_DONE;
         }
 
-        /* enable preemption */   
+        /* enable preemption */
         tx_thread_preemption_change( tx_thread_identify(),old_treshold, &temp);
 
         if (once_control->state==PTH_ONCE_STARTED)

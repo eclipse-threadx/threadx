@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -135,14 +135,14 @@ __tx_timer_no_time_slice:
     MOV.L   [R2+], R1                            ; pickup timer list entry, _tx_timer_current_ptr++
     CMP     #0, R1                               ; Is timer pointer NULL?
     BEQ     __tx_timer_no_timer                  ; Yes, no timer has expired
-        
+
 ;
 ;        /* Set expiration flag.  */
 ;        _tx_timer_expired =  TX_TRUE;
 ;
     MOV.L   #__tx_timer_expired,R2               ; Build address of expired flag
     MOV.L   #1, R1                               ; Build expired value
-    MOV.L   R1, [R2]    
+    MOV.L   R1, [R2]
     BRA     __tx_timer_done                      ; Finished with timer processing
 ;
 ;    }
@@ -153,7 +153,7 @@ __tx_timer_no_timer:
 ;        /* No timer expired, increment the timer pointer.  */
 ;        _tx_timer_current_ptr++;
 ;
-;       /* R2 already contains __tx_timer_current_ptr++ */                         
+;       /* R2 already contains __tx_timer_current_ptr++ */
 ;
 ;        /* Check for wrap-around.  */
 ;        if (_tx_timer_current_ptr == _tx_timer_list_end)
@@ -172,9 +172,9 @@ __tx_timer_no_timer:
 ;    }
 ;
 __tx_timer_skip_wrap:
-    MOV.L   #__tx_timer_current_ptr,R1     
+    MOV.L   #__tx_timer_current_ptr,R1
     MOV.L   R2, [R1]                             ; Store in updated pointer in  _tx_timer_current_ptr
-    
+
 __tx_timer_done:
 ;
 ;    /* See if anything has expired.  */
@@ -208,14 +208,14 @@ __tx_timer_dont_activate:
 ;    /* Did time slice expire?  */
 ;    if (_tx_timer_expired_time_slice)
 ;    {
-; 
+;
     MOV.L   #__tx_timer_expired_time_slice, R1   ; Pickup time-slice expired flag addr
     MOV.L   [R1], R1                             ; Pickup actual flag
     CMP     #0,R1                                ; Has time-slice expired?
     BEQ      __tx_timer_not_ts_expiration        ; No, skip time-slice expiration
 ;
 ;        /* Time slice interrupted thread.  */
-;        _tx_thread_time_slice(); 
+;        _tx_thread_time_slice();
 
     BSR     __tx_thread_time_slice               ; Call time-slice processing
 

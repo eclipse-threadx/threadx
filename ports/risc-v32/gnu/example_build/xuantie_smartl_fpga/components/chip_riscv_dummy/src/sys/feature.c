@@ -295,7 +295,7 @@ void cpu_features_init(void)
 			while(1);
 		}
 		break;
-	case 0x8: 
+	case 0x8:
 		if (cpu_ver >= 0x0) {
 			rv_csr_clear(CSR_MXSTATUS, 0x1);
 			rv_csr_write(CSR_MISELECT,CSR_MNASTATUS);

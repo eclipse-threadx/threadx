@@ -9,7 +9,7 @@ delivers considerable integer and enhanced, energy-efficient floating-point comp
 
 Prerequisites
 - Install a XuanTie bare-metal GNU toolchain with riscv64-unknown-elf prefix
-- Download URL: https://www.xrvm.cn/community/download?versionId=4460156621967921152 
+- Download URL: https://www.xrvm.cn/community/download?versionId=4460156621967921152
 - Toolchain archive name: XuanTie-900-gcc-elf-newlib-x86_64-V3.2.0-20250627.tar.gz
 
 Verify the toolchain:

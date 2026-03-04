@@ -23,7 +23,7 @@
 #define MSTATUS_FS		    (1L << 13)
 
 // Machine-mode Interrupt Enable
-#define MIE_MTIE		(1L << 7)  
+#define MIE_MTIE		(1L << 7)
 #define MIE_MSIE		(1L << 3)
 #define MIE_MEIE		(1L << 11)
 #define MIE_STIE 		(1L << 5)  // supervisor timer

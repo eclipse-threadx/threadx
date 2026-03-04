@@ -1,5 +1,5 @@
 /* This is a small demo of the high-performance ThreadX kernel.  It includes examples of eight
-   threads of different priorities, using a message queue, semaphore, mutex, event flags group, 
+   threads of different priorities, using a message queue, semaphore, mutex, event flags group,
    byte pool, and block pool. Please refer to Chapter 6 of the ThreadX User Guide for a complete
    description of this demonstration.  */
 
@@ -69,7 +69,7 @@ void    thread_6_and_7_entry(ULONG thread_input);
 
 int main()
 {
-    
+
     /* Please refer to Chapter 6 of the ThreadX User Guide for a complete
        description of this demonstration.  */
 
@@ -102,91 +102,91 @@ CHAR    *pointer;
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
 
     /* Create the main thread.  */
-    tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, DEMO_STACK_SIZE,
             1, 1, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* Allocate secure stack space for thread.  */
     tx_thread_secure_stack_allocate(&thread_0,256);
-    
+
     /* Allocate the stack for thread 1.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
 
-    /* Create threads 1 and 2. These threads pass information through a ThreadX 
+    /* Create threads 1 and 2. These threads pass information through a ThreadX
        message queue.  It is also interesting to note that these threads have a time
        slice.  */
-    tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, DEMO_STACK_SIZE,
             16, 16, 4, TX_AUTO_START);
 
     /* Allocate secure stack space for thread.  */
     tx_thread_secure_stack_allocate(&thread_1,256);
-    
+
     /* Allocate the stack for thread 2.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
 
-    tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, DEMO_STACK_SIZE,
             16, 16, 4, TX_AUTO_START);
 
     /* Allocate secure stack space for thread.  */
     tx_thread_secure_stack_allocate(&thread_2,256);
-    
+
     /* Allocate the stack for thread 3.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
 
-    /* Create threads 3 and 4.  These threads compete for a ThreadX counting semaphore.  
+    /* Create threads 3 and 4.  These threads compete for a ThreadX counting semaphore.
        An interesting thing here is that both threads share the same instruction area.  */
-    tx_thread_create(&thread_3, "thread 3", thread_3_and_4_entry, 3,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_3, "thread 3", thread_3_and_4_entry, 3,
+            pointer, DEMO_STACK_SIZE,
             8, 8, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* Allocate secure stack space for thread.  */
     tx_thread_secure_stack_allocate(&thread_3,256);
-    
+
     /* Allocate the stack for thread 4.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
 
-    tx_thread_create(&thread_4, "thread 4", thread_3_and_4_entry, 4,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_4, "thread 4", thread_3_and_4_entry, 4,
+            pointer, DEMO_STACK_SIZE,
             8, 8, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* Allocate secure stack space for thread.  */
     tx_thread_secure_stack_allocate(&thread_4,256);
-    
+
     /* Allocate the stack for thread 5.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
 
     /* Create thread 5.  This thread simply pends on an event flag which will be set
        by thread_0.  */
-    tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,
+            pointer, DEMO_STACK_SIZE,
             4, 4, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* Allocate secure stack space for thread.  */
     tx_thread_secure_stack_allocate(&thread_5,256);
-    
+
     /* Allocate the stack for thread 6.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
 
     /* Create threads 6 and 7.  These threads compete for a ThreadX mutex.  */
-    tx_thread_create(&thread_6, "thread 6", thread_6_and_7_entry, 6,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_6, "thread 6", thread_6_and_7_entry, 6,
+            pointer, DEMO_STACK_SIZE,
             8, 8, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* Allocate secure stack space for thread.  */
     tx_thread_secure_stack_allocate(&thread_6,256);
-    
+
     /* Allocate the stack for thread 7.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
 
-    tx_thread_create(&thread_7, "thread 7", thread_6_and_7_entry, 7,  
-            pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&thread_7, "thread 7", thread_6_and_7_entry, 7,
+            pointer, DEMO_STACK_SIZE,
             8, 8, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* Allocate secure stack space for thread.  */
     tx_thread_secure_stack_allocate(&thread_7,256);
-    
+
     /* Allocate the message queue.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_QUEUE_SIZE*sizeof(ULONG), TX_NO_WAIT);
 
@@ -226,9 +226,9 @@ void    thread_0_entry(ULONG thread_input)
 {
 UINT    status;
 INT     test_secure;
-    
+
     (VOID)thread_input;     /* unused parameter. */
-    
+
     #if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE)
     /* Secure call and callback example.
        Only to be used when not running in a single mode. */
@@ -236,7 +236,7 @@ INT     test_secure;
     test_secure = func2(callbackA, test_secure);
     tx_thread_secure_stack_free(&thread_0);
     #endif
-    
+
     /* This thread simply sits in while-forever-sleep loop.  */
     while(1)
     {
@@ -263,7 +263,7 @@ void    thread_1_entry(ULONG thread_input)
 UINT    status;
 
     (VOID)thread_input;     /* unused parameter. */
-    
+
     /* This thread simply sends messages to a queue shared by thread 2.  */
     while(1)
     {
@@ -290,7 +290,7 @@ ULONG   received_message;
 UINT    status;
 
     (VOID)thread_input;     /* unused parameter. */
-    
+
     /* This thread retrieves messages placed on the queue by thread 1.  */
     while(1)
     {
@@ -301,11 +301,11 @@ UINT    status;
         /* Retrieve a message from the queue.  */
         status = tx_queue_receive(&queue_0, &received_message, TX_WAIT_FOREVER);
 
-        /* Check completion status and make sure the message is what we 
+        /* Check completion status and make sure the message is what we
            expected.  */
         if ((status != TX_SUCCESS) || (received_message != thread_2_messages_received))
             break;
-        
+
         /* Otherwise, all is okay.  Increment the received message count.  */
         thread_2_messages_received++;
     }
@@ -316,7 +316,7 @@ void    thread_3_and_4_entry(ULONG thread_input)
 {
 
 UINT    status;
-    
+
     /* This function is executed from thread 3 and thread 4.  As the loop
        below shows, these function compete for ownership of semaphore_0.  */
     while(1)
@@ -355,7 +355,7 @@ UINT    status;
 ULONG   actual_flags;
 
     (VOID)thread_input;     /* unused parameter. */
-    
+
     /* This thread simply waits for an event in a forever loop.  */
     while(1)
     {
@@ -364,7 +364,7 @@ ULONG   actual_flags;
         thread_5_counter++;
 
         /* Wait for event flag 0.  */
-        status =  tx_event_flags_get(&event_flags_0, 0x1, TX_OR_CLEAR, 
+        status =  tx_event_flags_get(&event_flags_0, 0x1, TX_OR_CLEAR,
                                                 &actual_flags, TX_WAIT_FOREVER);
 
         /* Check status.  */
@@ -417,7 +417,7 @@ UINT    status;
         if (status != TX_SUCCESS)
             break;
 
-        /* Release the mutex again.  This will actually 
+        /* Release the mutex again.  This will actually
            release ownership since it was obtained twice.  */
         status =  tx_mutex_put(&mutex_0);
 

@@ -75,14 +75,14 @@ ULONG   actual_events;
     /* Determine if calling event flag create from initialization was successful.  */
     if (test_event_flags_from_init != TX_SUCCESS)
     {
-    
+
         /* Error!  */
         error++;
     }
 
     /* Attempt to create an event flag group from a timer.  */
     status =  tx_event_flags_create(&group_2, "group 2");
-    
+
         /* Check status.  */
     if (status != TX_CALLER_ERROR)
     {
@@ -185,8 +185,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -198,8 +198,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -213,7 +213,7 @@ CHAR    *pointer;
 
      /* Create event flag group 0 and 1.  */
     status =  tx_event_flags_create(&group_0, "group 0");
- 
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -231,7 +231,7 @@ CHAR    *pointer;
         printf("Running Event Flag Basic Test....................................... ERROR #4\n");
         test_control_return(1);
     }
-    
+
     /* Register the event set notify function.  */
     status =  tx_event_flags_set_notify(&group_0, event_set_notify);
 
@@ -278,7 +278,7 @@ CHAR    *pointer;
         test_control_return(1);
     }
 #endif
- 
+
 }
 
 
@@ -300,11 +300,11 @@ ULONG   actual_events;
     event_flag_memory.second =       0x55667788;
     event_flag_memory.next_to_last = 0x99aabbcc;
     event_flag_memory.last =         0xddeeff00;
-    
+
     /* Create the event flag group.  */
     status =  tx_event_flags_create(&event_flag_memory.event_flags, "group memory");
     tx_event_flags_delete(&event_flag_memory.event_flags);
-    
+
     /* Check for status.  */
     if ((status != TX_SUCCESS) ||
         (event_flag_memory.first != 0x11223344) ||
@@ -312,7 +312,7 @@ ULONG   actual_events;
         (event_flag_memory.next_to_last != 0x99aabbcc) ||
         (event_flag_memory.last != 0xddeeff00))
     {
-    
+
         /* Event flag error.  */
         printf("ERROR #7\n");
         test_control_return(1);
@@ -324,7 +324,7 @@ ULONG   actual_events;
 
     /* Try to create with a NULL pointer.  */
     status =  tx_event_flags_create(TX_NULL, "group 0");
- 
+
     /* Check status.  */
     if (status != TX_GROUP_ERROR)
     {
@@ -333,10 +333,10 @@ ULONG   actual_events;
         printf("ERROR #8\n");
         test_control_return(1);
     }
-    
+
     /* Try to create with a bad size.  */
     status =  _txe_event_flags_create(&group_3, "group 3", (sizeof(TX_EVENT_FLAGS_GROUP)+1));
- 
+
     /* Check status.  */
     if (status != TX_GROUP_ERROR)
     {
@@ -345,10 +345,10 @@ ULONG   actual_events;
         printf("ERROR #9\n");
         test_control_return(1);
     }
-    
+
     /* Try to create an already created group.  */
     status =  tx_event_flags_create(&group_0, "group 0");
- 
+
     /* Check status.  */
     if (status != TX_GROUP_ERROR)
     {
@@ -369,7 +369,7 @@ ULONG   actual_events;
         printf("ERROR #11\n");
         test_control_return(1);
     }
-    
+
     /* Delete with a non-created pointer.  */
     group_2.tx_event_flags_group_id =  0;
     status =  tx_event_flags_delete(&group_2);
@@ -518,7 +518,7 @@ ULONG   actual_events;
         printf("ERROR #23\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to get events from an empty event flag group.  AND CLEAR option.  */
     status =  tx_event_flags_get(&group_0, 0x80008000, TX_AND_CLEAR, &actual_events, TX_NO_WAIT);
 
@@ -604,7 +604,7 @@ ULONG   actual_events;
         printf("ERROR #30\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to get events from event flag group.  AND CLEAR option.  */
     status =  tx_event_flags_get(&group_0, 0x80008000, TX_AND_CLEAR, &actual_events, TX_NO_WAIT);
 
@@ -691,7 +691,7 @@ ULONG   actual_events;
     /* Test for error.  */
     if ((error) || (timer_executed != 1) || (isr_executed != 1))
     {
-    
+
         /* Block memory error.  */
         printf("ERROR #36\n");
         test_control_return(1);
@@ -737,7 +737,7 @@ static void    thread_1_entry(ULONG thread_input)
     while(1)
     {
 
-        tx_thread_relinquish();    
+        tx_thread_relinquish();
     }
 }
 

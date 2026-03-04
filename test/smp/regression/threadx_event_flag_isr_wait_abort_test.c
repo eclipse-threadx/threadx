@@ -63,7 +63,7 @@ static volatile UINT miss_count = 0;
         condition_count++;
     }
 
-    /* 
+    /*
     It is possible for this test to get into a resonance condition in which
     the ISR never occurs while preemption is disabled (especially if the
     ISR is installed in the periodic timer interrupt handler, which is
@@ -85,10 +85,10 @@ static volatile UINT miss_count = 0;
         /* Abort the threads 1 and 2.  */
         status +=  tx_thread_wait_abort(&thread_0);
         status += tx_thread_wait_abort(&thread_1);
-        
+
         if (status == TX_SUCCESS)
         {
-        
+
             event_flags_wait_abort_counter++;
         }
     }
@@ -114,8 +114,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -127,8 +127,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -140,8 +140,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -155,7 +155,7 @@ CHAR    *pointer;
 
     /* Create event flags group.  */
     status =  tx_event_flags_create(&event_flags_0, "event_flags 0");
-    
+
     /* Check for status.  */
     if (status != TX_SUCCESS)
     {
@@ -174,10 +174,10 @@ CHAR    *pointer;
         printf("Running Event Flag Wait Abort from ISR Test......................... ERROR #5\n");
         test_control_return(1);
     }
-    
+
     /* Register the event set notify function.  */
     status =  tx_event_flags_set_notify(&event_flags_0, event_set_notify);
-    
+
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 
     /* Check status.  */
@@ -216,7 +216,7 @@ ULONG   actual;
     printf("Running Event Flag Wait Abort from ISR Test......................... ");
 
     /* Setup the test ISR.  */
-    test_isr_dispatch =  test_isr;  
+    test_isr_dispatch =  test_isr;
 
     /* Loop to exploit the probability window inside tx_event_flags_set call.  */
     while (condition_count < 40)
@@ -226,7 +226,7 @@ ULONG   actual;
         status =  tx_event_flags_get(&event_flags_0, 2, TX_OR_CLEAR, &actual, 4);
 
         /* Determine if we have an unexpected result.  */
-        if (status != TX_WAIT_ABORTED) 
+        if (status != TX_WAIT_ABORTED)
         {
 
             /* Test error!  */
@@ -253,7 +253,7 @@ ULONG   actual;
     }
 
     /* Setup the test ISR.  */
-    test_isr_dispatch =  TX_NULL;  
+    test_isr_dispatch =  TX_NULL;
 
     /* Let the other threads run once more...  */
     tx_thread_relinquish();
@@ -292,7 +292,7 @@ ULONG   actual;
         status =  tx_event_flags_get(&event_flags_0, 1, TX_OR_CLEAR, &actual, 4);
 
         /* Determine if we have an unexpected result.  */
-        if (status != TX_WAIT_ABORTED) 
+        if (status != TX_WAIT_ABORTED)
         {
 
             break;

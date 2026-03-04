@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -80,7 +80,7 @@ POSIX_TCB   *current_thread;
     /* Determine if the desired signal is valid.  */
     if ((signo < 0) || (signo > SIGRTMAX))
     {
-    
+
         /* Return an error.  */
         posix_set_pthread_errno(EINVAL);
         return(ERROR);
@@ -88,10 +88,10 @@ POSIX_TCB   *current_thread;
 
     /* Now pickup the current thread pointer.  */
     current_thread =  (POSIX_TCB *) tx_thread_identify();
-    
+
     /* Now index into the array of signal handlers and insert this one.  */
     current_thread -> signals.signal_func[signo] =  func;
-    
+
     /* Return success!  */
     return(OK);
 }

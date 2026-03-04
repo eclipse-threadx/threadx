@@ -1,4 +1,4 @@
-/* This test is designed to test simple memory byte pool creation, deletion, and 
+/* This test is designed to test simple memory byte pool creation, deletion, and
    allocates and releases.  */
 
 #include   <stdio.h>
@@ -84,7 +84,7 @@ CHAR    *pointer;
     /* Determine if calling byte pool create from initialization was successful.  */
     if (test_byte_pool_create_init != TX_SUCCESS)
     {
-    
+
         /* Error!  */
         error++;
     }
@@ -92,7 +92,7 @@ CHAR    *pointer;
     /* Attempt to create a byte pool from a timer.  */
     pointer =  (CHAR *) 0x30000;
     status =  tx_byte_pool_create(&pool_2, "pool 2", pointer, 108);
-    
+
         /* Check status.  */
     if (status != TX_CALLER_ERROR)
     {
@@ -138,14 +138,14 @@ CHAR    *pointer;
     /* Attempt to release byte memory from timer.  */
     pointer = (CHAR *) 0x30000;
     status =  tx_byte_release(pointer);
-    
+
     /* Check for error status!  */
     if (status != TX_CALLER_ERROR)
     {
-    
+
         /* Error!  */
         error++;
-    }    
+    }
 
     timer_executed =  1;
 #endif
@@ -209,14 +209,14 @@ UINT    status;
     /* Attempt to release byte memory from ISR.  */
     pointer = (CHAR *) 0x30000;
     status =  tx_byte_release(pointer);
-    
+
     /* Check for error status!  */
     if (status != TX_CALLER_ERROR)
     {
-    
+
         /* Error!  */
         error++;
-    }    
+    }
 
     isr_executed =  1;
 #endif
@@ -235,15 +235,15 @@ void    threadx_byte_memory_basic_application_define(void *first_unused_memory)
 UINT    status;
 CHAR    *pointer;
 
-    
+
     /* Put first available memory address into a character pointer.  */
     pointer =  (CHAR *) first_unused_memory;
 
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -290,44 +290,44 @@ CHAR    *pointer;
         printf("Running Byte Memory Basic Test...................................... ERROR #3a\n");
         test_control_return(1);
     }
-  
+
     /* Allocate first block.  */
     status +=  tx_byte_allocate(&pool_4, (VOID **) &block_0, 80, TX_NO_WAIT);
-    
+
     /* Save next search pointer.  */
     search_ptr_1 =  pool_4.tx_byte_pool_search;
-    
+
     /* Clear the allocatged memory.  */
     TX_MEMSET(block_0, 0, 80);
-    
+
     /* Allocate another block.  */
     status +=  tx_byte_allocate(&pool_4, (VOID **) &block_1, 80, TX_NO_WAIT);
-    
+
     /* Clear the allocated block.  */
     TX_MEMSET(block_1, 0, 80);
-    
+
     /* Allocate the third and final block.  */
     status +=  tx_byte_allocate(&pool_4, (VOID **) &block_2, 80, TX_NO_WAIT);
-      
+
     /* Clear the allocated block.  */
     TX_MEMSET(block_2, 0, 80);
 
     /* Release the first block.  */
     status +=  tx_byte_release(block_0);
-    
+
     /* Release the second block.  */
     status +=  tx_byte_release(block_1);
-    
+
     /* Manually move the search pointer to create the case where the search wraps and a merge happens on the search pointer
        necessitating its update.  */
     pool_4.tx_byte_pool_search  = search_ptr_1;         /* Point to the middle block.  */
 
     /* Allocate a larger block that will wrap the search and require moving as well as an update of the search pointer.  */
     status +=  tx_byte_allocate(&pool_4, (VOID **) &block_3, 120, TX_NO_WAIT);
-    
-    /* Clear the newly allocated block.  */    
+
+    /* Clear the newly allocated block.  */
     TX_MEMSET(block_3, 0, 120);
-    
+
     /* At this point, verify the search pointer was properly updated in the previous allocation.  */
     status +=  tx_byte_allocate(&pool_4, (VOID **) &block_4, 40, TX_NO_WAIT);   /* Should fail since search pointer is now invalid!  */
 
@@ -367,7 +367,7 @@ UCHAR   *save_search;
     byte_memory.second_middle= 0x61718191;
     byte_memory.next_to_last = 0x99aabbcc;
     byte_memory.last =         0xddeeff00;
-    
+
     /* Create the byte pool.  */
     status =  tx_byte_pool_create(&byte_memory.pool, "pool memory", &byte_memory.pool_area[0], (2048*sizeof(ULONG))/sizeof(ULONG));
     tx_byte_pool_delete(&byte_memory.pool);
@@ -477,7 +477,7 @@ UCHAR   *save_search;
         printf("ERROR #11\n");
         test_control_return(1);
     }
-    
+
     /* Test non-created pool pointer.  */
     pool_2.tx_byte_pool_id =  0;
     status = tx_byte_allocate(&pool_2, (VOID **) &pointer_1, 24, TX_NO_WAIT);
@@ -530,15 +530,15 @@ UCHAR   *save_search;
 
     /* Test NULL pointer release.  */
     status =  tx_byte_release(TX_NULL);
-    
+
     /* Check for error status!  */
     if (status != TX_PTR_ERROR)
     {
-    
+
         /* Byte memory error.  */
         printf("ERROR #16\n");
         test_control_return(1);
-    }    
+    }
 
     /* Allocate memory from the pool.  */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer_1, 24, TX_NO_WAIT);
@@ -599,30 +599,30 @@ UCHAR   *save_search;
 
     /* Test the byte release with a bad block pointer.  */
     status =  _tx_byte_release(TX_NULL);
-    
+
     /* Check for error status!  */
     if (status != TX_PTR_ERROR)
     {
-    
+
         /* Byte memory error.  */
         printf("ERROR #21\n");
         test_control_return(1);
-    }    
+    }
 
     /* Test another bad block release... no pool pointer!  */
     array[0] =  0;
     array[1] =  0;
     array[2] =  0;
     status =  _tx_byte_release(&array[2]);
-    
+
     /* Check for error status!  */
     if (status != TX_PTR_ERROR)
     {
-    
+
         /* Byte memory error.  */
         printf("ERROR #22\n");
         test_control_return(1);
-    }    
+    }
 
     /* Test another bad block release.... pool pointer is not a valid pool!  */
     array[0] =  0;
@@ -630,16 +630,16 @@ UCHAR   *save_search;
     array[2] =  0;
     array[3] =  0;
     status =  _tx_byte_release(&array[2]);
-    
+
     /* Check for error status!  */
     if (status != TX_PTR_ERROR)
     {
-    
+
         /* Byte memory error.  */
         printf("ERROR #22\n");
         test_control_return(1);
-    }    
-    
+    }
+
     /* Now release each of the blocks. */
     status =  tx_byte_release(pointer_1);
 
@@ -776,7 +776,7 @@ UCHAR   *save_search;
         test_control_return(1);
     }
 
-    /* Now allocate a block that should cause all of the blocks to merge 
+    /* Now allocate a block that should cause all of the blocks to merge
        together.  */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer_3, 88, TX_NO_WAIT);
 
@@ -813,9 +813,9 @@ UCHAR   *save_search;
         printf("ERROR #36\n");
         test_control_return(1);
     }
-    
+
     /* Now ensure the search pointer update in the byte search algorithm is updated.  */
-    
+
     /* Allocate memory from the pool.  */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer_1, 24, TX_NO_WAIT);
 
@@ -851,10 +851,10 @@ UCHAR   *save_search;
         printf("ERROR #39\n");
         test_control_return(1);
     }
-    
+
     /* Release the middle block.  */
-    status =  tx_byte_release(pointer_2);    
-    
+    status =  tx_byte_release(pointer_2);
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -883,7 +883,7 @@ UCHAR   *save_search;
     status =   tx_byte_release(pointer_3);
     status +=  tx_byte_release(pointer_2);
     status +=  tx_byte_release(pointer_1);
-    
+
     /* Move the search pointer to the third block to exercise that code in the byte search algorithm.  */
     pool_0.tx_byte_pool_search =  (UCHAR *) pointer_3-8;
 
@@ -898,8 +898,8 @@ UCHAR   *save_search;
         printf("ERROR #42\n");
         test_control_return(1);
     }
-    
-    
+
+
 #ifndef TX_DISABLE_ERROR_CHECKING
 
     /* Create a timer for the test.  */
@@ -917,14 +917,14 @@ UCHAR   *save_search;
     /* Test for error.  */
     if ((error) || (timer_executed != 1) || (isr_executed != 1))
     {
-    
+
         /* Byte memory error.  */
         printf("ERROR #43\n");
         test_control_return(1);
     }
 
 #endif
-    
+
     /* Delete both byte pools.  */
     status =  tx_byte_pool_delete(&pool_0);
 
@@ -950,7 +950,7 @@ UCHAR   *save_search;
 
     /* Delete pool 4.  */
     status =  tx_byte_pool_delete(&pool_4);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -959,10 +959,10 @@ UCHAR   *save_search;
         printf("ERROR #46\n");
         test_control_return(1);
     }
-    
+
     /* Create pool 4.  */
     status =  tx_byte_pool_create(&pool_4, "pool 4", pool_4_memory, 300);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -985,15 +985,15 @@ UCHAR   *save_search;
         printf("ERROR #48\n");
         test_control_return(1);
     }
-    
+
     /* At this point, there should be three allocated blocks and the reserved block at the end.  */
-    
+
     /* Now release all the blocks in reverse order. This should leave the search pointer at the last block.  */
     status =  tx_byte_release(pointer_3);
     save_search =  pool_4.tx_byte_pool_search;
     status += tx_byte_release(pointer_2);
     status += tx_byte_release(pointer_1);
-    
+
     /* Move the search pointer back to the last block.  */
     pool_4.tx_byte_pool_search =  save_search;
 
@@ -1004,12 +1004,12 @@ UCHAR   *save_search;
         /* Byte memory error.  */
         printf("ERROR #49\n");
         test_control_return(1);
-    }   
+    }
 
-    /* Now attempt to allocate a block that requires a merge, which should exercise the branch in byte search that does not 
+    /* Now attempt to allocate a block that requires a merge, which should exercise the branch in byte search that does not
        result in a search pointer change.  */
     status =  tx_byte_allocate(&pool_4, (VOID **) &pointer_1, 168, TX_NO_WAIT);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -1017,21 +1017,21 @@ UCHAR   *save_search;
         /* Byte memory error.  */
         printf("ERROR #50\n");
         test_control_return(1);
-    }      
-    
+    }
+
     /* Release the last block.  */
     status =  tx_byte_release(pointer_1);
-    
+
     /* Allocate all the blocks.  */
     status =  tx_byte_allocate(&pool_4, (VOID **) &pointer_1, 84, TX_NO_WAIT);
     status += tx_byte_allocate(&pool_4, (VOID **) &pointer_2, 84, TX_NO_WAIT);
     status += tx_byte_allocate(&pool_4, (VOID **) &pointer_3, 84, TX_NO_WAIT);
-    
+
     /* Release all of the blocks in order.  */
     status += tx_byte_release(pointer_1);
     status += tx_byte_release(pointer_2);
     status += tx_byte_release(pointer_3);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -1039,7 +1039,7 @@ UCHAR   *save_search;
         /* Byte memory error.  */
         printf("ERROR #50\n");
         test_control_return(1);
-    }      
+    }
 
     /* Now setup a special test to exercise the examine blocks equal to 0 path in the byte pool search.  */
     pool_4.tx_byte_pool_search =     save_search;
@@ -1047,7 +1047,7 @@ UCHAR   *save_search;
 
     /* Call byte allocate to execise the examine blocks equal to 0 path on non-merge block condition.  */
     status =  tx_byte_allocate(&pool_4, (VOID **) &pointer_1, 168, TX_NO_WAIT);
-    
+
     /* Check status.  */
     if (status != TX_NO_MEMORY)
     {
@@ -1055,8 +1055,8 @@ UCHAR   *save_search;
         /* Byte memory error.  */
         printf("ERROR #51\n");
         test_control_return(1);
-    }      
-    
+    }
+
     /* Successful test.  */
     printf("SUCCESS!\n");
     test_control_return(0);

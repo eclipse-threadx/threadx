@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -31,10 +31,10 @@
 ;#include "tx_timer.h"
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_context_save                         SMP/ARC_HS/MetaWare */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
@@ -42,32 +42,32 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function saves the context of an executing thread in the       */ 
-;/*    beginning of interrupt processing.  The function also ensures that  */ 
-;/*    the system stack is used upon return to the calling ISR.            */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                                                */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function saves the context of an executing thread in the       */
+;/*    beginning of interrupt processing.  The function also ensures that  */
+;/*    the system stack is used upon return to the calling ISR.            */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                                                */
+;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_save(VOID)
 ;{
     .global _tx_thread_context_save
-    .type   _tx_thread_context_save, @function 
+    .type   _tx_thread_context_save, @function
 _tx_thread_context_save:
 ;
 ;    /* Upon entry to this routine, it is assumed that an interrupt stack frame
@@ -90,7 +90,7 @@ _tx_thread_context_save:
     .endif
     asl     r3, r3, 2                                   ; Build index into core arrays
     mov     r0, _tx_thread_system_state                 ; Build address of system state
-    add     r1, r0, r3                                  ; 
+    add     r1, r0, r3                                  ;
     ld      r0, [r1]                                    ; Pickup system state
     breq    r0, 0, __tx_thread_not_nested_save          ; If 0, we are not in a nested
                                                         ;   condition
@@ -154,7 +154,7 @@ __tx_thread_not_nested_save:
     add     r0, r0, 1                                   ; Increment the nested interrupt count
     st      r0, [r1]                                    ; Update system state
     mov     r2, _tx_thread_current_ptr                  ; Build address of current thread pointer
-    add     r2, r2, r3                                  ; 
+    add     r2, r2, r3                                  ;
     ld      r1, [r2]                                    ; Pickup current thread pointer
     st      r12, [sp, 84]                               ; Save r12
     st      r11, [sp, 88]                               ; Save r11
@@ -204,7 +204,7 @@ __tx_thread_not_nested_save:
 ;    sp =  _tx_thread_system_stack_ptr[core];
 ;
     mov     r1, _tx_thread_system_stack_ptr             ; Build address of system stack pointer
-    add     r1, r1, r3                                  ; 
+    add     r1, r1, r3                                  ;
     j_s.d   [blink]                                     ; Return to calling ISR
     ld      sp, [r1]                                    ; Switch to system stack
 ;
@@ -236,11 +236,11 @@ __tx_thread_idle_system_save:
     and     r1, r0, r1                                  ; See if there are any other interrupts present
     brne    r0, r1, __tx_thread_nested_save             ; If more interrupts, go into the nested interrupt save logic
 ;
-;    /* Not much to do here, just adjust the stack pointer, and return to  
+;    /* Not much to do here, just adjust the stack pointer, and return to
 ;       ISR processing.  */
 ;
     j_s.d   [blink]                                     ; Return to ISR
-    add     sp, sp, 160                                 ; Recover stack space 
+    add     sp, sp, 160                                 ; Recover stack space
 ;
 ;    }
 ;}

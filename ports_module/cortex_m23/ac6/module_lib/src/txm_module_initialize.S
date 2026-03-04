@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -98,7 +98,7 @@ __rt_entry:
     LDM     r0,{r0-r1}
     BL      __rt_lib_init                       // Call ARM func to initialize library
     POP     {r0-r1}                             // Restore dregs and LR
-    MOV     r12, r0                             
+    MOV     r12, r0
     MOV     lr, r1
     POP     {r0-r7}
     MOV     r8, r0

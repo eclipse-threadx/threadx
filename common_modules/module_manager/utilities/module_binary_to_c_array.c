@@ -21,7 +21,7 @@ unsigned long   column;
 
 
     /* Determine if the proper number of files are provided.  */
-    if (argc != 3) 
+    if (argc != 3)
     {
 
         /* Print an error message out and wait for user key hit.  */
@@ -44,7 +44,7 @@ unsigned long   column;
         printf("            File: %s   ", argv[1]);
         return(2);
     }
-    
+
 	/* Determine if the binary file is a valid ThreadX module.  */
 	alpha =   fgetc(source_file);
 	alpha1 =  fgetc(source_file);
@@ -94,7 +94,7 @@ unsigned long   column;
 	address =  0;
 	column =   0;
 
-	do 
+	do
 	{
 
 		/* Get character from the input file.  */

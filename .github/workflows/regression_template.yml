@@ -56,7 +56,7 @@ jobs:
       issues: read
       checks: write
       pull-requests: write
-      
+
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -66,7 +66,7 @@ jobs:
       uses: actions/checkout@v4.2.2
       with:
         submodules: true
-    
+
     - name: Install softwares
       run: ${{ inputs.install_script }}
 
@@ -75,7 +75,7 @@ jobs:
 
     - name: Test
       run: ${{ inputs.test_script }}
-      
+
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2.11.0
       if: always()
@@ -83,7 +83,7 @@ jobs:
         check_name: Test Results ${{ inputs.result_affix }}
         files: |
           ${{ inputs.cmake_path }}/build/*/*.xml
-          
+
     - name: Upload Test Results
       if: success() || failure()
       uses: actions/upload-artifact@v4.6.2
@@ -93,7 +93,7 @@ jobs:
           ${{ inputs.cmake_path }}/build/*.txt
           ${{ inputs.cmake_path }}/build/*/Testing/**/*.xml
           ${{ inputs.cmake_path }}/build/**/regression/output_files/*.bin
-    
+
     - name: Configure GitHub Pages
       uses: actions/configure-pages@v5.0.0
 
@@ -158,7 +158,7 @@ jobs:
       if: (!inputs.skip_deploy && !inputs.skip_coverage)
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}
-  
+
   deploy_code_coverage:
     runs-on: ubuntu-latest
     if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && !failure() && !cancelled()
@@ -183,7 +183,7 @@ jobs:
       with:
         path: .
 
-    - name: Delete Duplicate Code Coverage Artifact 
+    - name: Delete Duplicate Code Coverage Artifact
       uses: geekyeggo/delete-artifact@v5.1.0
       with:
           name: coverage_report
@@ -195,7 +195,7 @@ jobs:
     - name: Write Code Coverage Report URL
       run: >-
         if [ "${{ inputs.deploy_list }}" != "" ]; then
-          for i in ${{ inputs.deploy_list }}; do            
+          for i in ${{ inputs.deploy_list }}; do
             echo 'Coverage report for ' $i ':${{ steps.deployment.outputs.page_url }}'$i >>  $GITHUB_STEP_SUMMARY
           done
         else

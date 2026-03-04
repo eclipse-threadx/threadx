@@ -11,7 +11,7 @@
 
 	Description:
 	------------
-	This file contains general definitions and API functions for TORNADO AMC 
+	This file contains general definitions and API functions for TORNADO AMC
 	modules SDK and must be included in the user C-application for
 	TORNADO AMC modules.
 

@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -132,10 +132,10 @@ UINT  _txm_module_manager_object_memory_check(TXM_MODULE_INSTANCE *module_instan
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  xx-xx-2025      William E. Lamie        Modified comment(s), and      */ 
-/*                                            removed module local memory */ 
-/*                                            check, resulting in         */ 
-/*                                            version 6.1x                */ 
+/*  xx-xx-2025      William E. Lamie        Modified comment(s), and      */
+/*                                            removed module local memory */
+/*                                            check, resulting in         */
+/*                                            version 6.1x                */
 /*                                                                        */
 /**************************************************************************/
 UCHAR _txm_module_manager_created_object_check(TXM_MODULE_INSTANCE *module_instance, VOID *object_ptr)
@@ -341,8 +341,8 @@ CHAR    object_name_char;
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function checks to make sure the object pointer for one of the */ 
-/*    creation APIs is valid.                                             */ 
+/*    This function checks to make sure the object pointer for one of the */
+/*    creation APIs is valid.                                             */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -352,8 +352,8 @@ CHAR    object_name_char;
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    TX_TRUE                           Valid object pointer              */ 
-/*    TX_FALSE                          Invalid object pointer            */ 
+/*    TX_TRUE                           Valid object pointer              */
+/*    TX_FALSE                          Invalid object pointer            */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -380,7 +380,7 @@ UINT    _txm_module_manager_param_check_object_for_creation(TXM_MODULE_INSTANCE 
         /* Object pointer is NULL, which is invalid.  */
         return(TX_FALSE);
     }
-  
+
     /* Determine if the object pointer is inside the module object pool.  */
     if (TXM_MODULE_MANAGER_ENSURE_INSIDE_OBJ_POOL(module_instance, object_ptr, object_size) == TX_FALSE)
     {
@@ -404,7 +404,7 @@ UINT    _txm_module_manager_param_check_object_for_creation(TXM_MODULE_INSTANCE 
         /* Object has already been created, which is invalid.  */
         return(TX_FALSE);
     }
-      
+
     /* Everything is okay with the object, return TX_TRUE.  */
     return(TX_TRUE);
 }
@@ -422,7 +422,7 @@ UINT    _txm_module_manager_param_check_object_for_creation(TXM_MODULE_INSTANCE 
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function checks to make sure the object pointer is valid.      */ 
+/*    This function checks to make sure the object pointer is valid.      */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -432,8 +432,8 @@ UINT    _txm_module_manager_param_check_object_for_creation(TXM_MODULE_INSTANCE 
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    TX_TRUE                           Valid object pointer              */ 
-/*    TX_FALSE                          Invalid object pointer            */ 
+/*    TX_TRUE                           Valid object pointer              */
+/*    TX_FALSE                          Invalid object pointer            */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -471,11 +471,11 @@ UINT    _txm_module_manager_param_check_object_for_use(TXM_MODULE_INSTANCE *modu
 
     /* Define application-specific object memory check.  */
 #ifdef TXM_MODULE_MANGER_APPLICATION_VALID_OBJECT_MEMORY_CHECK
-   
+
     /* Bring in the application-spefic objeft memory check, defined by the user.  */
     TXM_MODULE_MANGER_APPLICATION_VALID_OBJECT_MEMORY_CHECK
 #endif /* TXM_MODULE_MANGER_APPLICATION_VALID_OBJECT_MEMORY_ENABLE  */
-    
+
     /* Everything is okay with the object, return TX_TRUE.  */
     return(TX_TRUE);
 }

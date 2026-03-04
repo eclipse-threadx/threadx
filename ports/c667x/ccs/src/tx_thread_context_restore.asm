@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -43,41 +43,41 @@ SP          .set    B15
 ;
 ;
     .sect   ".text"
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_context_restore                          C667x/TI        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_context_restore                          C667x/TI        */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function restores the interrupt context if it is processing a  */ 
-;/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-;/*    if no thread was running, the function returns to the scheduler.    */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                  Interrupt Service Routines    */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function restores the interrupt context if it is processing a  */
+;/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+;/*    if no thread was running, the function returns to the scheduler.    */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_schedule                   Thread scheduling routine     */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                  Interrupt Service Routines    */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -99,20 +99,20 @@ _tx_thread_context_restore:
 ;    {
 ;
         MVKL        _tx_thread_system_state,A0          ; Build address of system state
-        MVKH        _tx_thread_system_state,A0          ; 
+        MVKH        _tx_thread_system_state,A0          ;
         LDW         *A0,A1                              ; Pickup system state variable
         MVKL        _tx_thread_current_ptr,A2           ; Build address of current thread ptr
         NOP         3                                   ; Delay slots
         SUB         A1,1,A1                             ; Decrement system state
  [!A1]  B           _tx_thread_not_nested_restore       ; If 0, not a nested restore
-        MVKH        _tx_thread_current_ptr,A2           ; 
+        MVKH        _tx_thread_current_ptr,A2           ;
         LDW         *A2,A3                              ; Pickup current thread pointer
         STW         A1,*A0                              ; Store system state
         NOP         2                                   ; Delay slots
 ;
 ;    /* Interrupts are nested.  */
 ;
-;    /* Just recover the saved registers and return to the point of 
+;    /* Just recover the saved registers and return to the point of
 ;       interrupt.  */
 ;
         LDW         *+SP(8),B0                          ; Recover saved CSR
@@ -196,19 +196,19 @@ _tx_thread_not_nested_restore:
         MV          A3,A1                               ; Move thread pointer into A1
  [!A1]  B           _tx_thread_schedule                 ; If null, idle system restore
         MVKL        _tx_thread_preempt_disable,A0       ; Build preempt disable flag address
-        MVKH        _tx_thread_preempt_disable,A0       ; 
+        MVKH        _tx_thread_preempt_disable,A0       ;
         MVKL        _tx_thread_execute_ptr,A4           ; Build execute thread pointer
-        MVKH        _tx_thread_execute_ptr,A4           ; 
+        MVKH        _tx_thread_execute_ptr,A4           ;
         LDW         *A0,B1                              ; Pickup preempt disable flag
 
-        LDW         *A4,A6                              ; Pickup next thread to execute 
+        LDW         *A4,A6                              ; Pickup next thread to execute
         NOP         4                                   ; Delay slot
         CMPEQ       A6,A1,A7                            ; Determine if threads are the same?
         ADD         A7,B1,B1                            ; Add results together
  [B1]   B           _tx_thread_no_preempt_restore       ; If set, skip preeemption
         LDW         *+A1(8),A6                          ; Recover thread's stack pointer
         MVKL        _tx_timer_time_slice,A5             ; Build time slice address
-        MVKH        _tx_timer_time_slice,A5             ; 
+        MVKH        _tx_timer_time_slice,A5             ;
         LDW         *A5,B1                              ; Pickup current time-slice
         NOP                                             ; Delay slot
 ;

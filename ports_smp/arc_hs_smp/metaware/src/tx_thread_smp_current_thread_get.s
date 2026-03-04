@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread - Low Level SMP Support                                      */
 ;/**                                                                       */
@@ -30,36 +30,36 @@
 ;#include "tx_timer.h"  */
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_smp_current_thread_get               SMP/ARC_HS/MetaWare */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_smp_current_thread_get               SMP/ARC_HS/MetaWare */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function is gets the current thread of the calling core.       */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function is gets the current thread of the calling core.       */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ThreadX Components                                                  */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ThreadX Components                                                  */
+;/*                                                                        */
 ;/**************************************************************************/
     .global _tx_thread_smp_current_thread_get
     .type   _tx_thread_smp_current_thread_get, @function
@@ -73,11 +73,11 @@ _tx_thread_smp_current_thread_get:
     .endif
     asl     r0, r0, 2                                   ; Build index into _tx_thread_current_ptr
     mov     r1, _tx_thread_current_ptr                  ; Build address of _tx_thread_current_ptr
-    add     r1, r1, r0                                  ; 
+    add     r1, r1, r0                                  ;
     ld      r0, [r1]                                    ; Pickup current thread for this core
     j_s.d   [blink]                                     ; Return to caller with delay slot
     seti    r2                                          ; Restore previous interrupt state
 
     .end
-    
+
 

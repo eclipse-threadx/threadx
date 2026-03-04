@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread                                                              */
 @/**                                                                       */
@@ -41,46 +41,46 @@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_schedule                             SMP/Cortex-A9/GNU   */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_schedule                             SMP/Cortex-A9/GNU   */
 @/*                                                           6.1          */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function waits for a thread control block pointer to appear in */ 
-@/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-@/*    in the variable, the corresponding thread is resumed.               */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*    This function waits for a thread control block pointer to appear in */
+@/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+@/*    in the variable, the corresponding thread is resumed.               */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
 @/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-@/*    _tx_thread_system_return             Return to system from thread   */ 
-@/*    _tx_thread_context_restore           Restore thread's context       */ 
-@/*                                                                        */ 
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+@/*    _tx_thread_system_return             Return to system from thread   */
+@/*    _tx_thread_context_restore           Restore thread's context       */
+@/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_schedule(VOID)
 @{
     .global _tx_thread_schedule
     .type _tx_thread_schedule,function
-_tx_thread_schedule: 
+_tx_thread_schedule:
 @
 @    /* Enable interrupts.  */
 @
@@ -118,7 +118,7 @@ _tx_thread_schedule:
 @
 @    }
 @    while(_tx_thread_execute_ptr[core] == TX_NULL);
-@    
+@
 @    /* Get the lock for accessing the thread's ready bit.  */
 @
     MOV     r2, #172                            @ Build offset to the lock
@@ -146,7 +146,7 @@ _tx_thread_schedule:
     DMB                                         @ Ensure write to lock completes
     B       _tx_thread_schedule                 @ Jump back to the scheduler
 @
-_tx_thread_ready_for_execution: 
+_tx_thread_ready_for_execution:
 @
 @    /* We have a thread to execute. */
 @
@@ -181,14 +181,14 @@ _tx_thread_ready_for_execution:
     MOV     r1, #0                              @ Build clear value
     STR     r1, [r2, #0]                        @ Clear current thread pointer
 
-    LDR     r1, [r0, #152]                      @ Pickup the ready bit 
+    LDR     r1, [r0, #152]                      @ Pickup the ready bit
     ORR     r1, r1, #0x8000                     @ Set ready bit (bit 15)
     STR     r1, [r0, #152]                      @ Make this thread ready for executing again
     DMB                                         @ Ensure that accesses to shared resource have completed
 
     B       _tx_thread_schedule                 @ Jump back to the scheduler to schedule the new thread
 
-_execute_pointer_did_not_change: 
+_execute_pointer_did_not_change:
 @
 @    /* Increment the run count for this thread.  */
 @    _tx_thread_current_ptr[core] -> tx_thread_run_count++;
@@ -201,7 +201,7 @@ _execute_pointer_did_not_change:
 @    /* Setup time-slice, if present.  */
 @    _tx_timer_time_slice[core] =  _tx_thread_current_ptr[core] -> tx_thread_time_slice;
 @
-    LDR     r2, =_tx_timer_time_slice           @ Pickup address of time slice 
+    LDR     r2, =_tx_timer_time_slice           @ Pickup address of time slice
                                                 @   variable
     ADD     r2, r2, r12                         @ Build index into the time-slice array
     LDR     sp, [r0, #8]                        @ Switch stack pointers
@@ -234,11 +234,11 @@ _execute_pointer_did_not_change:
     VLDMIA  sp!, {D16-D31}                      @ Recover D16-D31
     LDR     r4, [sp], #4                        @ Pickup FPSCR
     VMSR    FPSCR, r4                           @ Restore FPSCR
-_tx_skip_interrupt_vfp_restore: 
+_tx_skip_interrupt_vfp_restore:
 #endif
     LDMIA   sp!, {r0-r12, lr, pc}^              @ Return to point of thread interrupt
-    
-_tx_solicited_return: 
+
+_tx_solicited_return:
 #ifdef TARGET_FPU_VFP
     MSR     CPSR_cxsf, r5                       @ Recover CPSR
     LDR     r1, [r0, #160]                      @ Pickup the VFP enabled flag
@@ -248,7 +248,7 @@ _tx_solicited_return:
     VLDMIA  sp!, {D16-D31}                      @ Recover D16-D31
     LDR     r4, [sp], #4                        @ Pickup FPSCR
     VMSR    FPSCR, r4                           @ Restore FPSCR
-_tx_skip_solicited_vfp_restore: 
+_tx_skip_solicited_vfp_restore:
 #endif
     MSR     CPSR_cxsf, r5                       @ Recover CPSR
     LDMIA   sp!, {r4-r11, lr}                   @ Return to thread synchronously
@@ -259,7 +259,7 @@ _tx_skip_solicited_vfp_restore:
 
 #ifdef TARGET_FPU_VFP
     .global tx_thread_vfp_enable
-tx_thread_vfp_enable: 
+tx_thread_vfp_enable:
     MRS     r2, CPSR                            @ Pickup the CPSR
 #ifdef TX_ENABLE_FIQ_SUPPORT
     CPSID   if                                  @ Disable IRQ and FIQ interrupts
@@ -276,12 +276,12 @@ tx_thread_vfp_enable:
     BEQ     __tx_no_thread_to_enable            @ If NULL, skip VFP enable
     MOV     r0, #1                              @ Build enable value
     STR     r0, [r1, #160]                      @ Set the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
-__tx_no_thread_to_enable: 
+__tx_no_thread_to_enable:
     MSR     CPSR_cxsf, r2                       @ Recover CPSR
     BX      LR                                  @ Return to caller
 
     .global tx_thread_vfp_disable
-tx_thread_vfp_disable: 
+tx_thread_vfp_disable:
     MRS     r2, CPSR                            @ Pickup the CPSR
 #ifdef TX_ENABLE_FIQ_SUPPORT
     CPSID   if                                  @ Disable IRQ and FIQ interrupts
@@ -298,7 +298,7 @@ tx_thread_vfp_disable:
     BEQ     __tx_no_thread_to_disable           @ If NULL, skip VFP disable
     MOV     r0, #0                              @ Build disable value
     STR     r0, [r1, #160]                      @ Clear the VFP enable flag (tx_thread_vfp_enable field in TX_THREAD)
-__tx_no_thread_to_disable: 
+__tx_no_thread_to_disable:
     MSR     CPSR_cxsf, r2                       @ Recover CPSR
     BX      LR                                  @ Return to caller
 #endif

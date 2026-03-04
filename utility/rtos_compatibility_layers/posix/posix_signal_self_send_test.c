@@ -116,7 +116,7 @@ struct sched_param  param;
 queue_atrr.mq_maxmsg  = 124;
 queue_atrr.mq_msgsize = MAX_MESSAGE_SIZE;
 #endif
-   
+
     /* Init POSIX Wrapper */
     storage_ptr = (VOID*) posix_initialize((VOID*)free_memory);
 
@@ -130,56 +130,56 @@ queue_atrr.mq_msgsize = MAX_MESSAGE_SIZE;
     pthread_attr_init(&ptattr2);
     pthread_attr_init(&ptattr3);
     pthread_attr_init(&ptattr4);
-    pthread_attr_init(&ptattr5);  
+    pthread_attr_init(&ptattr5);
 #endif
 
     /* Create a sched_param structure */
     memset(&param, 0, sizeof(param));
-   
+
     /* Now create all pthreads , firstly modify respective ptheread
        attribute with desired priority and stack start address and then create the pthread */
-    
+
     /* Create pthread 0.  */
     param.sched_priority = 10;
     pthread_attr_setschedparam(&ptattr0, &param);
     pthread_attr_setstackaddr(&ptattr0,  storage_ptr );
-    storage_ptr = (int *) storage_ptr + DEMO_STACK_SIZE;    
+    storage_ptr = (int *) storage_ptr + DEMO_STACK_SIZE;
     pthread_create (&pthread_0, &ptattr0,pthread_0_entry,NULL);
-    
+
 #if 0
     /* Create pthread 1.  */
     param.sched_priority = 15;
     pthread_attr_setschedparam(&ptattr1, &param);
     pthread_attr_setstackaddr(&ptattr1, (VOID*) storage_ptr );
-    storage_ptr = storage_ptr + DEMO_STACK_SIZE;    
+    storage_ptr = storage_ptr + DEMO_STACK_SIZE;
     pthread_create (&pthread_1, &ptattr1,pthread_1_entry,NULL);
-    
+
     /* Create pthread 2.  */
     param.sched_priority = 20;
     pthread_attr_setschedparam(&ptattr2, &param);
     pthread_attr_setstackaddr(&ptattr2, (VOID*) storage_ptr );
-    storage_ptr = storage_ptr + DEMO_STACK_SIZE;    
+    storage_ptr = storage_ptr + DEMO_STACK_SIZE;
     pthread_create (&pthread_2, &ptattr2,pthread_2_entry,NULL);
 
     /* Create pthread 3.  */
     param.sched_priority = 25;
     pthread_attr_setschedparam(&ptattr3, &param);
     pthread_attr_setstackaddr(&ptattr3, (VOID*) storage_ptr );
-    storage_ptr = storage_ptr + DEMO_STACK_SIZE;    
+    storage_ptr = storage_ptr + DEMO_STACK_SIZE;
     pthread_create (&pthread_3, &ptattr3,pthread_3_entry,NULL);
-  
+
     /* Create pthread 4.  */
     param.sched_priority = 30;
     pthread_attr_setschedparam(&ptattr4, &param);
     pthread_attr_setstackaddr(&ptattr4, (VOID*) storage_ptr );
-    storage_ptr = storage_ptr + DEMO_STACK_SIZE;    
+    storage_ptr = storage_ptr + DEMO_STACK_SIZE;
     pthread_create (&pthread_4, &ptattr4,pthread_4_entry,NULL);
-  
+
     /* Create pthread 5.  */
     param.sched_priority = 5;
     pthread_attr_setschedparam(&ptattr5, &param);
     pthread_attr_setstackaddr(&ptattr5, (VOID*) storage_ptr );
-    storage_ptr = storage_ptr + DEMO_STACK_SIZE;    
+    storage_ptr = storage_ptr + DEMO_STACK_SIZE;
     pthread_create (&pthread_5, &ptattr5,pthread_5_entry,NULL);
 
     /* Create a Message queue.  */
@@ -191,7 +191,7 @@ queue_atrr.mq_msgsize = MAX_MESSAGE_SIZE;
     /* Create a Mutex */
     pthread_mutex_init(&mutex1, NULL);
 #endif
-  
+
 }
 
 VOID    error_handler(void)
@@ -213,7 +213,7 @@ VOID  pthread_0_signal_handler(int signo)
        called from pthread 0.  */
     if (pthread_self() != pthread_0)
     {
-    
+
         /* Call error handler.  */
         error_handler();
     }
@@ -221,7 +221,7 @@ VOID  pthread_0_signal_handler(int signo)
     /* Check for proper signal.  */
     if (signo != 15)
     {
-    
+
         /* Call error handler.  */
         error_handler();
     }
@@ -251,23 +251,23 @@ VOID    *pthread_0_entry(VOID *pthread0_input)
     if (pt0_status)
         error_handler();
 
-    /* This pthread simply sits in while-forever-sleep loop */ 
-    while(1) 
+    /* This pthread simply sits in while-forever-sleep loop */
+    while(1)
     {
         /* Increment the pthread counter.*/
         pthread_0_counter++;
 
         /* Raise the signal.  */
         pt0_status =  pthread_kill(pthread_0, 15);
-  
+
         /* Check for errors.  */
         if ((pt0_status) || (pthread_0_counter != pthread_0_signal_counter))
     {
             error_handler();
         break;
     }
-  
-#if 0  
+
+#if 0
         /* sleep for a while  */
         thread_0_sleep_time.tv_nsec =  999999999;
          thread_0_sleep_time.tv_sec =  4;
@@ -288,13 +288,13 @@ INT    pt1_status=0;
 
 VOID    *pthread_1_entry(VOID *pthread1_input)
 {
-    
+
     struct timespec thread_1_sleep_time={0,0};
 
     /* This thread simply sends a messages to a queue shared by pthread 2.  */
     while(1)
     {
-    
+
         /* Increment the thread counter.  */
         pthread_1_counter++;
     /* Send message to queue 0.  */
@@ -320,7 +320,7 @@ INT     pt2_status;
 VOID    *pthread_2_entry(VOID *pthread2_input)
 {
 
-CHAR    msgr0[MAX_MESSAGE_SIZE]; 
+CHAR    msgr0[MAX_MESSAGE_SIZE];
 ULONG   priority;
 struct timespec thread_2_sleep_time={0,0};
 
@@ -330,7 +330,7 @@ struct timespec thread_2_sleep_time={0,0};
         /* Increment the thread counter.  */
         pthread_2_counter++;
         pt2_status = mq_receive(q_des,msgr0,MAX_MESSAGE_SIZE,&priority);
-        
+
         if(pt2_status != 0)
            break;
 
@@ -357,7 +357,7 @@ struct timespec thread_3_sleep_time={0,0};
 
         /* Increment the thread counter.  */
         pthread_3_counter++;
-        /* Get the semaphore with suspension.  */ 
+        /* Get the semaphore with suspension.  */
         pt3_status = sem_wait(sem);
 
         /* Check status.  */

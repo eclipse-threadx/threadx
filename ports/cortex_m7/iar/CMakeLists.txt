@@ -7,7 +7,7 @@ target_sources(${PROJECT_NAME}
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_context_save.S
     ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_interrupt_control.S
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_interrupt_disable.S
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_interrupt_restore.S    
+	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_interrupt_restore.S
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_schedule.S
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_stack_build.S
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_system_return.S

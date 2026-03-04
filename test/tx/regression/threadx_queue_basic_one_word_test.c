@@ -1,5 +1,5 @@
 /* This test is designed to test immediate response queue services including create
-   and delete.  This test is for queue sizes of 1 ULONG.  Two queues are used one with 
+   and delete.  This test is for queue sizes of 1 ULONG.  Two queues are used one with
    a capacity of 1 message and another with a capacity of 3 messages.  */
 
 #include   <stdio.h>
@@ -40,7 +40,7 @@ static void    thread_0_entry(ULONG thread_input);
 static void    thread_1_entry(ULONG thread_input);
 
 
-UINT        _txe_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size, 
+UINT        _txe_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size,
                         VOID *queue_start, ULONG queue_size, UINT queue_control_block_size);
 
 
@@ -65,7 +65,7 @@ ULONG   destination;
     /* Determine if calling queue create from initialization was successful.  */
     if (test_queue_from_init != TX_SUCCESS)
     {
-    
+
         /* Error!  */
         error++;
     }
@@ -84,7 +84,7 @@ ULONG   destination;
 
     /* Attempt to delete a queue from a timer.  */
     status = tx_queue_delete(&queue_0);
-    
+
     /* Check for status.  */
     if (status != TX_CALLER_ERROR)
     {
@@ -95,7 +95,7 @@ ULONG   destination;
 
     /* Attempt to send something with suspension from a timer.  */
     status =  tx_queue_front_send(&queue_0, &source, 100);
-    
+
     /* Check for status.  */
     if (status != TX_WAIT_ERROR)
     {
@@ -106,7 +106,7 @@ ULONG   destination;
 
     /* Attempt to send something with suspension from a timer.  */
     status =  tx_queue_send(&queue_0, &source, 100);
-    
+
     /* Check for status.  */
     if (status != TX_WAIT_ERROR)
     {
@@ -117,7 +117,7 @@ ULONG   destination;
 
     /* Attempt to receive something with suspension from a timer.  */
     status =  tx_queue_receive(&queue_0, &destination, 100);
-    
+
     /* Check for status.  */
     if (status != TX_WAIT_ERROR)
     {
@@ -158,7 +158,7 @@ ULONG   destination;
 
     /* Attempt to delete a queue from an ISR.  */
     status = tx_queue_delete(&queue_0);
-    
+
     /* Check for status.  */
     if (status != TX_CALLER_ERROR)
     {
@@ -169,7 +169,7 @@ ULONG   destination;
 
     /* Attempt to send something with suspension from an ISR.  */
     status =  tx_queue_front_send(&queue_0, &source, 100);
-    
+
     /* Check for status.  */
     if (status != TX_WAIT_ERROR)
     {
@@ -180,7 +180,7 @@ ULONG   destination;
 
     /* Attempt to send something with suspension from an ISR.  */
     status =  tx_queue_send(&queue_0, &source, 100);
-    
+
     /* Check for status.  */
     if (status != TX_WAIT_ERROR)
     {
@@ -191,7 +191,7 @@ ULONG   destination;
 
     /* Attempt to receive something with suspension from an ISR.  */
     status =  tx_queue_receive(&queue_0, &destination, 100);
-    
+
     /* Check for status.  */
     if (status != TX_WAIT_ERROR)
     {
@@ -224,13 +224,13 @@ CHAR    *pointer;
 
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
-    status += tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status += tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -380,7 +380,7 @@ CHAR    *pointer;
 
     /* Attempt to delete a NULL pointer.  */
     status = tx_queue_delete(TX_NULL);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -393,7 +393,7 @@ CHAR    *pointer;
     /* Attempt to delete a non-created queue.  */
     queue_2.tx_queue_id =  0;
     status = tx_queue_delete(&queue_2);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -405,7 +405,7 @@ CHAR    *pointer;
 
     /* Attempt to flush a NULL pointer.  */
     status =  tx_queue_flush(TX_NULL);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -418,7 +418,7 @@ CHAR    *pointer;
     /* Attempt to flush a non-created queue.  */
     queue_2.tx_queue_id =  0;
     status =  tx_queue_flush(&queue_2);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -430,7 +430,7 @@ CHAR    *pointer;
 
     /* Attempt to send something to the front of a non-queue.  */
     status =  tx_queue_front_send(TX_NULL, &source_message, TX_NO_WAIT);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -439,11 +439,11 @@ CHAR    *pointer;
         printf("ERROR #15\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to send something to the front of a non-created queue.  */
     queue_2.tx_queue_id =  0;
     status =  tx_queue_front_send(&queue_2, &source_message, TX_NO_WAIT);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -455,7 +455,7 @@ CHAR    *pointer;
 
     /* Attempt to send something with a NULL source pointer.  */
     status =  tx_queue_front_send(&queue_0, TX_NULL, TX_NO_WAIT);
-    
+
     /* Check for status.  */
     if (status != TX_PTR_ERROR)
     {
@@ -467,7 +467,7 @@ CHAR    *pointer;
 
     /* Attempt to send something to a non-queue.  */
     status =  tx_queue_send(TX_NULL, &source_message, TX_NO_WAIT);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -476,11 +476,11 @@ CHAR    *pointer;
         printf("ERROR #18\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to send something to a non-created queue.  */
     queue_2.tx_queue_id =  0;
     status =  tx_queue_send(&queue_2, &source_message, TX_NO_WAIT);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -492,7 +492,7 @@ CHAR    *pointer;
 
     /* Attempt to send something with a NULL source pointer.  */
     status =  tx_queue_send(&queue_0, TX_NULL, TX_NO_WAIT);
-    
+
     /* Check for status.  */
     if (status != TX_PTR_ERROR)
     {
@@ -504,7 +504,7 @@ CHAR    *pointer;
 
     /* Attempt to receive something from a non-queue.  */
     status =  tx_queue_receive(TX_NULL, &dest_message, TX_NO_WAIT);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -517,7 +517,7 @@ CHAR    *pointer;
     /* Attempt to receive something from a non-created queue.  */
     queue_2.tx_queue_id =  0;
     status =  tx_queue_receive(&queue_2, &dest_message, TX_NO_WAIT);
-    
+
     /* Check for status.  */
     if (status != TX_QUEUE_ERROR)
     {
@@ -529,7 +529,7 @@ CHAR    *pointer;
 
     /* Attempt to receive something to a NULL destination.  */
     status =  tx_queue_receive(&queue_0, TX_NULL, TX_NO_WAIT);
-    
+
     /* Check for status.  */
     if (status != TX_PTR_ERROR)
     {
@@ -550,9 +550,9 @@ CHAR    *pointer;
         printf("ERROR #24\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_0, &source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_0, &source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -602,7 +602,7 @@ CHAR    *pointer;
     }
 
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_0, &source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_0, &source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -649,7 +649,7 @@ CHAR    *pointer;
     source_message++;
     status +=  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);
     source_message++;
-        
+
     if (status != TX_SUCCESS)
     {
 
@@ -657,9 +657,9 @@ CHAR    *pointer;
         printf("ERROR #32\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -735,9 +735,9 @@ CHAR    *pointer;
         printf("ERROR #38\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -810,7 +810,7 @@ CHAR    *pointer;
 
     /* Resume thread 1 so that we can take an interrupt on top of it.  */
     tx_thread_resume(&thread_1);
-    
+
     /* Sleep for a bit...  */
     tx_thread_sleep(3);
 
@@ -820,7 +820,7 @@ CHAR    *pointer;
     /* Test for error.  */
     if ((error) || (timer_executed != 1) || (isr_executed != 1))
     {
-    
+
         /* Queue error.  */
         printf("ERROR #44\n");
         test_control_return(1);

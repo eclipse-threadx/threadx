@@ -4,16 +4,16 @@
 
 1. Open the ThreadX Project Workspace
 
-In order to build the ThreadX library and the ThreadX demonstration first load 
-the Azure RTOS Workspace azure_rtos_workspace.gpj, which is located inside the 
-"example_build" directory. 
+In order to build the ThreadX library and the ThreadX demonstration first load
+the Azure RTOS Workspace azure_rtos_workspace.gpj, which is located inside the
+"example_build" directory.
 
 
 2. Building the ThreadX run-time Library
 
-Building the ThreadX library is easy; simply select the MULTI project file 
-tx.gpj and then select the build button. You should now observe the 
-compilation and assembly of the ThreadX library. This project build produces 
+Building the ThreadX library is easy; simply select the MULTI project file
+tx.gpj and then select the build button. You should now observe the
+compilation and assembly of the ThreadX library. This project build produces
 the ThreadX library file tx.a.
 
 
@@ -21,52 +21,52 @@ the ThreadX library file tx.a.
 
 The ThreadX demonstration is designed to execute under the MULTI environment
 on the Green Hills Cortex-M3 simulator. The instructions that follow describe
-how to get the ThreadX evaluation running under the MULTI Cortex-M3 simulation 
+how to get the ThreadX evaluation running under the MULTI Cortex-M3 simulation
 environment.
 
-Building the demonstration is easy; simply select the MULTI project file 
-sample_threadx.gpj. At this point, select the "Project Build" button and observe 
-the compilation, assembly, and linkage of the ThreadX demonstration application. 
+Building the demonstration is easy; simply select the MULTI project file
+sample_threadx.gpj. At this point, select the "Project Build" button and observe
+the compilation, assembly, and linkage of the ThreadX demonstration application.
 
-After the demonstration is built, invoke the  MULTI ARM simulator by selecting 
-the simulator connection from within the sample_threadx.con connection file. 
-Once connected to the simulator, select the "Debug" button. You should now 
-observe the main function of sample_threadx.c. 
+After the demonstration is built, invoke the  MULTI ARM simulator by selecting
+the simulator connection from within the sample_threadx.con connection file.
+Once connected to the simulator, select the "Debug" button. You should now
+observe the main function of sample_threadx.c.
 
-You are now ready to execute the ThreadX demonstration system. Select 
-breakpoints and data watches to observe the execution of the sample_threadx.c 
+You are now ready to execute the ThreadX demonstration system. Select
+breakpoints and data watches to observe the execution of the sample_threadx.c
 application.
 
 
 4. EventAnalyzer Demonstration
 
-To build a demonstration system that also logs events for the MULTI EventAnalyzer, 
-perform the same steps as the regular demo, except build the ThreadX library with 
-txe.gpj file and use the sample_threadx_el.gpj build file to build the demonstration. 
-The resulting image will log all system events, which can then be displayed by the 
+To build a demonstration system that also logs events for the MULTI EventAnalyzer,
+perform the same steps as the regular demo, except build the ThreadX library with
+txe.gpj file and use the sample_threadx_el.gpj build file to build the demonstration.
+The resulting image will log all system events, which can then be displayed by the
 MULTI EventAnalyzer.
 
 
 5. System Initialization
 
-The system entry point using the Green Hills tools is at the label _start. 
-This is defined within the crt0.arm file supplied by Green Hills. In addition, 
-this is where all static and global preset C variable initialization 
+The system entry point using the Green Hills tools is at the label _start.
+This is defined within the crt0.arm file supplied by Green Hills. In addition,
+this is where all static and global preset C variable initialization
 processing is called from.
 
 After the Green Hills startup function returns, ThreadX initialization is
 called. The main initialization function is _tx_initialize_low_level and
-is located in the file tx_initialize_low_level.arm. This function is responsible 
-for setting up various system data structures, interrupt vectors, and the 
+is located in the file tx_initialize_low_level.arm. This function is responsible
+for setting up various system data structures, interrupt vectors, and the
 periodic timer interrupt source of ThreadX.
 
-In addition, _tx_initialize_low_level determines where the first available 
+In addition, _tx_initialize_low_level determines where the first available
 RAM memory address is located. This address is supplied to tx_application_define.
 
-By default, the first available RAM memory address is assumed to start at the 
-beginning of the ThreadX section .free_mem. If changes are made to the 
-sample_threadx.ld file, the .free_mem section should remain the last allocated 
-section in the main RAM area. The starting address of this section is passed 
+By default, the first available RAM memory address is assumed to start at the
+beginning of the ThreadX section .free_mem. If changes are made to the
+sample_threadx.ld file, the .free_mem section should remain the last allocated
+section in the main RAM area. The starting address of this section is passed
 to tx_application_define.
 
 
@@ -75,11 +75,11 @@ to tx_application_define.
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
 All suspended threads have the same stack frame in the Cortex-M3 version of
-ThreadX. The top of the suspended thread's stack is pointed to by 
+ThreadX. The top of the suspended thread's stack is pointed to by
 tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
 
-  Stack Offset     Stack Contents 
+  Stack Offset     Stack Contents
 
      0x00               r4
      0x04               r5
@@ -101,21 +101,21 @@ tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
 7. Improving Performance
 
-The distribution version of ThreadX is built without any compiler 
-optimizations. This makes it easy to debug because you can trace or set 
-breakpoints inside of ThreadX itself. Of course, this costs some 
+The distribution version of ThreadX is built without any compiler
+optimizations. This makes it easy to debug because you can trace or set
+breakpoints inside of ThreadX itself. Of course, this costs some
 performance. To make ThreadX run faster, you can change the tx.gpj project
-to disable debug information and enable the desired optimizations. 
+to disable debug information and enable the desired optimizations.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined before tx_api.h is included. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined before tx_api.h is included.
 
 
 8. Interrupt Handling
 
 ThreadX provides complete and high-performance interrupt handling for Cortex-M3
-targets. There are a certain set of requirements that are defined in the 
+targets. There are a certain set of requirements that are defined in the
 following sub-sections:
 
 
@@ -127,7 +127,7 @@ the vector area according to its needs.
 
 8.2 Managed Interrupts
 
-A ThreadX managed interrupt is defined below. By following these conventions, the 
+A ThreadX managed interrupt is defined below. By following these conventions, the
 application ISR is then allowed access to various ThreadX services from the ISR.
 Here is the standard template for managed ISRs in ThreadX:
 
@@ -136,7 +136,7 @@ Here is the standard template for managed ISRs in ThreadX:
 __tx_IntHandler:
         PUSH    {lr}
         BL      _tx_thread_context_save
-        
+
             /* Do interrupt handler work here */
 
         B       _tx_thread_context_restore
@@ -154,7 +154,7 @@ information associated with this specific port of ThreadX:
 03-02-2021  The following files were changed/added for version 6.1.5:
             tx_thread_schedule.s            Added low power feature
 
-05/19/2020  Initial ThreadX version of Cortex-M3/Green Hills port. 
+05/19/2020  Initial ThreadX version of Cortex-M3/Green Hills port.
 
 
 Copyright(c) 1996-2020 Microsoft Corporation

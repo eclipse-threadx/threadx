@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -34,8 +34,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Support for Xtensa applications                                     */
 /**                                                                       */
@@ -66,10 +66,10 @@
 #include <unistd.h>
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    Callback to notify of a stack overflow when registered with         */
 /*    tx_stack_error_notify and stack checking is enabled (ThreadX        */
 /*    is compiled with TX_ENABLE_STACK_CHECKING defined).                 */
@@ -87,13 +87,13 @@
 /*    - Terminates the simulation (simulator only).                       */
 /*    - Panics.                                                           */
 /*                                                                        */
-/**************************************************************************/ 
+/**************************************************************************/
 
 VOID  _tx_xtensa_stack_error_handler(TX_THREAD * thread)
 {
     #ifdef XT_SIMULATOR
     register int32_t sc  __asm__ ("a2") = SYS_log_msg;
-    register char *  msg __asm__ ("a3") 
+    register char *  msg __asm__ ("a3")
         = "**** Stack overflow in thread 0x%08x.\n";
     register TX_THREAD * thd __asm__ ("a4") = thread;
     __asm__ volatile ("simcall" :: "a" (sc), "a" (msg), "a" (thd) );

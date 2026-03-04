@@ -1,19 +1,19 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -36,40 +36,40 @@
     EXTERN      _tx_timer_time_slice
     EXTERN      _tx_execution_thread_enter
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                               Cortex-A15/IAR    */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_schedule                               Cortex-A15/IAR    */
 ;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function waits for a thread control block pointer to appear in */ 
-;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-;/*    in the variable, the corresponding thread is resumed.               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function waits for a thread control block pointer to appear in */
+;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+;/*    in the variable, the corresponding thread is resumed.               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-;/*    _tx_thread_system_return             Return to system from thread   */ 
-;/*    _tx_thread_context_restore           Restore thread's context       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+;/*    _tx_thread_system_return             Return to system from thread   */
+;/*    _tx_thread_context_restore           Restore thread's context       */
+;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
 ;{
@@ -99,7 +99,7 @@ __tx_thread_schedule_loop
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr == TX_NULL);
-;    
+;
 ;    /* Yes! We have a thread to execute.  Lockout interrupts and
 ;       transfer control to it.  */
 ;
@@ -112,7 +112,7 @@ __tx_thread_schedule_loop
 ;    /* Setup the current thread pointer.  */
 ;    _tx_thread_current_ptr =  _tx_thread_execute_ptr;
 ;
-    LDR     r1, =_tx_thread_current_ptr     ; Pickup address of current thread 
+    LDR     r1, =_tx_thread_current_ptr     ; Pickup address of current thread
     STR     r0, [r1, #0]                    ; Setup current thread pointer
 ;
 ;    /* Increment the run count for this thread.  */
@@ -126,7 +126,7 @@ __tx_thread_schedule_loop
 ;    /* Setup time-slice, if present.  */
 ;    _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;
 ;
-    LDR     r2, =_tx_timer_time_slice       ; Pickup address of time-slice 
+    LDR     r2, =_tx_timer_time_slice       ; Pickup address of time-slice
                                             ;   variable
     LDR     sp, [r0, #8]                    ; Switch stack pointers
     STR     r3, [r2, #0]                    ; Setup time-slice

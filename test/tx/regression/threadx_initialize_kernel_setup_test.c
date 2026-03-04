@@ -10,7 +10,7 @@ TEST_FLAG               test_forced_mutex_timeout;
 TEST_FLAG               threadx_mutex_suspension_put_test;
 TEST_FLAG               threadx_mutex_suspension_priority_test;
 TEST_FLAG               threadx_byte_allocate_loop_test;
-TEST_FLAG               test_initialize_flag; 
+TEST_FLAG               test_initialize_flag;
 TEST_FLAG               threadx_byte_release_loop_test;
 TEST_FLAG               test_stack_analyze_flag;
 

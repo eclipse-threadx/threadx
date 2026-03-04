@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -79,7 +79,7 @@ INT    retval;
     /* Attempt to allocate the desired memory from the POSIX heap.
        Do not wait - if memory isn't available, flag an error.  */
     retval = tx_byte_allocate((TX_BYTE_POOL *)&posix_heap_byte_pool, memory_ptr,
-                              size, TX_NO_WAIT); 
+                              size, TX_NO_WAIT);
 
     /* Make sure the memory was obtained successfully.  */
     if (retval)
@@ -90,5 +90,5 @@ INT    retval;
         return(ERROR);
     }
     /* Return to caller.  */
-    return(retval); 
+    return(retval);
 }

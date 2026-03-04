@@ -39,7 +39,7 @@
 /* Required to work around a bug in the overlay header. */
 #ifdef XT_DISABLE_OVERLAYS
 #undef  xt_overlay_fatal_error
-#define xt_overlay_fatal_error(id)    
+#define xt_overlay_fatal_error(id)
 #endif
 
 
@@ -61,7 +61,7 @@ xt_overlay_init_os(void)
     /* Create the mutex for overlay access. Priority inheritance is
      * required.
      */
-    UINT status = 
+    UINT status =
         tx_mutex_create (&xt_overlay_mutex, "xt_overlay_lock", TX_INHERIT);
 
     if (status != TX_SUCCESS) {

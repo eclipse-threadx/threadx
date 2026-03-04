@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Initialize                                                          */
 ;/**                                                                       */
@@ -82,7 +82,7 @@ INTMUX1_TMR8_VAL        .set    0x43                ; Tie in Event 67 (TINT8H) t
     .global _tx_first_free_memory
     .align  16
 _tx_first_free_memory:
-    .space  4        
+    .space  4
 
 ; Useful macro definitions
 ; Load 32-bit integer into register
@@ -111,42 +111,42 @@ TX_INTERRUPT_EXIT    .macro
 
 
     .sect   ".text"
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_low_level                            C667x/TI        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_initialize_low_level                            C667x/TI        */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function is responsible for any low-level processor            */ 
-;/*    initialization, including setting up interrupt vectors, setting     */ 
-;/*    up a periodic timer interrupt source, saving the system stack       */ 
-;/*    pointer for use in ISR processing later, and finding the first      */ 
-;/*    available RAM memory address for tx_application_define.             */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function is responsible for any low-level processor            */
+;/*    initialization, including setting up interrupt vectors, setting     */
+;/*    up a periodic timer interrupt source, saving the system stack       */
+;/*    pointer for use in ISR processing later, and finding the first      */
+;/*    available RAM memory address for tx_application_define.             */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter           ThreadX entry function        */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -219,7 +219,7 @@ _tx_int4_vector:
         STW         A4,*+SP(36)                     ; Save A4
         NOP
 
-;_tx_timer_interrupt_preamble:    
+;_tx_timer_interrupt_preamble:
 
         MVK_LH      TMR8_INTCTLSTAT_ADDR,A0             ; Build address of Timer Interrupt Control Register
         MVK_LH      INTCTLSTAT_VAL,A1                   ; Build value of Timer Interrupt Control Register
@@ -234,7 +234,7 @@ _tx_int4_vector:
         B           A0                                  ; Branch ThreadX timer ISR routine
         NOP         5                                   ; Delay slots
         NOP
-        
+
 
 
     .global _tx_int5_vector

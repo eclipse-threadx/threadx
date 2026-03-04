@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -42,8 +42,8 @@
 /*                                                                        */
 /*    This function returns thread ID of the calling pthread        .     */
 /*                                                                        */
-/*                                                                        */   
-/*                                                                        */   
+/*                                                                        */
+/*                                                                        */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -65,24 +65,24 @@ pthread_t pthread_self(VOID)
 {
 
 TX_THREAD   *thread_ptr;
-pthread_t    thread_ID; 
+pthread_t    thread_ID;
 
-    /* Get the thread identifier of the currently running thread */ 
-    thread_ptr = tx_thread_identify(); 
+    /* Get the thread identifier of the currently running thread */
+    thread_ptr = tx_thread_identify();
 
-    /* Convert thread identifier to posix thread ID */ 
-    
-    thread_ID = posix_thread2tid(thread_ptr); 
+    /* Convert thread identifier to posix thread ID */
+
+    thread_ID = posix_thread2tid(thread_ptr);
 
     /* Determine if this thread is actually the signal thread helper.  */
     if (((POSIX_TCB *) thread_ptr) -> signals.signal_handler)
     {
-    
+
         /* Yes, override the thread_ID with the non-signal thread ID.  */
         thread_ID =  (pthread_t) ((POSIX_TCB *) thread_ptr) -> signals.base_thread_ptr;
     }
 
 
-    /* All done.  */ 
-    return(thread_ID); 
+    /* All done.  */
+    return(thread_ID);
 }

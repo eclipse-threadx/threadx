@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -69,7 +69,7 @@
 
 	sd   x1, 224(sp)                  // Store RA (28*8 = 224, because call will override ra [ra is a callee register in riscv])
 
-    	call    _tx_thread_context_save    	
+    	call    _tx_thread_context_save
 
 	csrr a0, mcause
 	csrr a1, mepc
@@ -79,11 +79,11 @@
     	call    trap_handler
     	ld      ra, 0(sp)
     	addi    sp, sp, 8
-	call _tx_thread_context_restore 
+	call _tx_thread_context_restore
 	// it will nerver return
 _err:
 	wfi
-	j _err  
+	j _err
     .section .text
 /**************************************************************************/
 /*                                                                        */

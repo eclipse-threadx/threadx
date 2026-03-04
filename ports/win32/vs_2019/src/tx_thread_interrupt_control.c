@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -50,43 +50,43 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture)
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_interrupt_control                      Win32/Visual      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_interrupt_control                      Win32/Visual      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is responsible for changing the interrupt lockout     */ 
-/*    posture of the system.                                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    new_posture                           New interrupt lockout posture */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    old_posture                           Old interrupt lockout posture */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    ExitThread                            Win32 thread exit             */ 
-/*    GetCurrentThread                      Win32 get current thread      */ 
-/*    GetCurrentThreadId                    Win32 get current thread ID   */ 
-/*    GetThreadPriority                     Win32 get thread priority     */ 
-/*    _tx_win32_critical_section_obtain     Obtain critical section       */ 
-/*    _tx_win32_critical_section_release    Release critical section      */ 
-/*    _tx_win32_critical_section_release_all                              */ 
-/*                                          Release critical section      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
+/*                                                                        */
+/*    This function is responsible for changing the interrupt lockout     */
+/*    posture of the system.                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    new_posture                           New interrupt lockout posture */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    old_posture                           Old interrupt lockout posture */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    ExitThread                            Win32 thread exit             */
+/*    GetCurrentThread                      Win32 get current thread      */
+/*    GetCurrentThreadId                    Win32 get current thread ID   */
+/*    GetThreadPriority                     Win32 get thread priority     */
+/*    _tx_win32_critical_section_obtain     Obtain critical section       */
+/*    _tx_win32_critical_section_release    Release critical section      */
+/*    _tx_win32_critical_section_release_all                              */
+/*                                          Release critical section      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 UINT   _tx_thread_interrupt_control(UINT new_posture)
@@ -94,9 +94,9 @@ UINT   _tx_thread_interrupt_control(UINT new_posture)
 
 UINT        old_posture;
 HANDLE      threadhandle;
-int         threadpriority; 
+int         threadpriority;
 DWORD       threadid;
-TX_THREAD   *thread_ptr; 
+TX_THREAD   *thread_ptr;
 
 
     /* Enter Win32 critical section.  */
@@ -111,7 +111,7 @@ TX_THREAD   *thread_ptr;
         _tx_win32_debug_entry_insert("RESTORE", __FILE__, __LINE__);
     }
     else
-    {   
+    {
         /* Disable.  */
         _tx_win32_debug_entry_insert("DISABLE", __FILE__, __LINE__);
     }
@@ -126,24 +126,24 @@ TX_THREAD   *thread_ptr;
     thread_ptr =      _tx_thread_current_ptr;
 
     /* Pickup the priority of the current thread.  */
-    threadpriority =  GetThreadPriority(threadhandle); 
+    threadpriority =  GetThreadPriority(threadhandle);
 
     /* Pickup the ID of the current thread.  */
     threadid =        GetCurrentThreadId();
 
-    /* Determine if this is a thread (THREAD_PRIORITY_LOWEST) and it does not 
+    /* Determine if this is a thread (THREAD_PRIORITY_LOWEST) and it does not
        match the current thread pointer.  */
-    if ((threadpriority == THREAD_PRIORITY_LOWEST) && 
-        ((!thread_ptr) || (thread_ptr -> tx_thread_win32_thread_id != threadid))) 
-    { 
+    if ((threadpriority == THREAD_PRIORITY_LOWEST) &&
+        ((!thread_ptr) || (thread_ptr -> tx_thread_win32_thread_id != threadid)))
+    {
 
-        /* This indicates the Win32 thread was actually terminated by ThreadX is only 
+        /* This indicates the Win32 thread was actually terminated by ThreadX is only
            being allowed to run in order to cleanup its resources.  */
         _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
 
         /* Exit this thread.  */
-        ExitThread(0); 
-    } 
+        ExitThread(0);
+    }
 
     /* Determine the current interrupt lockout condition.  */
     if (_tx_win32_critical_section.tx_win32_critical_section_nested_count == 1)
@@ -180,7 +180,7 @@ TX_THREAD   *thread_ptr;
             _tx_win32_global_int_disabled_flag =  TX_TRUE;
         }
     }
-    else if (thread_ptr) 
+    else if (thread_ptr)
     {
 
         /* Determine how to apply the new posture.  */

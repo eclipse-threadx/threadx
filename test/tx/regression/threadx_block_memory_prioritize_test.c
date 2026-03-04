@@ -76,12 +76,12 @@ static void    test_isr(void)
         }
         else
         {
-        
+
             /* Abort the wait of thread 5.  */
             tx_thread_wait_abort(&thread_5);
 
             /* End the ISR processing.  */
-            test_status =  2;    
+            test_status =  2;
             test_isr_dispatch =  TX_NULL;
         }
     }
@@ -107,8 +107,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -120,8 +120,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -133,8 +133,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -146,8 +146,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             3, 3, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -159,8 +159,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             4, 4, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -172,8 +172,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,
+            pointer, TEST_STACK_SIZE_PRINTF,
             5, 5, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -185,8 +185,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,
+            pointer, TEST_STACK_SIZE_PRINTF,
             6, 6, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -201,7 +201,7 @@ CHAR    *pointer;
     /* Create the block_pool with one block.  */
     status =  tx_block_pool_create(&block_pool_0, "block_pool 0", 30, pointer, 40);
     pointer = pointer + 40;
-    
+
     /* Check for status.  */
     if (status != TX_SUCCESS)
     {
@@ -229,7 +229,7 @@ VOID    *pointer;
 
     /* Attempt to prioritize with a NULL pointer.  */
     status =  tx_block_pool_prioritize(TX_NULL);
-    
+
     /* Check for an error condition.   */
     if (status != TX_POOL_ERROR)
     {
@@ -242,7 +242,7 @@ VOID    *pointer;
     /* Attempt to prioritize with a bad pool pointer.  */
     block_pool_1.tx_block_pool_id =  0;
     status =  tx_block_pool_prioritize(&block_pool_1);
-    
+
     /* Check for an error condition.   */
     if (status != TX_POOL_ERROR)
     {
@@ -296,7 +296,7 @@ VOID    *pointer;
         printf("ERROR #13\n");
         test_control_return(1);
     }
-    
+
     /* Call block pool prioritize again to test the don't-do-anything path in tx_block_pool_prioritize.  */
     status +=  tx_block_pool_prioritize(&block_pool_0);
 
@@ -307,7 +307,7 @@ VOID    *pointer;
     tx_thread_resume(&thread_4);
     tx_thread_resume(&thread_5);
     tx_thread_resume(&thread_6);
-    
+
     /* Prioritize the block pool suspension list.  */
     status =  tx_block_pool_prioritize(&block_pool_0);
 
@@ -319,10 +319,10 @@ VOID    *pointer;
         printf("ERROR #14\n");
         test_control_return(1);
     }
-    
+
     /* Now loop to test the interrupt of the prioritize loop logic.  */
     test_status =  1;
-    test_isr_dispatch =  test_isr;  
+    test_isr_dispatch =  test_isr;
     do
     {
 
@@ -339,10 +339,10 @@ VOID    *pointer;
         }
 
     } while (test_status == 1);
-    
+
     /* Now determine if thread 4 is at the front of the list... It should be!  */
     if (block_pool_0.tx_block_pool_suspension_list != &thread_4)
-    {    
+    {
 
         /* Block Pool error.  */
         printf("ERROR #16\n");

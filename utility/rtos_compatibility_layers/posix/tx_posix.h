@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -75,15 +75,15 @@
 #endif
 */
 
-/* Define the system configuration constants for the Evacuation Kit for 
-   POSIX Users.This is where the number of system objects 
+/* Define the system configuration constants for the Evacuation Kit for
+   POSIX Users.This is where the number of system objects
    (pthreads, message queues, semaphores etc.)are defined.              */
 
 /************************************************************************/
 /*               SYSTEM CONFIGURATION PARAMETERS                        */
 /************************************************************************/
 
-/* Define the maximum number of simultaneous POSIX semaphores 
+/* Define the maximum number of simultaneous POSIX semaphores
     supported.  */
 #define  SEM_NSEMS_MAX                  16
 
@@ -94,14 +94,14 @@
 #define  SEM_VALUE_MAX                  100
 
 /* Define the maximum number of simultaneous POSIX message queues supported.  */
-    
+
 #define  POSIX_MAX_QUEUES               16
 
 /* Define the maximum number of simultaneous POSIX pthreads supported.  */
 #define  PTHREAD_THREADS_MAX            16
 
 /* Define the maximum number of simultaneous POSIX mutexes supported.  */
-    
+
 #define  POSIX_MAX_MUTEX                16
 
 /* Define the maximum length of name of message queue.  */
@@ -122,8 +122,8 @@
 
 
 /* Define number of CPU ticks per second */
-#define  CPU_TICKS_PER_SECOND           100  /* assuming 10 mSec tick */  
-#define  NANOSECONDS_IN_CPU_TICK        10000000  /* assuming 10 mSec tick */ 
+#define  CPU_TICKS_PER_SECOND           100  /* assuming 10 mSec tick */
+#define  NANOSECONDS_IN_CPU_TICK        10000000  /* assuming 10 mSec tick */
 
 /* Define queue control specific data definitions.  */
 
@@ -137,7 +137,7 @@
 /************************************************************************/
 #define  POSIX_STACK_PADDING            1024
 #define  POSIX_SYSTEM_STACK_SIZE        1024
-#define  POSIX_PTHREAD_STACK_SIZE       1024  
+#define  POSIX_PTHREAD_STACK_SIZE       1024
 
 /************************************************************************/
 /*               ARCHITECTURE DEFINITIONS                               */
@@ -163,9 +163,9 @@
 
 #define  MIN_STACKSIZE_POWERPC          2048
 
-/************************************************************************/ 
-/*               MISCELLANEOUS CONSTANTS                                */ 
-/************************************************************************/ 
+/************************************************************************/
+/*               MISCELLANEOUS CONSTANTS                                */
+/************************************************************************/
 /* Requests/commands to SysMgr task.  */
 
 #define   SYSMGR_DELETE_TASK            0
@@ -174,7 +174,7 @@
 #define   PTHREAD_NAME_LEN              4
 
 #define   PTHREAD_CREATE_DETACHED       1
-#define   PTHREAD_CREATE_JOINABLE       0 
+#define   PTHREAD_CREATE_JOINABLE       0
 
 /* scheduler related constants */
 
@@ -215,9 +215,9 @@ enum pth_once_state {
   PTH_ONCE_CANCELLED = 0x3
 };
 
-/************************************************************************/ 
-/*               ERROR CODES (those defined outside of POSIX)           */ 
-/************************************************************************/ 
+/************************************************************************/
+/*               ERROR CODES (those defined outside of POSIX)           */
+/************************************************************************/
 
 #ifdef   ERROR
 #undef   ERROR
@@ -268,14 +268,14 @@ typedef  ULONG                  BOOL;
 typedef struct pthread_attr_obj
 {
      ULONG                pthread_flags;
-     INT                  detach_state; 
+     INT                  detach_state;
      INT                  inherit_sched;
      INT                  sched_policy;
      struct sched_param   sched_attr;
      VOID                *stack_address;
      ULONG                stack_size;
      INT                  inuse;
-} pthread_attr_t; 
+} pthread_attr_t;
 
 
 typedef  INT    ssize_t ;     /* this should be pulled in from sys\types.h  */
@@ -288,24 +288,24 @@ typedef  ULONG  mode_t;
 
 typedef struct pthread_control_block
 {
-    /* This pthread's ThreadX TCB.  */ 
+    /* This pthread's ThreadX TCB.  */
     TX_THREAD            thread_info;
     /* This pthread's unique identifier */
     pthread_t            pthreadID;
     /* To check if posix Pthread is in use.  */
     UINT                 in_use;
     /* All pthread attributes contained in the a pthread_attr_t object */
-    ULONG                pthread_flags;  
-    INT                  detach_state;   
+    ULONG                pthread_flags;
+    INT                  detach_state;
     INT                  inherit_sched;
     INT                  sched_policy;
     struct sched_param   sched_attr;
     VOID                *stack_address;
     ULONG                stack_size;
     INT                  cancel_state;
-    INT                  cancel_type;     
+    INT                  cancel_type;
     /* Identifier of the target thread to which this pthread is joined */
-    pthread_t            joined_to_pthreadID;   
+    pthread_t            joined_to_pthreadID;
     /* Identifier of the caller thread which has joined to this thread*/
     pthread_t            joined_by_pthreadID;
     /* To check if posix pthread is joined to any other pthread */
@@ -316,16 +316,16 @@ typedef struct pthread_control_block
         UINT             is_detached;
     /* Value returned by the terminating thread which is joined to this thread */
     VOID                 *value_ptr;
-    /* Define the original pthread priority.  */ 
+    /* Define the original pthread priority.  */
     ULONG                orig_priority;
-    /* Define the current pthread priority.  */ 
+    /* Define the current pthread priority.  */
     ULONG                current_priority;
-    /* Define the pthread's pre-emption threshold.  */ 
+    /* Define the pthread's pre-emption threshold.  */
     ULONG                threshold;
-    /* Define the pthread's timeslice.  */ 
+    /* Define the pthread's timeslice.  */
     ULONG                time_slice;
     /* specify pthread start routine */
-    VOID                 *(*start_routine)(VOID *); 
+    VOID                 *(*start_routine)(VOID *);
     /* specify argument for start up routine */
     ULONG                *entry_parameter;
     /* to hold error code for this pthread */
@@ -344,15 +344,15 @@ typedef struct pthread_mutex_attr_obj
      INT                 protocol;
      INT                 pshared;
      INT                 in_use;
-     
+
 } pthread_mutexattr_t;
 
 /* Define POSIX mutex structure.  */
 
 typedef struct pthread_mutex_control_block
 {
-    /* This mutex's ThreadX Control block  */ 
-    TX_MUTEX      mutex_info;   
+    /* This mutex's ThreadX Control block  */
+    TX_MUTEX      mutex_info;
     /* This mutex's attributes */
     INT           type;
     /* Is this Mutex object is in use?  */
@@ -372,7 +372,7 @@ struct mq_attr
     ULONG         mq_msgsize;
     /* Flags are ignored as these are passed separately in open().  */
     ULONG         mq_flags;
-}; 
+};
 
 /* Define POSIX message queue structure.  */
 typedef struct msg_que
@@ -401,17 +401,17 @@ typedef struct msg_que
 /* Define Queue Descriptor.  */
 typedef struct mq_des
 {
-    /* Queue FLAGS.  */ 
+    /* Queue FLAGS.  */
     ULONG                         f_flag;
     /* message Queue structure.  */
     POSIX_MSG_QUEUE             * f_data;
-    
+
 } *mqd_t;
 
 
 /* STRUCTURES RELATED TO POSIX SEMAPHORES  */
 
-typedef struct POSIX_SEMAPHORE_STRUCT         
+typedef struct POSIX_SEMAPHORE_STRUCT
 {
     /* ThreadX semaphore.  */
     TX_SEMAPHORE                  sem;
@@ -430,23 +430,23 @@ typedef struct POSIX_SEMAPHORE_STRUCT
 
 } sem_t;
 
-typedef sem_t             *SEM_ID;         
+typedef sem_t             *SEM_ID;
 
 typedef struct pthread_cond_obj
 {
-    /* This pthread condition variable's internal counting Semaphore  */ 
+    /* This pthread condition variable's internal counting Semaphore  */
     TX_SEMAPHORE        cond_semaphore;
-     
+
     INT                 type;
     INT                 in_use;
-     
+
 } pthread_cond_t;
 
 typedef struct pthread_condattr_obj
 {
 /*     INT                 type; */
      INT                 in_use;
-     
+
 } pthread_condattr_t;
 
 
@@ -469,10 +469,10 @@ extern unsigned int   posix_errno;
 
 VOID                 *posix_initialize(VOID * posix_memory);
 
-/* Define POSIX API function prototypes.  */ 
+/* Define POSIX API function prototypes.  */
 
 INT                   mq_send(mqd_t mqdes, const char * msg_ptr,
-                                size_t msg_len,ULONG msg_prio ); 
+                                size_t msg_len,ULONG msg_prio );
 ssize_t               mq_receive(mqd_t mqdes, VOID *pMsg, size_t msgLen,
                                    ULONG *pMsgPrio );
 INT                   mq_unlink(const char * mqName);
@@ -488,7 +488,7 @@ INT                   sem_wait( sem_t * sem );
 INT                   sem_init(sem_t *sem , INT pshared, UINT value);
 INT                   sem_destroy(sem_t *sem);
 
-INT                   pthread_create (pthread_t *thread,  pthread_attr_t *attr, 
+INT                   pthread_create (pthread_t *thread,  pthread_attr_t *attr,
                                       VOID *(*start_routine)(VOID*),VOID *arg);
 INT                   pthread_detach(pthread_t thread);
 INT                   pthread_join(pthread_t thread, VOID **value_ptr);

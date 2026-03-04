@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -338,7 +338,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
         extern void __tx_cpp_exception_cleanup(TX_THREAD *thread_ptr);          \
         __tx_cpp_exception_cleanup(thread_ptr);                                 \
     }
-#else 
+#else
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  \
     {                                                                           \
         #pragma weak __cpp_exception_cleanup                                    \

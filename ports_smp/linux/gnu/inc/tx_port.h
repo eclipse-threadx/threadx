@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -162,7 +162,7 @@ typedef uint64_t                                ULONG64;
 #define ULONG64_DEFINED
 
 
-/* Define automated coverage test extensions...  These are required for the 
+/* Define automated coverage test extensions...  These are required for the
    ThreadX regression test.  */
 
 typedef unsigned int    TEST_FLAG;
@@ -287,7 +287,7 @@ extern UINT             priority_change_extension_selection;
                                                 else                                                            \
                                                 {                                                               \
                                                     test_stack_analyze_flag =     ((TEST_FLAG) 0);              \
-                                                }                                                               
+                                                }
 
 #define TX_INITIALIZE_KERNEL_ENTER_EXTENSION    if (test_initialize_flag == ((TEST_FLAG) 1))                    \
                                                 {                                                               \

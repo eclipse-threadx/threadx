@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -81,7 +81,7 @@ __tx_thread_schedule_loop:
     MOV.L    [R1],R2                             ; Pickup next thread to execute
     CMP      #0,R2                               ; Is it NULL?
     BNE      __tx_thread_thread_ready            ; Not NULL, schedule the thread
-                                                 ; Idle system - no thread is ready    
+                                                 ; Idle system - no thread is ready
 #if (TX_LOW_POWER == 1)
     MOV.L    #__tx_thread_preempt_disable, R1    ; Load prempt disable flag.
     MOV.L    [R1], R2
@@ -110,7 +110,7 @@ __tx_thread_thread_ready:
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr == TX_NULL);
-;    
+;
 ;    /* Yes! We have a thread to execute. Note that interrupts are locked out at this point.  */
 ;
 ;    /* Setup the current thread pointer.  */

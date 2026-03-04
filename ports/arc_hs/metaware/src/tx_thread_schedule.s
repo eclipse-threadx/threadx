@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 
@@ -137,11 +137,11 @@ __tx_thread_schedule_loop:
     ld      r2, [sp, 4]                                 ; Pickup status32
     kflag   r2                                          ; Enter the proper register bank
     ld      r3, [sp, 8]                                 ; Pickup the saved interrupt posture
-    add     sp, sp, 12                                  ; Recover small stack frame 
-    j_s.d   [blink]                                     ; Return to thread and restore flags 
+    add     sp, sp, 12                                  ; Recover small stack frame
+    j_s.d   [blink]                                     ; Return to thread and restore flags
     seti    r3                                          ; Recover STATUS32
 
-__tx_hw_interrupt_restore:    
+__tx_hw_interrupt_restore:
 
     mov     r0, 0x2                                     ; Pretend level 1 interrupt is returning
     sr      r0, [AUX_IRQ_ACT]                           ;
@@ -151,10 +151,10 @@ __tx_hw_interrupt_restore:
     sr      r0, [LP_START]                              ; Restore LP_START
     ld      r1, [sp, 8]                                 ; Recover LP_END
     sr      r1, [LP_END]                                ; Restore LP_END
-    ld      r2, [sp, 12]                                ; Recover LP_COUNT      
+    ld      r2, [sp, 12]                                ; Recover LP_COUNT
     mov     LP_COUNT, r2
     .endif
-    
+
     .ifdef   TX_ENABLE_ACC
     ld      r58, [sp, 140]                              ; Recover r58
     ld      r59, [sp, 144]                              ; Recover r59
@@ -168,7 +168,7 @@ __tx_hw_interrupt_restore:
     kflag   r0                                          ; Switch to the proper register bank
     add     sp, sp, 160                                 ; Recover the interrupt stack frame
     rtie                                                ; Return to point of interrupt
-    
+
 __tx_restore_non_hw_context:
 ;
 ;    /* Determine if an interrupt frame or a synchronous task suspension frame

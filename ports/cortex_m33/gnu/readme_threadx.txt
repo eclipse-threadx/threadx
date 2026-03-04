@@ -1,32 +1,32 @@
-                     Microsoft's Azure RTOS ThreadX for Cortex-M33 
+                     Microsoft's Azure RTOS ThreadX for Cortex-M33
 
                               Using the GNU Tools
 
 1.  Building the ThreadX run-time Library
 
 Import all ThreadX common and port-specific source files into a GNU project.
-Configure the project to build a library rather than an executable. This 
-results in the ThreadX run-time library file tx.a, which is needed by 
+Configure the project to build a library rather than an executable. This
+results in the ThreadX run-time library file tx.a, which is needed by
 the application.
-Files tx_thread_stack_error_handler.c and tx_thread_stack_error_notify.c 
-replace the common files of the same name. 
+Files tx_thread_stack_error_handler.c and tx_thread_stack_error_notify.c
+replace the common files of the same name.
 
 2.  Demonstration System
 
-No demonstration project is provided. 
+No demonstration project is provided.
 
 
 3.  System Initialization
 
-The entry point in ThreadX for the Cortex-M33 using gnu tools uses the standard GNU 
+The entry point in ThreadX for the Cortex-M33 using gnu tools uses the standard GNU
 Cortex-M33 reset sequence. From the reset vector the C runtime will be initialized.
 
-The ThreadX tx_initialize_low_level.S file is responsible for setting up 
-various system data structures, the vector area, and a periodic timer interrupt 
-source. 
+The ThreadX tx_initialize_low_level.S file is responsible for setting up
+various system data structures, the vector area, and a periodic timer interrupt
+source.
 
-In addition, _tx_initialize_low_level determines the first available 
-address for use by the application, which is supplied as the sole input 
+In addition, _tx_initialize_low_level determines the first available
+address for use by the application, which is supplied as the sole input
 parameter to your application definition function, tx_application_define.
 
 
@@ -35,7 +35,7 @@ parameter to your application definition function, tx_application_define.
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
 All suspended threads have the same stack frame in the Cortex-M33 version of
-ThreadX. The top of the suspended thread's stack is pointed to by 
+ThreadX. The top of the suspended thread's stack is pointed to by
 tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
 Non-FPU Stack Frame:
@@ -118,26 +118,26 @@ FPU Stack Frame (only interrupted thread with FPU enabled):
 
 5.  Improving Performance
 
-To make ThreadX and the application(s) run faster, you can enable 
-all compiler optimizations. 
+To make ThreadX and the application(s) run faster, you can enable
+all compiler optimizations.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined.
 
 
 6.  Interrupt Handling
 
 ThreadX provides complete and high-performance interrupt handling for Cortex-M33
-targets. There are a certain set of requirements that are defined in the 
+targets. There are a certain set of requirements that are defined in the
 following sub-sections:
 
 
 6.1  Vector Area
 
 The Cortex-M33 vectors start at the label __tx_vectors or similar. The application may modify
-the vector area according to its needs. There is code in tx_initialize_low_level() that will 
-configure the vector base register. 
+the vector area according to its needs. There is code in tx_initialize_low_level() that will
+configure the vector base register.
 
 
 6.2 Managed Interrupts
@@ -170,15 +170,15 @@ your_assembly_isr:
 
 Note: the Cortex-M33 requires exception handlers to be thumb labels, this implies bit 0 set.
 To accomplish this, the declaration of the label has to be preceded by the assembler directive
-.thumb_func to instruct the linker to create thumb labels. The label __tx_IntHandler needs to 
-be inserted in the correct location in the interrupt vector table. This table is typically 
+.thumb_func to instruct the linker to create thumb labels. The label __tx_IntHandler needs to
+be inserted in the correct location in the interrupt vector table. This table is typically
 located in either your runtime startup file or in the tx_initialize_low_level.S file.
 
 
 7. FPU Support
 
-ThreadX for Cortex-M33 supports automatic ("lazy") VFP support, which means that applications threads 
-can simply use the VFP and ThreadX automatically maintains the VFP registers as part of the thread 
+ThreadX for Cortex-M33 supports automatic ("lazy") VFP support, which means that applications threads
+can simply use the VFP and ThreadX automatically maintains the VFP registers as part of the thread
 context.
 
 

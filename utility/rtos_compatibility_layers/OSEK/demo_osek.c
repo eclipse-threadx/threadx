@@ -51,7 +51,7 @@ TX_TIMER demo_isr_timer;
 VOID demo_isr_timer_entry(ULONG arg);
 
 
-/* Main function.  */  
+/* Main function.  */
 int main()
 {
 
@@ -67,8 +67,8 @@ CHAR    * pointer;
 
     /* Put the first available address into character pointer.  */
     pointer = (CHAR * )free_memory;
-     
-    /* Setup hook pointers (optional). */  
+
+    /* Setup hook pointers (optional). */
     Application1.shutdown_hook_handler = ShutdownHook;
     Application1.pretask_hook_handler = PreTaskHook;
     Application1.posttask_hook_handler = PostTaskHook;
@@ -77,7 +77,7 @@ CHAR    * pointer;
 
     /* Initialize a pointer.  */
     osek_initialize(pointer,&Application1);
-    
+
     /* Create the system counter  */
     SystemTimer = CreateCounter("SystemTimer", 0x7FFFFFFF, 2, 2, 0);
     DefineSystemCounter(SystemTimer);
@@ -87,13 +87,13 @@ CHAR    * pointer;
 
     /* Create an event. */
     Event1 = CreateEvent();
-    
+
     /* Register Event1 to Task1.  */
     RegisterEventtoTask(Event1 , Task1);
 
     /* Create a resource.  */
     Resource1 = CreateResource("Resource1", STANDARD, 0);
-    
+
     /* Register Resource1 to Task1.  */
     RegisterTasktoResource(Resource1, Task1);
 
@@ -103,10 +103,10 @@ CHAR    * pointer;
     /* Create a ThreadX timer to simulate an ISR.  */
     tx_timer_create(&demo_isr_timer, "Demo ISR timer", demo_isr_timer_entry, DemoISR,
                      1000, 1000, TX_AUTO_ACTIVATE);
-    
+
     /* Start OSEK  */
     StartOS(OSDEFAULTAPPMODE);
- 
+
 }
 
 /* Task body.  */

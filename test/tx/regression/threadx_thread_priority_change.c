@@ -51,7 +51,7 @@ UINT    saved_preempt_disable;
 #ifndef TX_NOT_INTERRUPTABLE
 
     /* Determine if we have the interrupt condition we are looking for.  */
-    if ((thread_3.tx_thread_priority == 6) && 
+    if ((thread_3.tx_thread_priority == 6) &&
         (thread_3.tx_thread_state == TX_READY) &&
         (_tx_thread_priority_list[6] != &thread_3) &&
         (thread_3_counter > 100))
@@ -59,16 +59,16 @@ UINT    saved_preempt_disable;
 
         /* Save the preempt disable flag.  */
         saved_preempt_disable =  _tx_thread_preempt_disable;
-        
+
         /* Clear the preempt disable flag to ensure the API works correctly.  */
         _tx_thread_preempt_disable =  0;
 
         /* Suspend the thread to generate the condition.  */
         tx_thread_suspend(&thread_3);
-        
+
         /* Restore the preempt disable flag.  */
         _tx_thread_preempt_disable =  saved_preempt_disable;
-        
+
         /* Done trying to generate this test condition.  */
         test_isr_dispatch =  TX_NULL;
     }
@@ -77,7 +77,7 @@ UINT    saved_preempt_disable;
     /* Can't get the interrupt inside the code wit TX_NOT_INTERRUPTABLE defined, so simply stop after thread_3_counter > 100.  */
     if (thread_3_counter > 100)
     {
-    
+
         /* Done trying to generate this test condition.  */
         test_isr_dispatch =  TX_NULL;
     }
@@ -102,8 +102,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -115,8 +115,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             22, 22, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -128,16 +128,16 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             30, 1, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             5, 5, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             6, 6, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -171,11 +171,11 @@ UINT    status;
     /* Increment thread 0 counter.  */
     thread_0_counter++;
 
-    /* Change priority to 22, to match that of the next highest priority ready thread. 
-       This is to test the update of the priority list when a thread is moved to a 
+    /* Change priority to 22, to match that of the next highest priority ready thread.
+       This is to test the update of the priority list when a thread is moved to a
        priority with already ready threads.  */
     status =  tx_thread_priority_change(&thread_0, 22, &old_priority);
-    
+
     /* Check status, return priority, and run count of other thread.  */
     if ((status != TX_SUCCESS) || (old_priority != 16) || (thread_1_counter != 0))
     {
@@ -186,7 +186,7 @@ UINT    status;
     }
 
     /* Restore original priority.  */
-    tx_thread_priority_change(&thread_0, old_priority, &old_priority);    
+    tx_thread_priority_change(&thread_0, old_priority, &old_priority);
 
     /* See if we can change priority of this thread.  */
     status =  tx_thread_priority_change(&thread_0, 7, &old_priority);
@@ -224,7 +224,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Thread 1 should have run already...  Raise this threads priority 
+    /* Thread 1 should have run already...  Raise this threads priority
        back up.  */
     status =  tx_thread_priority_change(&thread_0, 8, &old_priority);
 
@@ -284,10 +284,10 @@ UINT    status;
         printf("ERROR #11\n");
         test_control_return(1);
     }
-    
+
     /* Now thread 1 should be suspended.  Let's change thread 0's priority and make sure thread 2 doesn't run yet!  */
     status =  tx_thread_priority_change(&thread_0, 7, &old_priority);
-    
+
     /* Check status, return priority, and run count of other thread.  */
     if ((status != TX_SUCCESS) || (old_priority != 8) || (thread_1_counter != 2) || (thread_2_counter != 0))
     {
@@ -325,12 +325,12 @@ static void    thread_2_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         /* This thread should never run!  */
 
         /* Increment the thread counter.  */
         thread_2_counter++;
-        
+
         /* Self suspend.  */
         tx_thread_suspend(&thread_2);
     }
@@ -361,12 +361,12 @@ UINT    loop;
         /* Raise priority of thread 3 for code coverage.  */
         tx_thread_priority_change(&thread_3, 6, &old_priority);
         tx_thread_priority_change(&thread_3, 5, &old_priority);
-        
+
         /* Check to see if thread 4 has run... it should not have executed
            yet. If it does, set the thread_1_counter to indicate an error!  */
         if (thread_4_counter)
             thread_1_counter++;
-    
+
     } while (test_isr_dispatch);
 }
 

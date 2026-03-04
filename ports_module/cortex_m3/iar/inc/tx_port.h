@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -235,7 +235,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #define TX_THREAD_EXTENSION_3
 #else
 #define TX_THREAD_EXTENSION_3           unsigned long long  tx_thread_execution_time_total; \
-                                        unsigned long long  tx_thread_execution_time_last_start; 
+                                        unsigned long long  tx_thread_execution_time_last_start;
 #endif
 
 
@@ -368,7 +368,7 @@ void _tx_vfp_access(void);
 
 /* A thread can be terminated by another thread, so we first check if it's self-terminating and not in an ISR.
    If so, deactivate the FPU via CONTROL.FPCA. Otherwise we are in an interrupt or another thread is terminating
-   this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the FPU to flush 
+   this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the FPU to flush
    the lazy FPU save, then restore the CONTROL.FPCA state. */
 
 #ifndef TX_MISRA_ENABLE
@@ -527,7 +527,7 @@ ULONG   _tx_misra_ipsr_get(VOID);
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __clz(__rbit((m)));
 #elif defined(__GNUC__) /* GCC and AC6 Compiler */
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       __asm__ volatile (" RBIT %0,%1 ": "=r" (m) : "r" (m) ); \
-                                                __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) ); 
+                                                __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) );
 #else
 #error "Compiler not supported."
 #endif

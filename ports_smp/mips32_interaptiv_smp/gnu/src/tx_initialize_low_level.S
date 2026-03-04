@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -143,7 +143,7 @@ _tx_exception_trampoline_end:
     .globl  _tx_exception_handler
 _tx_exception_handler:
     mfc0    $26, $13                            # Pickup the cause register
-    ehb                                         # 
+    ehb                                         #
     andi    $26, $26, 0x3C                      # Isolate the exception code
     bne     $26, $0, _tx_error_exceptions       # If non-zero, an error exception is present
     nop                                         # Delay slot

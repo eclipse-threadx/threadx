@@ -39,7 +39,7 @@ crt0_ctor_loop:
   beq crt0_ctor_end
   ldr r2, [r0]
   add r0, #4
-  push {r0-r1}  
+  push {r0-r1}
   blx r2
   pop {r0-r1}
   b crt0_ctor_loop
@@ -88,4 +88,3 @@ memory_set_done:
   .section .stack, "wa", %nobits
   .section .stack_process, "wa", %nobits
   .section .heap, "wa", %nobits
-  

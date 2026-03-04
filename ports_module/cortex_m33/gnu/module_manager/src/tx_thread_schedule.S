@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -520,7 +520,7 @@ SVC_Handler:
     ORREQ   lr, lr, #0x10                           // Set bit, return with standard frame
     STR     r3, [r2, #0xB0]                         // Save thread stack pointer
     BIC     r3, #1                                  // Clear possibly OR'd bit
-    
+
     /* Build kernel stack by copying thread stack two registers at a time */
     ADD     r3, r3, #32                             // Start at bottom of hardware stack
     LDMDB   r3!, {r1-r2}
@@ -626,20 +626,20 @@ _tx_svc_secure_alloc:
     CMP     r1, r2                                  // Did we come from _tx_thread_secure_stack_allocate?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came.
-    
+
     PUSH    {r0, lr}                                // Save SP and EXC_RETURN
     LDM     r0, {r0-r3}                             // Load function parameters from stack
     BL      _tx_thread_secure_mode_stack_allocate
     POP     {r12, lr}                               // Restore SP and EXC_RETURN
     STR     r0, [r12]                               // Store function return value
     BX      lr
-    
+
 _tx_svc_secure_free:
     LDR     r2, =_tx_free_return                    // Load address of where we should have come from
     CMP     r1, r2                                  // Did we come from _tx_thread_secure_stack_free?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came.
-    
+
     PUSH    {r0, lr}                                // Save SP and EXC_RETURN
     LDM     r0, {r0-r3}                             // Load function parameters from stack
     BL      _tx_thread_secure_mode_stack_free

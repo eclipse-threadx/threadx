@@ -33,7 +33,7 @@ __txm_module_preamble:
                                                                 //           1 -> User mode execution
     .dc.l      _txm_module_thread_shell_entry - . - 0           // Module Shell Entry Point
     .dc.l      demo_module_start - . - 0                        // Module Start Thread Entry Point
-    .dc.l      0                                                // Module Stop Thread Entry Point 
+    .dc.l      0                                                // Module Stop Thread Entry Point
     .dc.l      1                                                // Module Start/Stop Thread Priority
     .dc.l      1024                                             // Module Start/Stop Thread Stack Size
     .dc.l      _txm_module_callback_request_thread_entry - . - 0 // Module Callback Thread Entry

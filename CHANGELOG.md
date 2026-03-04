@@ -200,7 +200,7 @@
 | Cleanup | Closed | 6.1.3 | Updates to use builtins/inline assembler | ports/cortex_m23/gnu/inc/tx_port.h<br/>ports/cortex_m23/gnu/src/tx_thread_secure_stack.c | 08/01/2021 | Scott Larson |
 | Cleanup | Closed | 6.1.3 | Remove unnecessary settings directories from example. | ports/cortex_a35/ac6/** | 08/01/2021 | Scott Larson |
 | Cleanup | Closed | 6.1.3 | Remove unneeded load of _tx_thread_preempt_disable. | ports/arc_em/metaware/src/tx_timer_interrupt.s<br/>ports/arc_hs/metaware/src/tx_timer_interrupt.s | 08/01/2021 | Scott Larson |
-| Enhancement | Closed | 6.1.3 | Update product constants.<br/>MISRA compliance changes | common_smp/inc/tx_api.h<br/>common_smp/src/tx_thread_create.c<br/>common_smp/src/tx_time_get.c<br/>common_smp/src/tx_thread_smp_high_level_initialize.c | 08/01/2021 | Scott Larson | 
+| Enhancement | Closed | 6.1.3 | Update product constants.<br/>MISRA compliance changes | common_smp/inc/tx_api.h<br/>common_smp/src/tx_thread_create.c<br/>common_smp/src/tx_time_get.c<br/>common_smp/src/tx_thread_smp_high_level_initialize.c | 08/01/2021 | Scott Larson |
 | New feature | Closed | 6.1.3 | Pre-execution module preamble validation and preparation | common_modules/module_manager/src/txm_module_manager_start.c<br/>common_modules/module_manager/src/txm_module_manager_absolute_load.c | 08/01/2021 | Scott Larson |
 | Enhancement | Closed | 6.1.3 | Added port-specific dispathc. | common/inc/tx_api.h | 08/01/2021 | Scott Larson |
 | Enhancement | Closed | 6.1.3 | Fix stack overlap checking.<br/>Added 64-bit & SMP support. | common_modules/module_manager/src/txm_module_manager_thread_create.c | 08/01/2021 | Scott Larson |

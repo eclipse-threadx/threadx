@@ -37,7 +37,7 @@ function build_libs() {
 function test() {
     pushd build/$1
     [ -z "${CTEST_PARALLEL_LEVEL}" ] && parallel="-j$2"
-    if [ -z "${CTEST_REPEAT_FAIL}" ]; 
+    if [ -z "${CTEST_REPEAT_FAIL}" ];
     then
         repeat_fail=2
     else

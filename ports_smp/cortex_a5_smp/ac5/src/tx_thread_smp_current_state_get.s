@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread - Low Level SMP Support                                      */
 ;/**                                                                       */
@@ -34,10 +34,10 @@
 
         AREA ||.text||, CODE, READONLY
         PRESERVE8
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_smp_current_state_get                SMP/Cortex-A5/AC5   */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
@@ -45,25 +45,25 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function is gets the current state of the calling core.        */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function is gets the current state of the calling core.        */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ThreadX Components                                                  */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ThreadX Components                                                  */
+;/*                                                                        */
 ;/**************************************************************************/
     EXPORT  _tx_thread_smp_current_state_get
 _tx_thread_smp_current_state_get
@@ -85,7 +85,7 @@ _tx_thread_smp_current_state_get
     LDR     r1, =_tx_thread_system_state        ; Pickup start of the current state array
     ADD     r1, r1, r2                          ; Build index into the current state array
     LDR     r0, [r1]                            ; Pickup state for this core
-    MSR     CPSR_c, r3                          ; Restore CPSR 
+    MSR     CPSR_c, r3                          ; Restore CPSR
     IF  {INTER} = {TRUE}
     BX      lr                                  ; Return to caller
     ELSE

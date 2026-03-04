@@ -1,26 +1,26 @@
-                         Microsoft's Azure RTOS ThreadX for Win32 
+                         Microsoft's Azure RTOS ThreadX for Win32
 
                               Using the Visual Studio Tools
 
 
 1. Open the ThreadX Project Workspace
 
-In order to build the ThreadX library and the ThreadX demonstration first load 
+In order to build the ThreadX library and the ThreadX demonstration first load
 the Azure RTOS Workspace azure_rtos.sln, which is located inside the "example_build"
-directory. 
+directory.
 
 
 2. Building the ThreadX run-time Library
 
-Building the ThreadX library is easy; simply make the "tx" project active and 
-then select the build button. You should now observe the compilation of the 
-ThreadX library source. This project build produces the ThreadX library file 
+Building the ThreadX library is easy; simply make the "tx" project active and
+then select the build button. You should now observe the compilation of the
+ThreadX library source. This project build produces the ThreadX library file
 tx.lib.
 
 
 3.  Building the Demonstration System
 
-You are now ready to run the ThreadX Win32 demonstration. Simply make the 
+You are now ready to run the ThreadX Win32 demonstration. Simply make the
 "sample_thread" project active and then select the build button. When the build
 is finished, select the run button from Visual Studio and observe various
 demonstration statistics being printed to the console window. You may also set
@@ -29,15 +29,15 @@ breakpoints, single step, perform data watches, etc.
 
 4.  System Initialization
 
-The system entry point is at main(), which is defined in the application. 
-Once the application calls tx_kernel_enter, ThreadX starts running and 
-performs various initialization duties prior to starting the scheduler. The 
+The system entry point is at main(), which is defined in the application.
+Once the application calls tx_kernel_enter, ThreadX starts running and
+performs various initialization duties prior to starting the scheduler. The
 Win32-specific initialization is done in the function _tx_initialize_low_level,
-which is located in the file tx_initialize_low_level.c. This function is 
-responsible for setting up various system data structures and simulated 
+which is located in the file tx_initialize_low_level.c. This function is
+responsible for setting up various system data structures and simulated
 interrupts - including the periodic timer interrupt source for ThreadX.
 
-In addition, _tx_initialize_low_level determines the first available 
+In addition, _tx_initialize_low_level determines the first available
 address for use by the application. In Win32, this is basically done
 by using malloc to get a big block of memory from Windows.
 
@@ -46,32 +46,32 @@ by using malloc to get a big block of memory from Windows.
 
 ThreadX for Win32 is implemented using Win32 threads. Each application
 thread in ThreadX actually runs as a Win32 thread. The determination of
-which application thread to run is made by the ThreadX scheduler, which 
-itself is a Win32 thread. The ThreadX scheduler is the highest priority 
+which application thread to run is made by the ThreadX scheduler, which
+itself is a Win32 thread. The ThreadX scheduler is the highest priority
 thread in the system.
 
 Interrupts in ThreadX/Win32 are also simulated by threads. A good example
-is the ThreadX system timer interrupt, which can be found in 
+is the ThreadX system timer interrupt, which can be found in
 tx_initialize_low_level.c.
 
 5.1  ThreadX Limitations
 
-ThreadX for Win32 behaves in the same manner as ThreadX in an embedded 
-environment EXCEPT in the case of thread termination. Unfortunately, the 
+ThreadX for Win32 behaves in the same manner as ThreadX in an embedded
+environment EXCEPT in the case of thread termination. Unfortunately, the
 Win32 API does not have a good mechanism to terminate threads and instead
 must rely on the thread itself terminating. Hence, threads in the ThreadX
-Win32 implementation must have some ThreadX call periodically in their 
+Win32 implementation must have some ThreadX call periodically in their
 processing if they can be terminated by another ThreadX thread.
 
 
 6.  Improving Performance
 
-The distribution version of ThreadX is built without any compiler 
-optimizations. This makes it easy to debug because you can trace or set 
-breakpoints inside of ThreadX itself. Of course, this costs some 
-performance. To make it run faster, you can change the tx project file to 
-enable all compiler optimizations. In addition, you can eliminate the 
-ThreadX basic API error checking by compiling your application code with the 
+The distribution version of ThreadX is built without any compiler
+optimizations. This makes it easy to debug because you can trace or set
+breakpoints inside of ThreadX itself. Of course, this costs some
+performance. To make it run faster, you can change the tx project file to
+enable all compiler optimizations. In addition, you can eliminate the
+ThreadX basic API error checking by compiling your application code with the
 symbol TX_DISABLE_ERROR_CHECKING defined.
 
 
@@ -79,7 +79,7 @@ symbol TX_DISABLE_ERROR_CHECKING defined.
 
 ThreadX provides simulated interrupt handling with Win32 threads. Simulated
 interrupt threads may be created by the application or may be added to the
-simulated timer interrupt defined in tx_initialize_low_level.c. The following 
+simulated timer interrupt defined in tx_initialize_low_level.c. The following
 format for creating simulated interrupts should be used:
 
 7.1  Data structures
@@ -116,7 +116,7 @@ in tx_initialize_low_level.c called _tx_initialize_start_interrupts or into the 
 7.4  Simulated Interrupt Thread Template
 
 The following is a template for the simulated interrupt thread. This interrupt will occur on
-a periodic basis. 
+a periodic basis.
 
 DWORD WINAPI _sample_win32_interrupt(LPVOID *ptr)
 {
@@ -135,7 +135,7 @@ DWORD WINAPI _sample_win32_interrupt(LPVOID *ptr)
 
         /* Call ThreadX context restore for interrupt completion.  */
         _tx_thread_context_restore();
-    } 
+    }
 }
 
 

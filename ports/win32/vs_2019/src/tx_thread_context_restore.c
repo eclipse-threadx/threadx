@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -31,41 +31,41 @@
 #include "tx_timer.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_context_restore                        Win32/Visual      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_context_restore                        Win32/Visual      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function restores the interrupt context if it is processing a  */ 
-/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-/*    if no thread was running, the function returns to the scheduler.    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    ReleaseSemaphore                      Win32 release semaphore       */ 
-/*    ResumeThread                          Win32 resume thread           */ 
-/*    _tx_win32_critical_section_obtain     Obtain critical section       */ 
-/*    _tx_win32_critical_section_release    Release critical section      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISRs                                  Interrupt Service Routines    */ 
+/*                                                                        */
+/*    This function restores the interrupt context if it is processing a  */
+/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+/*    if no thread was running, the function returns to the scheduler.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    ReleaseSemaphore                      Win32 release semaphore       */
+/*    ResumeThread                          Win32 resume thread           */
+/*    _tx_win32_critical_section_obtain     Obtain critical section       */
+/*    _tx_win32_critical_section_release    Release critical section      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISRs                                  Interrupt Service Routines    */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_context_restore(VOID)
@@ -92,7 +92,7 @@ VOID   _tx_thread_context_restore(VOID)
         if ((_tx_thread_preempt_disable == 0) && (_tx_thread_current_ptr != _tx_thread_execute_ptr))
         {
 
-            /* Preempt the running application thread.  We don't need to suspend the 
+            /* Preempt the running application thread.  We don't need to suspend the
                application thread since that is done in the context save processing.  */
 
             /* Indicate that this thread was suspended asynchronously.  */

@@ -1,5 +1,5 @@
 /* This test is designed to test immediate response queue services including create
-   and delete.  This test is for queue sizes of 2 ULONG.  Two queues are used one with 
+   and delete.  This test is for queue sizes of 2 ULONG.  Two queues are used one with
    a capacity of 1 message and another with a capacity of 3 messages.  */
 
 #include   <stdio.h>
@@ -54,8 +54,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -116,7 +116,7 @@ ULONG   expected_message[2];
     queue_memory.second_middle= 0x61718191;
     queue_memory.next_to_last = 0x99aabbcc;
     queue_memory.last =         0xddeeff00;
-    
+
     /* Create the queue.  */
     status =  tx_queue_create(&queue_memory.queue, "queue memory", TX_2_ULONG, &queue_memory.queue_area[0], (2048*sizeof(ULONG))/sizeof(ULONG));
     tx_queue_delete(&queue_memory.queue);
@@ -151,9 +151,9 @@ ULONG   expected_message[2];
         printf("ERROR #5\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_0, source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_0, source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -203,9 +203,9 @@ ULONG   expected_message[2];
         printf("ERROR #9\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_0, source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_0, source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -258,7 +258,7 @@ ULONG   expected_message[2];
     status +=  tx_queue_send(&queue_1, source_message, TX_NO_WAIT);
     source_message[0]++;
     source_message[1]++;
-        
+
 
     if (status != TX_SUCCESS)
     {
@@ -267,9 +267,9 @@ ULONG   expected_message[2];
         printf("ERROR #13\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_1, source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_1, source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -360,9 +360,9 @@ ULONG   expected_message[2];
         printf("ERROR #19\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_1, source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_1, source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)

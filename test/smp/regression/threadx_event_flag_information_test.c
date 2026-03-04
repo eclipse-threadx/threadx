@@ -54,8 +54,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -69,7 +69,7 @@ CHAR    *pointer;
 
      /* Create event flag group 0 and 1.  */
     status =  tx_event_flags_create(&group_0, "group 0");
- 
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -87,10 +87,10 @@ CHAR    *pointer;
         printf("Running Event Flag Information Test................................. ERROR #3\n");
         test_control_return(1);
     }
-    
+
     /* Register the event set notify function.  */
     status =  tx_event_flags_set_notify(&group_0, event_set_notify);
-    
+
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 
     /* Check status.  */
@@ -162,7 +162,7 @@ ULONG                   timeouts;
         printf("ERROR #7\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to get events from an empty event flag group.  AND CLEAR option.  */
     status =  tx_event_flags_get(&group_0, 0x80008000, TX_AND_CLEAR, &actual_events, TX_NO_WAIT);
 
@@ -248,7 +248,7 @@ ULONG                   timeouts;
         printf("ERROR #14\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to get events from event flag group.  AND CLEAR option.  */
     status =  tx_event_flags_get(&group_0, 0x80008000, TX_AND_CLEAR, &actual_events, TX_NO_WAIT);
 
@@ -343,7 +343,7 @@ ULONG                   timeouts;
     /* Get information about the event flag group.  */
     status =  tx_event_flags_info_get(&group_0, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_event_flags_info_get(&group_0, &name, &current_flags, &first_suspended, &suspended_count, &next_group);
-    
+
     /* Check the status.  */
     if ((status != TX_SUCCESS) || (current_flags != group_0.tx_event_flags_group_current) || (first_suspended != TX_NULL) || (suspended_count != 0) || (next_group != &group_1))
     {
@@ -357,7 +357,7 @@ ULONG                   timeouts;
 
     /* Get performance information with NULL pointer.  */
     status =  _tx_event_flags_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
-    
+
     /* Check the status.  */
     if (status != TX_PTR_ERROR)
     {
@@ -370,9 +370,9 @@ ULONG                   timeouts;
     /* Get performance information on the event flag group.  */
     status =  tx_event_flags_performance_info_get(&group_0, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_event_flags_performance_info_get(&group_0, &sets, &gets, &suspensions, &timeouts);
-    
+
     /* Check the status.  */
-    if ((status != TX_SUCCESS) || (sets != group_0.tx_event_flags_group_performance_set_count) || (gets != group_0.tx_event_flags_group__performance_get_count) || 
+    if ((status != TX_SUCCESS) || (sets != group_0.tx_event_flags_group_performance_set_count) || (gets != group_0.tx_event_flags_group__performance_get_count) ||
         (suspensions != group_0.tx_event_flags_group___performance_suspension_count) || (timeouts != group_0.tx_event_flags_group____performance_timeout_count))
     {
 
@@ -384,9 +384,9 @@ ULONG                   timeouts;
     /* Get system performance information on all event flags groups.  */
     status =  tx_event_flags_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_event_flags_performance_system_info_get(&sets, &gets, &suspensions, &timeouts);
-    
+
     /* Check the status.  */
-    if ((status != TX_SUCCESS) || (sets != _tx_event_flags_performance_set_count) || (gets != _tx_event_flags_performance_get_count) || 
+    if ((status != TX_SUCCESS) || (sets != _tx_event_flags_performance_set_count) || (gets != _tx_event_flags_performance_get_count) ||
         (suspensions != _tx_event_flags_performance_suspension_count) || (timeouts != _tx_event_flags_performance_timeout_count))
     {
 

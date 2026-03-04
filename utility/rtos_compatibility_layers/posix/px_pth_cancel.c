@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -69,12 +69,12 @@ INT pthread_cancel(pthread_t thread)
 TX_THREAD   *thread_ptr;
 POSIX_TCB   *pthread_ptr;
 
-    
-    
-    
-    /* Get the thread identifier of the pthread to be canceled */ 
-    thread_ptr = posix_tid2thread(thread); 
-    
+
+
+
+    /* Get the thread identifier of the pthread to be canceled */
+    thread_ptr = posix_tid2thread(thread);
+
     if( (thread_ptr->tx_thread_state == TX_COMPLETED) || (thread_ptr->tx_thread_state  == TX_TERMINATED) )
     {
         posix_errno = EINVAL;
@@ -98,9 +98,9 @@ POSIX_TCB   *pthread_ptr;
    }
    else if(pthread_ptr->cancel_type==PTHREAD_CANCEL_ASYNCHRONOUS )
    {
-        /* Signal the housekeeping ThreadX thread to cancel (delete) the requested pthread now */ 
+        /* Signal the housekeeping ThreadX thread to cancel (delete) the requested pthread now */
 
-       posix_destroy_pthread(pthread_ptr,(VOID *)0); 
+       posix_destroy_pthread(pthread_ptr,(VOID *)0);
    }
    else /* illegal value in pthread_ptr->cancel_type */
    {
@@ -109,6 +109,6 @@ POSIX_TCB   *pthread_ptr;
         return(EINVAL);
     }
 
-   /* Indicate success.  */ 
-   return(OK); 
+   /* Indicate success.  */
+   return(OK);
 }

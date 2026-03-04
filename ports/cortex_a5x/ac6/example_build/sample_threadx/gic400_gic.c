@@ -102,7 +102,7 @@ void enableIntID(unsigned int ID)
 void disableIntID(unsigned int ID)
 {
   unsigned int bank;
-  
+
   bank = ID/32;        // There are 32 IDs per register, need to work out which register to access
   ID   = ID & 0x1f;    // ... and which bit within the register
 
@@ -136,7 +136,7 @@ unsigned int getIntPriority(unsigned int ID)
     return 0;
 
   return gic_dist->GICD_IPRIORITYR[ID];
-} 
+}
 
 // ------------------------------------------------------------
 

@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -51,7 +51,7 @@
 /* Determine if the optional ThreadX user define file should be used.  */
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
 
-/* Yes, include the user defines in tx_user.h. The defines in this file may 
+/* Yes, include the user defines in tx_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
@@ -92,17 +92,17 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
 #define TX_PORT_THREAD_STACK_ERROR_HANDLING
 
 
-/* Define the system API mappings based on the error checking 
-   selected by the user.  Note: this section is only applicable to 
+/* Define the system API mappings based on the error checking
+   selected by the user.  Note: this section is only applicable to
    application source code, hence the conditional that turns off this
    stuff when the include file is processed by the ThreadX source. */
 
 #ifndef TX_SOURCE_CODE
 
 
-/* Determine if error checking is desired.  If so, map API functions 
+/* Determine if error checking is desired.  If so, map API functions
    to the appropriate error checking front-ends.  Otherwise, map API
-   functions to the core functions that actually perform the work. 
+   functions to the core functions that actually perform the work.
    Note: error checking is enabled by default.  */
 
 #ifdef TX_DISABLE_ERROR_CHECKING
@@ -147,7 +147,7 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
 #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
 #endif
 
-#ifndef TX_TIMER_THREAD_PRIORITY    
+#ifndef TX_TIMER_THREAD_PRIORITY
 #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
@@ -159,7 +159,7 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
 
 
 /* Define the clock source for trace event entry time stamp. The following two item are port specific.
-   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock 
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
    source constants would be:
 
 #define TX_TRACE_TIME_SOURCE                    *((volatile ULONG *) 0x0a800024)
@@ -198,7 +198,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #endif
 
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -212,7 +212,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 
 /* Define the TX_THREAD control block extensions for this port. The main reason
-   for the multiple macros is so that backward compatibility can be maintained with 
+   for the multiple macros is so that backward compatibility can be maintained with
    existing ThreadX kernel awareness modules.  */
 
 #define TX_THREAD_EXTENSION_0
@@ -255,7 +255,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 #define TX_TIMER_EXTENSION
 
 
-/* Define the user extension field of the thread control block.  Nothing 
+/* Define the user extension field of the thread control block.  Nothing
    additional is needed for this port so it is defined as white space.  */
 
 #ifndef TX_THREAD_USER_EXTENSION
@@ -282,7 +282,7 @@ void    __iar_Initlocks(void);
 #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0);
 #else
 /* No IAR library support. */
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
 #if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE)
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      if(thread_ptr -> tx_thread_secure_stack_context){_tx_thread_secure_stack_free(thread_ptr);}
 #else
@@ -324,7 +324,7 @@ void    __iar_Initlocks(void);
 
 
 /* Define the get system state macro.   */
-   
+
 #ifndef TX_THREAD_GET_SYSTEM_STATE
 #ifndef TX_MISRA_ENABLE
 #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_IPSR())
@@ -350,14 +350,14 @@ extern void    _tx_thread_secure_stack_initialize(void);
 #define TX_PORT_SPECIFIC_PRE_INITIALIZATION             _tx_thread_secure_stack_initialize();
 #endif
 
-/* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to 
+/* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
    prevent early scheduling on Cortex-M parts.  */
-   
+
 #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
 
 
-/* Determine if the ARM architecture has the CLZ instruction. This is available on 
-   architectures v5 and above. If available, redefine the macro for calculating the 
+/* Determine if the ARM architecture has the CLZ instruction. This is available on
+   architectures v5 and above. If available, redefine the macro for calculating the
    lowest bit set.  */
 
 #ifndef TX_DISABLE_INLINE
@@ -367,9 +367,9 @@ extern void    _tx_thread_secure_stack_initialize(void);
 #endif
 
 
-/* Define ThreadX interrupt lockout and restore macros for protection on 
-   access of critical kernel information.  The restore interrupt macro must 
-   restore the interrupt posture of the running thread prior to the value 
+/* Define ThreadX interrupt lockout and restore macros for protection on
+   access of critical kernel information.  The restore interrupt macro must
+   restore the interrupt posture of the running thread prior to the value
    present prior to the disable macro.  In most cases, the save area macro
    is used to define a local function save area for the disable and restore
    macros.  */
@@ -413,7 +413,7 @@ __istate_t interrupt_save;
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
+CHAR                            _tx_version_id[] =
                                     "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Cortex-M23/IAR Version 6.5.0.202601 *";
 #else
 #ifdef TX_MISRA_ENABLE

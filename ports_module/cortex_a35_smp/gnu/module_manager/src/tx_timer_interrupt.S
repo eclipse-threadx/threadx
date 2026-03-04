@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -170,8 +170,8 @@ __tx_timer_dont_activate:
     BL      _tx_thread_time_slice               // Call time-slice processing
 
     /* Release inter-core protection.  */
-    
-    MOV     x0, x28                             // Pass the previous status register back 
+
+    MOV     x0, x28                             // Pass the previous status register back
     BL      _tx_thread_smp_unprotect            // Release protection
 
     LDP     x29, x30, [sp], #16                 // Recover x29, x30

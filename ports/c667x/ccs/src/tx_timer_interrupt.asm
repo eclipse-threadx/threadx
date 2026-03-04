@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Timer                                                               */
 ;/**                                                                       */
@@ -48,45 +48,45 @@ SP          .set    B15
 ;
 ;
     .sect   ".text"
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_timer_interrupt                                 C667x/TI        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_timer_interrupt                                 C667x/TI        */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function processes the hardware timer interrupt.  This         */ 
-;/*    processing includes incrementing the system clock and checking for  */ 
-;/*    time slice and/or timer expiration.  If either is found, the        */ 
-;/*    interrupt context save/restore functions are called along with the  */ 
-;/*    expiration functions.                                               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_context_save               Context save                  */ 
-;/*    _tx_thread_context_restore            Context restore               */ 
-;/*    _tx_thread_time_slice                 Time slice interrupted thread */ 
-;/*    _tx_timer_expiration_process          Timer expiration processing   */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    interrupt vector                                                    */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function processes the hardware timer interrupt.  This         */
+;/*    processing includes incrementing the system clock and checking for  */
+;/*    time slice and/or timer expiration.  If either is found, the        */
+;/*    interrupt context save/restore functions are called along with the  */
+;/*    expiration functions.                                               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_context_save               Context save                  */
+;/*    _tx_thread_context_restore            Context restore               */
+;/*    _tx_thread_time_slice                 Time slice interrupted thread */
+;/*    _tx_timer_expiration_process          Timer expiration processing   */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    interrupt vector                                                    */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -106,10 +106,10 @@ _tx_timer_interrupt:
 ;    _tx_timer_system_clock++;
 ;
         MVKL        _tx_timer_system_clock,A0           ; Build address of system clock
-        MVKH        _tx_timer_system_clock,A0           ; 
+        MVKH        _tx_timer_system_clock,A0           ;
         LDW         *A0,A2                              ; Pickup system clock
         MVKL        _tx_timer_time_slice,A3             ; Build address of time slice
-        MVKH        _tx_timer_time_slice,A3             ; 
+        MVKH        _tx_timer_time_slice,A3             ;
         LDW         *A3,A1                              ; Pickup time slice
         NOP         2                                   ; Delay
         ADD         1,A2,A2                             ; Increment the system clock
@@ -120,7 +120,7 @@ _tx_timer_interrupt:
 ;    {
 ;
  [!A1]  B           _tx_timer_no_time_slice             ; If 0, skip time slice processing
-        SUB         A1,1,A1                             ; Decrement time-slice value 
+        SUB         A1,1,A1                             ; Decrement time-slice value
         NOP         4                                   ; Delay slots
 ;
 ;       /* Decrement the time_slice.  */
@@ -130,9 +130,9 @@ _tx_timer_interrupt:
 ;       if (_tx_timer_time_slice == 0)
 ;
  [A1]   B           _tx_timer_no_time_slice             ; If non-zero, not expired yet
-        STW         A1,*A3                              ; Store new time-slice    
+        STW         A1,*A3                              ; Store new time-slice
         MVKL        _tx_timer_expired_time_slice,A0     ; Build address of expired flag
-        MVKH        _tx_timer_expired_time_slice,A0     ; 
+        MVKH        _tx_timer_expired_time_slice,A0     ;
         MVKL        1,A4                                ; Expired flag
         NOP                                             ; Delay
 ;
@@ -149,10 +149,10 @@ _tx_timer_no_time_slice:
 ;    {
 ;
         MVKL        _tx_timer_current_ptr,A2            ; Build address of current timer pointer
-        MVKH        _tx_timer_current_ptr,A2            ; 
+        MVKH        _tx_timer_current_ptr,A2            ;
         LDW         *A2,A0                              ; Pickup timer list address
         MVKL        _tx_timer_expired,A3                ; Build address of expired flag
-        MVKH        _tx_timer_expired,A3                ; 
+        MVKH        _tx_timer_expired,A3                ;
         NOP         2                                   ; Delay slots
         LDW         *A0,A1                              ; Pickup current timer entry
         ADD         4,A0,A0                             ; Increment the current pointer
@@ -179,10 +179,10 @@ _tx_timer_no_timer:
 ;        if (_tx_timer_current_ptr == _tx_timer_list_end)
 ;
         MVKL        _tx_timer_list_end,A3               ; Build timer list end address
-        MVKH        _tx_timer_list_end,A3               ; 
+        MVKH        _tx_timer_list_end,A3               ;
         LDW         *A3,A4                              ; Pickup list end address
         MVKL        _tx_timer_list_start,A3             ; Build timer list start address
-        MVKH        _tx_timer_list_start,A3             ; 
+        MVKH        _tx_timer_list_start,A3             ;
         NOP         2                                   ; Delay slots
         CMPEQ       A4,A0,A1                            ; Compare current pointer with end
  [A1]   LDW         *A3,A0                              ; If at the end, pickup timer list start
@@ -205,10 +205,10 @@ _tx_timer_done:
 ;    {
 ;
         MVKL        _tx_timer_expired_time_slice,A3     ; Build time-slice expired flag
-        MVKH        _tx_timer_expired_time_slice,A3     ; 
+        MVKH        _tx_timer_expired_time_slice,A3     ;
         LDW         *A3,A4                              ; Pickup time-slice expired flag
         MVKL        _tx_timer_expired,A0                ; Build timer expired flag
-        MVKH        _tx_timer_expired,A0                ; 
+        MVKH        _tx_timer_expired,A0                ;
         LDW         *A0,A2                              ; Pickup timer expired flag
         NOP         4                                   ; Delay slots
         OR          A2,A4,A1                            ; Combine expired flags
@@ -223,8 +223,8 @@ _tx_something_expired:
 ;
         B           _tx_thread_context_save             ; Call context save routine
         MVKL        _tx_timer_ISR_return,B3             ; Build return address
-        MVKH        _tx_timer_ISR_return,B3             ; 
-        NOP         3                                   ; Delay slots  
+        MVKH        _tx_timer_ISR_return,B3             ;
+        NOP         3                                   ; Delay slots
 _tx_timer_ISR_return:
 ;
 ;    /* Did a timer expire?  */
@@ -232,7 +232,7 @@ _tx_timer_ISR_return:
 ;    {
 ;
         MVKL        _tx_timer_expired,A0                ; Build timer expired address
-        MVKH        _tx_timer_expired,A0                ; 
+        MVKH        _tx_timer_expired,A0                ;
         LDW         *A0,A1                              ; Pickup expired flag
         NOP         4                                   ; Delay slots
  [!A1]  B           _tx_timer_dont_activate             ; If not set, skip timer activation
@@ -243,7 +243,7 @@ _tx_timer_ISR_return:
 ;
         B           _tx_timer_expiration_process        ; Process timer expiration
         MVKL        _tx_timer_ISR_return_1,B3           ; Build return address
-        MVKH        _tx_timer_ISR_return_1,B3           ; 
+        MVKH        _tx_timer_ISR_return_1,B3           ;
         NOP         3                                   ; Delay slots
 _tx_timer_ISR_return_1:
 ;
@@ -255,7 +255,7 @@ _tx_timer_dont_activate:
 ;    {
 ;
         MVKL        _tx_timer_expired_time_slice,A0     ; Build address of expired flag
-        MVKH        _tx_timer_expired_time_slice,A0     ; 
+        MVKH        _tx_timer_expired_time_slice,A0     ;
         LDW         *A0,A1                              ; Pickup expired flag
         NOP         4                                   ; Delay slots
  [!A1]  B           _tx_timer_not_ts_expiration         ; If not set, skip time-slice processing
@@ -266,7 +266,7 @@ _tx_timer_dont_activate:
 ;
         B           _tx_thread_time_slice               ; Call time-slice processing
         MVKL        _tx_timer_ISR_return_2,B3           ; Build return address
-        MVKH        _tx_timer_ISR_return_2,B3           ; 
+        MVKH        _tx_timer_ISR_return_2,B3           ;
         NOP         3                                   ; Delay slots
 _tx_timer_ISR_return_2:
 ;

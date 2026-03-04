@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -84,7 +84,7 @@ ULONG    timer_ticks;
         return(ERROR);
     }
 
-    /* Add padding of 1 so that the thread will sleep no less than the specified time, 
+    /* Add padding of 1 so that the thread will sleep no less than the specified time,
        except in the case that timer_ticks is ULONG_MAX */
     if(timer_ticks != ULONG_MAX)
     {
@@ -93,7 +93,7 @@ ULONG    timer_ticks;
 
     /* Now call ThreadX thread sleep service. */
     tx_thread_sleep(timer_ticks);
-    
+
     /* Sleep completed. */
     if (rem)
     {

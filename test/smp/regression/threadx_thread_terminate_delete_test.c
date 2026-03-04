@@ -42,7 +42,7 @@ static void   entry_exit_notify(TX_THREAD *thread_ptr, UINT type)
     /* Check for the appropriate thread.  */
     if (thread_ptr != &thread_1)
         return;
-        
+
     /* Check for type.  */
     if (type == TX_THREAD_ENTRY)
         thread_1_enter++;
@@ -57,7 +57,7 @@ static void   entry_exit_notify3(TX_THREAD *thread_ptr, UINT type)
     /* Check for the appropriate thread.  */
     if (thread_ptr != &thread_3)
         return;
-        
+
     /* Check for type.  */
     if (type == TX_THREAD_ENTRY)
         thread_3_enter++;
@@ -84,8 +84,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -97,8 +97,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -136,8 +136,8 @@ CHAR    *pointer;
 
 #endif
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -149,8 +149,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             12, 12, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -231,7 +231,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* At this point, terminate thread 2 which should be in a suspended state 
+    /* At this point, terminate thread 2 which should be in a suspended state
        right now.  */
     status =  tx_thread_terminate(&thread_2);
 
@@ -267,7 +267,7 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* At this point, terminate thread 3 which should be in a suspended state 
+    /* At this point, terminate thread 3 which should be in a suspended state
        on the semaphore right now.  */
     status =  tx_thread_terminate(&thread_3);
 

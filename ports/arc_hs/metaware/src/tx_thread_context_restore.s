@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 
@@ -236,7 +236,7 @@ __tx_thread_preempt_restore:
     b       __tx_preempt_save_done                      ; Done, finished with preemption save
     nop
 
-__tx_software_interrupt_context:    
+__tx_software_interrupt_context:
     mov     r6, 1                                       ; Build interrupt stack type
     st      r6,  [r7, 0]                                ; Setup interrupt stack type
     st      fp,  [r7, 24]                               ; Save fp

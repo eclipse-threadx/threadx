@@ -1,6 +1,6 @@
 MEMORY {
     zero_memory  : ORIGIN = 0xffff8000, LENGTH = 64K
-    
+
     dram_rsvd1   : ORIGIN = 0x80000000, LENGTH = 0
     vector_0x000 : ORIGIN = .           LENGTH = 0x100
     vector_0x100 : ORIGIN = .           LENGTH = 0x080
@@ -20,7 +20,7 @@ DEFAULTS {
 
     heap_reserve = 2M
     stack_reserve = 512K
-    
+
 }
 //
 // Program layout for running out of RAM.
@@ -71,5 +71,5 @@ _end_bss = . ;
     __ghs_ramend    = MEMENDADDR(dram_rsvd2);
     __ghs_romstart  = MEMADDR(flash_rsvd1);
     __ghs_romend    = MEMENDADDR(flash_rsvd2);
-    
+
 }

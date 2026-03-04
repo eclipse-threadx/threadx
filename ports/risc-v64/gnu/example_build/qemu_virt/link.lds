@@ -37,7 +37,7 @@ SECTIONS
     *(.bss .bss.*)
     _bss_end = .;
   }
-  
+
   .stack : {
     . = ALIGN(4096);
     _sysstack_start = .;

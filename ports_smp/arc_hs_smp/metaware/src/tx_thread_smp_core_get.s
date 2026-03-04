@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread - Low Level SMP Support                                      */
 ;/**                                                                       */
@@ -30,36 +30,36 @@
 ;#include "tx_timer.h"  */
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_smp_core_get                         SMP/ARC_HS/MetaWare */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_smp_core_get                         SMP/ARC_HS/MetaWare */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function gets the currently running core number and returns it.*/ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function gets the currently running core number and returns it.*/
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    Core ID                                                             */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    Core ID                                                             */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
 ;/*    ThreadX Source                                                      */
-;/*                                                                        */ 
+;/*                                                                        */
 ;/**************************************************************************/
     .global _tx_thread_smp_core_get
     .type   _tx_thread_smp_core_get, @function
@@ -73,7 +73,7 @@ _tx_thread_smp_core_get:
     .ifndef TX_ZERO_BASED_CORE_ID
     sub     r0, r0, 1                                   ; Subtract 1 to make 0-based
     .else
-    nop                                                 ; 
-    .endif  
+    nop                                                 ;
+    .endif
     .end
-   
+

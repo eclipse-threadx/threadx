@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -27,18 +27,18 @@
 #include "px_int.h"     /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*  pthread_cond_init                                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*  pthread_cond_init                                     PORTABLE C      */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This function shall initialize the condition variable referenced by */
 /*    cond with attributes referenced by attr. If attr is NULL,the default*/
 /*    condition variable attributes shall be used; the effect is the same */
@@ -46,22 +46,22 @@
 /*    object. Upon successful initialization, the state of the condition  */
 /*    variable shall become initialized.                                  */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*     Nothing                                                            */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*     cond                               condition variable object       */
 /*     attr                               attributes                      */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    tx_semaphore_create                 create a semaphore internal to  */
-/*                                        cond variable                   */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
+/*                                        cond variable                   */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 INT pthread_cond_init(pthread_cond_t *cond, pthread_condattr_t *attr)
@@ -69,11 +69,11 @@ INT pthread_cond_init(pthread_cond_t *cond, pthread_condattr_t *attr)
 
 TX_SEMAPHORE   *semaphore_ptr;
 UINT            status;
-    
+
     cond->in_use = TX_TRUE;
     /* Get the condition variable's internal semaphore.  */
-    /* Simply convert the COndition variable control block into a semaphore  a cast */ 
-    semaphore_ptr = (&( cond->cond_semaphore )); 
+    /* Simply convert the COndition variable control block into a semaphore  a cast */
+    semaphore_ptr = (&( cond->cond_semaphore ));
     /* Now create the internal semaphore for this cond variable */
     status = tx_semaphore_create(semaphore_ptr,"csem",0);
     if (status != TX_SUCCESS)

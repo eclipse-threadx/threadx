@@ -82,16 +82,16 @@
   INTERRUPT/EXCEPTION STACK FRAME FOR A THREAD OR NESTED INTERRUPT
 
   A stack frame of this structure is allocated for any interrupt or exception.
-  It goes on the current stack. If the RTOS has a system stack for handling 
-  interrupts, every thread stack must allow space for just one interrupt stack 
+  It goes on the current stack. If the RTOS has a system stack for handling
+  interrupts, every thread stack must allow space for just one interrupt stack
   frame, then nested interrupt stack frames go on the system stack.
 
-  The frame includes basic registers (explicit) and "extra" registers introduced 
+  The frame includes basic registers (explicit) and "extra" registers introduced
   by user TIE or the use of the MAC16 option in the user's Xtensa config.
   The frame size is minimized by omitting regs not applicable to user's config.
 
   For Windowed ABI, this stack frame includes the interruptee's base save area,
-  another base save area to manage gcc nested functions, and a little temporary 
+  another base save area to manage gcc nested functions, and a little temporary
   space to help manage the spilling of the register windows.
 -------------------------------------------------------------------------------
 */
@@ -206,7 +206,7 @@ XSTRUCT_END(XtExcFrame)
 #else
 
 /* No extra storage required */
-#define XT_STK_NEXT2            XT_STK_NEXT1   
+#define XT_STK_NEXT2            XT_STK_NEXT1
 
 #endif
 
@@ -252,7 +252,7 @@ XSTRUCT_END(XtExcFrame)
   and the context switch of that co-processor is then peformed by the handler.
   Ownership represents which thread's state is currently in the co-processor.
 
-  Co-processors may not be used by interrupt or exception handlers. If an 
+  Co-processors may not be used by interrupt or exception handlers. If an
   co-processor instruction is executed by an interrupt or exception handler,
   the co-processor exception handler will trigger a kernel panic and freeze.
   This restriction is introduced to reduce the overhead of saving and restoring
@@ -263,7 +263,7 @@ XSTRUCT_END(XtExcFrame)
   such as in the thread control block or above the thread stack area. It need
   not be in the interrupt stack frame since interrupts don't use co-processors.
 
-  Along with the save area for each co-processor, two bitmasks with flags per 
+  Along with the save area for each co-processor, two bitmasks with flags per
   co-processor (laid out as in the CPENABLE reg) help manage context-switching
   co-processors as efficiently as possible:
 
@@ -279,10 +279,10 @@ XSTRUCT_END(XtExcFrame)
 
   XT_CPSTORED
     A bitmask with the same layout as CPENABLE, a bit per co-processor.
-    Indicates whether the state of each co-processor is saved in the state 
+    Indicates whether the state of each co-processor is saved in the state
     save area. When a thread enters the kernel, only the state of co-procs
-    still enabled in CPENABLE is saved. When the co-processor exception 
-    handler assigns ownership of a co-processor to a thread, it restores 
+    still enabled in CPENABLE is saved. When the co-processor exception
+    handler assigns ownership of a co-processor to a thread, it restores
     the saved state only if this bit is set, and clears this bit.
 
   XT_CP_CS_ST
@@ -338,7 +338,7 @@ XSTRUCT_END(XtExcFrame)
   For framed functions the frame is created and the return address saved at
   base of frame (Call0 ABI) or as determined by hardware (Windowed ABI).
   For frameless functions, there is no frame and return address remains in a0.
-  Note: Because CPP macros expand to a single line, macros requiring multi-line 
+  Note: Because CPP macros expand to a single line, macros requiring multi-line
   expansions are implemented as assembler macros.
 -------------------------------------------------------------------------------
 */
@@ -351,7 +351,7 @@ XSTRUCT_END(XtExcFrame)
     addi    sp, sp, -\size
     s32i    a0, sp, 0
     .endm
-  #define ENTRY0      
+  #define ENTRY0
   #define RET(sz)       ret1    sz
     .macro  ret1 size=0x10
     l32i    a0, sp, 0

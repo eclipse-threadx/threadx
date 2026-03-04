@@ -93,7 +93,7 @@ get_private_timer_count:
   LDR     r0, [r0, #0x604]        // Read count register
 
   BX      lr
-  
+
 // ------------------------------------------------------------
 
   // void clear_private_timer_irq(void)

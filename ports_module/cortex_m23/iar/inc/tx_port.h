@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -106,24 +106,24 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
     #error "Do not define TX_ENABLE_STACK_CHECKING"
 #endif
 
-/* If user does not want to terminate thread on stack overflow, 
+/* If user does not want to terminate thread on stack overflow,
    #define the TX_THREAD_NO_TERMINATE_STACK_ERROR symbol.
    The thread will be rescheduled and continue to cause the exception.
    It is suggested user code handle this by registering a notification with the
    tx_thread_stack_error_notify function. */
 /*#define TX_THREAD_NO_TERMINATE_STACK_ERROR */
 
-/* Define the system API mappings based on the error checking 
-   selected by the user.  Note: this section is only applicable to 
+/* Define the system API mappings based on the error checking
+   selected by the user.  Note: this section is only applicable to
    application source code, hence the conditional that turns off this
    stuff when the include file is processed by the ThreadX source. */
 
 #ifndef TX_SOURCE_CODE
 
 
-/* Determine if error checking is desired.  If so, map API functions 
+/* Determine if error checking is desired.  If so, map API functions
    to the appropriate error checking front-ends.  Otherwise, map API
-   functions to the core functions that actually perform the work. 
+   functions to the core functions that actually perform the work.
    Note: error checking is enabled by default.  */
 
 #ifdef TX_DISABLE_ERROR_CHECKING
@@ -440,7 +440,7 @@ __attribute__( ( always_inline ) ) static inline void __set_CONTROL(ULONG contro
 
 /* A thread can be terminated by another thread, so we first check if it's self-terminating and not in an ISR.
    If so, deactivate the FPU via CONTROL.FPCA. Otherwise we are in an interrupt or another thread is terminating
-   this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the FPU to flush 
+   this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the FPU to flush
    the lazy FPU save, then restore the CONTROL.FPCA state. */
 
 #ifndef TX_MISRA_ENABLE
@@ -598,7 +598,7 @@ extern void    _tx_thread_secure_stack_initialize(void);
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __CLZ(__RBIT((m)));
 #elif defined(__GNUC__) /* GCC and AC6 Compiler */
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       __asm__ volatile (" RBIT %0,%1 ": "=r" (m) : "r" (m) ); \
-                                                __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) ); 
+                                                __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) );
 #endif
 
 /* Define the interrupt disable/restore macros for each compiler. */

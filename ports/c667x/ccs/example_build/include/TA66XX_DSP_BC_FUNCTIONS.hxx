@@ -7,7 +7,7 @@
 
 	Notes:
 	------
-	1.	This C-header file contains TORNADO AMC modules SDK functions 
+	1.	This C-header file contains TORNADO AMC modules SDK functions
 		for DSP environment declarations and is an include file for
 		TI C6xxx C/C++ Code Generation Tools, which must be invoked to compile
 		for TORNADO AMC platform.
@@ -1008,7 +1008,7 @@ int32_t TA66XX_BC_get_hw_cfg_info(TA66XX_BC_HW_CFG_INFO_DATA_DD *info_dd);
 
 
 /*------------ TA66XX_BC_get_fmc_info() function -------------------------*//**
- * @brief  Function returns FMC module device info: installed status, device 
+ * @brief  Function returns FMC module device info: installed status, device
  * name, serial number, manufacturing date, firmware revisions, etc.
  *
  * @param[out]  info_dd - pointer to a buffer that receives FMC info data
@@ -1081,7 +1081,7 @@ int32_t TA66XX_BC_set_mmc_power_down_notification(void);
  * @brief  Function returns identification info about installed SFP
  * transceiver: 256-byte array read from address 0x50 (identification info
  * according to SFF-8472) and 256-byte array read from address 0x51 (digital
- * diagnostic monitoring interface (DDMI) data) 
+ * diagnostic monitoring interface (DDMI) data)
  *
  * @param[out]  id_data - pointer to a buffer that receives 256-byte array read
  *				from address 0x50 (identification info according to SFF-8472).
@@ -1356,7 +1356,7 @@ uint32_t TA66XX_BC_get_flash_length(void);
 
 
 /*------------ TA66XX_BC_get_flash_hw_wp_enable_status() function --------*//**
- * @brief  Function returns enable status of on-board FLASH memory hardware 
+ * @brief  Function returns enable status of on-board FLASH memory hardware
  * (via on-board switch) write-protection
  *
  * @return  On-board FLASH memory hardware write-protection enable state:
@@ -1367,7 +1367,7 @@ uint32_t TA66XX_BC_get_flash_hw_wp_enable_status(void);
 
 
 /*------------ TA66XX_BC_get_flash_sw_wp_enable_status() function --------*//**
- * @brief  Function returns enable status of on-board FLASH memory software 
+ * @brief  Function returns enable status of on-board FLASH memory software
  * write-protection
  *
  * @return  On-board FLASH memory software write-protection enable state:
@@ -1507,7 +1507,7 @@ uint32_t TA66XX_BC_get_mram_length(void);
 
 
 /*------------ TA66XX_BC_get_mram_sw_wp_enable_status() function ---------*//**
- * @brief  Function returns enable status of on-board MRAM memory software 
+ * @brief  Function returns enable status of on-board MRAM memory software
  * write-protection
  *
  * @return  On-board MRAM memory software write-protection enable state:

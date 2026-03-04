@@ -51,7 +51,7 @@ extern fmt_in_fn g_current_inputs;
 #define print_current_in_set(fn) do{g_current_inputs = fn;}while(0)
 static inline int is_normal_outputs(void)
 {
-	if(g_current_inputs) 
+	if(g_current_inputs)
 		return 0;
 	return 1;
 }

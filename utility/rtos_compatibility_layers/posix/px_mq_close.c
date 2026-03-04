@@ -1,19 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -67,12 +67,12 @@ INT  mq_close(mqd_t mqdes)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_QUEUE          * Queue; 
+TX_QUEUE          * Queue;
 POSIX_MSG_QUEUE   * q_ptr;
 
-    /* Assign a temporary variable for clarity.  */ 
-    Queue = &(mqdes->f_data->queue); 
-    q_ptr = (POSIX_MSG_QUEUE * )Queue; 
+    /* Assign a temporary variable for clarity.  */
+    Queue = &(mqdes->f_data->queue);
+    q_ptr = (POSIX_MSG_QUEUE * )Queue;
 
     /* First, check for an invalid queue pointer.  */
     if ( (!q_ptr) || ( (q_ptr -> px_queue_id) != PX_QUEUE_ID))
@@ -114,7 +114,7 @@ POSIX_MSG_QUEUE   * q_ptr;
 
         q_ptr ->open_count--;
 
-    /* Destroy the basic Queue is the ref count is zero and 
+    /* Destroy the basic Queue is the ref count is zero and
         it is marked by unlink.  */
     if( (! q_ptr ->open_count ) && (q_ptr->unlink_flag == TX_TRUE))
     {

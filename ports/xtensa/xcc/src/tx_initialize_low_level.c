@@ -114,8 +114,8 @@ VOID   _tx_initialize_low_level(VOID)
     Initialize co-processor management for threads. Leave CPENABLE alone.
     This is called from a normal Xtensa single-threaded run-time environment
     before multi-threading has commenced. All co-processors are enabled.
-    It is important NOT to clear CPENABLE yet because tx_application_define() 
-    is user code which might use a co-processor. The co-processor exception 
+    It is important NOT to clear CPENABLE yet because tx_application_define()
+    is user code which might use a co-processor. The co-processor exception
     handler does not expect to be called outside a thread.
     */
     _xt_coproc_init();

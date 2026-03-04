@@ -13,13 +13,13 @@
 /*
  * Copyright (c) 1999-2007 MIPS Technologies, Inc.
  * Copyright (C) 2009 CodeSourcery, LLC.
- * 
+ *
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *      * Redistributions of source code must retain the above copyright
  *        notice, this list of conditions and the following disclaimer.
  *      * Redistributions in binary form must reproduce the above
@@ -30,7 +30,7 @@
  *      * Neither the name of MIPS Technologies Inc. nor the names of its
  *        contributors may be used to endorse or promote products derived
  *        from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -323,13 +323,13 @@ extern "C" {
 #define CFG_C_WTHRU_NOALLOC	0
 #define CFG_C_WTHRU_ALLOC	1
 #define CFG_C_COHERENTXCL	4
-#define CFG_C_COHERENTXCLW	5 	
+#define CFG_C_COHERENTXCLW	5
 #define CFG_C_COHERENTUPD	6
 #define CFG_C_UNCACHED_ACCEL	7
 #endif
 
 
-/* 
+/*
  * Primary Cache TagLo (CP0 Register 28, Select 0/2)
  */
 #define TAG_PTAG_MASK           0xffffff00      /* Primary Tag */
@@ -412,8 +412,8 @@ extern "C" {
 
 #ifdef __ASSEMBLER__
 
-/* 
- * MIPS32 Coprocessor 0 register numbers 
+/*
+ * MIPS32 Coprocessor 0 register numbers
  */
 #define C0_INDEX	$0
 #define C0_INX		$0
@@ -518,8 +518,8 @@ typedef unsigned long		reg_t;
 typedef signed long		sreg_t;
 #endif
 
-/* 
- * MIPS32 Coprocessor 0 register numbers 
+/*
+ * MIPS32 Coprocessor 0 register numbers
  */
 #define C0_INDEX	0
 #define C0_INX		0
@@ -561,7 +561,7 @@ typedef signed long		sreg_t;
 #define C0_DESAVE	31
 
 #define _mips_nop() \
-  __asm__ __volatile ("%(ssnop%)" : :) 
+  __asm__ __volatile ("%(ssnop%)" : :)
 
 #if ! __mips16 || __force_mips16_asm
 # define _mips_sync() __asm__ __volatile__ ("sync" : : : "memory")
@@ -573,7 +573,7 @@ extern void _mips_sync(void);
 #define _mips_wait() \
   __asm__ __volatile ("wait")
 
-/* 
+/*
  * Define macros for accessing the MIPS32 coprocessor 0 registers.
  * Most apart from "set" return the original register value.
  */

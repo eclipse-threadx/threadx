@@ -4,7 +4,7 @@
 // Copyright ARM Ltd 2013. All rights reserved.
 // ------------------------------------------------------------
 
- 
+
 	.section  AArch64_GenericTimer,"ax"
   .align 3
 
@@ -14,10 +14,10 @@
   // uint32_t getCNTFRQ(void)
   // Returns the value of CNTFRQ_EL0
 	.type getCNTFRQ, @function
-getCNTFRQ:	
+getCNTFRQ:
   MRS     x0, CNTFRQ_EL0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -26,7 +26,7 @@ getCNTFRQ:
   // Sets the value of CNTFRQ_EL0 (only possible at EL3)
   // w0 - freq - The value to be written into CNTFRQ_EL0
 	.type setCNTFRQ, @function
-setCNTFRQ:	
+setCNTFRQ:
   MSR     CNTFRQ_EL0, x0
   RET
 
@@ -37,10 +37,10 @@ setCNTFRQ:
   // uint64_t getPhysicalCount(void)
   // Returns the current value of physical count (CNTPCT_EL0)
 	.type getPhysicalCount, @function
-getPhysicalCount:	
+getPhysicalCount:
   MRS      x0, CNTPCT_EL0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -48,10 +48,10 @@ getPhysicalCount:
   // uint64_t getVirtualCount(void)
   // Returns the current value of the virtual count register (CNTVCT_EL0)
 	.type getVirtualCount, @function
-getVirtualCount:	
+getVirtualCount:
   MRS     x0, CNTVCT_EL0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -59,10 +59,10 @@ getVirtualCount:
   // uint32_t getEL1Ctrl(void)
   // Returns the value of EL1 Timer Control Register (CNTKCTL_EL1)
 	.type getEL1Ctrl, @function
-getEL1Ctrl:	
+getEL1Ctrl:
   MRS      x0, CNTKCTL_EL1
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -71,10 +71,10 @@ getEL1Ctrl:
   // Sets the value of Counter Non-secure EL1 Control Register (CNTKCTL_EL1)
   // 0 - value - The value to be written into CNTKCTL_EL1
 	.type setEL1Ctrl, @function
-setEL1Ctrl:	
+setEL1Ctrl:
   MSR     CNTKCTL_EL1, x0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -82,10 +82,10 @@ setEL1Ctrl:
   // uint32_t getEL2Ctrl(void)
   // Returns the value of the EL2 Timer Control Register (CNTHCTL_EL2)
 	.type getEL2Ctrl, @function
-getEL2Ctrl:	
+getEL2Ctrl:
   MRS     x0, CNTHCTL_EL2
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -94,10 +94,10 @@ getEL2Ctrl:
   // Sets the value of the EL2 Timer Control Register (CNTHCTL_EL2)
   // x0 - value - The value to be written into CNTHCTL_EL2
 	.type setEL2Ctrl, @function
-setEL2Ctrl:	
+setEL2Ctrl:
   MSR     CNTHCTL_EL2, x0
   RET
-   
+
 
 // ------------------------------------------------------------
 // Non-Secure Physical Timer
@@ -107,10 +107,10 @@ setEL2Ctrl:
   // uint64_t getNSEL1PhysicalCompValue(void)
   // Returns the value of Non-Secure EL1 Physical Compare Value Register (CNTP_CVAL_EL0)
 	.type getNSEL1PhysicalCompValue, @function
-getNSEL1PhysicalCompValue:	
+getNSEL1PhysicalCompValue:
   MRS     x0, CNTP_CVAL_EL0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -119,10 +119,10 @@ getNSEL1PhysicalCompValue:
   // Sets the value of the Non-Secure EL1 Physical Compare Value Register (CNTP_CVAL_EL0)
   // x0 - value - The value to be written into CNTP_CVAL_EL0
 	.type setNSEL1PhysicalCompValue, @function
-setNSEL1PhysicalCompValue:	
+setNSEL1PhysicalCompValue:
   MSR     CNTP_CVAL_EL0, x0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -130,10 +130,10 @@ setNSEL1PhysicalCompValue:
   // uint32_t getNSEL1PhysicalTimerValue(void)
   // Returns the value of Non-Secure EL1 Physical Timer Value Register (CNTP_TVAL_EL0)
 	.type getNSEL1PhysicalTimerValue, @function
-getNSEL1PhysicalTimerValue:	
+getNSEL1PhysicalTimerValue:
   MRS     x0, CNTP_TVAL_EL0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -142,10 +142,10 @@ getNSEL1PhysicalTimerValue:
   // Sets the value of the Non-Secure EL1 Physical Timer Value Register (CNTP_TVAL_EL0)
   // w0 - value - The value to be written into CNTP_TVAL_EL0
 	.type setNSEL1PhysicalTimerValue, @function
-setNSEL1PhysicalTimerValue:	
+setNSEL1PhysicalTimerValue:
   MSR     CNTP_TVAL_EL0, x0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -153,10 +153,10 @@ setNSEL1PhysicalTimerValue:
   // uint32_t getNSEL1PhysicalTimerCtrl(void)
   // Returns the value of Non-Secure EL1 Physical Timer Control Register (CNTP_CTL_EL0)
 	.type getNSEL1PhysicalTimerCtrl, @function
-getNSEL1PhysicalTimerCtrl:	
+getNSEL1PhysicalTimerCtrl:
   MRS     x0, CNTP_CTL_EL0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -165,10 +165,10 @@ getNSEL1PhysicalTimerCtrl:
   // Sets the value of the Non-Secure EL1 Physical Timer Control Register (CNTP_CTL_EL0)
   // w0 - value - The value to be written into CNTP_CTL_EL0
 	.type setNSEL1PhysicalTimerCtrl, @function
-setNSEL1PhysicalTimerCtrl:	
+setNSEL1PhysicalTimerCtrl:
   MSR     CNTP_CTL_EL0, x0
   RET
-   
+
 
 // ------------------------------------------------------------
 // Secure Physical Timer
@@ -178,10 +178,10 @@ setNSEL1PhysicalTimerCtrl:
   // uint64_t getSEL1PhysicalCompValue(void)
   // Returns the value of Secure EL1 Physical Compare Value Register (CNTPS_CVAL_EL1)
 	.type getSEL1PhysicalCompValue, @function
-getSEL1PhysicalCompValue:	
+getSEL1PhysicalCompValue:
   MRS     x0, CNTPS_CVAL_EL1
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -190,10 +190,10 @@ getSEL1PhysicalCompValue:
   // Sets the value of the Secure EL1 Physical Compare Value Register (CNTPS_CVAL_EL1)
   // x0 - value - The value to be written into CNTPS_CVAL_EL1
 	.type setSEL1PhysicalCompValue, @function
-setSEL1PhysicalCompValue:	
+setSEL1PhysicalCompValue:
   MSR     CNTPS_CVAL_EL1, x0
   RET
-   
+
 
 
 // ------------------------------------------------------------
@@ -202,10 +202,10 @@ setSEL1PhysicalCompValue:
   // uint32_t getSEL1PhysicalTimerValue(void)
   // Returns the value of Secure EL1 Physical Timer Value Register (CNTPS_TVAL_EL1)
 	.type getSEL1PhysicalTimerValue, @function
-getSEL1PhysicalTimerValue:	
+getSEL1PhysicalTimerValue:
   MRS     x0, CNTPS_TVAL_EL1
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -214,10 +214,10 @@ getSEL1PhysicalTimerValue:
   // Sets the value of the Secure EL1 Physical Timer Value Register (CNTPS_TVAL_EL1)
   // w0 - value - The value to be written into CNTPS_TVAL_EL1
 	.type setSEL1PhysicalTimerValue, @function
-setSEL1PhysicalTimerValue:	
+setSEL1PhysicalTimerValue:
   MSR     CNTPS_TVAL_EL1, x0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -225,10 +225,10 @@ setSEL1PhysicalTimerValue:
   // uint32_t getSEL1PhysicalTimerCtrl(void)
   // Returns the value of Secure EL1 Physical Timer Control Register (CNTPS_CTL_EL1)
 	.type getSEL1PhysicalTimerCtrl, @function
-getSEL1PhysicalTimerCtrl:	
+getSEL1PhysicalTimerCtrl:
   MRS     x0, CNTPS_CTL_EL1
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -237,11 +237,11 @@ getSEL1PhysicalTimerCtrl:
   // Sets the value of the Secure EL1 Physical Timer Control Register (CNTPS_CTL_EL1)
   // w0 - value - The value to be written into CNTPS_CTL_EL1
 	.type setSEL1PhysicalTimerCtrl, @function
-setSEL1PhysicalTimerCtrl:	
+setSEL1PhysicalTimerCtrl:
   MSR     CNTPS_CTL_EL1, x0
   RET
-   
-  
+
+
 // ------------------------------------------------------------
 
 	.global configSecureEL1TimerAccess
@@ -249,12 +249,12 @@ setSEL1PhysicalTimerCtrl:
   // Sets the values of the SCR_EL3.ST bit (bit 11) based on the value in x0
   // EL3 accessible only!
 	.type configSecureEL1TimerAccess, @function
-configSecureEL1TimerAccess:	
+configSecureEL1TimerAccess:
   MRS     x1, SCR_EL3
   BFI     x1, x0, #11, #1
   MSR     SCR_EL3, x1
   RET
-   
+
 
 // ------------------------------------------------------------
 // Virtual Timer
@@ -264,10 +264,10 @@ configSecureEL1TimerAccess:
   // uint64_t getEL1VirtualCompValue(void)
   // Returns the value of EL1 Virtual Compare Value Register (CNTV_CVAL_EL0)
 	.type getEL1VirtualCompValue, @function
-getEL1VirtualCompValue:	
+getEL1VirtualCompValue:
   MRS      x0, CNTV_CVAL_EL0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -276,7 +276,7 @@ getEL1VirtualCompValue:
   // Sets the value of the EL1 Virtual Compare Value Register (CNTV_CVAL_EL0)
   // x0 - value - The value to be written into CNTV_CVAL_EL0
 	.type setEL1VirtualCompValue, @function
-setEL1VirtualCompValue:	
+setEL1VirtualCompValue:
   MSR     CNTV_CVAL_EL0, x0
   RET
 
@@ -287,10 +287,10 @@ setEL1VirtualCompValue:
   // uint32_t getEL1VirtualTimerValue(void)
   // Returns the value of EL1 Virtual Timer Value Register (CNTV_TVAL_EL0)
 	.type getEL1VirtualTimerValue, @function
-getEL1VirtualTimerValue:	
+getEL1VirtualTimerValue:
   MRS     x0, CNTV_TVAL_EL0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -299,10 +299,10 @@ getEL1VirtualTimerValue:
   // Sets the value of the EL1 Virtual Timer Value Register (CNTV_TVAL_EL0)
   // w0 - value - The value to be written into CNTV_TVAL_EL0
 	.type setEL1VirtualTimerValue, @function
-setEL1VirtualTimerValue:	
+setEL1VirtualTimerValue:
   MSR     CNTV_TVAL_EL0, x0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -310,10 +310,10 @@ setEL1VirtualTimerValue:
   // uint32_t getEL1VirtualTimerCtrl(void)
   // Returns the value of EL1 Virtual Timer Control Register (CNTV_CTL_EL0)
 	.type getEL1VirtualTimerCtrl, @function
-getEL1VirtualTimerCtrl:	
+getEL1VirtualTimerCtrl:
   MRS     x0, CNTV_CTL_EL0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -322,11 +322,11 @@ getEL1VirtualTimerCtrl:
   // Sets the value of the EL1 Virtual Timer Control Register (CNTV_CTL_EL0)
   // w0 - value - The value to be written into CNTV_CTL_EL0
 	.type setEL1VirtualTimerCtrl, @function
-setEL1VirtualTimerCtrl:	
+setEL1VirtualTimerCtrl:
   MSR     CNTV_CTL_EL0, x0
   RET
-   
-  
+
+
 // ------------------------------------------------------------
 // Virtual Timer functions to be called by EL2
 // ------------------------------------------------------------
@@ -336,10 +336,10 @@ setEL1VirtualTimerCtrl:
   // Returns the value of the Counter Virtual Offset Register (CNTVOFF_EL2)
   // EL2 and EL3 only
 	.type getVirtualCounterOffset, @function
-getVirtualCounterOffset:	
+getVirtualCounterOffset:
   MRS     x0, CNTVOFF_EL2
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -349,11 +349,11 @@ getVirtualCounterOffset:
   // x0 - offset - The value to be written into CNTVOFF_EL2
   // EL2 and EL3 only
 	.type setVirtualCounterOffset, @function
-setVirtualCounterOffset:	
+setVirtualCounterOffset:
   MSR     CNTVOFF_EL2, x0
   RET
-   
-  
+
+
 // ------------------------------------------------------------
 // EL2 Physical Timer
 // ------------------------------------------------------------
@@ -362,10 +362,10 @@ setVirtualCounterOffset:
   // uint64_t getEL2PhysicalCompValue(void)
   // Returns the value of EL2 Physical Compare Value Register (CNTHP_CVAL_EL2)
 	.type getEL2PhysicalCompValue, @function
-getEL2PhysicalCompValue:	
+getEL2PhysicalCompValue:
   MRS     x0, CNTHP_CVAL_EL2
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -374,10 +374,10 @@ getEL2PhysicalCompValue:
   // Sets the value of the EL2 Physical Compare Value Register (CNTHP_CVAL_EL2)
   // x0 - value - The value to be written into CNTHP_CVAL_EL2
 	.type setEL2PhysicalCompValue, @function
-setEL2PhysicalCompValue:	
+setEL2PhysicalCompValue:
   MSR     CNTHP_CVAL_EL2, x0
   RET
-   
+
 
 
 // ------------------------------------------------------------
@@ -386,10 +386,10 @@ setEL2PhysicalCompValue:
   // uint32_t getEL2PhysicalTimerValue(void)
   // Returns the value of EL2 Physical Timer Value Register (CNTHP_TVAL_EL2)
 	.type getEL2PhysicalTimerValue, @function
-getEL2PhysicalTimerValue:	
+getEL2PhysicalTimerValue:
   MRS     x0, CNTHP_TVAL_EL2
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -398,10 +398,10 @@ getEL2PhysicalTimerValue:
   // Sets the value of the EL2 Physical Timer Value Register (CNTHP_TVAL_EL2)
   // w0 - value - The value to be written into CNTHP_TVAL_EL2
 	.type setEL2PhysicalTimerValue, @function
-setEL2PhysicalTimerValue:	
+setEL2PhysicalTimerValue:
   MSR     CNTHP_TVAL_EL2, x0
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -409,10 +409,10 @@ setEL2PhysicalTimerValue:
   // uint32_t getEL2PhysicalTimerCtrl(void)
   // Returns the value of EL2 Physical Timer Control Register (CNTHP_CTL_EL2)
 	.type getEL2PhysicalTimerCtrl, @function
-getEL2PhysicalTimerCtrl:	
+getEL2PhysicalTimerCtrl:
   MRS     x0, CNTHP_CTL_EL2
   RET
-   
+
 
 // ------------------------------------------------------------
 
@@ -421,10 +421,10 @@ getEL2PhysicalTimerCtrl:
   // Sets the value of the EL2 Physical Timer Control Register (CNTHP_CTL_EL2)
   // w0 - value - The value to be written into CNTHP_CTL_EL2
 	.type setEL2PhysicalTimerCtrl, @function
-setEL2PhysicalTimerCtrl:	
+setEL2PhysicalTimerCtrl:
   MSR     CNTHP_CTL_EL2, x0
   RET
-   
+
 
 // ------------------------------------------------------------
 // End of code

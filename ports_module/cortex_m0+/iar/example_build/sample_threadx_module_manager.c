@@ -67,11 +67,11 @@ int main()
 void    tx_application_define(void *first_unused_memory)
 {
 
-CHAR    *pointer = (CHAR*)module_manager_stack;         
+CHAR    *pointer = (CHAR*)module_manager_stack;
 
 
-    tx_thread_create(&module_manager, "Module Manager Thread", module_manager_entry, 0,  
-                     pointer, DEMO_STACK_SIZE, 
+    tx_thread_create(&module_manager, "Module Manager Thread", module_manager_entry, 0,
+                     pointer, DEMO_STACK_SIZE,
                      1, 1, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + DEMO_STACK_SIZE;
 }
@@ -91,22 +91,22 @@ void    module_manager_entry(ULONG thread_input)
 
     /* Register a fault handler.  */
     txm_module_manager_memory_fault_notify(module_fault_handler);
-    
+
     /* Load the module that is already there, in this example it is placed there by the multiple image download.  */
     txm_module_manager_in_place_load(&my_module, "my module", (VOID *) MODULE_CODE);
-    
+
     /* Enable 128 byte read/write shared memory region.  */
     txm_module_manager_external_memory_enable(&my_module, (void *) EXTERNAL_MEMORY, EXTERNAL_MEMORY_SIZE, TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE);
-    
+
     /* Start the module.  */
     txm_module_manager_start(&my_module);
 
     /* Sleep for a while....  */
     tx_thread_sleep(1000);
-    
+
     /* Stop the module.  */
     txm_module_manager_stop(&my_module);
-    
+
     /* Unload the module.  */
     txm_module_manager_unload(&my_module);
 
@@ -115,11 +115,11 @@ void    module_manager_entry(ULONG thread_input)
 
     /* Start the module again.  */
     txm_module_manager_start(&my_module);
-    
+
     /* Now just spin...  */
     while(1)
     {
-    
+
         tx_thread_sleep(100);
     }
 }

@@ -1,13 +1,13 @@
 ;----------------------------------------------------------------
 ; Copyright (c) 2005-2018 Arm Limited (or its affiliates). All rights reserved.
 ; Use, modification and redistribution of this file is subject to your possession of a
-; valid End User License Agreement for the Arm Product of which these examples are part of 
+; valid End User License Agreement for the Arm Product of which these examples are part of
 ; and your compliance with all applicable terms and conditions of such licence agreement.
 ;
 ; Cortex-A SMP example - Startup Code
 ;----------------------------------------------------------------
 
-        
+
 
         AREA  MP_SCU, CODE, READONLY
 
@@ -22,7 +22,7 @@ getNumCPUs PROC
 
         ; Get base address of private peripheral space
         MRC     p15, 4, r0, c15, c0, 0     ; Read periph base address
-  
+
         LDR     r0, [r0, #0x004]           ; Read SCU Configuration register
         AND     r0, r0, #0x3               ; Bits 1:0 gives the number of cores-1
         ADD     r0, r0, #1
@@ -112,7 +112,7 @@ disableMaintenanceBroadcast PROC
 secureSCUInvalidate PROC
         AND     r0, r0, #0x03              ; Mask off unused bits of CPU ID
         MOV     r0, r0, LSL #2             ; Convert into bit offset (four bits per core)
-  
+
         AND     r1, r1, #0x0F              ; Mask off unused bits of ways
         MOV     r1, r1, LSL r0             ; Shift ways into the correct CPU field
 

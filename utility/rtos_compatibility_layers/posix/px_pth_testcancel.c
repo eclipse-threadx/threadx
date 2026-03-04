@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -69,17 +69,17 @@ VOID pthread_testcancel(VOID)
 
 POSIX_TCB   *pthread_ptr;
 
-    
-    /* Get the thread identifier of the calling pthread */ 
-    pthread_ptr = posix_tid2tcb(pthread_self()); 
+
+    /* Get the thread identifier of the calling pthread */
+    pthread_ptr = posix_tid2tcb(pthread_self());
 
     /* Check if thread was created with cancel enable */
     if ( (pthread_ptr->cancel_state == PTHREAD_CANCEL_ENABLE) &&
            (pthread_ptr->cancel_type==PTHREAD_CANCEL_DEFERRED) &&
            (pthread_ptr->cancel_request==TRUE) )
     {
-       
-        /* Signal the housekeeping ThreadX thread to cancel (delete) this pthread */ 
+
+        /* Signal the housekeeping ThreadX thread to cancel (delete) this pthread */
         posix_destroy_pthread(pthread_ptr,(VOID *)0);
    }
 }

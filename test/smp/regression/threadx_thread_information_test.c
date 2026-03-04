@@ -31,8 +31,8 @@ INT     status;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            first_unused_memory, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            first_unused_memory, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* Check for status.  */
@@ -83,9 +83,9 @@ ULONG       idle_returns;
     /* Get information about this thread.  */
     status =  tx_thread_info_get(&thread_0, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_thread_info_get(&thread_0, &name, &state, &run_count, &priority, &preemption_threshold, &time_slice, &next_thread, &suspended_thread);
-    
+
     /* Check for error status.  */
-    if ((status != TX_SUCCESS) || (state != TX_READY) || (run_count != thread_0.tx_thread_run_count) || (priority != 16) || (preemption_threshold != 16) || 
+    if ((status != TX_SUCCESS) || (state != TX_READY) || (run_count != thread_0.tx_thread_run_count) || (priority != 16) || (preemption_threshold != 16) ||
         (time_slice != 0) || (next_thread != thread_0.tx_thread_created_next) || (suspended_thread != thread_0.tx_thread_suspended_next))
     {
 
@@ -103,7 +103,7 @@ ULONG       idle_returns;
     /* Check status.  */
     if (status != TX_PTR_ERROR)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #3\n");
         test_control_return(1);
@@ -111,7 +111,7 @@ ULONG       idle_returns;
 
     /* Get the performance information about this thread.  */
     status =  tx_thread_performance_info_get(&thread_0, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
-    status += tx_thread_performance_info_get(&thread_0, &resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status += tx_thread_performance_info_get(&thread_0, &resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check for error.  */
@@ -129,7 +129,7 @@ ULONG       idle_returns;
 
     /* Get the system performance information.  */
     status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
-    status += tx_thread_performance_system_info_get(&resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status += tx_thread_performance_system_info_get(&resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check for error.  */
@@ -146,7 +146,7 @@ ULONG       idle_returns;
     }
     else
     {
-    
+
         /* Success!  */
         printf("SUCCESS!\n");
         test_control_return(0);
@@ -154,312 +154,312 @@ ULONG       idle_returns;
 #else
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(&thread_0, &resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_info_get(&thread_0, &resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #6\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, &resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_info_get(TX_NULL, &resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #7\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #8\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #9\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #10\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #11\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &time_slices, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #12\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 &relinquishes, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #13\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 TX_NULL, &timeouts, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #14\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 TX_NULL, TX_NULL, &wait_aborts, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #15\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 TX_NULL, TX_NULL, TX_NULL, &last_preempted_by);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #16\n");
         test_control_return(1);
     }
 
     /* Get the performance information about this thread.  */
-    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 TX_NULL, TX_NULL, TX_NULL, TX_NULL);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #17\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(&resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_system_info_get(&resumptions, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #18\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, &suspensions, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #19\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, &solicited_preemptions, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #20\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, &interrupt_preemptions, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, &interrupt_preemptions, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #21\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, &priority_inversions, &time_slices, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, &priority_inversions, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #22\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &time_slices, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &time_slices,
                                                 &relinquishes, &timeouts, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #23\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 &relinquishes, &timeouts, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #24\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 TX_NULL, &timeouts, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #25\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 TX_NULL, TX_NULL, &wait_aborts, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #26\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 TX_NULL, TX_NULL, TX_NULL, &non_idle_returns, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #27\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 TX_NULL, TX_NULL, TX_NULL, TX_NULL, &idle_returns);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #28\n");
         test_control_return(1);
     }
 
     /* Get the system performance information.  */
-    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, 
+    status =  tx_thread_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                                 TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
 
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Thread error.  */
         printf("ERROR #29\n");
         test_control_return(1);

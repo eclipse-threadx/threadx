@@ -72,7 +72,7 @@ UINT    status;
     /* Determine if calling semaphore create from initialization was successful.  */
     if (test_semaphore_from_init != TX_SUCCESS)
     {
-    
+
         /* Error!  */
         error++;
     }
@@ -182,13 +182,13 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
-    status +=  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -240,11 +240,11 @@ UINT    status;
     semaphore_memory.second =       0x55667788;
     semaphore_memory.next_to_last = 0x99aabbcc;
     semaphore_memory.last =         0xddeeff00;
-    
+
     /* Create the semaphore.  */
     status =  tx_semaphore_create(&semaphore_memory.semaphore, "semaphore memory", 0);
     tx_semaphore_delete(&semaphore_memory.semaphore);
-    
+
     /* Check for status.  */
     if ((status != TX_SUCCESS) ||
         (semaphore_memory.first != 0x11223344) ||
@@ -463,7 +463,7 @@ UINT    status;
 
     /* Attempt to get from semaphore with an instance.  Should be successful.  */
     status =  tx_semaphore_get(&semaphore_1, TX_NO_WAIT);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -496,7 +496,7 @@ UINT    status;
     /* Test for error.  */
     if ((error) || (timer_executed != 1) || (isr_executed != 1))
     {
-    
+
         /* Semaphore error.  */
         printf("ERROR #22\n");
         test_control_return(1);
@@ -539,7 +539,7 @@ static void    thread_1_entry(ULONG thread_input)
 
     while(1)
     {
-    
+
         tx_thread_relinquish();
     }
 }

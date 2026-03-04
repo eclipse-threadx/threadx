@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -138,14 +138,14 @@ Reset_Handler
 _tx_initialize_low_level
 
     /* Disable interrupts during ThreadX initialization.  */
-    
+
     CPSID   i
 
     /* Set base of available memory to end of non-initialised RAM area.  */
 
     LDR     r0, =_tx_initialize_unused_memory       // Build address of unused memory pointer
     LDR     r1, =|Image$$ZI$$Limit|                 // Build first free address
-    ADD     r1, r1, #4                              // 
+    ADD     r1, r1, #4                              //
     STR     r1, [r0]                                // Setup first unused memory pointer
 
     /* Setup Vector Table Offset Register.  */
@@ -159,7 +159,7 @@ _tx_initialize_low_level
 //    LDR     r0, =0xE0001000                         // Build address of DWT register
 //    LDR     r1, [r0]                                // Pickup the current value
 //    ORR     r1, r1, #1                              // Set the CYCCNTENA bit
-//    STR     r1, [r0]                                // Enable the cycle count register 
+//    STR     r1, [r0]                                // Enable the cycle count register
 
     /* Set system stack pointer from vector value.  */
 
@@ -191,7 +191,7 @@ _tx_initialize_low_level
 
     /* Return to caller.  */
 
-    BX      lr 
+    BX      lr
 // }
 
 
@@ -209,12 +209,12 @@ __user_initial_stackheap
 /* Define shells for each of the unused vectors.  */
 
     EXPORT  __tx_BadHandler
-__tx_BadHandler 
+__tx_BadHandler
     B       __tx_BadHandler
 
 //    EXPORT  __tx_SVCallHandler
 //__tx_SVCallHandler
-//    B       __tx_SVCallHandler 
+//    B       __tx_SVCallHandler
 
     EXPORT  __tx_IntHandler
 __tx_IntHandler
@@ -240,7 +240,7 @@ __tx_SysTickHandler
     BX      LR
 // }
 
-    EXPORT  __tx_NMIHandler 
+    EXPORT  __tx_NMIHandler
 __tx_NMIHandler
     B       __tx_NMIHandler
 

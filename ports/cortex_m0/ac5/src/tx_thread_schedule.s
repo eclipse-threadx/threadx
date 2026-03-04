@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -25,7 +25,7 @@
     IMPORT  _tx_timer_time_slice
     IMPORT  _tx_thread_system_stack_ptr
     IMPORT  _tx_thread_preempt_disable
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))    
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     IMPORT  _tx_execution_thread_enter
     IMPORT  _tx_execution_thread_exit
 #endif
@@ -117,7 +117,7 @@ __tx_PendSVHandler
 ;
 __tx_ts_handler
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))   
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 ;
 ;    /* Call the thread exit function to indicate the thread is no longer executing.  */
 ;
@@ -200,7 +200,7 @@ __tx_ts_restore
 ;
     STR     r5, [r4]                                ; Setup global time-slice
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)) 
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 ;
 ;    /* Call the thread entry function to indicate the thread is executing.  */
 ;

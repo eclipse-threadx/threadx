@@ -34,7 +34,7 @@ __txm_module_preamble
                                                                 ;           1 -> User mode execution (MMU protection)
     DCD       _txm_module_thread_shell_entry - . + .            ; Module Shell Entry Point
     DCD       demo_module_start - . + .                         ; Module Start Thread Entry Point
-    DCD       0                                                 ; Module Stop Thread Entry Point 
+    DCD       0                                                 ; Module Stop Thread Entry Point
     DCD       1                                                 ; Module Start/Stop Thread Priority
     DCD       2046                                              ; Module Start/Stop Thread Stack Size
     DCD       _txm_module_callback_request_thread_entry - . + . ; Module Callback Thread Entry

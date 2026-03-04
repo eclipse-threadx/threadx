@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -92,7 +92,7 @@ __tx_thread_context_save:
     BEQ     __tx_thread_not_nested_save
 ;
 ;    /* Nested interrupt condition.  */
-;   
+;
     ADD   #1, r2                             ; _tx_thread_system_state++
     MOV.L   r2, [r1]
 
@@ -118,7 +118,7 @@ __tx_thread_not_nested_save:
 
     MOV.L   #__tx_thread_current_ptr, R2         ; Pickup current thread pointer
     MOV.L   [R2], R2
-    CMP     #0,R2                                ; Is it NULL?  
+    CMP     #0,R2                                ; Is it NULL?
     BEQ      __tx_thread_idle_system_save        ; Yes, idle system is running - idle restore
 ;
 ;    /* Move stack frame over to the current threads stack.  */
@@ -140,7 +140,7 @@ __tx_thread_not_nested_save:
     MOV.L   R14, [-R1]                           ; Save R14 on thread stack
     MVFC    FPSW, R3
     MOV.L   R3, [-R1]                            ; Save FPSW on thread stack
-	
+
     POP     R2                                   ; Pick up return address from interrupt stack
     ADD     #16, R0, R0                          ; Correct interrupt stack pointer back to the bottom
     MVTC    R1, USP                              ; Set user/thread stack pointer
@@ -159,5 +159,5 @@ __tx_thread_idle_system_save:
     JMP     R1                                   ; Return to caller
 ;
 ;    }
-;}    
+;}
     END

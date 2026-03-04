@@ -3,7 +3,7 @@
  *
  *  Created on: Jan 12, 2011
  *  Author: MIPS TECHNOLOGIES, INC
- 
+
 Initialization code for Denali memory controller needed for CoreFPGA5
 */
 /*

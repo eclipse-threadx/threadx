@@ -99,7 +99,7 @@ start64:
   MOV      x28, #0
   MOV      x29, #0
   MOV      x30, #0
-  
+
   // Which core am I
   // ----------------
   MRS      x0, MPIDR_EL1
@@ -109,20 +109,20 @@ sleep:
   WFI
   B        sleep
 boot:
-  
+
 
   // Disable trapping of CPTR_EL3 accesses or use of Adv.SIMD/FPU
   // -------------------------------------------------------------
   MOV      x0, #0                           // Clear all trap bits
   MSR      CPTR_EL3, x0
-  
-  
+
+
   // Install vector table
   // ---------------------
   LDR      x0, vector_table_address
   MSR      VBAR_EL3, x0
 
-  
+
   // Configure SCR_EL3
   // ------------------
   MOV      w1, #0              // Initial value of register is unknown

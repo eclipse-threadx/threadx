@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -424,7 +424,7 @@ TXM_MODULE_INSTANCE *module_instance;
         break;
     }
     #endif
-    
+
     #ifndef TXM_QUEUE_SEND_CALL_NOT_USED
     case TXM_QUEUE_SEND_CALL:
     {

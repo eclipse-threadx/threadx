@@ -80,7 +80,7 @@ After tx_initialize_low_level returns, main() calls board_init() to:
 The RISC-V32 ABI defines t0-t6 and a0-a7 as caller-saved (scratch) registers.
 All other registers used by a function must be preserved by the function.
 
-ThreadX takes advantage of this: when a context switch happens during a 
+ThreadX takes advantage of this: when a context switch happens during a
 function call, only the non-scratch registers need to be saved.
 
 Stack Frame Types
@@ -137,8 +137,8 @@ Stack Layout for Interrupt Frame (with FP enabled):
     47-62   0xBC-0xF8   ft0-ft11  Scratch FP registers*
     63       0xFC       fcsr      FP control/status register
    ─────────────────────────────────────────────────
-   *Note: In ilp32d ABI, FP registers are 8 bytes each, but current 
-    port implementation uses 4-byte indexing which may cause 
+   *Note: In ilp32d ABI, FP registers are 8 bytes each, but current
+    port implementation uses 4-byte indexing which may cause
     overlap if fsd/fld are used.
 
 
@@ -319,19 +319,19 @@ Example from QEMU virt build:
   SECTIONS
   {
     . = 0x80000000;  /* QEMU virt base address */
-    
+
     .text : { *(.text .text.*) }
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss : { *(.bss .bss.*) }
-    
+
     .stack : {
       . = ALIGN(4096);
       _sysstack_start = .;
       . += 0x1000;  /* 4KB initial stack */
       _sysstack_end = .;
     }
-    
+
     PROVIDE(_end = .);
   }
 

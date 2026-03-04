@@ -1,5 +1,5 @@
 /* This test is designed to test error detection for simple memory block operations.  */
-   
+
 #include   <stdio.h>
 #include   "tx_api.h"
 
@@ -43,8 +43,8 @@ INT     status;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -160,7 +160,7 @@ INT     i;
         printf("ERROR #8\n");
         test_control_return(1);
     }
-    
+
     /* Allocate with bad pool pointer.  */
     pool_2.tx_block_pool_id =  0;
     status =  tx_block_allocate(&pool_2, (VOID **) TX_NULL, TX_NO_WAIT);
@@ -379,7 +379,7 @@ INT     i;
     thread_0_counter++;
 
 #endif  /* TX_DISABLE_ERROR_CHECKING */
-    
+
     /* All is good!  */
     printf("SUCCESS!\n");
     test_control_return(0);

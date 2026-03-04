@@ -2,16 +2,16 @@
         PUBLIC  __vector_table
 
         SECTION .text:CODE:REORDER(1)
-        
+
         ;; Keep vector table even if it's not referenced
         REQUIRE __vector_table
-        
+
         THUMB
-        
+
         ;; Forward declaration of sections.
         SECTION CSTACK:DATA:NOROOT(3)
         SECTION .intvec:CODE:NOROOT(2)
-        
+
         DATA
 
 __vector_table

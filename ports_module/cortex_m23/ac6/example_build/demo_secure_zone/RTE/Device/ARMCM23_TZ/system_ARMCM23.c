@@ -77,7 +77,7 @@ void SystemInit (void)
 #endif
 
   SystemCoreClock = SYSTEM_CLOCK;
-    
+
     *(uint32_t *)0xE000ED24 = 0x000F0000;   /* S: enable secure, usage, bus, mem faults */
     *(uint32_t *)0xE002ED24 = 0x000F0000;   /* NS: enable secure, usage, bus, mem faults */
 }

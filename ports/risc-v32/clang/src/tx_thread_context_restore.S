@@ -143,13 +143,13 @@ _tx_thread_context_restore:
 
     /* Compose mstatus via read/modify/write to avoid clobbering unrelated bits.
        Set MPIE and restore MPP to Machine, preserve other fields. */
-    
+
     csrr    t1, mstatus
 
     /* Clear MPP/MPIE/MIE bits in t1 then set desired values. */
 
     li      t2, 0x1888                                  // MPP(0x1800) | MPIE(0x80) | MIE(0x08)
-    li      t3, 0x1800                                  // Set MPP to Machine mode (bits 12:11)           
+    li      t3, 0x1800                                  // Set MPP to Machine mode (bits 12:11)
 
     /* Construct new mstatus in t1: clear mask bits, set MPP/MPIE and optionally FP bit,
        preserve everything except the bits we will modify.  */
@@ -400,7 +400,7 @@ _tx_thread_dont_save_ts:
 
     la      t0, _tx_thread_current_ptr                  // Pickup current thread pointer address
     sw      x0, 0(t0)                                   // Clear current thread pointer
-    
+
     /* }  */
 
 _tx_thread_idle_system_restore:

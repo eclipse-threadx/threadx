@@ -99,7 +99,7 @@ ULONG i;
         if (loop_count < min_loop_count)
             min_loop_count =  loop_count;
         if (loop_count > max_loop_count)
-            max_loop_count =  loop_count;   
+            max_loop_count =  loop_count;
 
         lower_bound = loop_count - 1;
         upper_bound = loop_count + 1;
@@ -110,18 +110,18 @@ ULONG i;
 
         if ((current_itterations < lower_bound) || (current_itterations > upper_bound))
             current_itterations =  lower_bound;
-        
+
 #ifdef DEBUG_1
         /* Last loop count.  */
         last_loop_count =  loop_count;
 #endif
-    
+
         /* Reset the loop count to all ones!  */
         loop_count =  0xFFFFFFFF;
     }
     count++;
     for (i = 0; i < (count%32); i++)
-        destination++;            
+        destination++;
 
     /* Determine if the ISR is in the mode to wakeup the thread suspending with a timeout.   */
     if (isr_test_suspend_interrupt)
@@ -135,26 +135,26 @@ ULONG i;
             if ((_tx_thread_preempt_disable) &&
                 (thread_0.tx_thread_timer.tx_timer_internal_list_head == TX_NULL))
             {
-        
+
                 /* Set the flag showing the condition is present.  */
                 isr_test_suspend_interrupted_condition =  TX_TRUE;
-                
+
                 /* All done with the test.  */
                 isr_test_suspend_interrupt =  TX_FALSE;
             }
-        
+
             /* Post to the semaphore to wakeup the thread.  */
             tx_semaphore_put(&test_semaphore);
-        }        
-        
+        }
+
         return;
     }
 #endif
 #endif
-    
+
     /* Increment the ISR count.  */
     isr_count++;
-    
+
     /* Call sleep from ISR to check for error!  */
     status =  tx_thread_sleep(100);
 
@@ -165,7 +165,7 @@ ULONG i;
 
         error =  1;
     }
-    
+
     /* End the ISR.  */
     test_isr_dispatch =  TX_NULL;
 }
@@ -190,8 +190,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 3, TX_AUTO_START);
 
     /* Check for status.  */
@@ -221,7 +221,7 @@ CHAR    *pointer;
     current_itterations =  0;
 #ifdef DEBUG_1
     last_loop_count =      0x0;
-#endif 
+#endif
 #endif
 #endif
 }
@@ -246,11 +246,11 @@ volatile ULONG       value = 0;
 
     /* Call sleep with an expiration of 0 and test error code.  */
     status =  tx_thread_sleep(0);
-    
+
     /* Check error code.  */
     if (status != TX_SUCCESS)
     {
-    
+
         /* Thread Simple Sleep error.  */
         printf("ERROR #3\n");
         test_control_return(1);
@@ -274,10 +274,10 @@ volatile ULONG       value = 0;
     /* Callibrate the loop count from thread sleep.  */
     for (i = 0; i < 180; i++)
     {
-    
+
         /* Sleep to get a fresh time.  */
         tx_thread_sleep(1);
-        
+
         /* Set the loop count to 0 and start counting....  */
         loop_count =  0;
         start_time =  _tx_timer_system_clock;
@@ -288,7 +288,7 @@ volatile ULONG       value = 0;
             delay_function();
             loop_count++;
         } while (start_time == _tx_timer_system_clock);
-        
+
         /* Wait to reset the loop count.  */
         tx_thread_sleep(1);
     }
@@ -323,7 +323,7 @@ volatile ULONG       value = 0;
             /* Call delay function.  */
             delay_function();
             loop_count++;
-        } while (loop_count < current_itterations);      
+        } while (loop_count < current_itterations);
 
         /* Check for a timer interrupt... if so, just skip the semaphore get.  */
         if (start_time != _tx_timer_system_clock)
@@ -331,7 +331,7 @@ volatile ULONG       value = 0;
 
         /* Suspend on the semaphore for 20 ticks...  */
         tx_semaphore_get(&test_semaphore, 20);
-        
+
         /* Adjust the current itterations.  */
         current_itterations++;
         if (current_itterations > upper_bound)
@@ -391,14 +391,14 @@ volatile ULONG       value = 0;
     /* Check for error.  */
     if (tx_time_get() < 100)
     {
-        
+
         /* Thread Simple Sleep error.  */
         printf("ERROR #4\n");
         test_control_return(1);
-    }    
+    }
 #endif
 #endif
-    
+
     /* Clear the tick count. */
     tx_time_set(0);
 
@@ -419,12 +419,12 @@ volatile ULONG       value = 0;
     /* Check to make sure the ISR happened and the proper return value was present.  */
     if ((isr_count == 0) || (error))
     {
-    
+
         /* Thread Simple Sleep error.  */
         printf("ERROR #6\n");
         test_control_return(1);
     }
-    else      
+    else
     {
 
         /* Successful Simple Sleep test.  */

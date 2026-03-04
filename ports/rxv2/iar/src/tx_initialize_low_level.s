@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Initialize                                                          */
 ;/**                                                                       */
@@ -25,41 +25,41 @@
     section .text:CODE:ROOT
 
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_initialize_low_level                             RXv2/IAR       */
 ;/*                                                           6.1.11       */
-;/*  AUTHOR                                                                */ 
-;/*                                                                        */ 
+;/*  AUTHOR                                                                */
+;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
-;/*                                                                        */ 
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function is responsible for any low-level processor            */ 
-;/*    initialization, including setting up interrupt vectors, setting     */ 
-;/*    up a periodic timer interrupt source, saving the system stack       */ 
-;/*    pointer for use in ISR processing later, and finding the first      */ 
-;/*    available RAM memory address for tx_application_define.             */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
-;/*                                                                        */ 
-;/**************************************************************************/ 
+;/*                                                                        */
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function is responsible for any low-level processor            */
+;/*    initialization, including setting up interrupt vectors, setting     */
+;/*    up a periodic timer interrupt source, saving the system stack       */
+;/*    pointer for use in ISR processing later, and finding the first      */
+;/*    available RAM memory address for tx_application_define.             */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter           ThreadX entry function        */
+;/*                                                                        */
+;/**************************************************************************/
     public __tx_initialize_low_level
 
 __tx_initialize_low_level:
@@ -68,7 +68,7 @@ __tx_initialize_low_level:
 ;    _tx_initialize_unused_memory =  (VOID_PTR) &free_mem_start;
 ;
     MOV.L    #__tx_free_memory_start, R1        ; Pickup unused memory address
-    MOV.L    #__tx_initialize_unused_memory,R2                
+    MOV.L    #__tx_initialize_unused_memory,R2
     MOV.L    R1,[R2]                            ; Save first free memory address
 
 ;   /* Set priority of SWINT to 1. */

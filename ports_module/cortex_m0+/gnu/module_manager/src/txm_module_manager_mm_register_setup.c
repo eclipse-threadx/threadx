@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -192,10 +192,10 @@ UINT    srd_bit_index;
     {
         /* Divide block_size by 8 by shifting right 3. Result is size of subregion.  */
         block_size = block_size >> 3;
-        
+
         /* Set SRD index into attribute register. */
         srd_bit_index = 8;
-        
+
         /* If subregion overlaps length, move to the next subregion. */
         while(length > block_size)
         {
@@ -207,7 +207,7 @@ UINT    srd_bit_index;
         {
             srd_bit_index++;
         }
-        
+
         /* Set unused subregion bits. */
         while(srd_bit_index < 16)
         {
@@ -215,7 +215,7 @@ UINT    srd_bit_index;
             srd_bit_index++;
         }
     }
-    
+
     return(srd_bits);
 }
 
@@ -314,16 +314,16 @@ UINT    i;
     /* Set the attributes, size (256 bytes) and enable bit.  */
     module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MPU_KERNEL_ENTRY_INDEX].txm_module_mpu_region_attribute_size = TXM_MODULE_MPU_CODE_ACCESS_CONTROL | (_txm_module_manager_region_size_get(256) << 1) | TXM_ENABLE_REGION;
     /* End of kernel mode entry setup.  */
-    
+
     /* Setup code protection.  */
-    
+
     /* Initialize the MPU table index.  */
     mpu_table_index = 1;
 
     /* Pickup code starting address and actual size.  */
     code_address =  (ULONG) module_instance -> txm_module_instance_code_start;
     code_size =     module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_code_size;
-    
+
     /* Determine code block sizes. Minimize the alignment requirement.
        There are 4 MPU code entries available. The following is how the code size
        will be distributed:
@@ -331,7 +331,7 @@ UINT    i;
        2. 1/4 of the largest power of two that is greater than or equal to code size.
        3. Largest power of 2 that fits in the remaining space.
        4. Smallest power of 2 that exceeds the remaining space, minimum 256. */
-    
+
     /* Now loop through to setup MPU protection for the code area.  */
     for (i = 0; i < TXM_MODULE_MPU_CODE_ENTRIES; i++)
     {
@@ -341,7 +341,7 @@ UINT    i;
         {
             block_size = _txm_power_of_two_block_size(code_size) >> 2;
         }
-        
+
         /* Third MPU block is the largest power of 2 that fits in the remaining space. */
         else if (i == 2)
         {
@@ -349,7 +349,7 @@ UINT    i;
             code_size = code_size - (block_size << 1);
             block_size = _txm_power_of_two_block_size(code_size) >> 1;
         }
-        
+
         /* Last MPU block is the smallest power of 2 that exceeds the remaining space, minimum 256.  */
         else
         {
@@ -358,10 +358,10 @@ UINT    i;
             block_size = _txm_power_of_two_block_size(code_size);
             srd_bits = _txm_module_manager_calculate_srd_bits(block_size, code_size);
         }
-        
+
         /* Calculate the region size information.  */
         region_size = (_txm_module_manager_region_size_get(block_size) << 1);
-        
+
         /* Build the base address register with address, MPU region, set Valid bit.  */
         module_instance -> txm_module_instance_mpu_registers[mpu_table_index].txm_module_mpu_region_address = (code_address & ~(block_size - 1)) | mpu_table_index | 0x10;
         /* Build the attribute-size register with permissions, SRD, size, enable.  */
@@ -369,29 +369,29 @@ UINT    i;
 
         /* Adjust the code address.  */
         code_address = code_address + block_size;
-        
+
         /* Increment MPU table index.  */
         mpu_table_index++;
     }
     /* End of code protection.  */
-    
+
     /* Setup data protection.  */
-    
+
     /* Reset SRD bitfield.  */
     srd_bits = 0;
-    
+
     /* Pickup data starting address and actual size.  */
     data_address =  (ULONG) module_instance -> txm_module_instance_data_start;
-    
+
     /* Adjust the size of the module elements to be aligned to the default alignment. We do this
        so that when we partition the allocated memory, we can simply place these regions right beside
        each other without having to align their pointers. Note this only works when they all have
        the same alignment.  */
-    
+
     data_size =             module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_data_size;
     start_stop_stack_size = module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_start_stop_stack_size;
     callback_stack_size =   module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_callback_stack_size;
-    
+
     data_size =              ((data_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
 
     start_stop_stack_size =  ((start_stop_stack_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
@@ -400,7 +400,7 @@ UINT    i;
 
     /* Update the data size to include thread stacks.  */
     data_size = data_size + start_stop_stack_size + callback_stack_size;
-    
+
     /* Determine data block sizes. Minimize the alignment requirement.
        There are 4 MPU data entries available. The following is how the data size
        will be distributed:
@@ -408,7 +408,7 @@ UINT    i;
        2. 1/4 of the largest power of two that is greater than or equal to data size.
        3. Largest power of 2 that fits in the remaining space.
        4. Smallest power of 2 that exceeds the remaining space, minimum 256. */
-    
+
     /* Now loop through to setup MPU protection for the data area.  */
     for (i = 0; i < TXM_MODULE_MPU_DATA_ENTRIES; i++)
     {
@@ -418,7 +418,7 @@ UINT    i;
         {
             block_size = _txm_power_of_two_block_size(data_size) >> 2;
         }
-        
+
         /* Third MPU block is the largest power of 2 that fits in the remaining space.  */
         else if (i == 2)
         {
@@ -426,7 +426,7 @@ UINT    i;
             data_size = data_size - (block_size << 1);
             block_size = _txm_power_of_two_block_size(data_size) >> 1;
         }
-        
+
         /* Last MPU block is the smallest power of 2 that exceeds the remaining space, minimum 256.  */
         else
         {
@@ -435,10 +435,10 @@ UINT    i;
             block_size = _txm_power_of_two_block_size(data_size);
             srd_bits = _txm_module_manager_calculate_srd_bits(block_size, data_size);
         }
-        
+
         /* Calculate the region size information.  */
         region_size = (_txm_module_manager_region_size_get(block_size) << 1);
-        
+
         /* Build the base address register with address, MPU region, set Valid bit.  */
         module_instance -> txm_module_instance_mpu_registers[mpu_table_index].txm_module_mpu_region_address = (data_address & ~(block_size - 1)) | mpu_table_index | 0x10;
         /* Build the attribute-size register with permissions, SRD, size, enable.  */
@@ -446,17 +446,17 @@ UINT    i;
 
         /* Adjust the data address.  */
         data_address =  data_address + block_size;
-        
+
         /* Increment MPU table index.  */
         mpu_table_index++;
     }
-    
+
     /* Setup MPU for the remaining regions.  */
     while (mpu_table_index < TXM_MODULE_MPU_TOTAL_ENTRIES)
     {
         /* Build the base address register with address, MPU region, set Valid bit.  */
         module_instance -> txm_module_instance_mpu_registers[mpu_table_index].txm_module_mpu_region_address = mpu_table_index | 0x10;
-        
+
         /* Increment MPU table index.  */
         mpu_table_index++;
     }
@@ -482,11 +482,11 @@ UINT    i;
     /* Setup the first region for the ThreadX trampoline code.  */
     /* Set base register to user mode entry, which is guaranteed to be at least 256-byte aligned.  */
     base_address_register =  (ULONG) _txm_module_manager_user_mode_entry;
-    
+
     /* Mask address to proper range,  region 0, set Valid bit. */
     base_address_register =  (base_address_register & 0xFFFFFF00) | mpu_register | 0x10;
     module_instance -> txm_module_instance_mpu_registers[0] =  base_address_register;
-    
+
     /* Attributes: read only, write-back, shareable, size 256 bytes, region enabled. */
     module_instance -> txm_module_instance_mpu_registers[1] =  0x0607000F;
 
@@ -499,7 +499,7 @@ UINT    i;
     /* Setup values for code area.  */
     code_address =  (ULONG) module_instance -> txm_module_instance_code_start;
     code_size =     module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_code_size;
-    
+
     /* Check if shared memory was set up. If so, only 3 entries are available for
        code protection. If not set up, 4 code entries are available.  */
     if(module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MANAGER_SHARED_MPU_INDEX] == 0)
@@ -511,7 +511,7 @@ UINT    i;
            2. 1/4 of the largest power of two that is greater than or equal to code size.
            3. Largest power of 2 that fits in the remaining space.
            4. Smallest power of 2 that exceeds the remaining space, minimum 256. */
-        
+
         /* Now loop through to setup MPU protection for the code area.  */
         for (i = 0; i < TXM_MODULE_MANAGER_CODE_MPU_ENTRIES; i++)
         {
@@ -521,7 +521,7 @@ UINT    i;
             {
                 block_size = _txm_power_of_two_block_size(code_size) >> 2;
             }
-            
+
             /* Third MPU block is the largest power of 2 that fits in the remaining space. */
             else if (i == 2)
             {
@@ -529,7 +529,7 @@ UINT    i;
                 code_size =  code_size - (block_size << 1);
                 block_size = _txm_power_of_two_block_size(code_size) >> 1;
             }
-            
+
             /* Last MPU block is the smallest power of 2 that exceeds the remaining space, minimum 256. */
             else
             {
@@ -538,57 +538,57 @@ UINT    i;
                 block_size = _txm_power_of_two_block_size(code_size);
                 srd_bits = _txm_module_manager_calculate_srd_bits(block_size, code_size);
             }
-            
+
             /* Build the base address register.  */
             base_address_register =  (code_address & ~(block_size - 1)) | mpu_register | 0x10;
-            
+
             /* Calculate the region size information.  */
             region_size = (_txm_module_manager_region_size_get(block_size) << 1);
-            
+
             /* Build the base attribute register. */
             base_attribute_register =  region_size | srd_bits | 0x06070001;
-            
+
             /* Setup the MPU Base Address Register.  */
             module_instance -> txm_module_instance_mpu_registers[mpu_table_index] =  base_address_register;
-            
+
             /* Setup the MPU Base Attribute Register.   */
             module_instance -> txm_module_instance_mpu_registers[mpu_table_index+1] =  base_attribute_register;
 
             /* Adjust the code address.  */
             code_address =  code_address + block_size;
-            
+
             /* Move MPU table index.  */
             mpu_table_index =  mpu_table_index + 2;
-            
+
             /* Increment the MPU register index.  */
             mpu_register++;
         }
     }
-    
+
     /* Only 3 code entries available.  */
     else
     {
         /* Calculate block size, one code entry taken up by shared memory.  */
         block_size = _txm_power_of_two_block_size(code_size / (TXM_MODULE_MANAGER_CODE_MPU_ENTRIES - 1));
-        
+
         /* Calculate the region size information.  */
         region_size = (_txm_module_manager_region_size_get(block_size) << 1);
-        
+
         /* Now loop through to setup MPU protection for the code area.  */
         for (i = 0; i < TXM_MODULE_MANAGER_CODE_MPU_ENTRIES - 1; i++)
         {
             /* Build the base address register.  */
             base_address_register = (code_address & ~(block_size - 1)) | mpu_register | 0x10;
-            
+
             /* Check if SRD bits need to be set.  */
             if (code_size < block_size)
             {
                 srd_bits = _txm_module_manager_calculate_srd_bits(block_size, code_size);
             }
-            
+
             /* Build the base attribute register. */
             base_attribute_register =  region_size | srd_bits | 0x06070000;
-            
+
             /* Is there still some code?  If so set the region enable bit.  */
             if (code_size)
             {
@@ -597,13 +597,13 @@ UINT    i;
             }
             /* Setup the MPU Base Address Register.  */
             module_instance -> txm_module_instance_mpu_registers[mpu_table_index] =  base_address_register;
-            
+
             /* Setup the MPU Base Attribute Register.   */
             module_instance -> txm_module_instance_mpu_registers[mpu_table_index+1] =  base_attribute_register;
-            
+
             /* Adjust the code address.  */
             code_address =  code_address + block_size;
-            
+
             /* Decrement the code size.  */
             if (code_size > block_size)
             {
@@ -613,34 +613,34 @@ UINT    i;
             {
                 code_size =  0;
             }
-            
+
             /* Move MPU table index.  */
             mpu_table_index =  mpu_table_index + 2;
-            
+
             /* Increment the MPU register index.  */
             mpu_register++;
         }
-        
+
         /* Adjust indeces to pass over the shared memory entry.  */
         /* Move MPU table index.  */
         mpu_table_index =  mpu_table_index + 2;
-        
+
         /* Increment the MPU register index.  */
         mpu_register++;
     }
-    
+
     /* Setup values for data area.  */
     data_address =  (ULONG) module_instance -> txm_module_instance_data_start;
-    
+
     /* Adjust the size of the module elements to be aligned to the default alignment. We do this
        so that when we partition the allocated memory, we can simply place these regions right beside
        each other without having to align their pointers. Note this only works when they all have
        the same alignment.  */
-    
+
     data_size =             module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_data_size;
     start_stop_stack_size = module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_start_stop_stack_size;
     callback_stack_size =   module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_callback_stack_size;
-    
+
     data_size =              ((data_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
 
     start_stop_stack_size =  ((start_stop_stack_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
@@ -649,46 +649,46 @@ UINT    i;
 
     /* Update the data size to include thread stacks.  */
     data_size = data_size + start_stop_stack_size + callback_stack_size;
-    
+
     block_size = _txm_power_of_two_block_size(data_size / TXM_MODULE_MANAGER_DATA_MPU_ENTRIES);
-    
+
     /* Reset SRD bitfield.  */
     srd_bits = 0;
-    
+
     /* Calculate the region size information.  */
     region_size =   (_txm_module_manager_region_size_get(block_size) << 1);
-    
+
     /* Now loop through to setup MPU protection for the data area.  */
     for (i = 0; i < TXM_MODULE_MANAGER_DATA_MPU_ENTRIES; i++)
     {
         /* Build the base address register.  */
         base_address_register =  (data_address & ~(block_size - 1)) | mpu_register | 0x10;
-        
+
         /* Check if SRD bits need to be set.  */
         if (data_size < block_size)
         {
             srd_bits = _txm_module_manager_calculate_srd_bits(block_size, data_size);
         }
-        
+
         /* Build the base attribute register. */
         base_attribute_register =  region_size | srd_bits | 0x13070000;
-        
+
         /* Is there still some data?  If so set the region enable bit.  */
         if (data_size)
         {
             /* Set the region enable bit.  */
             base_attribute_register =  base_attribute_register | 0x1;
         }
-        
+
         /* Setup the MPU Base Address Register.  */
         module_instance -> txm_module_instance_mpu_registers[mpu_table_index] =  base_address_register;
-        
+
         /* Setup the MPU Base Attribute Register.   */
         module_instance -> txm_module_instance_mpu_registers[mpu_table_index+1] =  base_attribute_register;
 
         /* Adjust the data address.  */
         data_address =  data_address + block_size;
-        
+
         /* Decrement the data size.  */
         if (data_size > block_size)
         {
@@ -698,10 +698,10 @@ UINT    i;
         {
             data_size =  0;
         }
-        
+
         /* Move MPU table index.  */
         mpu_table_index =  mpu_table_index + 2;
-        
+
         /* Increment the MPU register index.  */
         mpu_register++;
     }
@@ -763,7 +763,7 @@ ALIGN_TYPE shared_memory_address_end;
     {
         return(TX_FALSE);
     }
-    
+
     /* Check if the object is inside the module data.  */
     if ((obj_ptr >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) &&
         ((obj_ptr + obj_size) <= ((ALIGN_TYPE) module_instance -> txm_module_instance_data_end + 1)))

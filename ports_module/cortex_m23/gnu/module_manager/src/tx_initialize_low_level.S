@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -82,20 +82,20 @@ _tx_initialize_low_level:
     /* Set base of available memory to end of non-initialised RAM area.  */
     LDR     r0, =_tx_initialize_unused_memory       // Build address of unused memory pointer
     LDR     r1, =Image$$ARM_LIB_STACK$$ZI$$Limit    // Build first free address
-    ADDS    r1, r1, #4                              // 
+    ADDS    r1, r1, #4                              //
     STR     r1, [r0]                                // Setup first unused memory pointer
 
     /* Setup Vector Table Offset Register.  */
     LDR     r0, =0xE000ED08                         // Build address of NVIC registers
     LDR     r1, =__Vectors                          // Pickup address of vector table
-    STR     r1, [r0]                                // Set vector table address   
+    STR     r1, [r0]                                // Set vector table address
 
 //    /* Enable the cycle count register.  */
 //
 //    LDR     r0, =0xE0001000                         // Build address of DWT register
 //    LDR     r1, [r0]                                // Pickup the current value
 //    ORR     r1, r1, #1                              // Set the CYCCNTENA bit
-//    STR     r1, [r0]                                // Enable the cycle count register 
+//    STR     r1, [r0]                                // Enable the cycle count register
 
     /* Set system stack pointer from vector value.  */
     LDR     r0, =_tx_thread_system_stack_ptr        // Build address of system stack pointer
@@ -113,21 +113,21 @@ _tx_initialize_low_level:
     /* Configure handler priorities.  */
     LDR     r1, =0x00000000                         // Rsrv, UsgF, BusF, MemM
     LDR     r0, =0xE000E000                         // Build address of NVIC registers
-    LDR     r2, =0xD18                              // 
-    ADD     r0, r0, r2                              // 
+    LDR     r2, =0xD18                              //
+    ADD     r0, r0, r2                              //
     STR     r1, [r0]                                // Setup System Handlers 4-7 Priority Registers
 
     LDR     r1, =0xFF000000                         // SVCl, Rsrv, Rsrv, Rsrv
     LDR     r0, =0xE000E000                         // Build address of NVIC registers
-    LDR     r2, =0xD1C                              // 
-    ADD     r0, r0, r2                              // 
+    LDR     r2, =0xD1C                              //
+    ADD     r0, r0, r2                              //
     STR     r1, [r0]                                // Setup System Handlers 8-11 Priority Registers
                                                     // Note: SVC must be lowest priority, which is 0xFF
 
     LDR     r1, =0x40FF0000                         // SysT, PnSV, Rsrv, DbgM
     LDR     r0, =0xE000E000                         // Build address of NVIC registers
-    LDR     r2, =0xD20                              // 
-    ADD     r0, r0, r2                              // 
+    LDR     r2, =0xD20                              //
+    ADD     r0, r0, r2                              //
     STR     r1, [r0]                                // Setup System Handlers 12-15 Priority Registers
                                                     // Note: PnSV must be lowest priority, which is 0xFF
 
@@ -159,7 +159,7 @@ __tx_IntHandler:
 // VOID InterruptHandler (VOID)
 // {
     PUSH    {r0,lr}     // Save LR (and dummy r0 to maintain stack alignment)
-    
+
     /* Do interrupt handler work here */
     /* .... */
 
@@ -198,7 +198,7 @@ HardFault_Handler:
     // A stack overflow will trigger a hardfault.
     // There is no CFSR in M23, so we will not try to
     // determine if the fault is caused by a stack overflow
-    // or some other condition. 
+    // or some other condition.
     B       HardFault_Handler
 
     .end

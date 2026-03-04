@@ -32,7 +32,7 @@ Linker directive files (.ld) are used when your program is linked to define
 program sections and assign them to specific addresses in memory.
 
 The linker directive file from the project file for your executable will
-be used when linking.  
+be used when linking.
 
 If the .ld file included in the project for your executable does not suit
 your hardware configuration or program layout needs, it can be modified or
@@ -41,21 +41,21 @@ replaced with a custom .ld file.
 
 This resource.gpj contains example linker directives files:
 ** standalone_ram.ld      -- For programs that are linked into and run
-                             out of RAM. 
+                             out of RAM.
 ** standalone_romcopy.ld  -- For programs that are linked into ROM, but
                              run out of RAM.
 ** standalone_romrun.ld   -- For programs that are linked into and run
-                             out of ROM. 
+                             out of ROM.
 
 Some configurations also contain other linker directives files:
 ** standalone_romdebug.ld -- For programs that are linked into and run
                              out of ROM with enhanced debugging capabilities.
 ** standalone_pic.ld      -- For programs built with position independent
-                             code. 
+                             code.
 ** standalone_pid.ld      -- For programs built with position independent
                              data.
 ** standalone_picpid.ld   -- For programs built with position independent
                              code and data.
 
-For more information about linker directives files, see the "MULTI: Building 
+For more information about linker directives files, see the "MULTI: Building
 Applications" book for your processor.

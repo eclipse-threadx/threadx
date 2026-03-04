@@ -66,7 +66,7 @@ VOID tx_application_define(VOID *first_unused_memory)
 
 struct sched_param  param;
 
-   
+
     /* Init POSIX Wrapper */
     storage_ptr = (VOID*) posix_initialize((VOID*)free_memory);
 
@@ -79,15 +79,15 @@ struct sched_param  param;
 
     /* Create a sched_param structure */
     memset(&param, 0, sizeof(param));
-   
+
     /* Now create all pthreads , firstly modify respective ptheread
        attribute with desired priority and stack start address and then create the pthread */
-    
+
     /* Create pthread 0.  */
     param.sched_priority = 15;
     pthread_attr_setschedparam(&ptattr0, &param);
     pthread_attr_setstackaddr(&ptattr0,  storage_ptr );
-    storage_ptr = (UINT *) storage_ptr + DEMO_STACK_SIZE;    
+    storage_ptr = (UINT *) storage_ptr + DEMO_STACK_SIZE;
     pthread_create (&pthread_0, &ptattr0,pthread_0_entry,NULL);
 
 
@@ -95,7 +95,7 @@ struct sched_param  param;
     param.sched_priority = 10;
     pthread_attr_setschedparam(&ptattr1, &param);
     pthread_attr_setstackaddr(&ptattr1, (VOID*) storage_ptr );
-    storage_ptr = (UINT *) storage_ptr + DEMO_STACK_SIZE;    
+    storage_ptr = (UINT *) storage_ptr + DEMO_STACK_SIZE;
     pthread_create (&pthread_1, &ptattr1,pthread_1_entry,NULL);
 
 
@@ -123,7 +123,7 @@ VOID  pthread_0_signal_handler13(int signo)
        called from pthread 0.  */
     if (pthread_self() != pthread_0)
     {
-    
+
         /* Call error handler.  */
         error_handler();
     }
@@ -131,7 +131,7 @@ VOID  pthread_0_signal_handler13(int signo)
     /* Check for proper signal.  */
     if (signo != 13)
     {
-    
+
         /* Call error handler.  */
         error_handler();
     }
@@ -148,7 +148,7 @@ VOID  pthread_0_signal_handler14(int signo)
        called from pthread 0.  */
     if (pthread_self() != pthread_0)
     {
-    
+
         /* Call error handler.  */
         error_handler();
     }
@@ -156,7 +156,7 @@ VOID  pthread_0_signal_handler14(int signo)
     /* Check for proper signal.  */
     if (signo != 14)
     {
-    
+
         /* Call error handler.  */
         error_handler();
     }
@@ -176,7 +176,7 @@ VOID  pthread_0_signal_handler15(int signo)
        called from pthread 0.  */
     if (pthread_self() != pthread_0)
     {
-    
+
         /* Call error handler.  */
         error_handler();
     }
@@ -184,7 +184,7 @@ VOID  pthread_0_signal_handler15(int signo)
     /* Check for proper signal.  */
     if (signo != 15)
     {
-    
+
         /* Call error handler.  */
         error_handler();
     }
@@ -226,16 +226,16 @@ VOID    *pthread_0_entry(VOID *pthread0_input)
         error_handler();
 
 
-    /* Get the semaphore with suspension.  */ 
+    /* Get the semaphore with suspension.  */
     pt0_status = sem_wait(sem);
 
-    /* This pthread simply sits in while-forever-sleep loop */ 
-    while(1) 
+    /* This pthread simply sits in while-forever-sleep loop */
+    while(1)
     {
         /* Increment the pthread counter.*/
         pthread_0_counter++;
 
-        /* Get the semaphore with suspension.  */ 
+        /* Get the semaphore with suspension.  */
         pt0_status = sem_wait(sem);
 
         /* In this test, this thread should never resume!  */
@@ -244,9 +244,9 @@ VOID    *pthread_0_entry(VOID *pthread0_input)
         /* Check for error condition.  */
         if (pt0_status)
         {
-        
+
             /* Break out of the loop.  */
-            break;            
+            break;
         }
     }
 
@@ -258,12 +258,12 @@ INT    pt1_status=0;
 
 VOID    *pthread_1_entry(VOID *pthread1_input)
 {
-    
+
 
     /* This thread simply sends a messages to a queue shared by pthread 2.  */
     while(1)
     {
-    
+
         /* Increment the thread counter.  */
         pthread_1_counter++;
 
@@ -271,9 +271,9 @@ VOID    *pthread_1_entry(VOID *pthread1_input)
         pt1_status =  pthread_kill(pthread_0, 15);
 
         /* Check for errors.  */
-        if ((pt1_status) || 
+        if ((pt1_status) ||
             (pthread_0_counter != 1) ||
-            (pthread_1_counter != pthread_0_signal_counter15) || 
+            (pthread_1_counter != pthread_0_signal_counter15) ||
             (pthread_1_counter != pthread_0_signal_counter14) ||
             (pthread_1_counter != pthread_0_signal_counter13))
         {
@@ -282,7 +282,7 @@ VOID    *pthread_1_entry(VOID *pthread1_input)
             break;
         }
     }
-    
+
     return(&pt1_status);
 }
 

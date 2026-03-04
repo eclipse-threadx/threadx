@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -61,10 +61,10 @@
 
 __tx_thread_stack_build:
 ;
-;       
+;
 ;    /* Build an interrupt frame.  The form of the fake interrupt stack
 ;       on the Renesas RX should look like the following after it is built:
-;       
+;
 ;  Stack Top:           ACC0
 ;                       ACC1
 ;                       R6
@@ -100,22 +100,22 @@ __tx_thread_stack_build:
     MOV.L R2, [-R3]                             ; Initial PC
     MOV.L #0, R4
     MOV.L R4,[-R3]                              ; Initial R2 ...
-    MOV.L R4,[-R3]                              ; Initial R1 ...    
+    MOV.L R4,[-R3]                              ; Initial R1 ...
     MOV.L R4,[-R3]                              ; Initial R5 ...
     MOV.L R4,[-R3]                              ; Initial R4 ...
-    MOV.L R4,[-R3]                              ; Initial R3 ...    
+    MOV.L R4,[-R3]                              ; Initial R3 ...
     MOV.L R4,[-R3]                              ; Initial R15 ...
     MOV.L R4,[-R3]                              ; Initial R14 ...
     MVFC  FPSW, r4
     MOV.L R4, [-R3]                             ; Initial FPSW
     MOV.L #0, R4
-    MOV.L R4,[-R3]                              ; Initial R13 ...   
+    MOV.L R4,[-R3]                              ; Initial R13 ...
     MOV.L R4,[-R3]                              ; Initial R12 ...
     MOV.L R4,[-R3]                              ; Initial R11 ...
-    MOV.L R4,[-R3]                              ; Initial R10 ...   
+    MOV.L R4,[-R3]                              ; Initial R10 ...
     MOV.L R4,[-R3]                              ; Initial R9 ...
     MOV.L R4,[-R3]                              ; Initial R8 ...
-    MOV.L R4,[-R3]                              ; Initial R7 ...    
+    MOV.L R4,[-R3]                              ; Initial R7 ...
     MOV.L R4,[-R3]                              ; Initial R6 ...
 
     MOV.L R4,[-R3]                              ; Accumulator 1
@@ -127,11 +127,11 @@ __tx_thread_stack_build:
     MOV.L R4,[-R3]
 
 ;    /* Setup stack pointer.  */
-;    thread_ptr -> tx_thread_stack_ptr =  R1;   
+;    thread_ptr -> tx_thread_stack_ptr =  R1;
     MOV.L R3, 8[R1]
                                                 ; Store initial SP in thread control block
     RTS
-                                 
+
 ;}
 
     END

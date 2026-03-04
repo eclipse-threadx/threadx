@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -125,9 +125,9 @@ _get_protection:
     CBZ     w5, _got_protection                 // Did it succeed?  w5 = 0 means success!
     MSR     DAIF, x0                            // Restore interrupts
     B       _tx_thread_smp_protect              // Restart the protection attempt
-    
+
 _got_protection:
-    DMB     ISH                                 // 
+    DMB     ISH                                 //
     STR     w2, [x1, #4]                        // Save owning core
 _owned:
     LDR     w5, [x1, #8]                        // Pickup ownership count

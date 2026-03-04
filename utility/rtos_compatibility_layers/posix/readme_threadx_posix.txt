@@ -12,17 +12,17 @@ ThreadX primitives and bypasses basic ThreadX error checking.
 
 1.1 POSIX Compliancy Wrapper Source
 
-The Wrapper source code is designed for simplicity and is comprised of separate source 
-files for most functions.  Including the supplied pthread.h file will import 
+The Wrapper source code is designed for simplicity and is comprised of separate source
+files for most functions.  Including the supplied pthread.h file will import
 all the necessary POSIX constants and subroutine prototypes.
 
 
 1.2 POSIX Compliancy Wrapper Documentation
 
 This document itself serves as a POSIX Compliancy Wrapper User Guide by
-providing an overview of the porting process, including various caveats and 
-pitfalls to watch out for. In addition, each covered POSIX call is documented, 
-including information about supported/unsupported options, limitations, deviations, 
+providing an overview of the porting process, including various caveats and
+pitfalls to watch out for. In addition, each covered POSIX call is documented,
+including information about supported/unsupported options, limitations, deviations,
 and suggestions on how to work-around any limitations.
 
 
@@ -31,32 +31,32 @@ and suggestions on how to work-around any limitations.
 The POSIX Compliancy Wrapper is easily installed by adding the
 the posix library to your current application build. Make sure your application build
 references the same header files as the ones the posix library has been built with.
-The file pthread.h must be included in your application source where POSIX 
+The file pthread.h must be included in your application source where POSIX
 calls are required.
 Since the POSIX compliancy wrapper does not cover the complete standard, not all prototypes
 are provided. Most notably is the header file tx_px_time.h.
 
 2.1 Initialization
 
-The POSIX Compliancy Wrapper requires that a special initialization function is called 
+The POSIX Compliancy Wrapper requires that a special initialization function is called
 prior to accessing any POSIX calls.  The function to call and its prototype is:
 
 VOID    *posix_initialize(VOID * posix_memory);
 
 This function is usually called from the application specific ThreadX
-initialization routine, tx_application_define().  The memory pointer supplied 
-to posix_initialize must be a contiguouis reserved section of memory 
+initialization routine, tx_application_define().  The memory pointer supplied
+to posix_initialize must be a contiguouis reserved section of memory
 that has at least the following number of bytes:
 
 
         POSIX_SYSTEM_STACK_SIZE +
         TX_REGION0_SIZE_IN_BYTES +           /* Region0 size         */
         (WORK_QUEUE_DEPTH * WORK_REQ_SIZE) + /* system queue size    */
-        POSIX_HEAP_SIZE_IN_BYTES                     
+        POSIX_HEAP_SIZE_IN_BYTES
 
 
 These equates are defined in tx_posix.h.  The following additional equates
-define the number of POSIX objects supported by the POSIX Wrapper (default 
+define the number of POSIX objects supported by the POSIX Wrapper (default
 value is shown):
 
        SEM_NSEMS_MAX          100        /* simultaneous POSIX semaphores */
@@ -77,7 +77,7 @@ value is shown):
                                                 POSIX mutexes sported.     */
 
 
-The function posix_initialize will return a pointer to the next free 
+The function posix_initialize will return a pointer to the next free
 available memory location for the application.
 
 
@@ -119,7 +119,7 @@ INT                   sem_destroy(sem_t *sem);
 /***********************************************************************/
 
 INT                   sched_yield(VOID);
-INT                   pthread_create (pthread_t *thread,  
+INT                   pthread_create (pthread_t *thread,
 					                  pthread_attr_t *attr,
                                       VOID *(*start_routine)(VOID*),VOID *arg);
 INT                   pthread_detach(pthread_t thread);
@@ -220,35 +220,35 @@ throughout the Wrapper, as follows:
           posix_error_handler
           posix_internal_error
 
-In general these routines are called when basic usage errors occur.  These 
-routines may also be used as a place to catch errors that are not detected if the 
-application source is not checking the return status. The default processing for each of 
+In general these routines are called when basic usage errors occur.  These
+routines may also be used as a place to catch errors that are not detected if the
+application source is not checking the return status. The default processing for each of
 these is a simple spin loop.
 
 Most functions can provide an error number. The means by which each function
-provides its error numbers is specified in its description.  Some functions 
-provide the error number in a variable accessed through the symbol posix_errno.  
-While other functions return an error number directly as the function value. Functions 
-return a value of zero to indicate success. If more than one error occurs in 
-processing a function call, any one of the possible errors may be returned, as the order 
+provides its error numbers is specified in its description.  Some functions
+provide the error number in a variable accessed through the symbol posix_errno.
+While other functions return an error number directly as the function value. Functions
+return a value of zero to indicate success. If more than one error occurs in
+processing a function call, any one of the possible errors may be returned, as the order
 of detection is undefined.
 
 Some functions may return [ENOSYS] suggesting that an attempt was made to
 use a function that is not available in this implementation.
 
-Each pthread has its own error number, which can be obtained through a 
+Each pthread has its own error number, which can be obtained through a
 function call:
 
 INT   posix_get_pthread_errno(pthread_t ptid)
 
-This call will return the last generated error code for the pthread having 
+This call will return the last generated error code for the pthread having
 ptid as an ID.
 
 
 5.1   POSIX Compliancy Wrapper Limitations
 
 Due to performance and architecture issues, this POSIX Compliancy Wrapper
-does not support all the POSIX calls. A summary of the POSIX Compliancy 
+does not support all the POSIX calls. A summary of the POSIX Compliancy
 Wrapper limitations is as follows:
 
 ·   Configuration
@@ -288,8 +288,8 @@ Following calls are implemented with some limitations:
                     space becomes available in that queue, the message with the highest
                     priority will be unblocked. THIS FEATURE IS NOT IMPLEMENTED.
 
-                b.) If a message is sent (or received) to a queue with out opening the named 
-                    queue, in such a  case mqdes (message queue descriptor) pointer is 
+                b.) If a message is sent (or received) to a queue with out opening the named
+                    queue, in such a  case mqdes (message queue descriptor) pointer is
                     invalid and may result in erratic behavior.
 
 3.) mq_receive()
@@ -323,11 +323,11 @@ Following calls are implemented with some limitations:
 7.) Thread Cancelation
 
 pthread cancelation cleanup handlers are not supported which means
-pthread_cleanup_push( ) and pthread_cleanup_pop( ) functions are not 
+pthread_cleanup_push( ) and pthread_cleanup_pop( ) functions are not
 implemented.
 
 When the pthread_cancel( ) function is called the target thread is canceled
-with immediate effect. (provided cancelability is enabled for the target 
+with immediate effect. (provided cancelability is enabled for the target
 pthread)
 
 The cancelation processing in the target thread shall run asynchronously
@@ -337,7 +337,7 @@ with respect to the ailing thread returning from pthread_cancel( ).
     No attributes are supported for condition variable in this implementation.
 
 9.) pthreads suspended by nanosleep() and sleep() calls can not be awakened
-by signals, once in the suspension both these calls will complete the 
+by signals, once in the suspension both these calls will complete the
 suspension period.
 
 10.) pthread_once (pthread_once_t * once_control, VOID (*init_routine) (VOID))
@@ -347,8 +347,8 @@ There is no provision if the init_routine contains a cancellation point.
 6.0  Demonstration System
 
 The file posix_demo.c contains a demonstration system that utilizes POSIX
-calls.  This Demo application will demonstrate some of the basic POSIX 
-calls.  This demo application should be used as an example of how to integrate the POSIX 
+calls.  This Demo application will demonstrate some of the basic POSIX
+calls.  This demo application should be used as an example of how to integrate the POSIX
 Compliancy Wrapper into your application.
 
 

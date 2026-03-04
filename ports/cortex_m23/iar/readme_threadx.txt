@@ -1,4 +1,4 @@
-                       Microsoft's Azure RTOS ThreadX for Cortex-M23 
+                       Microsoft's Azure RTOS ThreadX for Cortex-M23
 
                                    Using the IAR Tools
 
@@ -6,33 +6,33 @@
 1.  Building the ThreadX run-time Library
 
 Import all ThreadX common and port-specific source files into an IAR project.
-Configure the project to build a library rather than an executable. This 
-results in the ThreadX run-time library file tx.a, which is needed by 
+Configure the project to build a library rather than an executable. This
+results in the ThreadX run-time library file tx.a, which is needed by
 the application.
-Files tx_thread_stack_error_handler.c and tx_thread_stack_error_notify.c 
-replace the common files of the same name. 
+Files tx_thread_stack_error_handler.c and tx_thread_stack_error_notify.c
+replace the common files of the same name.
 
 2.  Demonstration System
 
 No demonstration is provided because the IAR EWARM 8.50 simulator does
-not simulate the Cortex-M23 correctly. 
+not simulate the Cortex-M23 correctly.
 
 
 3.  System Initialization
 
-The entry point in ThreadX for the Cortex-M23 using IAR tools is at label 
-__iar_program_start. This is defined within the IAR compiler's startup code. 
-In addition, this is where all static and global preset C variable 
+The entry point in ThreadX for the Cortex-M23 using IAR tools is at label
+__iar_program_start. This is defined within the IAR compiler's startup code.
+In addition, this is where all static and global preset C variable
 initialization processing takes place.
 
-The ThreadX tx_initialize_low_level.s file is responsible for setting up 
-various system data structures, and a periodic timer interrupt source. 
+The ThreadX tx_initialize_low_level.s file is responsible for setting up
+various system data structures, and a periodic timer interrupt source.
 
 The _tx_initialize_low_level function inside of tx_initialize_low_level.s
-also determines the first available address for use by the application, which 
-is supplied as the sole input parameter to your application definition function, 
-tx_application_define. To accomplish this, a section is created in 
-tx_initialize_low_level.s called FREE_MEM, which must be located after all 
+also determines the first available address for use by the application, which
+is supplied as the sole input parameter to your application definition function,
+tx_application_define. To accomplish this, a section is created in
+tx_initialize_low_level.s called FREE_MEM, which must be located after all
 other RAM sections in memory.
 
 
@@ -41,10 +41,10 @@ other RAM sections in memory.
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
 All suspended threads have the same stack frame in the Cortex-M23 version of
-ThreadX. The top of the suspended thread's stack is pointed to by 
+ThreadX. The top of the suspended thread's stack is pointed to by
 tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
-  Stack Offset     Stack Contents 
+  Stack Offset     Stack Contents
 
      0x00               LR          Interrupted LR (LR at time of PENDSV)
      0x04               r8
@@ -67,17 +67,17 @@ tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
 5.  Improving Performance
 
-To make ThreadX and the application(s) run faster, you can enable 
-all compiler optimizations. 
+To make ThreadX and the application(s) run faster, you can enable
+all compiler optimizations.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined.
 
 
 6.  Interrupt Handling
 
-The Cortex-M23 vectors start at the label __vector_table and is typically defined in a 
+The Cortex-M23 vectors start at the label __vector_table and is typically defined in a
 startup.s file (or similar). The application may modify the vector area according to its needs.
 
 
@@ -126,7 +126,7 @@ should have the following line added (if not already in place):
 
 initialize by copy with packing = none { section __DLIB_PERTHREAD }; // Required in a multi-threaded application
 
-The project options "General Options -> Library Configuration" should also have the 
+The project options "General Options -> Library Configuration" should also have the
 "Enable thread support in library" box selected.
 
 

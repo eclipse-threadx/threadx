@@ -1,11 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * Copyright (C) 2026-present Eclipse ThreadX contributors
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -40,7 +40,7 @@ extern pthread_t _tx_linux_timer_id;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_schedule                                 Linux/GNU       */ 
+/*    _tx_thread_schedule                                 Linux/GNU       */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -122,9 +122,9 @@ struct timespec ts;
                     ts.tv_sec++;
                 }
                 sem_timedwait(&_tx_linux_semaphore_no_idle, &ts);
-#else                
+#else
                 nanosleep(&ts, &ts);
-#endif /* TX_LINUX_NO_IDLE_ENABLE */                
+#endif /* TX_LINUX_NO_IDLE_ENABLE */
             }
         }
 
