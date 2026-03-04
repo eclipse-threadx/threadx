@@ -272,7 +272,7 @@ static void _tx_thread_system_return_inline(void)
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX RXv2/GNURX Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX RXv2/GNURX Version 6.5.0.202601 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

@@ -319,7 +319,7 @@ unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX ARM11/AC5 Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX ARM11/AC5 Version 6.5.0.202601 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

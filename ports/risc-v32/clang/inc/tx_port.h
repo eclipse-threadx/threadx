@@ -282,7 +282,7 @@ UINT                                            _tx_thread_interrupt_control(UIN
 #ifndef __ASSEMBLER__
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation. * ThreadX RISC-V32/GNU Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX RISC-V32/GNU Version 6.5.0.202601 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif /* TX_THREAD_INIT */
