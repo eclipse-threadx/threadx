@@ -54,16 +54,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ISRs                                  Interrupt Service Routines    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020      Andres Mlinar           Initial Version 6.1.3         */
-/*  04-25-2022      William E. Lamie        Modified comments, removed    */
-/*                                            FIFO queueing,              */
-/*                                            resulting in version 6.1.11 */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_restore(VOID)
 // {

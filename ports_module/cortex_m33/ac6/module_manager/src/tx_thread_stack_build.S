@@ -52,13 +52,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_thread_create                     Create thread service         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020      Scott Larson            Initial Version 6.1.3         */        
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 // {

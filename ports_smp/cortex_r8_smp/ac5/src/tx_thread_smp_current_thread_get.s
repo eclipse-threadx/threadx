@@ -51,13 +51,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Components                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2022      Scott Larson            Initial Version 6.2.0         */
-/*                                                                        */
 /**************************************************************************/
     EXPORT  _tx_thread_smp_current_thread_get
 _tx_thread_smp_current_thread_get

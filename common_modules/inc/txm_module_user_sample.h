@@ -38,16 +38,6 @@
 /*    defined. Note that all the defines in this file may also be made on */
 /*    the command line when building Modules library and application      */
 /*    objects.                                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  01-31-2022      Scott Larson            Modified comments and added   */
-/*                                            CALL_NOT_USED defines,      */
-/*                                            resulting in version 6.1.10 */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TXM_MODULE_USER_H

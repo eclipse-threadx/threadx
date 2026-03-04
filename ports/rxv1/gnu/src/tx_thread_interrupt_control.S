@@ -51,18 +51,6 @@
 ;/*                                                                        */
 ;/*    Application Code                                                    */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  08-02-2021     William E. Lamie         Initial Version 6.1.8         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.9  */
-;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.11 */
-;/*                                                                        */
 ;/**************************************************************************/
 ;UINT   _tx_thread_interrupt_control(UINT new_posture)
 ;{

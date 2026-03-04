@@ -62,13 +62,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Components                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 ULONG  _tx_thread_smp_current_state_get(void)
 {

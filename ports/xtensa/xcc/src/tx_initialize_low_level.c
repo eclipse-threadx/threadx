@@ -47,16 +47,6 @@ int32_t xt_timer_intnum = -1;
 /*    pointer for use in ISR processing later, and finding the first      */
 /*    available RAM memory address for tx_application_define.             */
 /*    It also sets the default heap region for the optional C library.    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
-/*  04-25-2022      Scott Larson            Modified comments and updated */
-/*                                            function names,             */
-/*                                            resulting in version 6.1.11 */
-/*                                                                        */
 /**************************************************************************/
 VOID   _tx_initialize_low_level(VOID)
 {

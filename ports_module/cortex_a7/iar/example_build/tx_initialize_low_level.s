@@ -109,15 +109,6 @@ __tx_free_memory_start
 ;/*                                                                        */ 
 ;/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
 ;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  10-31-2023     Yajun Xia                Modified comment(s),          */
-;/*                                            Added thumb mode support,   */
-;/*                                            resulting in version 6.3.0  */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
 ;{

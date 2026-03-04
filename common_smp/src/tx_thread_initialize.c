@@ -340,13 +340,6 @@ const CHAR _tx_thread_special_string[] =
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_high_level         High level initialization         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_initialize(VOID)
 {

@@ -32,13 +32,6 @@
 /*  DESCRIPTION                                                           */ 
 /*                                                                        */ 
 /*    This file defines the preemptive scheduling test.                   */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  10-15-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */ 
 /**************************************************************************/ 
 
 #include "tm_api.h"

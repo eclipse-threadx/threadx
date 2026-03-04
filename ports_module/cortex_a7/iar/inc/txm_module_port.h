@@ -34,16 +34,6 @@
 /*                                                                        */ 
 /*    This file defines the basic module constants, interface structures, */ 
 /*    and function prototypes.                                            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  10-31-2023      Yajun Xia               Modified comment(s),          */
-/*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TXM_MODULE_PORT_H

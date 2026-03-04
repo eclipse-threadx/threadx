@@ -64,13 +64,6 @@
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 INT pthread_mutex_init(pthread_mutex_t *mutex ,pthread_mutexattr_t *attr)
 {

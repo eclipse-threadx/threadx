@@ -80,15 +80,6 @@ SVC_MODE_BITS   =       0x13                    @ SVC mode value
 @/*                                                                        */ 
 @/*    FIQ ISR                               Interrupt Service Routines    */ 
 @/*                                                                        */ 
-@/*  RELEASE HISTORY                                                       */ 
-@/*                                                                        */ 
-@/*    DATE              NAME                      DESCRIPTION             */
-@/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-@/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-@/*                                            #include tx_user.h,         */
-@/*                                            resulting in version 6.2.1  */
-@/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_fiq_context_restore(VOID)
 @{

@@ -128,13 +128,6 @@ ULONG                   _txm_module_manager_callback_error_count;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_memory_size)
 {

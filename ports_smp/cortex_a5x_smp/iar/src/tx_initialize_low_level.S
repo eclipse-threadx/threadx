@@ -84,13 +84,6 @@ __tx_free_memory_start
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      William E. Lamie        Initial Version 6.1.9         */
-/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_initialize_low_level(VOID)
 { */

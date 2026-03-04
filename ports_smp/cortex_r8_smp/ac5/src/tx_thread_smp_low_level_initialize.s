@@ -51,13 +51,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_high_level            ThreadX high-level init        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2022      Scott Larson            Initial Version 6.2.0         */
-/*                                                                        */
 /**************************************************************************/
     EXPORT  _tx_thread_smp_low_level_initialize
 _tx_thread_smp_low_level_initialize

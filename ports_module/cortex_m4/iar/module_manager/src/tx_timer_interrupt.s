@@ -71,18 +71,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    interrupt vector                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
-/*  01-31-2022      Scott Larson            Modified comment(s), added    */
-/*                                            TX_NO_TIMER support,        */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023      Tiejun Zhou             Included tx_user.h,           */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
 // {

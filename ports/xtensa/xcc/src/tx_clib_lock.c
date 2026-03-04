@@ -29,17 +29,6 @@
 /*    This file contains the interface functions to provide thread-safe   */
 /*    operation of the C library. Both newlib and the Xtensa C Library    */
 /*    are supported.                                                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*  12-31-2023     Xiuwen Cai               Modified comment(s), and      */
-/*                                            added error handling in     */
-/*                                            lock initialization,        */
-/*                                            resulting in version 6.4.0  */
-/*                                                                        */
 /**************************************************************************/
 
 #include "tx_api.h"     /* TX_THREAD_SAFE_CLIB may be defined by tx_port.h */

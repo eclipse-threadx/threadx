@@ -87,16 +87,6 @@ extern VOID     _txm_module_initialize(VOID *heap_base, VOID *heap_top);
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Initial thread stack frame                                          */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*  01-31-2022      Scott Larson            Modified comments and made    */
-/*                                            heap user configurable,     */
-/*                                            resulting in version 6.1.10 */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_ENTRY_INFO *thread_info)
 {

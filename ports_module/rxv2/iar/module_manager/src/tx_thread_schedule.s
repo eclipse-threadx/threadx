@@ -62,17 +62,6 @@
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
 /*    _tx_thread_context_restore           Restore thread's context       */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
-/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
-/*                                            removed unnecessary stack   */
-/*                                            type checking,              */
-/*                                            resulting in version 6.1.9  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
 // {

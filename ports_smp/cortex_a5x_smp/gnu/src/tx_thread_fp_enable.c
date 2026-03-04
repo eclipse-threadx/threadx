@@ -56,15 +56,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     Andres Mlinar            Updated comments,             */
-/*                                             resulting in version 6.1.9 */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_fp_enable(VOID)
 {

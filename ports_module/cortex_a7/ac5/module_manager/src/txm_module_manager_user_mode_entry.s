@@ -56,12 +56,6 @@
 ;/*                                                                        */ 
 ;/*    Modules in user mode                                                */ 
 ;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-;/*                                                                        */
 ;/**************************************************************************/
     EXPORT  _txm_module_manager_user_mode_entry
     EXPORT  _txm_system_mode_enter

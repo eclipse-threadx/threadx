@@ -44,40 +44,6 @@
 /*                                                                        */
 /*    This file replaces the previous Cortex-M55 files. It unifies        */
 /*    the Cortex-M55 compilers into one common file.                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  03-02-2021      Scott Larson            Modified comment(s), added    */
-/*                                            ULONG64_DEFINED,            */
-/*                                            resulting in version 6.1.5  */
-/*  06-02-2021      Scott Larson            Modified comment(s), removed  */
-/*                                            unneeded header file, funcs */
-/*                                            set_control and get_control */
-/*                                            changed to inline,          */
-/*                                            added symbol to enable      */
-/*                                            stack error handler,        */
-/*                                            resulting in version 6.1.7  */
-/*  10-15-2021      Scott Larson            Modified comment(s), improved */
-/*                                            stack check error handling, */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022      Scott Larson            Modified comment(s), unified  */
-/*                                            this file across compilers, */
-/*                                            fixed predefined macro,     */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022      Scott Larson            Modified comments and added   */
-/*                                            volatile to registers,      */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Modified comments and changed */
-/*                                            secure stack initialization */
-/*                                            macro to port-specific,     */
-/*                                            described BASEPRI usage,    */
-/*                                            resulting in version 6.1.12 */
-/*  03-08-2023      Scott Larson            Removed unneeded #include,    */
-/*                                            resulting in version 6.2.1  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_PORT_H

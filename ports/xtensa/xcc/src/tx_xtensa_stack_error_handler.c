@@ -85,13 +85,6 @@
 /*    - Passes control to the debugger (if attached).                     */
 /*    - Terminates the simulation (simulator only).                       */
 /*    - Panics.                                                           */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */ 
 /**************************************************************************/ 
 
 VOID  _tx_xtensa_stack_error_handler(TX_THREAD * thread)

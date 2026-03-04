@@ -60,13 +60,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      William E. Lamie        Initial Version 6.1.9         */
-/*                                                                        */
 /**************************************************************************/
 /* UINT   _tx_thread_interrupt_disable(void)
 { */

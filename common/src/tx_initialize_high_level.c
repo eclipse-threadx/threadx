@@ -99,15 +99,6 @@ VOID     *_tx_initialize_unused_memory;
 /*    _tx_initialize_kernel_setup       Early kernel setup function that  */
 /*                                        is optionally called by         */
 /*                                        compiler's startup code.        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 VOID    _tx_initialize_high_level(VOID)
 {

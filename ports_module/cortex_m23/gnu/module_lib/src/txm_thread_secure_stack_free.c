@@ -53,13 +53,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Module application code                                             */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
-/*                                                                        */
 /**************************************************************************/
 UINT _txe_thread_secure_stack_free(TX_THREAD *thread_ptr)
 {

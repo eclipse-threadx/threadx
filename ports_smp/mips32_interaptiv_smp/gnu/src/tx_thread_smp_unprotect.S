@@ -57,13 +57,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Source                                                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-08-2023      Scott Larson            Initial Version 6.2.1         */
-/*                                                                        */
 /**************************************************************************/
     .globl  _tx_thread_smp_unprotect
 _tx_thread_smp_unprotect:

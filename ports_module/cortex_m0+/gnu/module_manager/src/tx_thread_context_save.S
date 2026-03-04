@@ -55,13 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ISRs                                                                */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022      Scott Larson            Initial Version 6.1.10        */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_save(VOID)
 // {

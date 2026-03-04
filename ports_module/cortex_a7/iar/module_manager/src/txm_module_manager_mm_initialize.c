@@ -90,13 +90,6 @@ ULONG _txm_level2_external_page_pool[TXM_LEVEL2_EXTERNAL_POOL_PAGES][TXM_LEVEL_2
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_mm_initialize(VOID)
 {

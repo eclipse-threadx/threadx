@@ -76,16 +76,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Source                                                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      William E. Lamie        Initial Version 6.1.9         */
-/*  04-25-2022      William E. Lamie        Modified comments, removed    */
-/*                                            FIFO queueing,              */
-/*                                            resulting in version 6.1.11 */
-/*                                                                        */
 /**************************************************************************/
     PUBLIC   _tx_thread_smp_protect
 _tx_thread_smp_protect:

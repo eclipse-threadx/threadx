@@ -76,13 +76,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    POSIX internal code                                                 */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 static VOID posix_memory_init(VOID * posix_heap_ptr)
 {

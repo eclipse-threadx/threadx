@@ -54,16 +54,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _txm_module_manager_thread_create                                   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020      Scott Larson            Initial Version 6.1.3         */
-/*  04-02-2021      Scott Larson            Modified comments and check   */
-/*                                            for overflow,               */
-/*                                            resulting 6.1.6             */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance)
 {

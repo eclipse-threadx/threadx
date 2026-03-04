@@ -61,19 +61,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-16-2020     Yuxin Zhou               Modified comment(s), and      */
-/*                                            added type cast to address  */
-/*                                            a MISRA compliance issue,   */
-/*                                            resulting in version 6.1.1  */
-/*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_suspend(TX_THREAD *thread_ptr)
 {

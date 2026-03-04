@@ -35,15 +35,6 @@
 /*    This file defines the ThreadX byte memory management component,     */
 /*    including all data types and external references.  It is assumed    */
 /*    that tx_api.h and tx_port.h have already been included.             */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_BYTE_POOL_H

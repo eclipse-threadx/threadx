@@ -63,15 +63,6 @@ SYS_MODE_BITS   EQU     0x1F                    ; System mode bits
 ;/*                                                                        */ 
 ;/*    ISRs                                                                */ 
 ;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  10-31-2023     Yajun Xia                Modified comment(s),          */
-;/*                                            Added thumb mode support,   */
-;/*                                            resulting in version 6.3.0  */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_irq_nesting_start(VOID)
 ;{

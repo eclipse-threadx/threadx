@@ -67,15 +67,6 @@
 /*    _tx_thread_timeout                    Thread timeout                */
 /*    _tx_thread_wait_abort                 Thread wait abort             */
 /*    Other ThreadX Components                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_system_resume(TX_THREAD *thread_ptr)
 #ifndef TX_NOT_INTERRUPTABLE

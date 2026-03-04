@@ -27,13 +27,6 @@
 /*                                                                        */
 /*    Xtensa coprocessor handling routines. This code is only active if   */
 /*    one or more coprocessors are present.                               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 
 

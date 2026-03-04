@@ -70,13 +70,6 @@
 /*                                                                        */
 /*    _tx_mutex_get                     Inherit priority                  */
 /*    _tx_mutex_put                     Restore previous priority         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_mutex_priority_change(TX_THREAD *thread_ptr, UINT new_priority)
 {

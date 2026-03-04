@@ -56,16 +56,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    POSIX internal Code                                                 */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Modified comments,            */
-/*                                            fixed message swap logic,   */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 ULONG posix_arrange_msg(TX_QUEUE *Queue, ULONG *pMsgPrio)
 {

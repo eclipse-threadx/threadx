@@ -72,16 +72,6 @@ extern TXM_MODULE_THREAD_ENTRY_INFO    *_txm_module_entry_info;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Initial thread stack frame                                          */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  01-31-2022      Scott Larson            Modified comments and added   */
-/*                                            CALL_NOT_USED option,       */
-/*                                            resulting in version 6.1.10 */
-/*                                                                        */
 /**************************************************************************/
 VOID _txm_module_callback_request_thread_entry(ULONG id)
 {

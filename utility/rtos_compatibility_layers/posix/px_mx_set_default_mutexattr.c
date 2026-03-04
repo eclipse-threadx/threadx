@@ -56,13 +56,6 @@
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    Start-up code                                                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 VOID set_default_mutexattr(pthread_mutexattr_t *mutexattr)
 {

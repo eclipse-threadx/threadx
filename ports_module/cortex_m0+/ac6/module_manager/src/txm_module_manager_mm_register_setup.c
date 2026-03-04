@@ -55,13 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _txm_module_manager_mm_register_setup                               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022      Scott Larson            Initial Version 6.1.10        */
-/*                                                                        */
 /**************************************************************************/
 ULONG  _txm_module_manager_region_size_get(ULONG block_size)
 {

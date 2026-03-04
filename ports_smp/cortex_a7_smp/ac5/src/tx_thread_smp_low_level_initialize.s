@@ -63,12 +63,6 @@
 ;/*                                                                        */ 
 ;/*    _tx_initialize_high_level            ThreadX high-level init        */ 
 ;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*                                                                        */
 ;/**************************************************************************/
     EXPORT  _tx_thread_smp_low_level_initialize
 _tx_thread_smp_low_level_initialize

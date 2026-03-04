@@ -76,14 +76,6 @@
 @/*                                                                        */ 
 @/*    ThreadX Source                                                      */
 @/*                                                                        */ 
-@/*  RELEASE HISTORY                                                       */ 
-@/*                                                                        */ 
-@/*    DATE              NAME                      DESCRIPTION             */
-@/*                                                                        */
-@/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-@/*  07-29-2022      Scott Larson            Fixed preprocessor statement, */
-@/*                                            resulting in version 6.1.12 */
-@/*                                                                        */
 @/**************************************************************************/
     .global _tx_thread_smp_protect
     .type   _tx_thread_smp_protect,function

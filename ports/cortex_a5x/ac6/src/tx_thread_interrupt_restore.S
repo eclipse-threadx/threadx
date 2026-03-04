@@ -61,13 +61,6 @@
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 /* UINT   _tx_thread_interrupt_restore(UINT old_posture)
 { */

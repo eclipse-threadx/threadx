@@ -58,16 +58,6 @@
 /*    time slice and/or timer expiration.  If either is found, the        */ 
 /*    interrupt context save/restore functions are called along with the  */ 
 /*    expiration functions.                                               */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
-/*  04-25-2022      Scott Larson            Modified comments and updated */
-/*                                            function name,              */
-/*                                            resulting in version 6.1.11 */
-/*                                                                        */ 
 /**************************************************************************/ 
 
 //  VOID   _tx_timer_interrupt(VOID)

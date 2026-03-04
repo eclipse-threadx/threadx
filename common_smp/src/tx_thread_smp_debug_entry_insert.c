@@ -117,13 +117,6 @@ ULONG                           _tx_thread_smp_debug_info_current_index;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Internal routines                                                   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 void  _tx_thread_smp_debug_entry_insert(ULONG id, ULONG suspend, VOID *thread_void_ptr)
 {

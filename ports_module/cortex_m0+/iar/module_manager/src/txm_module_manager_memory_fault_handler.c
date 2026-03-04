@@ -70,13 +70,6 @@ TXM_MODULE_MANAGER_FAULT_INFO
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Fault handler                                                       */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022      Scott Larson            Initial Version 6.1.10        */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_memory_fault_handler(VOID)
 {

@@ -56,13 +56,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    posix internal code                                                 */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 ULONG  posix_in_thread_context(VOID)
 {

@@ -89,13 +89,6 @@
 /*    _tx_thread_timeout                    Thread timeout                */
 /*    _tx_thread_wait_abort                 Thread wait abort             */
 /*    Other ThreadX Components                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_system_resume(TX_THREAD *thread_ptr)
 {

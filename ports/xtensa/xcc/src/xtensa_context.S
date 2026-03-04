@@ -40,13 +40,6 @@
 /* scratch registers for interrupt dispatch code, so are presumed saved   */
 /* anyway, and are always restored even in Call0 ABI. Only A14, A15 are   */
 /* truly handled as callee-save regs.                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 
 

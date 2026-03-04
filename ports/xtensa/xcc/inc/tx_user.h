@@ -38,13 +38,6 @@
 /*    ThreadX library are built with TX_INCLUDE_USER_DEFINE_FILE defined. */ 
 /*    Note that all the defines in this file may also be made on the      */ 
 /*    command line when building ThreadX library and application objects. */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_USER_H

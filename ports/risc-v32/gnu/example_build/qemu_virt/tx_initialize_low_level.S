@@ -43,12 +43,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    hardware exception                                                  */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-29-2025        Akif Ejaz        Adapted for RV32 from RV64 port    */
-/*                                                                        */
 /**************************************************************************/
 
 

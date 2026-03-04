@@ -123,13 +123,6 @@ EXECUTION_TIME_SOURCE_TYPE          _tx_execution_idle_time_last_start[TX_THREAD
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_thread_schedule               Thread scheduling                 */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  07-29-2022      William E. Lamie        Initial Version 6.1.12        */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_execution_thread_enter(void)
 {

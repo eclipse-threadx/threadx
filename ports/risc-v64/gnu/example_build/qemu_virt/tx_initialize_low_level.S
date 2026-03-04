@@ -43,12 +43,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    hardware exception                                                  */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-25-2024      Jerry Luo                                             */
-/*                                                                        */
 /**************************************************************************/
 
 

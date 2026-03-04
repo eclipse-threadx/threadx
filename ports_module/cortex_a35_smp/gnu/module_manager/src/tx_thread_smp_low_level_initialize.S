@@ -52,13 +52,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_high_level            ThreadX high-level init        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_low_level_initialize
     .type    _tx_thread_smp_low_level_initialize, @function

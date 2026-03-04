@@ -78,13 +78,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    interrupt vector                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      William E. Lamie        Initial Version 6.1.9         */
-/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_timer_interrupt(VOID)
 {  */

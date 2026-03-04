@@ -86,16 +86,6 @@ FIQ_MASK        =   0x040
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
 /*    _tx_thread_context_restore           Restore thread's context       */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-08-2023      Scott Larson            Initial Version 6.2.1         */
-/*  10-31-2023      Yajun Xia               Updated comments,             */
-/*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
 // {

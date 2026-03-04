@@ -65,13 +65,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    startup code                      Compiler startup code             */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_initialize_kernel_setup(VOID)
 {

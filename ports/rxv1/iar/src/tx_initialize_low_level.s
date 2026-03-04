@@ -59,18 +59,6 @@
 ;/*                                                                        */
 ;/*    _tx_initialize_kernel_enter           ThreadX entry function        */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  08-02-2021     William E. Lamie         Initial Version 6.1.8         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.9  */
-;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.11 */
-;/*                                                                        */
 ;/**************************************************************************/
     public __tx_initialize_low_level
 

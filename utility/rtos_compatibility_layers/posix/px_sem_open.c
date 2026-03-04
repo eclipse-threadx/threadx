@@ -63,15 +63,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Update comparison with NULL,  */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 sem_t * sem_open(const CHAR * name, ULONG oflag, ...)
 {

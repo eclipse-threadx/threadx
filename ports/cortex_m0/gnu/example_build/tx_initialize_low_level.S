@@ -79,16 +79,6 @@ SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
 @/*                                                                        */
 @/*    _tx_initialize_kernel_enter           ThreadX entry function        */
 @/*                                                                        */
-@/*  RELEASE HISTORY                                                       */
-@/*                                                                        */
-@/*    DATE              NAME                      DESCRIPTION             */
-@/*                                                                        */
-@/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-@/*  09-30-2020     Scott Larson             Modified comment(s), and      */
-@/*                                            commented out code for      */
-@/*                                            enabling DWT,               */
-@/*                                            resulting in version 6.1    */
-@/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_initialize_low_level(VOID)
 @{

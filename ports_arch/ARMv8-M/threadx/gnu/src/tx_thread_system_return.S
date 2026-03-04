@@ -55,15 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX components                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  03-08-2023      Scott Larson            Include tx_user.h,            */
-/*                                            resulting in version 6.2.1  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_system_return(VOID)
 // {

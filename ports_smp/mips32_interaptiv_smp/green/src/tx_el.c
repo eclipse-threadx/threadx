@@ -82,13 +82,6 @@ UINT                _tx_thread_interrupt_control(UINT new_posture);
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-08-2023      Cindy Deng              Initial Version 6.2.1         */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_el_initialize(VOID)
 {

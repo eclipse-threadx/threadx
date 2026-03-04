@@ -55,15 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
-/*  10-31-2023      Tiejun Zhou             Included tx_user.h,           */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 // UINT   _tx_thread_interrupt_disable(VOID)
 // {

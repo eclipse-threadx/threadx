@@ -34,13 +34,6 @@
 /*    This file defines the constants, structures, etc. needed for the    */
 /*    OSEK implementation.                                                */
 /*                                                                        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_OSEK_H

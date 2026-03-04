@@ -64,15 +64,6 @@ THUMB_MASK      EQU     0x20                    ; Thumb bit (5) of CPSR/SPSR
 ;/*                                                                        */ 
 ;/*    _tx_thread_create                     Create thread service         */ 
 ;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-;/*  10-31-2023      Yajun Xia               Modified comment(s),          */
-;/*                                            Added thumb mode support,   */
-;/*                                            resulting in version 6.3.0  */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 ;{

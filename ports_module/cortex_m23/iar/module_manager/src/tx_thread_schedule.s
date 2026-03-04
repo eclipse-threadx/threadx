@@ -68,20 +68,6 @@
 /*                                                                        */
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
-/*  04-25-2022      Scott Larson            Optimized MPU configuration,  */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Removed the code path to skip */
-/*                                            MPU reloading,              */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022      Scott Larson            Added low power support,      */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
 // {

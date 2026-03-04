@@ -81,17 +81,6 @@ TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    main                              Application main program          */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
-/*                                            added random generator      */
-/*                                            initialization,             */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_initialize_kernel_enter(VOID)
 {

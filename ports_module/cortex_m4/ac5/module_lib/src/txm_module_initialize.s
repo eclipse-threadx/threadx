@@ -53,13 +53,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _txm_module_thread_shell_entry        Start module thread           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_initialize(VOID)
 

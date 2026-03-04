@@ -17,15 +17,6 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  10-31-2022      Scott Larson            Change configSTACK_DEPTH_TYPE */
-/*                                           to 32 bit instead of 16 bit, */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef FREERTOS_CONFIG_H

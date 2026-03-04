@@ -34,13 +34,6 @@
 /*    implement time related functionality for the Evacuation Kit         */
 /*    for POSIX Users (POSIX)                                             */
 /*                                                                        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef _TX_PX_TIME_H

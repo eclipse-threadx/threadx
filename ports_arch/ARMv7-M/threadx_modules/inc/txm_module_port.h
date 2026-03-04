@@ -34,25 +34,6 @@
 /*                                                                        */
 /*    This file defines the basic module constants, interface structures, */
 /*    and function prototypes.                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*  01-31-2022      Scott Larson            Modified comments and made    */
-/*                                            heap user-configurable,     */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022      Scott Larson            Enabled user-defined and      */
-/*                                            default MPU settings,       */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022      Scott Larson            Configure heap size,          */
-/*                                            resulting in version 6.2.0  */
-/*  03-08-2023      Scott Larson            Set default values for RBAR,  */
-/*                                            unify this file for all     */
-/*                                            compilers,                  */
-/*                                            resulting in version 6.2.1  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TXM_MODULE_PORT_H

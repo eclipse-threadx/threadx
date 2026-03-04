@@ -69,15 +69,6 @@
 ;/*                                                                        */ 
 ;/*    ISRs                                                                */ 
 ;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
-;/*                                            execution profile support,  */
-;/*                                            resulting in version 6.1.9  */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_save(VOID)
 ;{

@@ -41,30 +41,6 @@
 /*    directly use native C data types.  Instead, ThreadX creates its     */
 /*    own special types that can be mapped to actual data types by this   */
 /*    file to guarantee consistency in the interface and functionality.   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  03-02-2021      Scott Larson            Modified comment(s), added    */
-/*                                            ULONG64_DEFINED,            */
-/*                                            resulting in version 6.1.5  */
-/*  06-02-2021      Yuxin Zhou              Modified comment(s), added    */
-/*                                            conditional compilation     */
-/*                                            for ARMv8-M (Cortex M23/33) */
-/*                                            resulting in version 6.1.7  */
-/*  10-15-2021      Scott Larson            Modified comment(s), improved */
-/*                                            stack check error handling, */
-/*                                            resulting in version 6.1.9  */
-/*  04-25-2022      Scott Larson            Modified comments and added   */
-/*                                            volatile to registers,      */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Modified comments and changed */
-/*                                            secure stack initialization */
-/*                                            macro to port-specific,     */
-/*                                            resulting in version 6.1.12 */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_PORT_H

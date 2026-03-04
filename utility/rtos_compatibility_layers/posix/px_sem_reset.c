@@ -55,13 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    POSIX internal Code                                                 */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 VOID posix_sem_reset(sem_t *sem )
 {

@@ -53,15 +53,6 @@
 ;/*                                                                        */ 
 ;/*    Modules in user mode                                                */ 
 ;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-;/*  10-31-2023      Yajun Xia               Modified comment(s),          */
-;/*                                            Added thumb mode support,   */
-;/*                                            resulting in version 6.3.0  */
-;/*                                                                        */
 ;/**************************************************************************/
     RSEG    .text:CODE:NOROOT(2)
     PUBLIC  _txm_module_manager_user_mode_entry

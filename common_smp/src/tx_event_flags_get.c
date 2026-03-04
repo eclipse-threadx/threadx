@@ -67,21 +67,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
-/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022      Scott Larson            Modified comment(s),          */
-/*                                            handle 0 flags case,        */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022      Scott Larson            Modified comment(s), always   */
-/*                                            return actual flags,        */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 UINT  _tx_event_flags_get(TX_EVENT_FLAGS_GROUP *group_ptr, ULONG requested_flags,
                     UINT get_option, ULONG *actual_flags_ptr, ULONG wait_option)

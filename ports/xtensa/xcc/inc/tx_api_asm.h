@@ -21,13 +21,6 @@
 /*    Structure offsets depend on the compiler, so are tools-specific,    */
 /*    which usually means port-specific since a compiler's struct         */
 /*    packing rules depend on properties of the target architecture.      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_API_ASM_H

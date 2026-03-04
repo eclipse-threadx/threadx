@@ -58,12 +58,6 @@
 /*    nested interrupt. If not, it returns to the interrupt thread if no  */
 /*    preemption is necessary.  Otherwise, if preemption is necessary or  */
 /*    if no thread was running, the function returns to the scheduler.    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
-/*  10-31-2022      Scott Larson            Updated EPK definitions,      */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 
 //  VOID   _tx_thread_context_restore(VOID)

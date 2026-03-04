@@ -70,24 +70,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ISRs                                                                */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
-/*                                            execution profile support,  */
-/*                                            resulting in version 6.1.9  */
-/*  04-25-2022     Zhen Kong                Updated comments,             */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.3.0  */
-/*  12-31-2023     Yajun Xia                Modified comment(s),          */
-/*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.4.0  */
-/*                                                                        */
 /**************************************************************************/
     .global _tx_thread_context_save
     .type   _tx_thread_context_save,function

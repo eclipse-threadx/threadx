@@ -34,23 +34,6 @@
 /*                                                                        */
 /*    This file declares prototypes of utility functions used by the      */
 /*    module manager.                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  04-02-2021      Scott Larson            Modified comment(s) and       */
-/*                                            optimized object checks,    */
-/*                                            resulting in version 6.1.6  */
-/*  10-31-2023      Tiejun Zhou             Modified comment(s) and       */
-/*                                            improved object check,      */
-/*                                            resulting in version 6.3.0  */
-/*  xx-xx-2025      William E. Lamie        Modified comment(s) and       */
-/*                                            improved object pointer use */ 
-/*                                            and creation checking,      */
-/*                                            resulting in version 6.4.3  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TXM_MODULE_MANAGER_UTIL_H

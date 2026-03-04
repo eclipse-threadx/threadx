@@ -59,13 +59,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _txm_module_manager_kernel_dispatch                                 */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
-/*                                                                        */
 /**************************************************************************/
 ALIGN_TYPE _txm_module_manager_port_dispatch(TXM_MODULE_INSTANCE *module_instance, ULONG kernel_request, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2)
 {

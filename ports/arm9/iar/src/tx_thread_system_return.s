@@ -75,12 +75,6 @@ DISABLE_INTS    DEFINE  0x80                ; IRQ interrupts disabled
 ;/*                                                                        */ 
 ;/*    ThreadX components                                                  */ 
 ;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
 ;{

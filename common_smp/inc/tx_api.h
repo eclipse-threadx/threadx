@@ -37,67 +37,6 @@
 /*    and data structure definitions are defined in this file.            */
 /*    Please note that basic data type definitions and other architecture-*/
 /*    specific information is contained in the file tx_port.h.            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  10-16-2020      William E. Lamie        Modified comment(s), and      */
-/*                                            increased patch version,    */
-/*                                            resulting in version 6.1.1  */
-/*  12-31-2020      William E. Lamie        Modified comment(s), and      */
-/*                                            increased patch version,    */
-/*                                            resulting in version 6.1.3  */
-/*  03-02-2021      Scott Larson            Modified comment(s), and      */
-/*                                            order defines numerically,  */
-/*                                            add option to remove FileX  */
-/*                                            pointer, fix whitespace,    */
-/*                                            resulting in version 6.1.5  */
-/*  04-02-2021      Scott Larson            Modified comment(s), and      */
-/*                                            update patch number,        */
-/*                                            resulting in version 6.1.6  */
-/*  06-02-2021      Scott Larson            Added options for multiple    */
-/*                                            block pool search & delay,  */
-/*                                            resulting in version 6.1.7  */
-/*  08-02-2021      Scott Larson            Modified comment(s), and      */
-/*                                            update patch number,        */
-/*                                            resulting in version 6.1.8  */
-/*  10-15-2021      Yuxin Zhou              Modified comment(s),          */
-/*                                            update patch number,        */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022      Scott Larson            Modified comment(s),          */
-/*                                            add unused parameter macro, */
-/*                                            update patch number,        */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022      Wenhui Xie              Modified comment(s),          */
-/*                                            optimized the definition of */
-/*                                            TX_TIMER_TICKS_PER_SECOND,  */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Modified comment(s),          */
-/*                                            update patch number,        */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022      Scott Larson            Modified comment(s),          */
-/*                                            add extension macros,       */
-/*                                            update version numbers,     */
-/*                                            resulting in version 6.2.0  */
-/*  03-08-2023      Tiejun Zhou             Modified comment(s),          */
-/*                                            update patch number,        */
-/*                                            resulting in version 6.2.1  */
-/*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
-/*                                            added option for random     */
-/*                                            number stack filling,       */
-/*                                            resulting in version 6.3.0  */
-/*  12-31-2023      Tiejun Zhou             Modified comment(s),          */
-/*                                            update version number,      */
-/*                                            resulting in version 6.4.0  */
-/*  03-01-2024      Tiejun Zhou             Modified comment(s),          */
-/*                                            update version number,      */
-/*                                            resulting in version 6.4.1  */
-/*  02-19-2025      Frédéric Desbiens       Modified comment(s),          */
-/*                                            update version number,      */
-/*                                            resulting in version 6.4.2  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_API_H

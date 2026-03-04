@@ -35,13 +35,6 @@
 /*    This file defines the ThreadX event log functions for the GHS MULTI */ 
 /*    EventAnalyzer.  It is assumed that tx_api.h and tx_port.h have      */ 
 /*    already been included.                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_EL_H

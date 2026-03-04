@@ -71,15 +71,6 @@
 ;/*    _tx_thread_system_return             Return to system from thread   */
 ;/*    _tx_thread_context_restore           Restore thread's context       */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie        Initial Version 6.1            */
-;/*  03-02-2021     Scott Larson            Modified comment(s), add       */
-;/*                                           low power code,              */
-;/*                                           resulting in version 6.1.5   */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
 ;{

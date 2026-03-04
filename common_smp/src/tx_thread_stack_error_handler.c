@@ -59,16 +59,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX internal code                                               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-16-2020     William E. Lamie         Modified comment(s),          */
-/*                                            fixed link issue,           */
-/*                                            resulting in version 6.1.1  */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_stack_error_handler(TX_THREAD *thread_ptr)
 {

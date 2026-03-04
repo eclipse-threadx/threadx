@@ -74,25 +74,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*    _tx_timer_initialize                  Create system timer thread    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  12-31-2020      Andres Mlinar           Modified comment(s),          */
-/*                                            resulting in version 6.1.3  */
-/*  08-02-2021      Scott Larson            Removed unneeded cast,        */
-/*                                            resulting in version 6.1.8  */
-/*  10-31-2022      Scott Larson            Removed ifdef block to always */
-/*                                            restore interrupts at end   */
-/*                                            of if block,                */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
-/*                                            added option for random     */
-/*                                            number stack filling,       */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
                             VOID (*entry_function)(ULONG id), ULONG entry_input,

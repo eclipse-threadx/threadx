@@ -71,17 +71,6 @@ SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     William E. Lamie         Modified Comment(s), fixed    */
-/*                                            GNU assembly comment, clean */
-/*                                            up whitespace, resulting    */
-/*                                            in version 6.1              */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_initialize_low_level(VOID)
 // {

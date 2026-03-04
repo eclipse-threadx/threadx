@@ -51,13 +51,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  23-12-2025        Akif Ejaz            Initial Version 6.4.x          */
-/*                                                                        */
 /**************************************************************************/
 /* UINT   _tx_thread_interrupt_control(UINT new_posture)
 {  */

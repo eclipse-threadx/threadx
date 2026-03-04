@@ -58,13 +58,6 @@
 /*    the system stack is used upon return to the calling ISR.            */ 
 /*                                                                        */ 
 /*    Interrupts remain disabled and no exceptions are triggered!         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */ 
 /**************************************************************************/ 
 
 //  VOID   _tx_thread_context_save(VOID)

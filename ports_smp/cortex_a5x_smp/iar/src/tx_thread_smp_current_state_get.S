@@ -67,13 +67,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Components                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      William E. Lamie        Initial Version 6.1.9         */
-/*                                                                        */
 /**************************************************************************/
     PUBLIC   _tx_thread_smp_current_state_get
 _tx_thread_smp_current_state_get:

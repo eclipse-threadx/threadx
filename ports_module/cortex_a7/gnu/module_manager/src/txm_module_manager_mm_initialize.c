@@ -87,13 +87,6 @@ __attribute__ ((aligned (1024))) ULONG _txm_level2_external_page_pool[TXM_LEVEL2
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    Application code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-08-2023      Scott Larson            Initial Version 6.2.1         */
-/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_mm_initialize(VOID)
 {

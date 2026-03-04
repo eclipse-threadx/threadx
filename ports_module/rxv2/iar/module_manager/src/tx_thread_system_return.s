@@ -54,14 +54,6 @@
 ;/*                                                                        */
 ;/*    ThreadX components                                                  */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.9  */
-;/*                                                                        */
 ;/**************************************************************************/
 
     public __tx_thread_system_return

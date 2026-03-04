@@ -71,21 +71,6 @@ SYS_MODE_BITS   =       0x1F                    // System mode bits
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ISRs                                                                */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  04-25-2022     Zhen Kong                Updated comments,             */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.3.0  */
-/*  12-31-2023     Yajun Xia                Modified comment(s),          */
-/*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.4.0  */
-/*                                                                        */
 /**************************************************************************/
 #if defined(THUMB_MODE)
     .thumb_func

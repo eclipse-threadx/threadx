@@ -34,19 +34,6 @@
 /*                                                                        */
 /*    This file defines the basic module constants, interface structures, */
 /*    and function prototypes.                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  12-31-2020      Scott Larson            Modified comment(s), added    */
-/*                                            port-specific extension,    */
-/*                                            resulting in version 6.1.3  */
-/*  01-31-2022      Scott Larson            Modified comment(s), added    */
-/*                                            callback thread prototype,  */
-/*                                            resulting in version 6.1.10 */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TXM_MODULE_H

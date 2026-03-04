@@ -55,14 +55,6 @@
 /*    control from a thread back to the system.  Only a minimal context   */
 /*    is saved since the compiler assumes temp registers are going to get */
 /*    slicked by a function call anyway.                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
-/*  10-31-2022      Scott Larson            Updated EPK definitions,      */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 
 //  VOID   _tx_thread_system_return(VOID)

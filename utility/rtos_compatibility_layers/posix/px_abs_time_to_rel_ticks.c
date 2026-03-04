@@ -42,13 +42,6 @@
 /*    This function converts the absolute time specified in a POSIX       */
 /*    timespec structure into the relative number of timer ticks until    */
 /*    that time will occur.                                               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 ULONG posix_abs_time_to_rel_ticks(struct timespec *abs_timeout)
 {

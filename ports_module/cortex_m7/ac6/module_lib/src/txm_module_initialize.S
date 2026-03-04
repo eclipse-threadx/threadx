@@ -56,16 +56,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _txm_module_thread_shell_entry        Start module thread           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*  01-31-2022      Scott Larson            Modified comments and made    */
-/*                                            heap user configurable,     */
-/*                                            resulting in version 6.1.10 */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_initialize(VOID)
     .global  _txm_module_initialize

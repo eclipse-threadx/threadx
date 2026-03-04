@@ -81,18 +81,6 @@
 /*    _tx_thread_suspend                    Application thread suspend    */
 /*    _tx_thread_terminate                  Thread terminate              */
 /*    Other ThreadX Components                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  04-25-2022      Scott Larson            Modified comments and fixed   */
-/*                                            loop to find next thread,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023      Tiejun Zhou             Fixed MISRA2012 rule 10.4_a,  */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_system_suspend(TX_THREAD *thread_ptr)
 {

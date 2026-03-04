@@ -101,21 +101,6 @@ static INT tx_head_free_index = 0U;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  10-16-2020      Scott Larson            Modified comment(s),          */
-/*                                            resulting in version 6.1.1  */
-/*  06-02-2021      Scott Larson            Change name, execute in       */
-/*                                            handler mode,               */
-/*                                            resulting in version 6.1.7  */
-/*  01-31-2022      Himanshu Gupta          Modified comments(s), updated */
-/*                                            secure stack allocation,    */
-/*                                            resulting in version 6.1.10 */
-/*                                                                        */
 /**************************************************************************/
 __attribute__((cmse_nonsecure_entry))
 UINT    _tx_thread_secure_mode_stack_initialize(void)

@@ -54,13 +54,6 @@
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
 /*    _tx_thread_context_restore           Restore thread's context       */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  23-12-2025        Akif Ejaz            Initial Version 6.4.x          */
-/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_schedule(VOID)
 {  */

@@ -54,19 +54,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Source                                                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  10-15-2021      Andres Mlinar           Updated comments,             */
-/*                                            added ARMv8.2-A support,    */
-/*                                            resulting in version 6.1.9  */
-/*  04-25-2022      William E. Lamie        Modified comments, removed    */
-/*                                            FIFO queueing,              */
-/*                                            resulting in version 6.1.11 */
-/*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_unprotect
     .type    _tx_thread_smp_unprotect, @function

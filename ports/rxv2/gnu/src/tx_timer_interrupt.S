@@ -86,20 +86,6 @@
 ;/*                                                                        */
 ;/*    interrupt vector                                                    */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.9  */
-;/*  01-31-2022     William E. Lamie         Modified comment(s), and      */
-;/*                                            added missing thread        */
-;/*                                            preemption logic,           */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.11 */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_timer_interrupt(VOID)
 ;{

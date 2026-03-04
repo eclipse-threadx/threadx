@@ -55,13 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    interrupt vector                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-20-2023       Akif Ejaz                Initial Version 6.2.1       */
-/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_timer_interrupt(VOID)
 {  */

@@ -17,14 +17,6 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  03-02-2021     Andres Mlinar            Modified comment(s), fixed    */
-/*                                             interrupt macros,          */
-/*                                             resulting in version 6.1.5 */
 /**************************************************************************/
 
 #ifndef FREERTOS_H

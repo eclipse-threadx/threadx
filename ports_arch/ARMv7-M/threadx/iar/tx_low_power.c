@@ -70,13 +70,6 @@ UINT    tx_low_power_entered;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_thread_schedule                   Thread scheduling loop        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*                                                                        */
 /**************************************************************************/
 VOID  tx_low_power_enter(VOID)
 {

@@ -56,29 +56,6 @@
 /*                                                                        */
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020      Scott Larson            Initial Version 6.1.3         */
-/*  04-02-2021      Scott Larson            Modified comments and fixed   */
-/*                                            MPU region configuration,   */
-/*                                            resulting in version 6.1.6  */
-/*  06-02-2021      Scott Larson            Fixed extended stack handling */
-/*                                            when calling kernel APIs,   */
-/*                                            resulting in version 6.1.7  */
-/*  04-25-2022      Scott Larson            Optimized MPU configuration,  */
-/*                                            added BASEPRI support,      */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Removed the code path to skip */
-/*                                            MPU reloading,              */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022      Scott Larson            Added low power support,      */
-/*                                            resulting in version 6.2.0  */
-/*  03-08-2023      Scott Larson            Added preproc FPU option,     */
-/*                                            resulting in version 6.2.1  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
 // {

@@ -35,15 +35,6 @@
 /*    This file defines the ThreadX thread control component, including   */
 /*    data types and external references.  It is assumed that tx_api.h    */
 /*    and tx_port.h have already been included.                           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-31-2023     Tiejun Zhou              Fixed MISRA2012 rule 8.3,     */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_THREAD_H

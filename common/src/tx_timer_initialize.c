@@ -191,15 +191,6 @@ ULONG               _tx_timer_time_slice;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_high_level         High level initialization         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_timer_initialize(VOID)
 {

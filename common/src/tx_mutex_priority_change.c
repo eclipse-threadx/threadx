@@ -64,24 +64,6 @@
 /*                                                                        */
 /*    _tx_mutex_get                     Inherit priority                  */
 /*    _tx_mutex_put                     Restore previous priority         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
-/*  09-30-2020      William E. Lamie        Modified comment(s), and      */
-/*                                            change thread state from    */
-/*                                            TX_SUSPENDED to             */
-/*                                            TX_PRIORITY_CHANGE before   */
-/*                                            calling                     */
-/*                                            _tx_thread_system_suspend,  */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021      Scott Larson            Modified comments, fixed      */
-/*                                            mapping current thread's    */
-/*                                            priority rather than next,  */
-/*                                            resulting in version 6.1.6  */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_mutex_priority_change(TX_THREAD *thread_ptr, UINT new_priority)
 {

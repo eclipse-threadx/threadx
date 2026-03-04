@@ -60,13 +60,6 @@ extern ULONG _txm_ttbr1_page_table[TXM_MAXIMUM_MODULES][TXM_MASTER_PAGE_TABLE_EN
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    TXM_MODULE_MANAGER_DATA_POINTER_CHECK                               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-08-2023      Scott Larson            Initial Version 6.2.1         */
-/*                                                                        */
 /**************************************************************************/
 UINT _txm_module_manager_inside_data_check(ULONG pointer)
 {

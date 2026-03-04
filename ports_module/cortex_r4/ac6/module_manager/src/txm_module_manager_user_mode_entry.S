@@ -53,13 +53,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Modules in user mode                                                */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
     .text
     .align 12

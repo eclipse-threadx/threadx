@@ -67,16 +67,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Remove double parenthesis,    */
-/*                                            update argument type,       */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 int   pthread_kill(ALIGN_TYPE thread_id, int sig)
 {

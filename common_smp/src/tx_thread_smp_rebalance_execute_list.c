@@ -81,13 +81,6 @@
 /*    _tx_thread_system_resume              Thread system resume          */
 /*    _tx_thread_system_suspend             Thread suspend                */
 /*    _tx_thread_time_slice                 Thread time-slice             */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 void  _tx_thread_smp_rebalance_execute_list(UINT core_index)
 {

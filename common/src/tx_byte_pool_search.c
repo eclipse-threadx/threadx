@@ -70,18 +70,6 @@
 /*                                                                        */
 /*    _tx_byte_allocate                 Allocate bytes of memory          */
 /*    _tx_byte_release                  Release bytes of memory           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
-/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  06-02-2021      Scott Larson            Improve possible free bytes   */
-/*                                            calculation,                */
-/*                                            resulting in version 6.1.7  */
-/*                                                                        */
 /**************************************************************************/
 UCHAR  *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size)
 {

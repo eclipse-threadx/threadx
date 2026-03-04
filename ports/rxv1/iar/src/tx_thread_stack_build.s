@@ -55,20 +55,6 @@
 ;/*                                                                        */
 ;/*    _tx_thread_create                     Create thread service         */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  08-02-2021     William E. Lamie         Initial Version 6.1.8         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
-;/*                                            removed unnecessary stack   */
-;/*                                            type placement,             */
-;/*                                            resulting in version 6.1.9  */
-;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.11 */
-;/*                                                                        */
 ;/**************************************************************************/
 
     public __tx_thread_stack_build

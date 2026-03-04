@@ -58,13 +58,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX                                                             */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_callback_request(TX_QUEUE *module_callback_queue, TXM_MODULE_CALLBACK_MESSAGE  *callback_message)
 {

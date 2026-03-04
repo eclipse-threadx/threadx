@@ -27,13 +27,6 @@
 /*                                                                        */
 /*    Xtensa interrupt handling data and assembly routines.               */
 /*    Also see xtensa_intr.c.                                             */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 
 

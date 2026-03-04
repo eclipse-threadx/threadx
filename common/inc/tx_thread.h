@@ -35,22 +35,6 @@
 /*    This file defines the ThreadX thread control component, including   */
 /*    data types and external references.  It is assumed that tx_api.h    */
 /*    and tx_port.h have already been included.                           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Yuxin Zhou               Modified comment(s), and      */
-/*                                            moved TX_THREAD_GET_SYSTEM_ */
-/*                                            STATE to tx_api.h,          */
-/*                                            resulting in version 6.1.2  */
-/*  10-15-2021     Scott Larson             Modified comment(s), improved */
-/*                                            stack check error handling, */
-/*                                            resulting in version 6.1.9  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_THREAD_H

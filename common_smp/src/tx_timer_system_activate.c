@@ -62,13 +62,6 @@
 /*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
 /*    _tx_timer_thread_entry            Timer thread processing           */
 /*    _tx_timer_activate                Application timer activate        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_timer_system_activate(TX_TIMER_INTERNAL *timer_ptr)
 {

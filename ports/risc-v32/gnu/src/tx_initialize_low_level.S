@@ -58,13 +58,6 @@ __tx_free_memory_start:
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  23-12-2025        Akif Ejaz            Initial Version 6.4.x          */
-/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_initialize_low_level(VOID)
 {  */

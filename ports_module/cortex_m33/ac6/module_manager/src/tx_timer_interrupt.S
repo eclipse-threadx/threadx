@@ -53,13 +53,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    interrupt vector                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020      Scott Larson            Initial Version 6.1.3         */        
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
 // {

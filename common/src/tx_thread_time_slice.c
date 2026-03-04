@@ -63,17 +63,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_timer_interrupt                   Timer interrupt handling      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Scott Larson             Modified comment(s), and      */
-/*                                            opt out of function when    */
-/*                                            TX_NO_TIMER is defined,     */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_time_slice(VOID)
 {

@@ -55,15 +55,6 @@
 /*    This function waits for a thread control block pointer to appear in */
 /*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
 /*    in the variable, the corresponding thread is resumed.               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
-/*  10-31-2022      Scott Larson            Updated EPK definitions,      */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 
 //  VOID   _tx_thread_schedule(VOID)

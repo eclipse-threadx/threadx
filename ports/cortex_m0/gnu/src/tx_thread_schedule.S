@@ -72,19 +72,6 @@
 @/*    _tx_thread_system_return             Return to system from thread   */
 @/*    _tx_thread_context_restore           Restore thread's context       */
 @/*                                                                        */
-@/*  RELEASE HISTORY                                                       */
-@/*                                                                        */
-@/*    DATE              NAME                      DESCRIPTION             */
-@/*                                                                        */
-@/*  05-19-2020     William E. Lamie        Initial Version 6.0            */
-@/*  09-30-2020     William E. Lamie        Modified comment(s),           */
-@/*                                            resulting in version 6.1    */
-@/*  03-02-2021     Scott Larson            Modified comment(s), add       */
-@/*                                           low power code,              */
-@/*                                           resulting in version 6.1.5   */
-@/*  03-08-2023      Scott Larson            Include tx_user.h,            */
-@/*                                            resulting in version 6.2.1  */
-@/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_schedule(VOID)
 @{

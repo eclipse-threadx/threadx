@@ -53,13 +53,6 @@
 /*    This function is responsible for changing the interrupt lockout     */ 
 /*    posture of the system.                                              */ 
 /*    NOTE: In earlier versions this was implemented in assembly.         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */ 
 /**************************************************************************/ 
 
 UINT   _tx_thread_interrupt_control(UINT new_posture)

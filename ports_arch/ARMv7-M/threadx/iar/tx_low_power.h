@@ -34,13 +34,6 @@
 /*                                                                        */ 
 /*    This file defines prototypes for the low-power timer additions      */ 
 /*    required for sleep mode.                                            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef  TX_LOW_POWER_H

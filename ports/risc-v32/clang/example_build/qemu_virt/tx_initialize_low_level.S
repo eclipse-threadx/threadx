@@ -44,12 +44,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    hardware exception                                                  */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  02-02-2026        Francisco Merino    Adapted for RV32 Clang          */
-/*                                                                        */
 /**************************************************************************/
 
 

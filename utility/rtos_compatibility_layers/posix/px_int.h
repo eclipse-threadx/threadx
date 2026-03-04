@@ -33,15 +33,6 @@
 /*    This file defines the constants, structures, etc.needed to          */
 /*    implement the Evacuation Kit for POSIX Users (POSIX)                */
 /*                                                                        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Remove unneeded values,       */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef _TX_PX_INT_H

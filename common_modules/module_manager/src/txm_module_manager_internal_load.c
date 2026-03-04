@@ -67,13 +67,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_internal_load(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location,
                                         ULONG code_size, VOID *code_allocation_ptr, ULONG code_allocation_size)

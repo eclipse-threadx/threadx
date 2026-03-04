@@ -66,13 +66,6 @@
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 INT  pthread_mutex_timedlock(pthread_mutex_t *mutex, struct timespec *abs_timeout)
 {

@@ -70,16 +70,6 @@ UINT    tx_low_power_entered;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_thread_schedule                   Thread scheduling loop        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-02-2021      William E. Lamie        Initial Version 6.1.5         */
-/*  04-02-2021      Scott Larson            Modified comments and fixed   */
-/*                                            compiler warning,           */
-/*                                            resulting in version 6.1.6  */
-/*                                                                        */
 /**************************************************************************/
 VOID  tx_low_power_enter(VOID)
 {

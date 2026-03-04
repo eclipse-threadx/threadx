@@ -92,12 +92,6 @@ THUMB_MASK          EQU     0x20            ; Thumb bit mask
 ;/*    _tx_thread_system_return             Return to system from thread   */ 
 ;/*    _tx_thread_context_restore           Restore thread's context       */ 
 ;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
 ;{

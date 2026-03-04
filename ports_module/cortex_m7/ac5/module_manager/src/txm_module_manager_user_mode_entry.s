@@ -54,13 +54,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Modules in user mode                                                */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_manager_user_mode_entry(VOID)
 // {

@@ -55,13 +55,6 @@
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
 /*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 INT clock_getres(clockid_t t, struct timespec * tspec)
 {

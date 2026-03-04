@@ -33,13 +33,6 @@
 /*                                                                        */
 /*    This files contains user configurable compile time paramteres for   */
 /*    the OSEK implementation.                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef OSEK_USER_H

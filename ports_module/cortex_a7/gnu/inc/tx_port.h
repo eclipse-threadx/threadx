@@ -41,24 +41,6 @@
 /*    directly use native C data types.  Instead, ThreadX creates its     */
 /*    own special types that can be mapped to actual data types by this   */
 /*    file to guarantee consistency in the interface and functionality.   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  04-02-2021      Bhupendra Naphade       Modified comment(s),updated   */
-/*                                            macro definition,           */
-/*                                            resulting in version 6.1.6  */
-/*  04-25-2022      Zhen Kong               Updated comments,             */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Updated comments, removed     */
-/*                                            unneeded temp variable,     */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Yajun Xia                Updated comments,             */
-/*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_PORT_H

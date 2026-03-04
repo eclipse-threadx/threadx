@@ -131,13 +131,6 @@ ULONG                                   _tx_execution_isr_nest_counter = 0;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    xxx                               xxx                               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  04-25-2022      Scott Larson            Initial Version 6.1.11        */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_execution_initialize(void)
 {

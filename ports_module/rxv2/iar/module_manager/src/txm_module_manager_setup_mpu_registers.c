@@ -54,13 +54,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _txm_module_manager_thread_create                                   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_setup_mpu_registers(TXM_MODULE_INSTANCE *module_instance)
 {

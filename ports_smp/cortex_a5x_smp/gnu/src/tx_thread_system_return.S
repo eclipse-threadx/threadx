@@ -54,16 +54,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX components                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     Andres Mlinar            Updated comments,             */
-/*                                             added ARMv8.2-A support,   */
-/*                                             resulting in version 6.1.9 */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_system_return(VOID)
 // {

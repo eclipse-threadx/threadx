@@ -44,16 +44,6 @@
 /*                                                                        */
 /*    This file replaces the previous Cortex-M3/M4/M7 files. It unifies   */
 /*    the ARMv7-M architecture and compilers into one common file.        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*  04-25-2022      Scott Larson            Modified comments and added   */
-/*                                            volatile to registers,      */
-/*                                            resulting in version 6.1.11 */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_PORT_H

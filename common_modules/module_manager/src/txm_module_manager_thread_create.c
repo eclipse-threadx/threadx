@@ -79,27 +79,6 @@
 /*    _txm_module_manager_start             Initiate module's start thread*/
 /*    _txm_module_manager_stop              Initiate module's stop thread */
 /*    _txm_module_manager_kernel_dispatch   Kernel dispatch function      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  12-31-2020      Scott Larson            Modified comment(s),          */
-/*                                            fix stack overlap checking, */
-/*                                            added 64-bit support,       */
-/*                                            added SMP support,          */
-/*                                            resulting in version 6.1.3  */
-/*  03-08-2023      Scott Larson            Check module stack for        */
-/*                                            overlap,                    */
-/*                                            resulting in version 6.2.1  */
-/*  10-31-2023      Xiuwen Cai, Yajun xia   Modified comment(s),          */
-/*                                            added option for random     */
-/*                                            number stack filling,       */
-/*                                            fixed the kernel stack      */
-/*                                            allocation issue,           */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
                             VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
