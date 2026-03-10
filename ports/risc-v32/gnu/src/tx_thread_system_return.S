@@ -19,8 +19,26 @@
 /**************************************************************************/
 /**************************************************************************/
 
+/* #define TX_SOURCE_CODE  */
+
+
+/* Include necessary system files.  */
+
+/*  #include "tx_api.h"
+    #include "tx_thread.h"
+    #include "tx_timer.h"  */
+
+    .extern      _tx_thread_execute_ptr
+    .extern      _tx_thread_current_ptr
+    .extern      _tx_timer_time_slice
+    .extern      _tx_thread_system_stack_ptr
+    .extern      _tx_thread_schedule
+#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    .extern      _tx_execution_thread_exit
+#endif
 
     .section .text
+    .balign 4
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -30,6 +48,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -55,83 +74,71 @@
 /*    ThreadX components                                                  */
 /*                                                                        */
 /**************************************************************************/
+
 /* VOID   _tx_thread_system_return(VOID)
 {  */
-    .global  _tx_thread_system_return
+    .globl  _tx_thread_system_return
 _tx_thread_system_return:
 
     /* Save minimal context on the stack.  */
-    /* sp -= sizeof(stack_frame);  */
 
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    sp, sp, -29*4                               // Allocate space on the stack - with floating point enabled
+#if defined(__riscv_32e) || defined(__riscv_32rve)
+    addi    sp, sp, -116                                // Allocate space on the stack - with floating point enabled
 #else
-    addi    sp, sp, -16*4                               // Allocate space on the stack - without floating point enabled
+    addi    sp, sp, -64                                 // Allocate space on the stack - without floating point enabled
 #endif
+
+#if defined(__riscv_32e) || defined(__riscv_32rve)
 
     /* Store floating point preserved registers.  */
-#if defined(__riscv_float_abi_single)
-    fsw     f8,  15*4(sp)                               // Store fs0
-    fsw     f9,  16*4(sp)                               // Store fs1
-    fsw     f18, 17*4(sp)                               // Store fs2
-    fsw     f19, 18*4(sp)                               // Store fs3
-    fsw     f20, 19*4(sp)                               // Store fs4
-    fsw     f21, 20*4(sp)                               // Store fs5
-    fsw     f22, 21*4(sp)                               // Store fs6
-    fsw     f23, 22*4(sp)                               // Store fs7
-    fsw     f24, 23*4(sp)                               // Store fs8
-    fsw     f25, 24*4(sp)                               // Store fs9
-    fsw     f26, 25*4(sp)                               // Store fs10
-    fsw     f27, 26*4(sp)                               // Store fs11
+ 
+    fsw     f8,  0x3C(sp)                               // Store fs0
+    fsw     f9,  0x40(sp)                               // Store fs1
+    fsw     f18, 0x44(sp)                               // Store fs2
+    fsw     f19, 0x48(sp)                               // Store fs3
+    fsw     f20, 0x4C(sp)                               // Store fs4
+    fsw     f21, 0x50(sp)                               // Store fs5
+    fsw     f22, 0x54(sp)                               // Store fs6
+    fsw     f23, 0x58(sp)                               // Store fs7
+    fsw     f24, 0x5C(sp)                               // Store fs8
+    fsw     f25, 0x60(sp)                               // Store fs9
+    fsw     f26, 0x64(sp)                               // Store fs10
+    fsw     f27, 0x68(sp)                               // Store fs11
     csrr    t0, fcsr
-    sw      t0, 27*4(sp)                                // Store fcsr
-#elif defined(__riscv_float_abi_double)
-    fsd     f8,  15*4(sp)                               // Store fs0
-    fsd     f9,  16*4(sp)                               // Store fs1
-    fsd     f18, 17*4(sp)                               // Store fs2
-    fsd     f19, 18*4(sp)                               // Store fs3
-    fsd     f20, 19*4(sp)                               // Store fs4
-    fsd     f21, 20*4(sp)                               // Store fs5
-    fsd     f22, 21*4(sp)                               // Store fs6
-    fsd     f23, 22*4(sp)                               // Store fs7
-    fsd     f24, 23*4(sp)                               // Store fs8
-    fsd     f25, 24*4(sp)                               // Store fs9
-    fsd     f26, 25*4(sp)                               // Store fs10
-    fsd     f27, 26*4(sp)                               // Store fs11
-    csrr    t0, fcsr
-    sw      t0, 27*4(sp)                                // Store fcsr
+    sw      t0, 0x6C(sp)                                // Store fcsr
 #endif
 
-    sw      zero,  0(sp)                                // Solicited stack type
-    sw      ra,  13*4(sp)                               // Save return address
-    sw      s0,  12*4(sp)                               // Save s0
-    sw      s1,  11*4(sp)                               // Save s1
-    sw      s2,  10*4(sp)                               // Save s2
-    sw      s3,   9*4(sp)                               // Save s3
-    sw      s4,   8*4(sp)                               // Save s4
-    sw      s5,   7*4(sp)                               // Save s5
-    sw      s6,   6*4(sp)                               // Save s6
-    sw      s7,   5*4(sp)                               // Save s7
-    sw      s8,   4*4(sp)                               // Save s8
-    sw      s9,   3*4(sp)                               // Save s9
-    sw      s10,  2*4(sp)                               // Save s10
-    sw      s11,  1*4(sp)                               // Save s11
+
+    sw      x0, 0(sp)                                   // Solicited stack type
+    sw      x1, 0x34(sp)                                // Save RA
+    sw      x8, 0x30(sp)                                // Save s0
+    sw      x9, 0x2C(sp)                                // Save s1
+    sw      x18, 0x28(sp)                               // Save s2
+    sw      x19, 0x24(sp)                               // Save s3
+    sw      x20, 0x20(sp)                               // Save s4
+    sw      x21, 0x1C(sp)                               // Save s5
+    sw      x22, 0x18(sp)                               // Save s6
+    sw      x23, 0x14(sp)                               // Save s7
+    sw      x24, 0x10(sp)                               // Save s8
+    sw      x25, 0x0C(sp)                               // Save s9
+    sw      x26, 0x08(sp)                               // Save s10
+    sw      x27, 0x04(sp)                               // Save s11
     csrr    t0, mstatus                                 // Pickup mstatus
-    sw      t0, 14*4(sp)                                // Save mstatus
+    sw      t0, 0x38(sp)                                // Save mstatus
 
 
-    /* Lockout interrupts. will be enabled in _tx_thread_schedule  */
-
-    csrci   mstatus, 0x08                               // Disable interrupts (MIE bit 3)
-
+   /* Lockout interrupts. - will be enabled in _tx_thread_schedule  */
+   
+    csrci   mstatus, 0xF 
+    
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 
     call    _tx_execution_thread_exit                   // Call the thread execution exit function
 #endif
-
+    
     la      t0, _tx_thread_current_ptr                  // Pickup address of pointer
     lw      t1, 0(t0)                                   // Pickup current thread pointer
-    la      t2, _tx_thread_system_stack_ptr             // Pickup stack pointer address
+    la      t2,_tx_thread_system_stack_ptr              // Pickup stack pointer address
 
     /* Save current stack and switch to system stack.  */
     /* _tx_thread_current_ptr -> tx_thread_stack_ptr =  SP;
@@ -154,7 +161,7 @@ _tx_thread_system_return:
         _tx_timer_time_slice =  0;  */
 
     sw      t3, 24(t1)                                  // Save current time-slice for thread
-    sw      zero, 0(t4)                                 // Clear time-slice variable
+    sw      x0, 0(t4)                                   // Clear time-slice variable
 
     /* }  */
 _tx_thread_dont_save_ts:
@@ -164,5 +171,3 @@ _tx_thread_dont_save_ts:
 
     sw      x0, 0(t0)                                   // Clear current thread pointer
     jr      t2                                          // Return to thread scheduler
-
-/* }  */

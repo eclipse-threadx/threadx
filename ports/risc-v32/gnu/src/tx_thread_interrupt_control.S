@@ -19,8 +19,19 @@
 /**************************************************************************/
 /**************************************************************************/
 
+/* #define TX_SOURCE_CODE  */
+
+
+/* Include necessary system files.  */
+
+/*  #include "tx_api.h"
+    #include "tx_thread.h"  */
+
+.equ RETURN_MASK,               0x0000000F
+.equ SET_SR_MASK,               0xFFFFFFF0
 
     .section .text
+    .balign 4
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -30,6 +41,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -53,36 +65,21 @@
 /*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
+
 /* UINT   _tx_thread_interrupt_control(UINT new_posture)
 {  */
-    .global  _tx_thread_interrupt_control
+    .globl  _tx_thread_interrupt_control
 _tx_thread_interrupt_control:
+    /* Pickup current interrupt lockout posture.  */
 
-    /* Pickup current interrupt posture.  */
+    csrr    t0, mstatus
+    mv      t1, t0                                      // Save original mstatus for return
 
-    csrr    a1, mstatus                         // Pickup mstatus
-    andi    a1, a1, 0x08                        // Mask out all but MIE
-
-    /* Check for the new posture.  */
-
-    beqz    a0, _tx_thread_interrupt_disable    // If 0, disable interrupts
-
-    /* Enable interrupts.  */
-
-    csrsi   mstatus, 0x08                       // Enable interrupts (MIE bit 3)
-    j       _tx_thread_interrupt_control_exit   // Return to caller
-
-_tx_thread_interrupt_disable:
-
-    /* Disable interrupts.  */
-
-    csrci   mstatus, 0x08                       // Disable interrupts (MIE bit 3)
-
-_tx_thread_interrupt_control_exit:
-
-    /* Return the old interrupt posture.  */
-
-    mv      a0, a1                              // Setup return value
-    ret                                         // Return to caller
-
-/* }  */
+    /* Apply the new interrupt posture.  */
+    
+    li      t2, SET_SR_MASK                             // Build set SR mask
+    and     t0, t0, t2                                  // Isolate interrupt lockout bits
+    or      t0, t0, a0                                  // Put new lockout bits in
+    csrw    mstatus, t0
+    andi    a0, t1, RETURN_MASK                         // Return original mstatus.
+    ret

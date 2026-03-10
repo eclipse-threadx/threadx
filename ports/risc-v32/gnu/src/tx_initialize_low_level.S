@@ -19,12 +19,27 @@
 /**************************************************************************/
 /**************************************************************************/
 
-    .section .data
-    .global  __tx_free_memory_start
-__tx_free_memory_start:
+/* Include necessary system files.  */
 
+/*  #include "tx_api.h"
+    #include "tx_initialize.h"
+    #include "tx_thread.h"
+    #include "tx_timer.h"  */
+    
+    .extern      _tx_thread_system_stack_ptr
+    .extern      _tx_initialize_unused_memory
+    .extern      _tx_thread_context_save
+    .extern      _tx_thread_context_restore
+    .extern      _tx_timer_interrupt
+
+    .section .bss
+    .balign    4
+    .globl __tx_free_memory_start
+__tx_free_memory_start:
+    .space    4
 
     .section .text
+    .balign    4
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -34,6 +49,7 @@ __tx_free_memory_start:
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -60,32 +76,42 @@ __tx_free_memory_start:
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
 /*                                                                        */
 /**************************************************************************/
+
 /* VOID   _tx_initialize_low_level(VOID)
 {  */
-    .global  _tx_initialize_low_level
-    .weak    _tx_initialize_low_level
+    .globl _tx_initialize_low_level
 _tx_initialize_low_level:
-
-    /* Save the system stack pointer.  */
-    /* _tx_thread_system_stack_ptr = sp;  */
-
-    la      t0, _tx_thread_system_stack_ptr         // Pickup address of system stack ptr
+    la      t0, _tx_thread_system_stack_ptr 
     sw      sp, 0(t0)                               // Save system stack pointer
 
-    /* Pickup first free address.  */
-    /* _tx_initialize_unused_memory(__tx_free_memory_start);  */
-
     la      t0, __tx_free_memory_start              // Pickup first free address
-    la      t1, _tx_initialize_unused_memory        // Pickup address of unused memory
+    la      t1, _tx_initialize_unused_memory
     sw      t0, 0(t1)                               // Save unused memory address
 
-    /* Initialize floating point control/status register if floating point is enabled.  */
-#ifdef __riscv_flen
-    li      t0, 0
-    csrw    fcsr, t0                                // Clear FP control/status register
-#endif
-
     ret
+
+
+    /* Define the actual timer interrupt/exception handler.  */
+    .globl _tx_timer_interrupt_handler
+    .globl __minterrupt_000007
+_tx_timer_interrupt_handler:
+__minterrupt_000007:
+
+    /* Before calling _tx_thread_context_save, we have to allocate an interrupt
+       stack frame and save the current value of x1 (ra). */
+#if defined(__riscv_32e) || defined(__riscv_32rve)
+    addi    sp, sp, -260                            // Allocate space for all registers - with floating point enabled
+#else
+    addi    sp, sp, -128                            // Allocate space for all registers - without floating point enabled
+#endif
+    sw      x1, 0x70(sp)                            // Store RA
+    call    _tx_thread_context_save                 // Call ThreadX context save
+
+    /* Call the ThreadX timer routine.  */
+    call    _tx_timer_interrupt                     // Call timer interrupt handler
+
+    /* Timer interrupt processing is done, jump to ThreadX context restore.  */
+    tail    _tx_thread_context_restore              // Jump to ThreadX context restore function. Note: this does not return!
 
 /* Timer Interrupt Handler Note:
    Platform-specific implementations must provide their own timer ISR.

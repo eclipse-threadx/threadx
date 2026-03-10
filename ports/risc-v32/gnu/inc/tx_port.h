@@ -30,6 +30,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -229,36 +230,37 @@ typedef unsigned short                          USHORT;
    is used to define a local function save area for the disable and restore
    macros.  */
 
-/* Expose helper used to perform an atomic read/modify/write of mstatus.
-   The helper composes and returns the posture per ThreadX contract. */
-#ifndef __ASSEMBLER__
-UINT                                            _tx_thread_interrupt_control(UINT new_posture);
-#endif
-
 #ifdef TX_DISABLE_INLINE
 
-#define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save;
+unsigned int                                    _tx_thread_interrupt_control(unsigned int new_posture);
 
-#define TX_DISABLE                              __asm__ volatile("csrrci %0, mstatus, 8" : "=r" (interrupt_save) :: "memory");
-#define TX_RESTORE                              { \
-                                                    unsigned long _temp_mstatus; \
-                                                    __asm__ volatile( \
-                                                        "csrc mstatus, 8\n" \
-                                                        "andi %0, %1, 8\n" \
-                                                        "csrs mstatus, %0" \
-                                                        : "=&r" (_temp_mstatus) \
-                                                        : "r" (interrupt_save) \
-                                                        : "memory"); \
-                                                }
-
-#else
-
-#define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  register INT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save =  _tx_thread_interrupt_control(TX_INT_DISABLE);
 #define TX_RESTORE                              _tx_thread_interrupt_control(interrupt_save);
 
-#endif /* TX_DISABLE_INLINE */
+#else
+
+#define TX_INTERRUPT_SAVE_AREA                  ULONG interrupt_save;
+
+#define TX_DISABLE                            \
+      __asm__ volatile (                      \
+      "csrr %0, mstatus\n\t"                  \
+      "csrci mstatus, 8"                      \
+      : "=r" (interrupt_save)                 \
+      :                                       \
+      : "memory"                              \
+      );
+
+#define TX_RESTORE                            \
+      __asm__ volatile (                      \
+      "csrw mstatus, %0\n\t"                  \
+      :                                       \
+      : "r" (interrupt_save)                  \
+      : "memory"                              \
+      );
+
+#endif
 
 
 /* Define the interrupt lockout macros for each ThreadX object.  */

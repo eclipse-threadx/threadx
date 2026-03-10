@@ -20,7 +20,16 @@
 /**************************************************************************/
 
 
+/* #define TX_SOURCE_CODE  */
+
+
+/* Include necessary system files.  */
+
+/*  #include "tx_api.h"
+    #include "tx_thread.h"  */
+
     .section .text
+    .balign 4
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -30,6 +39,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -57,165 +67,163 @@
 /**************************************************************************/
 /* VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 {  */
-    .global  _tx_thread_stack_build
+    .globl _tx_thread_stack_build
 _tx_thread_stack_build:
 
+       
     /* Build a fake interrupt frame.  The form of the fake interrupt stack
-       on the RISC-V should look like the following after it is built:
-                    Reg     Index
-       Stack Top:   1        0      Interrupt stack frame type
-                    x27      1      Initial s11
-                    x26      2      Initial s10
-                    x25      3      Initial s9
-                    x24      4      Initial s8
-                    x23      5      Initial s7
-                    x22      6      Initial s6
-                    x21      7      Initial s5
-                    x20      8      Initial s4
-                    x19      9      Initial s3
-                    x18     10      Initial s2
-                    x9      11      Initial s1
-                    x8      12      Initial s0
-                    x31     13      Initial t6
-                    x30     14      Initial t5
-                    x29     15      Initial t4
-                    x28     16      Initial t3
-                    x7      17      Initial t2
-                    x6      18      Initial t1
-                    x5      19      Initial t0
-                    x17     20      Initial a7
-                    x16     21      Initial a6
-                    x15     22      Initial a5
-                    x14     23      Initial a4
-                    x13     24      Initial a3
-                    x12     25      Initial a2
-                    x11     26      Initial a1
-                    x10     27      Initial a0
-                    x1      28      Initial ra
-                    --      29      reserved
-                    mepc    30      Initial mepc
+       on the RISC-V RV32 should look like the following after it is built:
+       
+       Stack Top:      1       (00)    Interrupt stack frame type
+                       x27     (04)    Initial s11
+                       x26     (08)    Initial s10
+                       x25     (12)    Initial s9
+                       x24     (16)    Initial s8
+                       x23     (20)    Initial s7
+                       x22     (24)    Initial s6
+                       x21     (28)    Initial s5
+                       x20     (32)    Initial s4
+                       x19     (36)    Initial s3
+                       x18     (40)    Initial s2
+                       x9      (44)    Initial s1
+                       x8      (48)    Initial s0
+                       x31     (52)    Initial t6
+                       x30     (56)    Initial t5
+                       x29     (60)    Initial t4
+                       x28     (64)    Initial t3
+                       x7      (68)    Initial t2
+                       x6      (72)    Initial t1
+                       x5      (76)    Initial t0
+                       x17     (80)    Initial a7
+                       x16     (84)    Initial a6
+                       x15     (88)    Initial a5
+                       x14     (92)    Initial a4
+                       x13     (96)    Initial a3
+                       x12     (100)   Initial a2
+                       x11     (104)   Initial a1
+                       x10     (108)   Initial a0
+                       x1      (112)   Initial ra
+                       mepc    (120)   Initial mepc
 If floating point support:
-                    f0      31      Initial ft0
-                    f1      32      Initial ft1
-                    f2      33      Initial ft2
-                    f3      34      Initial ft3
-                    f4      35      Initial ft4
-                    f5      36      Initial ft5
-                    f6      37      Initial ft6
-                    f7      38      Initial ft7
-                    f8      39      Initial fs0
-                    f9      40      Initial fs1
-                    f10     41      Initial fa0
-                    f11     42      Initial fa1
-                    f12     43      Initial fa2
-                    f13     44      Initial fa3
-                    f14     45      Initial fa4
-                    f15     46      Initial fa5
-                    f16     47      Initial fa6
-                    f17     48      Initial fa7
-                    f18     49      Initial fs2
-                    f19     50      Initial fs3
-                    f20     51      Initial fs4
-                    f21     52      Initial fs5
-                    f22     53      Initial fs6
-                    f23     54      Initial fs7
-                    f24     55      Initial fs8
-                    f25     56      Initial fs9
-                    f26     57      Initial fs10
-                    f27     58      Initial fs11
-                    f28     59      Initial ft8
-                    f29     60      Initial ft9
-                    f30     61      Initial ft10
-                    f31     62      Initial ft11
-                    fscr    63      Initial fscr
+                       f0      (124)   Inital ft0
+                       f1      (128)   Inital ft1
+                       f2      (132)   Inital ft2
+                       f3      (136)   Inital ft3
+                       f4      (140)   Inital ft4
+                       f5      (144)   Inital ft5
+                       f6      (148)   Inital ft6
+                       f7      (152)   Inital ft7
+                       f8      (156)   Inital fs0
+                       f9      (160)   Inital fs1
+                       f10     (164)   Inital fa0
+                       f11     (168)   Inital fa1
+                       f12     (172)   Inital fa2
+                       f13     (176)   Inital fa3
+                       f14     (180)   Inital fa4
+                       f15     (184)   Inital fa5
+                       f16     (188)   Inital fa6
+                       f17     (192)   Inital fa7
+                       f18     (196)   Inital fs2
+                       f19     (200)   Inital fs3
+                       f20     (204)   Inital fs4
+                       f21     (208)   Inital fs5
+                       f22     (212)   Inital fs6
+                       f23     (216)   Inital fs7
+                       f24     (220)   Inital fs8
+                       f25     (224)   Inital fs9
+                       f26     (228)   Inital fs10
+                       f27     (232)   Inital fs11
+                       f28     (236)   Inital ft8
+                       f29     (240)   Inital ft9
+                       f30     (244)   Inital ft10
+                       f31     (248)   Inital ft11
+                       fscr    (252)   Inital fscr
 
     Stack Bottom: (higher memory address)  */
 
     lw      t0, 16(a0)                                  // Pickup end of stack area
-    li      t1, ~15                                     // Build 16-byte alignment mask
+    li      t1, -16                                     // Build 16-byte alignment mask
     and     t0, t0, t1                                  // Make sure 16-byte alignment
 
     /* Actually build the stack frame.  */
 
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    t0, t0, -65*4
+#if defined(__riscv_32e) || defined(__riscv_32rve)
+    addi    t0, t0, -260
 #else
-    addi    t0, t0, -32*4                               // Allocate space for the stack frame
+    addi    t0, t0, -128                                // Allocate space for the stack frame
 #endif
     li      t1, 1                                       // Build stack type
-    sw      t1,  0*4(t0)                                // Place stack type on the top
-    sw      zero,  1*4(t0)                              // Initial s11
-    sw      zero,  2*4(t0)                              // Initial s10
-    sw      zero,  3*4(t0)                              // Initial s9
-    sw      zero,  4*4(t0)                              // Initial s8
-    sw      zero,  5*4(t0)                              // Initial s7
-    sw      zero,  6*4(t0)                              // Initial s6
-    sw      zero,  7*4(t0)                              // Initial s5
-    sw      zero,  8*4(t0)                              // Initial s4
-    sw      zero,  9*4(t0)                              // Initial s3
-    sw      zero, 10*4(t0)                              // Initial s2
-    sw      zero, 11*4(t0)                              // Initial s1
-    sw      zero, 12*4(t0)                              // Initial s0
-    sw      zero, 13*4(t0)                              // Initial t6
-    sw      zero, 14*4(t0)                              // Initial t5
-    sw      zero, 15*4(t0)                              // Initial t4
-    sw      zero, 16*4(t0)                              // Initial t3
-    sw      zero, 17*4(t0)                              // Initial t2
-    sw      zero, 18*4(t0)                              // Initial t1
-    sw      zero, 19*4(t0)                              // Initial t0
-    sw      zero, 20*4(t0)                              // Initial a7
-    sw      zero, 21*4(t0)                              // Initial a6
-    sw      zero, 22*4(t0)                              // Initial a5
-    sw      zero, 23*4(t0)                              // Initial a4
-    sw      zero, 24*4(t0)                              // Initial a3
-    sw      zero, 25*4(t0)                              // Initial a2
-    sw      zero, 26*4(t0)                              // Initial a1
-    sw      zero, 27*4(t0)                              // Initial a0
-    sw      zero, 28*4(t0)                              // Initial ra
-    sw      a1, 30*4(t0)                                // Initial mepc (thread entry point)
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    sw      zero, 31*4(t0)                              // Initial ft0
-    sw      zero, 32*4(t0)                              // Initial ft1
-    sw      zero, 33*4(t0)                              // Initial ft2
-    sw      zero, 34*4(t0)                              // Initial ft3
-    sw      zero, 35*4(t0)                              // Initial ft4
-    sw      zero, 36*4(t0)                              // Initial ft5
-    sw      zero, 37*4(t0)                              // Initial ft6
-    sw      zero, 38*4(t0)                              // Initial ft7
-    sw      zero, 39*4(t0)                              // Initial fs0
-    sw      zero, 40*4(t0)                              // Initial fs1
-    sw      zero, 41*4(t0)                              // Initial fa0
-    sw      zero, 42*4(t0)                              // Initial fa1
-    sw      zero, 43*4(t0)                              // Initial fa2
-    sw      zero, 44*4(t0)                              // Initial fa3
-    sw      zero, 45*4(t0)                              // Initial fa4
-    sw      zero, 46*4(t0)                              // Initial fa5
-    sw      zero, 47*4(t0)                              // Initial fa6
-    sw      zero, 48*4(t0)                              // Initial fa7
-    sw      zero, 49*4(t0)                              // Initial fs2
-    sw      zero, 50*4(t0)                              // Initial fs3
-    sw      zero, 51*4(t0)                              // Initial fs4
-    sw      zero, 52*4(t0)                              // Initial fs5
-    sw      zero, 53*4(t0)                              // Initial fs6
-    sw      zero, 54*4(t0)                              // Initial fs7
-    sw      zero, 55*4(t0)                              // Initial fs8
-    sw      zero, 56*4(t0)                              // Initial fs9
-    sw      zero, 57*4(t0)                              // Initial fs10
-    sw      zero, 58*4(t0)                              // Initial fs11
-    sw      zero, 59*4(t0)                              // Initial ft8
-    sw      zero, 60*4(t0)                              // Initial ft9
-    sw      zero, 61*4(t0)                              // Initial ft10
-    sw      zero, 62*4(t0)                              // Initial ft11
-    csrr    a1, fcsr                                    // Read fcsr for initial value
-    sw      a1, 63*4(t0)                                // Initial fcsr
-    sw      zero, 64*4(t0)                              // Reserved word (0)
+    sw      t1, 0(t0)                                   // Place stack type on the top
+    sw      x0, 4(t0)                                   // Initial s11
+    sw      x0, 8(t0)                                   // Initial s10
+    sw      x0, 12(t0)                                  // Initial s9
+    sw      x0, 16(t0)                                  // Initial s8
+    sw      x0, 20(t0)                                  // Initial s7
+    sw      x0, 24(t0)                                  // Initial s6
+    sw      x0, 28(t0)                                  // Initial s5
+    sw      x0, 32(t0)                                  // Initial s4
+    sw      x0, 36(t0)                                  // Initial s3
+    sw      x0, 40(t0)                                  // Initial s2
+    sw      x0, 44(t0)                                  // Initial s1
+    sw      x0, 48(t0)                                  // Initial s0
+    sw      x0, 52(t0)                                  // Initial t6
+    sw      x0, 56(t0)                                  // Initial t5
+    sw      x0, 60(t0)                                  // Initial t4
+    sw      x0, 64(t0)                                  // Initial t3
+    sw      x0, 68(t0)                                  // Initial t2
+    sw      x0, 72(t0)                                  // Initial t1
+    sw      x0, 76(t0)                                  // Initial t0
+    sw      x0, 80(t0)                                  // Initial a7
+    sw      x0, 84(t0)                                  // Initial a6
+    sw      x0, 88(t0)                                  // Initial a5
+    sw      x0, 92(t0)                                  // Initial a4
+    sw      x0, 96(t0)                                  // Initial a3
+    sw      x0, 100(t0)                                 // Initial a2
+    sw      x0, 104(t0)                                 // Initial a1
+    sw      x0, 108(t0)                                 // Initial a0
+    sw      x0, 112(t0)                                 // Initial ra
+    sw      a1, 120(t0)                                 // Initial mepc
+#if defined(__riscv_32e) || defined(__riscv_32rve)
+    sw      x0, 124(t0)                                 // Inital ft0
+    sw      x0, 128(t0)                                 // Inital ft1
+    sw      x0, 132(t0)                                 // Inital ft2
+    sw      x0, 136(t0)                                 // Inital ft3
+    sw      x0, 140(t0)                                 // Inital ft4
+    sw      x0, 144(t0)                                 // Inital ft5
+    sw      x0, 148(t0)                                 // Inital ft6
+    sw      x0, 152(t0)                                 // Inital ft7
+    sw      x0, 156(t0)                                 // Inital fs0
+    sw      x0, 160(t0)                                 // Inital fs1
+    sw      x0, 164(t0)                                 // Inital fa0
+    sw      x0, 168(t0)                                 // Inital fa1
+    sw      x0, 172(t0)                                 // Inital fa2
+    sw      x0, 176(t0)                                 // Inital fa3
+    sw      x0, 180(t0)                                 // Inital fa4
+    sw      x0, 184(t0)                                 // Inital fa5
+    sw      x0, 188(t0)                                 // Inital fa6
+    sw      x0, 192(t0)                                 // Inital fa7
+    sw      x0, 196(t0)                                 // Inital fs2
+    sw      x0, 200(t0)                                 // Inital fs3
+    sw      x0, 204(t0)                                 // Inital fs4
+    sw      x0, 208(t0)                                 // Inital fs5
+    sw      x0, 212(t0)                                 // Inital fs6
+    sw      x0, 216(t0)                                 // Inital fs7
+    sw      x0, 220(t0)                                 // Inital fs8
+    sw      x0, 224(t0)                                 // Inital fs9
+    sw      x0, 228(t0)                                 // Inital fs10
+    sw      x0, 232(t0)                                 // Inital fs11
+    sw      x0, 236(t0)                                 // Inital ft8
+    sw      x0, 240(t0)                                 // Inital ft9
+    sw      x0, 244(t0)                                 // Inital ft10
+    sw      x0, 248(t0)                                 // Inital ft11
+    csrr    a1, fcsr                                    // Read fcsr and use it for initial value for each thread
+    sw      a1, 252(t0)                                 // Initial fscr
+    sw      x0, 256(t0)                                 // Reserved word (0)
 #else
-    sw      zero, 31*4(t0)                              // Reserved word (0)
+    sw      x0, 124(t0)                                 // Reserved word (0)
 #endif
 
     /* Setup stack pointer.  */
     /* thread_ptr -> tx_thread_stack_ptr =  t0;  */
-
     sw      t0, 8(a0)                                   // Save stack pointer in thread's
     ret                                                 //   control block and return
-/* }  */
