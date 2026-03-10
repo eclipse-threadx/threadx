@@ -105,12 +105,12 @@ _tx_trap_handler:
 //    sd      x1, 224(sp)                             // Store RA
 
 #if defined(__riscv_flen) && ((__riscv_flen == 32) || (__riscv_flen == 64))
-    addi    sp, sp, -65*REGBYTES                      // Allocate space for all registers - with floating point enabled
+    addi    sp, sp, -TX_THREAD_FRAME_SIZE_FPU         // Allocate space for all registers - with floating point enabled
 #else
-    addi    sp, sp, -32*REGBYTES                      // Allocate space for all registers - without floating point enabled
+    addi    sp, sp, -TX_THREAD_FRAME_SIZE_INT         // Allocate space for all registers - without floating point enabled
 #endif
 
-    STORE x1, 28*REGBYTES(sp)
+    STORE x1, TX_STACK_OFFSET_X1(sp)
     call    _tx_thread_context_save                   // Call ThreadX context save
     csrr    t0, mcause                                // Pickup mcause
     li      t1, 0x80000007

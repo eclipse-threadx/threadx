@@ -138,91 +138,91 @@ If floating point support:
 
     Stack Bottom: (higher memory address)  */
 
-    LOAD    t0, 4*REGBYTES(a0)                          // Pickup end of stack area
+    LOAD    t0, TX_THREAD_STACK_END(a0)                 // Pickup end of stack area
     li      t1, ~15                                     // Build 16-byte alignment mask
     and     t0, t0, t1                                  // Make sure 16-byte alignment
 
     /* Actually build the stack frame.  */
 
 #if defined(__riscv_flen) && ((__riscv_flen == 32) || (__riscv_flen == 64))
-    addi    t0, t0, -65*REGBYTES
+    addi    t0, t0, -TX_THREAD_FRAME_SIZE_FPU
 #else
-    addi    t0, t0, -32*REGBYTES                        // Allocate space for the stack frame
+    addi    t0, t0, -TX_THREAD_FRAME_SIZE_INT           // Allocate space for the stack frame
 #endif
     li      t1, 1                                       // Build stack type
-    STORE   t1,  0*REGBYTES(t0)                         // Place stack type on the top
-    STORE   x0,  1*REGBYTES(t0)                         // Initial s11
-    STORE   x0,  2*REGBYTES(t0)                         // Initial s10
-    STORE   x0,  3*REGBYTES(t0)                         // Initial s9
-    STORE   x0,  4*REGBYTES(t0)                         // Initial s8
-    STORE   x0,  5*REGBYTES(t0)                         // Initial s7
-    STORE   x0,  6*REGBYTES(t0)                         // Initial s6
-    STORE   x0,  7*REGBYTES(t0)                         // Initial s5
-    STORE   x0,  8*REGBYTES(t0)                         // Initial s4
-    STORE   x0,  9*REGBYTES(t0)                         // Initial s3
-    STORE   x0, 10*REGBYTES(t0)                         // Initial s2
-    STORE   x0, 11*REGBYTES(t0)                         // Initial s1
-    STORE   x0, 12*REGBYTES(t0)                         // Initial s0
-    STORE   x0, 13*REGBYTES(t0)                         // Initial t6
-    STORE   x0, 14*REGBYTES(t0)                         // Initial t5
-    STORE   x0, 15*REGBYTES(t0)                         // Initial t4
-    STORE   x0, 16*REGBYTES(t0)                         // Initial t3
-    STORE   x0, 17*REGBYTES(t0)                         // Initial t2
-    STORE   x0, 18*REGBYTES(t0)                         // Initial t1
-    STORE   x0, 19*REGBYTES(t0)                         // Initial t0
-    STORE   x0, 20*REGBYTES(t0)                         // Initial a7
-    STORE   x0, 21*REGBYTES(t0)                         // Initial a6
-    STORE   x0, 22*REGBYTES(t0)                         // Initial a5
-    STORE   x0, 23*REGBYTES(t0)                         // Initial a4
-    STORE   x0, 24*REGBYTES(t0)                         // Initial a3
-    STORE   x0, 25*REGBYTES(t0)                         // Initial a2
-    STORE   x0, 26*REGBYTES(t0)                         // Initial a1
-    STORE   x0, 27*REGBYTES(t0)                         // Initial a0
-    STORE   x0, 28*REGBYTES(t0)                         // Initial ra
-    STORE   a1, 30*REGBYTES(t0)                         // Initial mepc
+    STORE   t1,  TX_STACK_OFFSET_TYPE(t0)               // Place stack type on the top
+    STORE   x0,  TX_STACK_OFFSET_X27(t0)                // Initial s11
+    STORE   x0,  TX_STACK_OFFSET_X26(t0)                // Initial s10
+    STORE   x0,  TX_STACK_OFFSET_X25(t0)                // Initial s9
+    STORE   x0,  TX_STACK_OFFSET_X24(t0)                // Initial s8
+    STORE   x0,  TX_STACK_OFFSET_X23(t0)                // Initial s7
+    STORE   x0,  TX_STACK_OFFSET_X22(t0)                // Initial s6
+    STORE   x0,  TX_STACK_OFFSET_X21(t0)                // Initial s5
+    STORE   x0,  TX_STACK_OFFSET_X20(t0)                // Initial s4
+    STORE   x0,  TX_STACK_OFFSET_X19(t0)                // Initial s3
+    STORE   x0,  TX_STACK_OFFSET_X18(t0)                // Initial s2
+    STORE   x0,  TX_STACK_OFFSET_X9(t0)                 // Initial s1
+    STORE   x0,  TX_STACK_OFFSET_X8(t0)                 // Initial s0
+    STORE   x0,  TX_STACK_OFFSET_X31(t0)                // Initial t6
+    STORE   x0,  TX_STACK_OFFSET_X30(t0)                // Initial t5
+    STORE   x0,  TX_STACK_OFFSET_X29(t0)                // Initial t4
+    STORE   x0,  TX_STACK_OFFSET_X28(t0)                // Initial t3
+    STORE   x0,  TX_STACK_OFFSET_X7(t0)                 // Initial t2
+    STORE   x0,  TX_STACK_OFFSET_X6(t0)                 // Initial t1
+    STORE   x0,  TX_STACK_OFFSET_X5(t0)                 // Initial t0
+    STORE   x0,  TX_STACK_OFFSET_X17(t0)                // Initial a7
+    STORE   x0,  TX_STACK_OFFSET_X16(t0)                // Initial a6
+    STORE   x0,  TX_STACK_OFFSET_X15(t0)                // Initial a5
+    STORE   x0,  TX_STACK_OFFSET_X14(t0)                // Initial a4
+    STORE   x0,  TX_STACK_OFFSET_X13(t0)                // Initial a3
+    STORE   x0,  TX_STACK_OFFSET_X12(t0)                // Initial a2
+    STORE   x0,  TX_STACK_OFFSET_X11(t0)                // Initial a1
+    STORE   x0,  TX_STACK_OFFSET_X10(t0)                // Initial a0
+    STORE   x0,  TX_STACK_OFFSET_X1(t0)                 // Initial ra
+    STORE   a1,  TX_STACK_OFFSET_MEPC(t0)               // Initial mepc
 #if defined(__riscv_flen) && ((__riscv_flen == 32) || (__riscv_flen == 64))
-    STORE   x0, 31*REGBYTES(t0)                         // Inital ft0
-    STORE   x0, 32*REGBYTES(t0)                         // Inital ft1
-    STORE   x0, 33*REGBYTES(t0)                         // Inital ft2
-    STORE   x0, 34*REGBYTES(t0)                         // Inital ft3
-    STORE   x0, 35*REGBYTES(t0)                         // Inital ft4
-    STORE   x0, 36*REGBYTES(t0)                         // Inital ft5
-    STORE   x0, 37*REGBYTES(t0)                         // Inital ft6
-    STORE   x0, 38*REGBYTES(t0)                         // Inital ft7
-    STORE   x0, 39*REGBYTES(t0)                         // Inital fs0
-    STORE   x0, 40*REGBYTES(t0)                         // Inital fs1
-    STORE   x0, 41*REGBYTES(t0)                         // Inital fa0
-    STORE   x0, 42*REGBYTES(t0)                         // Inital fa1
-    STORE   x0, 43*REGBYTES(t0)                         // Inital fa2
-    STORE   x0, 44*REGBYTES(t0)                         // Inital fa3
-    STORE   x0, 45*REGBYTES(t0)                         // Inital fa4
-    STORE   x0, 46*REGBYTES(t0)                         // Inital fa5
-    STORE   x0, 47*REGBYTES(t0)                         // Inital fa6
-    STORE   x0, 48*REGBYTES(t0)                         // Inital fa7
-    STORE   x0, 49*REGBYTES(t0)                         // Inital fs2
-    STORE   x0, 50*REGBYTES(t0)                         // Inital fs3
-    STORE   x0, 51*REGBYTES(t0)                         // Inital fs4
-    STORE   x0, 52*REGBYTES(t0)                         // Inital fs5
-    STORE   x0, 53*REGBYTES(t0)                         // Inital fs6
-    STORE   x0, 54*REGBYTES(t0)                         // Inital fs7
-    STORE   x0, 55*REGBYTES(t0)                         // Inital fs8
-    STORE   x0, 56*REGBYTES(t0)                         // Inital fs9
-    STORE   x0, 57*REGBYTES(t0)                         // Inital fs10
-    STORE   x0, 58*REGBYTES(t0)                         // Inital fs11
-    STORE   x0, 59*REGBYTES(t0)                         // Inital ft8
-    STORE   x0, 60*REGBYTES(t0)                         // Inital ft9
-    STORE   x0, 61*REGBYTES(t0)                         // Inital ft10
-    STORE   x0, 62*REGBYTES(t0)                         // Inital ft11
+    STORE   x0,  TX_STACK_OFFSET_F0(t0)                 // Inital ft0
+    STORE   x0,  TX_STACK_OFFSET_F1(t0)                 // Inital ft1
+    STORE   x0,  TX_STACK_OFFSET_F2(t0)                 // Inital ft2
+    STORE   x0,  TX_STACK_OFFSET_F3(t0)                 // Inital ft3
+    STORE   x0,  TX_STACK_OFFSET_F4(t0)                 // Inital ft4
+    STORE   x0,  TX_STACK_OFFSET_F5(t0)                 // Inital ft5
+    STORE   x0,  TX_STACK_OFFSET_F6(t0)                 // Inital ft6
+    STORE   x0,  TX_STACK_OFFSET_F7(t0)                 // Inital ft7
+    STORE   x0,  TX_STACK_OFFSET_F8(t0)                 // Inital fs0
+    STORE   x0,  TX_STACK_OFFSET_F9(t0)                 // Inital fs1
+    STORE   x0,  TX_STACK_OFFSET_F10(t0)                // Inital fa0
+    STORE   x0,  TX_STACK_OFFSET_F11(t0)                // Inital fa1
+    STORE   x0,  TX_STACK_OFFSET_F12(t0)                // Inital fa2
+    STORE   x0,  TX_STACK_OFFSET_F13(t0)                // Inital fa3
+    STORE   x0,  TX_STACK_OFFSET_F14(t0)                // Inital fa4
+    STORE   x0,  TX_STACK_OFFSET_F15(t0)                // Inital fa5
+    STORE   x0,  TX_STACK_OFFSET_F16(t0)                // Inital fa6
+    STORE   x0,  TX_STACK_OFFSET_F17(t0)                // Inital fa7
+    STORE   x0,  TX_STACK_OFFSET_F18(t0)                // Inital fs2
+    STORE   x0,  TX_STACK_OFFSET_F19(t0)                // Inital fs3
+    STORE   x0,  TX_STACK_OFFSET_F20(t0)                // Inital fs4
+    STORE   x0,  TX_STACK_OFFSET_F21(t0)                // Inital fs5
+    STORE   x0,  TX_STACK_OFFSET_F22(t0)                // Inital fs6
+    STORE   x0,  TX_STACK_OFFSET_F23(t0)                // Inital fs7
+    STORE   x0,  TX_STACK_OFFSET_F24(t0)                // Inital fs8
+    STORE   x0,  TX_STACK_OFFSET_F25(t0)                // Inital fs9
+    STORE   x0,  TX_STACK_OFFSET_F26(t0)                // Inital fs10
+    STORE   x0,  TX_STACK_OFFSET_F27(t0)                // Inital fs11
+    STORE   x0,  TX_STACK_OFFSET_F28(t0)                // Inital ft8
+    STORE   x0,  TX_STACK_OFFSET_F29(t0)                // Inital ft9
+    STORE   x0,  TX_STACK_OFFSET_F30(t0)                // Inital ft10
+    STORE   x0,  TX_STACK_OFFSET_F31(t0)                // Inital ft11
     csrr    a1, fcsr                                    // Read fcsr and use it for initial value for each thread
-    STORE   a1, 63*REGBYTES(t0)                         // Initial fscr
-    STORE   x0, 64*REGBYTES(t0)                         // Reserved word (0)
+    STORE   a1, TX_STACK_OFFSET_FCSR(t0)                // Initial fscr
+    STORE   x0, (TX_THREAD_FRAME_SIZE_FPU-REGBYTES)(t0) // Reserved word (0)
 #else
-    STORE   x0, 31*REGBYTES(t0)                         // Reserved word (0)
+    STORE   x0, (TX_THREAD_FRAME_SIZE_INT-REGBYTES)(t0) // Reserved word (0)
 #endif
 
     /* Setup stack pointer.  */
     /* thread_ptr -> tx_thread_stack_ptr =  t0;  */
 
-    STORE   t0, 2*REGBYTES(a0)                          // Save stack pointer in thread's
+    STORE   t0, TX_THREAD_STACK_PTR(a0)                 // Save stack pointer in thread's
     ret                                                 //   control block and return
 /* }  */
