@@ -19,26 +19,9 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
-/* #define TX_SOURCE_CODE  */
-
-
-/* Include necessary system files.  */
-
-/*  #include "tx_api.h"
-    #include "tx_thread.h"
-    #include "tx_timer.h"  */
-
-    .extern      _tx_thread_current_ptr
-    .extern      _tx_thread_system_state
-    .extern      _tx_thread_system_stack_ptr
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-    .extern      _tx_execution_isr_enter
-#endif
-
+#include "tx_port.h"
 
     .section .text
-    .balign 4
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -48,7 +31,6 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
-/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -72,84 +54,119 @@
 /*                                                                        */
 /*    ISRs                                                                */
 /*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  23-12-2025        Akif Ejaz            Initial Version 6.4.x          */
+/*                                                                        */
 /**************************************************************************/
-
 /* VOID   _tx_thread_context_save(VOID)
 {  */
-    .globl _tx_thread_context_save
+    .global      _tx_thread_context_save
 _tx_thread_context_save:
 
     /* Upon entry to this routine, it is assumed that interrupts are locked
        out and the interrupt stack fame has been allocated and x1 (ra) has
        been saved on the stack. */
 
-    sw      x5, 0x4C(sp)                                // First store t0 and t1
-    sw      x6, 0x48(sp)
+    STORE   x5, 19*REGBYTES(sp)                         // First store t0 and t1
+    STORE   x6, 18*REGBYTES(sp)
 
     la      x5, _tx_thread_system_state                 // Pickup address of system state
-    lw      x6, 0(x5)                                   // Pickup system state
+    LOAD    x6, 0(x5)                                   // Pickup system state
 
     /* Check for a nested interrupt condition.  */
     /* if (_tx_thread_system_state++)
     {  */
     beqz    x6, _tx_thread_not_nested_save              // If 0, first interrupt condition
     addi    x6, x6, 1                                   // Increment the interrupt counter
-    sw      x6, 0(x5)                                   // Store the interrupt counter
+    STORE   x6, 0(x5)                                   // Store the interrupt counter
 
     /* Nested interrupt condition.
        Save the reset of the scratch registers on the stack and return to the
        calling ISR.  */
 
-    sw      x7, 0x44(sp)                                // Store t2
-    sw      x8, 0x30(sp)                                // Store s0
-    sw      x10, 0x6C(sp)                               // Store a0
-    sw      x11, 0x68(sp)                               // Store a1
-    sw      x12, 0x64(sp)                               // Store a2
-    sw      x13, 0x60(sp)                               // Store a3
-    sw      x14, 0x5C(sp)                               // Store a4
-    sw      x15, 0x58(sp)                               // Store a5
-    sw      x16, 0x54(sp)                               // Store a6
-    sw      x17, 0x50(sp)                               // Store a7
-    sw      x28, 0x40(sp)                               // Store t3
-    sw      x29, 0x3C(sp)                               // Store t4
-    sw      x30, 0x38(sp)                               // Store t5
-    sw      x31, 0x34(sp)                               // Store t6
+    STORE   x7,  17*REGBYTES(sp)                        // Store t2
+    STORE   x8,  12*REGBYTES(sp)                        // Store s0
+    STORE   x10, 27*REGBYTES(sp)                        // Store a0
+    STORE   x11, 26*REGBYTES(sp)                        // Store a1
+    STORE   x12, 25*REGBYTES(sp)                        // Store a2
+    STORE   x13, 24*REGBYTES(sp)                        // Store a3
+    STORE   x14, 23*REGBYTES(sp)                        // Store a4
+    STORE   x15, 22*REGBYTES(sp)                        // Store a5
+    STORE   x16, 21*REGBYTES(sp)                        // Store a6
+    STORE   x17, 20*REGBYTES(sp)                        // Store a7
+    STORE   x28, 16*REGBYTES(sp)                        // Store t3
+    STORE   x29, 15*REGBYTES(sp)                        // Store t4
+    STORE   x30, 14*REGBYTES(sp)                        // Store t5
+    STORE   x31, 13*REGBYTES(sp)                        // Store t6
     csrr    t0, mepc                                    // Load exception program counter
-    sw      t0, 0x78(sp)                                // Save it on the stack
-
-#if defined(__riscv_32e) || defined(__riscv_32rve)
+    STORE   t0, 30*REGBYTES(sp)                         // Save it on the stack
 
     /* Save floating point scratch registers.  */
-    
-    fsw     f0, 0x7C(sp)                                // Store ft0
-    fsw     f1, 0x80(sp)                                // Store ft1
-    fsw     f2, 0x84(sp)                                // Store ft2
-    fsw     f3, 0x88(sp)                                // Store ft3
-    fsw     f4, 0x8C(sp)                                // Store ft4
-    fsw     f5, 0x90(sp)                                // Store ft5
-    fsw     f6, 0x94(sp)                                // Store ft6
-    fsw     f7, 0x98(sp)                                // Store ft7
-    fsw     f10,0xA4(sp)                                // Store fa0
-    fsw     f11,0xA8(sp)                                // Store fa1
-    fsw     f12,0xAC(sp)                                // Store fa2
-    fsw     f13,0xB0(sp)                                // Store fa3
-    fsw     f14,0xB4(sp)                                // Store fa4
-    fsw     f15,0xB8(sp)                                // Store fa5
-    fsw     f16,0xBC(sp)                                // Store fa6
-    fsw     f17,0xC0(sp)                                // Store fa7
-    fsw     f28,0xEC(sp)                                // Store ft8
-    fsw     f29,0xF0(sp)                                // Store ft9
-    fsw     f30,0xF4(sp)                                // Store ft10
-    fsw     f31,0xF8(sp)                                // Store ft11
+#if defined(__riscv_flen)
+    csrr  t0, mstatus                                   // Pickup thread's floating point state
+    STORE t0, 29*REGBYTES(sp)
+    /* Check the floating point status for lazy FPU*/
+    srli  t1, t0, 13
+    andi  t1, t1, 0x3
+    beqz  t1, _tx_skip_nested_fpu_save                  // Skip floating point save FS is Off
+#if (__riscv_flen == 32)
+    fsw     f0, 31*REGBYTES(sp)                         // Store ft0
+    fsw     f1, 32*REGBYTES(sp)                         // Store ft1
+    fsw     f2, 33*REGBYTES(sp)                         // Store ft2
+    fsw     f3, 34*REGBYTES(sp)                         // Store ft3
+    fsw     f4, 35*REGBYTES(sp)                         // Store ft4
+    fsw     f5, 36*REGBYTES(sp)                         // Store ft5
+    fsw     f6, 37*REGBYTES(sp)                         // Store ft6
+    fsw     f7, 38*REGBYTES(sp)                         // Store ft7
+    fsw     f10,41*REGBYTES(sp)                         // Store fa0
+    fsw     f11,42*REGBYTES(sp)                         // Store fa1
+    fsw     f12,43*REGBYTES(sp)                         // Store fa2
+    fsw     f13,44*REGBYTES(sp)                         // Store fa3
+    fsw     f14,45*REGBYTES(sp)                         // Store fa4
+    fsw     f15,46*REGBYTES(sp)                         // Store fa5
+    fsw     f16,47*REGBYTES(sp)                         // Store fa6
+    fsw     f17,48*REGBYTES(sp)                         // Store fa7
+    fsw     f28,59*REGBYTES(sp)                         // Store ft8
+    fsw     f29,60*REGBYTES(sp)                         // Store ft9
+    fsw     f30,61*REGBYTES(sp)                         // Store ft10
+    fsw     f31,62*REGBYTES(sp)                         // Store ft11
     csrr    t0, fcsr
-    sw      t0, 0xFC(sp)                                // Store fcsr
+    STORE   t0, 63*REGBYTES(sp)                         // Store fcsr
+#elif (__riscv_flen == 64)
+    fsd     f0, 31*REGBYTES(sp)                         // Store ft0
+    fsd     f1, 32*REGBYTES(sp)                         // Store ft1
+    fsd     f2, 33*REGBYTES(sp)                         // Store ft2
+    fsd     f3, 34*REGBYTES(sp)                         // Store ft3
+    fsd     f4, 35*REGBYTES(sp)                         // Store ft4
+    fsd     f5, 36*REGBYTES(sp)                         // Store ft5
+    fsd     f6, 37*REGBYTES(sp)                         // Store ft6
+    fsd     f7, 38*REGBYTES(sp)                         // Store ft7
+    fsd     f10,41*REGBYTES(sp)                         // Store fa0
+    fsd     f11,42*REGBYTES(sp)                         // Store fa1
+    fsd     f12,43*REGBYTES(sp)                         // Store fa2
+    fsd     f13,44*REGBYTES(sp)                         // Store fa3
+    fsd     f14,45*REGBYTES(sp)                         // Store fa4
+    fsd     f15,46*REGBYTES(sp)                         // Store fa5
+    fsd     f16,47*REGBYTES(sp)                         // Store fa6
+    fsd     f17,48*REGBYTES(sp)                         // Store fa7
+    fsd     f28,59*REGBYTES(sp)                         // Store ft8
+    fsd     f29,60*REGBYTES(sp)                         // Store ft9
+    fsd     f30,61*REGBYTES(sp)                         // Store ft10
+    fsd     f31,62*REGBYTES(sp)                         // Store ft11
+    csrr    t0, fcsr
+    STORE   t0, 63*REGBYTES(sp)                         // Store fcsr
+#endif
+_tx_skip_nested_fpu_save:
 #endif
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     call    _tx_execution_isr_enter                     // Call the ISR execution enter function
 #endif
 
-    ret                                                 // Return to calling ISR 
+    ret                                                 // Return to calling ISR
 
 _tx_thread_not_nested_save:
     /* }  */
@@ -158,60 +175,89 @@ _tx_thread_not_nested_save:
     /* else if (_tx_thread_current_ptr)
     {  */
     addi    x6, x6, 1                                   // Increment the interrupt counter
-    sw      x6, 0(x5)                                   // Store the interrupt counter
+    STORE   x6, 0(x5)                                   // Store the interrupt counter
 
     /* Not nested: Find the user thread that was running and load our SP */
 
-    la      t0, _tx_thread_current_ptr
-    lw      x5, 0(t0)                                   // Pickup current thread pointer
+    LOAD    x5, _tx_thread_current_ptr                  // Pickup current thread pointer
     beqz    x5, _tx_thread_idle_system_save             // If NULL, idle system was interrupted
 
     /* Save the standard scratch registers.  */
 
-    sw      x7, 0x44(sp)                                // Store t2
-    sw      x8, 0x30(sp)                                // Store s0
-    sw      x10, 0x6C(sp)                               // Store a0
-    sw      x11, 0x68(sp)                               // Store a1
-    sw      x12, 0x64(sp)                               // Store a2
-    sw      x13, 0x60(sp)                               // Store a3
-    sw      x14, 0x5C(sp)                               // Store a4
-    sw      x15, 0x58(sp)                               // Store a5
-    sw      x16, 0x54(sp)                               // Store a6
-    sw      x17, 0x50(sp)                               // Store a7
-    sw      x28, 0x40(sp)                               // Store t3
-    sw      x29, 0x3C(sp)                               // Store t4
-    sw      x30, 0x38(sp)                               // Store t5
-    sw      x31, 0x34(sp)                               // Store t6
+    STORE   x7,  17*REGBYTES(sp)                        // Store t2
+    STORE   x8,  12*REGBYTES(sp)                        // Store s0
+    STORE   x10, 27*REGBYTES(sp)                        // Store a0
+    STORE   x11, 26*REGBYTES(sp)                        // Store a1
+    STORE   x12, 25*REGBYTES(sp)                        // Store a2
+    STORE   x13, 24*REGBYTES(sp)                        // Store a3
+    STORE   x14, 23*REGBYTES(sp)                        // Store a4
+    STORE   x15, 22*REGBYTES(sp)                        // Store a5
+    STORE   x16, 21*REGBYTES(sp)                        // Store a6
+    STORE   x17, 20*REGBYTES(sp)                        // Store a7
+    STORE   x28, 16*REGBYTES(sp)                        // Store t3
+    STORE   x29, 15*REGBYTES(sp)                        // Store t4
+    STORE   x30, 14*REGBYTES(sp)                        // Store t5
+    STORE   x31, 13*REGBYTES(sp)                        // Store t6
 
     csrr    t0, mepc                                    // Load exception program counter
-    sw      t0, 0x78(sp)                                // Save it on the stack
-
-#if defined(__riscv_32e) || defined(__riscv_32rve)
+    STORE   t0, 30*REGBYTES(sp)                         // Save it on the stack
 
     /* Save floating point scratch registers.  */
-
-    fsw     f0, 0x7C(sp)                                // Store ft0
-    fsw     f1, 0x80(sp)                                // Store ft1
-    fsw     f2, 0x84(sp)                                // Store ft2
-    fsw     f3, 0x88(sp)                                // Store ft3
-    fsw     f4, 0x8C(sp)                                // Store ft4
-    fsw     f5, 0x90(sp)                                // Store ft5
-    fsw     f6, 0x94(sp)                                // Store ft6
-    fsw     f7, 0x98(sp)                                // Store ft7
-    fsw     f10,0xA4(sp)                                // Store fa0
-    fsw     f11,0xA8(sp)                                // Store fa1
-    fsw     f12,0xAC(sp)                                // Store fa2
-    fsw     f13,0xB0(sp)                                // Store fa3
-    fsw     f14,0xB4(sp)                                // Store fa4
-    fsw     f15,0xB8(sp)                                // Store fa5
-    fsw     f16,0xBC(sp)                                // Store fa6
-    fsw     f17,0xC0(sp)                                // Store fa7
-    fsw     f28,0xEC(sp)                                // Store ft8
-    fsw     f29,0xF0(sp)                                // Store ft9
-    fsw     f30,0xF4(sp)                                // Store ft10
-    fsw     f31,0xF8(sp)                                // Store ft11
+#if defined(__riscv_flen)
+    csrr  t0, mstatus                                   // Pickup thread's floating point state
+    STORE t0, 29*REGBYTES(sp)
+    /* Check the floating point status for lazy FPU*/
+    srli  t1, t0, 13
+    andi  t1, t1, 0x3
+    beqz  t1, _tx_skip_not_nested_fpu_save              // Skip floating point save FS is Off
+#if (__riscv_flen == 32)
+    fsw     f0, 31*REGBYTES(sp)                         // Store ft0
+    fsw     f1, 32*REGBYTES(sp)                         // Store ft1
+    fsw     f2, 33*REGBYTES(sp)                         // Store ft2
+    fsw     f3, 34*REGBYTES(sp)                         // Store ft3
+    fsw     f4, 35*REGBYTES(sp)                         // Store ft4
+    fsw     f5, 36*REGBYTES(sp)                         // Store ft5
+    fsw     f6, 37*REGBYTES(sp)                         // Store ft6
+    fsw     f7, 38*REGBYTES(sp)                         // Store ft7
+    fsw     f10,41*REGBYTES(sp)                         // Store fa0
+    fsw     f11,42*REGBYTES(sp)                         // Store fa1
+    fsw     f12,43*REGBYTES(sp)                         // Store fa2
+    fsw     f13,44*REGBYTES(sp)                         // Store fa3
+    fsw     f14,45*REGBYTES(sp)                         // Store fa4
+    fsw     f15,46*REGBYTES(sp)                         // Store fa5
+    fsw     f16,47*REGBYTES(sp)                         // Store fa6
+    fsw     f17,48*REGBYTES(sp)                         // Store fa7
+    fsw     f28,59*REGBYTES(sp)                         // Store ft8
+    fsw     f29,60*REGBYTES(sp)                         // Store ft9
+    fsw     f30,61*REGBYTES(sp)                         // Store ft10
+    fsw     f31,62*REGBYTES(sp)                         // Store ft11
     csrr    t0, fcsr
-    sw      t0, 0xFC(sp)                                // Store fcsr
+    STORE   t0, 63*REGBYTES(sp)                         // Store fcsr
+#elif (__riscv_flen == 64)
+    fsd     f0, 31*REGBYTES(sp)                         // Store ft0
+    fsd     f1, 32*REGBYTES(sp)                         // Store ft1
+    fsd     f2, 33*REGBYTES(sp)                         // Store ft2
+    fsd     f3, 34*REGBYTES(sp)                         // Store ft3
+    fsd     f4, 35*REGBYTES(sp)                         // Store ft4
+    fsd     f5, 36*REGBYTES(sp)                         // Store ft5
+    fsd     f6, 37*REGBYTES(sp)                         // Store ft6
+    fsd     f7, 38*REGBYTES(sp)                         // Store ft7
+    fsd     f10,41*REGBYTES(sp)                         // Store fa0
+    fsd     f11,42*REGBYTES(sp)                         // Store fa1
+    fsd     f12,43*REGBYTES(sp)                         // Store fa2
+    fsd     f13,44*REGBYTES(sp)                         // Store fa3
+    fsd     f14,45*REGBYTES(sp)                         // Store fa4
+    fsd     f15,46*REGBYTES(sp)                         // Store fa5
+    fsd     f16,47*REGBYTES(sp)                         // Store fa6
+    fsd     f17,48*REGBYTES(sp)                         // Store fa7
+    fsd     f28,59*REGBYTES(sp)                         // Store ft8
+    fsd     f29,60*REGBYTES(sp)                         // Store ft9
+    fsd     f30,61*REGBYTES(sp)                         // Store ft10
+    fsd     f31,62*REGBYTES(sp)                         // Store ft11
+    csrr    t0, fcsr
+    STORE   t0, 63*REGBYTES(sp)                         // Store fcsr
+#endif
+_tx_skip_not_nested_fpu_save:
 #endif
 
     /* Save the current stack pointer in the thread's control block.  */
@@ -220,17 +266,16 @@ _tx_thread_not_nested_save:
     /* Switch to the system stack.  */
     /* sp =  _tx_thread_system_stack_ptr;  */
 
-    la      t0, _tx_thread_current_ptr
-    lw      t1, 0(t0)                                   // Pickup current thread pointer
-    sw      sp, 8(t1)                                   // Save stack pointer*/
+    LOAD    t1, _tx_thread_current_ptr                  // Pickup current thread pointer
+    STORE   sp, 2*REGBYTES(t1)                          // Save stack pointer
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     /* _tx_execution_isr_enter is called with thread stack pointer */
     call    _tx_execution_isr_enter                     // Call the ISR execution enter function
 #endif
 
-    la      t0, _tx_thread_system_stack_ptr
-    lw      sp, 0(t0)                                   // Switch to system stack
+
+    LOAD    sp, _tx_thread_system_stack_ptr             // Switch to system stack
     ret                                                 // Return to calling ISR
 
     /* }
@@ -248,9 +293,9 @@ _tx_thread_idle_system_save:
 
     /* }
 }  */
-#if defined(__riscv_32e) || defined(__riscv_32rve)
-    addi    sp, sp, 260                                 // Recover stack frame - with floating point enabled
+#if defined(__riscv_flen) && ((__riscv_flen == 32) || (__riscv_flen == 64))
+    addi    sp, sp, 65*REGBYTES                         // Recover stack frame - with floating point enabled
 #else
-    addi    sp, sp, 128                                 // Recover the reserved stack space
+    addi    sp, sp, 32*REGBYTES                         // Recover the reserved stack space
 #endif
     ret                                                 // Return to calling ISR

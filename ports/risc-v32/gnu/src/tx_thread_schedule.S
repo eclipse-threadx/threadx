@@ -19,27 +19,9 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
-/* #define TX_SOURCE_CODE  */
-
-
-/* Include necessary system files.  */
-
-/*  #include "tx_api.h"
-    #include "tx_thread.h"
-    #include "tx_timer.h"  */
-
-
-    .extern      _tx_thread_execute_ptr
-    .extern      _tx_thread_current_ptr
-    .extern      _tx_timer_time_slice
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-    .extern      _tx_execution_thread_enter
-#endif
-
+#include "tx_port.h"
 
     .section .text
-    .balign 4
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -49,7 +31,6 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
-/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -75,11 +56,16 @@
 /*    _tx_thread_system_return             Return to system from thread   */
 /*    _tx_thread_context_restore           Restore thread's context       */
 /*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  23-12-2025        Akif Ejaz            Initial Version 6.4.x          */
+/*                                                                        */
 /**************************************************************************/
-
 /* VOID   _tx_thread_schedule(VOID)
 {  */
-    .globl  _tx_thread_schedule
+    .global  _tx_thread_schedule
 _tx_thread_schedule:
 
     /* Enable interrupts.  */
@@ -91,12 +77,12 @@ _tx_thread_schedule:
 
     la      t0, _tx_thread_execute_ptr                  // Pickup address of execute ptr
 _tx_thread_schedule_loop:
-    lw      t1, 0(t0)                                   // Pickup next thread to execute
+    LOAD    t1, 0(t0)                                   // Pickup next thread to execute
     beqz    t1, _tx_thread_schedule_loop                // If NULL, wait for thread to execute
 
     /* }
     while(_tx_thread_execute_ptr == TX_NULL);  */
-    
+
     /* Yes! We have a thread to execute.  Lockout interrupts and
        transfer control to it.  */
     csrci   mstatus, 0x08                               // Lockout interrupts
@@ -105,15 +91,15 @@ _tx_thread_schedule_loop:
     /* _tx_thread_current_ptr =  _tx_thread_execute_ptr;  */
 
     la      t0, _tx_thread_current_ptr                  // Pickup current thread pointer address
-    sw      t1, 0(t0)                                   // Set current thread pointer
+    STORE   t1, 0(t0)                                   // Set current thread pointer
 
     /* Increment the run count for this thread.  */
     /* _tx_thread_current_ptr -> tx_thread_run_count++;  */
 
-    lw      t2, 4(t1)                                   // Pickup run count
-    lw      t3, 24(t1)                                  // Pickup time slice value
+    LOAD    t2, 1*REGBYTES(t1)                          // Pickup run count
+    LOAD    t3, 6*REGBYTES(t1)                          // Pickup time slice value
     addi    t2, t2, 1                                   // Increment run count
-    sw      t2, 4(t1)                                   // Store new run count
+    STORE   t2, 1*REGBYTES(t1)                          // Store new run count
 
     /* Setup time-slice, if present.  */
     /* _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;  */
@@ -123,8 +109,8 @@ _tx_thread_schedule_loop:
     /* Switch to the thread's stack.  */
     /* SP =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;  */
 
-    lw      sp, 8(t1)                                   // Switch to thread's stack
-    sw      t3, 0(t2)                                   // Store new time-slice
+    LOAD    sp, 2*REGBYTES(t1)                          // Switch to thread's stack
+    STORE   t3, 0(t2)                                   // Store new time-slice*/
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 
@@ -134,132 +120,202 @@ _tx_thread_schedule_loop:
     /* Determine if an interrupt frame or a synchronous task suspension frame
        is present.  */
 
-    lw      t2, 0(sp)                                   // Pickup stack type
+    LOAD    t2, 0(sp)                                   // Pickup stack type
     beqz    t2, _tx_thread_synch_return                 // If 0, solicited thread return
 
     /* Determine if floating point registers need to be recovered.  */
 
-#if defined(__riscv_32e) || defined(__riscv_32rve) 
-    flw     f0, 0x7C(sp)                                // Recover ft0
-    flw     f1, 0x80(sp)                                // Recover ft1
-    flw     f2, 0x84(sp)                                // Recover ft2
-    flw     f3, 0x88(sp)                                // Recover ft3
-    flw     f4, 0x8C(sp)                                // Recover ft4
-    flw     f5, 0x90(sp)                                // Recover ft5
-    flw     f6, 0x94(sp)                                // Recover ft6
-    flw     f7, 0x98(sp)                                // Recover ft7
-    flw     f8, 0x9C(sp)                                // Recover fs0
-    flw     f9, 0xA0(sp)                                // Recover fs1
-    flw     f10,0xA4(sp)                                // Recover fa0
-    flw     f11,0xA8(sp)                                // Recover fa1
-    flw     f12,0xAC(sp)                                // Recover fa2
-    flw     f13,0xB0(sp)                                // Recover fa3
-    flw     f14,0xB4(sp)                                // Recover fa4
-    flw     f15,0xB8(sp)                                // Recover fa5
-    flw     f16,0xBC(sp)                                // Recover fa6
-    flw     f17,0xC0(sp)                                // Recover fa7
-    flw     f18,0xC4(sp)                                // Recover fs2
-    flw     f19,0xC8(sp)                                // Recover fs3
-    flw     f20,0xCC(sp)                                // Recover fs4
-    flw     f21,0xD0(sp)                                // Recover fs5
-    flw     f22,0xD4(sp)                                // Recover fs6
-    flw     f23,0xD8(sp)                                // Recover fs7
-    flw     f24,0xDC(sp)                                // Recover fs8
-    flw     f25,0xE0(sp)                                // Recover fs9
-    flw     f26,0xE4(sp)                                // Recover fs10
-    flw     f27,0xE8(sp)                                // Recover fs11
-    flw     f28,0xEC(sp)                                // Recover ft8
-    flw     f29,0xF0(sp)                                // Recover ft9
-    flw     f30,0xF4(sp)                                // Recover ft10
-    flw     f31,0xF8(sp)                                // Recover ft11
-    lw      t0, 0xFC(sp)                                // Recover fcsr
-    csrw    fcsr, t0                                    // 
+#if defined(__riscv_flen)
+    LOAD    t1, 29*REGBYTES(t0)                         // Pickup thread's floating point state */
+    /* Check if floating point is enabled */
+    srli    t1, t1, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_schedule_skip_fp_restore   // Skip floating point restore FS is Off
+#if __riscv_flen == 32
+    flw     f0, 31*REGBYTES(sp)                         // Recover ft0
+    flw     f1, 32*REGBYTES(sp)                         // Recover ft1
+    flw     f2, 33*REGBYTES(sp)                         // Recover ft2
+    flw     f3, 34*REGBYTES(sp)                         // Recover ft3
+    flw     f4, 35*REGBYTES(sp)                         // Recover ft4
+    flw     f5, 36*REGBYTES(sp)                         // Recover ft5
+    flw     f6, 37*REGBYTES(sp)                         // Recover ft6
+    flw     f7, 38*REGBYTES(sp)                         // Recover ft7
+    flw     f8, 39*REGBYTES(sp)                         // Recover fs0
+    flw     f9, 40*REGBYTES(sp)                         // Recover fs1
+    flw     f10,41*REGBYTES(sp)                         // Recover fa0
+    flw     f11,42*REGBYTES(sp)                         // Recover fa1
+    flw     f12,43*REGBYTES(sp)                         // Recover fa2
+    flw     f13,44*REGBYTES(sp)                         // Recover fa3
+    flw     f14,45*REGBYTES(sp)                         // Recover fa4
+    flw     f15,46*REGBYTES(sp)                         // Recover fa5
+    flw     f16,47*REGBYTES(sp)                         // Recover fa6
+    flw     f17,48*REGBYTES(sp)                         // Recover fa7
+    flw     f18,49*REGBYTES(sp)                         // Recover fs2
+    flw     f19,50*REGBYTES(sp)                         // Recover fs3
+    flw     f20,51*REGBYTES(sp)                         // Recover fs4
+    flw     f21,52*REGBYTES(sp)                         // Recover fs5
+    flw     f22,53*REGBYTES(sp)                         // Recover fs6
+    flw     f23,54*REGBYTES(sp)                         // Recover fs7
+    flw     f24,55*REGBYTES(sp)                         // Recover fs8
+    flw     f25,56*REGBYTES(sp)                         // Recover fs9
+    flw     f26,57*REGBYTES(sp)                         // Recover fs10
+    flw     f27,58*REGBYTES(sp)                         // Recover fs11
+    flw     f28,59*REGBYTES(sp)                         // Recover ft8
+    flw     f29,60*REGBYTES(sp)                         // Recover ft9
+    flw     f30,61*REGBYTES(sp)                         // Recover ft10
+    flw     f31,62*REGBYTES(sp)                         // Recover ft11
+    LOAD    t0, 63*REGBYTES(sp)                         // Recover fcsr
+    csrw    fcsr, t0                                    //
+#elif __riscv_flen == 64
+    fld     f0, 31*REGBYTES(sp)                         // Recover ft0
+    fld     f1, 32*REGBYTES(sp)                         // Recover ft1
+    fld     f2, 33*REGBYTES(sp)                         // Recover ft2
+    fld     f3, 34*REGBYTES(sp)                         // Recover ft3
+    fld     f4, 35*REGBYTES(sp)                         // Recover ft4
+    fld     f5, 36*REGBYTES(sp)                         // Recover ft5
+    fld     f6, 37*REGBYTES(sp)                         // Recover ft6
+    fld     f7, 38*REGBYTES(sp)                         // Recover ft7
+    fld     f8, 39*REGBYTES(sp)                         // Recover fs0
+    fld     f9, 40*REGBYTES(sp)                         // Recover fs1
+    fld     f10,41*REGBYTES(sp)                         // Recover fa0
+    fld     f11,42*REGBYTES(sp)                         // Recover fa1
+    fld     f12,43*REGBYTES(sp)                         // Recover fa2
+    fld     f13,44*REGBYTES(sp)                         // Recover fa3
+    fld     f14,45*REGBYTES(sp)                         // Recover fa4
+    fld     f15,46*REGBYTES(sp)                         // Recover fa5
+    fld     f16,47*REGBYTES(sp)                         // Recover fa6
+    fld     f17,48*REGBYTES(sp)                         // Recover fa7
+    fld     f18,49*REGBYTES(sp)                         // Recover fs2
+    fld     f19,50*REGBYTES(sp)                         // Recover fs3
+    fld     f20,51*REGBYTES(sp)                         // Recover fs4
+    fld     f21,52*REGBYTES(sp)                         // Recover fs5
+    fld     f22,53*REGBYTES(sp)                         // Recover fs6
+    fld     f23,54*REGBYTES(sp)                         // Recover fs7
+    fld     f24,55*REGBYTES(sp)                         // Recover fs8
+    fld     f25,56*REGBYTES(sp)                         // Recover fs9
+    fld     f26,57*REGBYTES(sp)                         // Recover fs10
+    fld     f27,58*REGBYTES(sp)                         // Recover fs11
+    fld     f28,59*REGBYTES(sp)                         // Recover ft8
+    fld     f29,60*REGBYTES(sp)                         // Recover ft9
+    fld     f30,61*REGBYTES(sp)                         // Recover ft10
+    fld     f31,62*REGBYTES(sp)                         // Recover ft11
+    LOAD    t0, 63*REGBYTES(sp)                         // Recover fcsr
+#endif
+_tx_thread_schedule_skip_fp_restore:
 #endif
 
     /* Recover standard registers.  */
 
-    lw      t0, 0x78(sp)                                // Recover mepc
+    LOAD    t0, 30*REGBYTES(sp)                         // Recover mepc
     csrw    mepc, t0                                    // Store mepc
     li      t0, 0x1880                                  // Prepare MPIP
+#if defined(__riscv_flen) && ((__riscv_flen == 32) || (__riscv_flen == 64))
+    li      t1, 1<<13
+    or      t0, t1, t0
+#endif
     csrw    mstatus, t0                                 // Enable MPIP
 
-    lw      x1, 0x70(sp)                                // Recover RA
-    lw      x5, 0x4C(sp)                                // Recover t0
-    lw      x6, 0x48(sp)                                // Recover t1
-    lw      x7, 0x44(sp)                                // Recover t2
-    lw      x8, 0x30(sp)                                // Recover s0
-    lw      x9, 0x2C(sp)                                // Recover s1
-    lw      x10, 0x6C(sp)                               // Recover a0
-    lw      x11, 0x68(sp)                               // Recover a1
-    lw      x12, 0x64(sp)                               // Recover a2
-    lw      x13, 0x60(sp)                               // Recover a3
-    lw      x14, 0x5C(sp)                               // Recover a4
-    lw      x15, 0x58(sp)                               // Recover a5
-    lw      x16, 0x54(sp)                               // Recover a6
-    lw      x17, 0x50(sp)                               // Recover a7
-    lw      x18, 0x28(sp)                               // Recover s2
-    lw      x19, 0x24(sp)                               // Recover s3
-    lw      x20, 0x20(sp)                               // Recover s4
-    lw      x21, 0x1C(sp)                               // Recover s5
-    lw      x22, 0x18(sp)                               // Recover s6
-    lw      x23, 0x14(sp)                               // Recover s7
-    lw      x24, 0x10(sp)                               // Recover s8
-    lw      x25, 0x0C(sp)                               // Recover s9
-    lw      x26, 0x08(sp)                               // Recover s10
-    lw      x27, 0x04(sp)                               // Recover s11
-    lw      x28, 0x40(sp)                               // Recover t3
-    lw      x29, 0x3C(sp)                               // Recover t4
-    lw      x30, 0x38(sp)                               // Recover t5
-    lw      x31, 0x34(sp)                               // Recover t6
+    LOAD    x1,  28*REGBYTES(sp)                        // Recover RA
+    LOAD    x5,  19*REGBYTES(sp)                        // Recover t0
+    LOAD    x6,  18*REGBYTES(sp)                        // Recover t1
+    LOAD    x7,  17*REGBYTES(sp)                        // Recover t2
+    LOAD    x8,  12*REGBYTES(sp)                        // Recover s0
+    LOAD    x9,  11*REGBYTES(sp)                        // Recover s1
+    LOAD    x10, 27*REGBYTES(sp)                        // Recover a0
+    LOAD    x11, 26*REGBYTES(sp)                        // Recover a1
+    LOAD    x12, 25*REGBYTES(sp)                        // Recover a2
+    LOAD    x13, 24*REGBYTES(sp)                        // Recover a3
+    LOAD    x14, 23*REGBYTES(sp)                        // Recover a4
+    LOAD    x15, 22*REGBYTES(sp)                        // Recover a5
+    LOAD    x16, 21*REGBYTES(sp)                        // Recover a6
+    LOAD    x17, 20*REGBYTES(sp)                        // Recover a7
+    LOAD    x18, 10*REGBYTES(sp)                        // Recover s2
+    LOAD    x19,  9*REGBYTES(sp)                        // Recover s3
+    LOAD    x20,  8*REGBYTES(sp)                        // Recover s4
+    LOAD    x21,  7*REGBYTES(sp)                        // Recover s5
+    LOAD    x22,  6*REGBYTES(sp)                        // Recover s6
+    LOAD    x23,  5*REGBYTES(sp)                        // Recover s7
+    LOAD    x24,  4*REGBYTES(sp)                        // Recover s8
+    LOAD    x25,  3*REGBYTES(sp)                        // Recover s9
+    LOAD    x26,  2*REGBYTES(sp)                        // Recover s10
+    LOAD    x27,  1*REGBYTES(sp)                        // Recover s11
+    LOAD    x28, 16*REGBYTES(sp)                        // Recover t3
+    LOAD    x29, 15*REGBYTES(sp)                        // Recover t4
+    LOAD    x30, 14*REGBYTES(sp)                        // Recover t5
+    LOAD    x31, 13*REGBYTES(sp)                        // Recover t6
 
-#if defined(__riscv_32e) || defined(__riscv_32rve) 
-    addi    sp, sp, 260                                 // Recover stack frame - with floating point registers  
+#if defined(__riscv_flen) && ((__riscv_flen == 32) || (__riscv_flen == 64))
+    addi    sp, sp, 65*REGBYTES                         // Recover stack frame - with floating point registers
 #else
-    addi    sp, sp, 128                                 // Recover stack frame - without floating point registers
+    addi    sp, sp, 32*REGBYTES                         // Recover stack frame - without floating point registers
 #endif
     mret                                                // Return to point of interrupt
 
 _tx_thread_synch_return:
 
-#if defined(__riscv_32e) || defined(__riscv_32rve) 
-    flw     f8, 0x3C(sp)                                // Recover fs0
-    flw     f9, 0x40(sp)                                // Recover fs1
-    flw     f18,0x44(sp)                                // Recover fs2
-    flw     f19,0x48(sp)                                // Recover fs3
-    flw     f20,0x4C(sp)                                // Recover fs4
-    flw     f21,0x50(sp)                                // Recover fs5
-    flw     f22,0x54(sp)                                // Recover fs6
-    flw     f23,0x58(sp)                                // Recover fs7
-    flw     f24,0x5C(sp)                                // Recover fs8
-    flw     f25,0x60(sp)                                // Recover fs9
-    flw     f26,0x64(sp)                                // Recover fs10
-    flw     f27,0x68(sp)                                // Recover fs11
-    lw      t0, 0x6C(sp)                                // Recover fcsr
-    csrw    fcsr, t0                                    // 
+#if defined(__riscv_flen)
+    LOAD    t1, 29*REGBYTES(t0)                         // Pickup thread's floating point state */
+    /* Check if floating point is enabled */
+    srli    t1, t1, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_synch_return_skip_fp_restore   // Skip floating point restore FS is Off
+#if __riscv_flen == 32
+    flw     f8, 15*REGBYTES(sp)                         // Recover fs0
+    flw     f9, 16*REGBYTES(sp)                         // Recover fs1
+    flw     f18,17*REGBYTES(sp)                         // Recover fs2
+    flw     f19,18*REGBYTES(sp)                         // Recover fs3
+    flw     f20,19*REGBYTES(sp)                         // Recover fs4
+    flw     f21,20*REGBYTES(sp)                         // Recover fs5
+    flw     f22,21*REGBYTES(sp)                         // Recover fs6
+    flw     f23,22*REGBYTES(sp)                         // Recover fs7
+    flw     f24,23*REGBYTES(sp)                         // Recover fs8
+    flw     f25,24*REGBYTES(sp)                         // Recover fs9
+    flw     f26,25*REGBYTES(sp)                         // Recover fs10
+    flw     f27,26*REGBYTES(sp)                         // Recover fs11
+    LOAD    t0, 27*REGBYTES(sp)                         // Recover fcsr
+    csrw    fcsr, t0                                    //
+#elif __riscv_flen == 64
+    fld     f8, 15*REGBYTES(sp)                         // Recover fs0
+    fld     f9, 16*REGBYTES(sp)                         // Recover fs1
+    fld     f18,17*REGBYTES(sp)                         // Recover fs2
+    fld     f19,18*REGBYTES(sp)                         // Recover fs3
+    fld     f20,19*REGBYTES(sp)                         // Recover fs4
+    fld     f21,20*REGBYTES(sp)                         // Recover fs5
+    fld     f22,21*REGBYTES(sp)                         // Recover fs6
+    fld     f23,22*REGBYTES(sp)                         // Recover fs7
+    fld     f24,23*REGBYTES(sp)                         // Recover fs8
+    fld     f25,24*REGBYTES(sp)                         // Recover fs9
+    fld     f26,25*REGBYTES(sp)                         // Recover fs10
+    fld     f27,26*REGBYTES(sp)                         // Recover fs11
+    LOAD    t0, 27*REGBYTES(sp)                         // Recover fcsr
+    csrw    fcsr, t0                                    //
+#endif
+_tx_thread_synch_return_skip_fp_restore:
 #endif
 
     /* Recover standard preserved registers.  */
     /* Recover standard registers.  */
 
-    lw      x1, 0x34(sp)                                // Recover RA
-    lw      x8, 0x30(sp)                                // Recover s0
-    lw      x9, 0x2C(sp)                                // Recover s1
-    lw      x18, 0x28(sp)                               // Recover s2
-    lw      x19, 0x24(sp)                               // Recover s3
-    lw      x20, 0x20(sp)                               // Recover s4
-    lw      x21, 0x1C(sp)                               // Recover s5
-    lw      x22, 0x18(sp)                               // Recover s6
-    lw      x23, 0x14(sp)                               // Recover s7
-    lw      x24, 0x10(sp)                               // Recover s8
-    lw      x25, 0x0C(sp)                               // Recover s9
-    lw      x26, 0x08(sp)                               // Recover s10
-    lw      x27, 0x04(sp)                               // Recover s11
-    lw      t0, 0x38(sp)                                // Recover mstatus
+    LOAD    x1,  13*REGBYTES(sp)                        // Recover RA
+    LOAD    x8,  12*REGBYTES(sp)                        // Recover s0
+    LOAD    x9,  11*REGBYTES(sp)                        // Recover s1
+    LOAD    x18, 10*REGBYTES(sp)                        // Recover s2
+    LOAD    x19,  9*REGBYTES(sp)                        // Recover s3
+    LOAD    x20,  8*REGBYTES(sp)                        // Recover s4
+    LOAD    x21,  7*REGBYTES(sp)                        // Recover s5
+    LOAD    x22,  6*REGBYTES(sp)                        // Recover s6
+    LOAD    x23,  5*REGBYTES(sp)                        // Recover s7
+    LOAD    x24,  4*REGBYTES(sp)                        // Recover s8
+    LOAD    x25,  3*REGBYTES(sp)                        // Recover s9
+    LOAD    x26,  2*REGBYTES(sp)                        // Recover s10
+    LOAD    x27,  1*REGBYTES(sp)                        // Recover s11
+    LOAD    t0,  14*REGBYTES(sp)                        // Recover mstatus
     csrw    mstatus, t0                                 // Store mstatus, enables interrupt
-#if defined(__riscv_32e) || defined(__riscv_32rve)
-    addi    sp, sp, 116                                 // Recover stack frame
+#if defined(__riscv_flen) && ((__riscv_flen == 32) || (__riscv_flen == 64))
+    addi    sp, sp, 29*REGBYTES                         // Recover stack frame
 #else
-    addi    sp, sp, 64                                  // Recover stack frame
+    addi    sp, sp, 16*REGBYTES                         // Recover stack frame
 #endif
     ret                                                 // Return to thread
 
+/* }  */
