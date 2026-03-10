@@ -243,7 +243,7 @@ _tx_thread_no_preempt_restore:
     flw     f31,62*REGBYTES(sp)                         // Recover ft11
     lw      t0, 63*REGBYTES(sp)                         // Recover fcsr
     csrw    fcsr, t0                                    //
-#if __riscv_flen == 64
+#elif __riscv_flen == 64
     fld     f0, 31*REGBYTES(sp)                         // Recover ft0
     fld     f1, 32*REGBYTES(sp)                         // Recover ft1
     fld     f2, 33*REGBYTES(sp)                         // Recover ft2
@@ -267,7 +267,7 @@ _tx_thread_no_preempt_restore:
     LOAD    t0, 63*REGBYTES(sp)                         // Recover fcsr
     csrw    fcsr, t0                                    //
 #endif
-tx_thread_no_preempt_skip_fp_restore:
+_tx_thread_no_preempt_skip_fp_restore:
 #endif
 
     /* Recover the saved context and return to the point of interrupt.  */
@@ -323,11 +323,11 @@ _tx_thread_preempt_restore:
 
     /* Store floating point preserved registers.  */
 #if defined(__riscv_flen)
-    LOAD    t1, 29*REGBYTES(t0)                         // Pickup thread's floating point state */
+    LOAD    t2, 29*REGBYTES(t0)                         // Pickup thread's floating point state */
     /* Check if floating point is enabled */
-    srli    t1, t1, 13
-    andi    t1, t1, 0x3
-    beqz    t1, _tx_thread_preempt_skip_fp_restore      // Skip floating point restore FS is Off
+    srli    t2, t2, 13
+    andi    t2, t2, 0x3
+    beqz    t2, _tx_thread_preempt_skip_fp_restore      // Skip floating point restore FS is Off
 #if __riscv_flen == 32
     fsw     f8,  39*REGBYTES(t0)                                // Store fs0
     fsw     f9,  40*REGBYTES(t0)                                // Store fs1

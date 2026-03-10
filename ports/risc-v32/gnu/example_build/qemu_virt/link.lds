@@ -8,6 +8,10 @@ SECTIONS
    * where qemu's -kernel jumps.
    */
   . = 0x80000000;
+  
+  .init : {
+    KEEP (*(.init))
+  }
 
   .text : {
     *(.text .text.*)

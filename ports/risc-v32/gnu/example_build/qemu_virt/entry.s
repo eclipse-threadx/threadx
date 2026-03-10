@@ -1,5 +1,5 @@
 
-.section .text
+.section .init
 .align 4
 .global _start
 .extern main

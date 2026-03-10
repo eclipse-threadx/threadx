@@ -70,3 +70,32 @@ set(CPACK_SOURCE_IGNORE_FILES
 )
 set(CPACK_VERBATIM_VARIABLES YES)
 include(CPack)
+
+# Enable the QEMU Virt demo application (Target: kernel.elf)
+set(QEMU_DEMO_DIR ${CMAKE_CURRENT_LIST_DIR}/ports/risc-v32/gnu/example_build/qemu_virt)
+
+add_executable(kernel.elf 
+    ${QEMU_DEMO_DIR}/demo_threadx.c
+    ${QEMU_DEMO_DIR}/entry.s
+    ${QEMU_DEMO_DIR}/uart.c
+    ${QEMU_DEMO_DIR}/plic.c
+    ${QEMU_DEMO_DIR}/hwtimer.c
+    ${QEMU_DEMO_DIR}/trap.c
+    ${QEMU_DEMO_DIR}/board.c
+    ${QEMU_DEMO_DIR}/tx_initialize_low_level.S
+)
+
+target_link_libraries(kernel.elf PRIVATE threadx)
+
+target_include_directories(kernel.elf PRIVATE 
+    ${CMAKE_CURRENT_LIST_DIR}/common/inc 
+    ${CMAKE_CURRENT_LIST_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+    ${QEMU_DEMO_DIR}
+)
+
+# Linker options
+target_link_options(kernel.elf PRIVATE 
+    -T${QEMU_DEMO_DIR}/link.lds 
+    -nostartfiles
+    -Wl,-Map=kernel.map
+)

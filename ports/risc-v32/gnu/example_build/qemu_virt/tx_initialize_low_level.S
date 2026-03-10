@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "csr.h"
+#include "tx_port.h"
 
  .section .text
  .align 4
@@ -43,6 +44,11 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    hardware exception                                                  */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  12-29-2025        Akif Ejaz        Adapted for RV32 from RV64 port    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -60,13 +66,13 @@
     .extern  trap_handler
     .extern  _tx_thread_context_restore
     trap_entry:
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-	addi sp, sp, -260         // Allocate space for all registers - with floating point enabled (65*4)
+#if defined(__riscv_flen) && ((__riscv_flen == 32)||(__riscv_flen == 64))
+	addi sp, sp, -65*REGBYTES         // Allocate space for all registers - with floating point enabled
 #else
-	addi sp, sp, -128         // Allocate space for all registers - without floating point enabled (32*4)
+	addi sp, sp, -32*REGBYTES         // Allocate space for all registers - without floating point enabled
 #endif
 
-	sw   x1, 112(sp)         // Store RA (28*4 = 112, because call will override ra [ra is a callee register in riscv])
+	STORE   x1, 28*REGBYTES(sp)       // Store RA, 28*REGBYTES(because call will override ra [ra is a calle register in riscv])
 
     	call    _tx_thread_context_save
 
@@ -133,6 +139,11 @@ _err:
     .extern  board_init
 _tx_initialize_low_level:
 
+/*  debug print
+    .section .rodata
+debug_str_init:
+    .string "DEBUG : threadx/ports/risc-v32/gnu/example_build/qemu_virt/tx_initialize_low_level.S, _tx_initialize_low_level\n"
+*/
     .section .text
 
     la      t0, _tx_thread_system_stack_ptr
@@ -155,6 +166,10 @@ _tx_initialize_low_level:
     addi    sp, sp, -4
     sw	    ra, 0(sp)
     call    board_init
+/*  debug print
+    la      a0, debug_str_init
+    call    uart_puts
+*/
     lw	    ra, 0(sp)
     addi    sp, sp, 4
     la	    t0, trap_entry
