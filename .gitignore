@@ -4,6 +4,7 @@
 .tmp/
 _deps/
 build/
+build_qemu/
 Debug/
 CMakeFiles/
 CMakeScripts/
