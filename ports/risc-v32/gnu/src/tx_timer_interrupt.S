@@ -19,28 +19,8 @@
 /**************************************************************************/
 /**************************************************************************/
 
-/* #define TX_SOURCE_CODE  */
-
-
-/* Include necessary system files.  */
-
-/*  #include "tx_api.h"
-    #include "tx_timer.h"
-    #include "tx_thread.h"  */
-
-    .extern      _tx_timer_system_clock
-    .extern      _tx_timer_time_slice
-    .extern      _tx_timer_expired_time_slice
-    .extern      _tx_timer_current_ptr
-    .extern      _tx_timer_expired
-    .extern      _tx_timer_list_end
-    .extern      _tx_timer_list_start
-    .extern      _tx_timer_expiration_process
-    .extern      _tx_thread_time_slice
-
-
-    .section .mtext
-    .balign 4
+    .section .text
+    .align 4
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -50,7 +30,6 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
-/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -78,10 +57,9 @@
 /*    interrupt vector                                                    */
 /*                                                                        */
 /**************************************************************************/
-
 /* VOID   _tx_timer_interrupt(VOID)
 {  */
-    .globl      _tx_timer_interrupt
+    .global  _tx_timer_interrupt
 _tx_timer_interrupt:
 
     /* Increment the system clock.  */
@@ -108,7 +86,7 @@ _tx_timer_interrupt:
     sw      t3, 0(t2)                                   // Store new time slice
 
        /* Check for expiration.  */
-       /* if (__tx_timer_time_slice == 0)  */
+       /* if (_tx_timer_time_slice == 0)  */
 
     bgtz    t3, _tx_timer_no_time_slice                 // If not 0, has not expired yet
     li      t1, 1                                       // Build expired flag
@@ -117,7 +95,7 @@ _tx_timer_interrupt:
        /* _tx_timer_expired_time_slice =  TX_TRUE;  */
 
     la      t4, _tx_timer_expired_time_slice            // Get address of expired flag
-    sw      t1, 0(t4)                                   // Set expired flag
+    sw      t1, 0(t4)                                   // Set expired flag (UINT)
     ori     t6, t6, 1                                   // Set local expired flag
 
     /* }  */
@@ -129,8 +107,8 @@ _tx_timer_no_time_slice:
     {  */
 
     la      t0, _tx_timer_current_ptr                   // Pickup address of current ptr
-    lw      t1, 0(t0)                                   // Pickup current pointer
-    lw      t3, 0(t1)                                   // Pickup the current timer entry
+    lw      t1, 0(t0)                                   // Pickup current pointer (word)
+    lw      t3, 0(t1)                                   // Pickup the current timer entry (word)
     la      t2, _tx_timer_expired                       // Pickup address of timer expired flag
     li      t4, 1                                       // Build TX_TRUE flag
     beqz    t3, _tx_timer_no_timer                      // If NULL, no timer has expired
@@ -139,7 +117,7 @@ _tx_timer_no_time_slice:
         /* _tx_timer_expired =  TX_TRUE;  */
 
     ori     t6, t6, 2                                   // Set local expired flag
-    sw      t4, 0(t2)                                   // Set expired flag in memory
+    sw      t4, 0(t2)                                   // Set expired flag in memory (UINT)
     j       _tx_timer_done                              // Finished timer processing
 
 
@@ -179,7 +157,6 @@ _tx_timer_done:
     {  */
 
     beqz    t6, _tx_timer_nothing_expired               // If nothing expired skip the rest
-    and     t2, t6, 2                                   // Isolate the timer expired bit
     addi    sp, sp, -16                                 // Allocate some storage on the stack
     sw      t6, 0(sp)                                   // Save local expired flag
     sw      ra, 4(sp)                                   // Save ra
@@ -188,6 +165,7 @@ _tx_timer_done:
     /* if (_tx_timer_expired)
     {  */
 
+    andi    t2, t6, 2                                   // Isolate the timer expired bit
     beqz    t2, _tx_timer_dont_activate                 // No, timer not expired
 
         /* Call the timer expiration processing.  */
@@ -203,7 +181,7 @@ _tx_timer_dont_activate:
     /* if (_tx_timer_expired_time_slice)
     {  */
 
-    and     t2, t6, 1                                   // Is the timer expired bit set?
+    andi    t2, t6, 1                                   // Is the timer expired bit set?
     beqz    t2, _tx_timer_not_ts_expiration             // If not, skip time slice processing
 
         /* Time slice interrupted thread.  */
@@ -222,3 +200,5 @@ _tx_timer_not_ts_expiration:
 _tx_timer_nothing_expired:
 
     ret
+
+/* }  */

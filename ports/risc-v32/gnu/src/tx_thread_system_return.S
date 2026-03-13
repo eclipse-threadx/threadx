@@ -31,6 +31,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -54,12 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX components                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  23-12-2025        Akif Ejaz            Initial Version 6.4.x          */
 /*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_system_return(VOID)

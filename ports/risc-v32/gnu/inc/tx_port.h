@@ -30,7 +30,6 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
-/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -177,16 +176,15 @@
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
-#endif /* TX_INCLUDE_USER_DEFINE_FILE */
+#endif
 
-#endif /* __ASSEMBLER__ */
+
+/* Define compiler library include files.  */
 
 
 /* Define ThreadX basic types for this port.  */
 
 #define VOID                                    void
-
-#ifndef __ASSEMBLER__
 typedef char                                    CHAR;
 typedef unsigned char                           UCHAR;
 typedef int                                     INT;
@@ -197,7 +195,8 @@ typedef unsigned long long                      ULONG64;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
 #define ULONG64_DEFINED
-#endif /* __ASSEMBLER__ */
+#define ALIGN_TYPE_DEFINED
+#define ALIGN_TYPE                              ULONG64
 
 
 
@@ -346,33 +345,21 @@ typedef unsigned short                          USHORT;
 
 #ifdef TX_DISABLE_INLINE
 
-unsigned int                                    _tx_thread_interrupt_control(unsigned int new_posture);
+ULONG64                                         _tx_thread_interrupt_control(unsigned int new_posture);
 
-#define TX_INTERRUPT_SAVE_AREA                  register INT interrupt_save;
+#define TX_INTERRUPT_SAVE_AREA                  register ULONG64 interrupt_save;
 
 #define TX_DISABLE                              interrupt_save =  _tx_thread_interrupt_control(TX_INT_DISABLE);
 #define TX_RESTORE                              _tx_thread_interrupt_control(interrupt_save);
 
 #else
 
-#define TX_INTERRUPT_SAVE_AREA                  ULONG interrupt_save;
-
-#define TX_DISABLE                            \
-      __asm__ volatile (                      \
-      "csrr %0, mstatus\n\t"                  \
-      "csrci mstatus, 8"                      \
-      : "=r" (interrupt_save)                 \
-      :                                       \
-      : "memory"                              \
-      );
-
-#define TX_RESTORE                            \
-      __asm__ volatile (                      \
-      "csrw mstatus, %0\n\t"                  \
-      :                                       \
-      : "r" (interrupt_save)                  \
-      : "memory"                              \
-      );
+#define TX_INTERRUPT_SAVE_AREA                  ULONG64 interrupt_save;
+/* Atomically read mstatus into interrupt_save and clear bit 3 of mstatus.  */
+#define TX_DISABLE                              {__asm__ ("csrrci %0, mstatus, 0x08" : "=r" (interrupt_save) : );};
+/* We only care about mstatus.mie (bit 3), so mask interrupt_save and write to mstatus.  */
+#define TX_RESTORE                              {register ULONG64 __tempmask = interrupt_save & 0x08; \
+                                                __asm__ ("csrrs x0, mstatus, %0 \n\t" : : "r" (__tempmask) : );};
 
 #endif
 
@@ -389,13 +376,12 @@ unsigned int                                    _tx_thread_interrupt_control(uns
 
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
-#ifndef __ASSEMBLER__
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX RISC-V32/GNU Version 6.5.0.202601 *";
+                                    "Copyright (c) 2024 Microsoft Corporation. * ThreadX RISC-V32/GNU Version 6.4.2 *";
 #else
 extern  CHAR                    _tx_version_id[];
-#endif /* TX_THREAD_INIT */
-#endif /* __ASSEMBLER__ */
+#endif
 
-#endif /* TX_PORT_H */
+#endif   /*not __ASSEMBLER__ */
+#endif

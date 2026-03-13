@@ -31,6 +31,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -54,12 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_thread_create                     Create thread service         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  23-12-2025        Akif Ejaz            Initial Version 6.4.x          */
 /*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -102,39 +97,39 @@ _tx_thread_stack_build:
                     --      29      reserved
                     mepc    30      Initial mepc
 If floating point support:
-                    f0      31      Inital ft0
-                    f1      32      Inital ft1
-                    f2      33      Inital ft2
-                    f3      34      Inital ft3
-                    f4      35      Inital ft4
-                    f5      36      Inital ft5
-                    f6      37      Inital ft6
-                    f7      38      Inital ft7
-                    f8      39      Inital fs0
-                    f9      40      Inital fs1
-                    f10     41      Inital fa0
-                    f11     42      Inital fa1
-                    f12     43      Inital fa2
-                    f13     44      Inital fa3
-                    f14     45      Inital fa4
-                    f15     46      Inital fa5
-                    f16     47      Inital fa6
-                    f17     48      Inital fa7
-                    f18     49      Inital fs2
-                    f19     50      Inital fs3
-                    f20     51      Inital fs4
-                    f21     52      Inital fs5
-                    f22     53      Inital fs6
-                    f23     54      Inital fs7
-                    f24     55      Inital fs8
-                    f25     56      Inital fs9
-                    f26     57      Inital fs10
-                    f27     58      Inital fs11
-                    f28     59      Inital ft8
-                    f29     60      Inital ft9
-                    f30     61      Inital ft10
-                    f31     62      Inital ft11
-                    fscr    63      Inital fscr
+                    f0      31      Initial ft0
+                    f1      32      Initial ft1
+                    f2      33      Initial ft2
+                    f3      34      Initial ft3
+                    f4      35      Initial ft4
+                    f5      36      Initial ft5
+                    f6      37      Initial ft6
+                    f7      38      Initial ft7
+                    f8      39      Initial fs0
+                    f9      40      Initial fs1
+                    f10     41      Initial fa0
+                    f11     42      Initial fa1
+                    f12     43      Initial fa2
+                    f13     44      Initial fa3
+                    f14     45      Initial fa4
+                    f15     46      Initial fa5
+                    f16     47      Initial fa6
+                    f17     48      Initial fa7
+                    f18     49      Initial fs2
+                    f19     50      Initial fs3
+                    f20     51      Initial fs4
+                    f21     52      Initial fs5
+                    f22     53      Initial fs6
+                    f23     54      Initial fs7
+                    f24     55      Initial fs8
+                    f25     56      Initial fs9
+                    f26     57      Initial fs10
+                    f27     58      Initial fs11
+                    f28     59      Initial ft8
+                    f29     60      Initial ft9
+                    f30     61      Initial ft10
+                    f31     62      Initial ft11
+                    fscr    63      Initial fscr
 
     Stack Bottom: (higher memory address)  */
 
