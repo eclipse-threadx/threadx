@@ -87,7 +87,7 @@ _tx_thread_context_restore:
 
     /* Recover floating point registers.  */
 #if defined(__riscv_flen)
-    LOAD    t1, TX_STACK_OFFSET_MSTATUS(t0)             // Pickup thread's floating point state */
+    LOAD    t1, TX_STACK_OFFSET_MSTATUS(sp)             // Pickup thread's floating point state */
     /* Check if floating point is enabled */
     srli    t1, t1, 13
     andi    t1, t1, 0x3
@@ -151,12 +151,8 @@ _tx_thread_skip_fp_restore:
 
     LOAD    t0, TX_STACK_OFFSET_MEPC(sp)                // Recover mepc
     csrw    mepc, t0                                    // Setup mepc
-    li      t0, 0x1880                                  // Prepare MPIP
-#if defined(__riscv_flen) && ((__riscv_flen == 32) || (__riscv_flen == 64))
-    li      t1, 1<<13
-    or      t0, t1, t0
-#endif
-    csrw    mstatus, t0                                 // Enable MPIP
+    LOAD    t0, TX_STACK_OFFSET_MSTATUS(sp)             // Recover mstatus
+    csrw    mstatus, t0
 
     LOAD    x1,  TX_STACK_OFFSET_X1(sp)                 // Recover RA
     LOAD    x5,  TX_STACK_OFFSET_X5(sp)                 // Recover t0
@@ -190,13 +186,16 @@ _tx_thread_not_nested_restore:
                || (_tx_thread_preempt_disable))
     {  */
 
-    LOAD    t1, _tx_thread_current_ptr                  // Pickup current thread pointer
+    la      t0, _tx_thread_current_ptr
+    LOAD    t1, 0(t0)                 // Pickup current thread pointer
     beqz    t1, _tx_thread_idle_system_restore          // If NULL, idle system restore
 
-    LOAD    t2, _tx_thread_preempt_disable              // Pickup preempt disable flag
+    la      t0, _tx_thread_preempt_disable
+    LOAD    t2, 0(t0)                 // Pickup preempt disable flag
     bgtz    t2, _tx_thread_no_preempt_restore           // If set, restore interrupted thread
 
-    LOAD    t2, _tx_thread_execute_ptr                  // Pickup thread execute pointer
+    la      t0, _tx_thread_execute_ptr
+    LOAD    t2, 0(t0)                 // Pickup thread execute pointer
     bne     t1, t2, _tx_thread_preempt_restore          // If higher-priority thread is ready, preempt
 
 
@@ -210,7 +209,7 @@ _tx_thread_no_preempt_restore:
 
     /* Recover floating point registers.  */
 #if defined(__riscv_flen)
-    LOAD    t1, TX_STACK_OFFSET_MSTATUS(t0)             // Pickup thread's floating point state */
+    LOAD    t1, TX_STACK_OFFSET_MSTATUS(sp)             // Pickup thread's floating point state */
     /* Check if floating point is enabled */
     srli    t1, t1, 13
     andi    t1, t1, 0x3
@@ -273,12 +272,8 @@ _tx_thread_no_preempt_skip_fp_restore:
 
     LOAD    t0, TX_STACK_OFFSET_MEPC(sp)                // Recover mepc
     csrw    mepc, t0                                    // Setup mepc
-    li      t0, 0x1880                                  // Prepare MPIP
-#if defined(__riscv_flen)
-    li      t1, 1<<13
-    or      t0, t1, t0
-#endif
-    csrw    mstatus, t0                                 // Enable MPIP
+    LOAD    t0, TX_STACK_OFFSET_MSTATUS(sp)             // Recover mstatus
+    csrw    mstatus, t0
 
     LOAD    x1,  TX_STACK_OFFSET_X1(sp)                 // Recover RA
     LOAD    x5,  TX_STACK_OFFSET_X5(sp)                 // Recover t0
@@ -312,62 +307,61 @@ _tx_thread_preempt_restore:
     /* Instead of directly activating the thread again, ensure we save the
        entire stack frame by saving the remaining registers. */
 
-    LOAD    t0, TX_THREAD_STACK_PTR(t1)                 // Pickup thread's stack pointer
+    LOAD    sp, TX_THREAD_STACK_PTR(t1)
     ori     t3, x0, 1                                   // Build interrupt stack type
-    STORE   t3, 0(t0)                                   // Store stack type
-
+    STORE   t3, 0(sp)                                   // Store stack type
     /* Store floating point preserved registers.  */
 #if defined(__riscv_flen)
-    LOAD    t2, TX_STACK_OFFSET_MSTATUS(t0)             // Pickup thread's floating point state */
+    LOAD    t2, TX_STACK_OFFSET_MSTATUS(sp)             // Pickup thread's floating point state */
     /* Check if floating point is enabled */
     srli    t2, t2, 13
     andi    t2, t2, 0x3
     beqz    t2, _tx_thread_preempt_skip_fp_restore      // Skip floating point restore FS is Off
 #if __riscv_flen == 32
-    fsw     f8,  TX_STACK_OFFSET_F8(t0)                 // Store fs0
-    fsw     f9,  TX_STACK_OFFSET_F9(t0)                 // Store fs1
-    fsw     f18, TX_STACK_OFFSET_F18(t0)                // Store fs2
-    fsw     f19, TX_STACK_OFFSET_F19(t0)                // Store fs3
-    fsw     f20, TX_STACK_OFFSET_F20(t0)                // Store fs4
-    fsw     f21, TX_STACK_OFFSET_F21(t0)                // Store fs5
-    fsw     f22, TX_STACK_OFFSET_F22(t0)                // Store fs6
-    fsw     f23, TX_STACK_OFFSET_F23(t0)                // Store fs7
-    fsw     f24, TX_STACK_OFFSET_F24(t0)                // Store fs8
-    fsw     f25, TX_STACK_OFFSET_F25(t0)                // Store fs9
-    fsw     f26, TX_STACK_OFFSET_F26(t0)                // Store fs10
-    fsw     f27, TX_STACK_OFFSET_F27(t0)                // Store fs11
+    fsw     f8,  TX_STACK_OFFSET_F8(sp)                 // Store fs0
+    fsw     f9,  TX_STACK_OFFSET_F9(sp)                 // Store fs1
+    fsw     f18, TX_STACK_OFFSET_F18(sp)                // Store fs2
+    fsw     f19, TX_STACK_OFFSET_F19(sp)                // Store fs3
+    fsw     f20, TX_STACK_OFFSET_F20(sp)                // Store fs4
+    fsw     f21, TX_STACK_OFFSET_F21(sp)                // Store fs5
+    fsw     f22, TX_STACK_OFFSET_F22(sp)                // Store fs6
+    fsw     f23, TX_STACK_OFFSET_F23(sp)                // Store fs7
+    fsw     f24, TX_STACK_OFFSET_F24(sp)                // Store fs8
+    fsw     f25, TX_STACK_OFFSET_F25(sp)                // Store fs9
+    fsw     f26, TX_STACK_OFFSET_F26(sp)                // Store fs10
+    fsw     f27, TX_STACK_OFFSET_F27(sp)                // Store fs11
 #elif __riscv_flen == 64
-    fsd     f8,  TX_STACK_OFFSET_F8(t0)                 // Store fs0
-    fsd     f9,  TX_STACK_OFFSET_F9(t0)                 // Store fs1
-    fsd     f18, TX_STACK_OFFSET_F18(t0)                // Store fs2
-    fsd     f19, TX_STACK_OFFSET_F19(t0)                // Store fs3
-    fsd     f20, TX_STACK_OFFSET_F20(t0)                // Store fs4
-    fsd     f21, TX_STACK_OFFSET_F21(t0)                // Store fs5
-    fsd     f22, TX_STACK_OFFSET_F22(t0)                // Store fs6
-    fsd     f23, TX_STACK_OFFSET_F23(t0)                // Store fs7
-    fsd     f24, TX_STACK_OFFSET_F24(t0)                // Store fs8
-    fsd     f25, TX_STACK_OFFSET_F25(t0)                // Store fs9
-    fsd     f26, TX_STACK_OFFSET_F26(t0)                // Store fs10
-    fsd     f27, TX_STACK_OFFSET_F27(t0)                // Store fs11
+    fsd     f8,  TX_STACK_OFFSET_F8(sp)                 // Store fs0
+    fsd     f9,  TX_STACK_OFFSET_F9(sp)                 // Store fs1
+    fsd     f18, TX_STACK_OFFSET_F18(sp)                // Store fs2
+    fsd     f19, TX_STACK_OFFSET_F19(sp)                // Store fs3
+    fsd     f20, TX_STACK_OFFSET_F20(sp)                // Store fs4
+    fsd     f21, TX_STACK_OFFSET_F21(sp)                // Store fs5
+    fsd     f22, TX_STACK_OFFSET_F22(sp)                // Store fs6
+    fsd     f23, TX_STACK_OFFSET_F23(sp)                // Store fs7
+    fsd     f24, TX_STACK_OFFSET_F24(sp)                // Store fs8
+    fsd     f25, TX_STACK_OFFSET_F25(sp)                // Store fs9
+    fsd     f26, TX_STACK_OFFSET_F26(sp)                // Store fs10
+    fsd     f27, TX_STACK_OFFSET_F27(sp)                // Store fs11
 #endif
 _tx_thread_preempt_skip_fp_restore:
 #endif
 
     /* Store standard preserved registers.  */
 
-    STORE   x9,  TX_STACK_OFFSET_X9(t0)                 // Store s1
-    STORE   x18, TX_STACK_OFFSET_X18(t0)                // Store s2
-    STORE   x19, TX_STACK_OFFSET_X19(t0)                // Store s3
-    STORE   x20, TX_STACK_OFFSET_X20(t0)                // Store s4
-    STORE   x21, TX_STACK_OFFSET_X21(t0)                // Store s5
-    STORE   x22, TX_STACK_OFFSET_X22(t0)                // Store s6
-    STORE   x23, TX_STACK_OFFSET_X23(t0)                // Store s7
-    STORE   x24, TX_STACK_OFFSET_X24(t0)                // Store s8
-    STORE   x25, TX_STACK_OFFSET_X25(t0)                // Store s9
-    STORE   x26, TX_STACK_OFFSET_X26(t0)                // Store s10
-    STORE   x27, TX_STACK_OFFSET_X27(t0)                // Store s11
+    STORE   x9,  TX_STACK_OFFSET_X9(sp)                 // Store s1
+    STORE   x18, TX_STACK_OFFSET_X18(sp)                // Store s2
+    STORE   x19, TX_STACK_OFFSET_X19(sp)                // Store s3
+    STORE   x20, TX_STACK_OFFSET_X20(sp)                // Store s4
+    STORE   x21, TX_STACK_OFFSET_X21(sp)                // Store s5
+    STORE   x22, TX_STACK_OFFSET_X22(sp)                // Store s6
+    STORE   x23, TX_STACK_OFFSET_X23(sp)                // Store s7
+    STORE   x24, TX_STACK_OFFSET_X24(sp)                // Store s8
+    STORE   x25, TX_STACK_OFFSET_X25(sp)                // Store s9
+    STORE   x26, TX_STACK_OFFSET_X26(sp)                // Store s10
+    STORE   x27, TX_STACK_OFFSET_X27(sp)                // Store s11
                                                         // Note: s0 is already stored!
-
+    STORE   sp, TX_THREAD_STACK_PTR(t1)
     /* Save the remaining time-slice and disable it.  */
     /* if (_tx_timer_time_slice)
     {  */
@@ -391,7 +385,8 @@ _tx_thread_dont_save_ts:
     /* Return to the scheduler.  */
     /* _tx_thread_schedule();  */
 
-    STORE   x0, _tx_thread_current_ptr, t0              // Clear current thread pointer*/
+    la      t0, _tx_thread_current_ptr
+    STORE   x0, 0(t0)                                   // Clear current thread pointer*/
     /* }  */
 
 _tx_thread_idle_system_restore:

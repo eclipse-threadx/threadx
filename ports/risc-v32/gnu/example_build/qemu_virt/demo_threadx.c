@@ -112,7 +112,7 @@ void    tx_application_define(void *first_unused_memory)
 
     tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
             pointer, DEMO_STACK_SIZE,
-            16, 16, 4, TX_AUTO_START);
+            10, 10, 4, TX_AUTO_START);
 
     /* Allocate the stack for thread 3.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
@@ -201,7 +201,7 @@ UINT    status;
         thread_0_counter++;
 
         /* Sleep for 10 ticks.  */
-        tx_thread_sleep(10);
+        tx_thread_sleep(1);
 
         /* Set event flag 0 to wakeup thread 5.  */
         status =  tx_event_flags_set(&event_flags_0, 0x1, TX_OR);

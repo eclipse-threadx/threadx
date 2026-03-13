@@ -156,7 +156,7 @@ else
 end
 
 # Verify Preemption Logic (Thread Priority)
-break tx_thread_context_restore.S:320
+break _tx_thread_preempt_restore
 
 set $max_loops = 5
 set $loop_cnt = 0
@@ -165,18 +165,16 @@ set $found_preemption = 0
 while $loop_cnt < $max_loops
   continue
   set $loop_cnt = $loop_cnt + 1
-  
-  print "Hit Preemption Restore Path"
+
 
   set $curr_ptr = _tx_thread_current_ptr
   set $exec_ptr = _tx_thread_execute_ptr
 
   if $curr_ptr != 0 && $exec_ptr != 0
+    print "Preemption Check: Current Prio=%d, Exec Prio=%d", $curr_ptr->tx_thread_priority, $exec_ptr->tx_thread_priority
     set $curr_prio = $curr_ptr->tx_thread_priority
     set $exec_prio = $exec_ptr->tx_thread_priority
 
-    print $curr_prio
-    print $exec_prio
 
     if $exec_prio < $curr_prio
       print "SUCCESS: Thread Preemption Verified."
