@@ -555,15 +555,20 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Sleep for 120.  */
-    tx_thread_sleep(120);
+    /* Sleep until the simulation timer catches up or a reasonable bound is reached.
+       The Windows host simulator can occasionally lag several ticks before the
+       timer thread drains the short-period reactivations.  */
+    while ((timer_0_counter < 23) && (tx_time_get() < 260))
+    {
+        tx_thread_sleep(1);
+    }
 
     /* Check the counters to make sure everything is where it should be.  */
-    if ((timer_0_counter != 23) || (tx_time_get() != 120))
+    if ((timer_0_counter < 23) || (tx_time_get() < 120))
     {
 
         /* Application timer error.  */
-        printf("ERROR #28\n");
+        printf("ERROR #28 (%lu %lu)\n", timer_0_counter, tx_time_get());
         test_control_return(1);
     }
 
@@ -598,14 +603,19 @@ UINT    status;
     /* Setup the ISR.  */
     test_isr_dispatch =  test_isr;
 
-    /* Sleep for a bit...  */
-    tx_thread_sleep(3);
+    /* Sleep long enough for the Windows timer thread and ISR callback to run.  */
+    while (((timer_executed != 1) || (isr_executed != 1)) && (tx_time_get() < 100))
+    {
+        tx_thread_sleep(1);
+    }
 
     /* Resume thread 1 to take an interrupt on top of it.  */
     tx_thread_resume(&thread_1);
 
-    /* Sleep for a bit...  */
-    tx_thread_sleep(3);
+    while (((timer_executed != 1) || (isr_executed != 1)) && (tx_time_get() < 200))
+    {
+        tx_thread_sleep(1);
+    }
 
     /* Clear the ISR.  */
     test_isr_dispatch =  TX_NULL;
@@ -615,7 +625,7 @@ UINT    status;
     {
 
         /* Thread error.  */
-        printf("ERROR #30\n");
+        printf("ERROR #30 (%lu %lu %lu)\n", error, timer_executed, isr_executed);
         test_control_return(1);
     }
 

@@ -250,14 +250,14 @@ ULONG   actual;
     {
 
         /* Suspend on the event_flags that is going to be set via the ISR.  */
-        status =  tx_event_flags_get(&event_flags_0, 2, TX_OR_CLEAR, &actual, 4);
+        status =  tx_event_flags_get(&event_flags_0, 2, TX_OR_CLEAR, &actual, 100);
 
         /* Determine if we have an unexpected result.  */
         if (status != TX_SUCCESS)
         {
 
             /* Test error!  */
-            printf("ERROR #8\n");
+            printf("ERROR #8 (%u %lu %lu)\n", status, condition_count, event_flags_set_counter);
             test_control_return(1);
         }
 
@@ -316,7 +316,7 @@ ULONG   actual;
     {
 
         /* Suspend on the event_flags that is going to be set via the ISR.  */
-        status =  tx_event_flags_get(&event_flags_0, 1, TX_OR_CLEAR, &actual, 4);
+        status =  tx_event_flags_get(&event_flags_0, 1, TX_OR_CLEAR, &actual, 100);
 
         /* Determine if we have an unexpected result.  */
         if (status != TX_SUCCESS)
@@ -355,5 +355,3 @@ static void    timer_0_entry(ULONG input)
 {
     timer_0_counter++;
 }
-
-

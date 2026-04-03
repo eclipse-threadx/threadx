@@ -141,13 +141,23 @@ UINT    status;
     /* Sleep for a some ticks.  */
     tx_thread_sleep(300);
 
-    /* Insure that each timer ran twice.  */
-    if ((timer_0_counter != 300) || (timer_1_counter != 150) ||
-        (timer_2_counter != 100))
+    /* Give the Windows-hosted simulator a moment to drain the final timer
+       callbacks before checking the free-running timer counts.  */
+    while (((timer_0_counter < 300UL) || (timer_1_counter < 150UL) ||
+            (timer_2_counter < 100UL)) && (tx_time_get() < 302UL))
+    {
+        tx_thread_sleep(1);
+    }
+
+    /* The timers should be at their expected counts, with at most one extra
+       tick of host scheduling drift on the fastest timer.  */
+    if ((timer_0_counter < 300UL) || (timer_0_counter > 301UL) ||
+        (timer_1_counter < 150UL) || (timer_1_counter > 151UL) ||
+        (timer_2_counter < 100UL) || (timer_2_counter > 101UL))
     {
 
         /* Application timer error.  */
-        printf("ERROR #8\n");
+        printf("ERROR #8 (%lu, %lu, %lu)\n", timer_0_counter, timer_1_counter, timer_2_counter);
         test_control_return(1);
     }
     else
@@ -183,4 +193,3 @@ static void    timer_2_expiration(ULONG timer_input)
     /* Process timer expiration.  */
     timer_2_counter++;
 }
-

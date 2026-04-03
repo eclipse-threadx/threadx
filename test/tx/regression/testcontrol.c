@@ -122,6 +122,14 @@ typedef  struct TEST_ENTRY_STRUCT
 VOID        (*test_entry)(void *);
 } TEST_ENTRY;
 
+#ifdef _MSC_VER
+#if defined(_M_IX86)
+#define TX_TEST_LINKER_ALIAS(symbol, default_symbol) __pragma(comment(linker, "/alternatename:_" #symbol "=_" #default_symbol))
+#else
+#define TX_TEST_LINKER_ALIAS(symbol, default_symbol) __pragma(comment(linker, "/alternatename:" #symbol "=" #default_symbol))
+#endif
+#endif
+
 
 /* Define the prototypes for the test entry points.  */
 
@@ -430,8 +438,37 @@ static void   init_timer_entry(ULONG timer_input)
 
 void delete_timer_thread(void)
 {
+#if defined(_WIN32)
+HANDLE  threadhandle;
+HANDLE  threadrunsemaphore;
+#endif
 
     _tx_thread_terminate(&_tx_timer_thread);
+
+#if defined(_WIN32)
+    if (_tx_thread_current_ptr == TX_NULL)
+    {
+
+        /* The Windows simulator creates the host thread before the scheduler can run it.
+           Tear it down directly so the regression hook can force the retry path safely.  */
+        threadhandle =       _tx_timer_thread.tx_thread_win32_thread_handle;
+        threadrunsemaphore = _tx_timer_thread.tx_thread_win32_thread_run_semaphore;
+
+        if (threadhandle != ((HANDLE) 0))
+        {
+            (void)TerminateThread(threadhandle, 0U);
+            (void)CloseHandle(threadhandle);
+            _tx_timer_thread.tx_thread_win32_thread_handle = ((HANDLE) 0);
+        }
+
+        if (threadrunsemaphore != ((HANDLE) 0))
+        {
+            (void)CloseHandle(threadrunsemaphore);
+            _tx_timer_thread.tx_thread_win32_thread_run_semaphore = ((HANDLE) 0);
+        }
+    }
+#endif
+
     _tx_thread_delete(&_tx_timer_thread);
 }
 
@@ -482,7 +519,6 @@ UINT        i, j;
 #if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
 TX_THREAD   *thread_ptr;
 #endif
-
 
     /* Initialize the test error/success counters.  */
     test_control_successful_tests =  0;
@@ -565,6 +601,7 @@ TX_THREAD   *thread_ptr;
     /* Clear the ISR dispatch.  */
     test_isr_dispatch =  TX_NULL;
 
+
     /* Ensure that _tx_thread_time_slice can handle NULL thread, note that current thread pointer is NULL at this point.  */
     _tx_thread_time_slice();
 
@@ -586,7 +623,7 @@ TX_THREAD   *thread_ptr;
     init_test_thread.tx_thread_ready_previous =                     &init_test_thread;
     _tx_thread_time_slice();
     _tx_thread_current_ptr =  TX_NULL;
-
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
     /* Test to make sure _tx_thread_shell_entry can handle a NULL mutex release function pointer.  */
     temp_mutex_release =  _tx_thread_mutex_release;
     temp_thread =         _tx_thread_execute_ptr;
@@ -605,6 +642,7 @@ TX_THREAD   *thread_ptr;
     _tx_thread_current_ptr =  TX_NULL;
     _tx_thread_execute_ptr =  temp_thread;
     _tx_thread_mutex_release =  temp_mutex_release;     /* Recover Mutex release pointer.  */
+#endif
 
     /* Test _tx_thread_system_suspend when not current, preemption is needed but disabled.  */
     temp_thread =         _tx_thread_execute_ptr;
@@ -1413,6 +1451,25 @@ void   test_exit_notify(TX_THREAD *thread_ptr, UINT type)
 }
 
 
+#ifdef _MSC_VER
+void  abort_all_threads_suspended_on_mutex(void);
+void  tx_test_default_abort_all_threads_suspended_on_mutex(void)
+{
+}
+TX_TEST_LINKER_ALIAS(abort_all_threads_suspended_on_mutex, tx_test_default_abort_all_threads_suspended_on_mutex)
+
+void  suspend_lowest_priority(void);
+void  tx_test_default_suspend_lowest_priority(void)
+{
+}
+TX_TEST_LINKER_ALIAS(suspend_lowest_priority, tx_test_default_suspend_lowest_priority)
+
+void abort_and_resume_byte_allocating_thread(void);
+void tx_test_default_abort_and_resume_byte_allocating_thread(void)
+{
+}
+TX_TEST_LINKER_ALIAS(abort_and_resume_byte_allocating_thread, tx_test_default_abort_and_resume_byte_allocating_thread)
+#else
 __attribute__((weak)) void  abort_all_threads_suspended_on_mutex(void)
 {
 }
@@ -1424,3 +1481,7 @@ __attribute__((weak)) void  suspend_lowest_priority(void)
 __attribute__((weak)) void abort_and_resume_byte_allocating_thread(void)
 {
 }
+#endif
+
+
+

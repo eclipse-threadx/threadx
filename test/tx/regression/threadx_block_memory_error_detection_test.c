@@ -2,6 +2,7 @@
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 
 static unsigned long   thread_0_counter =  0;
 static TX_THREAD       thread_0;
@@ -49,18 +50,18 @@ INT     status;
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
     /* Create block pool 0.  */
-    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, 340);
-    pointer = pointer + 340;
+    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
+    pointer = pointer + TX_TEST_BLOCK_POOL_BYTES(100, 3);
 
 #ifndef TX_DISABLE_ERROR_CHECKING   /* skip this test and pretend it passed */
 
     /* Create block pool again to get pool_ptr error.  */
-    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, 320);
+    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
     if (status != TX_POOL_ERROR)
         return;
 
     /* Create block pool with NULL pointer.  */
-    status =  tx_block_pool_create(TX_NULL, "pool 0", 100, pointer, 320);
+    status =  tx_block_pool_create(TX_NULL, "pool 0", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
     if (status != TX_POOL_ERROR)
     {
 
@@ -69,7 +70,7 @@ INT     status;
     }
 
     /* Create block pool pointer if NULL start.  */
-    status =  tx_block_pool_create(&pool_1, "pool 0", 100, NULL, 320);
+    status =  tx_block_pool_create(&pool_1, "pool 0", 100, NULL, TX_TEST_BLOCK_POOL_BYTES(100, 3));
     if (status != TX_PTR_ERROR)
     {
 
@@ -128,11 +129,11 @@ INT     i;
 
 #ifndef TX_DISABLE_ERROR_CHECKING   /* skip this test and pretend it passed */
 
-    status =  tx_block_pool_create(&pool_1, "pool 1", 100, pointer, 340);
-    pointer = pointer + 340;
+    status =  tx_block_pool_create(&pool_1, "pool 1", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
+    pointer = pointer + TX_TEST_BLOCK_POOL_BYTES(100, 3);
 
     /* Attempt to create a pool with an invalid size.  */
-    status =  _txe_block_pool_create(&pool_2, "pool 2", 100, pointer, 320, 777777);
+    status =  _txe_block_pool_create(&pool_2, "pool 2", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3), 777777);
     if (status != TX_POOL_ERROR)
     {
 
@@ -384,4 +385,3 @@ INT     i;
     printf("SUCCESS!\n");
     test_control_return(0);
 }
-
