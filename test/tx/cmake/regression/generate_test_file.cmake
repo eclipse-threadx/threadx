@@ -6,34 +6,34 @@ if(NOT DEFINED OUTPUT_FILE)
     message(FATAL_ERROR "OUTPUT_FILE is required")
 endif()
 
-file(READ "${SOURCE_FILE}" FILE_CONTENTS)
+file(STRINGS "${SOURCE_FILE}" FILE_LINES)
 
-set(TIMER_CALL_BLOCK
-"    /* Call the ThreadX system timer interrupt processing.  */\n    _tx_timer_interrupt();")
-set(TIMER_CALL_BLOCK_REPLACEMENT
-"    test_interrupt_dispatch();\n\n    /* Call the ThreadX system timer interrupt processing.  */\n    _tx_timer_interrupt();")
+set(UPDATED_FILE_CONTENTS "")
+set(DISPATCH_DECLARATION "VOID                            test_interrupt_dispatch(VOID);")
+set(DISPATCH_CALL "test_interrupt_dispatch();")
+set(DECLARATION_INSERTED FALSE)
+set(CALL_INSERTED FALSE)
 
-string(REPLACE "${TIMER_CALL_BLOCK}" "${TIMER_CALL_BLOCK_REPLACEMENT}" UPDATED_FILE_CONTENTS "${FILE_CONTENTS}")
+foreach(FILE_LINE IN LISTS FILE_LINES)
+    if((NOT DECLARATION_INSERTED) AND
+       ((FILE_LINE MATCHES "^void[ \t]+\\*_tx_linux_timer_interrupt\\(void \\*p\\);[ \t]*$")
+        OR
+        (FILE_LINE MATCHES "^VOID CALLBACK[ \t]+_tx_win32_timer_interrupt\\(UINT wTimerID, UINT msg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2\\);[ \t]*$")))
+        string(APPEND UPDATED_FILE_CONTENTS "${FILE_LINE}\n${DISPATCH_DECLARATION}\n")
+        set(DECLARATION_INSERTED TRUE)
+    elseif((NOT CALL_INSERTED) AND (FILE_LINE MATCHES "^([ \t]*)_tx_timer_interrupt\\(\\);[ \t]*$"))
+        string(APPEND UPDATED_FILE_CONTENTS "${CMAKE_MATCH_1}${DISPATCH_CALL}\n${FILE_LINE}\n")
+        set(CALL_INSERTED TRUE)
+    else()
+        string(APPEND UPDATED_FILE_CONTENTS "${FILE_LINE}\n")
+    endif()
+endforeach()
 
-if(UPDATED_FILE_CONTENTS STREQUAL FILE_CONTENTS)
+if(NOT CALL_INSERTED)
     message(FATAL_ERROR "Unable to insert test interrupt dispatcher call into ${SOURCE_FILE}")
 endif()
 
-set(FILE_CONTENTS "${UPDATED_FILE_CONTENTS}")
-
-set(LINUX_DECLARATION "void               *_tx_linux_timer_interrupt(void *p);")
-set(WINDOWS_DECLARATION "VOID CALLBACK                   _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2);")
-set(DISPATCH_DECLARATION "VOID                            test_interrupt_dispatch(VOID);")
-
-if(FILE_CONTENTS MATCHES "_tx_linux_timer_interrupt")
-    string(REPLACE "${LINUX_DECLARATION}" "${LINUX_DECLARATION}\n${DISPATCH_DECLARATION}" UPDATED_FILE_CONTENTS "${FILE_CONTENTS}")
-elseif(FILE_CONTENTS MATCHES "_tx_win32_timer_interrupt")
-    string(REPLACE "${WINDOWS_DECLARATION}" "${WINDOWS_DECLARATION}\n${DISPATCH_DECLARATION}" UPDATED_FILE_CONTENTS "${FILE_CONTENTS}")
-else()
-    message(FATAL_ERROR "Unsupported timer interrupt source file: ${SOURCE_FILE}")
-endif()
-
-if(UPDATED_FILE_CONTENTS STREQUAL FILE_CONTENTS)
+if(NOT DECLARATION_INSERTED)
     message(FATAL_ERROR "Unable to insert test interrupt dispatcher declaration into ${SOURCE_FILE}")
 endif()
 
