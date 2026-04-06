@@ -221,7 +221,13 @@ function Invoke-ProcessWithTimeout {
         $completed = $true
     }
     else {
-        $completed = $null -ne (Wait-Process -Id $process.Id -Timeout $TimeoutSeconds -ErrorAction SilentlyContinue)
+        try {
+            $process | Wait-Process -Timeout $TimeoutSeconds -ErrorAction Stop
+            $completed = $true
+        }
+        catch {
+            $completed = $false
+        }
     }
 
     if (-not $completed) {
@@ -237,6 +243,15 @@ function Invoke-ProcessWithTimeout {
         Completed = $true
         ExitCode = $process.ExitCode
     }
+}
+
+function Test-IsNinjaBuildDirectory {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$BuildDir
+    )
+
+    return (Test-Path -LiteralPath (Join-Path $BuildDir 'build.ninja'))
 }
 
 function Get-NinjaBuildStatements {
@@ -330,26 +345,12 @@ function Get-PendingNinjaCommands {
         [string]$BuildDir
     )
 
-    $commandFile = Join-Path $BuildDir 'ninja_commands.txt'
-
-    Push-Location $BuildDir
-    try {
-        if (Test-Path -LiteralPath $commandFile) {
-            Remove-Item -LiteralPath $commandFile -Force
-        }
-
-        cmd.exe /c "ninja -t commands > `"$commandFile`""
-
-        $commandLines = Get-Content -LiteralPath $commandFile | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
-        return $commandLines
+    $commandLines = & ninja -C $BuildDir -t commands
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to enumerate pending Ninja commands in $BuildDir"
     }
-    finally {
-        if (Test-Path -LiteralPath $commandFile) {
-            Remove-Item -LiteralPath $commandFile -Force
-        }
 
-        Pop-Location
-    }
+    return $commandLines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
 }
 
 function Invoke-NinjaFallbackBuild {
@@ -400,30 +401,56 @@ function Invoke-CMakeBuild {
     )
 
     Remove-NinjaLock -Path $BuildDir
+    $isNinjaBuild = Test-IsNinjaBuildDirectory -BuildDir $BuildDir
 
     if ($TimeoutSeconds -le 0) {
-        Invoke-NativeCommand -FilePath 'cmake' -Arguments @(
-            '--build', $BuildDir,
-            '--parallel', $Parallel.ToString()
-        )
+        if ($isNinjaBuild) {
+            Invoke-NativeCommand -FilePath 'ninja' -Arguments @(
+                '-C', $BuildDir,
+                '-j', $Parallel.ToString()
+            )
+        }
+        else {
+            Invoke-NativeCommand -FilePath 'cmake' -Arguments @(
+                '--build', $BuildDir,
+                '--parallel', $Parallel.ToString()
+            )
+        }
         return
     }
 
-    $buildResult = Invoke-ProcessWithTimeout -FilePath 'cmake' -Arguments @(
-        '--build', $BuildDir,
-        '--parallel', $Parallel.ToString()
-    ) -TimeoutSeconds $TimeoutSeconds
+    if ($isNinjaBuild) {
+        $buildToolName = 'Ninja'
+        $buildResult = Invoke-ProcessWithTimeout -FilePath 'ninja' -Arguments @(
+            '-C', $BuildDir,
+            '-j', $Parallel.ToString()
+        ) -TimeoutSeconds $TimeoutSeconds
+    }
+    else {
+        $buildToolName = 'CMake'
+        $buildResult = Invoke-ProcessWithTimeout -FilePath 'cmake' -Arguments @(
+            '--build', $BuildDir,
+            '--parallel', $Parallel.ToString()
+        ) -TimeoutSeconds $TimeoutSeconds
+    }
 
     if ($buildResult.Completed -and ($buildResult.ExitCode -eq 0)) {
         return
     }
 
-    if (-not $buildResult.Completed) {
-        Write-Warning "CMake build timed out after $TimeoutSeconds seconds in $BuildDir. Replaying pending Ninja commands from PowerShell."
+    if (-not $isNinjaBuild) {
+        if (-not $buildResult.Completed) {
+            throw "$buildToolName build timed out after $TimeoutSeconds seconds in $BuildDir"
+        }
+
+        throw "$buildToolName build failed with exit code $($buildResult.ExitCode) in $BuildDir"
     }
-    else {
-        Write-Warning "CMake build failed with exit code $($buildResult.ExitCode) in $BuildDir. Replaying pending Ninja commands from PowerShell."
+
+    if ($buildResult.Completed) {
+        throw "$buildToolName build failed with exit code $($buildResult.ExitCode) in $BuildDir"
     }
+
+    Write-Warning "$buildToolName build timed out after $TimeoutSeconds seconds in $BuildDir. Replaying pending Ninja commands from PowerShell."
 
     Remove-NinjaLock -Path $BuildDir
     Invoke-NinjaFallbackBuild -BuildDir $BuildDir

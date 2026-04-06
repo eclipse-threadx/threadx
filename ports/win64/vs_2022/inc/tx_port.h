@@ -553,6 +553,7 @@ extern  CHAR                    _tx_version_id[];
 
 extern TX_WIN32_CRITICAL_SECTION                _tx_win32_critical_section;
 extern HANDLE                                   _tx_win32_scheduler_semaphore;
+extern HANDLE                                   _tx_win32_scheduler_wake_event;
 extern DWORD                                    _tx_win32_scheduler_id;
 extern ULONG                                    _tx_win32_global_int_disabled_flag;
 extern LARGE_INTEGER                            _tx_win32_time_stamp;
@@ -565,6 +566,8 @@ extern LARGE_INTEGER                            _tx_win32_time_stamp;
 #ifndef TX_WIN32_MEMORY_SIZE
 #define TX_WIN32_MEMORY_SIZE                    64000
 #endif
+
+VOID                                            _tx_win32_scheduler_wake(VOID);
 
 #ifndef TX_TIMER_PERIODIC
 #ifdef TX_WIN32_SLOW_TIMER
