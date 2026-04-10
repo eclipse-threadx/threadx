@@ -181,7 +181,11 @@ To enable interrupt/exception hooks, compile the RTOS with '-DXT_INTEXC_HOOKS'.
 #define XT_INTEXC_HOOK_NUM  (1 + XCHAL_NUM_INTLEVELS + XCHAL_HAVE_NMI)
 
 #ifndef __ASSEMBLER__
+#if XCHAL_HAVE_XEA2 && (XCHAL_NUM_INTERRUPTS > 32)
+typedef uint32_t (*XT_INTEXC_HOOK)(uint32_t cause, uint32_t block);
+#else
 typedef uint32_t (*XT_INTEXC_HOOK)(uint32_t cause);
+#endif
 extern  volatile XT_INTEXC_HOOK _xt_intexc_hooks[XT_INTEXC_HOOK_NUM];
 #endif
 

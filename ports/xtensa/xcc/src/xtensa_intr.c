@@ -1,5 +1,5 @@
 /*******************************************************************************
-Copyright (c) 2006-2019 Cadence Design Systems Inc.
+Copyright (c) 2006-2023 Cadence Design Systems Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -80,7 +80,7 @@ xt_exc_handler xt_set_exception_handler(uint32_t n, xt_exc_handler f)
 
 #if XCHAL_HAVE_INTERRUPTS
 
-#if XCHAL_HAVE_XEA2
+#if XCHAL_HAVE_XEA2 && (XCHAL_NUM_INTERRUPTS <= 32)
 /* Defined in xtensa_intr_asm.S */
 extern uint32_t _xt_intenable;
 extern uint32_t _xt_vpri_mask;
@@ -157,7 +157,7 @@ xt_handler xt_set_interrupt_handler(uint32_t n, xt_handler f, void * arg)
 */
 void xt_interrupt_enable(uint32_t intnum)
 {
-#if XCHAL_HAVE_XEA2
+#if XCHAL_HAVE_XEA2 && (XCHAL_NUM_INTERRUPTS <= 32)
     uint32_t ps = XT_RSIL(15);
 
     // New INTENABLE = (_xt_intenable | mask) & _xt_vpri_mask.
@@ -177,7 +177,7 @@ void xt_interrupt_enable(uint32_t intnum)
 */
 void xt_interrupt_disable(uint32_t intnum)
 {
-#if XCHAL_HAVE_XEA2
+#if XCHAL_HAVE_XEA2 && (XCHAL_NUM_INTERRUPTS <= 32)
     uint32_t ps = XT_RSIL(15);
 
     // New INTENABLE = (_xt_intenable & ~mask) & _xt_vpri_mask.

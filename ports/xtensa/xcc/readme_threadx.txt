@@ -382,7 +382,8 @@ Application Defines (preprocessor macros definable with the -D option):
                             higher bit numbers over those with lower bit
                             numbers at the same level. This works only for
                             low and medium priority interrupts that can be
-                            dispatched to C handlers.
+                            dispatched to C handlers on either NX cores or 
+                            on LX cores with 32 or fewer interrupts.
 
     TX_SYSTEM_STACK_SIZE=n  Specify the size of the interrupt stack, which
                             is the stack that all interrupt handlers switch

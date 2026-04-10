@@ -388,6 +388,10 @@ XSTRUCT_END(XtExcFrame)
 #define XT_USE_INT_WRAPPER    0
 #endif
 
+#if XCHAL_HAVE_XEA2 && (XCHAL_NUM_INTERRUPTS > 32) && (defined XT_USE_SWPRI)
+#error "Software prioritization of interrupts (XT_USE_SWPRI) not supported for XEA2 with > 32 interrupts."
+#endif
+
 #if XCHAL_HAVE_XEA3
 #ifdef XT_USE_SWPRI
 //#warning "Software prioritization of interrupts (XT_USE_SWPRI) not supported for XEA3."

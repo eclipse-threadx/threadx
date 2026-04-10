@@ -66,6 +66,8 @@ TX_MUTEX  clib_lock_mutex;
 void
 __malloc_lock (struct _reent * ptr)
 {
+    (void) ptr;
+
     if (_tx_thread_system_state != TX_INITIALIZE_IS_FINISHED) {
         return;
     }
@@ -80,6 +82,8 @@ __malloc_lock (struct _reent * ptr)
 void
 __malloc_unlock (struct _reent * ptr)
 {
+    (void) ptr;
+
     if (_tx_thread_system_state != TX_INITIALIZE_IS_FINISHED) {
         return;
     }
@@ -99,6 +103,8 @@ __malloc_unlock (struct _reent * ptr)
 void
 __env_lock (struct _reent * ptr)
 {
+    (void) ptr;
+
     if (_tx_thread_system_state != TX_INITIALIZE_IS_FINISHED) {
         return;
     }
@@ -113,6 +119,8 @@ __env_lock (struct _reent * ptr)
 void
 __env_unlock (struct _reent * ptr)
 {
+    (void) ptr;
+
     if (_tx_thread_system_state != TX_INITIALIZE_IS_FINISHED) {
         return;
     }
