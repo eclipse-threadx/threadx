@@ -1,4 +1,4 @@
-﻿                     Microsoft's Azure RTOS ThreadX for Cortex-M52
+                     Microsoft's Azure RTOS ThreadX for Cortex-M52
 
                               Using the AC6 Tools in Keil uVision
 
