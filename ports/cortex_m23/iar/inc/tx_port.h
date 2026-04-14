@@ -399,6 +399,7 @@ __istate_t interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
     *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    __asm__ volatile ("dsb 0xF \n isb 0xF " : : : "memory");
     if (__get_IPSR() == 0)
     {
         interrupt_save = __get_interrupt_state();

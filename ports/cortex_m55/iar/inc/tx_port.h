@@ -579,6 +579,7 @@ UINT interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
     *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    __asm__ volatile ("dsb 0xF \n isb 0xF " : : : "memory");
     if (_tx_ipsr_get() == 0)
     {
         interrupt_save = __get_interrupt_posture();
