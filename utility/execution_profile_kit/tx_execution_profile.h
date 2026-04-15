@@ -56,9 +56,15 @@ typedef unsigned long                   EXECUTION_TIME_SOURCE_TYPE;
 
 /* Define basic constants for the execution profile kit.  */
 
-/*  Example for Cortex-M targets:  */
+/* Xtensa target definition */
 #ifndef TX_EXECUTION_TIME_SOURCE
-#define TX_EXECUTION_TIME_SOURCE         (EXECUTION_TIME_SOURCE_TYPE) *((volatile ULONG *) 0xE0001004)
+#include <xtensa/config/core.h>
+#if XCHAL_HAVE_CCOUNT
+#include <xtensa/tie/xt_timer.h>
+#define TX_EXECUTION_TIME_SOURCE         (EXECUTION_TIME_SOURCE_TYPE) XT_RSR_CCOUNT()
+#else
+#define TX_EXECUTION_TIME_SOURCE         0
+#endif
 #endif
 #ifndef TX_EXECUTION_MAX_TIME_SOURCE
 #define TX_EXECUTION_MAX_TIME_SOURCE     0xFFFFFFFF

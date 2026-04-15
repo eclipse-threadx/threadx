@@ -340,7 +340,10 @@ typedef unsigned short                          USHORT;
 #define TX_THREAD_EXTENSION_2
 
 /* Execution profile related */
-#define TX_THREAD_EXTENSION_3
+#define TX_THREAD_EXTENSION_3 \
+    unsigned long long  tx_thread_execution_time_total; \
+    unsigned long       tx_thread_execution_time_last_start;
+
 
 /* Define the port extensions of the remaining ThreadX objects.  */
 
