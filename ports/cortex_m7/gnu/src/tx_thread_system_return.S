@@ -85,10 +85,12 @@ _tx_thread_system_return:
     MOV     r0, #0
     MSR     BASEPRI, r0                             // Enable interrupts
     MSR     BASEPRI, r1                             // Restore original interrupt posture
+    ISB     #0xF                                    // Flush pipeline
 #else
     MRS     r1, PRIMASK                             // Thread context returning, pickup PRIMASK
     CPSIE   i                                       // Enable interrupts
     MSR     PRIMASK, r1                             // Restore original interrupt posture
+    ISB     #0xF                                    // Flush pipeline
 #endif
 _isr_context:
     BX      lr                                      // Return to caller

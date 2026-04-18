@@ -591,6 +591,7 @@ UINT interrupt_save;
         __enable_interrupts();
 #endif
         __restore_interrupt(interrupt_save);
+        __asm__ volatile ("isb 0xF " : : : "memory");
     }
 }
 

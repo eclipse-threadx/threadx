@@ -330,6 +330,7 @@ unsigned int interrupt_save;
         interrupt_save = __get_primask_value();
         __enable_interrupts();
         __restore_interrupts(interrupt_save);
+        __asm__ volatile ("isb 0xF " : : : "memory");
     }
 }
 
