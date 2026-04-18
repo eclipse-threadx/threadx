@@ -176,10 +176,9 @@ _tx_thread_context_restore:
 
     csrr    t1, mstatus
     li      t2, 0x1880                                  // Set MPP(0x1800) | MPIE(0x80)
-    li      t3, ~0x8                                    // Preserve all bits except MIE
 
-    or      t1, t1, t2                                  // MPP and MPIE are now set
-    and     t1, t1, t2                                  // Clear MIE, Hardware will restore it from MPIE
+    or      t1, t1, t2                                  // MPP and MPIE are now set. All other bits are preserved
+    andi    t1, t1, ~0x8                                // Clear MIE, Hardware will restore it from MPIE
 
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     li      t0, 0x2000                                  // Set FS bits (bits 14:13 to 01) for FP state
@@ -351,10 +350,9 @@ _tx_thread_no_preempt_restore:
 
     csrr    t1, mstatus
     li      t2, 0x1880                                  // Set MPP(0x1800) | MPIE(0x80)
-    li      t3, ~0x8                                    // Preserve all bits except MIE
 
-    or      t1, t1, t2                                  // MPP and MPIE are now set
-    and     t1, t1, t2                                  // Clear MIE, Hardware will restore it from MPIE
+    or      t1, t1, t2                                  // MPP and MPIE are now set. All other bits are preserved
+    andi    t1, t1, ~0x8                                // Clear MIE, Hardware will restore it from MPIE
 
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     li      t0, 0x2000                                  // Set FS bits for FP state
