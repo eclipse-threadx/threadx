@@ -29,6 +29,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -96,6 +97,15 @@ _tx_thread_context_save:
     sw      t5, 14*4(sp)                         // Store t5
     sw      t6, 13*4(sp)                         // Store t6
 
+    /* Save mstatus and skip FP state if FS is Off.  */
+    csrr    t0, mstatus
+    sw      t0, 29*4(sp)
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    srli    t1, t0, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_skip_fpu_save
+#endif
+
     /* Save floating point registers.  */
 #if defined(__riscv_float_abi_single)
     fsw     f0,  31*4(sp)                        // Store ft0
@@ -144,13 +154,10 @@ _tx_thread_context_save:
     csrr    t0, fcsr
     sw      t0, 63*4(sp)                         // Store fcsr
 #endif
+_tx_thread_skip_fpu_save:
 
     csrr    t0, mepc
     sw      t0, 30*4(sp)                         // Save it on the stack
-
-    /* Save mstatus.  */
-    csrr    t0, mstatus
-    sw      t0, 29*4(sp)
 
     la      t1, _tx_thread_current_ptr           // Pickup address of current thread ptr
     lw      t2, 0(t1)                            // Pickup current thread pointer
@@ -190,6 +197,15 @@ _tx_thread_nested_save:
     sw      t5, 14*4(sp)                         // Store t5
     sw      t6, 13*4(sp)                         // Store t6
 
+    /* Save mstatus and skip FP state if FS is Off.  */
+    csrr    t0, mstatus
+    sw      t0, 29*4(sp)
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    srli    t1, t0, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_skip_nested_fpu_save
+#endif
+
     /* Save floating point registers.  */
 #if defined(__riscv_float_abi_single)
     fsw     f0,  31*4(sp)                        // Store ft0
@@ -238,12 +254,10 @@ _tx_thread_nested_save:
     csrr    t0, fcsr
     sw      t0, 63*4(sp)                         // Store fcsr
 #endif
+_tx_thread_skip_nested_fpu_save:
 
     csrr    t0, mepc
     sw      t0, 30*4(sp)                         // Save it on stack
-
-    csrr    t0, mstatus
-    sw      t0, 29*4(sp)
 
     /* Call the ISR execution exit function if enabled.  */
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
