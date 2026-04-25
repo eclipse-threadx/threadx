@@ -10,6 +10,9 @@
 #define     DEMO_BLOCK_POOL_SIZE    100
 #define     DEMO_QUEUE_SIZE         100
 
+/* Shared FPU register exercised by thread_6/7 to validate FP context save/restore.  */
+float           fpu_test_val = 0.0f;
+
 char *_to_str(ULONG val)
 {
     static char buf[11];     /* 10 digits max + '\0' */
@@ -112,7 +115,7 @@ void    tx_application_define(void *first_unused_memory)
 
     tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
             pointer, DEMO_STACK_SIZE,
-            10, 10, 4, TX_AUTO_START);
+            16, 16, 4, TX_AUTO_START);
 
     /* Allocate the stack for thread 3.  */
     tx_byte_allocate(&byte_pool_0, (VOID **) &pointer, DEMO_STACK_SIZE, TX_NO_WAIT);
@@ -336,8 +339,6 @@ ULONG   actual_flags;
             break;
     }
 }
-
-float   fpu_test_val = 0.0f;
 
 void    thread_6_and_7_entry(ULONG thread_input)
 {

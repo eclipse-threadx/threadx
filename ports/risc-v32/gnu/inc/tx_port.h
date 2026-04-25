@@ -30,7 +30,6 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
-/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -48,121 +47,7 @@
 #ifndef TX_PORT_H
 #define TX_PORT_H
 
-#ifdef __ASSEMBLER__
-
-
-#if __riscv_xlen == 64
-# define SLL32    sllw
-# define STORE    sd
-# define LOAD     ld
-# define LWU      lwu
-# define LOG_REGBYTES 3
-#else
-# define SLL32    sll
-# define STORE    sw
-# define LOAD     lw
-# define LWU      lw
-# define LOG_REGBYTES 2
-#endif
-#define REGBYTES (1 << LOG_REGBYTES)
-
-/* Define stack frame offsets for thread context save/restore.
-   These offsets correspond to the layout used in tx_thread_context_save.S
-   and tx_thread_context_restore.S. */
-
-/* General Purpose Registers */
-#define TX_STACK_OFFSET_X1    (28 * REGBYTES)  /* ra */
-#define TX_STACK_OFFSET_X5    (19 * REGBYTES)  /* t0 */
-#define TX_STACK_OFFSET_X6    (18 * REGBYTES)  /* t1 */
-#define TX_STACK_OFFSET_X7    (17 * REGBYTES)  /* t2 */
-#define TX_STACK_OFFSET_X8    (12 * REGBYTES)  /* s0/fp */
-#define TX_STACK_OFFSET_X9    (11 * REGBYTES)  /* s1 */
-#define TX_STACK_OFFSET_X10   (27 * REGBYTES)  /* a0 */
-#define TX_STACK_OFFSET_X11   (26 * REGBYTES)  /* a1 */
-#define TX_STACK_OFFSET_X12   (25 * REGBYTES)  /* a2 */
-#define TX_STACK_OFFSET_X13   (24 * REGBYTES)  /* a3 */
-#define TX_STACK_OFFSET_X14   (23 * REGBYTES)  /* a4 */
-#define TX_STACK_OFFSET_X15   (22 * REGBYTES)  /* a5 */
-#define TX_STACK_OFFSET_X16   (21 * REGBYTES)  /* a6 */
-#define TX_STACK_OFFSET_X17   (20 * REGBYTES)  /* a7 */
-#define TX_STACK_OFFSET_X18   (10 * REGBYTES)  /* s2 */
-#define TX_STACK_OFFSET_X19   (9 * REGBYTES)   /* s3 */
-#define TX_STACK_OFFSET_X20   (8 * REGBYTES)   /* s4 */
-#define TX_STACK_OFFSET_X21   (7 * REGBYTES)   /* s5 */
-#define TX_STACK_OFFSET_X22   (6 * REGBYTES)   /* s6 */
-#define TX_STACK_OFFSET_X23   (5 * REGBYTES)   /* s7 */
-#define TX_STACK_OFFSET_X24   (4 * REGBYTES)   /* s8 */
-#define TX_STACK_OFFSET_X25   (3 * REGBYTES)   /* s9 */
-#define TX_STACK_OFFSET_X26   (2 * REGBYTES)   /* s10 */
-#define TX_STACK_OFFSET_X27   (1 * REGBYTES)   /* s11 */
-#define TX_STACK_OFFSET_X28   (16 * REGBYTES)  /* t3 */
-#define TX_STACK_OFFSET_X29   (15 * REGBYTES)  /* t4 */
-#define TX_STACK_OFFSET_X30   (14 * REGBYTES)  /* t5 */
-#define TX_STACK_OFFSET_X31   (13 * REGBYTES)  /* t6 */
-
-/* Special Registers */
-#define TX_STACK_OFFSET_MSTATUS (29 * REGBYTES)
-#define TX_STACK_OFFSET_MEPC    (30 * REGBYTES)
-#define TX_STACK_OFFSET_FCSR    (63 * REGBYTES)
-
-/* Stack Frame Offsets */
-#define TX_STACK_OFFSET_TYPE    (0 * REGBYTES)
-
-/* Floating Point Registers (F0-F31) */
-/* Note: Base offset for FPU regs is 31 * REGBYTES */
-/* Floating Point Registers (F0-F31) */
-/* Note: Base offset for FPU regs is 31 * REGBYTES */
-#define TX_STACK_OFFSET_F0    (31 * REGBYTES)
-#define TX_STACK_OFFSET_F1    (32 * REGBYTES)
-#define TX_STACK_OFFSET_F2    (33 * REGBYTES)
-#define TX_STACK_OFFSET_F3    (34 * REGBYTES)
-#define TX_STACK_OFFSET_F4    (35 * REGBYTES)
-#define TX_STACK_OFFSET_F5    (36 * REGBYTES)
-#define TX_STACK_OFFSET_F6    (37 * REGBYTES)
-#define TX_STACK_OFFSET_F7    (38 * REGBYTES)
-#define TX_STACK_OFFSET_F8    (39 * REGBYTES)
-#define TX_STACK_OFFSET_F9    (40 * REGBYTES)
-#define TX_STACK_OFFSET_F10   (41 * REGBYTES)
-#define TX_STACK_OFFSET_F11   (42 * REGBYTES)
-#define TX_STACK_OFFSET_F12   (43 * REGBYTES)
-#define TX_STACK_OFFSET_F13   (44 * REGBYTES)
-#define TX_STACK_OFFSET_F14   (45 * REGBYTES)
-#define TX_STACK_OFFSET_F15   (46 * REGBYTES)
-#define TX_STACK_OFFSET_F16   (47 * REGBYTES)
-#define TX_STACK_OFFSET_F17   (48 * REGBYTES)
-#define TX_STACK_OFFSET_F18   (49 * REGBYTES)
-#define TX_STACK_OFFSET_F19   (50 * REGBYTES)
-#define TX_STACK_OFFSET_F20   (51 * REGBYTES)
-#define TX_STACK_OFFSET_F21   (52 * REGBYTES)
-#define TX_STACK_OFFSET_F22   (53 * REGBYTES)
-#define TX_STACK_OFFSET_F23   (54 * REGBYTES)
-#define TX_STACK_OFFSET_F24   (55 * REGBYTES)
-#define TX_STACK_OFFSET_F25   (56 * REGBYTES)
-#define TX_STACK_OFFSET_F26   (57 * REGBYTES)
-#define TX_STACK_OFFSET_F27   (58 * REGBYTES)
-#define TX_STACK_OFFSET_F28   (59 * REGBYTES)
-#define TX_STACK_OFFSET_F29   (60 * REGBYTES)
-#define TX_STACK_OFFSET_F30   (61 * REGBYTES)
-#define TX_STACK_OFFSET_F31   (62 * REGBYTES)
-
-/* FCSR is stored after F31 */
-/* FCSR is stored after F31 */
-#define TX_STACK_OFFSET_FCSR  (63 * REGBYTES)
-
-/* Thread Control Block (TX_THREAD) Offsets */
-#define TX_THREAD_RUN_COUNT     (1 * REGBYTES)
-#define TX_THREAD_STACK_PTR     (2 * REGBYTES)
-#define TX_THREAD_STACK_END     (4 * REGBYTES)
-#define TX_THREAD_TIME_SLICE    (6 * REGBYTES)
-
-/* Stack Frame Sizes */
-/* FPU Enabled: 65 Registers (x0-x31, f0-f31, fcsr) + Alignment */
-#define TX_THREAD_FRAME_SIZE_FPU (65 * REGBYTES)
-/* FPU Disabled: 32 Registers (x0-x31) + Alignment */
-#define TX_THREAD_FRAME_SIZE_INT (32 * REGBYTES)
-
-
-#else   /*not __ASSEMBLER__ */
+#ifndef __ASSEMBLER__
 
 /* Include for memset.  */
 #include <string.h>
@@ -177,15 +62,16 @@
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
-#endif
+#endif /* TX_INCLUDE_USER_DEFINE_FILE */
 
-
-/* Define compiler library include files.  */
+#endif /* __ASSEMBLER__ */
 
 
 /* Define ThreadX basic types for this port.  */
 
 #define VOID                                    void
+
+#ifndef __ASSEMBLER__
 typedef char                                    CHAR;
 typedef unsigned char                           UCHAR;
 typedef int                                     INT;
@@ -196,8 +82,7 @@ typedef unsigned long long                      ULONG64;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
 #define ULONG64_DEFINED
-#define ALIGN_TYPE_DEFINED
-#define ALIGN_TYPE                              ULONG64
+#endif /* __ASSEMBLER__ */
 
 
 
@@ -344,25 +229,36 @@ typedef unsigned short                          USHORT;
    is used to define a local function save area for the disable and restore
    macros.  */
 
+/* Expose helper used to perform an atomic read/modify/write of mstatus.
+   The helper composes and returns the posture per ThreadX contract. */
+#ifndef __ASSEMBLER__
+UINT                                            _tx_thread_interrupt_control(UINT new_posture);
+#endif
+
 #ifdef TX_DISABLE_INLINE
 
-ULONG64                                         _tx_thread_interrupt_control(unsigned int new_posture);
+#define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save;
 
-#define TX_INTERRUPT_SAVE_AREA                  register ULONG64 interrupt_save;
+#define TX_DISABLE                              __asm__ volatile("csrrci %0, mstatus, 8" : "=r" (interrupt_save) :: "memory");
+#define TX_RESTORE                              { \
+                                                    unsigned long _temp_mstatus; \
+                                                    __asm__ volatile( \
+                                                        "csrc mstatus, 8\n" \
+                                                        "andi %0, %1, 8\n" \
+                                                        "csrs mstatus, %0" \
+                                                        : "=&r" (_temp_mstatus) \
+                                                        : "r" (interrupt_save) \
+                                                        : "memory"); \
+                                                }
+
+#else
+
+#define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save;
 
 #define TX_DISABLE                              interrupt_save =  _tx_thread_interrupt_control(TX_INT_DISABLE);
 #define TX_RESTORE                              _tx_thread_interrupt_control(interrupt_save);
 
-#else
-
-#define TX_INTERRUPT_SAVE_AREA                  ULONG64 interrupt_save;
-/* Atomically read mstatus into interrupt_save and clear bit 3 of mstatus.  */
-#define TX_DISABLE                              {__asm__ ("csrrci %0, mstatus, 0x08" : "=r" (interrupt_save) : );};
-/* We only care about mstatus.mie (bit 3), so mask interrupt_save and write to mstatus.  */
-#define TX_RESTORE                              {register ULONG64 __tempmask = interrupt_save & 0x08; \
-                                                __asm__ ("csrrs x0, mstatus, %0 \n\t" : : "r" (__tempmask) : );};
-
-#endif
+#endif /* TX_DISABLE_INLINE */
 
 
 /* Define the interrupt lockout macros for each ThreadX object.  */
@@ -377,12 +273,13 @@ ULONG64                                         _tx_thread_interrupt_control(uns
 
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
+#ifndef __ASSEMBLER__
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation. * ThreadX RISC-V32/GNU Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX RISC-V32/GNU Version 6.5.0.202601 *";
 #else
 extern  CHAR                    _tx_version_id[];
-#endif
+#endif /* TX_THREAD_INIT */
+#endif /* __ASSEMBLER__ */
 
-#endif   /*not __ASSEMBLER__ */
-#endif
+#endif /* TX_PORT_H */

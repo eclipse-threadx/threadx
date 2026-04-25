@@ -19,7 +19,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-#include "tx_port.h"
 
     .section .text
 /**************************************************************************/
@@ -31,7 +30,6 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
-/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -63,68 +61,68 @@
 _tx_thread_system_return:
 
     /* Save minimal context on the stack.  */
+    /* sp -= sizeof(stack_frame);  */
 
-#if defined(__riscv_flen) && ((__riscv_flen == 32) || (__riscv_flen == 64))
-    addi    sp, sp, -TX_THREAD_FRAME_SIZE_FPU           // Allocate space on the stack - with floating point enabled
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    addi    sp, sp, -29*4                               // Allocate space on the stack - with floating point enabled
 #else
-    addi    sp, sp, -TX_THREAD_FRAME_SIZE_INT           // Allocate space on the stack - without floating point enabled
+    addi    sp, sp, -16*4                               // Allocate space on the stack - without floating point enabled
 #endif
 
     /* Store floating point preserved registers.  */
-#if defined(__riscv_flen) && (__riscv_flen == 32)
-    fsw     f8,  TX_STACK_OFFSET_F8(sp)                 // Store fs0
-    fsw     f9,  TX_STACK_OFFSET_F9(sp)                 // Store fs1
-    fsw     f18, TX_STACK_OFFSET_F18(sp)                // Store fs2
-    fsw     f19, TX_STACK_OFFSET_F19(sp)                // Store fs3
-    fsw     f20, TX_STACK_OFFSET_F20(sp)                // Store fs4
-    fsw     f21, TX_STACK_OFFSET_F21(sp)                // Store fs5
-    fsw     f22, TX_STACK_OFFSET_F22(sp)                // Store fs6
-    fsw     f23, TX_STACK_OFFSET_F23(sp)                // Store fs7
-    fsw     f24, TX_STACK_OFFSET_F24(sp)                // Store fs8
-    fsw     f25, TX_STACK_OFFSET_F25(sp)                // Store fs9
-    fsw     f26, TX_STACK_OFFSET_F26(sp)                // Store fs10
-    fsw     f27, TX_STACK_OFFSET_F27(sp)                // Store fs11
+#if defined(__riscv_float_abi_single)
+    fsw     f8,  15*4(sp)                               // Store fs0
+    fsw     f9,  16*4(sp)                               // Store fs1
+    fsw     f18, 17*4(sp)                               // Store fs2
+    fsw     f19, 18*4(sp)                               // Store fs3
+    fsw     f20, 19*4(sp)                               // Store fs4
+    fsw     f21, 20*4(sp)                               // Store fs5
+    fsw     f22, 21*4(sp)                               // Store fs6
+    fsw     f23, 22*4(sp)                               // Store fs7
+    fsw     f24, 23*4(sp)                               // Store fs8
+    fsw     f25, 24*4(sp)                               // Store fs9
+    fsw     f26, 25*4(sp)                               // Store fs10
+    fsw     f27, 26*4(sp)                               // Store fs11
     csrr    t0, fcsr
-    STORE   t0, TX_STACK_OFFSET_FCSR(sp)                // Store fcsr
-#elif defined(__riscv_flen) && (__riscv_flen == 64)
-    fsd     f8,  TX_STACK_OFFSET_F8(sp)                 // Store fs0
-    fsd     f9,  TX_STACK_OFFSET_F9(sp)                 // Store fs1
-    fsd     f18, TX_STACK_OFFSET_F18(sp)                // Store fs2
-    fsd     f19, TX_STACK_OFFSET_F19(sp)                // Store fs3
-    fsd     f20, TX_STACK_OFFSET_F20(sp)                // Store fs4
-    fsd     f21, TX_STACK_OFFSET_F21(sp)                // Store fs5
-    fsd     f22, TX_STACK_OFFSET_F22(sp)                // Store fs6
-    fsd     f23, TX_STACK_OFFSET_F23(sp)                // Store fs7
-    fsd     f24, TX_STACK_OFFSET_F24(sp)                // Store fs8
-    fsd     f25, TX_STACK_OFFSET_F25(sp)                // Store fs9
-    fsd     f26, TX_STACK_OFFSET_F26(sp)                // Store fs10
-    fsd     f27, TX_STACK_OFFSET_F27(sp)                // Store fs11
+    sw      t0, 27*4(sp)                                // Store fcsr
+#elif defined(__riscv_float_abi_double)
+    fsd     f8,  15*4(sp)                               // Store fs0
+    fsd     f9,  16*4(sp)                               // Store fs1
+    fsd     f18, 17*4(sp)                               // Store fs2
+    fsd     f19, 18*4(sp)                               // Store fs3
+    fsd     f20, 19*4(sp)                               // Store fs4
+    fsd     f21, 20*4(sp)                               // Store fs5
+    fsd     f22, 21*4(sp)                               // Store fs6
+    fsd     f23, 22*4(sp)                               // Store fs7
+    fsd     f24, 23*4(sp)                               // Store fs8
+    fsd     f25, 24*4(sp)                               // Store fs9
+    fsd     f26, 25*4(sp)                               // Store fs10
+    fsd     f27, 26*4(sp)                               // Store fs11
     csrr    t0, fcsr
-    STORE   t0, TX_STACK_OFFSET_FCSR(sp)                // Store fcsr
+    sw      t0, 27*4(sp)                                // Store fcsr
 #endif
 
-    STORE   x0,  0(sp)                                  // Solicited stack type
-    STORE   x1,  TX_STACK_OFFSET_X1(sp)                 // Save RA
-    STORE   x1,  TX_STACK_OFFSET_MEPC(sp)               // Save RA as MEPC
-    STORE   x8,  TX_STACK_OFFSET_X8(sp)                 // Save s0
-    STORE   x9,  TX_STACK_OFFSET_X9(sp)                 // Save s1
-    STORE   x18, TX_STACK_OFFSET_X18(sp)                // Save s2
-    STORE   x19, TX_STACK_OFFSET_X19(sp)                // Save s3
-    STORE   x20, TX_STACK_OFFSET_X20(sp)                // Save s4
-    STORE   x21, TX_STACK_OFFSET_X21(sp)                // Save s5
-    STORE   x22, TX_STACK_OFFSET_X22(sp)                // Save s6
-    STORE   x23, TX_STACK_OFFSET_X23(sp)                // Save s7
-    STORE   x24, TX_STACK_OFFSET_X24(sp)                // Save s8
-    STORE   x25, TX_STACK_OFFSET_X25(sp)                // Save s9
-    STORE   x26, TX_STACK_OFFSET_X26(sp)                // Save s10
-    STORE   x27, TX_STACK_OFFSET_X27(sp)                // Save s11
+    sw      zero,  0(sp)                                // Solicited stack type
+    sw      ra,  13*4(sp)                               // Save return address
+    sw      s0,  12*4(sp)                               // Save s0
+    sw      s1,  11*4(sp)                               // Save s1
+    sw      s2,  10*4(sp)                               // Save s2
+    sw      s3,   9*4(sp)                               // Save s3
+    sw      s4,   8*4(sp)                               // Save s4
+    sw      s5,   7*4(sp)                               // Save s5
+    sw      s6,   6*4(sp)                               // Save s6
+    sw      s7,   5*4(sp)                               // Save s7
+    sw      s8,   4*4(sp)                               // Save s8
+    sw      s9,   3*4(sp)                               // Save s9
+    sw      s10,  2*4(sp)                               // Save s10
+    sw      s11,  1*4(sp)                               // Save s11
     csrr    t0, mstatus                                 // Pickup mstatus
-    STORE   t0, TX_STACK_OFFSET_MSTATUS(sp)             // Save mstatus
+    sw      t0, 14*4(sp)                                // Save mstatus
 
 
-   /* Lockout interrupts. - will be enabled in _tx_thread_schedule  */
+    /* Lockout interrupts. will be enabled in _tx_thread_schedule  */
 
-    csrci   mstatus, 0xF
+    csrci   mstatus, 0x08                               // Disable interrupts (MIE bit 3)
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 
@@ -132,22 +130,22 @@ _tx_thread_system_return:
 #endif
 
     la      t0, _tx_thread_current_ptr                  // Pickup address of pointer
-    LOAD    t1, 0(t0)                                   // Pickup current thread pointer
-    la      t2,_tx_thread_system_stack_ptr              // Pickup stack pointer address
+    lw      t1, 0(t0)                                   // Pickup current thread pointer
+    la      t2, _tx_thread_system_stack_ptr             // Pickup stack pointer address
 
     /* Save current stack and switch to system stack.  */
     /* _tx_thread_current_ptr -> tx_thread_stack_ptr =  SP;
     SP = _tx_thread_system_stack_ptr;  */
 
-    STORE   sp, TX_THREAD_STACK_PTR(t1)                 // Save stack pointer
-    LOAD    sp, 0(t2)                                   // Switch to system stack
+    sw      sp, 8(t1)                                   // Save stack pointer
+    lw      sp, 0(t2)                                   // Switch to system stack
 
     /* Determine if the time-slice is active.  */
     /* if (_tx_timer_time_slice)
     {  */
 
     la      t4, _tx_timer_time_slice                    // Pickup time slice variable addr
-    LOAD    t3, 0(t4)                                   // Pickup time slice value
+    lw      t3, 0(t4)                                   // Pickup time slice value
     la      t2, _tx_thread_schedule                     // Pickup address of scheduling loop
     beqz    t3, _tx_thread_dont_save_ts                 // If no time-slice, don't save it
 
@@ -155,8 +153,8 @@ _tx_thread_system_return:
         /* _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
         _tx_timer_time_slice =  0;  */
 
-    STORE   t3, TX_THREAD_TIME_SLICE(t1)                // Save current time-slice for thread
-    STORE   x0, 0(t4)                                   // Clear time-slice variable
+    sw      t3, 24(t1)                                  // Save current time-slice for thread
+    sw      zero, 0(t4)                                 // Clear time-slice variable
 
     /* }  */
 _tx_thread_dont_save_ts:
@@ -164,7 +162,7 @@ _tx_thread_dont_save_ts:
     /* Clear the current thread pointer.  */
     /* _tx_thread_current_ptr =  TX_NULL;  */
 
-    STORE   x0, 0(t0)                                   // Clear current thread pointer
+    sw      x0, 0(t0)                                   // Clear current thread pointer
     jr      t2                                          // Return to thread scheduler
 
 /* }  */
