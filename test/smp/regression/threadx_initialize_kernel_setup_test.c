@@ -33,18 +33,6 @@ UINT            mutex_priority_change_extension_selection;
 UINT            priority_change_extension_selection;
 
 
-__attribute__((weak)) void  abort_all_threads_suspended_on_mutex(void)
-{
-}
-
-__attribute__((weak)) void  suspend_lowest_priority(void)
-{
-}
-
-__attribute__((weak)) void abort_and_resume_byte_allocating_thread(void)
-{
-}
-
 void main()
 {
 

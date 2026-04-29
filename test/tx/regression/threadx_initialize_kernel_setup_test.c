@@ -32,44 +32,6 @@ UINT            test_byte_pool_create_init;
 UINT            test_block_pool_create_init;
 UINT            test_timer_create_init;
 
-#ifdef _MSC_VER
-#if defined(_M_IX86)
-#define TX_TEST_LINKER_ALIAS(symbol, default_symbol) __pragma(comment(linker, "/alternatename:_" #symbol "=_" #default_symbol))
-#else
-#define TX_TEST_LINKER_ALIAS(symbol, default_symbol) __pragma(comment(linker, "/alternatename:" #symbol "=" #default_symbol))
-#endif
-
-void  abort_all_threads_suspended_on_mutex(void);
-void  tx_test_default_abort_all_threads_suspended_on_mutex(void)
-{
-}
-TX_TEST_LINKER_ALIAS(abort_all_threads_suspended_on_mutex, tx_test_default_abort_all_threads_suspended_on_mutex)
-
-void  suspend_lowest_priority(void);
-void  tx_test_default_suspend_lowest_priority(void)
-{
-}
-TX_TEST_LINKER_ALIAS(suspend_lowest_priority, tx_test_default_suspend_lowest_priority)
-
-void abort_and_resume_byte_allocating_thread(void);
-void tx_test_default_abort_and_resume_byte_allocating_thread(void)
-{
-}
-TX_TEST_LINKER_ALIAS(abort_and_resume_byte_allocating_thread, tx_test_default_abort_and_resume_byte_allocating_thread)
-#else
-__attribute__((weak)) void  abort_all_threads_suspended_on_mutex(void)
-{
-}
-
-__attribute__((weak)) void  suspend_lowest_priority(void)
-{
-}
-
-__attribute__((weak)) void abort_and_resume_byte_allocating_thread(void)
-{
-}
-#endif
-
 int main(void)
 {
 

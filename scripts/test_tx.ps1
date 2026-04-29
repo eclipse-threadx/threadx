@@ -12,6 +12,12 @@ param(
 
     [int]$TestTimeoutSeconds = 20,
 
+    [switch]$CollectFailureDiagnostics = $true,
+
+    [string]$TestRegex,
+
+    [switch]$RerunFailedOnly,
+
     [string]$BuildDir
 )
 
@@ -67,9 +73,27 @@ foreach ($currentConfiguration in $selectedConfigurations) {
             $ctestArguments += @('--repeat', "until-pass:$RepeatFailCount")
         }
 
+        if ($TestRegex) {
+            $ctestArguments += @('-R', $TestRegex)
+        }
+
+        if ($RerunFailedOnly) {
+            $ctestArguments += '--rerun-failed'
+        }
+
         Invoke-NativeCommand -FilePath 'ctest' -Arguments $ctestArguments
     }
     catch {
+        if ($CollectFailureDiagnostics -and (Test-Path -LiteralPath $currentBuildDir)) {
+            try {
+                Invoke-CtestFailureDiagnostics -BuildDir $currentBuildDir -TestingTemporaryDir $currentTestingTemporaryDir `
+                    -TimeoutSeconds $TestTimeoutSeconds
+            }
+            catch {
+                Write-Warning "Failure diagnostics collection failed for ${currentConfiguration}: $($_.Exception.Message)"
+            }
+        }
+
         $failedConfigurations += @{
             Configuration = $currentConfiguration
             Message = $_.Exception.Message

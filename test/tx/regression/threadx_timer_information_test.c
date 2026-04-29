@@ -175,14 +175,12 @@ TX_TIMER_INTERNAL **list_head;
     /* Sleep for 120.  */
     tx_thread_sleep(120);
 
-    /* Host-side Windows scheduling can deliver the sleeping thread one tick late
-       after the periodic timer has already advanced again. The dedicated timer
-       accuracy regressions validate exact cadence.  */
-    if ((timer_0_counter < 22) || (tx_time_get() < 120))
+    /* Check the counters to make sure everything is where it should be.  */
+    if ((timer_0_counter != 23) || (tx_time_get() != 120))
     {
 
         /* Application timer error.  */
-        printf("ERROR #9 (%lu %lu)\n", timer_0_counter, tx_time_get());
+        printf("ERROR #9\n");
         test_control_return(1);
     }
 

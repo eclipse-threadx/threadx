@@ -7,6 +7,7 @@ set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../regression)
 set(REPO_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../..)
 set(PORT_LOW_LEVEL_SOURCE ${REPO_ROOT}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/src/tx_initialize_low_level.c)
 set(GENERATED_LOW_LEVEL_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/tx_initialize_low_level.c)
+set(TESTCONTROL_WEAK_DEFAULTS_SOURCE ${REPO_ROOT}/test/shared/regression/testcontrol_weak_defaults.c)
 
 if(NOT EXISTS ${PORT_LOW_LEVEL_SOURCE})
   message(FATAL_ERROR "Unable to locate tx_initialize_low_level.c for ${THREADX_ARCH}/${THREADX_TOOLCHAIN}")
@@ -120,7 +121,8 @@ add_custom_command(
   COMMENT "Generating tx_initialize_low_level.c for test")
 
 add_library(test_utility OBJECT ${GENERATED_LOW_LEVEL_SOURCE}
-                                ${SOURCE_DIR}/testcontrol.c)
+                                ${SOURCE_DIR}/testcontrol.c
+                                ${TESTCONTROL_WEAK_DEFAULTS_SOURCE})
 target_compile_definitions(test_utility PRIVATE CTEST BATCH_TEST
                                                 TEST_STACK_SIZE_PRINTF=4096)
 target_link_libraries(test_utility PRIVATE azrtos::threadx)

@@ -311,7 +311,6 @@ volatile ULONG       value = 0;
 #endif
     while (isr_test_suspend_interrupted_condition != TX_TRUE)
     {
-
         /* Sleep to get a frest timer slot.  */
         tx_thread_sleep(1);
 
@@ -432,4 +431,3 @@ volatile ULONG       value = 0;
         test_control_return(0);
     }
 }
-

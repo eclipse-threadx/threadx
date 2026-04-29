@@ -350,6 +350,7 @@ void    _tx_initialize_start_interrupts(void);
 #define TX_THREAD_EXTENSION_0                                               HANDLE tx_thread_win32_thread_handle; \
                                                                             DWORD  tx_thread_win32_thread_id; \
                                                                             HANDLE tx_thread_win32_thread_run_semaphore; \
+                                                                            HANDLE tx_thread_win32_thread_start_semaphore; \
                                                                             UINT   tx_thread_win32_suspension_type; \
                                                                             UINT   tx_thread_win32_int_disabled_flag;
 #define TX_THREAD_EXTENSION_1
@@ -559,6 +560,9 @@ extern ULONG                                    _tx_win32_global_int_disabled_fl
 extern LARGE_INTEGER                            _tx_win32_time_stamp;
 extern ULONG                                    _tx_win32_system_error;
 extern HANDLE                                   _tx_win32_timer_handle;
+extern HANDLE                                   _tx_win32_timer_thread_handle;
+extern HANDLE                                   _tx_win32_isr_semaphore;
+extern UINT                                     _tx_win32_timer_waiting;
 extern UINT                                     _tx_win32_timer_id;
 extern LARGE_INTEGER                            _tx_win32_time_stamp;
 

@@ -918,11 +918,8 @@ VOID            (*temp_mutex_release)(TX_THREAD *thread_ptr);
     /* Setup the ISR.  */
     test_isr_dispatch =  test_isr;
 
-    /* Sleep long enough for the Windows timer thread and ISR callback to run.  */
-    while (((timer_executed != 1) || (isr_executed != 1)) && (tx_time_get() < 100))
-    {
-        tx_thread_sleep(1);
-    }
+    /* Sleep for a bit...  */
+    tx_thread_sleep(3);
 
     /* Clear the ISR.  */
     test_isr_dispatch =  TX_NULL;
@@ -932,7 +929,7 @@ VOID            (*temp_mutex_release)(TX_THREAD *thread_ptr);
     {
 
         /* Thread error.  */
-        printf("ERROR #41 (%lu %lu %lu)\n", error, timer_executed, isr_executed);
+        printf("ERROR #41\n");
         test_control_return(1);
     }
 

@@ -71,11 +71,10 @@ ULONG now;
     tx_thread_sleep(9);
     tx_thread_sleep(9);
 
-    /* The Windows host simulator can occasionally resume the sleeping
-       thread one additional tick later under heavier host-side jitter.  */
+    /* Determine if the sleep was accurate.  */
     now = tx_time_get();
-    if ((now >= 18) &&
-        (now <= 20))
+    if ((now == 18) ||
+        (now == 19))
     {
 
         /* Successful Simple Sleep test.  */

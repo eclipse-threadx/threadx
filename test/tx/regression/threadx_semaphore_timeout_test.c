@@ -146,10 +146,9 @@ ULONG   now;
     /* Suspend on the semaphore. */
     status =  tx_semaphore_get(&semaphore_0, 33);
 
-    /* Windows host scheduling can deliver the timeout completion one tick
-       late relative to the simulated timer cadence.  */
+    /* Did we get the right status at the right time?  */
     now = tx_time_get();
-    if ((status != TX_NO_INSTANCE) || (now < 33UL) || (now > 34UL))
+    if ((status != TX_NO_INSTANCE) || (now != 33))
     {
 
         /* Semaphore error.  */
@@ -164,4 +163,3 @@ ULONG   now;
         test_control_return(0);
     }
 }
-

@@ -918,11 +918,8 @@ UCHAR   *save_search;
     /* Setup the ISR.  */
     test_isr_dispatch =  test_isr;
 
-    /* Sleep long enough for the Windows timer thread and ISR callback to run.  */
-    for (i = 0; (((timer_executed != 1) || (isr_executed != 1)) && (i < 100)); i++)
-    {
-        tx_thread_sleep(1);
-    }
+    /* Sleep for a bit...  */
+    tx_thread_sleep(3);
 
     /* Clear the ISR.  */
     test_isr_dispatch =  TX_NULL;
@@ -932,7 +929,7 @@ UCHAR   *save_search;
     {
 
         /* Byte memory error.  */
-        printf("ERROR #43 (%lu %lu %lu)\n", error, timer_executed, isr_executed);
+        printf("ERROR #43\n");
         test_control_return(1);
     }
 

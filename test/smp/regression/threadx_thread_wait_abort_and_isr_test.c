@@ -269,4 +269,3 @@ static void    timer_0_entry(ULONG input)
 {
     timer_0_counter++;
 }
-

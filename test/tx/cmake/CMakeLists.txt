@@ -32,15 +32,9 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}.")
 set(default_build_coverage TX_QUEUE_MESSAGE_MAX_SIZE=32)
 set(disable_notify_callbacks_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_DISABLE_NOTIFY_CALLBACKS)
-set(stack_checking_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING TX_WIN32_SLOW_TIMER=10)
-set(stack_checking_rand_fill_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING TX_ENABLE_RANDOM_NUMBER_STACK_FILLING TX_WIN32_SLOW_TIMER=10)
+set(stack_checking_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING)
+set(stack_checking_rand_fill_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING TX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
 set(trace_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_EVENT_TRACE)
-
-if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
-  list(APPEND default_build_coverage TX_WIN32_SLOW_TIMER=10)
-  list(APPEND disable_notify_callbacks_build TX_WIN32_SLOW_TIMER=15)
-  list(APPEND trace_build TX_WIN32_SLOW_TIMER=10)
-endif()
 
 add_compile_definitions(
   TX_REGRESSION_TEST
@@ -48,7 +42,8 @@ add_compile_definitions(
   ${${CMAKE_BUILD_TYPE}})
 
 if(MSVC)
-  add_compile_options(/W3)
+  add_compile_options(/W3 /Zi)
+  add_link_options(/DEBUG /INCREMENTAL:NO)
 else()
   add_compile_options(
     -m32

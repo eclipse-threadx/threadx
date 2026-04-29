@@ -2325,5 +2325,3 @@ static void thread_entry(ULONG id)
         tx_thread_suspend(_smp_randomized_source_array[id]);
     }
 }
-
-

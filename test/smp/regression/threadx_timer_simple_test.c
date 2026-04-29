@@ -596,7 +596,6 @@ ULONG   exclusion_map;
 
     /* Create a timer for the test.  */
     tx_timer_create(&timer_0, "timer 0", timer_entry, 0, 1, 1, TX_AUTO_ACTIVATE);
-
     /* Setup the ISR.  */
     test_isr_dispatch =  test_isr;
 

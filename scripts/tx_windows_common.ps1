@@ -18,6 +18,20 @@ function Invoke-NativeCommand {
     }
 }
 
+function Get-CommandPathIfAvailable {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CommandName
+    )
+
+    $command = Get-Command $CommandName -ErrorAction SilentlyContinue
+    if ($null -eq $command) {
+        return $null
+    }
+
+    return $command.Source
+}
+
 function Get-PortSettings {
     param(
         [Parameter(Mandatory = $true)]
@@ -177,7 +191,27 @@ function Remove-BuildDirectory {
     }
 
     if (Test-Path -LiteralPath $fullPath) {
-        Remove-Item -LiteralPath $fullPath -Recurse -Force
+        try {
+            Remove-Item -LiteralPath $fullPath -Recurse -Force -ErrorAction Stop
+            return
+        } catch {
+            Write-Warning "Failed to remove build directory '$fullPath': $($_.Exception.Message)"
+        }
+
+        Get-ChildItem -LiteralPath $fullPath -Force -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
+            try {
+                if (($_.Attributes -band [System.IO.FileAttributes]::ReadOnly) -ne 0) {
+                    $_.Attributes = ($_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly))
+                }
+            } catch {
+            }
+        }
+
+        try {
+            Remove-Item -LiteralPath $fullPath -Recurse -Force -ErrorAction Stop
+        } catch {
+            Write-Warning "Proceeding with partially cleaned build directory '$fullPath': $($_.Exception.Message)"
+        }
     }
 }
 
@@ -193,6 +227,280 @@ function Remove-NinjaLock {
     }
 }
 
+function Get-WindowsDebuggerPath {
+    $debuggerPath = Get-CommandPathIfAvailable -CommandName 'cdb.exe'
+    if ($debuggerPath) {
+        return $debuggerPath
+    }
+
+    $candidatePaths = @(
+        (Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10\Debuggers\x64\cdb.exe'),
+        (Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10\Debuggers\x86\cdb.exe')
+    )
+
+    foreach ($candidatePath in $candidatePaths) {
+        if (Test-Path -LiteralPath $candidatePath) {
+            return $candidatePath
+        }
+    }
+
+    return $null
+}
+
+function Get-SanitizedFileName {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $safeName = [regex]::Replace($Name, '[<>:"/\\|?*]', '_')
+    $safeName = $safeName -replace '\s+', '_'
+    return $safeName
+}
+
+function Initialize-MinidumpSupport {
+    if ($null -ne ('ThreadX.WindowsMiniDump' -as [type])) {
+        return
+    }
+
+    Add-Type -TypeDefinition @'
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+
+namespace ThreadX
+{
+    public static class WindowsMiniDump
+    {
+        [DllImport("Dbghelp.dll", SetLastError = true)]
+        private static extern bool MiniDumpWriteDump(
+            IntPtr hProcess,
+            uint processId,
+            IntPtr hFile,
+            uint dumpType,
+            IntPtr exceptionParam,
+            IntPtr userStreamParam,
+            IntPtr callbackParam);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr OpenProcess(uint desiredAccess, bool inheritHandle, int processId);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool CloseHandle(IntPtr handle);
+
+        private const uint ProcessQueryInformation = 0x0400U;
+        private const uint ProcessVmRead = 0x0010U;
+        private const uint ProcessDupHandle = 0x0040U;
+
+        public static bool WriteDump(int processId, string dumpPath, uint dumpType, out int errorCode)
+        {
+            IntPtr processHandle = OpenProcess(ProcessQueryInformation | ProcessVmRead | ProcessDupHandle, false, processId);
+            if (processHandle == IntPtr.Zero)
+            {
+                errorCode = Marshal.GetLastWin32Error();
+                return false;
+            }
+
+            try
+            {
+                using (FileStream dumpStream = new FileStream(dumpPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
+                {
+                    bool success = MiniDumpWriteDump(
+                        processHandle,
+                        unchecked((uint)processId),
+                        dumpStream.SafeFileHandle.DangerousGetHandle(),
+                        dumpType,
+                        IntPtr.Zero,
+                        IntPtr.Zero,
+                        IntPtr.Zero);
+
+                    errorCode = success ? 0 : Marshal.GetLastWin32Error();
+                    return success;
+                }
+            }
+            finally
+            {
+                CloseHandle(processHandle);
+            }
+        }
+    }
+}
+'@
+}
+
+function Wait-FileReadable {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+
+        [Parameter()]
+        [int]$TimeoutSeconds = 10
+    )
+
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ((Get-Date) -lt $deadline) {
+        if (-not (Test-Path -LiteralPath $Path)) {
+            Start-Sleep -Milliseconds 200
+            continue
+        }
+
+        try {
+            $fileStream = [System.IO.File]::Open($Path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+            $fileStream.Dispose()
+            return $true
+        }
+        catch {
+            Start-Sleep -Milliseconds 200
+        }
+    }
+
+    return $false
+}
+
+function Get-CtestTestMetadata {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$BuildDir
+    )
+
+    $ctestOutput = & ctest --test-dir $BuildDir --show-only=json-v1
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to enumerate ctest metadata in $BuildDir"
+    }
+
+    return (($ctestOutput -join [Environment]::NewLine) | ConvertFrom-Json).tests
+}
+
+function Get-CtestFailedTestNames {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$TestingTemporaryDir
+    )
+
+    $lastFailedPath = Join-Path $TestingTemporaryDir 'LastTestsFailed.log'
+    if (-not (Test-Path -LiteralPath $lastFailedPath)) {
+        return @()
+    }
+
+    $failedTestNames = @()
+    foreach ($logLine in (Get-Content -LiteralPath $lastFailedPath)) {
+        if ([string]::IsNullOrWhiteSpace($logLine)) {
+            continue
+        }
+
+        if ($logLine -match '^\s*\d+:(?<name>.+)\s*$') {
+            $failedTestNames += $Matches['name'].Trim()
+        }
+        else {
+            $failedTestNames += $logLine.Trim()
+        }
+    }
+
+    return $failedTestNames
+}
+
+function Invoke-ProcessDumpCapture {
+    param(
+        [Parameter(Mandatory = $true)]
+        [int]$ProcessId,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DumpPath,
+
+        [Parameter()]
+        [int]$TimeoutSeconds = 15
+    )
+
+    $outputDirectory = Split-Path -Parent $DumpPath
+    if (-not (Test-Path -LiteralPath $outputDirectory)) {
+        New-Item -ItemType Directory -Path $outputDirectory | Out-Null
+    }
+
+    Remove-Item -LiteralPath $DumpPath -Force -ErrorAction SilentlyContinue
+
+    Initialize-MinidumpSupport
+    $dumpType = [uint32]0x00001006
+    $errorCode = 0
+    $dumpCaptured = [ThreadX.WindowsMiniDump]::WriteDump($ProcessId, $DumpPath, $dumpType, [ref]$errorCode)
+
+    if (-not $dumpCaptured) {
+        Write-Warning "MiniDumpWriteDump failed for PID ${ProcessId} with Win32 error $errorCode"
+        return $false
+    }
+
+    return (Test-Path -LiteralPath $DumpPath)
+}
+
+function Invoke-DumpStackAnalysis {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$DumpPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$OutputBasePath,
+
+        [Parameter()]
+        [string]$SymbolPath,
+
+        [Parameter()]
+        [int]$TimeoutSeconds = 15
+    )
+
+    if (-not (Test-Path -LiteralPath $DumpPath)) {
+        Write-Warning "Skipping dump analysis because the dump file was not created: $DumpPath"
+        return $false
+    }
+
+    if (-not (Wait-FileReadable -Path $DumpPath)) {
+        Write-Warning "Skipping dump analysis because the dump file is not readable yet: $DumpPath"
+        return $false
+    }
+
+    $debuggerPath = Get-WindowsDebuggerPath
+    if (-not $debuggerPath) {
+        Write-Warning 'Skipping dump analysis because cdb.exe is not available.'
+        return $false
+    }
+
+    $outputDirectory = Split-Path -Parent $OutputBasePath
+    if (-not (Test-Path -LiteralPath $outputDirectory)) {
+        New-Item -ItemType Directory -Path $outputDirectory | Out-Null
+    }
+
+    $stdoutPath = "${OutputBasePath}.stdout.txt"
+    $stderrPath = "${OutputBasePath}.stderr.txt"
+    $commandFilePath = "${OutputBasePath}.commands.txt"
+    Set-Content -LiteralPath $commandFilePath -Value @(
+        '!runaway 7'
+        '~* kb 200'
+        'q'
+    ) -Encoding Ascii
+    $cdbArguments = @(
+        '-lines',
+        '-z', $DumpPath
+    )
+
+    if ($SymbolPath) {
+        $cdbArguments += @('-y', $SymbolPath)
+    }
+
+    $cdbArguments += @('-cf', $commandFilePath)
+    $cdbProcess = Start-Process -FilePath $debuggerPath -ArgumentList $cdbArguments -PassThru -NoNewWindow `
+        -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
+
+    try {
+        $cdbProcess | Wait-Process -Timeout $TimeoutSeconds -ErrorAction Stop
+    }
+    catch {
+        if (-not $cdbProcess.HasExited) {
+            $null = Start-Process -FilePath 'taskkill.exe' -ArgumentList @('/PID', $cdbProcess.Id.ToString(), '/T', '/F') `
+                -WindowStyle Hidden -Wait -PassThru
+        }
+    }
+
+    return $true
+}
+
 function Invoke-ProcessWithTimeout {
     param(
         [Parameter(Mandatory = $true)]
@@ -202,7 +510,22 @@ function Invoke-ProcessWithTimeout {
         [string[]]$Arguments = @(),
 
         [Parameter()]
-        [int]$TimeoutSeconds = 0
+        [int]$TimeoutSeconds = 0,
+
+        [Parameter()]
+        [string]$WorkingDirectory,
+
+        [Parameter()]
+        [string]$RedirectStandardOutputPath,
+
+        [Parameter()]
+        [string]$RedirectStandardErrorPath,
+
+        [Parameter()]
+        [scriptblock]$OnTimeout,
+
+        [Parameter()]
+        [scriptblock]$PostTimeout
     )
 
     $argumentList = @()
@@ -215,7 +538,29 @@ function Invoke-ProcessWithTimeout {
         }
     }
 
-    $process = Start-Process -FilePath $FilePath -ArgumentList $argumentList -NoNewWindow -PassThru
+    $startProcessParameters = @{
+        FilePath = $FilePath
+        NoNewWindow = $true
+        PassThru = $true
+    }
+
+    if ($argumentList.Count -gt 0) {
+        $startProcessParameters['ArgumentList'] = $argumentList
+    }
+
+    if ($WorkingDirectory) {
+        $startProcessParameters['WorkingDirectory'] = $WorkingDirectory
+    }
+
+    if ($RedirectStandardOutputPath) {
+        $startProcessParameters['RedirectStandardOutput'] = $RedirectStandardOutputPath
+    }
+
+    if ($RedirectStandardErrorPath) {
+        $startProcessParameters['RedirectStandardError'] = $RedirectStandardErrorPath
+    }
+
+    $process = Start-Process @startProcessParameters
     if ($TimeoutSeconds -le 0) {
         $process | Wait-Process
         $completed = $true
@@ -231,10 +576,20 @@ function Invoke-ProcessWithTimeout {
     }
 
     if (-not $completed) {
+        if ($null -ne $OnTimeout) {
+            & $OnTimeout $process
+        }
+
         $null = Start-Process -FilePath 'taskkill.exe' -ArgumentList @('/PID', $process.Id.ToString(), '/T', '/F') -WindowStyle Hidden -Wait -PassThru
+
+        if ($null -ne $PostTimeout) {
+            & $PostTimeout $process
+        }
+
         return @{
             Completed = $false
             ExitCode = $null
+            ProcessId = $process.Id
         }
     }
 
@@ -242,6 +597,92 @@ function Invoke-ProcessWithTimeout {
     return @{
         Completed = $true
         ExitCode = $process.ExitCode
+        ProcessId = $process.Id
+    }
+}
+
+function Invoke-CtestFailureDiagnostics {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$BuildDir,
+
+        [Parameter(Mandatory = $true)]
+        [string]$TestingTemporaryDir,
+
+        [Parameter(Mandatory = $true)]
+        [int]$TimeoutSeconds
+    )
+
+    $failedTestNames = Get-CtestFailedTestNames -TestingTemporaryDir $TestingTemporaryDir
+    if ($failedTestNames.Count -eq 0) {
+        Write-Warning "No failed tests were recorded in $TestingTemporaryDir"
+        return
+    }
+
+    $testMetadataList = Get-CtestTestMetadata -BuildDir $BuildDir
+    $testMetadataMap = @{}
+    foreach ($testMetadata in $testMetadataList) {
+        $testMetadataMap[$testMetadata.name] = $testMetadata
+    }
+
+    $diagnosticsRoot = Join-Path $TestingTemporaryDir 'FailureDiagnostics'
+    if (-not (Test-Path -LiteralPath $diagnosticsRoot)) {
+        New-Item -ItemType Directory -Path $diagnosticsRoot | Out-Null
+    }
+
+    foreach ($failedTestName in $failedTestNames) {
+        if (-not $testMetadataMap.ContainsKey($failedTestName)) {
+            Write-Warning "Unable to locate ctest metadata for failed test: $failedTestName"
+            continue
+        }
+
+        $testMetadata = $testMetadataMap[$failedTestName]
+        if (($null -eq $testMetadata.command) -or ($testMetadata.command.Count -eq 0)) {
+            Write-Warning "No executable command was recorded for failed test: $failedTestName"
+            continue
+        }
+
+        $testArguments = @()
+        if ($testMetadata.command.Count -gt 1) {
+            $testArguments = @($testMetadata.command[1..($testMetadata.command.Count - 1)])
+        }
+
+        $safeTestName = Get-SanitizedFileName -Name $failedTestName
+        $stdoutPath = Join-Path $diagnosticsRoot "${safeTestName}.stdout.txt"
+        $stderrPath = Join-Path $diagnosticsRoot "${safeTestName}.stderr.txt"
+        $debugOutputBasePath = Join-Path $diagnosticsRoot "${safeTestName}.cdb"
+        $workingDirectory = $null
+        $symbolDirectory = Split-Path -Parent $testMetadata.command[0]
+
+        if ($null -ne $testMetadata.properties) {
+            foreach ($testProperty in $testMetadata.properties) {
+                if ($testProperty.name -eq 'WORKING_DIRECTORY') {
+                    $workingDirectory = $testProperty.value
+                    break
+                }
+            }
+        }
+
+        Write-Warning "Collecting failure diagnostics for $failedTestName"
+        $dumpPath = '{0}.{1}.dmp' -f $debugOutputBasePath, ([DateTime]::UtcNow.ToString('yyyyMMddHHmmssfff'))
+        $testResult = Invoke-ProcessWithTimeout -FilePath $testMetadata.command[0] -Arguments $testArguments `
+            -TimeoutSeconds $TimeoutSeconds -WorkingDirectory $workingDirectory -RedirectStandardOutputPath $stdoutPath `
+            -RedirectStandardErrorPath $stderrPath -OnTimeout {
+                param($timedOutProcess)
+                Invoke-ProcessDumpCapture -ProcessId $timedOutProcess.Id -DumpPath $dumpPath | Out-Null
+            } -PostTimeout {
+                param($timedOutProcess)
+                if (Test-Path -LiteralPath $dumpPath) {
+                    Invoke-DumpStackAnalysis -DumpPath $dumpPath -OutputBasePath $debugOutputBasePath -SymbolPath $symbolDirectory | Out-Null
+                }
+            }
+
+        if (-not $testResult.Completed) {
+            Write-Warning "Timeout diagnostics were captured for $failedTestName under $diagnosticsRoot"
+            continue
+        }
+
+        Write-Warning "Replay finished for $failedTestName with exit code $($testResult.ExitCode). Output was saved under $diagnosticsRoot"
     }
 }
 

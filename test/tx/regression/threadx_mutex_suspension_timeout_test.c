@@ -165,12 +165,12 @@ UINT    old_priority;
     /* Suspend on the mutex. */
     status =  tx_mutex_get(&mutex_0, 33);
 
-    /* Windows host scheduling can occasionally advance the simulated clock by one extra tick.  */
-    if ((status != TX_NOT_AVAILABLE) || (tx_time_get() < 33) || (tx_time_get() > 34))
+    /* Did we get the right status at the right time?  */
+    if ((status != TX_NOT_AVAILABLE) || (tx_time_get() != 33))
     {
 
         /* Mutex error.  */
-        printf("ERROR #3, now = %lu\n", tx_time_get());
+        printf("ERROR #3\n");
         test_control_return(1);
     }
 

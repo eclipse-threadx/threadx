@@ -503,17 +503,14 @@ TX_TEST_POINTER_WORD fake_block[20];
     /* Setup the ISR.  */
     test_isr_dispatch =  test_isr;
 
-    /* Sleep long enough for the Windows timer thread and ISR callback to run.  */
-    for (i = 0; (((timer_executed != 1) || (isr_executed != 1)) && (i < 100)); i++)
-    {
-        tx_thread_sleep(1);
-    }
+    /* Sleep for a bit...  */
+    tx_thread_sleep(3);
 
     /* Now resume the background thread.  */
     tx_thread_resume(&thread_1);
 
-    /* Allow the resumed thread to execute.  */
-    tx_thread_sleep(1);
+    /* Sleep for a bit...  */
+    tx_thread_sleep(3);
 
     /* Clear the ISR.  */
     test_isr_dispatch =  TX_NULL;
@@ -523,7 +520,7 @@ TX_TEST_POINTER_WORD fake_block[20];
     {
 
         /* Block memory error.  */
-        printf("ERROR #20 (%lu %lu %lu)\n", error, timer_executed, isr_executed);
+        printf("ERROR #20\n");
         test_control_return(1);
     }
 

@@ -240,14 +240,12 @@ ULONG   actual;
 
     /* Inform user.  */
     printf("Running Event Flag Set/Clear from ISR Test.......................... ");
-
     /* Setup the test ISR.  */
     test_isr_dispatch =  test_isr;
 
     /* Loop to exploit the probability window inside tx_event_flags_set call.  */
     while (condition_count < 40)
     {
-
         /* Suspend on the event_flags that is going to be set via the ISR.  */
         status =  tx_event_flags_get(&event_flags_0, 2, TX_OR_CLEAR, &actual, 4);
 
@@ -256,7 +254,7 @@ ULONG   actual;
         {
 
             /* Test error!  */
-            printf("ERROR #8\n");
+            printf("ERROR #8 (%u %lu %lu)\n", status, condition_count, event_flags_set_counter);
             test_control_return(1);
         }
 
@@ -354,5 +352,3 @@ static void    timer_0_entry(ULONG input)
 {
     timer_0_counter++;
 }
-
-
