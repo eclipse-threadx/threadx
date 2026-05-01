@@ -27,5 +27,3 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
     ${CURRENT_DIR}/inc
 )
-
-target_compile_definitions(${PROJECT_NAME} PUBLIC "-DTX_WIN32_DEBUG_ENABLE")

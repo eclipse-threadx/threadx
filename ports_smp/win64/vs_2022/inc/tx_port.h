@@ -278,6 +278,13 @@ void    _tx_initialize_start_interrupts(void);
                                                                                 }                                               \
                                                                             }
 
+#ifdef TX_WIN32_PROFILE_ENABLE
+#define TX_WIN32_PROFILE_THREAD_EXTENSION                                   ULONG64 tx_thread_win32_profile_run_signal_ticks; \
+                                                                            ULONG64 tx_thread_win32_profile_run_wake_ticks;
+#else
+#define TX_WIN32_PROFILE_THREAD_EXTENSION
+#endif
+
 #ifndef TX_MISRA_ENABLE
 #ifdef TX_ENABLE_STACK_CHECKING
 #undef TX_DISABLE_STACK_FILLING
@@ -293,7 +300,8 @@ void    _tx_initialize_start_interrupts(void);
                                                                             UINT   tx_thread_win32_mutex_access; \
                                                                             UINT   tx_thread_win32_int_disabled_flag; \
                                                                             UINT   tx_thread_win32_deferred_preempt; \
-                                                                            UINT   tx_thread_win32_virtual_core;
+                                                                            UINT   tx_thread_win32_virtual_core; \
+                                                                            TX_WIN32_PROFILE_THREAD_EXTENSION
 #define TX_THREAD_EXTENSION_1
 #define TX_THREAD_EXTENSION_2
 #define TX_THREAD_EXTENSION_3
@@ -443,7 +451,22 @@ UINT   _tx_win32_smp_current_core_get(void);
 void   _tx_win32_thread_suspend(HANDLE thread_handle);
 void   _tx_win32_thread_resume(HANDLE thread_handle);
 void   _tx_win32_thread_sleep(ULONG milliseconds);
+void   _tx_win32_thread_yield(void);
 void   _tx_win32_semaphore_reset(HANDLE semaphore_handle);
+DWORD  _tx_win32_wait_for_scheduler_event(void);
+DWORD  _tx_win32_wait_for_thread_run_semaphore(HANDLE semaphore_handle);
+DWORD  _tx_win32_wait_for_thread_start_semaphore(HANDLE semaphore_handle);
+DWORD  _tx_win32_wait_for_thread_start_ack(HANDLE semaphore_handle);
+DWORD  _tx_win32_wait_for_isr_semaphore(void);
+DWORD  _tx_win32_wait_for_isr_rendezvous(void);
+DWORD  _tx_win32_wait_for_timer_object(void);
+#ifdef TX_WIN32_PROFILE_ENABLE
+void   _tx_win32_profile_reset(void);
+void   _tx_win32_profile_report(CHAR *label);
+void   _tx_win32_profile_mark_run_signal(TX_THREAD *thread_ptr);
+void   _tx_win32_profile_mark_run_wake(TX_THREAD *thread_ptr);
+void   _tx_win32_profile_mark_start_ack(TX_THREAD *thread_ptr);
+#endif
 
 #ifndef TX_WIN32_MEMORY_SIZE
 #define TX_WIN32_MEMORY_SIZE                    100000
