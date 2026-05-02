@@ -418,6 +418,8 @@ void  _tx_win32_critical_section_obtain(TX_WIN32_CRITICAL_SECTION *critical_sect
 DWORD       thread_id;
 LONG        previous_owner;
 UINT        contention_count;
+TX_THREAD   *current_thread;
+UINT        core_scan;
 #ifdef TX_WIN32_PROFILE_ENABLE
 ULONG64     start_ticks;
 #endif
@@ -430,6 +432,41 @@ ULONG64     start_ticks;
     }
     else
     {
+        /* If this is a ThreadX application thread, signal that it is about to
+         * spin waiting for the critical section.  context_save checks this flag
+         * before calling SuspendThread(): a thread that is merely blocked on the
+         * spinlock does not need to be OS-suspended — it cannot execute protected
+         * code anyway, and will proceed automatically once the CS is released.
+         * The flag is cleared below once the CS has been acquired.
+         *
+         * Identify the calling thread by scanning _tx_win32_virtual_cores for a
+         * matching OS thread ID rather than using the TLS _tx_win32_current_virtual_core
+         * cache.  The TLS value can be stale when the scheduler moves a thread to a
+         * different virtual core via a type-1 (SuspendThread/ResumeThread) hand-off;
+         * using a stale core index would stamp mutex_access on the WRONG thread,
+         * which could then prevent context_restore from issuing the matching
+         * ResumeThread and leave that thread permanently OS-suspended.
+         *
+         * The scan is performed without holding the CS (racy by design): worst case
+         * the entry is momentarily absent and current_thread remains TX_NULL, which
+         * simply skips the optimisation for this one acquisition. */
+        current_thread =  TX_NULL;
+        if (_tx_win32_threadx_thread != 0)
+        {
+            for (core_scan = 0U; core_scan < TX_THREAD_SMP_MAX_CORES; core_scan++)
+            {
+                if (_tx_win32_virtual_cores[core_scan].tx_thread_smp_core_mapping_thread_id == thread_id)
+                {
+                    current_thread =  _tx_win32_virtual_cores[core_scan].tx_thread_smp_core_mapping_thread;
+                    break;
+                }
+            }
+            if (current_thread != TX_NULL)
+            {
+                current_thread -> tx_thread_win32_mutex_access =  TX_TRUE;
+            }
+        }
+
         contention_count =  0U;
 #ifdef TX_WIN32_PROFILE_ENABLE
         start_ticks =  _tx_win32_profile_time_get();
@@ -464,6 +501,14 @@ ULONG64     start_ticks;
                 (_tx_win32_profile_time_get() - start_ticks);
         }
 #endif
+        /* CS acquired; clear the spinning flag so the next timer ISR will see
+         * the thread as normally running.  The thread is now inside the CS body
+         * and the ISR cannot reach context_save until we release the CS. */
+        if (current_thread != TX_NULL)
+        {
+            current_thread -> tx_thread_win32_mutex_access =  TX_FALSE;
+        }
+
         critical_section -> tx_win32_critical_section_nested_count =  1U;
     }
 }

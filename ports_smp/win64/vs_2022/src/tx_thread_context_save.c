@@ -65,6 +65,18 @@ UINT        interrupt_posture;
                 thread_ptr -> tx_thread_win32_suspension_type =  3U;
             }
         }
+        else
+        {
+            /* Thread is spinning on the Win32 critical section (mutex_access TRUE).
+             * It is blocked waiting to acquire the CS and cannot execute any protected
+             * ThreadX code, so SuspendThread is unnecessary.  Tag the thread with
+             * suspension_type 4 so context_restore handles it correctly:
+             *   - no-preemption path: just clear the flag (no ResumeThread).
+             *   - preemption path: call SuspendThread retrospectively and proceed.
+             *
+             * MISRA C 2012 Rule 10.3 deviation: value 4 is a port-local extension. */
+            thread_ptr -> tx_thread_win32_suspension_type =  4U;
+        }
     }
 
     _tx_thread_system_state[0]++;

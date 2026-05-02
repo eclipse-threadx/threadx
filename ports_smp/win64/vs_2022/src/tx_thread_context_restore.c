@@ -41,6 +41,16 @@ TX_THREAD   *execute_thread;
         {
             if ((_tx_thread_preempt_disable == 0U) && (current_thread != execute_thread))
             {
+                /* If context_save skipped SuspendThread because the thread was spinning
+                 * on the Win32 CS (suspension_type == 4), suspend it now.  The ISR still
+                 * holds the CS so the spinning thread cannot make forward progress, making
+                 * SuspendThread safe to call here.  mutex_access remains TRUE; the thread
+                 * will clear it naturally when it acquires the CS after being resumed. */
+                if (current_thread -> tx_thread_win32_suspension_type == 4U)
+                {
+                    _tx_win32_thread_suspend(current_thread -> tx_thread_win32_thread_handle);
+                }
+
                 current_thread -> tx_thread_win32_suspension_type =  1U;
 
                 if (_tx_timer_time_slice[0] != 0U)
@@ -75,25 +85,26 @@ TX_THREAD   *execute_thread;
             }
             else
             {
-                if (current_thread -> tx_thread_win32_suspension_type == 3U)
+                if ((current_thread -> tx_thread_win32_suspension_type == 3U) ||
+                    (current_thread -> tx_thread_win32_suspension_type == 4U))
                 {
-                    /* context_save did not call SuspendThread because
-                     * _tx_thread_preempt_disable was non-zero; clear the flag and
-                     * do not issue a ResumeThread (which would corrupt the OS suspend
-                     * count).  The thread will continue automatically once the ISR
-                     * releases the Win32 critical section. */
+                    /* context_save did not call SuspendThread (type 3: preempt_disable≠0;
+                     * type 4: thread was spinning on Win32 CS).  Clear the flag; do not
+                     * issue a matching ResumeThread.  The thread will continue
+                     * automatically once the ISR releases the Win32 critical section. */
                     current_thread -> tx_thread_win32_suspension_type =  0U;
-                }
-                else if (current_thread -> tx_thread_win32_mutex_access == TX_FALSE)
-                {
-                    /* Thread was suspended in context_save; resume it. */
-                    _tx_win32_thread_resume(current_thread -> tx_thread_win32_thread_handle);
                 }
                 else
                 {
-                    /* Thread is spinning on the Win32 critical section (mutex_access TRUE);
-                     * SuspendThread was not called, so ResumeThread must not be called.
-                     * The thread will acquire the CS and continue once the ISR releases it. */
+                    /* suspension_type 0: context_save called SuspendThread.  Always issue
+                     * the matching ResumeThread here, regardless of mutex_access.
+                     *
+                     * Do NOT gate this on mutex_access: a thread on a different virtual core
+                     * that happens to share the same stale TLS slot can momentarily stamp
+                     * mutex_access = TRUE on this thread's struct while it is OS-suspended,
+                     * which would otherwise cause context_restore to skip ResumeThread and
+                     * leave the thread permanently suspended (deadlock). */
+                    _tx_win32_thread_resume(current_thread -> tx_thread_win32_thread_handle);
                 }
             }
         }
