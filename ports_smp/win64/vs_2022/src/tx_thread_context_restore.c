@@ -65,6 +65,12 @@ TX_THREAD   *execute_thread;
                 _tx_win32_virtual_cores[0].tx_thread_smp_core_mapping_thread =        TX_NULL;
                 current_thread -> tx_thread_smp_core_control =  1U;
 
+                /* Signal the scheduler to assign the next execute_thread.  Wait for the
+                 * scheduler to signal isr_semaphore before returning: the scheduler holds
+                 * the CS while waiting for start_ack from the execute_thread, which forces
+                 * any thread calling TX_DISABLE to spin with mutex_access=TRUE while
+                 * preempt_disable may be non-zero — exactly the window needed to satisfy
+                 * the condition in tests such as wait_abort_and_isr. */
                 _tx_win32_timer_waiting =  1U;
                 MemoryBarrier();
                 if (SetEvent(_tx_win32_scheduler_event) == 0)

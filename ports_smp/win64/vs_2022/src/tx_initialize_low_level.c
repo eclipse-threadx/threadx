@@ -49,7 +49,7 @@ static UINT                     _tx_win32_smp_current_core_get_internal(DWORD th
 static UINT                     _tx_win32_smp_thread_core_get(DWORD thread_id);
 
 #ifndef TX_WIN32_CONTENTION_PAUSE_COUNT
-#define TX_WIN32_CONTENTION_PAUSE_COUNT       64U
+#define TX_WIN32_CONTENTION_PAUSE_COUNT       256U
 #endif
 
 #ifdef TX_WIN32_PROFILE_ENABLE
@@ -440,25 +440,29 @@ ULONG64     start_ticks;
          * The flag is cleared below once the CS has been acquired.
          *
          * Identify the calling thread by scanning _tx_win32_virtual_cores for a
-         * matching OS thread ID rather than using the TLS _tx_win32_current_virtual_core
-         * cache.  The TLS value can be stale when the scheduler moves a thread to a
-         * different virtual core via a type-1 (SuspendThread/ResumeThread) hand-off;
-         * using a stale core index would stamp mutex_access on the WRONG thread,
-         * which could then prevent context_restore from issuing the matching
-         * ResumeThread and leave that thread permanently OS-suspended.
-         *
-         * The scan is performed without holding the CS (racy by design): worst case
-         * the entry is momentarily absent and current_thread remains TX_NULL, which
-         * simply skips the optimisation for this one acquisition. */
+         * matching OS thread ID.  As a fast path, check the TLS-cached virtual core
+         * index first; fall back to a full scan only when the TLS value is stale
+         * (e.g., after a type-1 scheduler hand-off moves the thread to a new core).
+         * Worst case: the entry is momentarily absent and current_thread stays
+         * TX_NULL, which simply skips the mutex_access optimisation this cycle. */
         current_thread =  TX_NULL;
         if (_tx_win32_threadx_thread != 0)
         {
-            for (core_scan = 0U; core_scan < TX_THREAD_SMP_MAX_CORES; core_scan++)
+            core_scan =  _tx_win32_current_virtual_core;
+            if ((core_scan < TX_THREAD_SMP_MAX_CORES) &&
+                (_tx_win32_virtual_cores[core_scan].tx_thread_smp_core_mapping_thread_id == thread_id))
             {
-                if (_tx_win32_virtual_cores[core_scan].tx_thread_smp_core_mapping_thread_id == thread_id)
+                current_thread =  _tx_win32_virtual_cores[core_scan].tx_thread_smp_core_mapping_thread;
+            }
+            else
+            {
+                for (core_scan = 0U; core_scan < TX_THREAD_SMP_MAX_CORES; core_scan++)
                 {
-                    current_thread =  _tx_win32_virtual_cores[core_scan].tx_thread_smp_core_mapping_thread;
-                    break;
+                    if (_tx_win32_virtual_cores[core_scan].tx_thread_smp_core_mapping_thread_id == thread_id)
+                    {
+                        current_thread =  _tx_win32_virtual_cores[core_scan].tx_thread_smp_core_mapping_thread;
+                        break;
+                    }
                 }
             }
             if (current_thread != TX_NULL)

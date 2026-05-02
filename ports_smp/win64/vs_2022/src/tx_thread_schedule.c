@@ -119,6 +119,11 @@ DWORD       wait_status;
                         _tx_win32_semaphore_reset(execute_thread -> tx_thread_win32_thread_start_semaphore);
                         _tx_win32_semaphore_reset(execute_thread -> tx_thread_win32_thread_run_semaphore);
                         ReleaseSemaphore(execute_thread -> tx_thread_win32_thread_run_semaphore, 1, NULL);
+                        /* Wait for the execute_thread to signal start_ack before proceeding.
+                         * Holding the CS here means any thread that calls TX_DISABLE will
+                         * spin with mutex_access=TRUE and preempt_disable≠0, creating the
+                         * window the ISR needs to observe preempt_disable!=0 for resonance
+                         * tests such as wait_abort_and_isr. */
                         wait_status =  _tx_win32_wait_for_thread_start_ack(execute_thread -> tx_thread_win32_thread_start_semaphore);
                         if (wait_status != WAIT_OBJECT_0)
                         {
@@ -133,6 +138,8 @@ DWORD       wait_status;
             }
         }
 
+        /* Signal context_restore's rendezvous wait now that all execute_threads have
+         * been resumed and their start_ack received. */
         if (_tx_win32_timer_waiting != 0U)
         {
             ReleaseSemaphore(_tx_win32_isr_semaphore, 1, NULL);
