@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                          Win32/Visual     */
-/*                                                           6.1          */
+/*                                                  6.5.1.202602          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -286,7 +286,7 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
 #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
 #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
 
-*/
+ */
 
 #ifndef TX_TRACE_TIME_SOURCE
 #define TX_TRACE_TIME_SOURCE                    ((ULONG) (_tx_win32_time_stamp.LowPart));
@@ -500,7 +500,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Win32/Visual Studio Version 6.5.0.202601 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Win32/Visual Studio Version 6.5.1.202602 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

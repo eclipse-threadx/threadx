@@ -441,7 +441,7 @@ UINT   _tx_thread_interrupt_control(UINT new_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2026 Eclipse ThreadX contributors.  *  ThreadX SMP/Win64/MSVC Version 6.5.1.202604 *";
+                                    "(c) 2026 Eclipse ThreadX contributors.  *  ThreadX SMP/Win64/MSVC Version 6.5.1.202602 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

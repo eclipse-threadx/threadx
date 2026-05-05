@@ -30,7 +30,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                          Win64/Visual     */
-/*                                                           6.5          */
+/*                                                  6.5.1.202602          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -298,7 +298,7 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
 #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
 #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
 
-*/
+ */
 
 #ifndef TX_TRACE_TIME_SOURCE
 #define TX_TRACE_TIME_SOURCE                    ((ULONG) (_tx_win32_time_stamp.LowPart))
