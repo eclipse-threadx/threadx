@@ -32,6 +32,7 @@ TX_THREAD   *current_thread;
 TX_THREAD   *execute_thread;
 UCHAR       preempt_retry;
 DWORD       wait_status;
+LONG        start_sequence;
 
     preempt_retry =  TX_FALSE;
 
@@ -116,15 +117,18 @@ DWORD       wait_status;
 #ifdef TX_WIN32_PROFILE_ENABLE
                         _tx_win32_profile_mark_run_signal(execute_thread);
 #endif
+#if (TX_WIN32_USE_ADDRESS_WAIT == 0)
                         _tx_win32_semaphore_reset(execute_thread -> tx_thread_win32_thread_start_semaphore);
                         _tx_win32_semaphore_reset(execute_thread -> tx_thread_win32_thread_run_semaphore);
-                        ReleaseSemaphore(execute_thread -> tx_thread_win32_thread_run_semaphore, 1, NULL);
+#endif
+                        start_sequence =  _tx_win32_thread_start_sequence_get(execute_thread);
+                        _tx_win32_thread_run_signal(execute_thread);
                         /* Wait for the execute_thread to signal start_ack before proceeding.
                          * Holding the CS here means any thread that calls TX_DISABLE will
                          * spin with mutex_access=TRUE and preempt_disable≠0, creating the
                          * window the ISR needs to observe preempt_disable!=0 for resonance
                          * tests such as wait_abort_and_isr. */
-                        wait_status =  _tx_win32_wait_for_thread_start_ack(execute_thread -> tx_thread_win32_thread_start_semaphore);
+                        wait_status =  _tx_win32_wait_for_thread_start_ack(execute_thread, start_sequence);
                         if (wait_status != WAIT_OBJECT_0)
                         {
                             _tx_win32_system_error++;
@@ -209,10 +213,7 @@ ULONG   wait_count;
 
             _tx_win32_thread_resume(thread_ptr -> tx_thread_win32_thread_handle);
 
-            if (thread_ptr -> tx_thread_win32_thread_run_semaphore != NULL)
-            {
-                ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_run_semaphore, 1, NULL);
-            }
+            _tx_win32_thread_run_signal(thread_ptr);
 
             _tx_win32_thread_sleep(1U);
             wait_count++;

@@ -29,6 +29,10 @@ VOID  _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 {
     TX_PARAMETER_NOT_USED(function_ptr);
 
+#if (TX_WIN32_USE_ADDRESS_WAIT != 0)
+    thread_ptr -> tx_thread_win32_thread_run_semaphore =    NULL;
+    thread_ptr -> tx_thread_win32_thread_start_semaphore =  NULL;
+#else
     thread_ptr -> tx_thread_win32_thread_run_semaphore =  CreateSemaphore(NULL, 0, 0x7FFFFFFF, NULL);
     if (thread_ptr -> tx_thread_win32_thread_run_semaphore == NULL)
     {
@@ -46,6 +50,7 @@ VOID  _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
         {
         }
     }
+#endif
 
     thread_ptr -> tx_thread_win32_thread_handle =  CreateThread(NULL,
                                                                 TX_WIN32_THREAD_STACK_SIZE,
@@ -68,6 +73,9 @@ VOID  _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
     thread_ptr -> tx_thread_win32_int_disabled_flag =  TX_FALSE;
     thread_ptr -> tx_thread_win32_deferred_preempt =   TX_FALSE;
     thread_ptr -> tx_thread_win32_virtual_core =       0U;
+    thread_ptr -> tx_thread_win32_run_sequence =        0L;
+    thread_ptr -> tx_thread_win32_run_sequence_seen =   0L;
+    thread_ptr -> tx_thread_win32_start_sequence =      0L;
 
     thread_ptr -> tx_thread_stack_ptr =  (VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8);
     *(((ULONG *) thread_ptr -> tx_thread_stack_ptr) - 1) =  0UL;
@@ -85,7 +93,7 @@ TX_THREAD   *thread_ptr;
     _tx_win32_threadx_thread =  1;
 
     _tx_win32_debug_entry_insert("THREAD_ENTRY_wait", __FILE__, __LINE__);
-    _tx_win32_wait_for_thread_run_semaphore(thread_ptr -> tx_thread_win32_thread_run_semaphore);
+    _tx_win32_wait_for_thread_run(thread_ptr);
 #ifdef TX_WIN32_PROFILE_ENABLE
     _tx_win32_profile_mark_run_wake(thread_ptr);
 #endif
@@ -105,7 +113,7 @@ TX_THREAD   *thread_ptr;
 #ifdef TX_WIN32_PROFILE_ENABLE
     _tx_win32_profile_mark_start_ack(thread_ptr);
 #endif
-    ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
+    _tx_win32_thread_start_ack_signal(thread_ptr);
     _tx_win32_debug_entry_insert("THREAD_ENTRY_ack", __FILE__, __LINE__);
 
     _tx_thread_shell_entry();

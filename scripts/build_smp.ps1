@@ -5,7 +5,7 @@ param(
 
     [int]$Parallel = [Math]::Max(1, [Environment]::ProcessorCount),
 
-    [int]$BuildTimeoutSeconds = 60,
+    [int]$BuildTimeoutSeconds = 180,
 
     [string]$BuildDir,
 

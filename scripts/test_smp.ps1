@@ -7,7 +7,7 @@ param(
 
     [int]$RepeatFailCount = 1,
 
-    [int]$TestTimeoutSeconds = 180,
+    [int]$TestTimeoutSeconds = 45,
 
     [switch]$CollectFailureDiagnostics = $true,
 

@@ -230,6 +230,18 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
 
 #include <windows.h>
 
+#ifndef TX_WIN32_USE_ADDRESS_WAIT
+#define TX_WIN32_USE_ADDRESS_WAIT               1
+#endif
+
+#ifndef TX_WIN32_USE_HIGH_RESOLUTION_TIMER
+#define TX_WIN32_USE_HIGH_RESOLUTION_TIMER      1
+#endif
+
+#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
+#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION   0x00000002UL
+#endif
+
 
 #ifndef TX_MAX_PRIORITIES
 #define TX_MAX_PRIORITIES                       32
@@ -296,6 +308,9 @@ void    _tx_initialize_start_interrupts(void);
                                                                             DWORD  tx_thread_win32_thread_id; \
                                                                             HANDLE tx_thread_win32_thread_run_semaphore; \
                                                                             HANDLE tx_thread_win32_thread_start_semaphore; \
+                                                                            LONG   tx_thread_win32_run_sequence; \
+                                                                            LONG   tx_thread_win32_run_sequence_seen; \
+                                                                            LONG   tx_thread_win32_start_sequence; \
                                                                             UINT   tx_thread_win32_suspension_type; \
                                                                             UINT   tx_thread_win32_mutex_access; \
                                                                             UINT   tx_thread_win32_int_disabled_flag; \
@@ -453,10 +468,14 @@ void   _tx_win32_thread_resume(HANDLE thread_handle);
 void   _tx_win32_thread_sleep(ULONG milliseconds);
 void   _tx_win32_thread_yield(void);
 void   _tx_win32_semaphore_reset(HANDLE semaphore_handle);
+LONG   _tx_win32_thread_start_sequence_get(TX_THREAD *thread_ptr);
+void   _tx_win32_thread_run_signal(TX_THREAD *thread_ptr);
+DWORD  _tx_win32_wait_for_thread_run(TX_THREAD *thread_ptr);
+void   _tx_win32_thread_start_ack_signal(TX_THREAD *thread_ptr);
 DWORD  _tx_win32_wait_for_scheduler_event(void);
 DWORD  _tx_win32_wait_for_thread_run_semaphore(HANDLE semaphore_handle);
 DWORD  _tx_win32_wait_for_thread_start_semaphore(HANDLE semaphore_handle);
-DWORD  _tx_win32_wait_for_thread_start_ack(HANDLE semaphore_handle);
+DWORD  _tx_win32_wait_for_thread_start_ack(TX_THREAD *thread_ptr, LONG start_sequence);
 DWORD  _tx_win32_wait_for_isr_semaphore(void);
 DWORD  _tx_win32_wait_for_isr_rendezvous(void);
 DWORD  _tx_win32_wait_for_timer_object(void);
@@ -487,6 +506,24 @@ void   _tx_win32_profile_mark_start_ack(TX_THREAD *thread_ptr);
 #define TX_TIMER_PERIODIC                       10
 #endif
 #endif
+
+#ifndef TX_WIN32_ISR_PERIODIC
+#if defined(CTEST) || defined(BATCH_TEST)
+#define TX_WIN32_ISR_PERIODIC                   1
+#else
+#define TX_WIN32_ISR_PERIODIC                   TX_TIMER_PERIODIC
+#endif
+#endif
+
+#if (TX_WIN32_ISR_PERIODIC > TX_TIMER_PERIODIC)
+#error "TX_WIN32_ISR_PERIODIC must not exceed TX_TIMER_PERIODIC"
+#endif
+
+#if ((TX_TIMER_PERIODIC % TX_WIN32_ISR_PERIODIC) != 0)
+#error "TX_TIMER_PERIODIC must be an integer multiple of TX_WIN32_ISR_PERIODIC"
+#endif
+
+#define TX_WIN32_TIMER_INTERRUPTS_PER_TICK      (TX_TIMER_PERIODIC / TX_WIN32_ISR_PERIODIC)
 
 #define TX_WIN32_PRIORITY_SCHEDULE              THREAD_PRIORITY_NORMAL
 #define TX_WIN32_PRIORITY_ISR                   THREAD_PRIORITY_HIGHEST

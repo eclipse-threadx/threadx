@@ -27,6 +27,9 @@
 #include <stdio.h>
 
 #pragma comment (lib, "Winmm.lib")
+#if (TX_WIN32_USE_ADDRESS_WAIT != 0)
+#pragma comment (lib, "Synchronization.lib")
+#endif
 
 TX_WIN32_CRITICAL_SECTION       _tx_win32_critical_section;
 HANDLE                          _tx_win32_scheduler_event;
@@ -186,6 +189,15 @@ void  _tx_timer_interrupt(void);
 VOID  _tx_thread_context_save(VOID);
 VOID  _tx_thread_context_restore(VOID);
 VOID  _tx_win32_timer_interrupt(VOID);
+#if defined(CTEST) || defined(BATCH_TEST)
+VOID  test_interrupt_dispatch(VOID);
+extern VOID (*test_isr_dispatch)(void);
+#if (TX_WIN32_ISR_PERIODIC < TX_TIMER_PERIODIC)
+static VOID  _tx_win32_timer_tick_process(VOID);
+static UINT  _tx_win32_timer_fast_active;
+static UINT  _tx_win32_timer_fast_count;
+#endif
+#endif
 
 
 VOID  _tx_initialize_low_level(VOID)
@@ -228,6 +240,10 @@ UINT        timer_resolution;
 
     _tx_win32_global_int_disabled_flag =  TX_FALSE;
     _tx_win32_timer_waiting =             0U;
+#if (defined(CTEST) || defined(BATCH_TEST)) && (TX_WIN32_ISR_PERIODIC < TX_TIMER_PERIODIC)
+    _tx_win32_timer_fast_active =         TX_FALSE;
+    _tx_win32_timer_fast_count =          0U;
+#endif
 
 #ifdef TX_WIN32_PROFILE_ENABLE
     if (_tx_win32_profile_frequency.QuadPart == 0)
@@ -245,7 +261,7 @@ UINT        timer_resolution;
         }
     }
 
-    timer_resolution = (UINT) min(max(tc.wPeriodMin, TX_TIMER_PERIODIC), tc.wPeriodMax);
+    timer_resolution = (UINT) min(max(tc.wPeriodMin, TX_WIN32_ISR_PERIODIC), tc.wPeriodMax);
     if (timeBeginPeriod(timer_resolution) != TIMERR_NOERROR)
     {
         printf("ThreadX SMP Win64 error configuring timer resolution!\n");
@@ -254,7 +270,14 @@ UINT        timer_resolution;
         }
     }
 
-    _tx_win32_timer_handle =  CreateWaitableTimer(NULL, FALSE, NULL);
+#if (TX_WIN32_USE_HIGH_RESOLUTION_TIMER != 0)
+    _tx_win32_timer_handle =  CreateWaitableTimerEx(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+    if (_tx_win32_timer_handle == NULL)
+#endif
+    {
+        _tx_win32_timer_handle =  CreateWaitableTimer(NULL, FALSE, NULL);
+    }
+
     if (_tx_win32_timer_handle == NULL)
     {
         printf("ThreadX SMP Win64 error creating timer handle!\n");
@@ -773,6 +796,90 @@ ULONG64  start_ticks;
 }
 
 
+LONG  _tx_win32_thread_start_sequence_get(TX_THREAD *thread_ptr)
+{
+#if (TX_WIN32_USE_ADDRESS_WAIT != 0)
+    return(thread_ptr -> tx_thread_win32_start_sequence);
+#else
+    TX_PARAMETER_NOT_USED(thread_ptr);
+    return(0L);
+#endif
+}
+
+
+void  _tx_win32_thread_run_signal(TX_THREAD *thread_ptr)
+{
+#if (TX_WIN32_USE_ADDRESS_WAIT != 0)
+    (void) InterlockedIncrement(&(thread_ptr -> tx_thread_win32_run_sequence));
+    WakeByAddressSingle(&(thread_ptr -> tx_thread_win32_run_sequence));
+#else
+    ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_run_semaphore, 1, NULL);
+#endif
+}
+
+
+DWORD  _tx_win32_wait_for_thread_run(TX_THREAD *thread_ptr)
+{
+DWORD   wait_status;
+#if (TX_WIN32_USE_ADDRESS_WAIT != 0)
+LONG    observed_sequence;
+LONG    current_sequence;
+#endif
+#ifdef TX_WIN32_PROFILE_ENABLE
+ULONG64 start_ticks;
+
+    start_ticks =  _tx_win32_profile_time_get();
+#endif
+
+#if (TX_WIN32_USE_ADDRESS_WAIT != 0)
+    wait_status =        WAIT_OBJECT_0;
+    observed_sequence =  thread_ptr -> tx_thread_win32_run_sequence_seen;
+    current_sequence =   thread_ptr -> tx_thread_win32_run_sequence;
+
+    while (current_sequence == observed_sequence)
+    {
+        if (WaitOnAddress(&(thread_ptr -> tx_thread_win32_run_sequence),
+                          &observed_sequence,
+                          sizeof(thread_ptr -> tx_thread_win32_run_sequence),
+                          INFINITE) == 0)
+        {
+            _tx_win32_system_error++;
+            wait_status =  WAIT_FAILED;
+            break;
+        }
+
+        current_sequence =  thread_ptr -> tx_thread_win32_run_sequence;
+    }
+
+    if (wait_status == WAIT_OBJECT_0)
+    {
+        thread_ptr -> tx_thread_win32_run_sequence_seen =  current_sequence;
+    }
+#else
+    wait_status =  WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_run_semaphore, INFINITE);
+#endif
+
+#ifdef TX_WIN32_PROFILE_ENABLE
+    _tx_win32_profile_accumulate(&_tx_win32_profile.tx_win32_profile_thread_run_wait_ticks,
+                                 &_tx_win32_profile.tx_win32_profile_thread_run_wait_count,
+                                 start_ticks);
+#endif
+
+    return(wait_status);
+}
+
+
+void  _tx_win32_thread_start_ack_signal(TX_THREAD *thread_ptr)
+{
+#if (TX_WIN32_USE_ADDRESS_WAIT != 0)
+    (void) InterlockedIncrement(&(thread_ptr -> tx_thread_win32_start_sequence));
+    WakeByAddressSingle(&(thread_ptr -> tx_thread_win32_start_sequence));
+#else
+    ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
+#endif
+}
+
+
 DWORD  _tx_win32_wait_for_scheduler_event(VOID)
 {
 DWORD   wait_status;
@@ -842,16 +949,40 @@ ULONG64 start_ticks;
 }
 
 
-DWORD  _tx_win32_wait_for_thread_start_ack(HANDLE semaphore_handle)
+DWORD  _tx_win32_wait_for_thread_start_ack(TX_THREAD *thread_ptr, LONG start_sequence)
 {
 DWORD   wait_status;
+#if (TX_WIN32_USE_ADDRESS_WAIT != 0)
+LONG    current_sequence;
+#endif
 #ifdef TX_WIN32_PROFILE_ENABLE
 ULONG64 start_ticks;
 
     start_ticks =  _tx_win32_profile_time_get();
 #endif
 
-    wait_status =  WaitForSingleObject(semaphore_handle, INFINITE);
+#if (TX_WIN32_USE_ADDRESS_WAIT != 0)
+    wait_status =       WAIT_OBJECT_0;
+    current_sequence =  thread_ptr -> tx_thread_win32_start_sequence;
+
+    while (current_sequence == start_sequence)
+    {
+        if (WaitOnAddress(&(thread_ptr -> tx_thread_win32_start_sequence),
+                          &start_sequence,
+                          sizeof(thread_ptr -> tx_thread_win32_start_sequence),
+                          INFINITE) == 0)
+        {
+            _tx_win32_system_error++;
+            wait_status =  WAIT_FAILED;
+            break;
+        }
+
+        current_sequence =  thread_ptr -> tx_thread_win32_start_sequence;
+    }
+#else
+    TX_PARAMETER_NOT_USED(start_sequence);
+    wait_status =  WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_start_semaphore, INFINITE);
+#endif
 
 #ifdef TX_WIN32_PROFILE_ENABLE
     _tx_win32_profile_accumulate(&_tx_win32_profile.tx_win32_profile_thread_start_ack_wait_ticks,
@@ -942,17 +1073,74 @@ static DWORD WINAPI  _tx_win32_timer_thread_entry(LPVOID thread_input)
 VOID  _tx_win32_timer_interrupt(VOID)
 {
     _tx_thread_context_save();
+#if defined(CTEST) || defined(BATCH_TEST)
+    test_interrupt_dispatch();
+#if (TX_WIN32_ISR_PERIODIC < TX_TIMER_PERIODIC)
+    _tx_win32_timer_tick_process();
+#else
     _tx_timer_interrupt();
+#endif
+#else
+    _tx_timer_interrupt();
+#endif
     _tx_thread_context_restore();
 }
+
+
+#if (defined(CTEST) || defined(BATCH_TEST)) && (TX_WIN32_ISR_PERIODIC < TX_TIMER_PERIODIC)
+static VOID  _tx_win32_timer_tick_process(VOID)
+{
+    if (test_isr_dispatch != TX_NULL)
+    {
+        if (_tx_win32_timer_fast_active == TX_FALSE)
+        {
+            _tx_win32_timer_fast_active =  TX_TRUE;
+            _tx_win32_timer_fast_count =   0U;
+        }
+        else
+        {
+            _tx_win32_timer_fast_count++;
+            if (_tx_win32_timer_fast_count < TX_WIN32_TIMER_INTERRUPTS_PER_TICK)
+            {
+                return;
+            }
+
+            _tx_win32_timer_fast_count =  0U;
+        }
+    }
+    else
+    {
+        _tx_win32_timer_fast_active =  TX_FALSE;
+        _tx_win32_timer_fast_count =   0U;
+    }
+
+    _tx_timer_interrupt();
+}
+#endif
 
 
 static VOID  _tx_win32_timer_start(VOID)
 {
 LARGE_INTEGER   due_time;
+LONGLONG        timer_period;
 
-    due_time.QuadPart =  -(((LONGLONG) TX_TIMER_PERIODIC) * 10000LL);
+#if (defined(CTEST) || defined(BATCH_TEST)) && (TX_WIN32_ISR_PERIODIC < TX_TIMER_PERIODIC)
+    if (test_isr_dispatch != TX_NULL)
+    {
+        timer_period =  (LONGLONG) TX_WIN32_ISR_PERIODIC;
+    }
+    else
+#endif
+    {
+        timer_period =  (LONGLONG) TX_TIMER_PERIODIC;
+    }
+
+    due_time.QuadPart =  -(timer_period * 10000LL);
+#if (TX_WIN32_USE_HIGH_RESOLUTION_TIMER != 0)
+    if (SetWaitableTimerEx(_tx_win32_timer_handle, &due_time, 0, NULL, NULL, NULL, 0) == 0)
+#else
     if (SetWaitableTimer(_tx_win32_timer_handle, &due_time, 0, NULL, NULL, FALSE) == 0)
+#endif
     {
         printf("ThreadX SMP Win64 error starting timer!\n");
         while (1)

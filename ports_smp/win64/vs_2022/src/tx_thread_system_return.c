@@ -25,7 +25,6 @@
 VOID  _tx_thread_system_return(VOID)
 {
 TX_THREAD   *temp_thread_ptr;
-HANDLE      temp_run_semaphore;
 UINT        temp_thread_state;
 UINT        core;
 DWORD       thread_id;
@@ -52,7 +51,6 @@ DWORD       thread_id;
         _tx_timer_time_slice[core] =  0U;
     }
 
-    temp_run_semaphore =  temp_thread_ptr -> tx_thread_win32_thread_run_semaphore;
     temp_thread_state =   temp_thread_ptr -> tx_thread_state;
     temp_thread_ptr -> tx_thread_win32_suspension_type =  2U;
     _tx_thread_current_ptr[core] =  TX_NULL;
@@ -90,7 +88,7 @@ DWORD       thread_id;
         ExitThread(0);
     }
 
-    _tx_win32_wait_for_thread_run_semaphore(temp_run_semaphore);
+    _tx_win32_wait_for_thread_run(temp_thread_ptr);
 #ifdef TX_WIN32_PROFILE_ENABLE
     _tx_win32_profile_mark_run_wake(temp_thread_ptr);
 #endif
@@ -98,7 +96,7 @@ DWORD       thread_id;
 #ifdef TX_WIN32_PROFILE_ENABLE
     _tx_win32_profile_mark_start_ack(temp_thread_ptr);
 #endif
-    ReleaseSemaphore(temp_thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
+    _tx_win32_thread_start_ack_signal(temp_thread_ptr);
 
     _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
 
