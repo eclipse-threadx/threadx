@@ -147,16 +147,36 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
     /* Make the thread initially ready so it will run to the initial wait on
        its run semaphore.  */
     ResumeThread(thread_ptr -> tx_thread_win32_thread_handle);
+
+    /* Wait until the host thread is parked at the controlled handoff point
+       before ThreadX can schedule it.  */
+    if (WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_start_semaphore, INFINITE) != WAIT_OBJECT_0)
+    {
+
+        /* Display an error message.  */
+        printf("ThreadX Win32 error synchronizing thread startup!\n");
+        while(1)
+        {
+        }
+    }
 }
 
 
 DWORD WINAPI _tx_win32_thread_entry(LPVOID ptr)
 {
 
-TX_THREAD  *thread_ptr;
+TX_THREAD   *thread_ptr;
+TX_THREAD   *current_thread_ptr;
+HANDLE      threadhandle;
+int         threadpriority;
+DWORD       threadid;
 
     /* Pickup the current thread pointer.  */
     thread_ptr =  (TX_THREAD *) ptr;
+
+    /* Tell the creator that this host thread has reached the controlled
+       handoff point and is ready to be scheduled.  */
+    ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
 
     /* Now suspend the thread initially.  If the thread has already
        been scheduled, this will return immediately.  */
@@ -164,6 +184,23 @@ TX_THREAD  *thread_ptr;
 
     /* Acknowledge that the host thread is now able to execute ThreadX code.  */
     ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
+
+    /* A deleted host thread can be released only to let it exit.  In notify-enabled
+       builds, the first TX_DISABLE in _tx_thread_shell_entry catches this path.
+       When callbacks are disabled, perform the same check before the shell calls
+       the stale ThreadX entry function.  */
+    _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
+    threadhandle =       GetCurrentThread();
+    threadpriority =     GetThreadPriority(threadhandle);
+    threadid =           GetCurrentThreadId();
+    current_thread_ptr = _tx_thread_current_ptr;
+    if ((threadpriority == THREAD_PRIORITY_LOWEST) &&
+        ((current_thread_ptr == TX_NULL) || (current_thread_ptr -> tx_thread_win32_thread_id != threadid)))
+    {
+        _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
+        ExitThread(0);
+    }
+    _tx_win32_critical_section_release(&_tx_win32_critical_section);
 
     /* Call ThreadX thread entry point.  */
     _tx_thread_shell_entry();
