@@ -254,7 +254,7 @@ ULONG   actual;
         {
 
             /* Test error!  */
-            printf("ERROR #8 (%u %lu %lu)\n", status, condition_count, event_flags_set_counter);
+            printf("ERROR #8\n");
             test_control_return(1);
         }
 

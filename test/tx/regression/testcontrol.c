@@ -430,37 +430,8 @@ static void   init_timer_entry(ULONG timer_input)
 
 void delete_timer_thread(void)
 {
-#if defined(_WIN32)
-HANDLE  threadhandle;
-HANDLE  threadrunsemaphore;
-#endif
 
     _tx_thread_terminate(&_tx_timer_thread);
-
-#if defined(_WIN32)
-    if (_tx_thread_current_ptr == TX_NULL)
-    {
-
-        /* The Windows simulator creates the host thread before the scheduler can run it.
-           Tear it down directly so the regression hook can force the retry path safely.  */
-        threadhandle =       _tx_timer_thread.tx_thread_win32_thread_handle;
-        threadrunsemaphore = _tx_timer_thread.tx_thread_win32_thread_run_semaphore;
-
-        if (threadhandle != ((HANDLE) 0))
-        {
-            (void)TerminateThread(threadhandle, 0U);
-            (void)CloseHandle(threadhandle);
-            _tx_timer_thread.tx_thread_win32_thread_handle = ((HANDLE) 0);
-        }
-
-        if (threadrunsemaphore != ((HANDLE) 0))
-        {
-            (void)CloseHandle(threadrunsemaphore);
-            _tx_timer_thread.tx_thread_win32_thread_run_semaphore = ((HANDLE) 0);
-        }
-    }
-#endif
-
     _tx_thread_delete(&_tx_timer_thread);
 }
 

@@ -406,10 +406,9 @@ volatile ULONG       value = 0;
     /* Sleep for 100 ticks.  */
     status =  tx_thread_sleep(100);
 
-    /* The Windows host simulator can occasionally resume the sleeping thread
-       one additional tick later under heavier host-side scheduling jitter.  */
+    /* Determine if the sleep was accurate.  */
     if ((status != TX_SUCCESS) || (tx_time_get() < 100) ||
-        (tx_time_get() > 102))
+        (tx_time_get() > 101))
     {
 
         /* Thread Simple Sleep error.  */
@@ -433,4 +432,3 @@ volatile ULONG       value = 0;
         test_control_return(0);
     }
 }
-

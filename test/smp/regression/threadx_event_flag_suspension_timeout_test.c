@@ -179,9 +179,7 @@ UINT    status;
     tx_thread_sleep(63);
 
     /* Check the run counters.  */
-    /* Host scheduling jitter can shift one extra round in these timeout loops.  */
-    if (((thread_1_counter < 32UL) || (thread_1_counter > 33UL)) ||
-        ((thread_2_counter < 13UL) || (thread_2_counter > 14UL)))
+    if ((thread_1_counter != 33) || (thread_2_counter != 13))
     {
 
         /* Event flag error.  */
