@@ -256,6 +256,14 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
 
 #include <windows.h>
 
+#ifndef TX_WIN32_USE_HIGH_RESOLUTION_TIMER
+#define TX_WIN32_USE_HIGH_RESOLUTION_TIMER      1
+#endif
+
+#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
+#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION   0x00000002UL
+#endif
+
 
 /* Define the priority levels for ThreadX.  Legal values range
    from 32 to 1024 and MUST be evenly divisible by 32.  */
@@ -447,6 +455,7 @@ BOOL            win32_status;                                                   
 DWORD           exitcode;                                                       \
 HANDLE          threadrunsemaphore;                                             \
 HANDLE          threadhandle;                                                   \
+ULONG           wait_count;                                                     \
     threadhandle =       thread_ptr -> tx_thread_win32_thread_handle;           \
     threadrunsemaphore = thread_ptr -> tx_thread_win32_thread_run_semaphore;    \
     if ((threadhandle != ((HANDLE) 0)) || (threadrunsemaphore != ((HANDLE) 0)))\
@@ -454,6 +463,7 @@ HANDLE          threadhandle;                                                   
         _tx_thread_interrupt_restore(tx_saved_posture);                         \
         if (threadhandle != ((HANDLE) 0))                                       \
         {                                                                       \
+            wait_count =  ((ULONG) 0);                                          \
             do                                                                  \
             {                                                                   \
                 win32_status =  GetExitCodeThread(threadhandle, &exitcode);     \
@@ -462,9 +472,19 @@ HANDLE          threadhandle;                                                   
                     break;                                                      \
                 }                                                               \
                 ResumeThread(threadhandle);                                     \
-                ReleaseSemaphore(threadrunsemaphore, 1, NULL);                  \
+                if (threadrunsemaphore != ((HANDLE) 0))                         \
+                {                                                               \
+                    ReleaseSemaphore(threadrunsemaphore, 1, NULL);              \
+                }                                                               \
                 Sleep(1);                                                       \
-            } while (1);                                                        \
+                wait_count++;                                                   \
+            } while (wait_count < ((ULONG) 100));                               \
+            win32_status =  GetExitCodeThread(threadhandle, &exitcode);         \
+            if ((win32_status) && (exitcode == STILL_ACTIVE))                   \
+            {                                                                   \
+                (void) TerminateThread(threadhandle, 0U);                       \
+                (void) WaitForSingleObject(threadhandle, INFINITE);             \
+            }                                                                   \
             CloseHandle(threadhandle);                                          \
         }                                                                       \
         if (threadrunsemaphore != ((HANDLE) 0))                                 \
@@ -484,6 +504,7 @@ BOOL            win32_status;                                                   
 DWORD           exitcode;                                                       \
 HANDLE          threadrunsemaphore;                                             \
 HANDLE          threadhandle;                                                   \
+ULONG           wait_count;                                                     \
     threadhandle =       thread_ptr -> tx_thread_win32_thread_handle;           \
     threadrunsemaphore = thread_ptr -> tx_thread_win32_thread_run_semaphore;    \
     if ((threadhandle != ((HANDLE) 0)) || (threadrunsemaphore != ((HANDLE) 0)))\
@@ -491,6 +512,7 @@ HANDLE          threadhandle;                                                   
         _tx_thread_interrupt_restore(tx_saved_posture);                         \
         if (threadhandle != ((HANDLE) 0))                                       \
         {                                                                       \
+            wait_count =  ((ULONG) 0);                                          \
             do                                                                  \
             {                                                                   \
                 win32_status =  GetExitCodeThread(threadhandle, &exitcode);     \
@@ -499,9 +521,19 @@ HANDLE          threadhandle;                                                   
                     break;                                                      \
                 }                                                               \
                 ResumeThread(threadhandle);                                     \
-                ReleaseSemaphore(threadrunsemaphore, 1, NULL);                  \
+                if (threadrunsemaphore != ((HANDLE) 0))                         \
+                {                                                               \
+                    ReleaseSemaphore(threadrunsemaphore, 1, NULL);              \
+                }                                                               \
                 Sleep(1);                                                       \
-            } while (1);                                                        \
+                wait_count++;                                                   \
+            } while (wait_count < ((ULONG) 100));                               \
+            win32_status =  GetExitCodeThread(threadhandle, &exitcode);         \
+            if ((win32_status) && (exitcode == STILL_ACTIVE))                   \
+            {                                                                   \
+                (void) TerminateThread(threadhandle, 0U);                       \
+                (void) WaitForSingleObject(threadhandle, INFINITE);             \
+            }                                                                   \
             CloseHandle(threadhandle);                                          \
         }                                                                       \
         if (threadrunsemaphore != ((HANDLE) 0))                                 \

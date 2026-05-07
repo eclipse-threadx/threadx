@@ -310,7 +310,14 @@ void _tx_initialize_start_interrupts(void)
     }
 
     /* Create the periodic waitable timer used to drive simulated interrupts.  */
-    _tx_win32_timer_handle =  CreateWaitableTimer(NULL, FALSE, NULL);
+#if (TX_WIN32_USE_HIGH_RESOLUTION_TIMER != 0)
+    _tx_win32_timer_handle =  CreateWaitableTimerEx(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+    if (_tx_win32_timer_handle == NULL)
+#endif
+    {
+        _tx_win32_timer_handle =  CreateWaitableTimer(NULL, FALSE, NULL);
+    }
+
     if (_tx_win32_timer_handle == NULL)
     {
         printf("ThreadX Win64 error creating timer handle!\n");
@@ -395,7 +402,11 @@ LARGE_INTEGER   due_time;
 
     /* Rearm the host timer relative to "now" to avoid burst catch-up ticks.  */
     due_time.QuadPart =  -(((LONGLONG) TX_TIMER_PERIODIC) * 10000LL);
+#if (TX_WIN32_USE_HIGH_RESOLUTION_TIMER != 0)
+    if (SetWaitableTimerEx(_tx_win32_timer_handle, &due_time, 0, NULL, NULL, NULL, 0) == 0)
+#else
     if (SetWaitableTimer(_tx_win32_timer_handle, &due_time, 0, NULL, NULL, FALSE) == 0)
+#endif
     {
         printf("ThreadX Win64 error starting timer!\n");
         while (1)
