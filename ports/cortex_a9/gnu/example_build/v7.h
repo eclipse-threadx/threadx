@@ -37,7 +37,6 @@ void disableInterrupts(void);
 
 void invalidateCaches_IS(void);
 void cleanInvalidateDCache(void);
-void invalidateCaches_IS(void);
 void enableCaches(void);
 void disableCaches(void);
 void invalidateCaches(void);
