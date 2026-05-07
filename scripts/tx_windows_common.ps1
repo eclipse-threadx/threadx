@@ -151,6 +151,16 @@ function Enter-VisualStudioDevShell {
         [string]$VsArch
     )
 
+    $targetArch = switch ($VsArch) {
+        'amd64' { 'x64' }
+        'x86' { 'x86' }
+        default { $VsArch }
+    }
+
+    if ((Get-Command cl -ErrorAction SilentlyContinue) -and ($env:VSCMD_ARG_TGT_ARCH -eq $targetArch)) {
+        return
+    }
+
     $vsWherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
     if (-not (Test-Path -LiteralPath $vsWherePath)) {
         throw "Unable to locate vswhere.exe at $vsWherePath"
@@ -212,6 +222,39 @@ function Remove-BuildDirectory {
         } catch {
             Write-Warning "Proceeding with partially cleaned build directory '$fullPath': $($_.Exception.Message)"
         }
+    }
+}
+
+function Remove-CtestTestingDirectory {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return
+    }
+
+    try {
+        Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction Stop
+        return
+    } catch {
+        Write-Warning "Failed to remove CTest directory '$Path': $($_.Exception.Message)"
+    }
+
+    Get-ChildItem -LiteralPath $Path -Force -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
+        try {
+            if (($_.Attributes -band [System.IO.FileAttributes]::ReadOnly) -ne 0) {
+                $_.Attributes = ($_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly))
+            }
+        } catch {
+        }
+    }
+
+    try {
+        Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction Stop
+    } catch {
+        Write-Warning "Proceeding with partially cleaned CTest directory '$Path': $($_.Exception.Message)"
     }
 }
 

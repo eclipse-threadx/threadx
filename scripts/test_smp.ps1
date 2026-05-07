@@ -5,7 +5,7 @@ param(
 
     [int]$Parallel = 1,
 
-    [int]$RepeatFailCount = 1,
+    [int]$RepeatFailCount = 2,
 
     [int]$TestTimeoutSeconds = 45,
 
@@ -15,7 +15,9 @@ param(
 
     [switch]$RerunFailedOnly,
 
-    [string]$BuildDir
+    [string]$BuildDir,
+
+    [switch]$Clean
 )
 
 $ErrorActionPreference = 'Stop'
@@ -50,6 +52,11 @@ foreach ($currentConfiguration in $selectedConfigurations) {
     $currentTestingTemporaryDir = Join-Path $currentBuildDir 'Testing\Temporary'
 
     try {
+        if ($Clean) {
+            $currentTestingDir = Join-Path $currentBuildDir 'Testing'
+            Remove-CtestTestingDirectory -Path $currentTestingDir
+        }
+
         if (-not (Test-Path -LiteralPath $currentBuildDir)) {
             throw "Build directory does not exist for win64_smp / ${currentConfiguration}: $currentBuildDir"
         }
