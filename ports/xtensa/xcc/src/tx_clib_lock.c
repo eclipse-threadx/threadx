@@ -233,10 +233,11 @@ __getreent(void)
 #if XSHAL_CLIB == XTHAL_CLIB_XCLIB
     extern struct _reent g_reent; /* from xclib */
     return &g_reent;
-#endif
-#if XSHAL_CLIB == XTHAL_CLIB_NEWLIB
+#elif XSHAL_CLIB == XTHAL_CLIB_NEWLIB
     extern struct _reent * _impure_ptr; /* from newlib */
     return _impure_ptr;
+#else
+#error "Unsupported C library for __DYNAMIC_REENT__"
 #endif
 }
 #endif
