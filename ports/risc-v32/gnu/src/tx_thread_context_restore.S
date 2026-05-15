@@ -284,7 +284,7 @@ _tx_thread_no_preempt_restore:
 
     csrr    t1, mstatus
     li      t2, 0x1888                                  // MPP(0x1800) | MPIE(0x80) | MIE(0x08)
-    li      t3, 0x1800                                  // Set MPP to Machine mode
+    li      t3, 0x1880                                  // Set MPP=Machine(0x1800) + MPIE(0x80) so mret re-enables MIE
     li      t4, ~0x1888                                 // Clear mask for MPP/MPIE/MIE
     and     t1, t1, t4
     or      t1, t1, t3

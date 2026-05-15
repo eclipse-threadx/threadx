@@ -78,7 +78,7 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
         /* Registry is setup, proceed.  */
 
         /* Pickup the total entries.  */
-        entries =  _tx_trace_total_registry_entries;
+        entries =  (UINT) _tx_trace_total_registry_entries;
 
         /* Loop to find available entry.  */
         for (i = ((ULONG) 0); i < entries; i++)

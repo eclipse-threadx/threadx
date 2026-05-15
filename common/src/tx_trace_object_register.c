@@ -85,7 +85,7 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
         /* Trace buffer is enabled, proceed.  */
 
         /* Pickup the total entries.  */
-        entries =  _tx_trace_total_registry_entries;
+        entries =  (UINT) _tx_trace_total_registry_entries;
 
         /* Determine if there are available entries in the registry.  */
         if (_tx_trace_available_registry_entries != ((ULONG) 0))
@@ -98,7 +98,7 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
             loop_break =  TX_FALSE;
 
             /* Loop to find available entry.  */
-            i =  _tx_trace_registry_search_start;
+            i =  (UINT) _tx_trace_registry_search_start;
             do
             {
 

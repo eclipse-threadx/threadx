@@ -49,8 +49,8 @@ INT     status;
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
     /* Create block pool 0.  */
-    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, 320);
-    pointer = pointer + 320;
+    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, 340);
+    pointer = pointer + 340;
 
 #ifndef TX_DISABLE_ERROR_CHECKING   /* skip this test and pretend it passed */
 
@@ -128,8 +128,8 @@ INT     i;
 
 #ifndef TX_DISABLE_ERROR_CHECKING   /* skip this test and pretend it passed */
 
-    status =  tx_block_pool_create(&pool_1, "pool 1", 100, pointer, 320);
-    pointer = pointer + 320;
+    status =  tx_block_pool_create(&pool_1, "pool 1", 100, pointer, 340);
+    pointer = pointer + 340;
 
     /* Attempt to create a pool with an invalid size.  */
     status =  _txe_block_pool_create(&pool_2, "pool 2", 100, pointer, 320, 777777);
