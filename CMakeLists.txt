@@ -75,6 +75,14 @@ if(THREADX_SMP)
     target_compile_definitions(${PROJECT_NAME} PUBLIC "TX_MPCORE" )
 endif()
 
+# Optional: build for S-mode (Supervisor mode) instead of M-mode (Machine mode).
+# Required when running after OpenSBI, e.g. booted from U-Boot.
+option(TX_RISCV_SMODE "Use S-mode CSRs instead of M-mode for RISC-V targets" OFF)
+if(TX_RISCV_SMODE)
+    message(STATUS "RISC-V S-mode enabled (TX_RISCV_SMODE)")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC "TX_RISCV_SMODE")
+endif()
+
 # Enable a build target that produces a ZIP file of all sources
 set(CPACK_SOURCE_GENERATOR "ZIP")
 set(CPACK_SOURCE_IGNORE_FILES

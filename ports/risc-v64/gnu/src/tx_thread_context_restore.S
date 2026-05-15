@@ -63,7 +63,11 @@ _tx_thread_context_restore:
 
     /* Lockout interrupts.  */
 
+#ifdef TX_RISCV_SMODE
+    csrci   sstatus, 0x02                               // Disable interrupts (SIE bit 1)
+#else
     csrci   mstatus, 0x08                               // Disable interrupts (MIE bit 3)
+#endif
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     call    _tx_execution_isr_exit                      // Call the ISR execution exit function
@@ -168,7 +172,25 @@ _tx_thread_context_restore:
        Also skip the saved registers since they have been restored by any function we called,
        except s0 since we use it ourselves. */
 
-    ld      t0, 30*8(sp)                                // Recover mepc
+    ld      t0, 30*8(sp)                                // Recover exception PC
+#ifdef TX_RISCV_SMODE
+    csrw    sepc, t0                                    // Setup sepc
+
+    /* Compose sstatus via read/modify/write to avoid clobbering unrelated bits.
+       Set SPIE and restore SPP to Supervisor, preserve other fields. */
+
+    csrr    t1, sstatus
+    li      t4, ~0x122                                  // Clear mask for SPP/SPIE/SIE
+    and     t1, t1, t4
+    li      t3, 0x100                                   // Set SPP to Supervisor mode (bit 8)
+    or      t1, t1, t3
+
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    li      t0, 0x2000                                  // Set FS bits for FP state
+    or      t1, t1, t0
+#endif
+    csrw    sstatus, t1                                 // Update sstatus safely
+#else
     csrw    mepc, t0                                    // Setup mepc
 
     /* Compose mstatus via read/modify/write to avoid clobbering unrelated bits.
@@ -189,6 +211,7 @@ _tx_thread_context_restore:
     or      t1, t1, t0
 #endif
     csrw    mstatus, t1                                 // Update mstatus safely
+#endif
 
     ld      ra,  28*8(sp)                               // Recover return address
     ld      t0,  19*8(sp)                               // Recover t0
@@ -228,7 +251,11 @@ _tx_thread_context_restore:
     ld      t1, 18*8(t0)                                // Recover t1
     ld      t0, 19*8(t0)                                // Recover t0
 #endif
+#ifdef TX_RISCV_SMODE
+    sret                                                // Return to point of interrupt
+#else
     mret                                                // Return to point of interrupt
+#endif
 
     /* }  */
 _tx_thread_not_nested_restore:
@@ -341,7 +368,24 @@ _tx_thread_no_preempt_restore:
     /* Restore registers,
        Skip global pointer because that does not change */
 
-    ld      t0, 30*8(sp)                                // Recover mepc
+    ld      t0, 30*8(sp)                                // Recover exception PC
+#ifdef TX_RISCV_SMODE
+    csrw    sepc, t0                                    // Setup sepc
+
+    /* Compose sstatus via read/modify/write to avoid clobbering unrelated bits. */
+
+    csrr    t1, sstatus
+    li      t4, ~0x122                                  // Clear mask for SPP/SPIE/SIE
+    and     t1, t1, t4
+    li      t3, 0x120                                   // Set SPP=Supervisor(0x100) + SPIE(0x20) so sret re-enables SIE
+    or      t1, t1, t3
+
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    li      t0, 0x2000                                  // Set FS bits for FP state
+    or      t1, t1, t0
+#endif
+    csrw    sstatus, t1                                 // Update sstatus safely
+#else
     csrw    mepc, t0                                    // Setup mepc
 
 
@@ -363,6 +407,7 @@ _tx_thread_no_preempt_restore:
     or      t1, t1, t0
 #endif
     csrw    mstatus, t1                                 // Update mstatus safely
+#endif
 
     ld      ra,  28*8(sp)                               // Recover return address
     ld      t0,  19*8(sp)                               // Recover t0
@@ -402,7 +447,11 @@ _tx_thread_no_preempt_restore:
     ld      t1, 18*8(t0)                                // Recover t1
     ld      t0, 19*8(t0)                                // Recover t0
 #endif
+#ifdef TX_RISCV_SMODE
+    sret                                                // Return to point of interrupt
+#else
     mret                                                // Return to point of interrupt
+#endif
 
     /* }
     else

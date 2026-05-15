@@ -126,8 +126,13 @@ typedef unsigned short                          USHORT;
 
 /* Define various constants for the ThreadX RISC-V port.  */
 
-#define TX_INT_DISABLE                          0x00000000  /* Disable interrupts value */
-#define TX_INT_ENABLE                           0x00000008  /* Enable interrupt value   */
+#ifdef TX_RISCV_SMODE
+#define TX_INT_DISABLE                          0x00000000  /* Disable interrupts value  */
+#define TX_INT_ENABLE                           0x00000002  /* Enable interrupt value (SIE bit 1 of sstatus)  */
+#else
+#define TX_INT_DISABLE                          0x00000000  /* Disable interrupts value  */
+#define TX_INT_ENABLE                           0x00000008  /* Enable interrupt value (MIE bit 3 of mstatus)  */
+#endif
 
 
 /* Define the clock source for trace event entry time stamp. The following two item are port specific.
@@ -248,6 +253,19 @@ UINT                                            _tx_thread_interrupt_control(UIN
 
 #define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save;
 
+#ifdef TX_RISCV_SMODE
+#define TX_DISABLE                              __asm__ volatile("csrrci %0, sstatus, 2" : "=r" (interrupt_save) :: "memory");
+#define TX_RESTORE                              { \
+                                                    unsigned long _temp_sstatus; \
+                                                    __asm__ volatile( \
+                                                        "csrc sstatus, 2\n" \
+                                                        "andi %0, %1, 2\n" \
+                                                        "csrs sstatus, %0" \
+                                                        : "=&r" (_temp_sstatus) \
+                                                        : "r" (interrupt_save) \
+                                                        : "memory"); \
+                                                }
+#else
 #define TX_DISABLE                              __asm__ volatile("csrrci %0, mstatus, 8" : "=r" (interrupt_save) :: "memory");
 #define TX_RESTORE                              { \
                                                     unsigned long _temp_mstatus; \
@@ -259,6 +277,7 @@ UINT                                            _tx_thread_interrupt_control(UIN
                                                         : "r" (interrupt_save) \
                                                         : "memory"); \
                                                 }
+#endif /* TX_RISCV_SMODE */
 
 #else
 

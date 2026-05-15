@@ -192,7 +192,7 @@ If vector extension support:
     sd      zero, 26*8(t0)                              // Initial a1
     sd      zero, 27*8(t0)                              // Initial a0
     sd      zero, 28*8(t0)                              // Initial ra
-    sd      a1, 30*8(t0)                                // Initial mepc (thread entry point)
+    sd      a1, 30*8(t0)                                // Initial mepc/sepc (thread entry point)
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     sd      zero, 31*8(t0)                              // Initial ft0
     sd      zero, 32*8(t0)                              // Initial ft1

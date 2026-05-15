@@ -62,7 +62,11 @@
 _tx_thread_schedule:
 
     /* Enable interrupts.  */
+#ifdef TX_RISCV_SMODE
+    csrsi   sstatus, 0x02                               // Enable interrupts (SIE bit 1)
+#else
     csrsi   mstatus, 0x08                               // Enable interrupts (MIE bit 3)
+#endif
 
     /* Wait for a thread to execute.  */
     /* do
@@ -94,7 +98,11 @@ _tx_thread_schedule_loop:
 
     /* Yes! We have a thread to execute.  Lockout interrupts and
        transfer control to it.  */
+#ifdef TX_RISCV_SMODE
+    csrci   sstatus, 0x02                               // Lockout interrupts
+#else
     csrci   mstatus, 0x08                               // Lockout interrupts
+#endif
 
     /* Setup the current thread pointer.  */
     /* _tx_thread_current_ptr =  _tx_thread_execute_ptr;  */
@@ -236,11 +244,33 @@ _tx_thread_schedule_loop:
 
     /* Recover standard registers.  */
 
-    ld      t0, 30*8(sp)                                // Recover mepc
-    csrw    mepc, t0                                    // Store mepc
-    li      t0, 0x1880                                  // Prepare mstatus: MPP=Machine(0x1800) | MPIE(0x80)
+    ld      t0, 30*8(sp)                                // Recover mepc/sepc
+#ifdef TX_RISCV_SMODE
+    csrw    sepc, t0                                    // Store sepc
+
+    /* Read/modify/write sstatus to preserve SUM, MXR, UXL, FS, etc.
+       Only touch SPP, SPIE, SIE — the bits SRET consumes. */
+    csrr    t0, sstatus
+    li      t1, ~0x122                                  // Clear mask: SIE(1) | SPIE(5) | SPP(8)
+    and     t0, t0, t1
+    li      t1, 0x120                                   // Set SPP=Supervisor(0x100) | SPIE(0x20)
+    or      t0, t0, t1
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    li      t1, 0x2000                                  // Set FS bits for FP state
+    li      t1, 0x6000                                  // Set FS=Dirty (bits 14:13)
+    or      t0, t0, t1
+#endif
+    csrw    sstatus, t0                                 // Update sstatus safely
+#else
+    csrw    mepc, t0                                    // Store mepc
+
+    /* Read/modify/write mstatus — same principle as S-mode path. */
+    csrr    t0, mstatus
+    li      t1, ~0x1888                                 // Clear mask: MIE(3) | MPIE(7) | MPP(11:12)
+    and     t0, t0, t1
+    li      t1, 0x1880                                  // Set MPP=Machine(0x1800) | MPIE(0x80)
+    or      t0, t0, t1
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    li      t1, 0x6000                                  // Set FS=Dirty (bits 14:13)
     or      t0, t0, t1
 #endif
 #if defined(__riscv_vector)
@@ -248,6 +278,7 @@ _tx_thread_schedule_loop:
     or      t0, t0, t1
 #endif
     csrw    mstatus, t0                                 // Set mstatus
+#endif
 
     ld      ra,  28*8(sp)                               // Recover return address
     ld      t0,  19*8(sp)                               // Recover t0
@@ -297,7 +328,11 @@ _tx_thread_schedule_loop:
     ld      t1, 18*8(t0)                                // Recover t1
     ld      t0, 19*8(t0)                                // Recover t0
 #endif
+#ifdef TX_RISCV_SMODE
+    sret                                                // Return to point of interrupt
+#else
     mret                                                // Return to point of interrupt
+#endif
 
 _tx_thread_synch_return:
 
@@ -377,8 +412,12 @@ _tx_thread_synch_return:
     ld      s9,  3*8(sp)                                // Recover s9
     ld      s10,  2*8(sp)                               // Recover s10
     ld      s11,  1*8(sp)                               // Recover s11
-    ld      t0,  14*8(sp)                               // Recover mstatus
+    ld      t0,  14*8(sp)                               // Recover status register
+#ifdef TX_RISCV_SMODE
+    csrw    sstatus, t0                                 // Store sstatus, enables interrupt
+#else
     csrw    mstatus, t0                                 // Store mstatus, enables interrupt
+#endif
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     addi    sp, sp, 29*8                                // Recover stack frame
 #else

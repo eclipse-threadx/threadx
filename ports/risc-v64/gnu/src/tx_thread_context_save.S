@@ -94,7 +94,11 @@ _tx_thread_context_save:
     sd      t4, 15*8(sp)                                // Store t4
     sd      t5, 14*8(sp)                                // Store t5
     sd      t6, 13*8(sp)                                // Store t6
+#ifdef TX_RISCV_SMODE
+    csrr    t0, sepc                                    // Load exception program counter
+#else
     csrr    t0, mepc                                    // Load exception program counter
+#endif
     sd      t0, 30*8(sp)                                // Save it on the stack
 
     /* Save floating point scratch registers if floating point is enabled.  */
@@ -214,7 +218,11 @@ _tx_thread_not_nested_save:
     sd      t5, 14*8(sp)                                // Store t5
     sd      t6, 13*8(sp)                                // Store t6
 
+#ifdef TX_RISCV_SMODE
+    csrr    t1, sepc                                    // Load exception program counter
+#else
     csrr    t1, mepc                                    // Load exception program counter
+#endif
     sd      t1, 30*8(sp)                                // Save it on the stack
 
     /* Save floating point scratch registers if floating point is enabled.  */

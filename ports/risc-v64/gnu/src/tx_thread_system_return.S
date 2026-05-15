@@ -152,6 +152,15 @@ _tx_thread_system_return:
     sd      s9,   3*8(sp)                               // Save s9
     sd      s10,  2*8(sp)                               // Save s10
     sd      s11,  1*8(sp)                               // Save s11
+#ifdef TX_RISCV_SMODE
+    csrr    t0, sstatus                                 // Pickup sstatus
+    sd      t0, 14*8(sp)                                // Save sstatus
+
+
+    /* Lockout interrupts. will be enabled in _tx_thread_schedule  */
+
+    csrci   sstatus, 0x02                               // Disable interrupts (SIE bit 1)
+#else
     csrr    t0, mstatus                                 // Pickup mstatus
     sd      t0, 14*8(sp)                                // Save mstatus
 
@@ -159,6 +168,7 @@ _tx_thread_system_return:
     /* Lockout interrupts. will be enabled in _tx_thread_schedule  */
 
     csrci   mstatus, 0x08                               // Disable interrupts (MIE bit 3)
+#endif
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 
