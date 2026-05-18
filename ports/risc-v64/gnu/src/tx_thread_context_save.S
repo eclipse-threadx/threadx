@@ -304,7 +304,7 @@ _tx_thread_not_nested_save:
 
     la      t1, _tx_thread_current_ptr                  // Pickup current thread pointer address
     ld      t1, 0(t1)                                   // Pickup current thread pointer
-    sd      sp, 16(t1)                                  // Save stack pointer
+    sd      sp, 8(t1)                                   // Save stack pointer
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     /* _tx_execution_isr_enter is called with thread stack pointer */

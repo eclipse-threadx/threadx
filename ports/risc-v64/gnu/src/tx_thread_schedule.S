@@ -105,10 +105,10 @@ _tx_thread_schedule_loop:
     /* Increment the run count for this thread.  */
     /* _tx_thread_current_ptr -> tx_thread_run_count++;  */
 
-    ld      t2, 8(t1)                                   // Pickup run count
-    ld      t3, 48(t1)                                  // Pickup time slice value
+    lw      t2, 4(t1)                                   // Pickup run count
+    lw      t3, 36(t1)                                  // Pickup time slice value
     addi    t2, t2, 1                                   // Increment run count
-    sd      t2, 8(t1)                                   // Store new run count
+    sw      t2, 4(t1)                                   // Store new run count
 
     /* Setup time-slice, if present.  */
     /* _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;  */
@@ -118,8 +118,8 @@ _tx_thread_schedule_loop:
     /* Switch to the thread's stack.  */
     /* SP =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;  */
 
-    ld      sp, 16(t1)                                  // Switch to thread's stack
-    sd      t3, 0(t2)                                   // Store new time-slice
+    ld      sp, 8(t1)                                  // Switch to thread's stack
+    sw      t3, 0(t2)                                  // Store new time-slice
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 

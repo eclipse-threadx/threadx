@@ -258,6 +258,6 @@ vector_clear_done:
     /* Setup stack pointer.  */
     /* thread_ptr -> tx_thread_stack_ptr =  t0;  */
 
-    sd      t0, 16(a0)                                  // Save stack pointer in thread's
+    sd      t0, 8(a0)                                   // Save stack pointer in thread's
     ret                                                 //   control block and return
 /* }  */

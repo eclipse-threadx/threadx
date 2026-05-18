@@ -74,9 +74,9 @@ _tx_thread_context_restore:
     {  */
 
     la      t0, _tx_thread_system_state                 // Pickup addr of nested interrupt count
-    ld      t1, 0(t0)                                   // Pickup nested interrupt count
+    lw      t1, 0(t0)                                   // Pickup nested interrupt count
     addi    t1, t1, -1                                  // Decrement the nested interrupt counter
-    sd      t1, 0(t0)                                   // Store new nested count
+    sw      t1, 0(t0)                                   // Store new nested count
     beqz    t1, _tx_thread_not_nested_restore           // If 0, not nested restore
 
     /* Interrupts are nested.  */
@@ -256,7 +256,7 @@ _tx_thread_no_preempt_restore:
     /* Pickup the saved stack pointer.  */
     /* sp =  _tx_thread_current_ptr -> tx_thread_stack_ptr;  */
 
-    ld      sp, 16(t1)                                  // Switch back to thread's stack
+    ld      sp, 8(t1)                                  // Switch back to thread's stack
 
     /* Recover floating point registers.  */
 #if defined(__riscv_float_abi_single)
@@ -411,7 +411,7 @@ _tx_thread_preempt_restore:
     /* Instead of directly activating the thread again, ensure we save the
        entire stack frame by saving the remaining registers. */
 
-    ld      t0, 16(t1)                                  // Pickup thread's stack pointer
+    ld      t0, 8(t1)                                  // Pickup thread's stack pointer
     ori     t3, zero, 1                                 // Build interrupt stack type
     sd      t3, 0(t0)                                   // Store stack type
 
@@ -494,13 +494,13 @@ _tx_thread_preempt_restore:
     {  */
 
     la      t0, _tx_timer_time_slice                    // Pickup time slice variable address
-    ld      t2, 0(t0)                                   // Pickup time slice
+    lw      t2, 0(t0)                                   // Pickup time slice
     beqz    t2, _tx_thread_dont_save_ts                 // If 0, skip time slice processing
 
         /* _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice
         _tx_timer_time_slice =  0;  */
 
-    sd      t2, 48(t1)                                  // Save current time slice
+    sw      t2, 36(t1)                                  // Save current time slice
     sd      x0, 0(t0)                                   // Clear global time slice
 
 
