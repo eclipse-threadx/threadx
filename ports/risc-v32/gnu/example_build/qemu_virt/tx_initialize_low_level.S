@@ -10,24 +10,23 @@
 
 #include "csr.h"
 
-    .section .text
-    .align 4
+ .section .text
+ .align 4
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    trap_entry                                          RISC-V32/GNU    */
+/*    trap_entry                           		     RISC-V32/GNU         */
 /*                                                          6.4.x         */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    Akif Ejaz, 10xEngineers                                             */
-/*    Wei-Chen Lai, National Cheng Kung University                        */
+/*    Akif Ejaz, 10xEngineers            		                          */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function is responsible for the RISC-V trap entry. It saves    */
-/*    the interrupted thread's context, calls the C trap_handler, then    */
-/*    restores context via _tx_thread_context_restore.                    */
+/*    This function is responsible for riscv processor trap handle        */
+/*    It will do the contex save and call c trap_handler and do contex    */
+/*    load 							                                      */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -60,31 +59,30 @@
     .global  trap_entry
     .extern  trap_handler
     .extern  _tx_thread_context_restore
-trap_entry:
-#if defined(__riscv_flen) && ((__riscv_flen == 32)||(__riscv_flen == 64))
-    addi    sp, sp, -65*4               /* Allocate space for all registers (FP enabled) */
+    trap_entry:
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+	addi sp, sp, -260         // Allocate space for all registers - with floating point enabled (65*4)
 #else
-    addi    sp, sp, -32*4               /* Allocate space for all registers (no FP) */
+	addi sp, sp, -128         // Allocate space for all registers - without floating point enabled (32*4)
 #endif
 
-    sw      x1, 28*4(sp)                /* Save RA before call clobbers it */
+	sw   x1, 112(sp)         // Store RA (28*4 = 112, because call will override ra [ra is a callee register in riscv])
 
-    call    _tx_thread_context_save
+    	call    _tx_thread_context_save
 
-    csrr    a0, mcause
-    csrr    a1, mepc
-    csrr    a2, mtval
-    addi    sp, sp, -4
-    sw      ra, 0(sp)
-    call    trap_handler
-    lw      ra, 0(sp)
-    addi    sp, sp, 4
-    call    _tx_thread_context_restore
-    /* _tx_thread_context_restore does not return. */
+	csrr a0, mcause
+	csrr a1, mepc
+        csrr a2, mtval
+	addi    sp, sp, -4
+    	sw      ra, 0(sp)
+    	call    trap_handler
+    	lw      ra, 0(sp)
+    	addi    sp, sp, 4
+	call _tx_thread_context_restore
+	// it will nerver return
 _err:
-    wfi
-    j       _err
-
+	wfi
+	j _err
     .section .text
 /**************************************************************************/
 /*                                                                        */
@@ -94,7 +92,7 @@ _err:
 /*                                                            6.4.x       */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    Akif Ejaz, 10xEngineers                                             */
+/*  Akif Ejaz, 10xEngineers            	     	                          */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -134,30 +132,31 @@ _err:
     .extern  _end
     .extern  board_init
 _tx_initialize_low_level:
+
+    .section .text
+
     la      t0, _tx_thread_system_stack_ptr
-    sw      sp, 0(t0)                   /* Save system stack pointer */
+    sw      sp, 0(t0)                               // Save system stack pointer
 
-    la      t0, _end                    /* Pickup first free address */
+    la      t0, _end                                // Pickup first free address
     la      t1, _tx_initialize_unused_memory
-    sw      t0, 0(t1)                   /* Save unused memory address */
-
+    sw      t0, 0(t1)                               // Save unused memory address
     li      t0, MSTATUS_MIE
-    csrrc   zero, mstatus, t0           /* Clear MSTATUS_MIE */
-    li      t0, (MSTATUS_MPP_M | MSTATUS_MPIE)
-    csrrs   zero, mstatus, t0           /* Set MSTATUS_MPP, MPIE */
-    li      t0, (MIE_MTIE | MIE_MSIE | MIE_MEIE)
-    csrrs   zero, mie, t0               /* Enable timer/software/external interrupts */
+    csrrc   zero, mstatus, t0			            // clear MSTATUS_MIE bit
+    li 	    t0, (MSTATUS_MPP_M | MSTATUS_MPIE )
+    csrrs   zero, mstatus, t0			            // set MSTATUS_MPP, MPIE bit
+    li	    t0, (MIE_MTIE | MIE_MSIE | MIE_MEIE)
+    csrrs   zero, mie, t0			                // set mie
 #ifdef __riscv_flen
     li      t0, MSTATUS_FS
-    csrrs   zero, mstatus, t0           /* Enable F/D ISA */
+    csrrs   zero, mstatus, t0			            // set MSTATUS_FS bit to open f/d isa in riscv
     fscsr   x0
 #endif
     addi    sp, sp, -4
-    sw      ra, 0(sp)
+    sw	    ra, 0(sp)
     call    board_init
-    lw      ra, 0(sp)
+    lw	    ra, 0(sp)
     addi    sp, sp, 4
-
-    la      t0, trap_entry
+    la	    t0, trap_entry
     csrw    mtvec, t0
     ret

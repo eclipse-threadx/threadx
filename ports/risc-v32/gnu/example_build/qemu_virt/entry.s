@@ -1,32 +1,5 @@
-/**************************************************************************/
-/*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-/*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
-/*                                                                        */
-/**************************************************************************/
 
-/*
- *  ThreadX RISC-V32 GNU port: QEMU virt machine reset/entry stub.
- *
- *  Linked at the load address of the QEMU `virt` machine (see link.lds).
- *  Placed in the .init section so the linker keeps it at the very start
- *  of the image regardless of file ordering during link, matching the
- *  PC value QEMU uses on reset.
- *
- *  Responsibilities:
- *    1. Park secondary harts on `wfi` (single-hart bring-up only; SMP TBD).
- *    2. Zero the integer register file on the boot hart, including x3
- *       (the global pointer) which we load explicitly with the linker
- *       symbol `__global_pointer$` below, with relaxation disabled so
- *       the `la gp, ...` itself is not subject to GP-relative rewriting.
- *    3. Set up the system stack and clear .bss before calling main().
- */
-
-.section .init
+.section .text.boot, "ax"
 .align 4
 .global _start
 .extern main
@@ -36,8 +9,6 @@
 _start:
 	csrr t0, mhartid
 	bne  t0, zero, 1f
-
-	/* Zero general purpose registers (x3/gp handled by the la below). */
 	li x1, 0
 	li x2, 0
 .option push
@@ -72,24 +43,19 @@ _start:
 	li x29, 0
 	li x30, 0
 	li x31, 0
-
-	/* Set up the system stack: top-of-stack = _sysstack_start + 0x1000. */
-	la  t0, _sysstack_start
-	li  t1, 0x1000
+	la t0, _sysstack_start
+	li t1, 0x1000
 	add sp, t0, t1
-
-	/* Clear .bss [_bss_start, _bss_end). */
 	la  t0, _bss_start
 	la  t1, _bss_end
 _bss_clean_start:
 	bgeu t0, t1, _bss_clean_end
-	sb   zero, 0(t0)
+	sb zero, 0(t0)
 	addi t0, t0, 1
-	j    _bss_clean_start
+	j _bss_clean_start
 _bss_clean_end:
 	call main
-
 1:
-	/* Secondary harts: park here. SMP bring-up is not yet supported. */
+	/* todo smp */
 	wfi
 	j 1b

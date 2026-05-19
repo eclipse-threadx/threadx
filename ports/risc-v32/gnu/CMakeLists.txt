@@ -18,10 +18,6 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_LIST_DIR}/inc
 )
 
-# Optional: pull in the QEMU virt demo if its CMakeLists is present.
-# kernel.elf is EXCLUDE_FROM_ALL inside, so the default build is
-# unaffected; consumers opt in via `--target kernel.elf` or
-# `--target check-functional-riscv32`.
 if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/example_build/qemu_virt/CMakeLists.txt)
     add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/example_build/qemu_virt)
 endif()

@@ -9,8 +9,6 @@
 #define     DEMO_BYTE_POOL_SIZE     9120
 #define     DEMO_BLOCK_POOL_SIZE    100
 #define     DEMO_QUEUE_SIZE         100
-
-/* Shared FPU register exercised by thread_6/7 to validate FP context save/restore.  */
 float           fpu_test_val = 0.0f;
 
 char *_to_str(ULONG val)
@@ -340,6 +338,7 @@ ULONG   actual_flags;
     }
 }
 
+
 void    thread_6_and_7_entry(ULONG thread_input)
 {
 
@@ -365,9 +364,8 @@ UINT    status;
         if (status != TX_SUCCESS)
             break;
 
-        /* FPU Test*/
+            /* FPU Test*/
         fpu_test_val += 1.1f;
-
         /* Get the mutex again with suspension.  This shows
            that an owning thread may retrieve the mutex it
            owns multiple times.  */
