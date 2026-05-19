@@ -77,7 +77,7 @@ typedef char                                    CHAR;
 typedef unsigned char                           UCHAR;
 typedef int                                     INT;
 typedef unsigned int                            UINT;
-typedef int                                    LONG;
+typedef int                                     LONG;
 typedef unsigned int                            ULONG;
 typedef unsigned long long                      ULONG64;
 typedef short                                   SHORT;
@@ -85,7 +85,8 @@ typedef unsigned short                          USHORT;
 #define ULONG64_DEFINED
 #endif /* __ASSEMBLER__ */
 
-
+#define ALIGN_TYPE_DEFINED
+typedef unsigned long long                     ALIGN_TYPE;
 
 
 /* Define the priority levels for ThreadX.  Legal values range

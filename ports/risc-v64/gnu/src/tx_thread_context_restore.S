@@ -501,7 +501,7 @@ _tx_thread_preempt_restore:
         _tx_timer_time_slice =  0;  */
 
     sw      t2, 36(t1)                                  // Save current time slice
-    sd      x0, 0(t0)                                   // Clear global time slice
+    sw      x0, 0(t0)                                   // Clear global time slice
 
 
     /* }  */

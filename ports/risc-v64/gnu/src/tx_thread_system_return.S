@@ -190,7 +190,7 @@ _tx_thread_system_return:
         _tx_timer_time_slice =  0;  */
 
     sw      t3, 36(t1)                                  // Save current time-slice for thread
-    sd      zero, 0(t4)                                 // Clear time-slice variable
+    sw      zero, 0(t4)                                 // Clear time-slice variable
 
     /* }  */
 _tx_thread_dont_save_ts:
