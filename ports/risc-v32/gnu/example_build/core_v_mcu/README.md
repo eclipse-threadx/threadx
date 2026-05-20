@@ -21,6 +21,7 @@ FPGA board running the synthesised CORE-V MCU bitstream.
 8. [BSP API reference](#8-bsp-api-reference)
 9. [Unit tests](#9-unit-tests)
 10. [Adapting to a different board](#10-adapting-to-a-different-board)
+11. [Setup and deployment scripts](#11-setup-and-deployment-scripts)
 
 ---
 
@@ -46,13 +47,21 @@ registers, and `mstatus.MIE` (bit 3) acts as the single global enable.
 
 ## 2. Software prerequisites
 
+Run `install_deps.sh` to install all dependencies in one step:
+
+```bash
+bash install_deps.sh
+```
+
+Or install individually:
+
 | Tool | Minimum version | Notes |
 |------|----------------|-------|
-| `riscv64-unknown-elf-gcc` | 13.x | Ubuntu: `apt install gcc-riscv64-unknown-elf` |
+| `riscv64-unknown-elf-gcc` | 13.x | `apt install gcc-riscv64-unknown-elf binutils-riscv64-unknown-elf` |
 | CMake | 3.15 | `apt install cmake` |
 | Ninja | 1.10 | `apt install ninja-build` |
-| OpenOCD | 0.11 with RISC-V support | Build from source or use the [RISC-V OpenOCD fork](https://github.com/riscv-collab/riscv-openocd) |
-| GDB (RISC-V) | Any recent multiarch build | Included in most `riscv64-unknown-elf` toolchain packages |
+| OpenOCD | 0.12 | `apt install openocd` |
+| GDB | any multiarch | `apt install gdb-multiarch` — Ubuntu does not ship `riscv64-unknown-elf-gdb` |
 
 > **Note:** There is no `riscv32-unknown-elf-gcc` package required.  The
 > `riscv64-unknown-elf-gcc` compiler generates RV32 code when passed
@@ -232,13 +241,37 @@ CMAKE_C_FLAGS       -march=rv32imc_zicsr -mabi=ilp32 -mcmodel=medlow
 
 ## 7. Flashing and debugging
 
-### 7.1 Connect hardware
+### 7.1 Quick deploy (recommended)
+
+Use `deploy.sh` to automate the entire OpenOCD + GDB workflow in one command:
+
+```bash
+# Flash and run (leave target running after GDB exits):
+bash deploy.sh
+
+# Build first, then flash and run:
+bash deploy.sh --build
+
+# Flash and stop at main for interactive debugging:
+bash deploy.sh --debug
+
+# Override the ELF or the OpenOCD config:
+bash deploy.sh --elf path/to/my.elf --openocd-cfg path/to/other.cfg
+```
+
+> **First time only:** run `bash ../../../../../samplex-fd/OpenHW/scripts/setup_opella.sh`
+> (or the equivalent path) once to install the udev rule for the Opella LD.
+> See [Section 11](#11-setup-and-deployment-scripts) for details.
+
+### 7.2 Manual procedure
+
+#### Connect hardware
 
 1. Connect the Ashling Opella LD to the Nexys A7 JTAG header.
 2. Connect the USB-UART cable (CORE-V MCU UART0 mapped to USB micro-B on Nexys A7).
 3. Power on the board.
 
-### 7.2 Start OpenOCD
+#### Start OpenOCD
 
 ```bash
 openocd -f openocd-nexys-Ashling-Opella-LD.cfg
@@ -247,7 +280,7 @@ openocd -f openocd-nexys-Ashling-Opella-LD.cfg
 Expected output ends with `Ready for Remote Connections`.  OpenOCD listens on
 port 3333 (GDB) and 4444 (telnet).
 
-### 7.3 Flash and run with GDB
+#### Flash and run with GDB
 
 In a second terminal:
 
@@ -259,13 +292,13 @@ riscv64-unknown-elf-gdb --command=gdb_init
 continues.  You should see the LED on pin 5 blinking at 1 Hz and the UART printing
 `ThreadX on CORE-V MCU` followed by periodic `.` heartbeats at 115 200 baud.
 
-### 7.4 UART monitor
+#### UART monitor
 
 ```bash
 minicom -b 115200 -D /dev/ttyUSBx   # adjust device as needed
 ```
 
-### 7.5 Useful GDB commands
+#### Useful GDB commands
 
 ```
 (gdb) info threads          — list ThreadX threads
@@ -390,6 +423,70 @@ To port to a different CORE-V MCU carrier board:
 
 5. **GPIO pin** — `DEMO_LED_PIN` in `demo_threadx.c` selects the LED.  Change to
    match your board's LED assignment.
+
+---
+
+## 11. Setup and deployment scripts
+
+### 11.1 `setup_opella.sh` — one-time host setup
+
+Located in `samplex-fd/OpenHW/scripts/setup_opella.sh`.  Run **once per machine**
+to grant user-space access to the Ashling Opella LD USB device.
+
+```bash
+# Native Linux:
+sudo bash samplex-fd/OpenHW/scripts/setup_opella.sh
+
+# WSL (also attempts usbipd-win USB forwarding):
+bash samplex-fd/OpenHW/scripts/setup_opella.sh
+```
+
+What it does:
+
+| Step | Native Linux | WSL |
+|------|-------------|-----|
+| Write `/etc/udev/rules.d/99-ashling-opella.rules` | ✓ | ✓ |
+| Add user to `plugdev` group | ✓ | ✓ |
+| Reload udev | ✓ | ✓ |
+| `usbipd.exe attach --wsl` (v3: `wsl attach`) | — | automatic |
+
+> **WSL — one-time bind (Windows admin required):**
+> Before the first attach, run this once in an **elevated (Run as Administrator) PowerShell** on the Windows host:
+> ```powershell
+> usbipd bind --hardware-id 0b6b:0040
+> ```
+> After binding, `setup_opella.sh` handles subsequent attaches automatically.
+
+> **WSL — if attach fails with "not USBIP capable" (usbipd-win v3 + Ubuntu 22.04+):**
+> Ubuntu 22.04 and 24.04 enable systemd by default.  usbipd-win **v3** has a
+> known bug where it incorrectly reports the kernel as not USBIP capable when
+> systemd is running.  **Upgrade usbipd-win to v4 or later:**
+> <https://github.com/dorssel/usbipd-win/releases>
+>
+> If you are on an older WSL2 kernel without USBIP support, first run:
+> ```powershell
+> wsl --update
+> wsl --shutdown
+> ```
+
+After running, **re-plug the probe**.  On WSL, re-run the script after each WSL restart.
+
+### 11.2 `deploy.sh` — flash and run
+
+```bash
+# Flash and run (leave target running):
+bash deploy.sh
+
+# Build first, then flash:
+bash deploy.sh --build
+
+# Flash and stop at main for interactive debug session:
+bash deploy.sh --debug
+```
+
+The script starts OpenOCD in the background, waits for it to become ready,
+then drives `riscv64-unknown-elf-gdb` to load the ELF.  OpenOCD is always
+stopped on exit (including Ctrl-C).
 
 ---
 
