@@ -16,6 +16,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "csr.h"
 #include "fll.h"
 #include "gpio.h"
 #include "irq.h"
@@ -28,6 +29,7 @@
 extern void _tx_timer_interrupt(void);
 
 volatile uint32_t system_core_clock = DEFAULT_SYSTEM_CLOCK;
+volatile uint32_t last_trap_mcause;
 void (*isr_table[32])(void);
 
 static uint32_t uart_console_ready;
@@ -71,7 +73,7 @@ void system_init(void)
         isr_table[i] = tx_undefined_irq_handler;
     }
 
-    isr_table[10U] = tx_timer_irq_handler;
+    isr_table[7U] = tx_timer_irq_handler;
 
     for (i = 0U; i < ARCHI_NB_FLL; ++i)
     {
@@ -79,8 +81,11 @@ void system_init(void)
     }
 
     pulp_irq_init();
-    (void)timer_irq_init(ARCHI_REF_CLOCK / (uint32_t)TX_TIMER_TICKS_PER_SECOND);
-    irq_enable(IRQ_FC_EVT_TIMER0_LO);
+    (void)timer_irq_init(ARCHI_SOC_FREQUENCY / (uint32_t)TX_TIMER_TICKS_PER_SECOND);
+    /* CV32E40P routes the FC Timer LO to irq_i[7] (MTI, bit 7), which maps
+     * to mip[7].  IRQ_MASK in cv32e40p_cs_registers forces mie[10] to zero,
+     * so bit 7 is the correct enable bit.  mcause will be 0x80000007. */
+    (void)csr_read_set(CSR_MIE, BIT(7));
 
     gpio_init();
     if (uart_init(0U, 115200U, ARCHI_FPGA_FREQUENCY) == 0)
@@ -91,6 +96,8 @@ void system_init(void)
 
 void tx_trap_handler(uint32_t mcause, uint32_t mepc, uint32_t mtval)
 {
+    last_trap_mcause = mcause;
+
     if ((mcause & 0x80000000UL) != 0UL)
     {
         uint32_t irq_id = mcause & 0x1FUL;

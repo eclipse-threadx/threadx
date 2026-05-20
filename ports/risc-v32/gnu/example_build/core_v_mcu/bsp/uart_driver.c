@@ -22,7 +22,6 @@
 #include "uart_driver.h"
 
 #define UDMA_CTRL_CG_OFFSET   0x00U
-#define UDMA_CTRL_RST_OFFSET  0x08U
 #define UDMA_CTRL_UART0_CLKEN BIT(0)
 
 #define UDMA_UART_RX_SADDR_OFFSET 0x00U
@@ -37,7 +36,9 @@
 #define UDMA_UART_DATA_OFFSET     0x34U
 
 #define UDMA_CFG_EN_BIT          BIT(4)
-#define UDMA_UART_TX_CFG_ENABLE  0x12U
+/* EN (bit 4) only; DATASIZE=0 for 8-bit transfers; 0x12 would set DATASIZE=1
+ * (16-bit) and cause the EN bit to never clear for single-byte buffers. */
+#define UDMA_UART_TX_CFG_ENABLE  0x10U
 #define UDMA_UART_WORDLEN_8_BITS 3U
 #define UDMA_UART_TX_ENABLE_BIT  BIT(8)
 #define UDMA_UART_RX_ENABLE_BIT  BIT(9)
@@ -60,7 +61,6 @@ int uart_init(uint8_t uart_id, uint32_t baudrate, uint32_t periph_freq)
     uint32_t clk_div;
     uint32_t setup;
     uint32_t cg;
-    uint32_t rst;
 
     if ((uart_id >= N_UART) || (baudrate == 0U) || (periph_freq == 0U))
     {
@@ -68,11 +68,6 @@ int uart_init(uint8_t uart_id, uint32_t baudrate, uint32_t periph_freq)
     }
 
     cg = readw((uintptr_t)(UDMA_CH_ADDR_CTRL + UDMA_CTRL_CG_OFFSET));
-    rst = readw((uintptr_t)(UDMA_CH_ADDR_CTRL + UDMA_CTRL_RST_OFFSET));
-    rst |= (uint32_t)(UDMA_CTRL_UART0_CLKEN << uart_id);
-    writew(rst, (uintptr_t)(UDMA_CH_ADDR_CTRL + UDMA_CTRL_RST_OFFSET));
-    rst &= ~((uint32_t)(UDMA_CTRL_UART0_CLKEN << uart_id));
-    writew(rst, (uintptr_t)(UDMA_CH_ADDR_CTRL + UDMA_CTRL_RST_OFFSET));
     cg |= (uint32_t)(UDMA_CTRL_UART0_CLKEN << uart_id);
     writew(cg, (uintptr_t)(UDMA_CH_ADDR_CTRL + UDMA_CTRL_CG_OFFSET));
 

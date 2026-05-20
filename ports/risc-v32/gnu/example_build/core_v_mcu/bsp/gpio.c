@@ -19,6 +19,47 @@
 #include "io.h"
 #include "gpio.h"
 
+/* APB SOC CTRL pad-mux interface (apb_soc_ctrl v1.0.0):
+ * Each IO pad has a dedicated 32-bit register at base + 0x400 + pad_index*4.
+ *   PWDATA[1:0] = mux function (0=sys, 1=perio, 2=apbio/GPIO, 3=fpgaio)
+ *   PWDATA[13:8] = pad config (drive/pull, optional)
+ *
+ * FUNC_C (2) routes the pad to the GPIO (apbio) controller.
+ * For the standard GPIO pins: io_pad = gpio_pin + GPIO_IO_PAD_OFFSET (=7).
+ * Verified in pad_control.sv: apbio[N] ↔ io_pad[N+7] when pad_mux[N+7]==2. */
+#define APB_SOC_PADMUX_BASE     0x400U
+#define PINMUX_FUNC_C           2U
+#define GPIO_IO_PAD_OFFSET      7U
+
+static void gpio_pinmux_set_func_c(uint32_t pin_mask)
+{
+    for (uint32_t gpio_pin = 0U; gpio_pin < 32U; gpio_pin++)
+    {
+        if ((pin_mask & (1UL << gpio_pin)) == 0U)
+        {
+            continue;
+        }
+        uint32_t io_pad  = gpio_pin + GPIO_IO_PAD_OFFSET;
+        uintptr_t reg    = PULP_APB_SOC_CTRL_ADDR + APB_SOC_PADMUX_BASE
+                           + io_pad * 4U;
+        writew(PINMUX_FUNC_C, reg);
+    }
+}
+
+/* Iterate over every set bit in pin_mask and call writew(pin_number, addr).
+ * The apb_gpiov2 SETGPIO/CLRGPIO/TOGGPIO/SETDIR registers are all
+ * pin-indexed: the written word encodes a pin number, not a bitmask. */
+static void gpio_foreach_pin(uint32_t pin_mask, uintptr_t reg_addr, uint32_t extra_bits)
+{
+    for (uint32_t pin = 0U; pin < 32U; pin++)
+    {
+        if ((pin_mask & (1UL << pin)) != 0U)
+        {
+            writew(pin | extra_bits, reg_addr);
+        }
+    }
+}
+
 void gpio_init(void)
 {
     /* GPIO clocking is handled by platform boot code on CORE-V MCU. */
@@ -26,24 +67,32 @@ void gpio_init(void)
 
 void gpio_set_output(uint32_t pin_mask)
 {
-    uint32_t value = readw((uintptr_t)(PULP_GPIO_ADDR + GPIO_DIR_OFFSET));
+    /* Route physical pads to the GPIO controller via the pad-mux (FUNC_C). */
+    gpio_pinmux_set_func_c(pin_mask);
 
-    writew(value | pin_mask, (uintptr_t)(PULP_GPIO_ADDR + GPIO_DIR_OFFSET));
+    /* Configure each pin as push-pull output via SETDIR. */
+    gpio_foreach_pin(pin_mask,
+                     (uintptr_t)(PULP_GPIO_ADDR + GPIO_SETDIR_OFFSET),
+                     GPIO_DIR_OUTPUT);
 }
 
 void gpio_toggle(uint32_t pin_mask)
 {
-    uint32_t value = readw((uintptr_t)(PULP_GPIO_ADDR + GPIO_OUT_OFFSET));
-
-    writew(value ^ pin_mask, (uintptr_t)(PULP_GPIO_ADDR + GPIO_OUT_OFFSET));
+    gpio_foreach_pin(pin_mask,
+                     (uintptr_t)(PULP_GPIO_ADDR + GPIO_TOGGPIO_OFFSET),
+                     0U);
 }
 
 void gpio_set(uint32_t pin_mask)
 {
-    writew(pin_mask, (uintptr_t)(PULP_GPIO_ADDR + GPIO_SET_OFFSET));
+    gpio_foreach_pin(pin_mask,
+                     (uintptr_t)(PULP_GPIO_ADDR + GPIO_SETGPIO_OFFSET),
+                     0U);
 }
 
 void gpio_clear(uint32_t pin_mask)
 {
-    writew(pin_mask, (uintptr_t)(PULP_GPIO_ADDR + GPIO_CLR_OFFSET));
+    gpio_foreach_pin(pin_mask,
+                     (uintptr_t)(PULP_GPIO_ADDR + GPIO_CLRGPIO_OFFSET),
+                     0U);
 }

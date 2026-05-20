@@ -17,7 +17,10 @@
 
 #define PULP
 
+/* Peripheral bus clock (clk_per): PER_CLK_PERIOD_NS=200 → 5 MHz */
 #define ARCHI_FPGA_FREQUENCY 5000000U
+/* FC/SOC clock (clk_soc): FC_CLK_PERIOD_NS=100 → 10 MHz */
+#define ARCHI_SOC_FREQUENCY  10000000U
 #define ARCHI_NUM_TIMER      1U
 #define ARCHI_NUM_FLL        2U
 

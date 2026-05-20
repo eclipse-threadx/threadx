@@ -18,14 +18,35 @@
 
 #include <stdint.h>
 
-/* PULP GPIO register offsets */
-#define GPIO_DIR_OFFSET    0x000U
-#define GPIO_EN_OFFSET     0x004U
-#define GPIO_IN_OFFSET     0x008U
-#define GPIO_OUT_OFFSET    0x00CU
-#define GPIO_SET_OFFSET    0x010U
-#define GPIO_CLR_OFFSET    0x014U
-#define GPIO_TOGGLE_OFFSET 0x018U
+/* apb_gpiov2 register map (pin-indexed interface)
+ *
+ *  Offset  Name       Access  Description
+ *  0x000   SETGPIO    W       PWDATA[6:0] = pin number → drive pin high
+ *  0x004   CLRGPIO    W       PWDATA[6:0] = pin number → drive pin low
+ *  0x008   TOGGPIO    W       PWDATA[6:0] = pin number → toggle pin
+ *  0x010   PIN0       R       bits [31:0] = sampled input state of pins 0-31
+ *  0x020   OUT0       R/W     bits [31:0] = output state bitmask, pins 0-31
+ *  0x030   SETSEL     W       select pin for RDSTAT
+ *  0x034   RDSTAT     R       status of selected pin
+ *  0x038   SETDIR     W       PWDATA[6:0]=pin, PWDATA[25:24]=dir
+ *                             dir[0]=1 → push-pull output; dir[1]=1 → open-drain
+ *  0x03C   SETINT     W       interrupt configuration
+ *  0x040   INTACK     W       interrupt acknowledge
+ */
+#define GPIO_SETGPIO_OFFSET   0x000U
+#define GPIO_CLRGPIO_OFFSET   0x004U
+#define GPIO_TOGGPIO_OFFSET   0x008U
+#define GPIO_PIN0_OFFSET      0x010U
+#define GPIO_OUT0_OFFSET      0x020U
+#define GPIO_SETSEL_OFFSET    0x030U
+#define GPIO_RDSTAT_OFFSET    0x034U
+#define GPIO_SETDIR_OFFSET    0x038U
+#define GPIO_SETINT_OFFSET    0x03CU
+#define GPIO_INTACK_OFFSET    0x040U
+
+/* Direction field in SETDIR: bits [25:24] of the written word.
+ * 0b01 = push-pull output enable; 0b10 = open-drain; 0b00 = input */
+#define GPIO_DIR_OUTPUT (1U << 24U)
 
 void gpio_init(void);
 void gpio_set_output(uint32_t pin_mask);

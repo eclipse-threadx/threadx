@@ -27,7 +27,6 @@ int timer_irq_init(uint32_t ticks)
 
     writew(TIMER_CFG_LO_ENABLE_MASK |
            TIMER_CFG_LO_RESET_MASK |
-           TIMER_CFG_LO_CCFG_MASK |
            TIMER_CFG_LO_MODE_MASK |
            TIMER_CFG_LO_IRQEN_MASK,
            (uintptr_t)(PULP_FC_TIMER_ADDR + TIMER_CFG_LO_OFFSET));
