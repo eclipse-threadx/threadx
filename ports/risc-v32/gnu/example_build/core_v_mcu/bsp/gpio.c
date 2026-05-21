@@ -96,3 +96,33 @@ void gpio_clear(uint32_t pin_mask)
                      (uintptr_t)(PULP_GPIO_ADDR + GPIO_CLRGPIO_OFFSET),
                      0U);
 }
+
+void gpio_setpinmux(uint8_t io_pad, uint8_t mux)
+{
+    uintptr_t reg = PULP_APB_SOC_CTRL_ADDR + APB_SOC_PADMUX_BASE
+                    + (uintptr_t)io_pad * 4U;
+    writew((uint32_t)mux & 0x3U, reg);
+}
+
+uint8_t gpio_getpinmux(uint8_t io_pad)
+{
+    uintptr_t reg = PULP_APB_SOC_CTRL_ADDR + APB_SOC_PADMUX_BASE
+                    + (uintptr_t)io_pad * 4U;
+    return (uint8_t)(readw(reg) & 0x3U);
+}
+
+void gpio_pin_set_dir(uint8_t pin, uint8_t dir)
+{
+    uint32_t val = (uint32_t)pin;
+    if (dir != 0U)
+    {
+        val |= GPIO_DIR_OUTPUT;
+    }
+    writew(val, (uintptr_t)(PULP_GPIO_ADDR + GPIO_SETDIR_OFFSET));
+}
+
+uint32_t gpio_pin_read_status(uint8_t pin)
+{
+    writew((uint32_t)pin, (uintptr_t)(PULP_GPIO_ADDR + GPIO_SETSEL_OFFSET));
+    return readw((uintptr_t)(PULP_GPIO_ADDR + GPIO_RDSTAT_OFFSET));
+}

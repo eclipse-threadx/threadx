@@ -54,4 +54,15 @@ void gpio_toggle(uint32_t pin_mask);
 void gpio_set(uint32_t pin_mask);
 void gpio_clear(uint32_t pin_mask);
 
+/* Pad-mux control (APB SOC CTRL v1.0.0).
+ * Each IO pad has a 32-bit register at SOC_CTRL_BASE + 0x400 + pad*4.
+ * bits[1:0] = mux function: 0=sys, 1=perio, 2=apbio/GPIO, 3=fpgaio. */
+void    gpio_setpinmux(uint8_t io_pad, uint8_t mux);
+uint8_t gpio_getpinmux(uint8_t io_pad);
+
+/* Single-pin direction and status (for CLI use).
+ * dir: 0 = input, 1 = push-pull output. */
+void     gpio_pin_set_dir(uint8_t pin, uint8_t dir);
+uint32_t gpio_pin_read_status(uint8_t pin);
+
 #endif /* GPIO_H */
