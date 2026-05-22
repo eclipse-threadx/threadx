@@ -22,6 +22,8 @@ set(SRCS
     ${CORE_V_MCU_DIR}/bsp/fll.c
     ${CORE_V_MCU_DIR}/bsp/gpio.c
     ${CORE_V_MCU_DIR}/bsp/uart_driver.c
+    ${CORE_V_MCU_DIR}/bsp/i2c_master.c
+    ${CORE_V_MCU_DIR}/bsp/temp_sensor.c
     ${CORE_V_MCU_DIR}/bsp/system_core_v_mcu.c
     ${CORE_V_MCU_DIR}/bsp/string.c
     ${CORE_V_MCU_DIR}/demo_threadx.c
