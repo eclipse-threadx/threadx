@@ -123,7 +123,9 @@ int plic_irq_intr(void)
 {
     int ret = -1;
     int irqno = plic_claim();
-    if (irqno > 0 && irqno < MAX_CALLBACK_NUM && callbacks[irqno] != NULL)
+    if (irqno == 0)
+        return ret;
+    if (irqno < MAX_CALLBACK_NUM && callbacks[irqno] != NULL)
         ret = (callbacks[irqno])(irqno);
     plic_complete(irqno);
     return ret;

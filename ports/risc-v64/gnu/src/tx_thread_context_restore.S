@@ -182,11 +182,11 @@ _tx_thread_context_restore:
     csrr    t1, sstatus
     li      t4, ~0x122                                  // Clear mask for SPP/SPIE/SIE
     and     t1, t1, t4
-    li      t3, 0x100                                   // Set SPP to Supervisor mode (bit 8)
+    li      t3, 0x120                                   // Set SPP=Supervisor(0x100) + SPIE(0x20) so sret re-enables SIE
     or      t1, t1, t3
 
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    li      t0, 0x2000                                  // Set FS bits for FP state
+    li      t0, 0x6000                                  // Set FS=Dirty (bits 14:13) for FP state
     or      t1, t1, t0
 #endif
     csrw    sstatus, t1                                 // Update sstatus safely
@@ -381,7 +381,7 @@ _tx_thread_no_preempt_restore:
     or      t1, t1, t3
 
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    li      t0, 0x2000                                  // Set FS bits for FP state
+    li      t0, 0x6000                                  // Set FS=Dirty (bits 14:13) for FP state
     or      t1, t1, t0
 #endif
     csrw    sstatus, t1                                 // Update sstatus safely
