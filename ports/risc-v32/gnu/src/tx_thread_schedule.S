@@ -133,7 +133,12 @@ _tx_thread_ready_to_run:
     lw      t0, 0(sp)                                   // Pickup stack type
     beqz    t0, _tx_thread_solicited_return             // If 0, solicited return
 
-    /* Recover floating point registers.  */
+    /* Recover floating point registers only if saved mstatus.FS was not Off.  */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    lw      t1, 29*4(sp)                                // Pickup saved mstatus
+    srli    t1, t1, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_schedule_skip_fp_restore     // Skip if FS was Off
 #if defined(__riscv_float_abi_single)
     flw     f0,  31*4(sp)                               // Recover ft0
     flw     f1,  32*4(sp)                               // Recover ft1
@@ -205,10 +210,10 @@ _tx_thread_ready_to_run:
     lw      t0,  63*4(sp)                               // Recover fcsr
     csrw    fcsr, t0                                    // Restore fcsr
 #endif
+_tx_thread_schedule_skip_fp_restore:
+#endif
 
     /* Recover standard registers.  */
-
-    lw      t0, 30*4(sp)                                // Recover mepc
     csrw    mepc, t0                                    // Setup mepc
 
     li      t0, 0x1880                                  // Prepare mstatus: MPP=Machine(0x1800) | MPIE(0x80)
@@ -256,7 +261,12 @@ _tx_thread_ready_to_run:
 
 _tx_thread_solicited_return:
 
-    /* Recover floating point registers.  */
+    /* Recover floating point registers only if saved mstatus.FS was not Off.  */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    lw      t1, 14*4(sp)                                // Pickup saved mstatus
+    srli    t1, t1, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_schedule_solicited_skip_fp_restore   // Skip if FS was Off
 #if defined(__riscv_float_abi_single)
     flw     f8,  15*4(sp)                               // Recover fs0
     flw     f9,  16*4(sp)                               // Recover fs1
@@ -288,10 +298,10 @@ _tx_thread_solicited_return:
     lw      t0,  27*4(sp)                               // Recover fcsr
     csrw    fcsr, t0                                    // Restore fcsr
 #endif
+_tx_thread_schedule_solicited_skip_fp_restore:
+#endif
 
     /* Recover standard registers.  */
-
-    lw      t0, 14*4(sp)                                // Recover mstatus
     csrw    mstatus, t0                                 // Restore mstatus
 
     lw      ra,  13*4(sp)                               // Recover return address

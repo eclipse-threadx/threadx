@@ -364,7 +364,7 @@ UINT    status;
         if (status != TX_SUCCESS)
             break;
 
-            /* FPU Test*/
+        /* FPU Test */
         fpu_test_val += 1.1f;
         /* Get the mutex again with suspension.  This shows
            that an owning thread may retrieve the mutex it
