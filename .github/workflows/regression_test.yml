@@ -41,6 +41,23 @@ jobs:
       cmake_path: ./test/smp/cmake
       result_affix: SMP
       skip_deploy: true
+  riscv:
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      pages: write    
+      id-token: write
+    uses: ./.github/workflows/regression_template.yml
+    with:
+      install_script: ./scripts/install_riscv.sh
+      build_script: ./scripts/build_tx_riscv.sh
+      test_script: ./scripts/test_tx_riscv.sh
+      cmake_path: ./test/tx/cmake/riscv
+      result_affix: RISC-V
+      skip_deploy: true
+      skip_coverage: true
   deploy:
     permissions:
       contents: read
@@ -49,7 +66,7 @@ jobs:
       pull-requests: write
       pages: write
       id-token: write
-    needs: [tx, smp]
+    needs: [tx, smp, riscv]
     uses: ./.github/workflows/regression_template.yml
     with:
       skip_test: true

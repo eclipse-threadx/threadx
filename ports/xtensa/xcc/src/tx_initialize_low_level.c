@@ -80,6 +80,8 @@ VOID   _tx_initialize_low_level(VOID)
 
     /* Disable interrupts - don't want any that interact with ThreadX yet. */
     TX_DISABLE
+    /* Suppress compiler warning about set but not used variable. */
+    (void) interrupt_save;
 
     /*
     Disable stack limit checking if present. Whatever was set up earlier

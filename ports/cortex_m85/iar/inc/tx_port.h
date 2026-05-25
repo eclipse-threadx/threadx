@@ -541,7 +541,7 @@ UINT posture;
 #ifdef TX_PORT_USE_BASEPRI
 __attribute__( ( always_inline ) ) static inline void __set_basepri_value(UINT basepri_value)
 {
-    __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
+    __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value) : "memory");
 }
 #else
 __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
@@ -554,6 +554,7 @@ __attribute__( ( always_inline ) ) static inline void __restore_interrupt(UINT i
 {
 #ifdef TX_PORT_USE_BASEPRI
     __set_basepri_value(int_posture);
+    __asm__ volatile ("" : : : "memory");
 #else
     __asm__ volatile ("MSR  PRIMASK,%0": : "r" (int_posture): "memory");
 #endif
@@ -620,6 +621,8 @@ extern  CHAR                    _tx_version_id[100];
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
+#endif
+
 #endif
 
 #endif

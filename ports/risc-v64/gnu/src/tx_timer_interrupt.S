@@ -66,11 +66,11 @@ _tx_timer_interrupt:
     /* _tx_timer_system_clock++;  */
 
     la      t0, _tx_timer_system_clock                  // Pickup address of system clock
-    ld      t1, 0(t0)                                   // Pickup system clock
+    lw      t1, 0(t0)                                   // Pickup system clock
     la      t2, _tx_timer_time_slice                    // Pickup address of time slice
-    ld      t3, 0(t2)                                   // Pickup time slice
+    lw      t3, 0(t2)                                   // Pickup time slice
     addi    t1, t1, 1                                   // Increment system clock
-    sd      t1, 0(t0)                                   // Store new system clock
+    sw      t1, 0(t0)                                   // Store new system clock
     li      t6, 0                                       // Clear local expired flag
 
     /* Test for time-slice expiration.  */
@@ -83,7 +83,7 @@ _tx_timer_interrupt:
        /* Decrement the time_slice.  */
        /* _tx_timer_time_slice--;  */
 
-    sd      t3, 0(t2)                                   // Store new time slice
+    sw      t3, 0(t2)                                   // Store new time slice
 
        /* Check for expiration.  */
        /* if (_tx_timer_time_slice == 0)  */

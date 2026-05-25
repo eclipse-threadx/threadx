@@ -131,7 +131,7 @@ _xt_context_save:
     s32i    a3,  sp, XT_STK_ATOMCTL
     #endif
 
-    #if XT_USE_SWPRI
+    #ifdef XT_USE_SWPRI
     /* Save virtual priority mask */
     movi    a3,  _xt_vpri_mask
     l32i    a3,  a3, 0
@@ -318,7 +318,7 @@ _xt_context_restore:
 
     ret
 
-#endif /* XCHAL_HAVE_XEA3 */
+#endif /* XCHAL_HAVE_XEA2 */
 
 
 /*******************************************************************************

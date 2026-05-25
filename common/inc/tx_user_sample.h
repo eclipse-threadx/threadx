@@ -95,7 +95,7 @@
    the new value must be a multiple of ULONG. */
 
 /*
-#define TX_QUEUE_MESSAGE_MAX_SIZE              TX_ULONG_16
+#define TX_QUEUE_MESSAGE_MAX_SIZE              TX_16_ULONG
 */
 
 /* Define the common timer tick reference for use by other middleware components. The default

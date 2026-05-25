@@ -1,7 +1,6 @@
 # Name of the target
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR risc-v32)
-
 set(THREADX_ARCH "risc-v32")
 set(THREADX_TOOLCHAIN "gnu")
 if(DEFINED SOFT_FLOAT)

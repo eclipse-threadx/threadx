@@ -22,6 +22,7 @@
 #define MSTATUS_MIE 		(1L << 3)    // machine-mode interrupt enable.
 #define MSTATUS_MPIE		(1L << 7)
 #define MSTATUS_FS		(1L << 13)
+#define MSTATUS_VS    (1L << 9)
 
 // Machine-mode Interrupt Enable
 #define MIE_MTIE		(1L << 7)

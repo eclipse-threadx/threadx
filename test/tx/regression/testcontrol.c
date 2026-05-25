@@ -195,7 +195,7 @@ void    threadx_semaphore_information_application_define(void *);
 void    threadx_thread_basic_execution_application_define(void *);
 void    threadx_thread_completed_application_define(void *);
 void    threadx_thread_relinquish_application_define(void *);
-void    threadx_thread_simple_supsend_application_define(void *);
+void    threadx_thread_simple_suspend_application_define(void *);
 void    threadx_thread_multiple_suspension_application_define(void *);
 void    threadx_thread_multiple_non_current_suspension_application_define(void *);
 void    threadx_thread_multi_level_preemption_threshold_application_define(void *);
@@ -312,7 +312,7 @@ TEST_ENTRY  test_control_tests[] =
     threadx_thread_basic_execution_application_define,
     threadx_thread_completed_application_define,
     threadx_thread_relinquish_application_define,
-    threadx_thread_simple_supsend_application_define,
+    threadx_thread_simple_suspend_application_define,
     threadx_thread_multiple_suspension_application_define,
     threadx_thread_multiple_non_current_suspension_application_define,
     threadx_thread_multi_level_preemption_threshold_application_define,
@@ -1232,8 +1232,8 @@ UINT    old_posture =  TX_INT_ENABLE;
     /* Are interrupts disabled?  */
     if (old_posture == TX_INT_DISABLE)
     {
-
-        /* System error - interrupts should alwasy be enabled in our test threads!  */
+    
+        /* System error - interrupts should always be enabled in our test threads!  */
         printf("    ***** SYSTEM ERROR ***** test returned with interrupts disabled!\n");
         test_control_system_errors++;
     }

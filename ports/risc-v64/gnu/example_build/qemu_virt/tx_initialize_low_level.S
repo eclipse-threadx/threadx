@@ -66,6 +66,13 @@
 #else
 	addi sp, sp, -256                 // Allocate space for all registers - without floating point enabled (32*8)
 #endif
+#if defined(__riscv_vector)
+    /* Allocate space for vector registers */
+    csrr    t4, vlenb
+    slli    t4, t4, 5
+    addi    t4, t4, 4*8
+    sub     sp, sp, t4
+#endif
 
 	sd   x1, 224(sp)                  // Store RA (28*8 = 224, because call will override ra [ra is a callee register in riscv])
 
@@ -149,6 +156,10 @@ _tx_initialize_low_level:
     li      t0, MSTATUS_FS
     csrrs   zero, mstatus, t0			           // set MSTATUS_FS bit to open f/d isa in riscv
     fscsr   x0
+#endif
+#ifdef __riscv_vector
+    li      t0, MSTATUS_VS
+    csrrs   zero, mstatus, t0			           // set MSTATUS_VS bit to open vector isa in riscv
 #endif
     addi    sp, sp, -8
     sd	    ra, 0(sp)

@@ -41,7 +41,11 @@ _start:
 	li x30, 0
 	li x31, 0
 	la t0, _sysstack_start
+#ifdef __riscv_vector
+	li t1, 0x5000
+#else
 	li t1, 0x1000
+#endif
 	add sp, t0, t1
 	la  t0, _bss_start
 	la  t1, _bss_end

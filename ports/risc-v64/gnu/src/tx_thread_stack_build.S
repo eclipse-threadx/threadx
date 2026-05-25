@@ -128,10 +128,19 @@ If floating point support:
                     f30     61      Inital ft10
                     f31     62      Inital ft11
                     fscr    63      Inital fscr
+If vector extension support:
+                    vstart  64      Initial vstart
+                    vtype   65      Initial vtype
+                    vl      66      Initial vl
+                    vcsr    67      Initial vcsr
+                    v0      68      Initial v0
+                    v1      69      Initial v1
+                    ...
+                    v31     99      Initial v31
 
     Stack Bottom: (higher memory address)  */
 
-    ld      t0, 32(a0)                                  // Pickup end of stack area
+    ld      t0, 24(a0)                                  // Pickup end of stack area
     li      t1, ~15                                     // Build 16-byte alignment mask
     and     t0, t0, t1                                  // Make sure 16-byte alignment
 
@@ -142,6 +151,17 @@ If floating point support:
 #else
     addi    t0, t0, -32*8                               // Allocate space for the stack frame
 #endif
+
+#if defined(__riscv_vector)
+    /* Vector extension support: calculate space based on vlenb */
+    csrr    t4, vlenb                                   // Get vector register byte length
+    slli    t4, t4, 5                                   // Multiply by 32 (number of vector registers)
+    addi    t4, t4, 4*8                                 // Add vector CSR space: vstart, vtype, vl, vcsr
+    sub     t0, t0, t4                                  // Allocate vector space for the stack frame
+#else
+    li      t4, 0
+#endif
+
     li      t1, 1                                       // Build stack type
     sd      t1,  0*8(t0)                                // Place stack type on the top
     sd      zero,  1*8(t0)                              // Initial s11
@@ -172,7 +192,7 @@ If floating point support:
     sd      zero, 26*8(t0)                              // Initial a1
     sd      zero, 27*8(t0)                              // Initial a0
     sd      zero, 28*8(t0)                              // Initial ra
-    sd      a1, 30*8(t0)                                // Initial mepc (thread entry point)
+    sd      a1, 30*8(t0)                                // Initial mepc/sepc (thread entry point)
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     sd      zero, 31*8(t0)                              // Initial ft0
     sd      zero, 32*8(t0)                              // Initial ft1
@@ -208,14 +228,36 @@ If floating point support:
     sd      zero, 62*8(t0)                              // Initial ft11
     csrr    a1, fcsr                                    // Read fcsr for initial value
     sd      a1, 63*8(t0)                                // Initial fcsr
-    sd      zero, 64*8(t0)                              // Reserved word (0)
+#endif
+
+#if defined(__riscv_vector)
+    /* Clear vector register space */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    addi    t2, t0, 64*8                                // t2 = start of vector registers
 #else
-    sd      zero, 31*8(t0)                              // Reserved word (0)
+    addi    t2, t0, 31*8                                // t2 = start of vector registers
+#endif
+    add     t3, t2, t4                                  // t3 = end of vector registers
+
+vector_clear_loop:
+    beq     t2, t3, vector_clear_done                   // Done if reached end
+    sd      zero, 0(t2)                                 // Clear 8 bytes
+    addi    t2, t2, 8                                   // Move to next 8 bytes
+    j       vector_clear_loop
+
+vector_clear_done:
+#endif
+
+    add     t2, t0, t4
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    sd      zero, 64*8(t2)                              // Reserved word (0)
+#else
+    sd      zero, 31*8(t2)                              // Reserved word (0)
 #endif
 
     /* Setup stack pointer.  */
     /* thread_ptr -> tx_thread_stack_ptr =  t0;  */
 
-    sd      t0, 16(a0)                                  // Save stack pointer in thread's
+    sd      t0, 8(a0)                                   // Save stack pointer in thread's
     ret                                                 //   control block and return
 /* }  */

@@ -4,6 +4,15 @@
 #include   <stdio.h>
 #include   "tx_api.h"
 
+/* Per-allocation overhead in byte pools: next pointer + ALIGN_TYPE alignment marker. */
+#define BYTE_POOL_OVERHEAD  (sizeof(UCHAR *) + sizeof(ALIGN_TYPE))
+
+/* Pool size for pool_0: exactly fits 3 allocations of 24 bytes with no room for a 4th. */
+#define POOL_0_SIZE  (ULONG)(3u * (24u + BYTE_POOL_OVERHEAD) + BYTE_POOL_OVERHEAD)
+
+/* Pool size for pool_4: must accommodate 3 allocations of 84 bytes (tightest pattern). */
+#define POOL_4_SIZE  (ULONG)(3u * (84u + BYTE_POOL_OVERHEAD) + BYTE_POOL_OVERHEAD + 16u)
+
 typedef struct BYTE_MEMORY_TEST_STRUCT
 {
     ULONG           first;
@@ -256,8 +265,8 @@ CHAR    *pointer;
     }
 
     /* Create byte pools 0 and 1.  */
-    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, 108);
-    pointer = pointer + 108;
+    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, POOL_0_SIZE);
+    pointer = pointer + POOL_0_SIZE;
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -279,9 +288,9 @@ CHAR    *pointer;
     }
 
     /* Test for search pointer issue on wrapped seach with prior block to search pointer merged.  */
-    status =  tx_byte_pool_create(&pool_4, "pool 4", pointer, 300);
+    status =  tx_byte_pool_create(&pool_4, "pool 4", pointer, POOL_4_SIZE);
     pool_4_memory =  pointer;
-    pointer = pointer + 300;
+    pointer = pointer + POOL_4_SIZE;
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -865,7 +874,7 @@ UCHAR   *save_search;
     }
 
     /* Move the search pointer to the third block to exercise that code in the byte search algorithm.  */
-    pool_0.tx_byte_pool_search =  (UCHAR *) pointer_3-8;
+    pool_0.tx_byte_pool_search =  (UCHAR *) pointer_3 - BYTE_POOL_OVERHEAD;
 
     /* Now allocate the block again.  */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer_2, 24, TX_NO_WAIT);
@@ -885,7 +894,7 @@ UCHAR   *save_search;
     status +=  tx_byte_release(pointer_1);
 
     /* Move the search pointer to the third block to exercise that code in the byte search algorithm.  */
-    pool_0.tx_byte_pool_search =  (UCHAR *) pointer_3-8;
+    pool_0.tx_byte_pool_search =  (UCHAR *) pointer_3 - BYTE_POOL_OVERHEAD;
 
     /* Allocate a large block to force the search pointer update.  */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer_3, 88, TX_NO_WAIT);
@@ -961,7 +970,7 @@ UCHAR   *save_search;
     }
 
     /* Create pool 4.  */
-    status =  tx_byte_pool_create(&pool_4, "pool 4", pool_4_memory, 300);
+    status =  tx_byte_pool_create(&pool_4, "pool 4", pool_4_memory, POOL_4_SIZE);
 
     /* Check status.  */
     if (status != TX_SUCCESS)

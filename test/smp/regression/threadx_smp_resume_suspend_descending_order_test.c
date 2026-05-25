@@ -1,4 +1,4 @@
-/* Define the ThreadX SMP resume and suspend threads in accending order test.  */
+/* Define the ThreadX SMP resume and suspend threads in ascending order test.  */
 
 #include   <stdio.h>
 #include   "tx_api.h"
@@ -71,7 +71,7 @@ static void   delay(UINT i)
 #ifdef CTEST
 void test_application_define(void *first_unused_memory)
 #else
-void    threadx_smp_resume_suspend_accending_order_test(void *first_unused_memory)
+void    threadx_smp_resume_suspend_descending_order_test(void *first_unused_memory)
 #endif
 {
 
@@ -96,7 +96,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #1\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #1\n");
         test_control_return(1);
     }
 
@@ -110,7 +110,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #2\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #2\n");
         test_control_return(1);
     }
 
@@ -124,7 +124,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #3\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #3\n");
         test_control_return(1);
     }
 
@@ -138,7 +138,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #4\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #4\n");
         test_control_return(1);
     }
 
@@ -152,7 +152,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #5\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #5\n");
         test_control_return(1);
     }
 
@@ -166,7 +166,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #6\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #6\n");
         test_control_return(1);
     }
 
@@ -180,7 +180,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #7\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #7\n");
         test_control_return(1);
     }
 
@@ -194,7 +194,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #8\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #8\n");
         test_control_return(1);
     }
 
@@ -208,7 +208,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #9\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #9\n");
         test_control_return(1);
     }
 
@@ -222,7 +222,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #9\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #9\n");
         test_control_return(1);
     }
 
@@ -236,7 +236,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #11\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #11\n");
         test_control_return(1);
     }
 
@@ -250,7 +250,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #12\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #12\n");
         test_control_return(1);
     }
 
@@ -264,7 +264,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #13\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #13\n");
         test_control_return(1);
     }
 
@@ -278,7 +278,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #14\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #14\n");
         test_control_return(1);
     }
 
@@ -292,7 +292,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #15\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #15\n");
         test_control_return(1);
     }
 
@@ -306,7 +306,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #16\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #16\n");
         test_control_return(1);
     }
 
@@ -320,7 +320,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #17\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #17\n");
         test_control_return(1);
     }
 
@@ -334,7 +334,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #18\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #18\n");
         test_control_return(1);
     }
 
@@ -348,7 +348,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #19\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #19\n");
         test_control_return(1);
     }
 
@@ -362,7 +362,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #20\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #20\n");
         test_control_return(1);
     }
 
@@ -376,7 +376,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #21\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #21\n");
         test_control_return(1);
     }
 
@@ -390,7 +390,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #22\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #22\n");
         test_control_return(1);
     }
 
@@ -404,7 +404,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #23\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #23\n");
         test_control_return(1);
     }
 
@@ -418,7 +418,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #24\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #24\n");
         test_control_return(1);
     }
 
@@ -432,7 +432,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #25\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #25\n");
         test_control_return(1);
     }
 
@@ -446,7 +446,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #26\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #26\n");
         test_control_return(1);
     }
 
@@ -460,7 +460,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #27\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #27\n");
         test_control_return(1);
     }
 
@@ -474,7 +474,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #28\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #28\n");
         test_control_return(1);
     }
 
@@ -488,7 +488,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #29\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #29\n");
         test_control_return(1);
     }
 
@@ -502,7 +502,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #30\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #30\n");
         test_control_return(1);
     }
 
@@ -516,7 +516,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #31\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #31\n");
         test_control_return(1);
     }
 
@@ -530,7 +530,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #32\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #32\n");
         test_control_return(1);
     }
 
@@ -547,7 +547,7 @@ UINT    i;
     if (status != TX_SUCCESS)
     {
 
-        printf("Running SMP Resume-Suspend Accending Priority Order Test............ ERROR #33\n");
+        printf("Running SMP Resume-Suspend descending Priority Order Test............ ERROR #33\n");
         test_control_return(1);
     }
 }
@@ -564,13 +564,13 @@ UINT    status;
 
 
     /* Inform user.  */
-    printf("Running SMP Resume-Suspend Accending Priority Order Test............ ");
+    printf("Running SMP Resume-Suspend descending Priority Order Test............ ");
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_1);
-
+    status =  tx_thread_resume(&thread_31);
+    delay(31);
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_31)
                                || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
@@ -580,11 +580,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_2);
+    status =  tx_thread_resume(&thread_30);
+    delay(30);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != TX_NULL))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_31)
+                               || (_tx_thread_execute_ptr[2] != &thread_30) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
         /* Execution error.  */
@@ -593,11 +594,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_3);
+    status =  tx_thread_resume(&thread_29);
+    delay(29);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_31)
+                               || (_tx_thread_execute_ptr[2] != &thread_30) || (_tx_thread_execute_ptr[3] != &thread_29))
     {
 
         /* Execution error.  */
@@ -606,11 +608,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_4);
+    status =  tx_thread_resume(&thread_28);
+    delay(28);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_28)
+                               || (_tx_thread_execute_ptr[2] != &thread_30) || (_tx_thread_execute_ptr[3] != &thread_29))
     {
 
         /* Execution error.  */
@@ -619,11 +622,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_5);
+    status =  tx_thread_resume(&thread_27);
+    delay(27);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_28)
+                               || (_tx_thread_execute_ptr[2] != &thread_27) || (_tx_thread_execute_ptr[3] != &thread_29))
     {
 
         /* Execution error.  */
@@ -632,11 +636,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_6);
+    status =  tx_thread_resume(&thread_26);
+    delay(26);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_28)
+                               || (_tx_thread_execute_ptr[2] != &thread_27) || (_tx_thread_execute_ptr[3] != &thread_26))
     {
 
         /* Execution error.  */
@@ -645,11 +650,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_7);
+    status =  tx_thread_resume(&thread_25);
+    delay(25);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_25)
+                               || (_tx_thread_execute_ptr[2] != &thread_27) || (_tx_thread_execute_ptr[3] != &thread_26))
     {
 
         /* Execution error.  */
@@ -658,11 +664,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_8);
+    status =  tx_thread_resume(&thread_24);
+    delay(24);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_25)
+                               || (_tx_thread_execute_ptr[2] != &thread_24) || (_tx_thread_execute_ptr[3] != &thread_26))
     {
 
         /* Execution error.  */
@@ -671,11 +678,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_9);
+    status =  tx_thread_resume(&thread_23);
+    delay(23);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_25)
+                               || (_tx_thread_execute_ptr[2] != &thread_24) || (_tx_thread_execute_ptr[3] != &thread_23))
     {
 
         /* Execution error.  */
@@ -684,11 +692,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_10);
+    status =  tx_thread_resume(&thread_22);
+    delay(22);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_22)
+                               || (_tx_thread_execute_ptr[2] != &thread_24) || (_tx_thread_execute_ptr[3] != &thread_23))
     {
 
         /* Execution error.  */
@@ -697,11 +706,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_11);
+    status =  tx_thread_resume(&thread_21);
+    delay(21);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_22)
+                               || (_tx_thread_execute_ptr[2] != &thread_21) || (_tx_thread_execute_ptr[3] != &thread_23))
     {
 
         /* Execution error.  */
@@ -710,11 +720,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_12);
+    status =  tx_thread_resume(&thread_20);
+    delay(20);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_22)
+                               || (_tx_thread_execute_ptr[2] != &thread_21) || (_tx_thread_execute_ptr[3] != &thread_20))
     {
 
         /* Execution error.  */
@@ -723,11 +734,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_13);
+    status =  tx_thread_resume(&thread_19);
+    delay(19);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_19)
+                               || (_tx_thread_execute_ptr[2] != &thread_21) || (_tx_thread_execute_ptr[3] != &thread_20))
     {
 
         /* Execution error.  */
@@ -736,11 +748,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_14);
+    status =  tx_thread_resume(&thread_18);
+    delay(18);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_19)
+                               || (_tx_thread_execute_ptr[2] != &thread_18) || (_tx_thread_execute_ptr[3] != &thread_20))
     {
 
         /* Execution error.  */
@@ -749,11 +762,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_15);
+    status =  tx_thread_resume(&thread_17);
+    delay(17);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_19)
+                               || (_tx_thread_execute_ptr[2] != &thread_18) || (_tx_thread_execute_ptr[3] != &thread_17))
     {
 
         /* Execution error.  */
@@ -763,10 +777,11 @@ UINT    status;
 
     /* Resume all the threads.  */
     status =  tx_thread_resume(&thread_16);
+    delay(16);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16)
+                               || (_tx_thread_execute_ptr[2] != &thread_18) || (_tx_thread_execute_ptr[3] != &thread_17))
     {
 
         /* Execution error.  */
@@ -775,11 +790,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_17);
+    status =  tx_thread_resume(&thread_15);
+    delay(15);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16)
+                               || (_tx_thread_execute_ptr[2] != &thread_15) || (_tx_thread_execute_ptr[3] != &thread_17))
     {
 
         /* Execution error.  */
@@ -788,11 +804,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_18);
+    status =  tx_thread_resume(&thread_14);
+    delay(14);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16)
+                               || (_tx_thread_execute_ptr[2] != &thread_15) || (_tx_thread_execute_ptr[3] != &thread_14))
     {
 
         /* Execution error.  */
@@ -801,11 +818,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_19);
+    status =  tx_thread_resume(&thread_13);
+    delay(13);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_13)
+                               || (_tx_thread_execute_ptr[2] != &thread_15) || (_tx_thread_execute_ptr[3] != &thread_14))
     {
 
         /* Execution error.  */
@@ -814,11 +832,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_20);
+    status =  tx_thread_resume(&thread_12);
+    delay(12);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_13)
+                               || (_tx_thread_execute_ptr[2] != &thread_12) || (_tx_thread_execute_ptr[3] != &thread_14))
     {
 
         /* Execution error.  */
@@ -827,11 +846,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_21);
+    status =  tx_thread_resume(&thread_11);
+    delay(11);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_13)
+                               || (_tx_thread_execute_ptr[2] != &thread_12) || (_tx_thread_execute_ptr[3] != &thread_11))
     {
 
         /* Execution error.  */
@@ -840,11 +860,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_22);
+    status =  tx_thread_resume(&thread_10);
+    delay(10);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_10)
+                               || (_tx_thread_execute_ptr[2] != &thread_12) || (_tx_thread_execute_ptr[3] != &thread_11))
     {
 
         /* Execution error.  */
@@ -853,11 +874,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_23);
+    status =  tx_thread_resume(&thread_9);
+    delay(9);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_10)
+                               || (_tx_thread_execute_ptr[2] != &thread_9) || (_tx_thread_execute_ptr[3] != &thread_11))
     {
 
         /* Execution error.  */
@@ -866,11 +888,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_24);
+    status =  tx_thread_resume(&thread_8);
+    delay(8);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_10)
+                               || (_tx_thread_execute_ptr[2] != &thread_9) || (_tx_thread_execute_ptr[3] != &thread_8))
     {
 
         /* Execution error.  */
@@ -879,11 +902,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_25);
+    status =  tx_thread_resume(&thread_7);
+    delay(7);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_7)
+                               || (_tx_thread_execute_ptr[2] != &thread_9) || (_tx_thread_execute_ptr[3] != &thread_8))
     {
 
         /* Execution error.  */
@@ -892,11 +916,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_26);
+    status =  tx_thread_resume(&thread_6);
+    delay(6);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_7)
+                               || (_tx_thread_execute_ptr[2] != &thread_6) || (_tx_thread_execute_ptr[3] != &thread_8))
     {
 
         /* Execution error.  */
@@ -905,11 +930,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_27);
+    status =  tx_thread_resume(&thread_5);
+    delay(5);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_7)
+                               || (_tx_thread_execute_ptr[2] != &thread_6) || (_tx_thread_execute_ptr[3] != &thread_5))
     {
 
         /* Execution error.  */
@@ -918,11 +944,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_28);
+    status =  tx_thread_resume(&thread_4);
+    delay(4);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_4)
+                               || (_tx_thread_execute_ptr[2] != &thread_6) || (_tx_thread_execute_ptr[3] != &thread_5))
     {
 
         /* Execution error.  */
@@ -931,11 +958,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_29);
+    status =  tx_thread_resume(&thread_3);
+    delay(3);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_4)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_5))
     {
 
         /* Execution error.  */
@@ -944,11 +972,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_30);
+    status =  tx_thread_resume(&thread_2);
+    delay(2);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_4)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -957,11 +986,12 @@ UINT    status;
     }
 
     /* Resume all the threads.  */
-    status =  tx_thread_resume(&thread_31);
+    status =  tx_thread_resume(&thread_1);
+    delay(1);
 
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -969,27 +999,25 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(1);
-    status =   tx_thread_suspend(&thread_1);
+    /* Suspend thread in descending priority.  */
+    status =   tx_thread_suspend(&thread_31);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_4)
-                               || (_tx_thread_execute_ptr[2] != &thread_2) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
         printf("ERROR #65\n");
         test_control_return(1);
     }
-
-    /* Suspend thread in accending priority.  */
-    delay(2);
-    status =   tx_thread_suspend(&thread_2);
+    
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_30);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_4)
-                               || (_tx_thread_execute_ptr[2] != &thread_5) || (_tx_thread_execute_ptr[3] != &thread_3))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -997,13 +1025,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(3);
-    status =   tx_thread_suspend(&thread_3);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_29);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_4)
-                               || (_tx_thread_execute_ptr[2] != &thread_5) || (_tx_thread_execute_ptr[3] != &thread_6))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1011,13 +1038,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(4);
-    status =   tx_thread_suspend(&thread_4);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_28);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_7)
-                               || (_tx_thread_execute_ptr[2] != &thread_5) || (_tx_thread_execute_ptr[3] != &thread_6))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1025,13 +1051,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(5);
-    status =   tx_thread_suspend(&thread_5);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_27);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_7)
-                               || (_tx_thread_execute_ptr[2] != &thread_8) || (_tx_thread_execute_ptr[3] != &thread_6))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1039,13 +1064,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(6);
-    status =   tx_thread_suspend(&thread_6);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_26);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_7)
-                               || (_tx_thread_execute_ptr[2] != &thread_8) || (_tx_thread_execute_ptr[3] != &thread_9))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1053,13 +1077,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(7);
-    status =   tx_thread_suspend(&thread_7);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_25);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_10)
-                               || (_tx_thread_execute_ptr[2] != &thread_8) || (_tx_thread_execute_ptr[3] != &thread_9))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1067,13 +1090,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(8);
-    status =   tx_thread_suspend(&thread_8);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_24);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_10)
-                               || (_tx_thread_execute_ptr[2] != &thread_11) || (_tx_thread_execute_ptr[3] != &thread_9))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1081,13 +1103,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(9);
-    status =   tx_thread_suspend(&thread_9);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_23);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_10)
-                               || (_tx_thread_execute_ptr[2] != &thread_11) || (_tx_thread_execute_ptr[3] != &thread_12))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1095,13 +1116,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(10);
-    status =   tx_thread_suspend(&thread_10);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_22);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_13)
-                               || (_tx_thread_execute_ptr[2] != &thread_11) || (_tx_thread_execute_ptr[3] != &thread_12))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1109,13 +1129,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(11);
-    status =   tx_thread_suspend(&thread_11);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_21);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_13)
-                               || (_tx_thread_execute_ptr[2] != &thread_14) || (_tx_thread_execute_ptr[3] != &thread_12))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1123,13 +1142,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(12);
-    status =   tx_thread_suspend(&thread_12);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_20);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_13)
-                               || (_tx_thread_execute_ptr[2] != &thread_14) || (_tx_thread_execute_ptr[3] != &thread_15))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1137,55 +1155,51 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(13);
-    status =   tx_thread_suspend(&thread_13);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_19);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16)
-                               || (_tx_thread_execute_ptr[2] != &thread_14) || (_tx_thread_execute_ptr[3] != &thread_15))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
         printf("ERROR #77\n");
         test_control_return(1);
     }
-
-    /* Suspend thread in accending priority.  */
-    delay(14);
-    status =   tx_thread_suspend(&thread_14);
+    
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_18);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16)
-                               || (_tx_thread_execute_ptr[2] != &thread_17) || (_tx_thread_execute_ptr[3] != &thread_15))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
         printf("ERROR #78\n");
         test_control_return(1);
     }
-
-    /* Suspend thread in accending priority.  */
-    delay(15);
-    status =   tx_thread_suspend(&thread_15);
+    
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_17);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_16)
-                               || (_tx_thread_execute_ptr[2] != &thread_17) || (_tx_thread_execute_ptr[3] != &thread_18))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
         printf("ERROR #79\n");
         test_control_return(1);
     }
-
-    /* Suspend thread in accending priority.  */
-    delay(16);
+    
+    /* Suspend thread in ascending priority.  */
     status =   tx_thread_suspend(&thread_16);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_19)
-                               || (_tx_thread_execute_ptr[2] != &thread_17) || (_tx_thread_execute_ptr[3] != &thread_18))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1193,27 +1207,25 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(17);
-    status =   tx_thread_suspend(&thread_17);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_15);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_19)
-                               || (_tx_thread_execute_ptr[2] != &thread_20) || (_tx_thread_execute_ptr[3] != &thread_18))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
         printf("ERROR #81\n");
         test_control_return(1);
     }
-
-    /* Suspend thread in accending priority.  */
-    delay(18);
-    status =   tx_thread_suspend(&thread_18);
+    
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_14);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_19)
-                               || (_tx_thread_execute_ptr[2] != &thread_20) || (_tx_thread_execute_ptr[3] != &thread_21))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1221,13 +1233,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(19);
-    status =   tx_thread_suspend(&thread_19);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_13);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_22)
-                               || (_tx_thread_execute_ptr[2] != &thread_20) || (_tx_thread_execute_ptr[3] != &thread_21))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1235,13 +1246,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(20);
-    status =   tx_thread_suspend(&thread_20);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_12);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_22)
-                               || (_tx_thread_execute_ptr[2] != &thread_23) || (_tx_thread_execute_ptr[3] != &thread_21))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1249,13 +1259,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(21);
-    status =   tx_thread_suspend(&thread_21);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_11);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_22)
-                               || (_tx_thread_execute_ptr[2] != &thread_23) || (_tx_thread_execute_ptr[3] != &thread_24))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1263,13 +1272,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(22);
-    status =   tx_thread_suspend(&thread_22);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_10);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_25)
-                               || (_tx_thread_execute_ptr[2] != &thread_23) || (_tx_thread_execute_ptr[3] != &thread_24))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1277,13 +1285,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(23);
-    status =   tx_thread_suspend(&thread_23);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_9);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_25)
-                               || (_tx_thread_execute_ptr[2] != &thread_26) || (_tx_thread_execute_ptr[3] != &thread_24))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1291,13 +1298,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(24);
-    status =   tx_thread_suspend(&thread_24);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_8);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_25)
-                               || (_tx_thread_execute_ptr[2] != &thread_26) || (_tx_thread_execute_ptr[3] != &thread_27))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1305,13 +1311,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(25);
-    status =   tx_thread_suspend(&thread_25);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_7);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_28)
-                               || (_tx_thread_execute_ptr[2] != &thread_26) || (_tx_thread_execute_ptr[3] != &thread_27))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1319,13 +1324,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(26);
-    status =   tx_thread_suspend(&thread_26);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_6);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_28)
-                               || (_tx_thread_execute_ptr[2] != &thread_29) || (_tx_thread_execute_ptr[3] != &thread_27))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1333,13 +1337,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(27);
-    status =   tx_thread_suspend(&thread_27);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_5);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_28)
-                               || (_tx_thread_execute_ptr[2] != &thread_29) || (_tx_thread_execute_ptr[3] != &thread_30))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1347,13 +1350,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(28);
-    status =   tx_thread_suspend(&thread_28);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_4);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_31)
-                               || (_tx_thread_execute_ptr[2] != &thread_29) || (_tx_thread_execute_ptr[3] != &thread_30))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != &thread_3) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1361,13 +1363,12 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(29);
-    status =   tx_thread_suspend(&thread_29);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_3);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_31)
-                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != &thread_30))
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
+                               || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != &thread_2))
     {
 
         /* Execution error.  */
@@ -1375,12 +1376,11 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(30);
-    status =   tx_thread_suspend(&thread_30);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_2);
 
     /* Check for the correct results.  */
-    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_31)
+    if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != &thread_1)
                                || (_tx_thread_execute_ptr[2] != TX_NULL) || (_tx_thread_execute_ptr[3] != TX_NULL))
     {
 
@@ -1389,9 +1389,8 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* Suspend thread in accending priority.  */
-    delay(31);
-    status =   tx_thread_suspend(&thread_31);
+    /* Suspend thread in ascending priority.  */
+    status =   tx_thread_suspend(&thread_1);
 
     /* Check for the correct results.  */
     if ((status != TX_SUCCESS) || (_tx_thread_execute_ptr[0] != &thread_0) || (_tx_thread_execute_ptr[1] != TX_NULL)

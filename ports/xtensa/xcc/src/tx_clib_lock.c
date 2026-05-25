@@ -66,6 +66,8 @@ TX_MUTEX  clib_lock_mutex;
 void
 __malloc_lock (struct _reent * ptr)
 {
+    (void) ptr;
+
     if (_tx_thread_system_state != TX_INITIALIZE_IS_FINISHED) {
         return;
     }
@@ -80,6 +82,8 @@ __malloc_lock (struct _reent * ptr)
 void
 __malloc_unlock (struct _reent * ptr)
 {
+    (void) ptr;
+
     if (_tx_thread_system_state != TX_INITIALIZE_IS_FINISHED) {
         return;
     }
@@ -99,6 +103,8 @@ __malloc_unlock (struct _reent * ptr)
 void
 __env_lock (struct _reent * ptr)
 {
+    (void) ptr;
+
     if (_tx_thread_system_state != TX_INITIALIZE_IS_FINISHED) {
         return;
     }
@@ -113,6 +119,8 @@ __env_lock (struct _reent * ptr)
 void
 __env_unlock (struct _reent * ptr)
 {
+    (void) ptr;
+
     if (_tx_thread_system_state != TX_INITIALIZE_IS_FINISHED) {
         return;
     }
@@ -127,6 +135,12 @@ __env_unlock (struct _reent * ptr)
 
 #include <errno.h>
 #include <sys/reent.h>
+
+#if defined(__DYNAMIC_REENT__)
+// Helps to keep code similar between dynamic and non-dynamic.
+#undef _reent_ptr
+struct _reent * _reent_ptr;
+#endif
 
 #define XT_NUM_CLIB_LOCKS      (_MAX_LOCK + FOPEN_MAX)
 
@@ -201,6 +215,32 @@ _Mtxunlock (_Rmtx * mtx)
 
 #endif /* XSHAL_CLIB == XTHAL_CLIB_XCLIB */
 
+#if defined(__DYNAMIC_REENT__)
+/**************************************************************************/
+/*    Return libc context pointer for current thread. Overrides weak      */
+/*    version in libc. Until real threads are active, use the libc's      */
+/*    global reent struct.                                                */
+/**************************************************************************/
+struct _reent *
+__getreent(void)
+{
+    TX_THREAD * thread_ptr = _tx_thread_current_ptr;
+
+    if (thread_ptr) {
+        return &(thread_ptr->tx_thread_clib_reent);
+    }
+
+#if XSHAL_CLIB == XTHAL_CLIB_XCLIB
+    extern struct _reent g_reent; /* from xclib */
+    return &g_reent;
+#elif XSHAL_CLIB == XTHAL_CLIB_NEWLIB
+    extern struct _reent * _impure_ptr; /* from newlib */
+    return _impure_ptr;
+#else
+#error "Unsupported C library for __DYNAMIC_REENT__"
+#endif
+}
+#endif
 
 /**************************************************************************/
 /*    _sbrk_r - heap allocator. This function is called when the memory   */

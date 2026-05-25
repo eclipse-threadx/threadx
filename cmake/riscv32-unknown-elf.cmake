@@ -17,7 +17,12 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 set(CMAKE_C_FLAGS   "${CFLAGS}" CACHE INTERNAL "c compiler flags")
 set(CMAKE_CXX_FLAGS "${CXXFLAGS}" CACHE INTERNAL "cxx compiler flags")
-set(CMAKE_ASM_FLAGS "${ASFLAGS} -D__ASSEMBLER__ -D__riscv_float_abi_single" CACHE INTERNAL "asm compiler flags")
+if(DEFINED SOFT_FLOAT)
+    set(CMAKE_ASM_FLAGS "${ASFLAGS} -D__ASSEMBLER__" CACHE INTERNAL "asm compiler flags")
+else()
+    set(CMAKE_ASM_FLAGS "${ASFLAGS} -D__ASSEMBLER__ -D__riscv_float_abi_single" CACHE INTERNAL "asm compiler flags")
+endif()
+
 set(CMAKE_EXE_LINKER_FLAGS "${LDFLAGS}" CACHE INTERNAL "exe link flags")
 
 SET(CMAKE_C_FLAGS_DEBUG "-Og -g -ggdb3" CACHE INTERNAL "c debug compiler flags")

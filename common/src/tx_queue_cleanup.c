@@ -109,6 +109,19 @@ TX_THREAD           *previous_thread;
                     {
 #else
 
+                        /* TX_NOT_INTERRUPTABLE path: the revalidation guards present in the
+                           interruptable path above (cleanup pointer, suspension sequence, NULL
+                           queue pointer, queue ID, and suspended count checks) are intentionally
+                           omitted here.  Those guards exist to handle the race window that opens
+                           when the interruptable path calls TX_RESTORE before invoking cleanup,
+                           allowing another context to service or abort the suspension in between.
+                           In TX_NOT_INTERRUPTABLE mode the caller keeps interrupts disabled across
+                           the entire cleanup call, so that race window never exists.  Additionally,
+                           every path that resumes a suspended thread (tx_queue_send, tx_queue_receive,
+                           tx_queue_flush, tx_queue_delete) clears tx_thread_suspend_cleanup before
+                           calling _tx_thread_system_ni_resume, making a double-cleanup impossible
+                           under the NI serialisation guarantee.  */
+
                         /* Setup pointer to queue control block.  */
                         queue_ptr =  TX_VOID_TO_QUEUE_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
 #endif
