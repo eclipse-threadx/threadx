@@ -125,7 +125,9 @@ load
 
 if [ "${OPT_DEBUG}" -eq 0 ]; then
     info "Flashing and running (detached) ..."
-    printf 'continue\ndetach\nquit\n' >> "${GDB_INIT_FILE}"
+    printf 'monitor reset run\ndisconnect\nquit\n' >> "${GDB_INIT_FILE}"
+    info "ELF: ${ELF}"
+    riscv64-unknown-elf-size "${ELF}"
     "${GDB}" --batch --command="${GDB_INIT_FILE}" 2>&1 \
         | grep -v "keep_alive() was not invoked" \
         | grep -v "GDB alive packet not sent"
@@ -134,8 +136,7 @@ if [ "${OPT_DEBUG}" -eq 0 ]; then
 else
     info "Flashing and stopping at main for interactive debug ..."
     printf 'break main\ncontinue\n' >> "${GDB_INIT_FILE}"
+    info "ELF: ${ELF}"
+    riscv64-unknown-elf-size "${ELF}"
     "${GDB}" --command="${GDB_INIT_FILE}"
 fi
-
-info "ELF: ${ELF}"
-riscv64-unknown-elf-size "${ELF}"
