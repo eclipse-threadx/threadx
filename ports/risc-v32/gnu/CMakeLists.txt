@@ -1,23 +1,7 @@
+include(${CMAKE_SOURCE_DIR}/cmake/threadx_riscv_port.cmake)
 
-target_sources(${PROJECT_NAME}
-    PRIVATE
-    # {{BEGIN_TARGET_SOURCES}}
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_initialize_low_level.S
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_context_restore.S
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_context_save.S
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_interrupt_control.S
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_schedule.S
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_stack_build.S
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_system_return.S
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_timer_interrupt.S
-    # {{END_TARGET_SOURCES}}
+threadx_add_riscv_port(
+    SRC_DIR     ${CMAKE_CURRENT_LIST_DIR}/src
+    INC_DIR     ${CMAKE_CURRENT_LIST_DIR}/inc
+    EXAMPLE_DIR ${CMAKE_CURRENT_LIST_DIR}/example_build/qemu_virt
 )
-
-target_include_directories(${PROJECT_NAME}
-    PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/inc
-)
-
-if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/example_build/qemu_virt/CMakeLists.txt)
-    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/example_build/qemu_virt)
-endif()

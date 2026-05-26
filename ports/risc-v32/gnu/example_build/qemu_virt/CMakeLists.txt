@@ -2,7 +2,7 @@ set(QEMU_DEMO_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 add_executable(kernel.elf EXCLUDE_FROM_ALL
     ${QEMU_DEMO_DIR}/demo_threadx.c
-    ${QEMU_DEMO_DIR}/entry.s
+    ${QEMU_DEMO_DIR}/entry.S
     ${QEMU_DEMO_DIR}/uart.c
     ${QEMU_DEMO_DIR}/plic.c
     ${QEMU_DEMO_DIR}/hwtimer.c
@@ -31,7 +31,7 @@ find_package(Python3 COMPONENTS Interpreter)
 if(Python3_FOUND)
     add_custom_target(check-functional-riscv32
         COMMAND ${Python3_EXECUTABLE}
-            ${QEMU_DEMO_DIR}/test/azrtos_test_tx_gnu_riscv32_qemu.py
+            ${QEMU_DEMO_DIR}/test/threadx_test_tx_gnu_riscv32_qemu.py
             --elf $<TARGET_FILE:kernel.elf>
             --qemu qemu-system-riscv32
             --gdb gdb

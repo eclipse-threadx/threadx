@@ -13,7 +13,7 @@ riscv64-unknown-elf-gcc \
   -ffunction-sections -fdata-sections \
   -I../../../../../common/inc \
   -I../../inc \
-  entry.s \
+  entry.S \
   tx_initialize_low_level.S \
   board.c uart.c hwtimer.c plic.c trap.c demo_threadx.c \
   -L../../../../../build -lthreadx \
