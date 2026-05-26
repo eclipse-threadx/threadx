@@ -70,7 +70,15 @@ target_compile_options(
             -Wunused
             -Wuninitialized
             -Wmissing-declarations
-            -Wconversion
+            # -Wconversion is disabled for RV64 because ULONG is intentionally 32-bit
+            # (for ThreadX ABI compatibility across all ports) while sizeof(VOID*) and
+            # sizeof(ALIGN_TYPE) return size_t (64-bit on RV64). This design matches
+            # ARM Cortex-A72 and other 64-bit ports. The implicit conversions in
+            # common/src/ byte/block pool code trigger -Wconversion warnings. Since
+            # pool sizes are inherently limited to 32-bit (ULONG), the conversions
+            # are safe. No other 64-bit port with 32-bit ULONG has been tested with
+            # -Wconversion enabled, so we disable it here for RV64.
+            $<$<STREQUAL:${THREADX_ARCH},risc-v32>:-Wconversion>
             -Wpointer-arith
             -Wlogical-op
             -Waggregate-return

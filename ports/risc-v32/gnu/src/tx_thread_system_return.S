@@ -69,7 +69,17 @@ _tx_thread_system_return:
     addi    sp, sp, -16*4                               // Allocate space on the stack - without floating point enabled
 #endif
 
-    /* Store floating point preserved registers.  */
+    sw      zero,  0(sp)                                // Solicited stack type (store early so slot is always written)
+
+    /* Read and save mstatus first; use it to guard FP register save.  */
+    csrr    t0, mstatus                                 // Pickup current mstatus
+    sw      t0, 14*4(sp)                                // Save mstatus
+
+    /* Store floating point preserved registers — only if FS != Off.  */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    srli    t1, t0, 13                                  // Shift FS field to bits [1:0]
+    andi    t1, t1, 0x3                                 // Isolate FS bits
+    beqz    t1, _tx_thread_system_return_skip_fp        // Skip FP save if FS == Off
 #if defined(__riscv_float_abi_single)
     fsw     f8,  15*4(sp)                               // Store fs0
     fsw     f9,  16*4(sp)                               // Store fs1
@@ -101,8 +111,9 @@ _tx_thread_system_return:
     csrr    t0, fcsr
     sw      t0, 27*4(sp)                                // Store fcsr
 #endif
+_tx_thread_system_return_skip_fp:
+#endif
 
-    sw      zero,  0(sp)                                // Solicited stack type
     sw      ra,  13*4(sp)                               // Save return address
     sw      s0,  12*4(sp)                               // Save s0
     sw      s1,  11*4(sp)                               // Save s1
@@ -116,9 +127,6 @@ _tx_thread_system_return:
     sw      s9,   3*4(sp)                               // Save s9
     sw      s10,  2*4(sp)                               // Save s10
     sw      s11,  1*4(sp)                               // Save s11
-    csrr    t0, mstatus                                 // Pickup mstatus
-    sw      t0, 14*4(sp)                                // Save mstatus
-
 
     /* Lockout interrupts. will be enabled in _tx_thread_schedule  */
 

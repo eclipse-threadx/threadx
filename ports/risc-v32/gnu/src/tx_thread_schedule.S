@@ -214,6 +214,7 @@ _tx_thread_schedule_skip_fp_restore:
 #endif
 
     /* Recover standard registers.  */
+    lw      t0, 30*4(sp)                                // Recover mepc
     csrw    mepc, t0                                    // Setup mepc
 
     li      t0, 0x1880                                  // Prepare mstatus: MPP=Machine(0x1800) | MPIE(0x80)
@@ -302,6 +303,7 @@ _tx_thread_schedule_solicited_skip_fp_restore:
 #endif
 
     /* Recover standard registers.  */
+    lw      t0, 14*4(sp)                                // Reload saved mstatus (t0 may hold fcsr if FP was restored)
     csrw    mstatus, t0                                 // Restore mstatus
 
     lw      ra,  13*4(sp)                               // Recover return address
