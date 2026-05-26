@@ -218,7 +218,6 @@ CHAR    *pointer;
 
 static void    thread_0_entry(ULONG thread_input)
 {
-
     /* Check for correct input value and execution of other threads.  */
     if ((thread_input != 0) || (thread_1_counter) || (thread_2_counter) ||
         (thread_3_counter))
@@ -234,7 +233,6 @@ static void    thread_0_entry(ULONG thread_input)
 
 static void    thread_1_entry(ULONG thread_input)
 {
-
     /* Check for correct input value and execution of other threads.  */
     if ((thread_input != 1) || (thread_0_counter != 1) || (thread_2_counter) ||
         (thread_3_counter))
@@ -250,7 +248,6 @@ static void    thread_1_entry(ULONG thread_input)
 
 static void    thread_2_entry(ULONG thread_input)
 {
-
     /* Check for correct input value and execution of other threads.  */
     if ((thread_input != 2) || (thread_0_counter != 1) || (thread_1_counter != 1) ||
         (thread_3_counter))
@@ -455,5 +452,3 @@ static void    thread_9_entry(ULONG thread_input)
         tx_thread_relinquish();
     }
 }
-
-

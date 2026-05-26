@@ -1,15 +1,28 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-# Set up the project
-project(threadx
-    LANGUAGES C ASM
-)
-
 if(NOT DEFINED THREADX_ARCH)
     message(FATAL_ERROR "Error: THREADX_ARCH not defined")
 endif()
 if(NOT DEFINED THREADX_TOOLCHAIN)
     message(FATAL_ERROR "Error: THREADX_TOOLCHAIN not defined")
+endif()
+
+# The Windows simulation ports build cleanly without executable try-compiles.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+    set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+endif()
+
+# Set up the project. The Windows simulation ports do not use assembly and
+# avoiding ASM language enablement keeps MSVC configuration on the CLI path
+# deterministic.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+    project(threadx
+        LANGUAGES C
+    )
+else()
+    project(threadx
+        LANGUAGES C ASM
+    )
 endif()
 
 option(THREADX_SMP "Build ThreadX SMP version" OFF)

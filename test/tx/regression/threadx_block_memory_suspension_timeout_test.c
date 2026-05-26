@@ -2,6 +2,7 @@
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 
 static unsigned long   thread_0_counter =  0;
 static TX_THREAD       thread_0;
@@ -84,8 +85,8 @@ CHAR    *pointer;
     }
 
     /* Create block pool.  */
-    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, 340);
-    pointer = pointer + 340;
+    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
+    pointer = pointer + TX_TEST_BLOCK_POOL_BYTES(100, 3);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -209,4 +210,3 @@ CHAR    *pointer_1;
         thread_2_counter++;
     }
 }
-

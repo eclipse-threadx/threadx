@@ -362,4 +362,3 @@ static void    thread_31h_entry(ULONG thread_input)
         thread_31h_counter++;
     }
 }
-

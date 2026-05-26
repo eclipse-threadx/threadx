@@ -101,14 +101,17 @@ VOID  _tx_initialize_kernel_enter(VOID)
         /* Call any port specific preprocessing.  */
         TX_PORT_SPECIFIC_PRE_INITIALIZATION
 
+
         /* Invoke the low-level initialization to handle all processor specific
            initialization issues.  */
         _tx_initialize_low_level();
+
 
         /* Invoke the high-level initialization to exercise all of the
            ThreadX components and the application's initialization
            function.  */
         _tx_initialize_high_level();
+
 
         /* Call any port specific post-processing.  */
         TX_PORT_SPECIFIC_POST_INITIALIZATION
@@ -150,4 +153,3 @@ VOID  _tx_initialize_kernel_enter(VOID)
     TX_SAFETY_CRITICAL_EXCEPTION(__FILE__, __LINE__, 0);
 #endif
 }
-

@@ -4,6 +4,14 @@ cmake_policy(SET CMP0057 NEW)
 project(regression_test LANGUAGES C)
 
 set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../regression)
+set(REPO_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../..)
+set(PORT_LOW_LEVEL_SOURCE ${REPO_ROOT}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/src/tx_initialize_low_level.c)
+set(GENERATED_LOW_LEVEL_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/tx_initialize_low_level.c)
+set(TESTCONTROL_WEAK_DEFAULTS_SOURCE ${REPO_ROOT}/test/shared/regression/testcontrol_weak_defaults.c)
+
+if(NOT EXISTS ${PORT_LOW_LEVEL_SOURCE})
+  message(FATAL_ERROR "Unable to locate tx_initialize_low_level.c for ${THREADX_ARCH}/${THREADX_TOOLCHAIN}")
+endif()
 
 set(regression_test_cases
     ${SOURCE_DIR}/threadx_block_memory_basic_test.c
@@ -104,19 +112,32 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
 
 add_custom_command(
-  OUTPUT ${SOURCE_DIR}/tx_initialize_low_level.c
-  COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/generate_test_file.sh
+  OUTPUT ${GENERATED_LOW_LEVEL_SOURCE}
+  COMMAND ${CMAKE_COMMAND}
+          -DSOURCE_FILE=${PORT_LOW_LEVEL_SOURCE}
+          -DOUTPUT_FILE=${GENERATED_LOW_LEVEL_SOURCE}
+          -P ${CMAKE_CURRENT_LIST_DIR}/generate_test_file.cmake
+  DEPENDS ${PORT_LOW_LEVEL_SOURCE} ${CMAKE_CURRENT_LIST_DIR}/generate_test_file.cmake
   COMMENT "Generating tx_initialize_low_level.c for test")
 
-add_library(test_utility ${SOURCE_DIR}/tx_initialize_low_level.c
-                         ${SOURCE_DIR}/testcontrol.c)
-target_link_libraries(test_utility PUBLIC azrtos::threadx)
-target_compile_definitions(test_utility PUBLIC CTEST BATCH_TEST
-                                               TEST_STACK_SIZE_PRINTF=4096)
+add_library(test_utility OBJECT ${GENERATED_LOW_LEVEL_SOURCE}
+                                ${SOURCE_DIR}/testcontrol.c
+                                ${TESTCONTROL_WEAK_DEFAULTS_SOURCE})
+target_compile_definitions(test_utility PRIVATE CTEST BATCH_TEST
+                                                TEST_STACK_SIZE_PRINTF=4096)
+target_link_libraries(test_utility PRIVATE azrtos::threadx)
 
 foreach(test_case ${regression_test_cases})
   get_filename_component(test_name ${test_case} NAME_WE)
-  add_executable(${test_name} ${test_case})
-  target_link_libraries(${test_name} PRIVATE test_utility)
+
+  if(test_name STREQUAL "threadx_initialize_kernel_setup_test")
+    add_executable(${test_name} ${test_case})
+  else()
+    add_executable(${test_name} ${test_case} $<TARGET_OBJECTS:test_utility>)
+    target_compile_definitions(${test_name} PRIVATE CTEST BATCH_TEST
+                                                    TEST_STACK_SIZE_PRINTF=4096)
+  endif()
+
+  target_link_libraries(${test_name} PRIVATE azrtos::threadx)
   add_test(${CMAKE_BUILD_TYPE}::${test_name} ${test_name})
 endforeach()

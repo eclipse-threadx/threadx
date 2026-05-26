@@ -3,6 +3,7 @@
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 
 static unsigned long   thread_0_counter =  0;
 static TX_THREAD       thread_0;
@@ -89,8 +90,8 @@ CHAR    *pointer;
     }
 
     /* Create byte pool 0.  */
-    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, 108);
-    pointer = pointer + 108;
+    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, TX_TEST_BYTE_POOL_BYTES(108));
+    pointer = pointer + TX_TEST_BYTE_POOL_BYTES(108);
 
     /* Save off the intial pool size.  */
     initial_pool_size =  pool_0.tx_byte_pool_available;
@@ -126,7 +127,6 @@ CHAR    *pointer;
 
     while(1)
     {
-
         /* Allocate memory from the pool.  This size will cause merge activity
            because the search pointer will sit in this large block about half
            the time.  */
@@ -195,10 +195,8 @@ static void    thread_1_entry(ULONG thread_input)
 UINT    status;
 CHAR    *pointer;
 
-
     while(test_done == TX_FALSE)
     {
-
         /* Allocate memory from the pool.  */
         status = tx_byte_allocate(&pool_0, (VOID **) &pointer, 30, TX_WAIT_FOREVER);
 
@@ -228,10 +226,8 @@ static void    thread_2_entry(ULONG thread_input)
 UINT    status;
 CHAR    *pointer;
 
-
     while(test_done == TX_FALSE)
     {
-
         /* Allocate memory from the pool.  */
         status = tx_byte_allocate(&pool_0, (VOID **) &pointer, 12, TX_WAIT_FOREVER);
 

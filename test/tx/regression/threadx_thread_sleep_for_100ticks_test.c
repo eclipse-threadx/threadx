@@ -432,4 +432,3 @@ volatile ULONG       value = 0;
         test_control_return(0);
     }
 }
-

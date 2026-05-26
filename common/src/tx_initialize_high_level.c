@@ -111,16 +111,21 @@ VOID    _tx_initialize_high_level(VOID)
     /* Initialize the event log, if enabled.  */
     TX_EL_INITIALIZE
 
+
     /* Call the thread control initialization function.  */
     _tx_thread_initialize();
 
+
 #ifndef TX_NO_TIMER
+
 
     /* Call the timer control initialization function.  */
     _tx_timer_initialize();
+
 #endif
 
 #ifndef TX_DISABLE_REDUNDANT_CLEARING
+
 
     /* Call the semaphore initialization function.  */
     _tx_semaphore_initialize();
@@ -139,6 +144,6 @@ VOID    _tx_initialize_high_level(VOID)
 
     /* Call the mutex initialization function.  */
     _tx_mutex_initialize();
+
 #endif
 }
-

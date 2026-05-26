@@ -89,4 +89,3 @@ ULONG now;
         test_control_return(1);
     }
 }
-

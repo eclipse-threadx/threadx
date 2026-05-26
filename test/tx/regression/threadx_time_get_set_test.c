@@ -104,4 +104,3 @@ ULONG   current_time;
         test_control_return(0);
     }
 }
-

@@ -181,9 +181,9 @@ UINT    status;
     /* Check the run counters.  Depending on the starting time relative to
        the tick boundary, thread 1 can run either 32 or 33 rounds and
        thread 2 can run 13 or 14 rounds.  This variance applies to any
-       platform with non-deterministic tick alignment (Linux, QEMU, etc.). */
-    if (((thread_1_counter != 32) && (thread_1_counter != 33)) ||
-        ((thread_2_counter != 13) && (thread_2_counter != 14)))
+       platform with non-deterministic tick alignment (Linux, QEMU, Windows, etc.). */
+    if (((thread_1_counter < 32UL) || (thread_1_counter > 33UL)) ||
+        ((thread_2_counter < 13UL) || (thread_2_counter > 14UL)))
     {
 
         /* Event flag error.  */

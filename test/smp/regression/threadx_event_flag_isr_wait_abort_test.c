@@ -32,7 +32,6 @@ static unsigned long   condition_count =  0;
 
 static TX_EVENT_FLAGS_GROUP    event_flags_0;
 
-
 /* Define thread prototypes.  */
 
 static void    thread_0_entry(ULONG thread_input);

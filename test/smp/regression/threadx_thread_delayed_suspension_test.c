@@ -227,7 +227,6 @@ UINT    status;
 
     /* Inform user.  */
     printf("Running Thread Delayed Suspension Clearing Test..................... ");
-
     /* Relinquish to the other thread.  */
     tx_thread_relinquish();
 
@@ -270,7 +269,6 @@ UINT    status;
     /* Wait until we see the delayed suspension set flag.  */
     while(delayed_suspend_set == 0)
     {
-
         /* Abort the suspension for thread 2.  */
         tx_thread_wait_abort(&thread_2);
 

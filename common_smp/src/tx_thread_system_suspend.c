@@ -984,4 +984,3 @@ VOID  _tx_thread_system_ni_suspend(TX_THREAD *thread_ptr, ULONG timeout)
     _tx_thread_system_suspend(thread_ptr);
 }
 #endif
-

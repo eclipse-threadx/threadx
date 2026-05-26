@@ -3,6 +3,7 @@
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 
 /* Per-allocation overhead in byte pools: next pointer + ALIGN_TYPE alignment marker. */
 #define BYTE_POOL_OVERHEAD  (sizeof(UCHAR *) + sizeof(ALIGN_TYPE))
@@ -100,7 +101,7 @@ CHAR    *pointer;
 
     /* Attempt to create a byte pool from a timer.  */
     pointer =  (CHAR *) 0x30000;
-    status =  tx_byte_pool_create(&pool_2, "pool 2", pointer, 108);
+    status =  tx_byte_pool_create(&pool_2, "pool 2", pointer, TX_TEST_BYTE_POOL_BYTES(108));
 
         /* Check status.  */
     if (status != TX_CALLER_ERROR)
@@ -112,7 +113,7 @@ CHAR    *pointer;
 
     /* Attempt to create a byte pool with an invalid size.  */
     status =  _txe_byte_pool_create(&pool_3, "pool 3", pointer,
-                    108, (sizeof(TX_BYTE_POOL)+1));
+                    TX_TEST_BYTE_POOL_BYTES(108), (sizeof(TX_BYTE_POOL)+1));
 
        /* Check status.  */
     if (status != TX_POOL_ERROR)
@@ -195,7 +196,7 @@ UINT    status;
 
 
     /* Attempt to create a byte pool from an ISR.  */
-    status =  tx_byte_pool_create(&pool_2, "pool 0", (void *) 0x100000, 108);
+    status =  tx_byte_pool_create(&pool_2, "pool 0", (void *) 0x100000, TX_TEST_BYTE_POOL_BYTES(108));
 
     /* Check status.  */
     if (status != TX_CALLER_ERROR)
@@ -265,8 +266,8 @@ CHAR    *pointer;
     }
 
     /* Create byte pools 0 and 1.  */
-    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, POOL_0_SIZE);
-    pointer = pointer + POOL_0_SIZE;
+    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, TX_TEST_BYTE_POOL_CAPACITY_BYTES(24, 3));
+    pointer = pointer + TX_TEST_BYTE_POOL_CAPACITY_BYTES(24, 3);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -276,8 +277,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_byte_pool_create(&pool_1, "pool 1", pointer, 200);
-    pointer = pointer + 200;
+    status =  tx_byte_pool_create(&pool_1, "pool 1", pointer, TX_TEST_BYTE_POOL_BYTES(200));
+    pointer = pointer + TX_TEST_BYTE_POOL_BYTES(200);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -288,9 +289,9 @@ CHAR    *pointer;
     }
 
     /* Test for search pointer issue on wrapped seach with prior block to search pointer merged.  */
-    status =  tx_byte_pool_create(&pool_4, "pool 4", pointer, POOL_4_SIZE);
+    status =  tx_byte_pool_create(&pool_4, "pool 4", pointer, TX_TEST_BYTE_POOL_CAPACITY_BYTES(84, 3));
     pool_4_memory =  pointer;
-    pointer = pointer + POOL_4_SIZE;
+    pointer = pointer + TX_TEST_BYTE_POOL_CAPACITY_BYTES(84, 3);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -362,7 +363,7 @@ CHAR    *pointer_2;
 CHAR    *pointer_3;
 CHAR    *pointer_4;
 INT     i;
-ULONG   array[20];
+TX_TEST_POINTER_WORD array[20];
 UCHAR   *save_search;
 
 
@@ -403,7 +404,7 @@ UCHAR   *save_search;
 
     /* Try to create a NULL pool.  */
     pointer_1 = (CHAR *) 0x30000;
-    status =  tx_byte_pool_create(TX_NULL, "pool 0", pointer_1, 108);
+    status =  tx_byte_pool_create(TX_NULL, "pool 0", pointer_1, TX_TEST_BYTE_POOL_BYTES(108));
 
     /* Check status.  */
     if (status != TX_POOL_ERROR)
@@ -415,7 +416,7 @@ UCHAR   *save_search;
     }
 
     /* Try to create the same pool.  */
-    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer_1, 108);
+    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer_1, TX_TEST_BYTE_POOL_BYTES(108));
 
     /* Check status.  */
     if (status != TX_POOL_ERROR)
@@ -427,7 +428,7 @@ UCHAR   *save_search;
     }
 
     /* Try to create a pool with a NULL start address.  */
-    status =  tx_byte_pool_create(&pool_2, "pool 2", TX_NULL, 108);
+    status =  tx_byte_pool_create(&pool_2, "pool 2", TX_NULL, TX_TEST_BYTE_POOL_BYTES(108));
 
     /* Check status.  */
     if (status != TX_PTR_ERROR)
@@ -635,7 +636,7 @@ UCHAR   *save_search;
 
     /* Test another bad block release.... pool pointer is not a valid pool!  */
     array[0] =  0;
-    array[1] =  (ULONG) &array[3];
+    TX_TEST_STORE_POINTER(array[1], &array[3]);
     array[2] =  0;
     array[3] =  0;
     status =  _tx_byte_release(&array[2]);
@@ -874,7 +875,7 @@ UCHAR   *save_search;
     }
 
     /* Move the search pointer to the third block to exercise that code in the byte search algorithm.  */
-    pool_0.tx_byte_pool_search =  (UCHAR *) pointer_3 - BYTE_POOL_OVERHEAD;
+    pool_0.tx_byte_pool_search =  (UCHAR *) pointer_3 - TX_TEST_BYTE_POOL_SEARCH_OFFSET;
 
     /* Now allocate the block again.  */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer_2, 24, TX_NO_WAIT);
@@ -894,7 +895,7 @@ UCHAR   *save_search;
     status +=  tx_byte_release(pointer_1);
 
     /* Move the search pointer to the third block to exercise that code in the byte search algorithm.  */
-    pool_0.tx_byte_pool_search =  (UCHAR *) pointer_3 - BYTE_POOL_OVERHEAD;
+    pool_0.tx_byte_pool_search =  (UCHAR *) pointer_3 - TX_TEST_BYTE_POOL_SEARCH_OFFSET;
 
     /* Allocate a large block to force the search pointer update.  */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer_3, 88, TX_NO_WAIT);
@@ -970,7 +971,7 @@ UCHAR   *save_search;
     }
 
     /* Create pool 4.  */
-    status =  tx_byte_pool_create(&pool_4, "pool 4", pool_4_memory, POOL_4_SIZE);
+    status =  tx_byte_pool_create(&pool_4, "pool 4", pool_4_memory, TX_TEST_BYTE_POOL_CAPACITY_BYTES(84, 3));
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -1070,4 +1071,3 @@ UCHAR   *save_search;
     printf("SUCCESS!\n");
     test_control_return(0);
 }
-

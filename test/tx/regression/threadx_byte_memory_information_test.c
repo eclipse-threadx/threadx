@@ -2,6 +2,7 @@
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 #include   "tx_byte_pool.h"
 
 
@@ -193,7 +194,7 @@ CHAR    *pointer;
     }
 
     /* Create the byte_pool with one byte.  */
-    status =  tx_byte_pool_create(&byte_pool_0, "byte_pool 0", pointer, 100);
+    status =  tx_byte_pool_create(&byte_pool_0, "byte_pool 0", pointer, TX_TEST_BYTE_POOL_BYTES(100));
     pointer = pointer + 100;
 
     /* Check for status.  */

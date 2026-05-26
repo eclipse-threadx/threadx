@@ -2370,4 +2370,3 @@ TX_THREAD   *thread_ptr;
         tx_thread_suspend(thread_ptr);
     }
 }
-

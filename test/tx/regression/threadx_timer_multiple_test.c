@@ -346,4 +346,3 @@ static void    timer_2_expiration(ULONG timer_input)
     /* Process timer expiration.  */
     timer_2_counter++;
 }
-
