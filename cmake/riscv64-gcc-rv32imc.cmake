@@ -15,8 +15,11 @@
 
 # CMake toolchain file for CORE-V MCU (CV32E40P, RV32IMC)
 #
-# Uses the riscv64-unknown-elf-gcc multi-lib toolchain (Ubuntu package
-# gcc-riscv64-unknown-elf) to cross-compile for a 32-bit RISC-V target.
+# Uses the Ubuntu gcc-riscv64-unknown-elf package (gcc-riscv64-unknown-elf) to
+# cross-compile for a 32-bit RISC-V target.  This package ships a full multilib
+# tree including rv32im/ilp32/libgcc.a which is required for soft-float linking.
+# Do NOT use the riscv-collab riscv64-unknown-elf toolchain from /opt/riscv —
+# it does not ship rv32 multilib and will produce __clzsi2 linker errors.
 #
 # Target ISA : rv32imc_zicsr  (integer, multiply, compressed, Zicsr)
 # ABI        : ilp32           (32-bit int/long/ptr, no hardware FP)
@@ -33,14 +36,21 @@ set(CFLAGS   "${ARCH_FLAGS}")
 set(ASFLAGS  "${ARCH_FLAGS}")
 set(LDFLAGS  "${ARCH_FLAGS}")
 
-# Toolchain binaries (riscv64-unknown-elf can target rv32 via multilib)
-set(CMAKE_C_COMPILER    riscv64-unknown-elf-gcc)
-set(CMAKE_CXX_COMPILER  riscv64-unknown-elf-g++)
-set(AS                  riscv64-unknown-elf-as)
-set(AR                  riscv64-unknown-elf-ar)
-set(OBJCOPY             riscv64-unknown-elf-objcopy)
-set(OBJDUMP             riscv64-unknown-elf-objdump)
-set(SIZE                riscv64-unknown-elf-size)
+# Toolchain binaries: use the Ubuntu gcc-riscv64-unknown-elf package, which ships
+# full multilib libraries (including rv32im/ilp32/libgcc.a with __clzsi2 etc.).
+# The riscv-collab riscv64-unknown-elf toolchain (typically at /opt/riscv) does
+# NOT ship an rv32 multilib and will cause __clzsi2 linker errors with -nodefaultlibs.
+# Using the absolute path avoids picking up a non-multilib toolchain via PATH.
+#
+# Install with:  sudo apt-get install gcc-riscv64-unknown-elf
+# or run:        ports/risc-v32/gnu/example_build/core_v_mcu/install_deps.sh
+set(CMAKE_C_COMPILER    /usr/bin/riscv64-unknown-elf-gcc)
+set(CMAKE_CXX_COMPILER  /usr/bin/riscv64-unknown-elf-g++)
+set(AS                  /usr/bin/riscv64-unknown-elf-as)
+set(AR                  /usr/bin/riscv64-unknown-elf-ar)
+set(OBJCOPY             /usr/bin/riscv64-unknown-elf-objcopy)
+set(OBJDUMP             /usr/bin/riscv64-unknown-elf-objdump)
+set(SIZE                /usr/bin/riscv64-unknown-elf-size)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
