@@ -17,6 +17,7 @@ set(SRCS
     ${CORE_V_MCU_DIR}/crt0.S
     ${CORE_V_MCU_DIR}/vectors.S
     ${CORE_V_MCU_DIR}/tx_initialize_low_level.S
+    ${CORE_V_MCU_DIR}/bsp/clz.c
     ${CORE_V_MCU_DIR}/bsp/irq.c
     ${CORE_V_MCU_DIR}/bsp/timer_irq.c
     ${CORE_V_MCU_DIR}/bsp/fll.c

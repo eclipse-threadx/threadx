@@ -15,11 +15,15 @@
 
 # CMake toolchain file for CORE-V MCU (CV32E40P, RV32IMC)
 #
-# Uses the Ubuntu gcc-riscv64-unknown-elf package (gcc-riscv64-unknown-elf) to
-# cross-compile for a 32-bit RISC-V target.  This package ships a full multilib
-# tree including rv32im/ilp32/libgcc.a which is required for soft-float linking.
-# Do NOT use the riscv-collab riscv64-unknown-elf toolchain from /opt/riscv —
-# it does not ship rv32 multilib and will produce __clzsi2 linker errors.
+# Uses the riscv64-unknown-elf-gcc cross-compiler to produce rv32imc/ilp32
+# bare-metal firmware.  The riscv-collab toolchain (installed to /opt/riscv by
+# scripts/install_riscv.sh) is used by default.  The Ubuntu package
+# gcc-riscv64-unknown-elf also works and can be installed via install_deps.sh.
+#
+# Note: the riscv-collab toolchain is built without multilib, so it does not
+# ship an rv32/ilp32 libgcc.  The CORE-V MCU BSP provides a weak __clzsi2
+# fallback in bsp/clz.c to satisfy any __builtin_clz() calls without relying
+# on libgcc.
 #
 # Target ISA : rv32imc_zicsr  (integer, multiply, compressed, Zicsr)
 # ABI        : ilp32           (32-bit int/long/ptr, no hardware FP)
@@ -36,21 +40,19 @@ set(CFLAGS   "${ARCH_FLAGS}")
 set(ASFLAGS  "${ARCH_FLAGS}")
 set(LDFLAGS  "${ARCH_FLAGS}")
 
-# Toolchain binaries: use the Ubuntu gcc-riscv64-unknown-elf package, which ships
-# full multilib libraries (including rv32im/ilp32/libgcc.a with __clzsi2 etc.).
-# The riscv-collab riscv64-unknown-elf toolchain (typically at /opt/riscv) does
-# NOT ship an rv32 multilib and will cause __clzsi2 linker errors with -nodefaultlibs.
-# Using the absolute path avoids picking up a non-multilib toolchain via PATH.
-#
-# Install with:  sudo apt-get install gcc-riscv64-unknown-elf
-# or run:        ports/risc-v32/gnu/example_build/core_v_mcu/install_deps.sh
-set(CMAKE_C_COMPILER    /usr/bin/riscv64-unknown-elf-gcc)
-set(CMAKE_CXX_COMPILER  /usr/bin/riscv64-unknown-elf-g++)
-set(AS                  /usr/bin/riscv64-unknown-elf-as)
-set(AR                  /usr/bin/riscv64-unknown-elf-ar)
-set(OBJCOPY             /usr/bin/riscv64-unknown-elf-objcopy)
-set(OBJDUMP             /usr/bin/riscv64-unknown-elf-objdump)
-set(SIZE                /usr/bin/riscv64-unknown-elf-size)
+# Toolchain binaries: riscv64-unknown-elf-gcc cross-compiler.
+# The riscv-collab toolchain (scripts/install_riscv.sh → /opt/riscv/bin) is the
+# preferred choice.  The Ubuntu package (gcc-riscv64-unknown-elf, install via
+# install_deps.sh) is also supported.  Both are searched via PATH so whichever
+# comes first is used; ensure /opt/riscv/bin precedes /usr/bin if you want the
+# riscv-collab toolchain.
+set(CMAKE_C_COMPILER    riscv64-unknown-elf-gcc)
+set(CMAKE_CXX_COMPILER  riscv64-unknown-elf-g++)
+set(AS                  riscv64-unknown-elf-as)
+set(AR                  riscv64-unknown-elf-ar)
+set(OBJCOPY             riscv64-unknown-elf-objcopy)
+set(OBJDUMP             riscv64-unknown-elf-objdump)
+set(SIZE                riscv64-unknown-elf-size)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
