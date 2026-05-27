@@ -120,9 +120,13 @@ add_custom_command(
   DEPENDS ${PORT_LOW_LEVEL_SOURCE} ${CMAKE_CURRENT_LIST_DIR}/generate_test_file.cmake
   COMMENT "Generating tx_initialize_low_level.c for test")
 
+add_library(test_weak_defaults OBJECT ${TESTCONTROL_WEAK_DEFAULTS_SOURCE})
+target_compile_definitions(test_weak_defaults PRIVATE CTEST BATCH_TEST
+                                                      TEST_STACK_SIZE_PRINTF=4096)
+target_link_libraries(test_weak_defaults PRIVATE azrtos::threadx)
+
 add_library(test_utility OBJECT ${GENERATED_LOW_LEVEL_SOURCE}
-                                ${SOURCE_DIR}/testcontrol.c
-                                ${TESTCONTROL_WEAK_DEFAULTS_SOURCE})
+                                ${SOURCE_DIR}/testcontrol.c)
 target_compile_definitions(test_utility PRIVATE CTEST BATCH_TEST
                                                 TEST_STACK_SIZE_PRINTF=4096)
 target_link_libraries(test_utility PRIVATE azrtos::threadx)
@@ -131,9 +135,11 @@ foreach(test_case ${regression_test_cases})
   get_filename_component(test_name ${test_case} NAME_WE)
 
   if(test_name STREQUAL "threadx_initialize_kernel_setup_test")
-    add_executable(${test_name} ${test_case})
+    add_executable(${test_name} ${test_case} $<TARGET_OBJECTS:test_weak_defaults>)
   else()
-    add_executable(${test_name} ${test_case} $<TARGET_OBJECTS:test_utility>)
+    add_executable(${test_name} ${test_case}
+                   $<TARGET_OBJECTS:test_utility>
+                   $<TARGET_OBJECTS:test_weak_defaults>)
     target_compile_definitions(${test_name} PRIVATE CTEST BATCH_TEST
                                                     TEST_STACK_SIZE_PRINTF=4096)
   endif()
