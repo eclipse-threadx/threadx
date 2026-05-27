@@ -57,15 +57,18 @@ Or install individually:
 
 | Tool | Minimum version | Notes |
 |------|----------------|-------|
-| `riscv64-unknown-elf-gcc` | 13.x | `apt install gcc-riscv64-unknown-elf binutils-riscv64-unknown-elf` |
+| `riscv32-unknown-elf-gcc` | 15.x | riscv-collab `riscv32-elf` release — run `bash scripts/install_riscv.sh` |
 | CMake | 3.15 | `apt install cmake` |
 | Ninja | 1.10 | `apt install ninja-build` |
 | OpenOCD | 0.12 | `apt install openocd` |
-| GDB | any multiarch | `apt install gdb-multiarch` — Ubuntu does not ship `riscv64-unknown-elf-gdb` |
+| GDB | any multiarch | `apt install gdb-multiarch` — Ubuntu does not ship `riscv32-unknown-elf-gdb` |
 
-> **Note:** There is no `riscv32-unknown-elf-gcc` package required.  The
-> `riscv64-unknown-elf-gcc` compiler generates RV32 code when passed
-> `-march=rv32imc_zicsr -mabi=ilp32`, as configured by the toolchain file.
+> **Note:** Use the dedicated `riscv32-unknown-elf-gcc` bare-metal toolchain
+> (riscv-collab `riscv32-elf` release, installs to `/opt/riscv`).  This is
+> the RV32 equivalent of `arm-none-eabi-gcc` and ships a native rv32/ilp32
+> libgcc with all required soft-float and integer helpers.  Do **not** use
+> `riscv64-unknown-elf-gcc` — the riscv-collab riscv64-elf toolchain has no
+> rv32 multilib and will produce missing-symbol linker errors.
 
 ---
 
@@ -221,19 +224,19 @@ build/demo_threadx.map   — linker map
 ```bash
 THREADX_ROOT=$(realpath ../../../../..)
 cmake -B build -G Ninja \
-      -DCMAKE_TOOLCHAIN_FILE="${THREADX_ROOT}/cmake/riscv64-gcc-rv32imc.cmake" \
+      -DCMAKE_TOOLCHAIN_FILE="${THREADX_ROOT}/cmake/riscv32-unknown-elf-rv32imc.cmake" \
       .
 cmake --build build
 ```
 
 ### Toolchain file
 
-`${THREADX_ROOT}/cmake/riscv64-gcc-rv32imc.cmake` sets:
+`${THREADX_ROOT}/cmake/riscv32-unknown-elf-rv32imc.cmake` sets:
 
 ```
-CMAKE_C_COMPILER    riscv64-unknown-elf-gcc
-CMAKE_ASM_COMPILER  riscv64-unknown-elf-gcc
-CMAKE_OBJCOPY       riscv64-unknown-elf-objcopy
+CMAKE_C_COMPILER    riscv32-unknown-elf-gcc
+CMAKE_ASM_COMPILER  riscv32-unknown-elf-gcc
+CMAKE_OBJCOPY       riscv32-unknown-elf-objcopy
 CMAKE_C_FLAGS       -march=rv32imc_zicsr -mabi=ilp32 -mcmodel=medlow
 ```
 
@@ -285,7 +288,7 @@ port 3333 (GDB) and 4444 (telnet).
 In a second terminal:
 
 ```bash
-riscv64-unknown-elf-gdb --command=gdb_init
+riscv32-unknown-elf-gdb --command=gdb_init
 ```
 
 `gdb_init` connects to OpenOCD, loads the ELF, sets a breakpoint at `main`, and
@@ -485,7 +488,7 @@ bash deploy.sh --debug
 ```
 
 The script starts OpenOCD in the background, waits for it to become ready,
-then drives `riscv64-unknown-elf-gdb` to load the ELF.  OpenOCD is always
+then drives `riscv32-unknown-elf-gdb` to load the ELF.  OpenOCD is always
 stopped on exit (including Ctrl-C).
 
 ---
