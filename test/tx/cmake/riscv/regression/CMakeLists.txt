@@ -120,6 +120,18 @@ set(standalone_test_cases
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c
 )
 
+set(WEAK_DEFAULTS_SOURCE ${CMAKE_CURRENT_LIST_DIR}/../../../../shared/regression/testcontrol_weak_defaults.c)
+
+# Weak defaults must be an OBJECT library so all objects are always linked
+# into each test executable, even though they only provide weak symbols.
+# A STATIC library would have the linker skip them (weak defs don't satisfy
+# undefined strong references during archive scanning).
+add_library(riscv_test_weak_defaults OBJECT ${WEAK_DEFAULTS_SOURCE})
+target_compile_definitions(riscv_test_weak_defaults PRIVATE
+    CTEST BATCH_TEST EXTERNAL_EXIT TEST_STACK_SIZE_PRINTF=4096)
+target_compile_options(riscv_test_weak_defaults PRIVATE -include stdlib.h)
+target_link_libraries(riscv_test_weak_defaults PRIVATE azrtos::threadx)
+
 # Build testcontrol.c as a static library (no patched tx_initialize_low_level
 # needed — the BSP provides it directly with test_interrupt_dispatch hook).
 add_library(riscv_test_utility ${SOURCE_DIR}/testcontrol.c)
@@ -146,7 +158,7 @@ endfunction()
 # Regular tests (linked with testcontrol).
 foreach(test_case ${regression_test_cases})
     get_filename_component(test_name ${test_case} NAME_WE)
-    add_executable(${test_name} ${test_case})
+    add_executable(${test_name} ${test_case} $<TARGET_OBJECTS:riscv_test_weak_defaults>)
     target_link_libraries(${test_name} PRIVATE
         -Wl,--whole-archive riscv_bsp -Wl,--no-whole-archive
         riscv_test_utility)
@@ -156,7 +168,7 @@ endforeach()
 # Standalone tests (provide their own main, no testcontrol).
 foreach(test_case ${standalone_test_cases})
     get_filename_component(test_name ${test_case} NAME_WE)
-    add_executable(${test_name} ${test_case})
+    add_executable(${test_name} ${test_case} $<TARGET_OBJECTS:riscv_test_weak_defaults>)
     target_link_libraries(${test_name} PRIVATE
         -Wl,--whole-archive riscv_bsp -Wl,--no-whole-archive
         azrtos::threadx)
