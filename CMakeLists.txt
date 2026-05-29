@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+# Declare the project with C only first so that CMake loads the toolchain file,
+# which sets THREADX_ARCH and THREADX_TOOLCHAIN as normal variables.  Checking
+# those variables before project() would always fail because the toolchain is
+# not sourced until the first project() call.
+project(threadx LANGUAGES C)
+
 if(NOT DEFINED THREADX_ARCH)
     message(FATAL_ERROR "Error: THREADX_ARCH not defined")
 endif()
@@ -7,22 +13,13 @@ if(NOT DEFINED THREADX_TOOLCHAIN)
     message(FATAL_ERROR "Error: THREADX_TOOLCHAIN not defined")
 endif()
 
-# The Windows simulation ports build cleanly without executable try-compiles.
-if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
-    set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-endif()
-
-# Set up the project. The Windows simulation ports do not use assembly and
-# avoiding ASM language enablement keeps MSVC configuration on the CLI path
-# deterministic.
-if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
-    project(threadx
-        LANGUAGES C
-    )
-else()
-    project(threadx
-        LANGUAGES C ASM
-    )
+# The Windows simulation ports do not use assembly.  All other ports require
+# it.  enable_language() is called here rather than in project() above so that
+# the ASM toolchain is only activated when we know the target actually needs it.
+# Note: CMAKE_TRY_COMPILE_TARGET_TYPE is already set to STATIC_LIBRARY by
+# every toolchain file in cmake/, so it does not need to be repeated here.
+if(NOT ((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64")))
+    enable_language(ASM)
 endif()
 
 option(THREADX_SMP "Build ThreadX SMP version" OFF)
