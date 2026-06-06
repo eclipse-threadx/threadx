@@ -1,4 +1,15 @@
 #!/bin/bash
+##############################################################################
+# Copyright (c) 2024 Microsoft Corporation
+# Copyright (c) 2026 Eclipse ThreadX contributors
+#
+# This program and the accompanying materials are made available under the
+# terms of the MIT License which is available at
+# https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: MIT
+##############################################################################
+
 # Build the bananapi-f3 (SpacemiT K1) ThreadX kernel.
 #
 # Boot flow: FSBL -> OpenSBI (M-mode) -> U-Boot (S-mode) -> ThreadX (S-mode).

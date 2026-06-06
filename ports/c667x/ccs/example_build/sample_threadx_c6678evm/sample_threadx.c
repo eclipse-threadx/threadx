@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This is a small demo of the high-performance ThreadX kernel.  It includes examples of eight
    threads of different priorities, using a message queue, semaphore, mutex, event flags group,
    byte pool, and block pool.  */
@@ -89,7 +100,7 @@ void    tx_application_define(void *first_unused_memory)
 CHAR    *pointer = TX_NULL;
 UINT    status;
 
-	/* Enable event tracing using the global “trace_buffer” memory and supporting
+	/* Enable event tracing using the global ï¿½trace_bufferï¿½ memory and supporting
    	   a maximum of TRACE_OBJECTS_COUNT ThreadX objects in the registry.  */
 	if ((status = tx_trace_enable(tx_trace_buffer, TRACE_BUFFER_SIZE, TRACE_OBJECTS_COUNT)) != TX_SUCCESS)
 	{
