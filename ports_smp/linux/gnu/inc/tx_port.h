@@ -622,7 +622,7 @@ void                        _tx_thread_smp_debug_entry_insert(ULONG id, ULONG su
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX SMP/Linux/gcc Version 6.5.1.202602 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX SMP/Linux/gcc Version 6.5.1.202602a *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

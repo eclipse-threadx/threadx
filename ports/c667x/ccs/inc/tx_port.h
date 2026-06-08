@@ -258,7 +258,7 @@ unsigned int  _tx_thread_interrupt_control(unsigned int);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX C667x/TI Version 6.5.1.202602 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX C667x/TI Version 6.5.1.202602a *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
