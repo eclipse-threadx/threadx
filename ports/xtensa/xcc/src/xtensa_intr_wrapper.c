@@ -40,7 +40,7 @@
 #include "tx_thread.h"
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-#include "tx_execution_profile.h"
+#include "../../utility/execution_profile_kit/tx_execution_profile.h"
 #endif
 
 

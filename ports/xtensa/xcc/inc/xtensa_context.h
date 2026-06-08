@@ -373,19 +373,8 @@ XSTRUCT_END(XtExcFrame)
 #endif
 #endif
 
-
-/*
--------------------------------------------------------------------------------
-  This flag is meant for internal use. Have all interrupts be dispatched via a
-  common wrapper, which takes care of doing some OS-specific stuff common to
-  all interrupt handlers. Said stuff cannot safely be handled in the RTOS_ENTER
-  and RTOS_EXIT macros.
--------------------------------------------------------------------------------
-*/
-#if (defined TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || (defined XT_INTEXC_HOOKS)
-#define XT_USE_INT_WRAPPER    1
-#else
-#define XT_USE_INT_WRAPPER    0
+#if XCHAL_HAVE_XEA2 && (XCHAL_NUM_INTERRUPTS > 32) && (defined XT_USE_SWPRI)
+#error "Software prioritization of interrupts (XT_USE_SWPRI) not supported for XEA2 with > 32 interrupts."
 #endif
 
 #if XCHAL_HAVE_XEA3
@@ -500,12 +489,15 @@ XSTRUCT_END(XtExcFrame)
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     // Call the thread entry function to indicate the thread is executing.
-    // SP should be pointing to a safe region at this point.
+    // SP should be pointing to a safe region at this point. Note that a9
+    // may be trashed by this call, must be reloaded.
 #ifdef __XTENSA_CALL0_ABI__
     call0    _tx_execution_thread_enter
 #else
     call8    _tx_execution_thread_enter
 #endif
+    movi     a9,  _tx_thread_current_ptr        // a9  <- &_tx_thread_current_ptr
+    l32i     a9,  a9, 0                         // a9  <- _tx_thread_current_ptr
 #endif
 
     l32i     a2,  a9, tx_thread_solicited       // a2 = solicited flag

@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test for wait abort from an ISR.  */
 
 #include   <stdio.h>
@@ -31,7 +42,6 @@ static unsigned long   event_flags_wait_abort_counter =  0;
 static unsigned long   condition_count =  0;
 
 static TX_EVENT_FLAGS_GROUP    event_flags_0;
-
 
 /* Define thread prototypes.  */
 

@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test simple tx_time_get and set services.  */
 
 #include   <stdio.h>
@@ -104,4 +115,3 @@ ULONG   current_time;
         test_control_return(0);
     }
 }
-

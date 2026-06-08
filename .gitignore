@@ -4,6 +4,7 @@
 .tmp/
 _deps/
 build/
+build_qemu/
 Debug/
 CMakeFiles/
 CMakeScripts/
@@ -22,3 +23,7 @@ CTestTestfile.cmake
 *.a
 *.htm
 
+
+# Local build artifacts
+build_m7/
+.codex

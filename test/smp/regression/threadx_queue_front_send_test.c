@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test immediate response queue services including queue front send.
    This test is for queue sizes of 2 ULONG.  */
 

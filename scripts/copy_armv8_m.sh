@@ -1,4 +1,15 @@
 #!/bin/bash
+##############################################################################
+# Copyright (c) 2024 Microsoft Corporation
+# Copyright (c) 2026 Eclipse ThreadX contributors
+#
+# This program and the accompanying materials are made available under the
+# terms of the MIT License which is available at
+# https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: MIT
+##############################################################################
+
 
 # There are two files tx_port.h and tx_secure_interface.h that cover three architectures: M33/M55/M85 and three tools: ac6/gnu/iar.
 # These files are in threadx/ports/armv8-m/inc.

@@ -72,20 +72,44 @@
 
 #define VOID                                    void
 
+/* IMPORTANT: On this RV64 port LONG/ULONG are intentionally 32-bit (int /
+ * unsigned int), NOT 64-bit.  ThreadX's internal data model requires LONG
+ * and ULONG to be exactly 4 bytes so that control-block layouts, queue
+ * message sizes, and the binary API remain identical to all other ThreadX
+ * ports.  Do NOT change these to long/unsigned long — that mistake was
+ * already corrected once (see PR #534).  Use ULONG64 for 64-bit values.  */
+
 #ifndef __ASSEMBLER__
 typedef char                                    CHAR;
 typedef unsigned char                           UCHAR;
 typedef int                                     INT;
 typedef unsigned int                            UINT;
-typedef long                                    LONG;
-typedef unsigned long                           ULONG;
+typedef int                                     LONG;
+typedef unsigned int                            ULONG;
 typedef unsigned long long                      ULONG64;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
 #define ULONG64_DEFINED
 #endif /* __ASSEMBLER__ */
 
+#define ALIGN_TYPE_DEFINED
+typedef unsigned long long                     ALIGN_TYPE;
 
+/* On RV64, ULONG is 32-bit but pointers are 64-bit.  Store the thread
+   pointer in the timer's VOID * extension field so _tx_thread_timeout
+   can recover it without truncation.  This mirrors the win64 port.  */
+#define TX_TIMER_INTERNAL_EXTENSION             VOID    *tx_timer_internal_extension_ptr;
+
+/* TX_TIMER_EXTENSION_PTR_DEFINED signals to portable code (e.g. tests)
+   that the timer extension pointer mechanism is in use on this port.  */
+#define TX_TIMER_EXTENSION_PTR_DEFINED
+
+#define TX_THREAD_CREATE_TIMEOUT_SETUP(t)       (t) -> tx_thread_timer.tx_timer_internal_timeout_function =  &(_tx_thread_timeout);            \
+                                                (t) -> tx_thread_timer.tx_timer_internal_timeout_param =     0;                                \
+                                                (t) -> tx_thread_timer.tx_timer_internal_extension_ptr =     (VOID *) (t);
+
+#define TX_THREAD_TIMEOUT_POINTER_SETUP(t)      TX_PARAMETER_NOT_USED(timeout_input);                                                         \
+                                                (t) =  (TX_THREAD *) _tx_timer_expired_timer_ptr -> tx_timer_internal_extension_ptr;
 
 
 /* Define the priority levels for ThreadX.  Legal values range
@@ -100,7 +124,11 @@ typedef unsigned short                          USHORT;
    thread creation is less than this value, the thread create call will return an error.  */
 
 #ifndef TX_MINIMUM_STACK
-#define TX_MINIMUM_STACK                        1024        /* Minimum stack size for this port  */
+#if defined(__riscv_vector)
+#define TX_MINIMUM_STACK                        (1024 + 16448)        /* Minimum stack size for this port  */
+#else
+#define TX_MINIMUM_STACK                        1024                  /* Minimum stack size for this port  */
+#endif
 #endif
 
 
@@ -108,7 +136,11 @@ typedef unsigned short                          USHORT;
    if TX_TIMER_PROCESS_IN_ISR is not defined.  */
 
 #ifndef TX_TIMER_THREAD_STACK_SIZE
-#define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
+#if defined(__riscv_vector)
+#define TX_TIMER_THREAD_STACK_SIZE              (1024 + 16448)        /* Default timer thread stack size  */
+#else
+#define TX_TIMER_THREAD_STACK_SIZE              1024                  /* Default timer thread stack size  */
+#endif
 #endif
 
 #ifndef TX_TIMER_THREAD_PRIORITY
@@ -118,8 +150,13 @@ typedef unsigned short                          USHORT;
 
 /* Define various constants for the ThreadX RISC-V port.  */
 
-#define TX_INT_DISABLE                          0x00000000  /* Disable interrupts value */
-#define TX_INT_ENABLE                           0x00000008  /* Enable interrupt value   */
+#ifdef TX_RISCV_SMODE
+#define TX_INT_DISABLE                          0x00000000  /* Disable interrupts value  */
+#define TX_INT_ENABLE                           0x00000002  /* Enable interrupt value (SIE bit 1 of sstatus)  */
+#else
+#define TX_INT_DISABLE                          0x00000000  /* Disable interrupts value  */
+#define TX_INT_ENABLE                           0x00000008  /* Enable interrupt value (MIE bit 3 of mstatus)  */
+#endif
 
 
 /* Define the clock source for trace event entry time stamp. The following two item are port specific.
@@ -240,6 +277,19 @@ UINT                                            _tx_thread_interrupt_control(UIN
 
 #define TX_INTERRUPT_SAVE_AREA                  register UINT interrupt_save;
 
+#ifdef TX_RISCV_SMODE
+#define TX_DISABLE                              __asm__ volatile("csrrci %0, sstatus, 2" : "=r" (interrupt_save) :: "memory");
+#define TX_RESTORE                              { \
+                                                    unsigned long _temp_sstatus; \
+                                                    __asm__ volatile( \
+                                                        "csrc sstatus, 2\n" \
+                                                        "andi %0, %1, 2\n" \
+                                                        "csrs sstatus, %0" \
+                                                        : "=&r" (_temp_sstatus) \
+                                                        : "r" (interrupt_save) \
+                                                        : "memory"); \
+                                                }
+#else
 #define TX_DISABLE                              __asm__ volatile("csrrci %0, mstatus, 8" : "=r" (interrupt_save) :: "memory");
 #define TX_RESTORE                              { \
                                                     unsigned long _temp_mstatus; \
@@ -251,6 +301,7 @@ UINT                                            _tx_thread_interrupt_control(UIN
                                                         : "r" (interrupt_save) \
                                                         : "memory"); \
                                                 }
+#endif /* TX_RISCV_SMODE */
 
 #else
 
@@ -272,12 +323,110 @@ UINT                                            _tx_thread_interrupt_control(UIN
 #define TX_SEMAPHORE_DISABLE                    TX_DISABLE
 
 
+/* Define automated coverage test extensions for the ThreadX regression test.  */
+
+#ifndef __ASSEMBLER__
+
+typedef unsigned int    TEST_FLAG;
+extern TEST_FLAG        threadx_byte_allocate_loop_test;
+extern TEST_FLAG        threadx_byte_release_loop_test;
+extern TEST_FLAG        threadx_mutex_suspension_put_test;
+extern TEST_FLAG        threadx_mutex_suspension_priority_test;
+#ifndef TX_TIMER_PROCESS_IN_ISR
+extern TEST_FLAG        threadx_delete_timer_thread;
+#endif
+
+extern void             abort_and_resume_byte_allocating_thread(void);
+extern void             abort_all_threads_suspended_on_mutex(void);
+extern void             suspend_lowest_priority(void);
+#ifndef TX_TIMER_PROCESS_IN_ISR
+extern void             delete_timer_thread(void);
+#endif
+extern TEST_FLAG        test_stack_analyze_flag;
+extern TEST_FLAG        test_initialize_flag;
+extern TEST_FLAG        test_forced_mutex_timeout;
+
+
+#ifdef TX_REGRESSION_TEST
+
+#define TX_BYTE_ALLOCATE_EXTENSION              if (threadx_byte_allocate_loop_test == ((TEST_FLAG) 1))         \
+                                                {                                                               \
+                                                    pool_ptr -> tx_byte_pool_owner =  TX_NULL;                  \
+                                                    threadx_byte_allocate_loop_test = ((TEST_FLAG) 0);          \
+                                                }
+
+#define TX_BYTE_RELEASE_EXTENSION               if (threadx_byte_release_loop_test == ((TEST_FLAG) 1))          \
+                                                {                                                               \
+                                                    threadx_byte_release_loop_test = ((TEST_FLAG) 0);           \
+                                                    abort_and_resume_byte_allocating_thread();                  \
+                                                }
+
+#define TX_MUTEX_PUT_EXTENSION_1                if (threadx_mutex_suspension_put_test == ((TEST_FLAG) 1))       \
+                                                {                                                               \
+                                                    threadx_mutex_suspension_put_test = ((TEST_FLAG) 0);        \
+                                                    abort_all_threads_suspended_on_mutex();                     \
+                                                }
+
+#define TX_MUTEX_PUT_EXTENSION_2                if (test_forced_mutex_timeout == ((TEST_FLAG) 1))               \
+                                                {                                                               \
+                                                    test_forced_mutex_timeout = ((TEST_FLAG) 0);                \
+                                                    _tx_thread_wait_abort(mutex_ptr -> tx_mutex_suspension_list); \
+                                                }
+
+#define TX_MUTEX_PRIORITY_CHANGE_EXTENSION      if (threadx_mutex_suspension_priority_test == ((TEST_FLAG) 1))  \
+                                                {                                                               \
+                                                    threadx_mutex_suspension_priority_test = ((TEST_FLAG) 0);   \
+                                                    suspend_lowest_priority();                                  \
+                                                }
+
+#ifndef TX_TIMER_PROCESS_IN_ISR
+
+#define TX_TIMER_INITIALIZE_EXTENSION(a)        if (threadx_delete_timer_thread == ((TEST_FLAG) 1))             \
+                                                {                                                               \
+                                                    threadx_delete_timer_thread = ((TEST_FLAG) 0);              \
+                                                    delete_timer_thread();                                      \
+                                                    (a) =  ((UINT) 1);                                          \
+                                                }
+
+#endif
+
+#define TX_THREAD_STACK_ANALYZE_EXTENSION       if (test_stack_analyze_flag == ((TEST_FLAG) 1))                 \
+                                                {                                                               \
+                                                    thread_ptr -> tx_thread_id =  ((TEST_FLAG) 0);              \
+                                                    test_stack_analyze_flag =     ((TEST_FLAG) 0);              \
+                                                }                                                               \
+                                                else if (test_stack_analyze_flag == ((TEST_FLAG) 2))            \
+                                                {                                                               \
+                                                    stack_ptr =  thread_ptr -> tx_thread_stack_start;           \
+                                                    test_stack_analyze_flag =     ((TEST_FLAG) 0);              \
+                                                }                                                               \
+                                                else if (test_stack_analyze_flag == ((TEST_FLAG) 3))            \
+                                                {                                                               \
+                                                    *stack_ptr =  TX_STACK_FILL;                                \
+                                                    test_stack_analyze_flag =     ((TEST_FLAG) 0);              \
+                                                }                                                               \
+                                                else                                                            \
+                                                {                                                               \
+                                                    test_stack_analyze_flag =     ((TEST_FLAG) 0);              \
+                                                }
+
+#define TX_INITIALIZE_KERNEL_ENTER_EXTENSION    if (test_initialize_flag == ((TEST_FLAG) 1))                    \
+                                                {                                                               \
+                                                    test_initialize_flag =  ((TEST_FLAG) 0);                    \
+                                                    return;                                                     \
+                                                }
+
+#endif /* TX_REGRESSION_TEST */
+
+#endif /* __ASSEMBLER__ */
+
+
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifndef __ASSEMBLER__
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX RISC-V64/GNU Version 6.5.0.202601 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX RISC-V64/GNU Version 6.5.1.202602 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif /* TX_THREAD_INIT */

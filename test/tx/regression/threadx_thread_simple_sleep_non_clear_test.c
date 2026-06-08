@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test a simple sleep for 18 ticks, with something in the
    remaining field of the thread control block.  */
 
@@ -89,4 +100,3 @@ ULONG now;
         test_control_return(1);
     }
 }
-

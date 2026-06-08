@@ -245,6 +245,7 @@ UINT    status;
     do
     {
 
+
         /* Create the system timer thread.  */
         status =  _tx_thread_create(&_tx_timer_thread,
                                     TX_CONST_CHAR_TO_CHAR_POINTER_CONVERT("System Timer Thread"),
@@ -252,6 +253,7 @@ UINT    status;
                                     ((ULONG) TX_TIMER_ID),
                                     _tx_timer_stack_start, _tx_timer_stack_size,
                                     _tx_timer_priority, _tx_timer_priority, TX_NO_TIME_SLICE, TX_DONT_START);
+
 
 #ifdef TX_SAFETY_CRITICAL
 
@@ -295,4 +297,3 @@ UINT    status;
 #endif
 #endif
 }
-

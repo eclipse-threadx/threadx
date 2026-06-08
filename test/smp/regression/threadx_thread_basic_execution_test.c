@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to see if one thread can be created and executed.
    It thread_0_entry is hit, then the thread was successfully scheduled.
    On success, thread_0_counter gets incremented.  */
@@ -11,6 +22,7 @@
 #include   "tx_queue.h"
 #include   "tx_semaphore.h"
 #include   "tx_thread.h"
+#include   "tx_timer.h"
 
 
 typedef struct THREAD_MEMORY_TEST_STRUCT
@@ -33,6 +45,7 @@ static  THREAD_MEMORY_TEST   thread_memory;
 /* Define the ISR dispatch.  */
 
 extern VOID    (*test_isr_dispatch)(void);
+extern TX_TIMER_INTERNAL   *_tx_timer_expired_timer_ptr;
 
 
 static unsigned long   thread_0_counter =  0;
@@ -314,7 +327,22 @@ VOID            (*temp_mutex_release)(TX_THREAD *thread_ptr);
     test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     test_thread.tx_thread_suspending =                         TX_TRUE;
     test_thread.tx_thread_delayed_suspend =                    TX_TRUE;
+#if defined(_WIN64)
+    {
+    TX_TIMER_INTERNAL   timeout_timer;
+    TX_TIMER_INTERNAL   *saved_expired_timer_ptr;
+
+
+        TX_MEMSET(&timeout_timer, 0, sizeof(TX_TIMER_INTERNAL));
+        saved_expired_timer_ptr =  _tx_timer_expired_timer_ptr;
+        _tx_timer_expired_timer_ptr =  &timeout_timer;
+        timeout_timer.tx_timer_internal_extension_ptr =  (VOID *) &test_thread;
+        _tx_thread_timeout(0);
+        _tx_timer_expired_timer_ptr =  saved_expired_timer_ptr;
+    }
+#else
     _tx_thread_timeout((ULONG) &test_thread);
+#endif
 
     /* Setup test thread to make sure _tx_thread_terminate can handle a NULL mutex release function pointer.  */
     temp_mutex_release =  _tx_thread_mutex_release;
@@ -741,7 +769,7 @@ VOID            (*temp_mutex_release)(TX_THREAD *thread_ptr);
         test_control_return(1);
     }
 
-    /* Attempt a thread termiante with a NULL pointer.  */
+    /* Attempt a thread terminate with a NULL pointer.  */
     status = tx_thread_terminate(TX_NULL);
 
     /* Check for status.  */
@@ -764,7 +792,7 @@ VOID            (*temp_mutex_release)(TX_THREAD *thread_ptr);
         test_control_return(1);
     }
 
-    /* Attempt a thread time-slice chagne with a NULL pointer.  */
+    /* Attempt a thread time-slice change with a NULL pointer.  */
     status = tx_thread_time_slice_change(TX_NULL, 1, &old_time_slice);
 
     /* Check for status.  */

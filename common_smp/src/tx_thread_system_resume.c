@@ -960,4 +960,3 @@ VOID  _tx_thread_system_ni_resume(TX_THREAD *thread_ptr)
     _tx_thread_system_resume(thread_ptr);
 }
 #endif
-

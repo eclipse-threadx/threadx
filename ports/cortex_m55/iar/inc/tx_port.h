@@ -579,6 +579,7 @@ UINT interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
     *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    __asm__ volatile ("dsb 0xF \n isb 0xF " : : : "memory");
     if (_tx_ipsr_get() == 0)
     {
         interrupt_save = __get_interrupt_posture();
@@ -613,7 +614,7 @@ VOID                                            _tx_thread_interrupt_restore(UIN
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX Cortex-M55/IAR Version 6.5.0.202601 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX Cortex-M55/IAR Version 6.5.1.202602 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

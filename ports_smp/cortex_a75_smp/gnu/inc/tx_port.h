@@ -187,7 +187,7 @@ typedef unsigned long long                      ALIGN_TYPE;
 /* Define various constants for the ThreadX ARM port.  */
 
 #define TX_INT_DISABLE                          0xC0        /* Disable IRQ & FIQ interrupts     */
-#define TX_INT_ENABLE                           0x00        /* Enable IRQ & FIQ interrupts            */
+#define TX_INT_ENABLE                           0x00        /* Enable IRQ & FIQ interrupts      */
 
 
 /* Define the clock source for trace event entry time stamp. The following two item are port specific.
@@ -411,7 +411,7 @@ VOID    tx_thread_fp_disable(VOID);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX ARMv8-A-SMP Version 6.5.0.202601 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX ARMv8-A-SMP Version 6.5.1.202602 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

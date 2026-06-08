@@ -1,4 +1,15 @@
 #!/bin/bash
+##############################################################################
+# Copyright (c) 2024 Microsoft Corporation
+# Copyright (c) 2026 Eclipse ThreadX contributors
+#
+# This program and the accompanying materials are made available under the
+# terms of the MIT License which is available at
+# https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: MIT
+##############################################################################
+
 
 # There is only one tx_port.h file that covers three architectures: M3/M4/M7 and four tools: ac5/ac6/gnu/iar.
 # This file is in threadx/ports/armv7-m/inc. We are going to ignore GHS for now, but I’d like to get GHS unified as well.

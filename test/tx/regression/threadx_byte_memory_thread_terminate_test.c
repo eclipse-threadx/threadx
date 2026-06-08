@@ -1,7 +1,19 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test termination on thread suspended on memory byte pool.  */
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 
 static unsigned long   thread_0_counter =  0;
 static TX_THREAD       thread_0;
@@ -68,8 +80,8 @@ CHAR    *pointer;
     }
 
     /* Create byte pools 0 and 1.  */
-    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, 108);
-    pointer = pointer + 108;
+    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, TX_TEST_BYTE_POOL_BYTES(108));
+    pointer = pointer + TX_TEST_BYTE_POOL_BYTES(108);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -174,4 +186,3 @@ CHAR    *pointer;
         thread_1_counter++;
     }
 }
-

@@ -59,20 +59,25 @@
     .global  _tx_thread_interrupt_control
 _tx_thread_interrupt_control:
     /* Pickup current interrupt lockout posture.  */
-    /* old_mstatus = mstatus;  */
 
+#ifdef TX_RISCV_SMODE
+    csrr    t0, sstatus
+    mv      t1, t0                                      // Save original sstatus for return
+    li      t2, ~0x02                                   // Build mask to clear SIE (bit 1)
+    and     t0, t0, t2                                  // Clear SIE bit
+    andi    a0, a0, 0x02                                // Mask incoming to only SIE bit
+    or      t0, t0, a0                                  // Set requested SIE state
+    csrw    sstatus, t0
+    andi    a0, t1, 0x02                                // Return original SIE bit
+#else
     csrr    t0, mstatus
     mv      t1, t0                                      // Save original mstatus for return
-
-    /* Apply the new interrupt posture while preserving unrelated mstatus bits. */
-    /* Only modify the MIE bit (bit 3)  */
-    /* mstatus = (mstatus & ~MIE) | (new_posture & MIE);  */
-
     li      t2, ~0x08                                   // Build mask to clear MIE
     and     t0, t0, t2                                  // Clear MIE bit
-    and     a0, a0, 0x08                                // Mask incoming to only MIE bit
+    andi    a0, a0, 0x08                                // Mask incoming to only MIE bit
     or      t0, t0, a0                                  // Set requested MIE state
     csrw    mstatus, t0
     andi    a0, t1, 0x08                                // Return original MIE bit
+#endif
     ret
 /* }  */

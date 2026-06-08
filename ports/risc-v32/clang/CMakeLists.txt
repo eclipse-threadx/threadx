@@ -1,19 +1,11 @@
+# RISC-V32 Clang port.
+#
+# Clang and GNU use identical RISC-V assembly sources; this port
+# compiles from gnu/src/ so fixes and features are shared automatically.
+include(${CMAKE_CURRENT_LIST_DIR}/../../../cmake/threadx_riscv_port.cmake)
 
-target_sources(${PROJECT_NAME}
-    PRIVATE
-    # {{BEGIN_TARGET_SOURCES}}
-    ${CMAKE_CURRENT_LIST_DIR}/src/tx_initialize_low_level.S
-    ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_context_restore.S
-    ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_context_save.S
-    ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_interrupt_control.S
-    ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_schedule.S
-    ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_stack_build.S
-    ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_system_return.S
-    ${CMAKE_CURRENT_LIST_DIR}/src/tx_timer_interrupt.S
-    # {{END_TARGET_SOURCES}}
-)
-
-target_include_directories(${PROJECT_NAME}
-    PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/inc
+threadx_add_riscv_port(
+    SRC_DIR     ${CMAKE_CURRENT_LIST_DIR}/../gnu/src
+    INC_DIR     ${CMAKE_CURRENT_LIST_DIR}/inc
+    EXAMPLE_DIR ${CMAKE_CURRENT_LIST_DIR}/example_build/qemu_virt
 )

@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test for simultaneous thread suspension lifting AND thread wait abort calls.  */
 
 #include   <stdio.h>
@@ -269,4 +280,3 @@ static void    timer_0_entry(ULONG input)
 {
     timer_0_counter++;
 }
-

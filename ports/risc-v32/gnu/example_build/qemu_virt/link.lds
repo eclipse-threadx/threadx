@@ -10,6 +10,7 @@ SECTIONS
   . = 0x80000000;
 
   .text : {
+    KEEP(*(.text.boot))   /* entry.s _start — must be first at 0x80000000 */
     *(.text .text.*)
     . = ALIGN(0x1000);
     PROVIDE(etext = .);
@@ -24,6 +25,9 @@ SECTIONS
 
   .data : {
     . = ALIGN(16);
+    /* Centre __global_pointer$ in the small-data window so the +/-2 KiB
+       reach of GP-relative addressing covers the .sdata/.sbss area. */
+    PROVIDE( __global_pointer$ = . + 0x800 );
     *(.sdata .sdata.*) /* do not need to distinguish this from .data */
     . = ALIGN(16);
     *(.data .data.*)

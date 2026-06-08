@@ -75,6 +75,12 @@
 /* Enable stack backtrace across exception/interrupt - see below */
 #define XT_DEBUG_BACKTRACE    1
 
+#if (XCHAL_NUM_INTERRUPTS > 32)
+#define XT_EXTD_INTERRUPTS    1
+#else
+#define XT_EXTD_INTERRUPTS    0
+#endif
+
 
 /*
 --------------------------------------------------------------------------------
@@ -103,6 +109,97 @@
     addi    \aout, \aout, 1         /* return aout + 1       */
     .endm
 
+
+/*
+--------------------------------------------------------------------------------
+  Macro debug_backtrace
+
+  This bit of code provides a nice debug backtrace in the debugger.
+  It does take a few more instructions, so undef XT_DEBUG_BACKTRACE
+  if you want to save the cycles.
+
+  Input  : "ra"    - Return address register (clobbered)
+  Input  : "tmp"   - Temp register (clobbered), must be a different register
+  Input  : "level" - Numeric interrupt level
+  Output : "ra"    - Return address modified to simulate call4
+--------------------------------------------------------------------------------
+*/
+
+    .macro  debug_backtrace     ra, tmp, level
+    #if XT_DEBUG_BACKTRACE
+    #ifndef __XTENSA_CALL0_ABI__
+    rsr     \ra, EPC_1 + \level - 1 /* return address */
+    movi    \tmp, 0xC0000000        /* constant with top 2 bits set (call size) */
+    or      \ra, \ra, \tmp          /* set top 2 bits */
+    addx2   \ra, \tmp, \ra          /* clear top bit -- simulating call4 size   */
+    #endif
+    #endif
+    .endm
+
+
+/*
+--------------------------------------------------------------------------------
+  Macro call_exec_isr_entry_fn
+
+  Call the ISR enter function to indicate an ISR is executing.
+
+  Inputs : None
+  Output : Nothing
+--------------------------------------------------------------------------------
+*/
+    .macro  call_exec_isr_entry_fn
+    #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    #ifdef __XTENSA_CALL0_ABI__
+    /* Preserve a2 across the call, a12 is callee-saved for call0 ABI. */
+    mov     a12, a2
+    call0   _tx_execution_isr_enter
+    mov     a2, a12
+    #else
+    call4   _tx_execution_isr_enter
+    #endif
+    #endif
+    .endm
+
+
+/*
+--------------------------------------------------------------------------------
+  Macro call_int_hook
+
+  Call interrupt hook if present to (pre)handle interrupts.
+  NOTE: macro does not parameterize all used registers since they cannot freely
+  be changed, either due to ABI conventions or other assembly code in this file.
+
+  Input    : "level" - Interrupt level being processed
+  Input    : "block" - Index of interrupt block being processed [0..3]
+  Input    : "goto_on_done" - Label where control proceeds to if hook returns 0
+  Input    : a2 - bitmask of pending interrupts in block being processed [0..3]
+  Output   : a2 - updated bitmask of pending interrupts
+  Clobbers : a2, a4, and:
+  Clobbers : for windowed ABI: a6, a7
+  Clobbers : for call0 ABI: a3
+--------------------------------------------------------------------------------
+*/
+    .macro  call_int_hook   level, block, goto_on_done
+    #ifdef XT_INTEXC_HOOKS
+    movi    a4, _xt_intexc_hooks
+    l32i    a4, a4, \level << 2
+    beqz    a4, 2f
+    #ifdef __XTENSA_CALL0_ABI__
+    movi    a3, \block
+    callx0  a4
+    beqz    a2, \goto_on_done
+    #else
+    mov     a6, a2
+    movi    a7, \block
+    callx4  a4
+    beqz    a6, \goto_on_done
+    mov     a2, a6
+    #endif
+2:
+    #endif
+    .endm
+
+
 /*
 --------------------------------------------------------------------------------
   Macro dispatch_c_isr - dispatch interrupts to user ISRs.
@@ -124,59 +221,134 @@
   NOTE: This macro will use registers a0 and a2-a6. The arguments are:
     level -- interrupt level
     mask  -- interrupt bitmask for this level
+    mask1 -- interrupt bitmask for this level for bits 63:32 (XT_EXTD_INTERRUPTS)
+    mask2 -- interrupt bitmask for this level for bits 95:64 (XT_EXTD_INTERRUPTS)
+    mask3 -- interrupt bitmask for this level for bits 127:96 (XT_EXTD_INTERRUPTS)
 --------------------------------------------------------------------------------
 */
 
-    .macro  dispatch_c_isr    level  mask
+    .macro  dispatch_c_isr    level  mask  mask1  mask2  mask3
 
     /* Get mask of pending, enabled interrupts at this level into a2. */
 
 .L_xt_user_int_&level&:
-    rsr     a2, INTENABLE
+
+    #if XT_EXTD_INTERRUPTS
+
+    /* When > 32 interrupts are configured, maintain at least 2 instructions
+       between RSR.INTERRUPT and branch instructions to avoid interlocks.
+    */
+    #if (XCHAL_NUM_INTERRUPTS > 96)
+    rsr     a6, INTERRUPT3
+    #endif
+    #if (XCHAL_NUM_INTERRUPTS > 64)
+    rsr     a5, INTERRUPT2
+    #endif
+    rsr     a4, INTERRUPT1
     rsr     a3, INTERRUPT
+    #if (XCHAL_NUM_INTERRUPTS > 96)
+    _bnez   a6, .L_xt_user_int_&level&_chk_blk3
+    #endif
+    #if (XCHAL_NUM_INTERRUPTS > 64)
+    _bnez   a5, .L_xt_user_int_&level&_chk_blk2
+    #endif
+    _bnez   a4, .L_xt_user_int_&level&_chk_blk1
+    _bnez   a3, .L_xt_user_int_&level&_chk
+    j       9f                              /* spurious */
+
+    #if (XCHAL_NUM_INTERRUPTS > 96)
+    /* Identify and process block 3 interrupts.  If none are active,
+       proceed to check subsequent blocks; thus preserve a3-a5.
+    */
+.L_xt_user_int_&level&_chk_blk3:
+    rsr     a2, INTENABLE3
+    and     a2, a2, a6
+    movi    a6, \mask3
+    and     a2, a2, a6
+    beqz    a2, .L_xt_user_int_&level&_chk_blk2
+
+    /* Block 3 interrupt(s) pending */
+    debug_backtrace a0, a4, \level
+    call_exec_isr_entry_fn
+    call_int_hook   \level, 3, 9f
+    extract_msb  a4, a2                     /* a4 = MSB of a2, a2 trashed */
+    wsr     a4, INTCLEAR3                   /* clear sw or edge-triggered interrupt */
+    #ifndef TX_NO_TIMER
+    #if (XT_TIMER_INTEN_BLK == 3)
+    movi    a3, XT_TIMER_INTEN_BIT          /* a3 = timer interrupt bit */
+    beq     a3, a4, 7f                      /* if timer interrupt then skip table */
+    #endif
+    #endif
+    movi    a5, _xt_interrupt_table + 8*96  /* a5 = dispatch table for block 3 */
+    j       .L_xt_user_int_&level&_post_clear
+    #endif
+
+    #if (XCHAL_NUM_INTERRUPTS > 64)
+    /* Identify and process block 2 interrupts.  If none are active,
+       proceed to check subsequent blocks; thus preserve a3-a4.
+    */
+.L_xt_user_int_&level&_chk_blk2:
+    rsr     a2, INTENABLE2
+    movi    a6, \mask2
+    and     a2, a2, a5
+    and     a2, a2, a6
+    beqz    a2, .L_xt_user_int_&level&_chk_blk1
+
+    /* Block 2 interrupt(s) pending */
+    debug_backtrace a0, a4, \level
+    call_exec_isr_entry_fn
+    call_int_hook   \level, 2, 9f
+    extract_msb  a4, a2                     /* a4 = MSB of a2, a2 trashed */
+    wsr     a4, INTCLEAR2                   /* clear sw or edge-triggered interrupt */
+    #ifndef TX_NO_TIMER
+    #if (XT_TIMER_INTEN_BLK == 2)
+    movi    a3, XT_TIMER_INTEN_BIT          /* a3 = timer interrupt bit */
+    beq     a3, a4, 7f                      /* if timer interrupt then skip table */
+    #endif
+    #endif
+    movi    a5, _xt_interrupt_table + 8*64  /* a5 = dispatch table for block 2 */
+    j       .L_xt_user_int_&level&_post_clear
+    #endif
+
+    /* Identify and process block 1 interrupts.  If none are active,
+       proceed to check subsequent blocks; thus preserve a3.
+    */
+.L_xt_user_int_&level&_chk_blk1:
+    rsr     a2, INTENABLE1
+    movi    a6, \mask1
+    and     a2, a2, a4
+    and     a2, a2, a6
+    beqz    a2, .L_xt_user_int_&level&_chk
+
+    /* Block 1 interrupt(s) pending */
+    debug_backtrace a0, a4, \level
+    call_exec_isr_entry_fn
+    call_int_hook   \level, 1, 9f
+    extract_msb  a4, a2                     /* a4 = MSB of a2, a2 trashed */
+    wsr     a4, INTCLEAR1                   /* clear sw or edge-triggered interrupt */
+    #ifndef TX_NO_TIMER
+    #if (XT_TIMER_INTEN_BLK == 1)
+    movi    a3, XT_TIMER_INTEN_BIT          /* a3 = timer interrupt bit */
+    beq     a3, a4, 7f                      /* if timer interrupt then skip table */
+    #endif
+    #endif
+    movi    a5, _xt_interrupt_table + 8*32  /* a5 = dispatch table for block 1 */
+    j       .L_xt_user_int_&level&_post_clear
+
+    #else   /* !XT_EXTD_INTERRUPTS */
+    rsr     a3, INTERRUPT
+    #endif
+
+.L_xt_user_int_&level&_chk:
+    rsr     a2, INTENABLE
     movi    a4, \mask
     and     a2, a2, a3
     and     a2, a2, a4
     beqz    a2, 9f                          /* nothing to do */
 
-    /* This bit of code provides a nice debug backtrace in the debugger.
-       It does take a few more instructions, so undef XT_DEBUG_BACKTRACE
-       if you want to save the cycles.
-    */
-    #if XT_DEBUG_BACKTRACE
-    #ifndef __XTENSA_CALL0_ABI__
-    rsr     a0, EPC_1 + \level - 1          /* return address */
-    movi    a4, 0xC0000000                  /* constant with top 2 bits set (call size) */
-    or      a0, a0, a4                      /* set top 2 bits */
-    addx2   a0, a4, a0                      /* clear top bit -- simulating call4 size   */
-    #endif
-    #endif
-
-    #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-    /* Call the ISR enter function to indicate an ISR is executing. */
-    #ifdef __XTENSA_CALL0_ABI__
-    call0   _tx_execution_isr_enter
-    #else
-    call4   _tx_execution_isr_enter
-    #endif
-    #endif
-
-    #ifdef XT_INTEXC_HOOKS
-    /* Call interrupt hook if present to (pre)handle interrupts. */
-    movi    a4, _xt_intexc_hooks
-    l32i    a4, a4, \level << 2
-    beqz    a4, 2f
-    #ifdef __XTENSA_CALL0_ABI__
-    callx0  a4
-    beqz    a2, 9f
-    #else
-    mov     a6, a2
-    callx4  a4
-    beqz    a6, 9f
-    mov     a2, a6
-    #endif
-2:
-    #endif
+    debug_backtrace a0, a4, \level
+    call_exec_isr_entry_fn
+    call_int_hook   \level, 0, 9f
 
     /* Now look up in the dispatch table and call user ISR if any. */
     /* If multiple bits are set then MSB has highest priority.     */
@@ -186,7 +358,7 @@
     #ifdef XT_USE_SWPRI
     /* Enable all interrupts at this level that are numerically higher
        than the one we just selected, since they are treated as higher
-       priority.
+       priority.  NOTE: SWPRI disabled for XT_EXTD_INTERRUPTS.
     */
     movi    a3, \mask                       /* a3 = all interrupts at this level */
     add     a2, a4, a4                      /* a2 = a4 << 1 */
@@ -205,33 +377,42 @@
     #endif
 
     wsr     a4, INTCLEAR                    /* clear sw or edge-triggered interrupt */
-
     #ifndef TX_NO_TIMER
-    movi    a3, XT_TIMER_INTEN              /* a3 = timer interrupt bit */
+    #if (XT_TIMER_INTEN_BLK == 0)
+    movi    a3, XT_TIMER_INTEN_BIT          /* a3 = timer interrupt bit */
     beq     a3, a4, 7f                      /* if timer interrupt then skip table */
     #endif
+    #endif
+    movi    a5, _xt_interrupt_table
 
+    /* Execution could arrive here from the direct, <= 32 interrupt case, or
+       from one of the XT_EXTD_INTERRUPTS blocks.  Regardless, we have:
+       a4 = MSB (of 32-bit block) of pending interrupt bits, already cleared
+       a5 = Base of interrupt table (of 32-bit block)
+    */
+.L_xt_user_int_&level&_post_clear:
     find_ms_setbit a3, a4, a3, 0            /* a3 = interrupt number */
 
-    movi    a4, _xt_interrupt_table
-    addx8   a3, a3, a4                      /* a3 = address of interrupt table entry */
+    addx8   a3, a3, a5                      /* a3 = address of interrupt table entry */
     l32i    a4, a3, XIE_HANDLER             /* a4 = handler address */
     #ifdef __XTENSA_CALL0_ABI__
+    #ifdef XT_USE_SWPRI
     mov     a12, a6                         /* save in callee-saved reg */
+    #endif
     l32i    a2, a3, XIE_ARG                 /* a2 = handler arg */
     callx0  a4                              /* call handler */
+    #ifdef XT_USE_SWPRI
     mov     a2, a12
-    #else
+    #endif
+    #else   /* !__XTENSA_CALL0_ABI__ */
+    #ifdef XT_USE_SWPRI
     mov     a2, a6                          /* save in windowed reg */
+    #endif
     l32i    a6, a3, XIE_ARG                 /* a6 = handler arg */
     callx4  a4                              /* call handler */
     #endif
 
-    #ifdef XT_USE_SWPRI
     j       8f
-    #else
-    j       .L_xt_user_int_&level&          /* check for more interrupts */
-    #endif
 
 7:
 
@@ -245,24 +426,24 @@
     */
 
     #ifdef __XTENSA_CALL0_ABI__
+    #ifdef XT_USE_SWPRI
     mov     a12, a6
+    #endif
     call0   XT_RTOS_TIMER_INT
+    #ifdef XT_USE_SWPRI
     mov     a2, a12
+    #endif
     #else
+    #ifdef XT_USE_SWPRI
     mov     a2, a6
+    #endif
     call4   XT_RTOS_TIMER_INT
     #endif
     .endif
     #endif
 
-    #ifdef XT_USE_SWPRI
-    j       8f
-    #else
-    j       .L_xt_user_int_&level&          /* check for more interrupts */
-    #endif
-
-    #ifdef XT_USE_SWPRI
 8:
+    #ifdef XT_USE_SWPRI
     /*
     Restore old value of _xt_vpri_mask from a2. Also update INTENABLE from
     virtual _xt_intenable which _could_ have changed during interrupt
@@ -275,7 +456,17 @@
     s32i    a2, a3, 4                       /* update _xt_vpri_mask  */
     and     a4, a4, a2                      /* a4 = masked intenable */
     wsr     a4, INTENABLE                   /* update INTENABLE      */
-    #endif
+
+    #elif XT_EXTD_INTERRUPTS
+
+    rsr     a2, INTPBL                      /* INTPBL bit(n-1): pending Ln interrupt */
+    bbsi.l  a2, \level - 1, .L_xt_user_int_&level&
+
+    #else
+
+    j       .L_xt_user_int_&level&          /* check for more interrupts */
+
+    #endif  /* XT_USE_SWPRI */
 
 9:
     /* done */
@@ -769,7 +960,11 @@ _xt_lowint1:
 
     /* OK to call C code at this point, dispatch user ISRs */
 
+#if XT_EXTD_INTERRUPTS
+    dispatch_c_isr 1 XCHAL_INTLEVEL1_MASK XCHAL_INTLEVEL1_MASK1 XCHAL_INTLEVEL1_MASK2 XCHAL_INTLEVEL1_MASK3
+#else
     dispatch_c_isr 1 XCHAL_INTLEVEL1_MASK
+#endif
 
     /* Done handling interrupts, transfer control to OS */
     call0   XT_RTOS_INT_EXIT                /* does not return directly here */
@@ -849,7 +1044,11 @@ _xt_medint2:
 
     /* OK to call C code at this point, dispatch user ISRs */
 
+#if XT_EXTD_INTERRUPTS
+    dispatch_c_isr 2 XCHAL_INTLEVEL2_MASK XCHAL_INTLEVEL2_MASK1 XCHAL_INTLEVEL2_MASK2 XCHAL_INTLEVEL2_MASK3
+#else
     dispatch_c_isr 2 XCHAL_INTLEVEL2_MASK
+#endif
 
     /* Done handling interrupts, transfer control to OS */
     call0   XT_RTOS_INT_EXIT                /* does not return directly here */
@@ -920,7 +1119,11 @@ _xt_medint3:
 
     /* OK to call C code at this point, dispatch user ISRs */
 
+#if XT_EXTD_INTERRUPTS
+    dispatch_c_isr 3 XCHAL_INTLEVEL3_MASK XCHAL_INTLEVEL3_MASK1 XCHAL_INTLEVEL3_MASK2 XCHAL_INTLEVEL3_MASK3
+#else
     dispatch_c_isr 3 XCHAL_INTLEVEL3_MASK
+#endif
 
     /* Done handling interrupts, transfer control to OS */
     call0   XT_RTOS_INT_EXIT                /* does not return directly here */
@@ -990,7 +1193,11 @@ _xt_medint4:
 
     /* OK to call C code at this point, dispatch user ISRs */
 
+#if XT_EXTD_INTERRUPTS
+    dispatch_c_isr 4 XCHAL_INTLEVEL4_MASK XCHAL_INTLEVEL4_MASK1 XCHAL_INTLEVEL4_MASK2 XCHAL_INTLEVEL4_MASK3
+#else
     dispatch_c_isr 4 XCHAL_INTLEVEL4_MASK
+#endif
 
     /* Done handling interrupts, transfer control to OS */
     call0   XT_RTOS_INT_EXIT                /* does not return directly here */
@@ -1060,7 +1267,11 @@ _xt_medint5:
 
     /* OK to call C code at this point, dispatch user ISRs */
 
+#if XT_EXTD_INTERRUPTS
+    dispatch_c_isr 5 XCHAL_INTLEVEL5_MASK XCHAL_INTLEVEL5_MASK1 XCHAL_INTLEVEL5_MASK2 XCHAL_INTLEVEL5_MASK3
+#else
     dispatch_c_isr 5 XCHAL_INTLEVEL5_MASK
+#endif
 
     /* Done handling interrupts, transfer control to OS */
     call0   XT_RTOS_INT_EXIT                /* does not return directly here */
@@ -1130,7 +1341,11 @@ _xt_medint6:
 
     /* OK to call C code at this point, dispatch user ISRs */
 
+#if XT_EXTD_INTERRUPTS
+    dispatch_c_isr 6 XCHAL_INTLEVEL6_MASK XCHAL_INTLEVEL6_MASK1 XCHAL_INTLEVEL6_MASK2 XCHAL_INTLEVEL6_MASK3
+#else
     dispatch_c_isr 6 XCHAL_INTLEVEL6_MASK
+#endif
 
     /* Done handling interrupts, transfer control to OS */
     call0   XT_RTOS_INT_EXIT                /* does not return directly here */

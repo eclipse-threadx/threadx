@@ -42,6 +42,9 @@ SECTIONS
     . = ALIGN(4096);
     _sysstack_start = .;
     . += 0x1000;
+#ifdef __riscv_vector
+    . += 0x4000;
+#endif
     _sysstack_end = .;
   }
 

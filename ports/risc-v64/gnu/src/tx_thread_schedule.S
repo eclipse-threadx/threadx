@@ -62,7 +62,11 @@
 _tx_thread_schedule:
 
     /* Enable interrupts.  */
+#ifdef TX_RISCV_SMODE
+    csrsi   sstatus, 0x02                               // Enable interrupts (SIE bit 1)
+#else
     csrsi   mstatus, 0x08                               // Enable interrupts (MIE bit 3)
+#endif
 
     /* Wait for a thread to execute.  */
     /* do
@@ -94,7 +98,11 @@ _tx_thread_schedule_loop:
 
     /* Yes! We have a thread to execute.  Lockout interrupts and
        transfer control to it.  */
+#ifdef TX_RISCV_SMODE
+    csrci   sstatus, 0x02                               // Lockout interrupts
+#else
     csrci   mstatus, 0x08                               // Lockout interrupts
+#endif
 
     /* Setup the current thread pointer.  */
     /* _tx_thread_current_ptr =  _tx_thread_execute_ptr;  */
@@ -105,10 +113,10 @@ _tx_thread_schedule_loop:
     /* Increment the run count for this thread.  */
     /* _tx_thread_current_ptr -> tx_thread_run_count++;  */
 
-    ld      t2, 8(t1)                                   // Pickup run count
-    ld      t3, 48(t1)                                  // Pickup time slice value
+    lw      t2, 4(t1)                                   // Pickup run count
+    lw      t3, 36(t1)                                  // Pickup time slice value
     addi    t2, t2, 1                                   // Increment run count
-    sd      t2, 8(t1)                                   // Store new run count
+    sw      t2, 4(t1)                                   // Store new run count
 
     /* Setup time-slice, if present.  */
     /* _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;  */
@@ -118,8 +126,8 @@ _tx_thread_schedule_loop:
     /* Switch to the thread's stack.  */
     /* SP =  _tx_thread_execute_ptr -> tx_thread_stack_ptr;  */
 
-    ld      sp, 16(t1)                                  // Switch to thread's stack
-    sd      t3, 0(t2)                                   // Store new time-slice
+    ld      sp, 8(t1)                                  // Switch to thread's stack
+    sw      t3, 0(t2)                                  // Store new time-slice
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 
@@ -206,16 +214,71 @@ _tx_thread_schedule_loop:
     csrw    fcsr, t0                                    // Restore fcsr
 #endif
 
+#if defined(__riscv_vector)
+    /* Recover vector registers v0-v31 */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    addi    t1, sp, 64*8
+#else
+    addi    t1, sp, 31*8
+#endif
+    addi    t2, t1, 4*8
+    vsetvli t3, zero, e8, m8, ta, ma
+    vle8.v  v0, (t2)                                    // Recover v0 ~ v7
+    add     t2, t2, t3
+    vle8.v  v8, (t2)                                    // Recover v8 ~ v15
+    add     t2, t2, t3
+    vle8.v  v16, (t2)                                   // Recover v16 ~ v23
+    add     t2, t2, t3
+    vle8.v  v24, (t2)                                   // Recover v24 ~ v31
+    add     t2, t2, t3
+
+    /* Recover vector CSRs */
+    ld      t2, 0*8(t1)
+    ld      t3, 1*8(t1)
+    ld      t4, 2*8(t1)
+    vsetvl  zero, t4, t3
+    csrw    vstart, t2
+    ld      t4, 3*8(t1)
+    csrw    vcsr, t4
+#endif
+
     /* Recover standard registers.  */
 
-    ld      t0, 30*8(sp)                                // Recover mepc
-    csrw    mepc, t0                                    // Store mepc
-    li      t0, 0x1880                                  // Prepare mstatus: MPP=Machine(0x1800) | MPIE(0x80)
+    ld      t0, 30*8(sp)                                // Recover mepc/sepc
+#ifdef TX_RISCV_SMODE
+    csrw    sepc, t0                                    // Store sepc
+
+    /* Read/modify/write sstatus to preserve SUM, MXR, UXL, FS, etc.
+       Only touch SPP, SPIE, SIE — the bits SRET consumes. */
+    csrr    t0, sstatus
+    li      t1, ~0x122                                  // Clear mask: SIE(1) | SPIE(5) | SPP(8)
+    and     t0, t0, t1
+    li      t1, 0x120                                   // Set SPP=Supervisor(0x100) | SPIE(0x20)
+    or      t0, t0, t1
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    li      t1, 0x2000                                  // Set FS bits for FP state
+    li      t1, 0x6000                                  // Set FS=Dirty (bits 14:13)
+    or      t0, t0, t1
+#endif
+    csrw    sstatus, t0                                 // Update sstatus safely
+#else
+    csrw    mepc, t0                                    // Store mepc
+
+    /* Read/modify/write mstatus — same principle as S-mode path. */
+    csrr    t0, mstatus
+    li      t1, ~0x1888                                 // Clear mask: MIE(3) | MPIE(7) | MPP(11:12)
+    and     t0, t0, t1
+    li      t1, 0x1880                                  // Set MPP=Machine(0x1800) | MPIE(0x80)
+    or      t0, t0, t1
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    li      t1, 0x6000                                  // Set FS=Dirty (bits 14:13)
+    or      t0, t0, t1
+#endif
+#if defined(__riscv_vector)
+    li      t1, 0x0200                                  // Set VS bits (bits 10:9 to 01) for vector state
     or      t0, t0, t1
 #endif
     csrw    mstatus, t0                                 // Set mstatus
+#endif
 
     ld      ra,  28*8(sp)                               // Recover return address
     ld      t0,  19*8(sp)                               // Recover t0
@@ -251,7 +314,25 @@ _tx_thread_schedule_loop:
 #else
     addi    sp, sp, 32*8                                // Recover stack frame - without floating point registers
 #endif
+#if defined(__riscv_vector)
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    addi    t0, sp, -65*8
+#else
+    addi    t0, sp, -32*8
+#endif
+    csrr    t1, vlenb                                   // Get vector register byte length
+    slli    t1, t1, 5                                   // Multiply by 32 (number of vector registers)
+    addi    t1, t1, 4*8                                 // Add vector CSR space: vstart, vtype, vl, vcsr
+    add     sp, sp, t1                                  // Recover vector stack frame
+
+    ld      t1, 18*8(t0)                                // Recover t1
+    ld      t0, 19*8(t0)                                // Recover t0
+#endif
+#ifdef TX_RISCV_SMODE
+    sret                                                // Return to point of interrupt
+#else
     mret                                                // Return to point of interrupt
+#endif
 
 _tx_thread_synch_return:
 
@@ -287,6 +368,34 @@ _tx_thread_synch_return:
     csrw    fcsr, t0                                    //
 #endif
 
+#if defined(__riscv_vector)
+    /* Recover vector registers v0-v31 */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    addi    t1, sp, 28*8
+#else
+    addi    t1, sp, 15*8
+#endif
+    addi    t2, t1, 4*8
+    vsetvli t3, zero, e8, m8, ta, ma
+    vle8.v  v0, (t2)                                    // Recover v0 ~ v7
+    add     t2, t2, t3
+    vle8.v  v8, (t2)                                    // Recover v8 ~ v15
+    add     t2, t2, t3
+    vle8.v  v16, (t2)                                   // Recover v16 ~ v23
+    add     t2, t2, t3
+    vle8.v  v24, (t2)                                   // Recover v24 ~ v31
+    add     t2, t2, t3
+
+    /* Recover vector CSRs */
+    ld      t2, 0*8(t1)
+    ld      t3, 1*8(t1)
+    ld      t4, 2*8(t1)
+    vsetvl  zero, t4, t3
+    csrw    vstart, t2
+    ld      t4, 3*8(t1)
+    csrw    vcsr, t4
+#endif
+
     /* Recover standard preserved registers.  */
     /* Recover standard registers.  */
 
@@ -303,12 +412,22 @@ _tx_thread_synch_return:
     ld      s9,  3*8(sp)                                // Recover s9
     ld      s10,  2*8(sp)                               // Recover s10
     ld      s11,  1*8(sp)                               // Recover s11
-    ld      t0,  14*8(sp)                               // Recover mstatus
+    ld      t0,  14*8(sp)                               // Recover status register
+#ifdef TX_RISCV_SMODE
+    csrw    sstatus, t0                                 // Store sstatus, enables interrupt
+#else
     csrw    mstatus, t0                                 // Store mstatus, enables interrupt
+#endif
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     addi    sp, sp, 29*8                                // Recover stack frame
 #else
     addi    sp, sp, 16*8                                // Recover stack frame
+#endif
+#if defined(__riscv_vector)
+    csrr    t1, vlenb                                   // Get vector register byte length
+    slli    t1, t1, 5                                   // Multiply by 32 (number of vector registers)
+    addi    t1, t1, 4*8                                 // Add vector CSR space: vstart, vtype, vl, vcsr
+    add     sp, sp, t1                                  // Recover vector stack frame
 #endif
     ret                                                 // Return to thread
 

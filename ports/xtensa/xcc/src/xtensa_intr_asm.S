@@ -45,7 +45,7 @@
 -------------------------------------------------------------------------------
 */
 
-#if XCHAL_HAVE_XEA2
+#if XCHAL_HAVE_XEA2 && (XCHAL_NUM_INTERRUPTS <= 32)
 
     .data
     .global _xt_intdata
@@ -111,9 +111,6 @@ _xt_interrupt_table:
 */
 #if XCHAL_HAVE_XEA3
     .word   xt_interrupt_wrapper
-    .word   0
-#elif XT_USE_INT_WRAPPER
-    .word   0
     .word   0
 #endif
 

@@ -1,7 +1,19 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test byte memory information.  */
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 #include   "tx_byte_pool.h"
 
 
@@ -193,7 +205,7 @@ CHAR    *pointer;
     }
 
     /* Create the byte_pool with one byte.  */
-    status =  tx_byte_pool_create(&byte_pool_0, "byte_pool 0", pointer, 100);
+    status =  tx_byte_pool_create(&byte_pool_0, "byte_pool 0", pointer, TX_TEST_BYTE_POOL_BYTES(100));
     pointer = pointer + 100;
 
     /* Check for status.  */

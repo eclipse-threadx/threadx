@@ -166,9 +166,18 @@ _tx_thread_schedule:
 
     #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread entry function to indicate the thread is executing. */
+    /* Note a2 may be trashed by this call, must be reloaded. */
     #ifdef __XTENSA_CALL0_ABI__
     call0   _tx_execution_thread_enter
+    movi    a2, _tx_thread_current_ptr
+    l32i    a2, a2, 0
     #else
+    /* Ensure that PS.WOE is set for windowed call */
+    movi    a0, PS_WOE
+    rsr.ps  a3
+    or      a3, a3, a0
+    wsr.ps  a3
+    rsync
     call8   _tx_execution_thread_enter
     #endif
     #endif
@@ -229,14 +238,24 @@ _tx_thread_schedule:
     rsync                               /* ensure wsr.CPENABLE has completed */
     #endif
 
+    /* De-allocate the remainder of the frame before reenabling interrupts
+     * to avoid overrunning a task stack of TX_MINIMUM_STACK bytes, which
+     * can only handle one XT_STK_FRMSZ.
+     */
+    #ifdef __XTENSA_CALL0_ABI__
+    /* 'addi sp, sp, imm' could turn into 'addmi, addi' sequence and make */
+    /* the sp briefly point to an illegal stack location. Avoid that.     */
+    addi    a2,  sp, XT_STK_FRMSZ       /* fully deallocate stack frame */
+    mov     sp,  a2
+    #else
+    addi    a2,  sp, XT_STK_FRMSZ - 48  /* initial SP at solicited entry; */
+    movsp   sp,  a2                     /* retw will deallocate remainder */
+    #endif
+
     wsr     a3,  PS                     /* no need to sync PS, delay is OK */
 
     /* This does not return to its caller, but to the selected thread. */
     #ifdef __XTENSA_CALL0_ABI__
-    /* 'addi sp, sp, imm' could turn into 'addmi, addi' sequence and make */
-    /* the sp briefly point to an illegal stack location. Avoid that.     */
-    addi    a2,  sp, XT_STK_FRMSZ
-    mov     sp,  a2
     ret
     #else
     retw

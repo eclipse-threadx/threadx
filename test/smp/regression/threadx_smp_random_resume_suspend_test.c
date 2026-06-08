@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* Define the ThreadX SMP random resume/suspend test.  */
 
 #include   <stdio.h>
@@ -2325,5 +2336,3 @@ static void thread_entry(ULONG id)
         tx_thread_suspend(_smp_randomized_source_array[id]);
     }
 }
-
-

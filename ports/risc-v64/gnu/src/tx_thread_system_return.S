@@ -68,6 +68,12 @@ _tx_thread_system_return:
 #else
     addi    sp, sp, -16*8                               // Allocate space on the stack - without floating point enabled
 #endif
+#if defined(__riscv_vector)
+    csrr    t1, vlenb                                   // Get vector register byte length
+    slli    t1, t1, 5                                   // Multiply by 32 (number of vector registers)
+    addi    t1, t1, 4*8                                 // Add vector CSR space: vstart, vtype, vl, vcsr
+    sub     sp, sp, t1                                  // Allocate vector space on the stack
+#endif
 
     /* Store floating point preserved registers.  */
 #if defined(__riscv_float_abi_single)
@@ -102,6 +108,36 @@ _tx_thread_system_return:
     sd      t0, 27*8(sp)                                // Store fcsr
 #endif
 
+#if defined(__riscv_vector)
+    /* Store vector registers and CSRs */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    addi    t1, sp, 28*8
+#else
+    addi    t1, sp, 15*8
+#endif
+    /* Store vector CSRs */
+    csrr    t2, vstart                                  // Store vstart
+    sd      t2, 0*8(t1)
+    csrr    t2, vtype                                   // Store vtype
+    sd      t2, 1*8(t1)
+    csrr    t2, vl                                      // Store vl
+    sd      t2, 2*8(t1)
+    csrr    t2, vcsr                                    // Store vcsr
+    sd      t2, 3*8(t1)
+
+    /* Store vector registers v0-v31 */
+    addi    t2, t1, 4*8
+    vsetvli t3, zero, e8, m8, ta, ma
+    vse8.v  v0, 0(t2)                                   // Store v0 ~ v7
+    add     t2, t2, t3
+    vse8.v  v8, 0(t2)                                   // Store v8 ~ v15
+    add     t2, t2, t3
+    vse8.v  v16, 0(t2)                                  // Store v16 ~ v23
+    add     t2, t2, t3
+    vse8.v  v24, 0(t2)                                  // Store v24 ~ v31
+    add     t2, t2, t3
+#endif
+
     sd      zero,  0(sp)                                // Solicited stack type
     sd      ra,  13*8(sp)                               // Save return address
     sd      s0,  12*8(sp)                               // Save s0
@@ -116,6 +152,15 @@ _tx_thread_system_return:
     sd      s9,   3*8(sp)                               // Save s9
     sd      s10,  2*8(sp)                               // Save s10
     sd      s11,  1*8(sp)                               // Save s11
+#ifdef TX_RISCV_SMODE
+    csrr    t0, sstatus                                 // Pickup sstatus
+    sd      t0, 14*8(sp)                                // Save sstatus
+
+
+    /* Lockout interrupts. will be enabled in _tx_thread_schedule  */
+
+    csrci   sstatus, 0x02                               // Disable interrupts (SIE bit 1)
+#else
     csrr    t0, mstatus                                 // Pickup mstatus
     sd      t0, 14*8(sp)                                // Save mstatus
 
@@ -123,6 +168,7 @@ _tx_thread_system_return:
     /* Lockout interrupts. will be enabled in _tx_thread_schedule  */
 
     csrci   mstatus, 0x08                               // Disable interrupts (MIE bit 3)
+#endif
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 
@@ -137,15 +183,15 @@ _tx_thread_system_return:
     /* _tx_thread_current_ptr -> tx_thread_stack_ptr =  SP;
     SP = _tx_thread_system_stack_ptr;  */
 
-    sd      sp, 16(t1)                                  // Save stack pointer
-    ld      sp, 0(t2)                                   // Switch to system stack
+    sd      sp, 8(t1)                                  // Save stack pointer
+    ld      sp, 0(t2)                                  // Switch to system stack
 
     /* Determine if the time-slice is active.  */
     /* if (_tx_timer_time_slice)
     {  */
 
     la      t4, _tx_timer_time_slice                    // Pickup time slice variable addr
-    ld      t3, 0(t4)                                   // Pickup time slice value
+    lw      t3, 0(t4)                                   // Pickup time slice value
     la      t2, _tx_thread_schedule                     // Pickup address of scheduling loop
     beqz    t3, _tx_thread_dont_save_ts                 // If no time-slice, don't save it
 
@@ -153,8 +199,8 @@ _tx_thread_system_return:
         /* _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
         _tx_timer_time_slice =  0;  */
 
-    sd      t3, 48(t1)                                  // Save current time-slice for thread
-    sd      zero, 0(t4)                                 // Clear time-slice variable
+    sw      t3, 36(t1)                                  // Save current time-slice for thread
+    sw      zero, 0(t4)                                 // Clear time-slice variable
 
     /* }  */
 _tx_thread_dont_save_ts:

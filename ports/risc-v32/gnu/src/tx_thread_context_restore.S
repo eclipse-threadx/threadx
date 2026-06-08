@@ -29,6 +29,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Akif Ejaz, 10xEngineers                                             */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -82,7 +83,13 @@ _tx_thread_context_restore:
     /* Just recover the saved registers and return to the point of
        interrupt.  */
 
-    /* Recover floating point registers.  */
+    /* Recover floating point registers only if saved mstatus.FS was not Off.  */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    lw      t1, 29*4(sp)                                // Pickup saved mstatus
+    srli    t1, t1, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_skip_fp_restore              // Skip if FS was Off
+#endif
 #if defined(__riscv_float_abi_single)
     flw     f0,  31*4(sp)                               // Recover ft0
     flw     f1,  32*4(sp)                               // Recover ft1
@@ -130,6 +137,7 @@ _tx_thread_context_restore:
     lw      t0,  63*4(sp)                               // Recover fcsr
     csrw    fcsr, t0                                    // Restore fcsr
 #endif
+_tx_thread_skip_fp_restore:
 
     /* Recover standard registers.  */
 
@@ -149,7 +157,7 @@ _tx_thread_context_restore:
     /* Clear MPP/MPIE/MIE bits in t1 then set desired values. */
 
     li      t2, 0x1888                                  // MPP(0x1800) | MPIE(0x80) | MIE(0x08)
-    li      t3, 0x1800                                  // Set MPP to Machine mode (bits 12:11)
+    li      t3, 0x1880                                  // Set MPP=Machine (0x1800) + MPIE=1 (0x80); mret sets MIE=MPIE
 
     /* Construct new mstatus in t1: clear mask bits, set MPP/MPIE and optionally FP bit,
        preserve everything except the bits we will modify.  */
@@ -222,7 +230,13 @@ _tx_thread_no_preempt_restore:
 
     lw      sp, 8(t1)                                   // Switch back to thread's stack
 
-    /* Recover floating point registers.  */
+    /* Recover floating point registers only if saved mstatus.FS was not Off.  */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    lw      t3, 29*4(sp)                                // Pickup saved mstatus
+    srli    t3, t3, 13
+    andi    t3, t3, 0x3
+    beqz    t3, _tx_thread_no_preempt_skip_fp_restore   // Skip if FS was Off
+#endif
 #if defined(__riscv_float_abi_single)
     flw     f0,  31*4(sp)                               // Recover ft0
     flw     f1,  32*4(sp)                               // Recover ft1
@@ -270,6 +284,7 @@ _tx_thread_no_preempt_restore:
     lw      t0,  63*4(sp)                               // Recover fcsr
     csrw    fcsr, t0                                    // Restore fcsr
 #endif
+_tx_thread_no_preempt_skip_fp_restore:
 
     /* Recover the saved context and return to the point of interrupt.  */
 
@@ -284,7 +299,7 @@ _tx_thread_no_preempt_restore:
 
     csrr    t1, mstatus
     li      t2, 0x1888                                  // MPP(0x1800) | MPIE(0x80) | MIE(0x08)
-    li      t3, 0x1800                                  // Set MPP to Machine mode
+    li      t3, 0x1880                                  // Set MPP=Machine (0x1800) + MPIE=1 (0x80); mret sets MIE=MPIE
     li      t4, ~0x1888                                 // Clear mask for MPP/MPIE/MIE
     and     t1, t1, t4
     or      t1, t1, t3
@@ -331,7 +346,13 @@ _tx_thread_preempt_restore:
     ori     t3, zero, 1                                 // Build interrupt stack type
     sw      t3, 0(t0)                                   // Store stack type
 
-    /* Store floating point preserved registers.  */
+    /* Store floating point preserved registers only if saved mstatus.FS was not Off.  */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    lw      t3, 29*4(t0)                                // Pickup saved mstatus
+    srli    t3, t3, 13
+    andi    t3, t3, 0x3
+    beqz    t3, _tx_thread_preempt_skip_fp_restore      // Skip if FS was Off
+#endif
 #ifdef __riscv_float_abi_single
     fsw     f8,  39*4(t0)                               // Store fs0
     fsw     f9,  40*4(t0)                               // Store fs1
@@ -359,6 +380,7 @@ _tx_thread_preempt_restore:
     fsd     f26, 57*4(t0)                               // Store fs10
     fsd     f27, 58*4(t0)                               // Store fs11
 #endif
+_tx_thread_preempt_skip_fp_restore:
 
     /* Store standard preserved registers.  */
 

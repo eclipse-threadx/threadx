@@ -1,10 +1,14 @@
 # Name of the target
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR risc-v32)
-
 set(THREADX_ARCH "risc-v32")
 set(THREADX_TOOLCHAIN "gnu")
-set(ARCH_FLAGS "-g -march=rv32gc -mabi=ilp32d -mcmodel=medany")
+if(DEFINED SOFT_FLOAT)
+    set(ARCH_FLAGS "-g -march=rv32ima_zicsr -mabi=ilp32 -mcmodel=medany")
+    set(CACHE{SOFT_FLOAT} FORCE 1)
+else()
+    set(ARCH_FLAGS "-g -march=rv32gc -mabi=ilp32d -mcmodel=medany -mrelax")
+endif()
 set(CFLAGS "${ARCH_FLAGS}")
 set(ASFLAGS "${ARCH_FLAGS}")
 set(LDFLAGS "${ARCH_FLAGS}")

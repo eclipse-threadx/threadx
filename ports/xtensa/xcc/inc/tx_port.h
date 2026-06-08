@@ -340,7 +340,10 @@ typedef unsigned short                          USHORT;
 #define TX_THREAD_EXTENSION_2
 
 /* Execution profile related */
-#define TX_THREAD_EXTENSION_3
+#define TX_THREAD_EXTENSION_3 \
+    unsigned long long  tx_thread_execution_time_total; \
+    unsigned long       tx_thread_execution_time_last_start;
+
 
 /* Define the port extensions of the remaining ThreadX objects.  */
 
@@ -458,7 +461,7 @@ extern int xt_timer_intnum;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * Azure RTOS Xtensa Version 6.5.0.202601 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * Azure RTOS Xtensa Version 6.5.1.202602 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

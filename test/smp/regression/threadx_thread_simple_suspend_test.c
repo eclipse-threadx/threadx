@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to see if a thread can successfully suspend itself in a single
    thread system.  This also tests a thread created that is not automatically enabled.  */
 
@@ -25,7 +36,7 @@ void  test_control_return(UINT status);
 #ifdef CTEST
 void test_application_define(void *first_unused_memory)
 #else
-void    threadx_thread_simple_supsend_application_define(void *first_unused_memory)
+void    threadx_thread_simple_suspend_application_define(void *first_unused_memory)
 #endif
 {
 
