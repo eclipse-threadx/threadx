@@ -576,7 +576,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2026 Eclipse ThreadX contributors.  *  ThreadX Win64/MSVC Version 6.5.1.202602 *";
+                                    "(c) 2026 Eclipse ThreadX contributors.  *  ThreadX Win64/MSVC Version 6.5.1.202602a *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
