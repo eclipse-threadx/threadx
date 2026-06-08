@@ -419,7 +419,7 @@ THREAD_SMP_DECLARE ULONG    _tx_thread_smp_initial_fpu_control_register;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX SMP MIPS32_interAptiv/GNU Version 6.5.1.202602 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX SMP MIPS32_interAptiv/GNU Version 6.5.1.202602a *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
