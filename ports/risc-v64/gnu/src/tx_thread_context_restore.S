@@ -31,6 +31,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -88,7 +89,13 @@ _tx_thread_context_restore:
     /* Just recover the saved registers and return to the point of
        interrupt.  */
 
-    /* Recover floating point registers.  */
+    /* Recover floating point registers only if saved mstatus/sstatus.FS was not Off.  */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    ld      t1, 29*8(sp)                                // Pickup saved mstatus/sstatus
+    srli    t1, t1, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_skip_fp_restore              // Skip if FS was Off
+#endif
 #if defined(__riscv_float_abi_single)
     flw     f0, 31*8(sp)                                // Recover ft0
     flw     f1, 32*8(sp)                                // Recover ft1
@@ -134,8 +141,9 @@ _tx_thread_context_restore:
     fld     f30,61*8(sp)                                // Recover ft10
     fld     f31,62*8(sp)                                // Recover ft11
     ld      t0, 63*8(sp)                                // Recover fcsr
-    csrw    fcsr, t0
+    csrw    fcsr, t0                                    // Restore fcsr
 #endif
+_tx_thread_skip_fp_restore:
 
 #if defined(__riscv_vector)
     /* Recover vector registers v0-v31 */
@@ -285,7 +293,13 @@ _tx_thread_no_preempt_restore:
 
     ld      sp, 8(t1)                                  // Switch back to thread's stack
 
-    /* Recover floating point registers.  */
+    /* Recover floating point registers only if saved mstatus/sstatus.FS was not Off.  */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    ld      t3, 29*8(sp)                                // Pickup saved mstatus/sstatus
+    srli    t3, t3, 13
+    andi    t3, t3, 0x3
+    beqz    t3, _tx_thread_no_preempt_skip_fp_restore   // Skip if FS was Off
+#endif
 #if defined(__riscv_float_abi_single)
     flw     f0, 31*8(sp)                                // Recover ft0
     flw     f1, 32*8(sp)                                // Recover ft1
@@ -333,6 +347,7 @@ _tx_thread_no_preempt_restore:
     ld      t0, 63*8(sp)                                // Recover fcsr
     csrw    fcsr, t0                                    // Restore fcsr
 #endif
+_tx_thread_no_preempt_skip_fp_restore:
 
 #if defined(__riscv_vector)
     /* Recover vector registers v0-v31 */
@@ -464,7 +479,13 @@ _tx_thread_preempt_restore:
     ori     t3, zero, 1                                 // Build interrupt stack type
     sd      t3, 0(t0)                                   // Store stack type
 
-    /* Store floating point preserved registers.  */
+    /* Store floating point preserved registers only if saved mstatus/sstatus.FS was not Off.  */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    ld      t3, 29*8(t0)                                // Pickup saved mstatus/sstatus
+    srli    t3, t3, 13
+    andi    t3, t3, 0x3
+    beqz    t3, _tx_thread_preempt_skip_fp_restore      // Skip if FS was Off
+#endif
 #ifdef __riscv_float_abi_single
     fsw     f8,  39*8(t0)                               // Store fs0
     fsw     f9,  40*8(t0)                               // Store fs1
@@ -492,6 +513,7 @@ _tx_thread_preempt_restore:
     fsd     f26, 57*8(t0)                               // Store fs10
     fsd     f27, 58*8(t0)                               // Store fs11
 #endif
+_tx_thread_preempt_skip_fp_restore:
 
 #if defined(__riscv_vector)
     /* Store vector registers and CSRs */

@@ -30,6 +30,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -101,6 +102,19 @@ _tx_thread_context_save:
 #endif
     sd      t0, 30*8(sp)                                // Save it on the stack
 
+    /* Save mstatus/sstatus and skip FP state if FS is Off.  */
+#ifdef TX_RISCV_SMODE
+    csrr    t0, sstatus
+#else
+    csrr    t0, mstatus
+#endif
+    sd      t0, 29*8(sp)                                // Save mstatus/sstatus
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    srli    t1, t0, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_skip_nested_fpu_save         // Skip if FS was Off
+#endif
+
     /* Save floating point scratch registers if floating point is enabled.  */
 #ifdef __riscv_float_abi_single
     fsw     f0, 31*8(sp)                                // Store ft0
@@ -149,6 +163,7 @@ _tx_thread_context_save:
     csrr    t0, fcsr
     sd      t0, 63*8(sp)                                // Store fcsr
 #endif
+_tx_thread_skip_nested_fpu_save:
 
 #if defined(__riscv_vector)
     /* Store vector registers and CSRs */
@@ -225,6 +240,19 @@ _tx_thread_not_nested_save:
 #endif
     sd      t1, 30*8(sp)                                // Save it on the stack
 
+    /* Save mstatus/sstatus and skip FP state if FS is Off.  */
+#ifdef TX_RISCV_SMODE
+    csrr    t1, sstatus
+#else
+    csrr    t1, mstatus
+#endif
+    sd      t1, 29*8(sp)                                // Save mstatus/sstatus
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    srli    t2, t1, 13
+    andi    t2, t2, 0x3
+    beqz    t2, _tx_thread_skip_fpu_save                // Skip if FS was Off
+#endif
+
     /* Save floating point scratch registers if floating point is enabled.  */
 #ifdef __riscv_float_abi_single
     fsw     f0, 31*8(sp)                                // Store ft0
@@ -273,6 +301,7 @@ _tx_thread_not_nested_save:
     csrr    t0, fcsr
     sd      t0, 63*8(sp)                                // Store fcsr
 #endif
+_tx_thread_skip_fpu_save:
 
 #if defined(__riscv_vector)
     /* Store vector registers and CSRs */
