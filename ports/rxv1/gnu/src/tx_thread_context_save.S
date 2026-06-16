@@ -69,7 +69,7 @@ __tx_thread_context_save:
 ;                           SP+4 ->     Saved R1
 ;                           SP+8 ->     Saved R2
 ;                           SP+12->     Interrupted PC
-;                           SP+16->     Interrupted PSW
+;                           SP+16->     Interrupted PSW  */
 ;
 ;    /* Check for a nested interrupt condition.  */
 ;    if (_tx_thread_system_state++)
