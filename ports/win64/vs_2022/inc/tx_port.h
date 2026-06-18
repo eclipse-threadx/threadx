@@ -605,11 +605,16 @@ extern LARGE_INTEGER                            _tx_win32_time_stamp;
 
 VOID                                            _tx_win32_scheduler_wake(VOID);
 
+/* This simulation port is not for production use.  Run at 1 ms per tick
+   (10x faster than wall clock at the default 100 ticks/second) so that
+   regression tests with protocol timeouts complete in a fraction of real
+   time without changing any tick-count-based test logic.  The slower
+   TX_WIN32_SLOW_TIMER escape hatch is preserved for debugging.  */
 #ifndef TX_TIMER_PERIODIC
 #ifdef TX_WIN32_SLOW_TIMER
 #define TX_TIMER_PERIODIC                       TX_WIN32_SLOW_TIMER
 #else
-#define TX_TIMER_PERIODIC                       10
+#define TX_TIMER_PERIODIC                       1
 #endif
 #endif
 
