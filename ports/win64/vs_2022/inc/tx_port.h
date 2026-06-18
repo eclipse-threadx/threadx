@@ -361,7 +361,7 @@ void    _tx_initialize_start_interrupts(void);
                                                                             HANDLE tx_thread_win32_thread_start_semaphore; \
                                                                             UINT   tx_thread_win32_suspension_type; \
                                                                             UINT   tx_thread_win32_int_disabled_flag;
-#define TX_THREAD_EXTENSION_1
+#define TX_THREAD_EXTENSION_1                                               VOID       *tx_thread_extension_ptr;
 #define TX_THREAD_EXTENSION_2
 #define TX_THREAD_EXTENSION_3
 
