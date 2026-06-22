@@ -162,3 +162,19 @@ foreach(test_case ${regression_test_cases})
   target_link_libraries(${test_name} PRIVATE azrtos::threadx_smp)
   add_test(${CMAKE_BUILD_TYPE}::${test_name} ${test_name})
 endforeach()
+
+add_executable(threadx_smp_execution_profile_get_test
+               ${SOURCE_DIR}/threadx_smp_execution_profile_get_test.c
+               ${REPO_ROOT}/utility/execution_profile_kit/smp_version/tx_execution_profile.c)
+target_include_directories(threadx_smp_execution_profile_get_test
+                           PRIVATE
+                           ${SOURCE_DIR}/execution_profile_test
+                           ${REPO_ROOT}/utility/execution_profile_kit/smp_version)
+target_compile_definitions(threadx_smp_execution_profile_get_test
+                           PRIVATE CTEST BATCH_TEST TEST_STACK_SIZE_PRINTF=4096)
+if(NOT MSVC)
+  target_compile_options(threadx_smp_execution_profile_get_test PRIVATE -m64)
+  target_link_options(threadx_smp_execution_profile_get_test PRIVATE -m64)
+endif()
+add_test(${CMAKE_BUILD_TYPE}::threadx_smp_execution_profile_get_test
+         threadx_smp_execution_profile_get_test)
