@@ -20,7 +20,6 @@
 #define     DEMO_BYTE_POOL_SIZE     9120
 #define     DEMO_BLOCK_POOL_SIZE    100
 #define     DEMO_QUEUE_SIZE         100
-float           fpu_test_val = 0.0f;
 
 char *_to_str(ULONG val)
 {
@@ -213,7 +212,7 @@ UINT    status;
         thread_0_counter++;
 
         /* Sleep for 10 ticks.  */
-        tx_thread_sleep(1);
+        tx_thread_sleep(10);
 
         /* Set event flag 0 to wakeup thread 5.  */
         status =  tx_event_flags_set(&event_flags_0, 0x1, TX_OR);
@@ -375,8 +374,7 @@ UINT    status;
         if (status != TX_SUCCESS)
             break;
 
-        /* FPU Test */
-        fpu_test_val += 1.1f;
+
         /* Get the mutex again with suspension.  This shows
            that an owning thread may retrieve the mutex it
            owns multiple times.  */
