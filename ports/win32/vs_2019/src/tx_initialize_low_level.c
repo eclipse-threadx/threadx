@@ -1,6 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
- * Copyright (c) 2026-present Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -37,10 +37,15 @@
 
 TX_WIN32_CRITICAL_SECTION       _tx_win32_critical_section;
 HANDLE                          _tx_win32_scheduler_semaphore;
+HANDLE                          _tx_win32_scheduler_wake_event;
 DWORD                           _tx_win32_scheduler_id;
 ULONG                           _tx_win32_global_int_disabled_flag;
 LARGE_INTEGER                   _tx_win32_time_stamp;
 ULONG                           _tx_win32_system_error;
+HANDLE                          _tx_win32_timer_handle;
+HANDLE                          _tx_win32_timer_thread_handle;
+HANDLE                          _tx_win32_isr_semaphore;
+UINT                            _tx_win32_timer_waiting;
 extern TX_THREAD                *_tx_thread_current_ptr;
 
 
@@ -50,6 +55,8 @@ extern TX_THREAD                *_tx_thread_current_ptr;
 
 UINT                            _tx_win32_timer_id;
 VOID CALLBACK                   _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2);
+static VOID                     _tx_win32_timer_start(VOID);
+static DWORD WINAPI             _tx_win32_timer_thread_entry(LPVOID thread_input);
 
 
 #ifdef TX_WIN32_DEBUG_ENABLE
@@ -151,6 +158,7 @@ void            _tx_timer_interrupt(void);
 VOID            _tx_initialize_low_level(VOID);
 VOID            _tx_thread_context_save(VOID);
 VOID            _tx_thread_context_restore(VOID);
+VOID            _tx_win32_scheduler_wake(VOID);
 
 
 /* Define other external variable references.  */
@@ -231,12 +239,38 @@ VOID   _tx_initialize_low_level(VOID)
     _tx_win32_critical_section.tx_win32_critical_section_mutex_handle =  CreateMutex(NULL, FALSE, NULL);
     _tx_win32_critical_section.tx_win32_critical_section_nested_count =  0;
     _tx_win32_critical_section.tx_win32_critical_section_owner =         0;
+    if (_tx_win32_critical_section.tx_win32_critical_section_mutex_handle == NULL)
+    {
+        printf("ThreadX Win32 error creating critical section mutex!\n");
+        while(1)
+        {
+        }
+    }
 
     /* Create the semaphore that regulates when the scheduler executes.  */
     _tx_win32_scheduler_semaphore =  CreateSemaphore(NULL, 0, 1, NULL);
+    _tx_win32_isr_semaphore =        CreateSemaphore(NULL, 0, 1, NULL);
+    if ((_tx_win32_scheduler_semaphore == NULL) || (_tx_win32_isr_semaphore == NULL))
+    {
+        printf("ThreadX Win32 error creating semaphores!\n");
+        while(1)
+        {
+        }
+    }
+
+    /* Create the event that wakes the scheduler whenever the ready state changes.  */
+    _tx_win32_scheduler_wake_event =  CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (_tx_win32_scheduler_wake_event == NULL)
+    {
+        printf("ThreadX Win32 error creating scheduler wake event!\n");
+        while(1)
+        {
+        }
+    }
 
     /* Initialize the global interrupt disabled flag.  */
     _tx_win32_global_int_disabled_flag =  TX_FALSE;
+    _tx_win32_timer_waiting =             TX_FALSE;
 
     /* Done, return to caller.  */
 }
@@ -254,7 +288,6 @@ void _tx_initialize_start_interrupts(void)
     /* Queries the timer device to determine its resolution.  */
     if (timeGetDevCaps(&tc, sizeof(TIMECAPS)) != TIMERR_NOERROR)
     {
-        /* Error; application can't continue. */
         printf("Query timer device error.");
         while (1)
         {
@@ -263,9 +296,48 @@ void _tx_initialize_start_interrupts(void)
 
     wTimerRes = min(max(tc.wPeriodMin, TX_TIMER_PERIODIC), tc.wPeriodMax);
 
-    /* Start a specified timer event. The timer runs in its own thread.
-       It calls the specified callback function when the event is activated.  */
-    _tx_win32_timer_id = timeSetEvent(TX_TIMER_PERIODIC, wTimerRes, _tx_win32_timer_interrupt, 0, TIME_PERIODIC);
+    /* Request the best available timer resolution for the simulation.  */
+    if (timeBeginPeriod(wTimerRes) != TIMERR_NOERROR)
+    {
+        printf("ThreadX Win32 error configuring timer resolution!\n");
+        while (1)
+        {
+        }
+    }
+
+    /* Create the periodic waitable timer used to drive simulated interrupts.  */
+#if (TX_WIN32_USE_HIGH_RESOLUTION_TIMER != 0)
+    _tx_win32_timer_handle =  CreateWaitableTimerEx(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+    if (_tx_win32_timer_handle == NULL)
+#endif
+    {
+        _tx_win32_timer_handle =  CreateWaitableTimer(NULL, FALSE, NULL);
+    }
+
+    if (_tx_win32_timer_handle == NULL)
+    {
+        printf("ThreadX Win32 error creating timer handle!\n");
+        while (1)
+        {
+        }
+    }
+
+    /* Create the timer thread so interrupts are serialized through one execution context.  */
+    _tx_win32_timer_thread_handle =  CreateThread(NULL, 0, _tx_win32_timer_thread_entry, NULL, 0, NULL);
+    if (_tx_win32_timer_thread_handle == NULL)
+    {
+        printf("ThreadX Win32 error creating timer thread!\n");
+        while (1)
+        {
+        }
+    }
+
+    SetThreadPriority(_tx_win32_timer_thread_handle, THREAD_PRIORITY_HIGHEST);
+
+    _tx_win32_timer_id =  1;
+
+    /* Start the first simulated tick.  */
+    _tx_win32_timer_start();
 }
 
 /* Define the ThreadX system timer interrupt.  Other interrupts may be simulated
@@ -273,6 +345,12 @@ void _tx_initialize_start_interrupts(void)
 
 VOID CALLBACK _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2)
 {
+    TX_PARAMETER_NOT_USED(wTimerID);
+    TX_PARAMETER_NOT_USED(msg);
+    TX_PARAMETER_NOT_USED(dwUser);
+    TX_PARAMETER_NOT_USED(dw1);
+    TX_PARAMETER_NOT_USED(dw2);
+
     /* Call ThreadX context save for interrupt preparation.  */
     _tx_thread_context_save();
 
@@ -281,4 +359,54 @@ VOID CALLBACK _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD dwUser, D
 
     /* Call ThreadX context restore for interrupt completion.  */
     _tx_thread_context_restore();
+
+    /* Wake the scheduler so it can promptly observe timer-driven work.  */
+    _tx_win32_scheduler_wake();
+}
+
+
+static DWORD WINAPI _tx_win32_timer_thread_entry(LPVOID thread_input)
+{
+    TX_PARAMETER_NOT_USED(thread_input);
+
+    /* Drive periodic simulated interrupts from a single thread.  */
+    while (1)
+    {
+        WaitForSingleObject(_tx_win32_timer_handle, INFINITE);
+        _tx_win32_timer_interrupt(0, 0, 0, 0, 0);
+        _tx_win32_timer_start();
+    }
+}
+
+
+VOID   _tx_win32_scheduler_wake(VOID)
+{
+
+    /* Wake the scheduler if it is waiting for a state change.  */
+    if (_tx_win32_scheduler_wake_event != NULL)
+    {
+        SetEvent(_tx_win32_scheduler_wake_event);
+    }
+}
+
+
+static VOID  _tx_win32_timer_start(VOID)
+{
+
+LARGE_INTEGER   due_time;
+
+
+    /* Rearm the host timer relative to "now" to avoid burst catch-up ticks.  */
+    due_time.QuadPart =  -(((LONGLONG) TX_TIMER_PERIODIC) * 10000LL);
+#if (TX_WIN32_USE_HIGH_RESOLUTION_TIMER != 0)
+    if (SetWaitableTimerEx(_tx_win32_timer_handle, &due_time, 0, NULL, NULL, NULL, 0) == 0)
+#else
+    if (SetWaitableTimer(_tx_win32_timer_handle, &due_time, 0, NULL, NULL, FALSE) == 0)
+#endif
+    {
+        printf("ThreadX Win32 error starting timer!\n");
+        while (1)
+        {
+        }
+    }
 }

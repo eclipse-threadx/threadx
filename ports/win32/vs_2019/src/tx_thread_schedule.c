@@ -1,6 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
- * Copyright (c) 2026-present Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -31,6 +31,9 @@
 #include "tx_timer.h"
 
 
+static VOID  _tx_win32_semaphore_reset(HANDLE semaphore_handle);
+
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -59,7 +62,6 @@
 /*                                                                        */
 /*    ReleaseSemaphore                      Win32 release semaphore       */
 /*    ResumeThread                          Win32 resume thread           */
-/*    Sleep                                 Win32 thread sleep            */
 /*    WaitForSingleObject                   Win32 wait on a semaphore     */
 /*    _tx_win32_critical_section_obtain     Obtain critical section       */
 /*    _tx_win32_critical_section_release    Release critical section      */
@@ -71,6 +73,9 @@
 /**************************************************************************/
 VOID   _tx_thread_schedule(VOID)
 {
+
+DWORD   wait_status;
+
 
 
     /* Loop forever.  */
@@ -102,8 +107,8 @@ VOID   _tx_thread_schedule(VOID)
                 /* Leave the critical section.  */
                 _tx_win32_critical_section_release(&_tx_win32_critical_section);
 
-                /* Now sleep so we don't block forever.  */
-                Sleep(2);
+                /* Wait for the next scheduling state change.  */
+                WaitForSingleObject(_tx_win32_scheduler_wake_event, INFINITE);
             }
         }
 
@@ -136,8 +141,38 @@ VOID   _tx_thread_schedule(VOID)
             /* Debug entry.  */
             _tx_win32_debug_entry_insert("SCHEDULE-release_sem", __FILE__, __LINE__);
 
+            /* Clear any stale wakeup acknowledgements before this solicited resume.  */
+            _tx_win32_semaphore_reset(_tx_thread_current_ptr -> tx_thread_win32_thread_start_semaphore);
+            _tx_win32_semaphore_reset(_tx_thread_current_ptr -> tx_thread_win32_thread_run_semaphore);
+
             /* Let the thread run again by releasing its run semaphore.  */
-            ReleaseSemaphore(_tx_thread_current_ptr -> tx_thread_win32_thread_run_semaphore, 1, NULL);
+            if (ReleaseSemaphore(_tx_thread_current_ptr -> tx_thread_win32_thread_run_semaphore, 1, NULL) == 0)
+            {
+
+                /* Increment the system error counter.  */
+                _tx_win32_system_error++;
+            }
+
+            /* Let the solicited wakeup reach ThreadX before the timer ISR advances again.  */
+            if (_tx_win32_timer_waiting)
+            {
+
+                /* Wait for the thread to acknowledge the wakeup and then release the ISR.  */
+                wait_status =  WaitForSingleObject(_tx_thread_current_ptr -> tx_thread_win32_thread_start_semaphore, INFINITE);
+                if (ReleaseSemaphore(_tx_win32_isr_semaphore, 1, NULL) == 0)
+                {
+
+                    /* Increment the system error counter.  */
+                    _tx_win32_system_error++;
+                }
+
+                if (wait_status != WAIT_OBJECT_0)
+                {
+
+                    /* Increment the system error counter.  */
+                    _tx_win32_system_error++;
+                }
+            }
         }
 
         /* Debug entry.  */
@@ -283,3 +318,12 @@ void    _tx_win32_critical_section_release_all(TX_WIN32_CRITICAL_SECTION    *cri
     }
 }
 
+static VOID  _tx_win32_semaphore_reset(HANDLE semaphore_handle)
+{
+
+    /* Drain any stale counts from a semaphore so the next WaitForSingleObject
+       blocks until a fresh release.  */
+    while (WaitForSingleObject(semaphore_handle, 0) == WAIT_OBJECT_0)
+    {
+    }
+}
