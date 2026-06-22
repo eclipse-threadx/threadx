@@ -10,7 +10,6 @@ SECTIONS
   . = 0x80000000;
 
   .text : {
-    KEEP(*(.text.boot))   /* entry.s _start — must be first at 0x80000000 */
     *(.text .text.*)
     . = ALIGN(0x1000);
     PROVIDE(etext = .);

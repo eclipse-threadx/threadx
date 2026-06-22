@@ -102,13 +102,9 @@ _tx_thread_context_save:
 #endif
     sd      t0, 30*8(sp)                                // Save it on the stack
 
-    /* Save mstatus/sstatus and skip FP state if FS is Off.  */
-#ifdef TX_RISCV_SMODE
-    csrr    t0, sstatus
-#else
+    /* Save mstatus and skip FP state if FS is Off.  */
     csrr    t0, mstatus
-#endif
-    sd      t0, 29*8(sp)                                // Save mstatus/sstatus
+    sd      t0, 29*8(sp)                                // Save mstatus
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     srli    t1, t0, 13
     andi    t1, t1, 0x3
@@ -240,13 +236,9 @@ _tx_thread_not_nested_save:
 #endif
     sd      t1, 30*8(sp)                                // Save it on the stack
 
-    /* Save mstatus/sstatus and skip FP state if FS is Off.  */
-#ifdef TX_RISCV_SMODE
-    csrr    t1, sstatus
-#else
+    /* Save mstatus and skip FP state if FS is Off.  */
     csrr    t1, mstatus
-#endif
-    sd      t1, 29*8(sp)                                // Save mstatus/sstatus
+    sd      t1, 29*8(sp)                                // Save mstatus
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     srli    t2, t1, 13
     andi    t2, t2, 0x3
