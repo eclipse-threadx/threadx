@@ -147,3 +147,63 @@ foreach(test_case ${regression_test_cases})
   target_link_libraries(${test_name} PRIVATE azrtos::threadx)
   add_test(${CMAKE_BUILD_TYPE}::${test_name} ${test_name})
 endforeach()
+
+# --------------------------------------------------------------------------
+# Module manager object deallocation test
+# This test exercises _txm_module_manager_object_deallocate() directly and
+# requires the module manager sources to be linked alongside the ThreadX
+# library.  It is registered as a separate target because the standard
+# regression loop does not include module manager sources.
+# --------------------------------------------------------------------------
+set(MODULE_MANAGER_SOURCES
+    ${REPO_ROOT}/common_modules/module_manager/src/txm_module_manager_initialize.c
+    ${REPO_ROOT}/common_modules/module_manager/src/txm_module_manager_object_pool_create.c
+    ${REPO_ROOT}/common_modules/module_manager/src/txm_module_manager_object_allocate.c
+    ${REPO_ROOT}/common_modules/module_manager/src/txm_module_manager_object_deallocate.c)
+
+add_executable(threadx_module_object_dealloc_live_test
+    ${SOURCE_DIR}/threadx_module_object_dealloc_live_test.c
+    $<TARGET_OBJECTS:test_utility>
+    $<TARGET_OBJECTS:test_weak_defaults>
+    ${MODULE_MANAGER_SOURCES})
+
+target_compile_definitions(threadx_module_object_dealloc_live_test
+    PRIVATE
+    CTEST
+    BATCH_TEST
+    TEST_STACK_SIZE_PRINTF=4096)
+
+target_include_directories(threadx_module_object_dealloc_live_test
+    PRIVATE
+    ${REPO_ROOT}/common_modules/inc
+    ${REPO_ROOT}/common_modules/module_manager/inc
+    ${REPO_ROOT}/ports_module/linux/gnu/inc)
+target_link_libraries(threadx_module_object_dealloc_live_test PRIVATE azrtos::threadx gcov)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_object_dealloc_live_test
+         threadx_module_object_dealloc_live_test)
+
+# Strict-mode variant: same test compiled with TXM_MODULE_OBJECT_DEALLOC_STRICT.
+add_executable(threadx_module_object_dealloc_strict_test
+    ${SOURCE_DIR}/threadx_module_object_dealloc_live_test.c
+    $<TARGET_OBJECTS:test_utility>
+    $<TARGET_OBJECTS:test_weak_defaults>
+    ${MODULE_MANAGER_SOURCES})
+
+target_compile_definitions(threadx_module_object_dealloc_strict_test
+    PRIVATE
+    CTEST
+    BATCH_TEST
+    TEST_STACK_SIZE_PRINTF=4096
+    TXM_MODULE_OBJECT_DEALLOC_STRICT)
+
+target_include_directories(threadx_module_object_dealloc_strict_test
+    PRIVATE
+    ${REPO_ROOT}/common_modules/inc
+    ${REPO_ROOT}/common_modules/module_manager/inc
+    ${REPO_ROOT}/ports_module/linux/gnu/inc)
+
+target_link_libraries(threadx_module_object_dealloc_strict_test PRIVATE azrtos::threadx gcov)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_object_dealloc_strict_test
+         threadx_module_object_dealloc_strict_test)

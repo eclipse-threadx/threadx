@@ -383,7 +383,7 @@ void    _tx_initialize_start_interrupts(void);
                                                                             UINT        tx_thread_linux_int_disabled_flag;
 
 #define TX_THREAD_EXTENSION_1                                               VOID       *tx_thread_extension_ptr;
-#define TX_THREAD_EXTENSION_2
+#define TX_THREAD_EXTENSION_2                                               VOID       *tx_thread_module_instance_ptr;
 #define TX_THREAD_EXTENSION_3
 
 
