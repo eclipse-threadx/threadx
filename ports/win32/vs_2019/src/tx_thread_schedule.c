@@ -75,8 +75,6 @@ VOID   _tx_thread_schedule(VOID)
 {
 DWORD   wait_status;
 
-DWORD   wait_status;
-
 
 
     /* Loop forever.  */
@@ -275,7 +273,7 @@ void    _tx_win32_critical_section_release(TX_WIN32_CRITICAL_SECTION *critical_s
 
                 /* Sleep for 0, just to relinquish to other ready threads.  */
                 Sleep(0);
-			}
+            }
         }
     }
     else
@@ -326,15 +324,5 @@ void    _tx_win32_critical_section_release_all(TX_WIN32_CRITICAL_SECTION    *cri
 
         /* Increment the system error counter.  */
         _tx_win32_system_error++;
-    }
-}
-
-static VOID  _tx_win32_semaphore_reset(HANDLE semaphore_handle)
-{
-
-    /* Drain any stale counts from a semaphore so the next WaitForSingleObject
-       blocks until a fresh release.  */
-    while (WaitForSingleObject(semaphore_handle, 0) == WAIT_OBJECT_0)
-    {
     }
 }
