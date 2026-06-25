@@ -1,6 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
- * Copyright (c) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -28,7 +28,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                          Win32/Visual     */
-/*                                                  6.5.2.202603          */
+/*                                                  6.5.1.202602          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -245,14 +245,6 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
 /* Include windows include file.  */
 
 #include <windows.h>
-
-#ifndef TX_WIN32_USE_HIGH_RESOLUTION_TIMER
-#define TX_WIN32_USE_HIGH_RESOLUTION_TIMER      1
-#endif
-
-#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
-#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION   0x00000002UL
-#endif
 
 
 /* Define the priority levels for ThreadX.  Legal values range
@@ -529,21 +521,20 @@ extern ULONG                                    _tx_win32_system_error;
 extern HANDLE                                   _tx_win32_timer_handle;
 extern HANDLE                                   _tx_win32_timer_thread_handle;
 extern HANDLE                                   _tx_win32_isr_semaphore;
-extern UINT                                     _tx_win32_timer_waiting;
 extern UINT                                     _tx_win32_timer_id;
+extern UINT                                     _tx_win32_timer_waiting;
 
+VOID                                            _tx_win32_scheduler_wake(VOID);
+
+
+#ifndef TX_WIN32_USE_HIGH_RESOLUTION_TIMER
+#define TX_WIN32_USE_HIGH_RESOLUTION_TIMER      1
+#endif
 
 #ifndef TX_WIN32_MEMORY_SIZE
 #define TX_WIN32_MEMORY_SIZE                    64000
 #endif
 
-VOID                                            _tx_win32_scheduler_wake(VOID);
-
-/* This simulation port is not for production use.  Run at 1 ms per tick
-   (10x faster than wall clock at the default 100 ticks/second) so that
-   regression tests with protocol timeouts complete in a fraction of real
-   time without changing any tick-count-based test logic.  The slower
-   TX_WIN32_SLOW_TIMER escape hatch is preserved for debugging.  */
 #ifndef TX_TIMER_PERIODIC
 #ifdef TX_WIN32_SLOW_TIMER
 #define TX_TIMER_PERIODIC                       TX_WIN32_SLOW_TIMER
@@ -552,4 +543,4 @@ VOID                                            _tx_win32_scheduler_wake(VOID);
 #endif
 #endif
 
-#endif /* TX_PORT_H */
+#endif

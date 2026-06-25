@@ -149,6 +149,7 @@ DWORD       threadid;
        on.  Note that the main scheduling algorithm will take care of
        setting the current thread pointer to NULL.  */
     ReleaseSemaphore(_tx_win32_scheduler_semaphore, 1, NULL);
+    _tx_win32_scheduler_wake();
 
     /* Leave Win32 critical section.  */
     _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
@@ -164,6 +165,9 @@ DWORD       threadid;
     /* Wait on the run semaphore for this thread.  This won't get set again
        until the thread is scheduled.  */
     WaitForSingleObject(temp_run_semaphore, INFINITE);
+
+    /* Acknowledge that the thread is once again executing ThreadX code.  */
+    ReleaseSemaphore(temp_thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
 
     /* Enter Win32 critical section.  */
     _tx_win32_critical_section_obtain(&_tx_win32_critical_section);

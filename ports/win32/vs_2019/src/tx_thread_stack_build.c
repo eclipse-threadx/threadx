@@ -1,6 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
- * Copyright (c) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -160,8 +160,8 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 DWORD WINAPI _tx_win32_thread_entry(LPVOID ptr)
 {
 
-TX_THREAD  *thread_ptr;
-TX_THREAD  *current_thread_ptr;
+TX_THREAD   *thread_ptr;
+TX_THREAD   *current_thread_ptr;
 HANDLE      threadhandle;
 int         threadpriority;
 DWORD       threadid;
@@ -180,8 +180,10 @@ DWORD       threadid;
     /* Acknowledge that the host thread is now able to execute ThreadX code.  */
     ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
 
-    /* A deleted host thread can be released only to let it exit.  Check
-       before calling the shell entry to avoid running stale ThreadX code.  */
+    /* A deleted host thread can be released only to let it exit.  In notify-enabled
+       builds, the first TX_DISABLE in _tx_thread_shell_entry catches this path.
+       When callbacks are disabled, perform the same check before the shell calls
+       the stale ThreadX entry function.  */
     _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
     threadhandle =       GetCurrentThread();
     threadpriority =     GetThreadPriority(threadhandle);

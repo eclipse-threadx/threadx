@@ -73,6 +73,7 @@ static VOID  _tx_win32_semaphore_reset(HANDLE semaphore_handle);
 /**************************************************************************/
 VOID   _tx_thread_schedule(VOID)
 {
+DWORD   wait_status;
 
 DWORD   wait_status;
 
@@ -183,6 +184,16 @@ DWORD   wait_status;
 
         /* Now suspend the main thread so the application thread can run.  */
         WaitForSingleObject(_tx_win32_scheduler_semaphore, INFINITE);
+    }
+}
+
+
+static VOID  _tx_win32_semaphore_reset(HANDLE semaphore_handle)
+{
+
+    /* Drain any stale semaphore count from a previous host-side wakeup.  */
+    while (WaitForSingleObject(semaphore_handle, 0) == WAIT_OBJECT_0)
+    {
     }
 }
 
