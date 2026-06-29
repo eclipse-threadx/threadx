@@ -1,6 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
- * Copyright (c) 2026-present Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -47,6 +47,11 @@ HANDLE                          _tx_win32_timer_thread_handle;
 HANDLE                          _tx_win32_isr_semaphore;
 UINT                            _tx_win32_timer_waiting;
 extern TX_THREAD                *_tx_thread_current_ptr;
+
+/* Flag set by the atexit handler to stop the timer thread before CRT cleanup
+   suspends any application threads.  Declared volatile so both the main thread
+   (which sets it) and the timer thread (which reads it) see the change.  */
+volatile LONG                   _tx_win32_exiting = 0;
 
 
 /* Define simulated timer interrupt.  This is done inside a thread, which is
@@ -160,6 +165,9 @@ VOID            _tx_thread_context_save(VOID);
 VOID            _tx_thread_context_restore(VOID);
 VOID            _tx_win32_scheduler_wake(VOID);
 
+/* Forward declaration of the process-exit cleanup function.  */
+static void     _tx_win32_exit_cleanup(void);
+
 
 /* Define other external variable references.  */
 
@@ -262,6 +270,37 @@ VOID   _tx_initialize_low_level(VOID)
 }
 
 
+/* Called by the C runtime during exit() before any CRT cleanup.  Sets the
+   exiting flag so the timer thread and context-save code stop touching
+   application OS threads (which may hold the CRT heap lock), then forcibly
+   terminates the timer thread so it cannot fire again during cleanup.  */
+
+static void _tx_win32_exit_cleanup(void)
+{
+
+    /* Signal all timer-path code to stop.  */
+    _InterlockedExchange(&_tx_win32_exiting, 1);
+
+    /* Unblock the timer thread if it is waiting on the waitable timer.  */
+    if (_tx_win32_timer_handle != NULL)
+    {
+        CancelWaitableTimer(_tx_win32_timer_handle);
+    }
+
+    /* Wait up to 50 ms for the timer thread to exit on its own.  */
+    if (_tx_win32_timer_thread_handle != NULL)
+    {
+        if (WaitForSingleObject(_tx_win32_timer_thread_handle, 50) != WAIT_OBJECT_0)
+        {
+
+            /* Force-terminate if it has not stopped in time.  */
+            TerminateThread(_tx_win32_timer_thread_handle, 0);
+        }
+        _tx_win32_timer_thread_handle = NULL;
+    }
+}
+
+
 /* This routine is called after initialization is complete in order to start
    all interrupt threads.  Interrupt threads in addition to the timer may
    be added to this routine as well.  */
@@ -323,6 +362,12 @@ void _tx_initialize_start_interrupts(void)
 
     _tx_win32_timer_id =  1;
 
+    /* Register exit cleanup so the timer thread is stopped before CRT cleanup
+       runs.  Without this, exit() can deadlock: the CRT holds the heap lock
+       while the timer fires and suspends the exiting thread via SuspendThread,
+       causing any subsequent malloc to block forever.  */
+    atexit(_tx_win32_exit_cleanup);
+
     /* Start the first simulated tick.  */
     _tx_win32_timer_start();
 }
@@ -337,6 +382,12 @@ VOID CALLBACK _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD_PTR dwUse
     TX_PARAMETER_NOT_USED(dwUser);
     TX_PARAMETER_NOT_USED(dw1);
     TX_PARAMETER_NOT_USED(dw2);
+
+    /* Skip the interrupt entirely if exit() has been called.  The CRT heap
+       lock may be held by the exiting thread; calling SuspendThread() on it
+       at this point causes a permanent deadlock.  */
+    if (_tx_win32_exiting)
+        return;
 
     /* Call ThreadX context save for interrupt preparation.  */
     _tx_thread_context_save();
@@ -356,13 +407,20 @@ static DWORD WINAPI _tx_win32_timer_thread_entry(LPVOID thread_input)
 {
     TX_PARAMETER_NOT_USED(thread_input);
 
-    /* Drive periodic simulated interrupts from a single thread.  */
-    while (1)
+    /* Drive periodic simulated interrupts from a single thread.
+       Exit the loop when _tx_win32_exiting is set by the atexit handler.  */
+    while (!_tx_win32_exiting)
     {
-        WaitForSingleObject(_tx_win32_timer_handle, INFINITE);
+        if (WaitForSingleObject(_tx_win32_timer_handle, INFINITE) != WAIT_OBJECT_0)
+            break;
+        if (_tx_win32_exiting)
+            break;
         _tx_win32_timer_interrupt(0, 0, 0, 0, 0);
+        if (_tx_win32_exiting)
+            break;
         _tx_win32_timer_start();
     }
+    return 0;
 }
 
 
