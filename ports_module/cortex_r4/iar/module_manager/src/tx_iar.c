@@ -270,7 +270,7 @@ TX_MUTEX    *mutex_ptr;
         mutex_ptr =  &__tx_iar_file_lock_mutexes[__tx_iar_file_lock_next_free_mutex++];
 
         /* Check for wrap-around on the next free mutex.  */
-        if (__tx_iar_file_lock_next_free_mutex >= _MAX_LOCK)
+        if (__tx_iar_file_lock_next_free_mutex >= _MAX_FLOCK)
         {
 
             /* Yes, set the free index back to 0.  */
@@ -287,7 +287,7 @@ TX_MUTEX    *mutex_ptr;
     }
 
     /* Determine if a free mutex was found.   */
-    if (i >= _MAX_LOCK)
+    if (i >= _MAX_FLOCK)
     {
 
         /* Error!  No more free mutexes!  */
@@ -678,7 +678,7 @@ TX_MUTEX    *mutex_ptr;
         mutex_ptr =  &__tx_iar_file_lock_mutexes[__tx_iar_file_lock_next_free_mutex++];
 
         /* Check for wrap-around on the next free mutex.  */
-        if (__tx_iar_file_lock_next_free_mutex >= _MAX_LOCK)
+        if (__tx_iar_file_lock_next_free_mutex >= _MAX_FLOCK)
         {
 
             /* Yes, set the free index back to 0.  */
@@ -695,7 +695,7 @@ TX_MUTEX    *mutex_ptr;
     }
 
     /* Determine if a free mutex was found.   */
-    if (i >= _MAX_LOCK)
+    if (i >= _MAX_FLOCK)
     {
 
         /* Error!  No more free mutexes!  */
