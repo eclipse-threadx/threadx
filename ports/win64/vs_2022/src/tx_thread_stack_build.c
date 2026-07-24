@@ -178,9 +178,10 @@ DWORD       threadid;
        handoff point and is ready to be scheduled.  */
     ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
 
-    /* Now suspend the thread initially.  If the thread has already
-       been scheduled, this will return immediately.  */
-    WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_run_semaphore, INFINITE);
+    /* Spin-poll for the scheduler to release this thread to run.
+       Matches the spin-poll pattern used in _tx_thread_system_return.  */
+    while (WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_run_semaphore, 0) != WAIT_OBJECT_0)
+        SwitchToThread();
 
     /* Acknowledge that the host thread is now able to execute ThreadX code.  */
     ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);

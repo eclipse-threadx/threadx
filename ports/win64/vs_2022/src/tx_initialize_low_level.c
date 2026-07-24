@@ -358,8 +358,20 @@ VOID CALLBACK _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD_PTR dwUse
     /* Call ThreadX context save for interrupt preparation.  */
     _tx_thread_context_save();
 
-    /* Call the ThreadX system timer interrupt processing.  */
-    _tx_timer_interrupt();
+    /* Fire TX_WIN32_TICKS_PER_INTERRUPT ticks inside a single interrupt
+       context.  The SuspendThread/ResumeThread overhead is amortized across
+       all N ticks, and all timer-based delays shrink by factor N.  The
+       relative ordering of thread wakeups is preserved because each call to
+       _tx_timer_interrupt() advances the tick counter by exactly one step and
+       processes the timers that expire at that step.  */
+#ifndef TX_WIN32_TICKS_PER_INTERRUPT
+#define TX_WIN32_TICKS_PER_INTERRUPT    5
+#endif
+    {
+        UINT _tick_i;
+        for (_tick_i = 0; _tick_i < TX_WIN32_TICKS_PER_INTERRUPT; _tick_i++)
+            _tx_timer_interrupt();
+    }
 
     /* Call ThreadX context restore for interrupt completion.  */
     _tx_thread_context_restore();

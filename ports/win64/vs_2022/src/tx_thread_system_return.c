@@ -167,9 +167,11 @@ DWORD       threadid;
         ExitThread(0);
     }
 
-    /* Wait on the run semaphore for this thread.  This won't get set again
-       until the thread is scheduled.  */
-    WaitForSingleObject(temp_run_semaphore, INFINITE);
+    /* Spin-poll for the scheduler to grant this thread a new time-slice.
+       SwitchToThread() between polls keeps the CPU available to the scheduler
+       and timer without paying the full kernel-wake cost of INFINITE.  */
+    while (WaitForSingleObject(temp_run_semaphore, 0) != WAIT_OBJECT_0)
+        SwitchToThread();
 
     /* Acknowledge that the thread is once again executing ThreadX code.  */
     ReleaseSemaphore(temp_thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);

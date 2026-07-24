@@ -131,9 +131,11 @@ TX_THREAD   *execute_thread;
                 (execute_thread -> tx_thread_win32_suspension_type == 0))
             {
 
-                /* Release the critical section while the scheduler runs.  */
+                /* Spin-poll for the scheduler to complete the solicited wakeup
+                   before the timer ISR proceeds.  */
                 _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
-                WaitForSingleObject(_tx_win32_isr_semaphore, INFINITE);
+                while (WaitForSingleObject(_tx_win32_isr_semaphore, 0) != WAIT_OBJECT_0)
+                    SwitchToThread();
                 _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
                 while (WaitForSingleObject(_tx_win32_isr_semaphore, 0) == WAIT_OBJECT_0)
                 {
@@ -161,9 +163,11 @@ TX_THREAD   *execute_thread;
         if (execute_thread -> tx_thread_win32_suspension_type == 0)
         {
 
-            /* Release the critical section while the scheduler runs.  */
+            /* Spin-poll for the scheduler to hand off to the next thread and
+               acknowledge via the ISR semaphore.  Keeps timer-path latency low.  */
             _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
-            WaitForSingleObject(_tx_win32_isr_semaphore, INFINITE);
+            while (WaitForSingleObject(_tx_win32_isr_semaphore, 0) != WAIT_OBJECT_0)
+                SwitchToThread();
             _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
             while (WaitForSingleObject(_tx_win32_isr_semaphore, 0) == WAIT_OBJECT_0)
             {
