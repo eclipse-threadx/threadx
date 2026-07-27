@@ -38,7 +38,17 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function deallocates a previously allocated object.            */
+/*    DEPRECATED.  This function is called internally by the Module       */
+/*    Manager dispatch layer after a successful tx_*_delete() call from   */
+/*    a module.  It must not be called directly by module or application  */
+/*    code.  Calling it on a live kernel object (one whose tx_*_delete()  */
+/*    has not yet been called) frees the backing pool memory while the    */
+/*    object is still referenced by the kernel (use-after-free).          */
+/*                                                                        */
+/*    Module authors: remove any explicit call to                         */
+/*    txm_module_object_deallocate().  Calling the appropriate            */
+/*    tx_*_delete() service is sufficient; pool deallocation is handled   */
+/*    automatically by the dispatch layer.                                */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
