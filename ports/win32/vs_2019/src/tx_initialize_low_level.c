@@ -48,6 +48,15 @@ HANDLE                          _tx_win32_isr_semaphore;
 UINT                            _tx_win32_timer_waiting;
 extern TX_THREAD                *_tx_thread_current_ptr;
 
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+/* Auto-reset event used by the scheduler to kick the timer thread so that the
+   simulated clock advances immediately when no thread is ready to run, instead
+   of waiting for the wall-clock periodic timer.  This makes the simulation
+   CPU-bound rather than wall-clock-bound during idle periods, mirroring the
+   Linux port's TX_LINUX_NO_IDLE_ENABLE behavior.  */
+HANDLE                          _tx_win32_timer_kick_event;
+#endif
+
 /* Flag set by the atexit handler to stop the timer thread before CRT cleanup
    suspends any application threads.  Declared volatile so both the main thread
    (which sets it) and the timer thread (which reads it) see the change.  */
@@ -262,6 +271,20 @@ VOID   _tx_initialize_low_level(VOID)
         }
     }
 
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+
+    /* Create the auto-reset event used to kick the timer thread when the
+       scheduler detects an idle system (see _tx_thread_schedule).  */
+    _tx_win32_timer_kick_event =  CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (_tx_win32_timer_kick_event == NULL)
+    {
+        printf("ThreadX Win32 error creating timer kick event!\n");
+        while(1)
+        {
+        }
+    }
+#endif
+
     /* Initialize the global interrupt disabled flag.  */
     _tx_win32_global_int_disabled_flag =  TX_FALSE;
     _tx_win32_timer_waiting =             TX_FALSE;
@@ -392,8 +415,20 @@ VOID CALLBACK _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD_PTR dwUse
     /* Call ThreadX context save for interrupt preparation.  */
     _tx_thread_context_save();
 
-    /* Call the ThreadX system timer interrupt processing.  */
-    _tx_timer_interrupt();
+    /* Fire TX_WIN32_TICKS_PER_INTERRUPT ticks inside a single interrupt
+       context.  The SuspendThread/ResumeThread overhead is amortized across
+       all N ticks, and all timer-based delays shrink by factor N.  The
+       relative ordering of thread wakeups is preserved because each call to
+       _tx_timer_interrupt() advances the tick counter by exactly one step and
+       processes the timers that expire at that step.  */
+#ifndef TX_WIN32_TICKS_PER_INTERRUPT
+#define TX_WIN32_TICKS_PER_INTERRUPT    5
+#endif
+    {
+        UINT _tick_i;
+        for (_tick_i = 0; _tick_i < TX_WIN32_TICKS_PER_INTERRUPT; _tick_i++)
+            _tx_timer_interrupt();
+    }
 
     /* Call ThreadX context restore for interrupt completion.  */
     _tx_thread_context_restore();
@@ -411,8 +446,21 @@ static DWORD WINAPI _tx_win32_timer_thread_entry(LPVOID thread_input)
        Exit the loop when _tx_win32_exiting is set by the atexit handler.  */
     while (!_tx_win32_exiting)
     {
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+
+        /* Wake either on the periodic wall-clock timer or on a scheduler kick
+           (issued when the system is idle).  Firing on the kick advances the
+           simulated clock immediately, without waiting for the wall clock.  */
+        HANDLE  _wait_handles[2];
+
+        _wait_handles[0] =  _tx_win32_timer_handle;
+        _wait_handles[1] =  _tx_win32_timer_kick_event;
+        if (WaitForMultipleObjects(2, _wait_handles, FALSE, INFINITE) == WAIT_FAILED)
+            break;
+#else
         if (WaitForSingleObject(_tx_win32_timer_handle, INFINITE) != WAIT_OBJECT_0)
             break;
+#endif
         if (_tx_win32_exiting)
             break;
         _tx_win32_timer_interrupt(0, 0, 0, 0, 0);

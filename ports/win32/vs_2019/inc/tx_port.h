@@ -343,7 +343,7 @@ void    _tx_initialize_start_interrupts(void);
                                                                             HANDLE tx_thread_win32_thread_start_semaphore; \
                                                                             UINT   tx_thread_win32_suspension_type; \
                                                                             UINT   tx_thread_win32_int_disabled_flag;
-#define TX_THREAD_EXTENSION_1
+#define TX_THREAD_EXTENSION_1                                               VOID       *tx_thread_extension_ptr;
 #define TX_THREAD_EXTENSION_2
 #define TX_THREAD_EXTENSION_3
 
@@ -397,6 +397,20 @@ void    _tx_initialize_start_interrupts(void);
 #define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
 #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
+
+
+/* Store the owning object pointer in the internal timer so timeout handlers can
+   recover it via a pointer field rather than the ULONG timeout parameter.  This
+   matches the Win64 port and satisfies NetXDuo/USBX default extension macros
+   that reference tx_timer_internal_extension_ptr / tx_thread_extension_ptr.  */
+
+#define TX_TIMER_INTERNAL_EXTENSION             VOID    *tx_timer_internal_extension_ptr;
+
+#define TX_THREAD_CREATE_TIMEOUT_SETUP(t)       (t) -> tx_thread_timer.tx_timer_internal_timeout_function =  &(_tx_thread_timeout);            \
+                                                (t) -> tx_thread_timer.tx_timer_internal_timeout_param =     0;                                \
+                                                (t) -> tx_thread_timer.tx_timer_internal_extension_ptr =     (VOID *) (t);
+
+#define TX_THREAD_TIMEOUT_POINTER_SETUP(t)      (t) =  (TX_THREAD *) _tx_timer_expired_timer_ptr -> tx_timer_internal_extension_ptr;
 
 
 struct TX_THREAD_STRUCT;
@@ -523,6 +537,9 @@ extern HANDLE                                   _tx_win32_timer_thread_handle;
 extern HANDLE                                   _tx_win32_isr_semaphore;
 extern UINT                                     _tx_win32_timer_id;
 extern UINT                                     _tx_win32_timer_waiting;
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+extern HANDLE                                   _tx_win32_timer_kick_event;
+#endif
 
 VOID                                            _tx_win32_scheduler_wake(VOID);
 

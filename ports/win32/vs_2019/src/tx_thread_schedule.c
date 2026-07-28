@@ -106,8 +106,22 @@ DWORD   wait_status;
                 /* Leave the critical section.  */
                 _tx_win32_critical_section_release(&_tx_win32_critical_section);
 
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+
+                /* No thread is ready to run: advance the simulated clock now
+                   instead of waiting for the wall-clock periodic timer.  Kick
+                   the timer thread so it fires the next tick(s) immediately,
+                   then wait for it to signal progress via the wake event.  A
+                   short bounded timeout guards against a missed wake.  This
+                   makes idle periods CPU-bound rather than wall-clock-bound,
+                   mirroring the Linux port's TX_LINUX_NO_IDLE_ENABLE path.  */
+                SetEvent(_tx_win32_timer_kick_event);
+                WaitForSingleObject(_tx_win32_scheduler_wake_event, 2);
+#else
+
                 /* Wait for the next scheduling state change.  */
                 WaitForSingleObject(_tx_win32_scheduler_wake_event, INFINITE);
+#endif
             }
         }
 
