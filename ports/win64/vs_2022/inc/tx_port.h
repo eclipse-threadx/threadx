@@ -595,6 +595,9 @@ extern HANDLE                                   _tx_win32_timer_handle;
 extern HANDLE                                   _tx_win32_timer_thread_handle;
 extern HANDLE                                   _tx_win32_isr_semaphore;
 extern UINT                                     _tx_win32_timer_waiting;
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+extern HANDLE                                   _tx_win32_timer_kick_event;
+#endif
 extern UINT                                     _tx_win32_timer_id;
 extern LARGE_INTEGER                            _tx_win32_time_stamp;
 

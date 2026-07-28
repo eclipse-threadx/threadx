@@ -51,6 +51,15 @@ HANDLE                          _tx_win32_isr_semaphore;
 UINT                            _tx_win32_timer_waiting;
 extern TX_THREAD                *_tx_thread_current_ptr;
 
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+/* Auto-reset event used by the scheduler to kick the timer thread so that the
+   simulated clock advances immediately when no thread is ready to run, instead
+   of waiting for the wall-clock periodic timer.  This makes the simulation
+   CPU-bound rather than wall-clock-bound during idle periods, mirroring the
+   Linux port's TX_LINUX_NO_IDLE_ENABLE behavior.  */
+HANDLE                          _tx_win32_timer_kick_event;
+#endif
+
 
 /* Define simulated timer interrupt.  This is done inside a thread, which is
    how other interrupts may be defined as well.  See code below for an
@@ -271,6 +280,20 @@ VOID   _tx_initialize_low_level(VOID)
         }
     }
 
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+
+    /* Create the auto-reset event used to kick the timer thread when the
+       scheduler detects an idle system (see _tx_thread_schedule).  */
+    _tx_win32_timer_kick_event =  CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (_tx_win32_timer_kick_event == NULL)
+    {
+        printf("ThreadX Win64 error creating timer kick event!\n");
+        while(1)
+        {
+        }
+    }
+#endif
+
     /* Initialize the global interrupt disabled flag.  */
     _tx_win32_global_int_disabled_flag =  TX_FALSE;
     _tx_win32_timer_waiting =             TX_FALSE;
@@ -388,7 +411,19 @@ static DWORD WINAPI _tx_win32_timer_thread_entry(LPVOID thread_input)
     /* Drive periodic simulated interrupts from a single thread.  */
     while (1)
     {
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+
+        /* Wake either on the periodic wall-clock timer or on a scheduler kick
+           (issued when the system is idle).  Firing on the kick advances the
+           simulated clock immediately, without waiting for the wall clock.  */
+        HANDLE  _wait_handles[2];
+
+        _wait_handles[0] =  _tx_win32_timer_handle;
+        _wait_handles[1] =  _tx_win32_timer_kick_event;
+        WaitForMultipleObjects(2, _wait_handles, FALSE, INFINITE);
+#else
         WaitForSingleObject(_tx_win32_timer_handle, INFINITE);
+#endif
         _tx_win32_timer_interrupt(0, 0, 0, 0, 0);
         _tx_win32_timer_start();
     }
