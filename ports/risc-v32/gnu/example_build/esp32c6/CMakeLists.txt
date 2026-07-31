@@ -1,4 +1,17 @@
+#
+# Copyright (c) 2026 Eclipse ThreadX contributors
+#
+# This program and the accompanying materials are made available under the
+# terms of the MIT License which is available at
+# https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: MIT
+#
+
 cmake_minimum_required(VERSION 3.16)
+
+# Generate compile_commands.json for clangd and IDE language servers
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Enforce Cross-Compilation Toolchain if not explicitly specified
 if(NOT CMAKE_TOOLCHAIN_FILE)
