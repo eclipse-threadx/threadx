@@ -27,3 +27,4 @@ CTestTestfile.cmake
 # Local build artifacts
 build_m7/
 .codex
+build_r52/
