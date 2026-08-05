@@ -28,3 +28,10 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/inc
 )
+
+# Armv8-R AEM FVP example builds (boot check now, kernel demo from AR1/M2).
+# Off by default so the default build stays a pure static-library build.
+option(TX_R52_BUILD_FVP_EXAMPLE "Build the Armv8-R AEM FVP example targets" OFF)
+if(TX_R52_BUILD_FVP_EXAMPLE)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/example_build/fvp_baser_aemv8r)
+endif()
