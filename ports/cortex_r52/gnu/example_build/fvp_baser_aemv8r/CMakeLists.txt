@@ -26,22 +26,53 @@ target_link_options(boot_check.elf PRIVATE
     -Wl,--no-warn-rwx-segments
 )
 
-# Run the boot check on the FVP.  The model exits by itself through the
-# semihosting SYS_EXIT call in bsp_main, so no host-side timeout is needed.
+# AR1/M2 -- cooperative two-thread demo.  Links ThreadX and exercises the
+# ported context-switch assembly with no interrupts and no timer tick.
+add_executable(demo_m2.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${FVP_DIR}/console.c
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_m2.c
+)
+
+target_link_libraries(demo_m2.elf PRIVATE threadx)
+
+target_include_directories(demo_m2.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_m2.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_m2.map
+    -Wl,--no-warn-rwx-segments
+)
+
+# Run a target on the FVP.  Each image exits by itself through the
+# semihosting SYS_EXIT call, so no host-side timeout is needed.
 find_program(FVP_BASER_AEMV8R FVP_BaseR_AEMv8R
     HINTS $ENV{HOME}/FVP_Base_AEMv8R_11.32_19/bin
 )
 if(FVP_BASER_AEMV8R)
-    add_custom_target(run-boot-check-r52
-        COMMAND ${FVP_BASER_AEMV8R}
-                -C cluster0.NUM_CORES=1
-                -C bp.vis.disable_visualisation=1
-                -C bp.terminal_0.start_telnet=0
-                -a $<TARGET_FILE:boot_check.elf>
-        DEPENDS boot_check.elf
-        USES_TERMINAL
-        COMMENT "Running AR1/M1 boot check on FVP_BaseR_AEMv8R..."
-    )
+    function(threadx_r52_add_fvp_run target_name run_target description)
+        add_custom_target(${run_target}
+            COMMAND ${FVP_BASER_AEMV8R}
+                    -C cluster0.NUM_CORES=1
+                    -C bp.vis.disable_visualisation=1
+                    -C bp.terminal_0.start_telnet=0
+                    -a $<TARGET_FILE:${target_name}>
+            DEPENDS ${target_name}
+            USES_TERMINAL
+            COMMENT "${description}"
+        )
+    endfunction()
+
+    threadx_r52_add_fvp_run(boot_check.elf run-boot-check-r52
+        "Running AR1/M1 boot check on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_m2.elf run-demo-m2-r52
+        "Running AR1/M2 cooperative switch demo on FVP_BaseR_AEMv8R...")
 else()
-    message(STATUS "FVP_BaseR_AEMv8R not found; run-boot-check-r52 unavailable.")
+    message(STATUS "FVP_BaseR_AEMv8R not found; FVP run targets unavailable.")
 endif()
