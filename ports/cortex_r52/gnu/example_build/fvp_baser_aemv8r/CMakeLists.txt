@@ -81,6 +81,37 @@ target_link_options(demo_m3.elf PRIVATE
     -Wl,--no-warn-rwx-segments
 )
 
+# AR1/M4 -- the standard eight-thread ThreadX demo.  demo_threadx.c is the
+# shipped sample kept byte-identical apart from its header note and one call
+# into the verification harness, which lives in demo_verify.c.
+add_executable(demo_threadx.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${FVP_DIR}/console.c
+    ${FVP_DIR}/gicv3.c
+    ${FVP_DIR}/timer.c
+    ${FVP_DIR}/irq_dispatch.c
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_threadx.c
+    ${FVP_DIR}/demo_verify.c
+)
+
+target_compile_definitions(demo_threadx.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+target_link_libraries(demo_threadx.elf PRIVATE threadx)
+
+target_include_directories(demo_threadx.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_threadx.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_threadx.map
+    -Wl,--no-warn-rwx-segments
+)
+
 # Run a target on the FVP.  Each image exits by itself through the
 # semihosting SYS_EXIT call, so no host-side timeout is needed.
 find_program(FVP_BASER_AEMV8R FVP_BaseR_AEMv8R
@@ -106,6 +137,40 @@ if(FVP_BASER_AEMV8R)
         "Running AR1/M2 cooperative switch demo on FVP_BaseR_AEMv8R...")
     threadx_r52_add_fvp_run(demo_m3.elf run-demo-m3-r52
         "Running AR1/M3 tick and preemption demo on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_threadx.elf run-demo-threadx-r52
+        "Running the standard ThreadX demo on FVP_BaseR_AEMv8R...")
+
+    # Automated checks.  The runner judges each image by its self-reported
+    # result and treats a missing result line as failure, so a hang cannot
+    # pass.  Registered with CTest when Python is available, plus a plain
+    # target so the suite is runnable without CTest.
+    find_package(Python3 COMPONENTS Interpreter)
+    if(Python3_FOUND)
+        set(R52_RUNNER ${FVP_DIR}/test/run_fvp_test.py)
+        set(R52_TEST_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf)
+
+        enable_testing()
+        foreach(image IN LISTS R52_TEST_IMAGES)
+            add_test(NAME r52-fvp-${image}
+                     COMMAND ${Python3_EXECUTABLE} ${R52_RUNNER}
+                             --elf $<TARGET_FILE:${image}>
+                             --fvp ${FVP_BASER_AEMV8R})
+        endforeach()
+
+        add_custom_target(check-r52-fvp
+            COMMENT "Running every Cortex-R52 FVP image through the test runner..."
+        )
+        foreach(image IN LISTS R52_TEST_IMAGES)
+            add_custom_command(TARGET check-r52-fvp POST_BUILD
+                COMMAND ${Python3_EXECUTABLE} ${R52_RUNNER}
+                        --elf $<TARGET_FILE:${image}>
+                        --fvp ${FVP_BASER_AEMV8R}
+            )
+            add_dependencies(check-r52-fvp ${image})
+        endforeach()
+    else()
+        message(STATUS "Python3 not found; check-r52-fvp unavailable.")
+    endif()
 else()
     message(STATUS "FVP_BaseR_AEMv8R not found; FVP run targets unavailable.")
 endif()

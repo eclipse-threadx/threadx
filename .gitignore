@@ -28,3 +28,5 @@ CTestTestfile.cmake
 build_m7/
 .codex
 build_r52/
+__pycache__/
+*.pyc
