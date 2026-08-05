@@ -603,7 +603,7 @@ extern LARGE_INTEGER                            _tx_win32_time_stamp;
 
 
 #ifndef TX_WIN32_MEMORY_SIZE
-#define TX_WIN32_MEMORY_SIZE                    64000
+#define TX_WIN32_MEMORY_SIZE                    256000
 #endif
 
 VOID                                            _tx_win32_scheduler_wake(VOID);

@@ -550,7 +550,7 @@ VOID                                            _tx_win32_scheduler_wake(VOID);
 #endif
 
 #ifndef TX_WIN32_MEMORY_SIZE
-#define TX_WIN32_MEMORY_SIZE                    64000
+#define TX_WIN32_MEMORY_SIZE                    256000
 #endif
 
 #ifndef TX_TIMER_PERIODIC
