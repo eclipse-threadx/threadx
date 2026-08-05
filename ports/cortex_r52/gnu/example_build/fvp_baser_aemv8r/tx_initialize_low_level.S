@@ -51,10 +51,12 @@
 /*    here and no run-time stack-overlap check to perform -- the linker     */
 /*    guarantees the regions do not overlap.                              */
 /*                                                                        */
-/*    The periodic timer interrupt is NOT set up here yet: the generic     */
-/*    timer and GICv3 arrive in AR1/M3.  Cooperative scheduling (M2)       */
-/*    needs no tick, and creating one before the interrupt path exists     */
-/*    would only produce unhandled interrupts.                            */
+/*    When built with TX_R52_USE_THREADX_IRQ, board_init() brings up GICv3 */
+/*    and the generic timer tick here.  That is safe this early because    */
+/*    interrupts stay masked until _tx_thread_schedule enables them, so no */
+/*    tick can be delivered before the kernel is ready to take one.        */
+/*    Without that symbol (the M2 cooperative demo) no tick is created,    */
+/*    which keeps M2 free of any interrupt dependency.                     */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -82,5 +84,15 @@ _tx_initialize_low_level:
     bic     r0, r0, #7
     ldr     r1, =_tx_initialize_unused_memory
     str     r0, [r1]
+
+#ifdef TX_R52_USE_THREADX_IRQ
+
+    /* Bring up the interrupt controller and the periodic tick.  */
+
+    push    {lr}
+    bl      board_init
+    pop     {lr}
+
+#endif
 
     bx      lr

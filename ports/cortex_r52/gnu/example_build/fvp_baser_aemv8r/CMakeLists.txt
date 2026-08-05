@@ -50,6 +50,37 @@ target_link_options(demo_m2.elf PRIVATE
     -Wl,--no-warn-rwx-segments
 )
 
+# AR1/M3 -- periodic tick and preemptive scheduling.  Adds GICv3, the generic
+# timer and the ThreadX IRQ path.  TX_R52_USE_THREADX_IRQ routes the EL1 IRQ
+# vector into _tx_thread_context_save and has _tx_initialize_low_level bring up
+# the interrupt controller; images without it keep the fault reporter.
+add_executable(demo_m3.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${FVP_DIR}/console.c
+    ${FVP_DIR}/gicv3.c
+    ${FVP_DIR}/timer.c
+    ${FVP_DIR}/irq_dispatch.c
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_m3.c
+)
+
+target_compile_definitions(demo_m3.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+target_link_libraries(demo_m3.elf PRIVATE threadx)
+
+target_include_directories(demo_m3.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_m3.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_m3.map
+    -Wl,--no-warn-rwx-segments
+)
+
 # Run a target on the FVP.  Each image exits by itself through the
 # semihosting SYS_EXIT call, so no host-side timeout is needed.
 find_program(FVP_BASER_AEMV8R FVP_BaseR_AEMv8R
@@ -73,6 +104,8 @@ if(FVP_BASER_AEMV8R)
         "Running AR1/M1 boot check on FVP_BaseR_AEMv8R...")
     threadx_r52_add_fvp_run(demo_m2.elf run-demo-m2-r52
         "Running AR1/M2 cooperative switch demo on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_m3.elf run-demo-m3-r52
+        "Running AR1/M3 tick and preemption demo on FVP_BaseR_AEMv8R...")
 else()
     message(STATUS "FVP_BaseR_AEMv8R not found; FVP run targets unavailable.")
 endif()

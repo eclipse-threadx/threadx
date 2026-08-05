@@ -35,6 +35,8 @@
 /*                                                                        */
 /**************************************************************************/
 
+#include "platform.h"
+
     .arch   armv8-r
     .syntax unified
     .arm
@@ -63,6 +65,16 @@
     .equ    HCR_HCD,    (1 << 29)       /* HVC disable -- must be clear      */
 
     .equ    HCPTR_TCP,  (3 << 10)       /* trap EL1 access to CP10/CP11     */
+
+/* CNTHCTL: permit EL1/EL0 use of the physical counter and timer.  */
+
+    .equ    CNTHCTL_PL1PCTEN, (1 << 0)
+    .equ    CNTHCTL_PL1PCEN,  (1 << 1)
+
+/* ICC_HSRE: enable the GICv3 system-register interface for EL1.  */
+
+    .equ    ICC_HSRE_SRE,     (1 << 0)
+    .equ    ICC_HSRE_ENABLE,  (1 << 3)
 
     .equ    SYS_WRITE0, 0x04            /* semihosting: write NUL-string    */
 
@@ -120,7 +132,7 @@ el1_vectors:
     b       el1_trap_pabt                   /* 0x0C  prefetch abort         */
     b       el1_trap_dabt                   /* 0x10  data abort             */
     b       el1_trap_reserved               /* 0x14  reserved               */
-    b       el1_trap_irq                    /* 0x18  IRQ                    */
+    b       el1_irq_entry                   /* 0x18  IRQ                    */
     b       el1_trap_fiq                    /* 0x1C  FIQ                    */
 
     .text
@@ -167,6 +179,34 @@ _start:
     ldr     r1, =HCPTR_TCP
     bic     r0, r0, r1
     mcr     p15, 4, r0, c1, c1, 2
+    isb
+
+    /* Generic timer, part 1 of 2 (part 2 is timer_init at EL1).
+
+       CNTFRQ resets to ZERO on this model and is writable only at the
+       highest implemented exception level, so it must be programmed here at
+       EL2.  The value is CNTFID0 read back from the counter control frame.
+       Software that derived a tick interval from CNTFRQ without this would
+       divide by zero.  */
+
+    ldr     r0, =SYSTEM_COUNTER_HZ
+    mcr     p15, 0, r0, c14, c0, 0          /* CNTFRQ                       */
+
+    /* Permit EL1/EL0 to use the physical counter and the physical timer.
+       CNTHCTL.PL1PCTEN/PL1PCEN reset disabled, so without this every EL1
+       access to CNTPCT or CNTP_* would trap to EL2.  */
+
+    mrc     p15, 4, r0, c14, c1, 0          /* CNTHCTL                      */
+    orr     r0, r0, #(CNTHCTL_PL1PCTEN | CNTHCTL_PL1PCEN)
+    mcr     p15, 4, r0, c14, c1, 0
+    isb
+
+    /* Permit EL1 to reach the GICv3 CPU interface through its system
+       registers (ICC_*), which is how the R52 acknowledges interrupts.  */
+
+    mrc     p15, 4, r0, c12, c9, 5          /* ICC_HSRE                     */
+    orr     r0, r0, #(ICC_HSRE_SRE | ICC_HSRE_ENABLE)
+    mcr     p15, 4, r0, c12, c9, 5
     isb
 
     /* Progress marker: proves we reached EL2 and semihosting works.  */
@@ -238,6 +278,33 @@ _start_hang:
     b       _start_hang
 
 /**************************************************************************/
+/*  el1_irq_entry -- IRQ vector.                                          */
+/*                                                                        */
+/*  With ThreadX linked in, the IRQ vector branches straight into          */
+/*  _tx_thread_context_save, which saves the interrupted context and       */
+/*  branches back to __tx_irq_processing_return.  The branch must be a      */
+/*  plain B: context save adjusts lr itself to find the point of           */
+/*  interrupt.  Interrupts are still disabled on return from it.           */
+/*                                                                        */
+/*  Images that do not link ThreadX (the M1 boot check) keep the           */
+/*  self-identifying fault reporter instead.                              */
+/**************************************************************************/
+
+    .global el1_irq_entry
+    .type   el1_irq_entry, %function
+el1_irq_entry:
+#ifdef TX_R52_USE_THREADX_IRQ
+    b       _tx_thread_context_save
+
+    .global __tx_irq_processing_return
+__tx_irq_processing_return:
+    bl      board_irq_handler
+    b       _tx_thread_context_restore
+#else
+    FAULT_REPORT msg_el1_irq
+#endif
+
+/**************************************************************************/
 /*  el2_hyp_trap_entry -- the ZoneX (AR3) seam.                           */
 /*                                                                        */
 /*  Reached for every exception routed to EL2 from EL1/EL0, so the cause    */
@@ -294,7 +361,6 @@ el1_trap_svc:       FAULT_REPORT msg_el1_svc
 el1_trap_pabt:      FAULT_REPORT msg_el1_pabt
 el1_trap_dabt:      FAULT_REPORT msg_el1_dabt
 el1_trap_reserved:  FAULT_REPORT msg_el1_reserved
-el1_trap_irq:       FAULT_REPORT msg_el1_irq
 el1_trap_fiq:       FAULT_REPORT msg_el1_fiq
 
 fault_halt:         b       fault_halt
