@@ -32,3 +32,5 @@ __pycache__/
 *.pyc
 build_r52_vfp/
 build_r52_uart/
+build_r52_mpu/
+build_r52_all/

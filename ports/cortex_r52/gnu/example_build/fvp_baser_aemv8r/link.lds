@@ -39,6 +39,14 @@ MEMORY
 
 SECTIONS
 {
+    /* PMSAv8-R regions have a 64-byte granule and their limits are inclusive,
+       so the code and data areas are separated on a 64-byte boundary.  Without
+       this a single region would have to span both, forcing writable code or
+       executable data.  */
+
+    . = ALIGN(64);
+    __code_start__ = .;
+
     .text :
     {
         KEEP(*(.vectors_el2))
@@ -55,9 +63,24 @@ SECTIONS
         . = ALIGN(4);
     } > DRAM
 
-    .data :
+    /* Start the writable area on a protection-region granule.
+     *
+     * The alignment belongs on the output section itself.  Two things that
+     * look equivalent do not work: an assignment such as ". = ALIGN(64);"
+     * between sections does not advance a MEMORY region's allocation
+     * pointer, and ". = ALIGN(64);" at the end of .rodata does not extend
+     * that section when no data follows it.  In both cases .data keeps its
+     * unaligned address while __data_start__ reports the aligned one, so the
+     * first bytes of .data fall inside the read-only code region.  The MPU
+     * caught precisely that: writes to the two variables at the start of
+     * .data faulted, and since one of them is the flag the abort handler
+     * consults, the fault turned itself fatal.
+     */
+
+    .data ALIGN(64) :
     {
-        . = ALIGN(4);
+        __code_end__ = .;       /* code region ends where writable data begins */
+        __data_start__ = .;
         *(.data*)
         . = ALIGN(4);
     } > DRAM
@@ -109,4 +132,10 @@ SECTIONS
     . = ALIGN(8);
     _end = .;
     PROVIDE(end = .);
+
+    /* Writable area for the MPU: data, bss, stacks and the heap that
+       tx_application_define carves out of everything above _end.  */
+
+    . = ALIGN(64);
+    __data_end__ = . + 0x00100000;      /* 1 MB of heap beyond the image */
 }

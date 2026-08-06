@@ -311,6 +311,15 @@ bss_zero_loop:
     b       bss_zero_loop
 bss_zero_done:
 
+#ifdef TX_R52_ENABLE_MPU
+
+    /* Protection and caches on before any application code runs.  This is
+       after .bss is cleared because mpu_init keeps its region table there.  */
+
+    bl      mpu_init
+
+#endif
+
     bl      bsp_main
 
     /* bsp_main is not expected to return.  */
@@ -399,7 +408,35 @@ el1_trap_reset:     FAULT_REPORT msg_el1_reset
 el1_trap_undef:     FAULT_REPORT msg_el1_undef
 el1_trap_svc:       FAULT_REPORT msg_el1_svc
 el1_trap_pabt:      FAULT_REPORT msg_el1_pabt
-el1_trap_dabt:      FAULT_REPORT msg_el1_dabt
+
+/* Data abort.  Normally fatal and self-reporting, but the MPU self-test
+   needs to provoke a permission fault and carry on: without that, "the MPU
+   is enabled" is an unverified claim.  When mpu_expect_abort is non-zero the
+   fault is counted and execution resumes at the instruction *after* the one
+   that faulted.  On a data abort LR_abt holds the faulting address plus 8,
+   so returning to LR_abt-4 skips it, where LR_abt-8 would retry it forever.
+   Runs on the Abort-mode stack set up above.  */
+
+el1_trap_dabt:
+#ifdef TX_R52_MPU_FAULT_TEST
+    push    {r0, r1}
+    ldr     r0, =mpu_expect_abort
+    ldr     r1, [r0]
+    cmp     r1, #0
+    beq     el1_dabt_fatal
+    mov     r1, #0
+    str     r1, [r0]                        /* consume the expectation      */
+    ldr     r0, =mpu_abort_count
+    ldr     r1, [r0]
+    add     r1, r1, #1
+    str     r1, [r0]
+    dsb
+    pop     {r0, r1}
+    subs    pc, lr, #4                      /* resume after the fault       */
+el1_dabt_fatal:
+    pop     {r0, r1}
+#endif
+    FAULT_REPORT msg_el1_dabt
 el1_trap_reserved:  FAULT_REPORT msg_el1_reserved
 el1_trap_fiq:       FAULT_REPORT msg_el1_fiq
 
@@ -432,4 +469,14 @@ msg_el1_fiq:        .asciz  "[FAULT] EL1 FIQ (no handler yet)\n"
     .balign 4
     .global _hvc_call_count
 _hvc_call_count:
+    .word   0
+
+/* Used by the MPU enforcement self-test (see el1_trap_dabt).  */
+
+    .global mpu_expect_abort
+mpu_expect_abort:
+    .word   0
+
+    .global mpu_abort_count
+mpu_abort_count:
     .word   0

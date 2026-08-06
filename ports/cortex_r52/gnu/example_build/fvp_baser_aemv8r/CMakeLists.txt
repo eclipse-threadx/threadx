@@ -12,6 +12,7 @@ set(FVP_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(R52_CONSOLE_SOURCES
     ${FVP_DIR}/console.c
     ${FVP_DIR}/uart_pl011.c
+    ${FVP_DIR}/mpu.c
 )
 
 # AR1/M1 -- boot check.  Verifies the EL2 configuration, the drop to EL1 and
@@ -152,8 +153,49 @@ if(TX_R52_ENABLE_VFP)
     )
 endif()
 
+# AR1/M5 -- PMSAv8-R protection and caches.  Verifies enforcement, so it needs
+# the recoverable data-abort path in entry.S (TX_R52_MPU_FAULT_TEST) and the
+# protection itself (TX_R52_ENABLE_MPU), independently of the global option.
+add_executable(demo_mpu.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${R52_CONSOLE_SOURCES}
+    ${FVP_DIR}/gicv3.c
+    ${FVP_DIR}/timer.c
+    ${FVP_DIR}/irq_dispatch.c
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_mpu.c
+)
+
+target_compile_definitions(demo_mpu.elf PRIVATE
+    TX_R52_USE_THREADX_IRQ
+    TX_R52_ENABLE_MPU
+    TX_R52_MPU_FAULT_TEST
+)
+
+target_link_libraries(demo_mpu.elf PRIVATE threadx)
+
+target_include_directories(demo_mpu.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_mpu.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_mpu.map
+    -Wl,--no-warn-rwx-segments
+)
+
 # Every image built here, in the order they should be exercised.
-set(R52_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf)
+set(R52_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf demo_mpu.elf)
+
+# The linker script is passed with -T, which CMake does not treat as a
+# dependency, so editing it would not trigger a relink and stale images would
+# be tested against new region boundaries.  Declare it explicitly.
+foreach(image IN LISTS R52_IMAGES)
+    set_target_properties(${image} PROPERTIES LINK_DEPENDS ${FVP_DIR}/link.lds)
+endforeach()
 if(TX_R52_ENABLE_VFP)
     list(APPEND R52_IMAGES demo_m5.elf)
 endif()
@@ -161,6 +203,16 @@ endif()
 # Console backend.  Semihosting is the default because it needs no peripheral
 # and so cannot be broken by a wrong memory map; the PL011 path is what real
 # silicon will use.
+# Protection and caches for every image.  Off by default so a bring-up failure
+# can always be reproduced with the simplest possible memory configuration.
+option(TX_R52_ENABLE_MPU
+       "Enable the PMSAv8-R MPU and caches in every image" OFF)
+if(TX_R52_ENABLE_MPU)
+    foreach(image IN LISTS R52_IMAGES)
+        target_compile_definitions(${image} PRIVATE TX_R52_ENABLE_MPU)
+    endforeach()
+endif()
+
 option(TX_R52_CONSOLE_PL011
        "Use the PL011 UART for console output instead of semihosting" OFF)
 if(TX_R52_CONSOLE_PL011)
