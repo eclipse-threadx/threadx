@@ -50,6 +50,7 @@
 #include "console.h"
 
 #define DEMO_STACK_SIZE     2048
+#define FILEX_PTR_SENTINEL  ((void *) 0xF11EF11EUL)
 #define FP_ITERATIONS       50UL
 #define FP_STEP             0.5           /* exactly representable          */
 
@@ -125,9 +126,10 @@ static void thread_fp_busy_entry(ULONG thread_input)
 
 static void thread_check_entry(ULONG thread_input)
 {
-    UINT    failures = 0U;
-    ULONG   iteration;
-    ULONG   expected_steps;
+    UINT        failures = 0U;
+    ULONG       iteration;
+    ULONG       expected_steps;
+    TX_THREAD  *self;
 
     /* Eight live doubles held across a blocking call.  Eight is chosen so
        the compiler must use the callee-saved bank D8-D15 (or spill), which
@@ -143,6 +145,16 @@ static void thread_check_entry(ULONG thread_input)
     double h = 8.00390625;
 
     (void) thread_input;
+
+    /* Guard against the VFP enable flag aliasing another thread member.  The
+       flag is reached from assembly by hard-coded offset, and on the
+       Cortex-R4/R5 ports that offset lands on tx_thread_filex_ptr because
+       their TX_THREAD_EXTENSION_2 is empty.  Planting a sentinel here turns
+       that class of mistake into a visible failure rather than corruption
+       that only surfaces once FileX is added.  */
+
+    self = tx_thread_identify();
+    self->tx_thread_filex_ptr = FILEX_PTR_SENTINEL;
 
     tx_thread_vfp_enable();
 
@@ -202,6 +214,15 @@ static void thread_check_entry(ULONG thread_input)
                        (busy_iterations > 0UL) ? 1U : 0U);
     failures += report("[check] no FP corruption across interrupts         ",
                        (busy_corruptions == 0UL) ? 1U : 0U);
+
+    /* The VFP flag must not have aliased tx_thread_filex_ptr.  */
+
+    console_puts("[check] tx_thread_filex_ptr = ");
+    console_puthex((unsigned long) self->tx_thread_filex_ptr);
+    console_puts(" (expected 0xf11ef11e)\n");
+
+    failures += report("[check] VFP flag did not alias filex_ptr           ",
+                       (self->tx_thread_filex_ptr == FILEX_PTR_SENTINEL) ? 1U : 0U);
 
     if (failures == 0U)
     {
