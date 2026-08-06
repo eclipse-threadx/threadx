@@ -6,12 +6,20 @@
 
 set(FVP_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+# Console sources.  Both backends are always compiled; console.c selects one at
+# compile time and --gc-sections drops the unused one, which keeps every image
+# building in either configuration without per-target source juggling.
+set(R52_CONSOLE_SOURCES
+    ${FVP_DIR}/console.c
+    ${FVP_DIR}/uart_pl011.c
+)
+
 # AR1/M1 -- boot check.  Verifies the EL2 configuration, the drop to EL1 and
 # the EL2 HVC seam.  Standalone by design: it does not link ThreadX, so a
 # failure here is unambiguously a boot problem rather than a kernel problem.
 add_executable(boot_check.elf EXCLUDE_FROM_ALL
     ${FVP_DIR}/entry.S
-    ${FVP_DIR}/console.c
+    ${R52_CONSOLE_SOURCES}
     ${FVP_DIR}/bsp_boot.c
 )
 
@@ -30,7 +38,7 @@ target_link_options(boot_check.elf PRIVATE
 # ported context-switch assembly with no interrupts and no timer tick.
 add_executable(demo_m2.elf EXCLUDE_FROM_ALL
     ${FVP_DIR}/entry.S
-    ${FVP_DIR}/console.c
+    ${R52_CONSOLE_SOURCES}
     ${FVP_DIR}/tx_initialize_low_level.S
     ${FVP_DIR}/demo_m2.c
 )
@@ -56,7 +64,7 @@ target_link_options(demo_m2.elf PRIVATE
 # the interrupt controller; images without it keep the fault reporter.
 add_executable(demo_m3.elf EXCLUDE_FROM_ALL
     ${FVP_DIR}/entry.S
-    ${FVP_DIR}/console.c
+    ${R52_CONSOLE_SOURCES}
     ${FVP_DIR}/gicv3.c
     ${FVP_DIR}/timer.c
     ${FVP_DIR}/irq_dispatch.c
@@ -86,7 +94,7 @@ target_link_options(demo_m3.elf PRIVATE
 # into the verification harness, which lives in demo_verify.c.
 add_executable(demo_threadx.elf EXCLUDE_FROM_ALL
     ${FVP_DIR}/entry.S
-    ${FVP_DIR}/console.c
+    ${R52_CONSOLE_SOURCES}
     ${FVP_DIR}/gicv3.c
     ${FVP_DIR}/timer.c
     ${FVP_DIR}/irq_dispatch.c
@@ -118,7 +126,7 @@ target_link_options(demo_threadx.elf PRIVATE
 if(TX_R52_ENABLE_VFP)
     add_executable(demo_m5.elf EXCLUDE_FROM_ALL
         ${FVP_DIR}/entry.S
-        ${FVP_DIR}/console.c
+        ${R52_CONSOLE_SOURCES}
         ${FVP_DIR}/gicv3.c
         ${FVP_DIR}/timer.c
         ${FVP_DIR}/irq_dispatch.c
@@ -144,8 +152,27 @@ if(TX_R52_ENABLE_VFP)
     )
 endif()
 
+# Every image built here, in the order they should be exercised.
+set(R52_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf)
+if(TX_R52_ENABLE_VFP)
+    list(APPEND R52_IMAGES demo_m5.elf)
+endif()
+
+# Console backend.  Semihosting is the default because it needs no peripheral
+# and so cannot be broken by a wrong memory map; the PL011 path is what real
+# silicon will use.
+option(TX_R52_CONSOLE_PL011
+       "Use the PL011 UART for console output instead of semihosting" OFF)
+if(TX_R52_CONSOLE_PL011)
+    foreach(image IN LISTS R52_IMAGES)
+        target_compile_definitions(${image} PRIVATE TX_R52_CONSOLE_PL011)
+    endforeach()
+endif()
+
 # Run a target on the FVP.  Each image exits by itself through the
-# semihosting SYS_EXIT call, so no host-side timeout is needed.
+# semihosting SYS_EXIT call, so no host-side timeout is needed.  UART0 is
+# routed to stdout unconditionally so that PL011-console images are visible
+# too; it is harmless for semihosting images.
 find_program(FVP_BASER_AEMV8R FVP_BaseR_AEMv8R
     HINTS $ENV{HOME}/FVP_Base_AEMv8R_11.32_19/bin
 )
@@ -156,6 +183,8 @@ if(FVP_BASER_AEMV8R)
                     -C cluster0.NUM_CORES=1
                     -C bp.vis.disable_visualisation=1
                     -C bp.terminal_0.start_telnet=0
+                    -C bp.pl011_uart0.out_file=-
+                    -C bp.pl011_uart0.unbuffered_output=1
                     -a $<TARGET_FILE:${target_name}>
             DEPENDS ${target_name}
             USES_TERMINAL
@@ -179,10 +208,7 @@ if(FVP_BASER_AEMV8R)
     find_package(Python3 COMPONENTS Interpreter)
     if(Python3_FOUND)
         set(R52_RUNNER ${FVP_DIR}/test/run_fvp_test.py)
-        set(R52_TEST_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf)
-        if(TX_R52_ENABLE_VFP)
-            list(APPEND R52_TEST_IMAGES demo_m5.elf)
-        endif()
+        set(R52_TEST_IMAGES ${R52_IMAGES})
 
         enable_testing()
         foreach(image IN LISTS R52_TEST_IMAGES)

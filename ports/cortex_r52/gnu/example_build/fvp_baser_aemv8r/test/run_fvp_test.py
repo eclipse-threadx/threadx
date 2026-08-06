@@ -46,6 +46,10 @@ def run(elf, fvp, timeout):
         "-C", "cluster0.NUM_CORES=1",
         "-C", "bp.vis.disable_visualisation=1",
         "-C", "bp.terminal_0.start_telnet=0",
+        # Route UART0 to stdout so PL011-console images are captured too.
+        # Harmless for semihosting images, which do not touch the UART.
+        "-C", "bp.pl011_uart0.out_file=-",
+        "-C", "bp.pl011_uart0.unbuffered_output=1",
         "-a", elf,
     ]
 

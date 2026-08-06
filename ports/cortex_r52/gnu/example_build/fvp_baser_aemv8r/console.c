@@ -39,6 +39,10 @@
 
 #include "console.h"
 
+#ifdef TX_R52_CONSOLE_PL011
+#include "uart_pl011.h"
+#endif
+
 /* Semihosting operation numbers (Arm semihosting specification).  */
 
 #define SYS_WRITE0      0x04U
@@ -82,10 +86,32 @@ static int semihost_call(int operation, const void *argument_ptr)
 
 void console_puts(const char *string_ptr)
 {
-    if (string_ptr != 0)
+    if (string_ptr == 0)
     {
-        (void) semihost_call((int) SYS_WRITE0, string_ptr);
+        return;
     }
+
+#ifdef TX_R52_CONSOLE_PL011
+
+    /* Initialise on first use rather than from board_init, so that images
+       with no ThreadX initialisation path (the M1 boot check) also get a
+       working UART console.  */
+
+    static unsigned int initialised = 0U;
+
+    if (initialised == 0U)
+    {
+        pl011_init();
+        initialised = 1U;
+    }
+
+    pl011_puts(string_ptr);
+
+#else
+
+    (void) semihost_call((int) SYS_WRITE0, string_ptr);
+
+#endif
 }
 
 
@@ -118,6 +144,10 @@ void console_puthex(unsigned long value)
 /**************************************************************************/
 /*  console_exit                                                          */
 /**************************************************************************/
+
+/* Note this always uses semihosting, even with the PL011 console selected:
+   SYS_EXIT is how the model is told to stop, which is a debug-channel
+   operation rather than console output.  */
 
 void console_exit(unsigned int status)
 {

@@ -31,3 +31,4 @@ build_r52/
 __pycache__/
 *.pyc
 build_r52_vfp/
+build_r52_uart/
