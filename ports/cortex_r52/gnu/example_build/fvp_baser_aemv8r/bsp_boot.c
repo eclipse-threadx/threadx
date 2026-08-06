@@ -37,6 +37,7 @@
 /*                                                                        */
 /**************************************************************************/
 
+#include "board.h"
 #include "console.h"
 
 /* AArch32 CPSR mode field encodings.  */
@@ -47,7 +48,6 @@
 
 /* Incremented by the EL2 HVC handler in entry.S.  */
 
-extern volatile unsigned long _hvc_call_count;
 
 
 /**************************************************************************/

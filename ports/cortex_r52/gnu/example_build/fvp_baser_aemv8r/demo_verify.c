@@ -38,6 +38,7 @@
 /**************************************************************************/
 
 #include "tx_api.h"
+#include "board.h"
 #include "console.h"
 #include "demo_verify.h"
 

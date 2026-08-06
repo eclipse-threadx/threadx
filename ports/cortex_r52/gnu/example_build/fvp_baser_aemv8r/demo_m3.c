@@ -43,6 +43,7 @@
 /**************************************************************************/
 
 #include "tx_api.h"
+#include "board.h"
 #include "console.h"
 #include "timer.h"
 
@@ -60,10 +61,6 @@ static volatile ULONG   busy_counter;
 
 /* Recorded by the interrupt dispatcher.  */
 
-extern volatile unsigned long   board_irq_count;
-extern volatile unsigned long   board_timer_intid;
-extern volatile unsigned long   board_spurious_count;
-extern volatile unsigned long   board_unexpected_intid;
 
 
 /**************************************************************************/

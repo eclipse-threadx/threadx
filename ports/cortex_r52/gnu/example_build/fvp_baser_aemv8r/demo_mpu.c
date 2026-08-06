@@ -34,6 +34,7 @@
 /**************************************************************************/
 
 #include "tx_api.h"
+#include "board.h"
 #include "console.h"
 #include "mpu.h"
 
@@ -44,8 +45,6 @@ static ULONG        thread_check_stack[DEMO_STACK_SIZE / sizeof(ULONG)];
 
 /* Provided by entry.S and manipulated by its data-abort handler.  */
 
-extern volatile unsigned long   mpu_expect_abort;
-extern volatile unsigned long   mpu_abort_count;
 
 /* A known-writable location, used to show legal access still works.  */
 

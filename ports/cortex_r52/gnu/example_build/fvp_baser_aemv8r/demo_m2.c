@@ -39,6 +39,7 @@
 /**************************************************************************/
 
 #include "tx_api.h"
+#include "board.h"
 #include "console.h"
 
 #define DEMO_STACK_SIZE     2048

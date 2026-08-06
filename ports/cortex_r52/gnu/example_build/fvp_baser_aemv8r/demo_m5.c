@@ -44,9 +44,20 @@
 /*    so forgetting the call would show up as corruption rather than as a   */
 /*    build error.                                                        */
 /*                                                                        */
+/*  MISRA C:2012 / warning deviations (justified)                           */
+/*                                                                        */
+/*    Rule 13.3 style equality on floating point (-Wfloat-equal)            */
+/*      -- exact comparison is the point of this test, not an oversight.     */
+/*      Every constant is an exact binary fraction and every operation is    */
+/*      an addition of 0.5, so the arithmetic is exact and the expected      */
+/*      results are representable.  A tolerance-based comparison would mask   */
+/*      precisely the corruption being looked for: a restored register that   */
+/*      is close but wrong would pass.  Confined to this test file.          */
+/*                                                                        */
 /**************************************************************************/
 
 #include "tx_api.h"
+#include "board.h"
 #include "console.h"
 
 #define DEMO_STACK_SIZE     2048
