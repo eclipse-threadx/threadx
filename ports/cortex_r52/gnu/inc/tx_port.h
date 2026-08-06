@@ -182,9 +182,22 @@ typedef unsigned short                          USHORT;
    for the multiple macros is so that backward compatibility can be maintained with
    existing ThreadX kernel awareness modules.  */
 
+/* TX_THREAD_EXTENSION_2 carries the per-thread VFP enable flag used by the
+   lazy floating-point save and restore in tx_thread_schedule.S,
+   tx_thread_system_return.S and tx_thread_context_restore.S.
+
+   It is defined UNCONDITIONALLY, not under TX_ENABLE_VFP_SUPPORT, and that is
+   deliberate: the assembly reaches this field through a hard-coded structure
+   offset, so making the field conditional would move every following member
+   between build configurations and leave the offset correct in only one of
+   them.  Keeping it always present makes the layout independent of the
+   floating-point build options.  The offset is checked at compile time in
+   tx_port_offset_check.c, which turns a wrong offset into a build failure
+   instead of silent corruption of an unrelated thread field.  */
+
 #define TX_THREAD_EXTENSION_0
 #define TX_THREAD_EXTENSION_1
-#define TX_THREAD_EXTENSION_2
+#define TX_THREAD_EXTENSION_2                   ULONG       tx_thread_vfp_enable;
 #define TX_THREAD_EXTENSION_3
 
 
@@ -260,6 +273,17 @@ typedef unsigned short                          USHORT;
    present prior to the disable macro.  In most cases, the save area macro
    is used to define a local function save area for the disable and restore
    macros.  */
+
+/* Per-thread floating-point control.  Implemented in tx_thread_schedule.S and
+   available only when the library is built with TX_ENABLE_VFP_SUPPORT.  A
+   thread's floating-point context is saved and restored lazily: only threads
+   that have called tx_thread_vfp_enable() pay for it.  */
+
+#ifdef TX_ENABLE_VFP_SUPPORT
+void    tx_thread_vfp_enable(void);
+void    tx_thread_vfp_disable(void);
+#endif
+
 
 #ifdef __thumb__
 

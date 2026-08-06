@@ -112,6 +112,38 @@ target_link_options(demo_threadx.elf PRIVATE
     -Wl,--no-warn-rwx-segments
 )
 
+# AR1/M5 -- lazy VFP context save and restore.  Only meaningful when the
+# library was built with TX_R52_ENABLE_VFP and a floating-point ABI, so the
+# target exists only in that configuration.
+if(TX_R52_ENABLE_VFP)
+    add_executable(demo_m5.elf EXCLUDE_FROM_ALL
+        ${FVP_DIR}/entry.S
+        ${FVP_DIR}/console.c
+        ${FVP_DIR}/gicv3.c
+        ${FVP_DIR}/timer.c
+        ${FVP_DIR}/irq_dispatch.c
+        ${FVP_DIR}/tx_initialize_low_level.S
+        ${FVP_DIR}/demo_m5.c
+    )
+
+    target_compile_definitions(demo_m5.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+    target_link_libraries(demo_m5.elf PRIVATE threadx)
+
+    target_include_directories(demo_m5.elf PRIVATE
+        ${FVP_DIR}
+        ${CMAKE_SOURCE_DIR}/common/inc
+        ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+    )
+
+    target_link_options(demo_m5.elf PRIVATE
+        -T${FVP_DIR}/link.lds
+        -nostartfiles
+        -Wl,-Map=demo_m5.map
+        -Wl,--no-warn-rwx-segments
+    )
+endif()
+
 # Run a target on the FVP.  Each image exits by itself through the
 # semihosting SYS_EXIT call, so no host-side timeout is needed.
 find_program(FVP_BASER_AEMV8R FVP_BaseR_AEMv8R
@@ -148,6 +180,9 @@ if(FVP_BASER_AEMV8R)
     if(Python3_FOUND)
         set(R52_RUNNER ${FVP_DIR}/test/run_fvp_test.py)
         set(R52_TEST_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf)
+        if(TX_R52_ENABLE_VFP)
+            list(APPEND R52_TEST_IMAGES demo_m5.elf)
+        endif()
 
         enable_testing()
         foreach(image IN LISTS R52_TEST_IMAGES)

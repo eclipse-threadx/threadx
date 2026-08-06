@@ -76,6 +76,13 @@
     .equ    ICC_HSRE_SRE,     (1 << 0)
     .equ    ICC_HSRE_ENABLE,  (1 << 3)
 
+/* CPACR grants EL1/EL0 access to CP10 and CP11 (the floating-point unit);
+   FPEXC.EN then enables floating-point execution.  */
+
+    .equ    CPACR_CP10,       (3 << 20)
+    .equ    CPACR_CP11,       (3 << 22)
+    .equ    FPEXC_EN,         (1 << 30)
+
     .equ    SYS_WRITE0, 0x04            /* semihosting: write NUL-string    */
 
 /* HSR (Hyp Syndrome Register) exception classes.  Every exception taken to
@@ -258,6 +265,39 @@ el1_entry:
     ldr     sp, =__sys_stack_top
     cps     #MODE_SVC
     ldr     sp, =__svc_stack_top
+
+#ifdef __ARM_FP
+
+    /* Enable the floating-point unit for EL1.
+     *
+     * Two separate gates must be opened and both reset closed:
+     *   CPACR   grants EL1/EL0 access to CP10/CP11.  It reads 0 out of reset,
+     *           so the first floating-point instruction would otherwise raise
+     *           an Undefined Instruction exception.
+     *   FPEXC   .EN enables floating-point execution itself.
+     * EL2 has already cleared HCPTR.TCP10/TCP11 so neither access traps to EL2.
+     *
+     * This is a BSP responsibility, not the kernel's: tx_thread_vfp_enable()
+     * only sets the per-thread software flag that makes the context switch
+     * save and restore floating-point state.  It does not turn the hardware
+     * on, so without the code below a VFP-enabled build faults on its first
+     * context switch that touches D-registers.
+     *
+     * Guarded by __ARM_FP, which the compiler defines exactly when the build
+     * can emit floating-point instructions.  In a soft-float build "vmsr
+     * fpexc" is not even assemblable for this target.
+     */
+
+    mrc     p15, 0, r0, c1, c0, 2           /* CPACR                        */
+    orr     r0, r0, #(CPACR_CP10 | CPACR_CP11)
+    mcr     p15, 0, r0, c1, c0, 2
+    isb
+
+    mov     r0, #FPEXC_EN
+    vmsr    fpexc, r0
+    isb
+
+#endif
 
     /* Zero .bss before any C code runs.  */
 

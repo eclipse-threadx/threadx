@@ -21,6 +21,7 @@ target_sources(${PROJECT_NAME}
     ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_system_return.S
     ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_vectored_context_save.S
     ${CMAKE_CURRENT_LIST_DIR}/src/tx_timer_interrupt.S
+    ${CMAKE_CURRENT_LIST_DIR}/src/tx_port_offset_check.c
     # {{END_TARGET_SOURCES}}
 )
 
@@ -28,6 +29,45 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/inc
 )
+
+# Lazy floating-point context save and restore.  PUBLIC because the assembly
+# in the library and the application must agree: the flag changes which
+# registers the context switch saves, so a mismatched application would either
+# lose floating-point state or misread the thread control block.  Requires a
+# floating-point ABI, so pair it with -DTX_R52_FLOAT_ABI=hard.
+option(TX_R52_ENABLE_VFP "Build with lazy VFP context save/restore" OFF)
+
+# FIQ support and interrupt nesting.  These change which registers the
+# assembly saves and what tx_port.h reports in TX_PORT_SPECIFIC_BUILD_OPTIONS,
+# so like the VFP flag they must be PUBLIC: library and application have to
+# agree.  FIQ nesting additionally requires FIQ support.
+option(TX_R52_ENABLE_FIQ "Build with FIQ support" OFF)
+option(TX_R52_ENABLE_IRQ_NESTING "Build with nested IRQ support" OFF)
+option(TX_R52_ENABLE_FIQ_NESTING "Build with nested FIQ support" OFF)
+
+if(TX_R52_ENABLE_FIQ)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC TX_ENABLE_FIQ_SUPPORT)
+endif()
+if(TX_R52_ENABLE_IRQ_NESTING)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC TX_ENABLE_IRQ_NESTING)
+endif()
+if(TX_R52_ENABLE_FIQ_NESTING)
+    if(NOT TX_R52_ENABLE_FIQ)
+        message(FATAL_ERROR
+            "TX_R52_ENABLE_FIQ_NESTING requires TX_R52_ENABLE_FIQ: nested FIQ "
+            "handling is meaningless without FIQ support compiled in.")
+    endif()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC TX_ENABLE_FIQ_NESTING)
+endif()
+if(TX_R52_ENABLE_VFP)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC TX_ENABLE_VFP_SUPPORT)
+    if(NOT TX_R52_FLOAT_ABI STREQUAL "hard")
+        message(WARNING
+            "TX_R52_ENABLE_VFP is on but TX_R52_FLOAT_ABI is '${TX_R52_FLOAT_ABI}'. "
+            "The compiler will not emit floating-point instructions, so the VFP "
+            "context path will never be exercised. Use -DTX_R52_FLOAT_ABI=hard.")
+    endif()
+endif()
 
 # Armv8-R AEM FVP example builds (boot check now, kernel demo from AR1/M2).
 # Off by default so the default build stays a pure static-library build.
