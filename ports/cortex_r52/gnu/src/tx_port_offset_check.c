@@ -29,6 +29,10 @@
 /*                                                                        */
 /*    tx_port_offset_check.c                           Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Compile-time verification of the TX_THREAD structure offsets that   */

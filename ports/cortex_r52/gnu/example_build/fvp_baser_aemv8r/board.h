@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    board.h                                          Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Declarations for the objects that cross the C/assembly boundary in  */

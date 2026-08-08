@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    uart_pl011.h                                     Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    PL011 UART console backend for the Armv8-R AEM FVP.                 */

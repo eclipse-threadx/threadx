@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    console.c                                        Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Semihosting console for the Armv8-R AEM FVP.  Armv8 AArch32 uses    */

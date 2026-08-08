@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    entry.S                                          Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Reset entry for Cortex-R52 (Armv8-R, AArch32) on the Armv8-R AEM    */

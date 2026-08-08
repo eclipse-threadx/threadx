@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    console.h                                        Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Minimal console for the Armv8-R AEM FVP.  Backed by semihosting so  */

@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    timer.h                                          Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Arm generic timer tick for Cortex-R52.                              */

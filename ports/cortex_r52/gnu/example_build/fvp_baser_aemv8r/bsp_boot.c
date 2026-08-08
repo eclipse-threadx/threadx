@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    bsp_boot.c                                       Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    AR1 milestone M1 boot check.  Verifies that the reset path really   */

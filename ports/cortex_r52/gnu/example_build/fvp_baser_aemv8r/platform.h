@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    platform.h                                       Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Memory map for the Armv8-R AEM FVP (BaseR platform).                */

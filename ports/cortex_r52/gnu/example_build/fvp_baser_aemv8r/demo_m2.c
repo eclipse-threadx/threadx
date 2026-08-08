@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    demo_m2.c                                        Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    AR1 milestone M2: two threads switching cooperatively, with no      */

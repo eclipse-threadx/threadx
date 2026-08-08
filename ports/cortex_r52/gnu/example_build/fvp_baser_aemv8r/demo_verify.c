@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    demo_verify.c                                    Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    AR1 milestone M4: verifies that the standard eight-thread ThreadX   */

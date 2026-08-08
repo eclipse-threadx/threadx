@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    mpu.c                                            Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    PMSAv8-R memory protection and cache enable for Cortex-R52.         */

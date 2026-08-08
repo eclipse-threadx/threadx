@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    demo_m3.c                                        Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    AR1 milestone M3: periodic tick and preemptive scheduling.  This    */

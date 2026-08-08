@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    gicv3.h                                          Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    GICv3 interrupt controller for Cortex-R52.  The CPU interface is    */

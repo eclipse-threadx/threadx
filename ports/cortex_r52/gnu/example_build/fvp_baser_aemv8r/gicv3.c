@@ -19,6 +19,10 @@
 /*                                                                        */
 /*    gicv3.c                                          Cortex-R52/GNU     */
 /*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    GICv3 bring-up for Cortex-R52 on the Armv8-R AEM FVP.               */
