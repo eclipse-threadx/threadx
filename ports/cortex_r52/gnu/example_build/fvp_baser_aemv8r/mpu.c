@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,26 +18,26 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    mpu.c                                            Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    PMSAv8-R memory protection and cache enable for Cortex-R52.          */
+/*    PMSAv8-R memory protection and cache enable for Cortex-R52.         */
 /*                                                                        */
-/*    Register model (AArch32): a region is selected through PRSELR and    */
-/*    then described by PRBAR (base, shareability, access permission,      */
-/*    execute-never) and PRLAR (inclusive limit, attribute index, enable). */
-/*    Both addresses have a 64-byte granule, so the low six bits of each   */
-/*    register hold attributes rather than address.  Memory types come     */
-/*    from MAIR through the attribute index, not from the region itself.   */
+/*    Register model (AArch32): a region is selected through PRSELR and   */
+/*    then described by PRBAR (base, shareability, access permission,     */
+/*    execute-never) and PRLAR (inclusive limit, attribute index, enable).*/
+/*    Both addresses have a 64-byte granule, so the low six bits of each  */
+/*    register hold attributes rather than address.  Memory types come    */
+/*    from MAIR through the attribute index, not from the region itself.  */
 /*                                                                        */
-/*    Caches are invalidated before being enabled.  On this model they     */
-/*    come out of reset invalid, but silicon does not guarantee that, and   */
-/*    this code is meant to be the template the S32Z280 port starts from.  */
+/*    Caches are invalidated before being enabled.  On this model they    */
+/*    come out of reset invalid, but silicon does not guarantee that, and */
+/*    this code is meant to be the template the S32Z280 port starts from. */
 /*                                                                        */
-/*  MISRA C:2012 deviations (justified)                                    */
+/*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 -- the MPU, MAIR, SCTLR and cache maintenance are only  */
-/*      reachable through CP15; every access is encapsulated in a one-line  */
+/*    Directive 4.3 -- the MPU, MAIR, SCTLR and cache maintenance are only*/
+/*      reachable through CP15; every access is encapsulated in a one-line*/
 /*      accessor below.                                                   */
 /*                                                                        */
 /**************************************************************************/
@@ -45,7 +45,7 @@
 #include "platform.h"
 #include "mpu.h"
 
-/* SCTLR bits.  */
+/* SCTLR bits.                                                            */
 
 #define SCTLR_M             (1UL << 0)      /* MPU enable                  */
 #define SCTLR_C             (1UL << 2)      /* data cache enable           */
@@ -57,7 +57,7 @@
 #define MAIR_ATTR_NORMAL_WB 0xFFUL
 #define MAIR_ATTR_DEVICE    0x00UL
 
-/* Boundaries supplied by the linker script, all 64-byte aligned.  */
+/* Boundaries supplied by the linker script, all 64-byte aligned.         */
 
 extern char __code_start__;
 extern char __code_end__;
@@ -68,11 +68,11 @@ extern char __data_end__;
 /**************************************************************************/
 /*  The region table.                                                     */
 /*                                                                        */
-/*  Deliberately minimal and readable: code is read-only and executable,   */
-/*  everything writable is non-executable, and the peripheral half of the  */
-/*  address map is Device.  A write-protected code region is the point --   */
-/*  it is what makes the MPU do something observable, and AR2 extends the  */
-/*  same table with per-module regions.                                    */
+/*  Deliberately minimal and readable: code is read-only and executable,  */
+/*  everything writable is non-executable, and the peripheral half of the */
+/*  address map is Device.  A write-protected code region is the point -- */
+/*  it is what makes the MPU do something observable, and AR2 extends the */
+/*  same table with per-module regions.                                   */
 /**************************************************************************/
 
 static MPU_REGION mpu_regions[3];

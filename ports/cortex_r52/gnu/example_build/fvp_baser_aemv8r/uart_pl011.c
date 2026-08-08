@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,35 +18,35 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    uart_pl011.c                                     Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    PL011 UART output for the Armv8-R AEM FVP, used as the console when  */
-/*    the image is built with TX_R52_CONSOLE_PL011.                        */
+/*    PL011 UART output for the Armv8-R AEM FVP, used as the console when */
+/*    the image is built with TX_R52_CONSOLE_PL011.                       */
 /*                                                                        */
-/*    Semihosting remains the default because it needs no peripheral at    */
-/*    all, which keeps early bring-up independent of the memory map.  The  */
-/*    UART matters because it is what real silicon will use: exercising it  */
-/*    here means the S32Z280 console differs only in its base address and  */
-/*    clocking, not in structure.                                          */
+/*    Semihosting remains the default because it needs no peripheral at   */
+/*    all, which keeps early bring-up independent of the memory map.  The */
+/*    UART matters because it is what real silicon will use: exercising it*/
+/*    here means the S32Z280 console differs only in its base address and */
+/*    clocking, not in structure.                                         */
 /*                                                                        */
-/*    The model leaves UART0 disabled at reset                              */
-/*    (bp.pl011_uart0.uart_enable=0), so the control register must be      */
-/*    written before the first character.  Baud rate is left alone: the    */
-/*    model does not emulate serial timing, and inventing a divisor here    */
-/*    would only be misleading.                                            */
+/*    The model leaves UART0 disabled at reset                            */
+/*    (bp.pl011_uart0.uart_enable=0), so the control register must be     */
+/*    written before the first character.  Baud rate is left alone: the   */
+/*    model does not emulate serial timing, and inventing a divisor here  */
+/*    would only be misleading.                                           */
 /*                                                                        */
-/*  MISRA C:2012 deviations (justified)                                    */
+/*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Rule 11.4/11.6 -- casting an integer address to a volatile pointer is  */
-/*      inherent to memory-mapped device access; confined to REG32.        */
+/*    Rule 11.4/11.6 -- casting integer addresses to volatile pointers is */
+/*      inherent to memory-mapped device access; confined to REG32.       */
 /*                                                                        */
 /**************************************************************************/
 
 #include "platform.h"
 #include "uart_pl011.h"
 
-/* PL011 register offsets.  */
+/* PL011 register offsets.                                                */
 
 #define UART_DR         0x000U          /* data                             */
 #define UART_FR         0x018U          /* flags                            */

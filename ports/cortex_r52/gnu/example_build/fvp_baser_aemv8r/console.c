@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,22 +18,22 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    console.c                                        Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Semihosting console for the Armv8-R AEM FVP.  Armv8 AArch32 uses     */
-/*    HLT 0xF000 as the semihosting trap; the model implements it with no  */
-/*    peripheral configuration, which keeps early bring-up independent of  */
+/*    Semihosting console for the Armv8-R AEM FVP.  Armv8 AArch32 uses    */
+/*    HLT 0xF000 as the semihosting trap; the model implements it with no */
+/*    peripheral configuration, which keeps early bring-up independent of */
 /*    the platform memory map.                                            */
 /*                                                                        */
-/*  MISRA C:2012 deviations (justified)                                    */
+/*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 (assembly language shall be encapsulated and isolated) */
-/*      -- observed rather than violated: the single asm statement lives    */
-/*      in semihost_call() and nowhere else in the port.                   */
-/*    Rule 1.1 / 1.2 (language extensions)                                 */
-/*      -- register-asm bindings and inline assembly are unavoidable to    */
-/*      invoke a semihosting trap; no standard C construct expresses it.   */
+/*    Directive 4.3 (assembly language shall be encapsulated and isolated)*/
+/*      -- observed rather than violated: the single asm statement lives  */
+/*      in semihost_call() and nowhere else in the port.                  */
+/*    Rule 1.1 / 1.2 (language extensions)                                */
+/*      -- register-asm bindings and inline assembly are unavoidable to   */
+/*      invoke a semihosting trap; no standard C construct expresses it.  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -43,7 +43,7 @@
 #include "uart_pl011.h"
 #endif
 
-/* Semihosting operation numbers (Arm semihosting specification).  */
+/* Semihosting operation numbers (Arm semihosting specification).         */
 
 #define SYS_WRITE0      0x04U
 #define SYS_EXIT        0x18U
@@ -54,7 +54,7 @@
 #define ADP_STOPPED_APPLICATION_EXIT    0x20026U
 #define ADP_STOPPED_RUN_TIME_ERROR      0x20023U
 
-/* Number of hexadecimal digits in a 32-bit value.  */
+/* Number of hexadecimal digits in a 32-bit value.                        */
 
 #define HEX_DIGITS      8U
 
@@ -62,7 +62,7 @@
 /**************************************************************************/
 /*  semihost_call                                                         */
 /*                                                                        */
-/*  Issues a single semihosting operation.  This is the only assembly in   */
+/*  Issues a single semihosting operation.  This is the only assembly in  */
 /*  the console driver (MISRA C:2012 Dir 4.3).                            */
 /**************************************************************************/
 

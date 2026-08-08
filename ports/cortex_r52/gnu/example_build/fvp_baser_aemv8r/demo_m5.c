@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,41 +18,42 @@
 /*  DEMONSTRATION                                          RELEASE        */
 /*                                                                        */
 /*    demo_m5.c                                        Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M5: lazy floating-point context save and restore.      */
+/*    AR1 milestone M5: lazy floating-point context save and restore.     */
 /*                                                                        */
-/*    Two paths must be covered, and they use different register sets:     */
+/*    Two paths must be covered, and they use different register sets:    */
 /*                                                                        */
-/*      solicited  tx_thread_system_return saves D8-D15 and FPSCR, because */
-/*                 the callee-saved half is all a voluntary switch can      */
-/*                 lose.  Exercised by the checking thread, which keeps     */
-/*                 eight doubles live across tx_thread_sleep.              */
-/*      interrupt  tx_thread_context_restore restores D0-D15 and FPSCR,     */
-/*                 because an asynchronous interrupt can land anywhere.     */
-/*                 Exercised by a lower-priority thread doing continuous    */
-/*                 floating-point work while the tick fires into it.        */
+/*      solicited  tx_thread_system_return saves D8-D15 and FPSCR, because*/
+/*                 the callee-saved half is all a voluntary switch can    */
+/*                 lose.  Exercised by the checking thread, which keeps   */
+/*                 eight doubles live across tx_thread_sleep.             */
+/*      interrupt  tx_thread_context_restore restores D0-D15 and FPSCR,   */
+/*                 because an asynchronous interrupt can land anywhere.   */
+/*                 Exercised by a lower-priority thread doing continuous  */
+/*                 floating-point work while the tick fires into it.      */
 /*                                                                        */
-/*    Every constant is an exact binary fraction, so the comparisons are    */
-/*    exact and a single corrupted register shows up as a mismatch rather   */
-/*    than as rounding noise.  The two threads use disjoint value ranges,   */
-/*    so leakage from one context into the other is also caught.            */
+/*    Every constant is an exact binary fraction, so the comparisons are  */
+/*    exact and a single corrupted register shows up as a mismatch rather */
+/*    than as rounding noise.  The two threads use disjoint value ranges, */
+/*    so leakage from one context into the other is also caught.          */
 /*                                                                        */
-/*    Both threads call tx_thread_vfp_enable(): with lazy save/restore, a   */
-/*    thread that has not asked for floating-point support does not get it, */
-/*    so forgetting the call would show up as corruption rather than as a   */
-/*    build error.                                                        */
+/*    Both threads call tx_thread_vfp_enable(): with lazy save/restore, a */
+/*    thread that has not asked for floating-point support does not get   */
+/*    it, so forgetting the call would show up as corruption rather than  */
+/*    as a build error.                                                   */
 /*                                                                        */
-/*  MISRA C:2012 / warning deviations (justified)                           */
+/*  MISRA C:2012 / warning deviations (justified)                         */
 /*                                                                        */
-/*    Rule 13.3 style equality on floating point (-Wfloat-equal)            */
-/*      -- exact comparison is the point of this test, not an oversight.     */
-/*      Every constant is an exact binary fraction and every operation is    */
-/*      an addition of 0.5, so the arithmetic is exact and the expected      */
-/*      results are representable.  A tolerance-based comparison would mask   */
-/*      precisely the corruption being looked for: a restored register that   */
-/*      is close but wrong would pass.  Confined to this test file.          */
+/*    Rule 13.3 style equality on floating point (-Wfloat-equal)          */
+/*      -- exact comparison is the point of this test, not an oversight.  */
+/*      Every constant is an exact binary fraction and every operation is */
+/*      an addition of 0.5, so the arithmetic is exact and the expected   */
+/*      results are representable.  A tolerance-based comparison would    */
+/*      mask precisely the corruption being looked for: a restored        */
+/*      register that is close but wrong would pass.  Confined to this    */
+/*      test file.                                                        */
 /*                                                                        */
 /**************************************************************************/
 
@@ -71,7 +72,7 @@ static TX_THREAD    thread_fp_busy;
 static ULONG        thread_check_stack[DEMO_STACK_SIZE / sizeof(ULONG)];
 static ULONG        thread_fp_busy_stack[DEMO_STACK_SIZE / sizeof(ULONG)];
 
-/* Set by the busy thread if its floating-point state was ever seen wrong.  */
+/* Set by the busy thread if its floating-point state was ever seen wrong.*/
 
 static volatile ULONG   busy_iterations;
 static volatile ULONG   busy_corruptions;
@@ -93,10 +94,10 @@ static UINT report(const char *label_ptr, UINT passed)
 /**************************************************************************/
 /*  thread_fp_busy_entry                                                  */
 /*                                                                        */
-/*  Lowest priority, never sleeps: the periodic tick therefore interrupts  */
-/*  it in the middle of floating-point work, which is what exercises the   */
-/*  interrupt half of the VFP context path (D0-D15 + FPSCR).  Its values   */
-/*  are checked every iteration against exactly representable constants.   */
+/*  Lowest priority, never sleeps: the periodic tick therefore interrupts */
+/*  it in the middle of floating-point work, which is what exercises the  */
+/*  interrupt half of the VFP context path (D0-D15 + FPSCR).  Its values  */
+/*  are checked every iteration against exactly representable constants.  */
 /**************************************************************************/
 
 static void thread_fp_busy_entry(ULONG thread_input)

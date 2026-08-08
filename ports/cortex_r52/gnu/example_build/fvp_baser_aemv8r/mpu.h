@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,16 +18,16 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    mpu.h                                            Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    PMSAv8-R memory protection and cache enable for Cortex-R52.          */
+/*    PMSAv8-R memory protection and cache enable for Cortex-R52.         */
 /*                                                                        */
-/*    The region set is described by a table rather than a sequence of     */
-/*    register writes.  That is deliberate and is a roadmap decision, not  */
-/*    a style preference: AR2 programs a Stage-1 region set per ThreadX    */
-/*    module and AR3 programs Stage-2 regions per ZoneX partition, and     */
-/*    both reuse this shape.  A table can be swapped at a partition        */
+/*    The region set is described by a table rather than a sequence of    */
+/*    register writes.  That is deliberate and is a roadmap decision, not */
+/*    a style preference: AR2 programs a Stage-1 region set per ThreadX   */
+/*    module and AR3 programs Stage-2 regions per ZoneX partition, and    */
+/*    both reuse this shape.  A table can be swapped at a partition       */
 /*    switch; open-coded register writes cannot.                          */
 /*                                                                        */
 /**************************************************************************/
@@ -58,18 +58,18 @@
 #define MPU_AP_RW_EL1_EL0   2U      /* EL1 read/write, EL0 read/write      */
 #define MPU_AP_RO_EL1_EL0   3U      /* EL1 read-only,  EL0 read-only       */
 
-/* Shareability, PRBAR.SH.  */
+/* Shareability, PRBAR.SH.                                                */
 
 #define MPU_SH_NON          0U
 #define MPU_SH_OUTER        2U
 #define MPU_SH_INNER        3U
 
-/* Attribute indices into MAIR, PRLAR.AttrIndx.  */
+/* Attribute indices into MAIR, PRLAR.AttrIndx.                           */
 
 #define MPU_ATTR_NORMAL_WB  0U      /* Normal, inner/outer write-back      */
 #define MPU_ATTR_DEVICE     1U      /* Device-nGnRnE                       */
 
-/* One protection region.  The limit is inclusive, matching the hardware.  */
+/* One protection region.  The limit is inclusive, matching the hardware. */
 
 typedef struct MPU_REGION_STRUCT
 {
@@ -82,7 +82,7 @@ typedef struct MPU_REGION_STRUCT
     const char     *mpu_region_name;
 } MPU_REGION;
 
-/* Number of regions this implementation provides, from MPUIR.  */
+/* Number of regions this implementation provides, from MPUIR.            */
 
 unsigned int mpu_region_count(void);
 
@@ -91,12 +91,12 @@ unsigned int mpu_region_count(void);
 
 unsigned int mpu_init(void);
 
-/* True once SCTLR reports the MPU and both caches enabled.  */
+/* True once SCTLR reports the MPU and both caches enabled.               */
 
 unsigned int mpu_is_enabled(void);
 unsigned int mpu_caches_enabled(void);
 
-/* The active table, for reporting.  */
+/* The active table, for reporting.                                       */
 
 const MPU_REGION *mpu_region_table(unsigned int *count_ptr);
 

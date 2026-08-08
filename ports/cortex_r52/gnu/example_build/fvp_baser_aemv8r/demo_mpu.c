@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,18 +18,18 @@
 /*  DEMONSTRATION                                          RELEASE        */
 /*                                                                        */
 /*    demo_mpu.c                                       Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M5: PMSAv8-R protection and caches.                    */
+/*    AR1 milestone M5: PMSAv8-R protection and caches.                   */
 /*                                                                        */
-/*    The important check here is enforcement, not configuration.  Reading */
-/*    SCTLR back only proves a bit was set; it says nothing about whether  */
-/*    the region table actually describes memory correctly.  So the test    */
-/*    provokes a real permission fault by writing to the read-only code     */
-/*    region and requires the abort to arrive, then confirms a legal write  */
-/*    to the data region still succeeds.  A region set that permitted       */
-/*    everything would pass the first kind of check and fail this one.      */
+/*    The important check here is enforcement, not configuration.  Reading*/
+/*    SCTLR back only proves a bit was set; it says nothing about whether */
+/*    the region table actually describes memory correctly.  So the test  */
+/*    provokes a real permission fault by writing to the read-only code   */
+/*    region and requires the abort to arrive, then confirms a legal write*/
+/*    to the data region still succeeds.  A region set that permitted     */
+/*    everything would pass the first kind of check and fail this one.    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -43,10 +43,10 @@
 static TX_THREAD    thread_check;
 static ULONG        thread_check_stack[DEMO_STACK_SIZE / sizeof(ULONG)];
 
-/* Provided by entry.S and manipulated by its data-abort handler.  */
+/* Provided by entry.S and manipulated by its data-abort handler.         */
 
 
-/* A known-writable location, used to show legal access still works.  */
+/* A known-writable location, used to show legal access still works.      */
 
 static volatile unsigned long   writable_probe;
 

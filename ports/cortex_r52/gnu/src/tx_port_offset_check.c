@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -28,28 +28,28 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port_offset_check.c                           Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Compile-time verification of the TX_THREAD structure offsets that    */
-/*    this port's assembly reaches by hard-coded displacement.  The file   */
-/*    emits no code; it exists purely so that a layout change becomes a    */
+/*    Compile-time verification of the TX_THREAD structure offsets that   */
+/*    this port's assembly reaches by hard-coded displacement.  The file  */
+/*    emits no code; it exists purely so that a layout change becomes a   */
 /*    build failure.                                                      */
 /*                                                                        */
-/*    Why this is needed: tx_thread_schedule.S,                            */
-/*    tx_thread_system_return.S and tx_thread_context_restore.S read and   */
-/*    write the per-thread VFP enable flag as [thread, #144].  Nothing in  */
-/*    the toolchain connects that literal to the C structure, so adding a  */
-/*    member, enabling an option that adds one, or reordering the port     */
-/*    extensions would silently retarget those accesses at an unrelated    */
-/*    field -- corrupting thread state in a way that is extremely hard to    */
-/*    diagnose from the symptom.  The offset was measured at 144 for the   */
-/*    default build and is asserted here.                                  */
+/*    Why this is needed: tx_thread_schedule.S,                           */
+/*    tx_thread_system_return.S and tx_thread_context_restore.S read and  */
+/*    write the per-thread VFP enable flag as [thread, #144].  Nothing in */
+/*    the toolchain connects that literal to the C structure, so adding a */
+/*    member, enabling an option that adds one, or reordering the port    */
+/*    extensions would silently retarget those accesses at an unrelated   */
+/*    field -- corrupting thread state in a way that is extremely hard to */
+/*    diagnose from the symptom.  The offset was measured at 144 for the  */
+/*    default build and is asserted here.                                 */
 /*                                                                        */
-/*    A negative array dimension is used rather than _Static_assert        */
-/*    because this project targets C99, where _Static_assert does not      */
-/*    exist.  If an assertion below fails, the compiler reports a negative  */
-/*    or zero-sized array for the named typedef.                           */
+/*    A negative array dimension is used rather than _Static_assert       */
+/*    because this project targets C99, where _Static_assert does not     */
+/*    exist.  If an assertion below fails, the compiler reports a negative*/
+/*    or zero-sized array for the named typedef.                          */
 /*                                                                        */
 /**************************************************************************/
 

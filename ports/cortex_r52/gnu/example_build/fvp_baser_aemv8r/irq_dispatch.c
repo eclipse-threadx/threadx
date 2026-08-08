@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,16 +18,16 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    irq_dispatch.c                                   Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Interrupt dispatch for Cortex-R52 on the Armv8-R AEM FVP.  Called    */
-/*    from __tx_irq_processing_return in entry.S, that is after            */
-/*    _tx_thread_context_save has saved the interrupted context and with   */
+/*    Interrupt dispatch for Cortex-R52 on the Armv8-R AEM FVP.  Called   */
+/*    from __tx_irq_processing_return in entry.S, that is after           */
+/*    _tx_thread_context_save has saved the interrupted context and with  */
 /*    interrupts still disabled.                                          */
 /*                                                                        */
-/*    _tx_timer_interrupt is safe to call from C: it uses only r0-r3 and   */
-/*    returns through lr like an ordinary function.                        */
+/*    _tx_timer_interrupt is safe to call from C: it uses only r0-r3 and  */
+/*    returns through lr like an ordinary function.                       */
 /*                                                                        */
 /**************************************************************************/
 
@@ -35,7 +35,7 @@
 #include "gicv3.h"
 #include "timer.h"
 
-/* ThreadX periodic timer entry point (assembly, AAPCS-compatible).  */
+/* ThreadX periodic timer entry point (assembly, AAPCS-compatible).       */
 
 extern void _tx_timer_interrupt(void);
 
@@ -60,8 +60,8 @@ volatile unsigned long  board_unexpected_intid;
 /**************************************************************************/
 /*  board_init                                                            */
 /*                                                                        */
-/*  Called from _tx_initialize_low_level.  Interrupts are still masked at  */
-/*  this point, so the tick cannot be delivered before the kernel is       */
+/*  Called from _tx_initialize_low_level.  Interrupts are still masked at */
+/*  this point, so the tick cannot be delivered before the kernel is      */
 /*  ready for it.                                                         */
 /**************************************************************************/
 

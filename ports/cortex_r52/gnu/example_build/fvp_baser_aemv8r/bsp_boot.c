@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,40 +18,40 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    bsp_boot.c                                       Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M1 boot check.  Verifies that the reset path really    */
-/*    configured EL2 and then dropped to EL1, and that the EL2 HVC seam    */
-/*    used by ZoneX (AR3) is reachable from EL1 and returns correctly.     */
+/*    AR1 milestone M1 boot check.  Verifies that the reset path really   */
+/*    configured EL2 and then dropped to EL1, and that the EL2 HVC seam   */
+/*    used by ZoneX (AR3) is reachable from EL1 and returns correctly.    */
 /*                                                                        */
-/*    This deliberately asserts the resulting exception level rather than  */
-/*    merely printing a message: "it printed something" does not prove a   */
-/*    correct EL2-to-EL1 transition, and AR3 depends on that transition.   */
+/*    This deliberately asserts the resulting exception level rather than */
+/*    merely printing a message: "it printed something" does not prove a  */
+/*    correct EL2-to-EL1 transition, and AR3 depends on that transition.  */
 /*                                                                        */
-/*  MISRA C:2012 deviations (justified)                                    */
+/*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 -- the two asm statements below read CPSR and issue     */
-/*      HVC; neither has a standard C equivalent.  Both are encapsulated   */
-/*      in dedicated one-line functions.                                   */
+/*    Directive 4.3 -- the two asm statements below read CPSR and issue   */
+/*      HVC; neither has a standard C equivalent.  Both are encapsulated  */
+/*      in dedicated one-line functions.                                  */
 /*                                                                        */
 /**************************************************************************/
 
 #include "board.h"
 #include "console.h"
 
-/* AArch32 CPSR mode field encodings.  */
+/* AArch32 CPSR mode field encodings.                                     */
 
 #define CPSR_MODE_MASK  0x1FUL
 #define CPSR_MODE_SVC   0x13UL          /* Supervisor -- an EL1 mode        */
 #define CPSR_MODE_HYP   0x1AUL          /* Hyp        -- EL2                */
 
-/* Incremented by the EL2 HVC handler in entry.S.  */
+/* Incremented by the EL2 HVC handler in entry.S.                         */
 
 
 
 /**************************************************************************/
-/*  read_cpsr -- current program status, including the mode field.         */
+/*  read_cpsr -- current program status, including the mode field.        */
 /**************************************************************************/
 
 static unsigned long read_cpsr(void)
@@ -65,7 +65,7 @@ static unsigned long read_cpsr(void)
 
 
 /**************************************************************************/
-/*  issue_hvc -- call into EL2 through the ZoneX seam and return.          */
+/*  issue_hvc -- call into EL2 through the ZoneX seam and return.         */
 /**************************************************************************/
 
 static void issue_hvc(void)

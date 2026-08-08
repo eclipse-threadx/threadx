@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,23 +18,23 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    console.h                                        Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Minimal console for the Armv8-R AEM FVP.  Backed by semihosting so   */
-/*    that early bring-up needs no peripheral base addresses; the PL011    */
-/*    UART implementation arrives in AR1/M3 behind this same interface.    */
+/*    Minimal console for the Armv8-R AEM FVP.  Backed by semihosting so  */
+/*    that early bring-up needs no peripheral base addresses; the PL011   */
+/*    UART implementation arrives in AR1/M3 behind this same interface.   */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-/* Write a NUL-terminated string to the console.  */
+/* Write a NUL-terminated string to the console.                          */
 
 void console_puts(const char *string_ptr);
 
-/* Write value as 0x-prefixed, zero-padded 32-bit hexadecimal.  */
+/* Write value as 0x-prefixed, zero-padded 32-bit hexadecimal.            */
 
 void console_puthex(unsigned long value);
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,22 +18,22 @@
 /*  DEMONSTRATION                                          RELEASE        */
 /*                                                                        */
 /*    demo_m2.c                                        Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M2: two threads switching cooperatively, with no       */
-/*    interrupts and no timer tick.  This is the first real exercise of    */
-/*    the ported assembly -- _tx_thread_stack_build builds each thread's    */
-/*    initial frame, _tx_thread_schedule restores it, and                  */
-/*    _tx_thread_system_return saves a solicited context on every          */
-/*    tx_thread_relinquish call.                                           */
+/*    AR1 milestone M2: two threads switching cooperatively, with no      */
+/*    interrupts and no timer tick.  This is the first real exercise of   */
+/*    the ported assembly -- _tx_thread_stack_build builds each thread's  */
+/*    initial frame, _tx_thread_schedule restores it, and                 */
+/*    _tx_thread_system_return saves a solicited context on every         */
+/*    tx_thread_relinquish call.                                          */
 /*                                                                        */
-/*    The threads record their execution order in a trace buffer, and the  */
-/*    expected alternating sequence is asserted at the end.  Counting      */
-/*    iterations alone would not prove a context switch happened: if       */
-/*    switching were broken, one thread could run to completion by itself. */
+/*    The threads record their execution order in a trace buffer, and the */
+/*    expected alternating sequence is asserted at the end.  Counting     */
+/*    iterations alone would not prove a context switch happened: if      */
+/*    switching were broken, one thread could run to completion by itself.*/
 /*                                                                        */
-/*    Only tx_thread_relinquish is used.  tx_thread_sleep would hang       */
+/*    Only tx_thread_relinquish is used.  tx_thread_sleep would hang      */
 /*    without a tick, which AR1/M3 adds.                                  */
 /*                                                                        */
 /**************************************************************************/
@@ -55,14 +55,14 @@ static ULONG        thread_1_stack[DEMO_STACK_SIZE / sizeof(ULONG)];
 static volatile ULONG   thread_0_counter;
 static volatile ULONG   thread_1_counter;
 
-/* Execution order, one character per slice.  */
+/* Execution order, one character per slice.                              */
 
 static char             trace[TRACE_LENGTH + 1U];
 static volatile UINT    trace_index;
 
 
 /**************************************************************************/
-/*  trace_record -- append one thread's mark to the execution trace.       */
+/*  trace_record -- append one thread's mark to the execution trace.      */
 /**************************************************************************/
 
 static void trace_record(char mark)
@@ -189,7 +189,7 @@ static void thread_0_entry(ULONG thread_input)
 /**************************************************************************/
 /*  tx_application_define -- create the demo threads.                     */
 /*                                                                        */
-/*  Static stacks are used rather than a byte pool so that M2 exercises    */
+/*  Static stacks are used rather than a byte pool so that M2 exercises   */
 /*  only the context-switch path, with no allocator in the way.           */
 /**************************************************************************/
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,11 +18,11 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    gicv3.h                                          Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    GICv3 interrupt controller for Cortex-R52.  The CPU interface is     */
-/*    reached through AArch32 ICC_* system registers; the Distributor and  */
+/*    GICv3 interrupt controller for Cortex-R52.  The CPU interface is    */
+/*    reached through AArch32 ICC_* system registers; the Distributor and */
 /*    Redistributor are memory mapped.                                    */
 /*                                                                        */
 /**************************************************************************/
@@ -50,7 +50,7 @@ void gicv3_enable_ppi(unsigned int intid, unsigned int priority);
 
 unsigned long gicv3_acknowledge(void);
 
-/* Signal completion of the interrupt previously acknowledged.  */
+/* Signal completion of the interrupt previously acknowledged.            */
 
 void gicv3_end_of_interrupt(unsigned long intid);
 

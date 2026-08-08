@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,25 +18,25 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    platform.h                                       Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Memory map for the Armv8-R AEM FVP (BaseR platform).                */
 /*                                                                        */
 /*    Every address here was VERIFIED IN-MODEL, not taken from            */
-/*    documentation or recollection.  The BaseR map is the Base platform   */
-/*    map with its two 2 GB halves swapped (so a Base peripheral at X      */
-/*    below 0x80000000 appears at X + 0x80000000), and each base was then  */
+/*    documentation or recollection.  The BaseR map is the Base platform  */
+/*    map with its two 2 GB halves swapped (so a Base peripheral at X     */
+/*    below 0x80000000 appears at X + 0x80000000), and each base was then */
 /*    confirmed by reading its identification register:                   */
 /*                                                                        */
 /*      PL011 UART0   peripheral ID  0x11,0x10,0x24,0x00, and a marker    */
 /*                    written to it appeared on the host console          */
-/*      GIC           GICD_PIDR2 = 0x3B and GICR_PIDR2 = 0x3B, i.e.        */
+/*      GIC           GICD_PIDR2 = 0x3B and GICR_PIDR2 = 0x3B, i.e.       */
 /*                    architecture revision 3 = GICv3                     */
-/*      Counter       CNTFID0 = 0x05F5E100 = 100 MHz, matching the         */
+/*      Counter       CNTFID0 = 0x05F5E100 = 100 MHz, matching the        */
 /*                    model's bp.refcounter.base_frequency parameter      */
 /*                                                                        */
-/*    Values are written without integer suffixes so that this header can  */
+/*    Values are written without integer suffixes so that this header can */
 /*    also be included from preprocessed assembly.                        */
 /*                                                                        */
 /**************************************************************************/
@@ -44,7 +44,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-/* PL011 UART0.  */
+/* PL011 UART0.                                                           */
 
 #define PL011_UART0_BASE        0x9C090000
 
@@ -56,7 +56,7 @@
 #define GICR_RD_BASE            0xAF100000
 #define GICR_SGI_BASE           0xAF110000
 
-/* System counter control frame (CNTControlBase).  */
+/* System counter control frame (CNTControlBase).                         */
 
 #define CNT_CONTROL_BASE        0xAA430000
 
@@ -69,7 +69,7 @@
 
 #ifndef __ASSEMBLER__
 
-/* 32-bit device register access.  */
+/* 32-bit device register access.                                         */
 
 #define REG32(address)  (*(volatile unsigned long *)(unsigned long)(address))
 

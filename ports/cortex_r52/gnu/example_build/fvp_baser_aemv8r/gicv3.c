@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,47 +18,47 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    gicv3.c                                          Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    GICv3 bring-up for Cortex-R52 on the Armv8-R AEM FVP.               */
 /*                                                                        */
-/*    Model characteristics that shape this code, taken from its own       */
+/*    Model characteristics that shape this code, taken from its own      */
 /*    parameters rather than assumed:                                     */
 /*                                                                        */
-/*      has-two-security-states=0  single security state, so GICD_CTLR.DS  */
-/*                                 reads 1 and the Group 1 enable is bit 1 */
-/*      ARE-fixed-to-one=1         affinity routing cannot be turned off   */
-/*      priority-bits=5            only the top 5 priority bits exist, so  */
-/*                                 priorities must be multiples of 8       */
+/*      has-two-security-states=0  single security state, so GICD_CTLR.DS */
+/*                                 reads 1 and the Group 1 enable is bit 1*/
+/*      ARE-fixed-to-one=1         affinity routing cannot be turned off  */
+/*      priority-bits=5            only the top 5 priority bits exist, so */
+/*                                 priorities must be multiples of 8      */
 /*                                                                        */
-/*  MISRA C:2012 deviations (justified)                                    */
+/*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 -- the CPU interface is only reachable through CP15     */
-/*      system registers, so inline assembly is unavoidable.  Every such   */
-/*      access is encapsulated in a one-line accessor below and appears     */
+/*    Directive 4.3 -- the CPU interface is only reachable through CP15   */
+/*      system registers, so inline assembly is unavoidable.  Every such  */
+/*      access is encapsulated in a one-line accessor below and appears   */
 /*      nowhere else.                                                     */
-/*    Rule 11.4/11.6 -- casting integer addresses to volatile pointers is   */
-/*      inherent to memory-mapped device access; confined to REG32.        */
+/*    Rule 11.4/11.6 -- casting integer addresses to volatile pointers is */
+/*      inherent to memory-mapped device access; confined to REG32.       */
 /*                                                                        */
 /**************************************************************************/
 
 #include "platform.h"
 #include "gicv3.h"
 
-/* Distributor registers.  */
+/* Distributor registers.                                                 */
 
 #define GICD_CTLR               0x0000U
 #define GICD_CTLR_ENABLE_GRP1   (1UL << 1)
 #define GICD_CTLR_ARE           (1UL << 4)
 
-/* Redistributor RD frame.  */
+/* Redistributor RD frame.                                                */
 
 #define GICR_WAKER              0x0014U
 #define GICR_WAKER_PROC_SLEEP   (1UL << 1)
 #define GICR_WAKER_CHILD_ASLEEP (1UL << 2)
 
-/* Redistributor SGI frame (SGIs and PPIs, INTID 0-31).  */
+/* Redistributor SGI frame (SGIs and PPIs, INTID 0-31).                   */
 
 #define GICR_IGROUPR0           0x0080U
 #define GICR_ISENABLER0         0x0100U

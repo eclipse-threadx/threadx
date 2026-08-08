@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,7 +18,7 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    timer.h                                          Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Arm generic timer tick for Cortex-R52.                              */
@@ -44,19 +44,19 @@
 
 void timer_init(void);
 
-/* Re-arm the timer for the next tick.  Called from the interrupt path.  */
+/* Re-arm the timer for the next tick.  Called from the interrupt path.   */
 
 void timer_reload(void);
 
-/* CNTFRQ as programmed by entry.S at EL2.  */
+/* CNTFRQ as programmed by entry.S at EL2.                                */
 
 unsigned long timer_frequency(void);
 
-/* Current 64-bit physical counter value, for verifying the counter runs.  */
+/* Current 64-bit physical counter value, for verifying the counter runs. */
 
 unsigned long long timer_counter(void);
 
-/* True once the counter control frame reports the counter enabled.  */
+/* True once the counter control frame reports the counter enabled.       */
 
 unsigned int timer_counter_enabled(void);
 

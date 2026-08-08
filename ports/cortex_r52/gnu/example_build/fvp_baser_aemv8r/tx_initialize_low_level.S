@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -38,25 +38,25 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                         Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Low-level initialization for Cortex-R52 on the Armv8-R AEM FVP.      */
-/*    Called by _tx_initialize_kernel_enter with the processor already in  */
+/*    Low-level initialization for Cortex-R52 on the Armv8-R AEM FVP.     */
+/*    Called by _tx_initialize_kernel_enter with the processor already in */
 /*    Supervisor mode at EL1.                                             */
 /*                                                                        */
-/*    This is deliberately shorter than the A-profile reference ports:      */
-/*    entry.S has already given every AArch32 mode its own stack from      */
-/*    dedicated linker-script regions, so there is no stack carving to do  */
-/*    here and no run-time stack-overlap check to perform -- the linker     */
+/*    This is deliberately shorter than the A-profile reference ports:    */
+/*    entry.S has already given every AArch32 mode its own stack from     */
+/*    dedicated linker-script regions, so there is no stack carving to do */
+/*    here and no run-time stack-overlap check to perform -- the linker   */
 /*    guarantees the regions do not overlap.                              */
 /*                                                                        */
-/*    When built with TX_R52_USE_THREADX_IRQ, board_init() brings up GICv3 */
-/*    and the generic timer tick here.  That is safe this early because    */
-/*    interrupts stay masked until _tx_thread_schedule enables them, so no */
-/*    tick can be delivered before the kernel is ready to take one.        */
-/*    Without that symbol (the M2 cooperative demo) no tick is created,    */
-/*    which keeps M2 free of any interrupt dependency.                     */
+/*    When built with TX_R52_USE_THREADX_IRQ, board_init() brings up GICv3*/
+/*    and the generic timer tick here.  That is safe this early because   */
+/*    interrupts stay masked until _tx_thread_schedule enables them, so no*/
+/*    tick can be delivered before the kernel is ready to take one.       */
+/*    Without that symbol (the M2 cooperative demo) no tick is created,   */
+/*    which keeps M2 free of any interrupt dependency.                    */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */

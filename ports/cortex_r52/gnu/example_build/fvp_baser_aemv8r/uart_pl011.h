@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,25 +18,25 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    uart_pl011.h                                     Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    PL011 UART console backend for the Armv8-R AEM FVP.                  */
+/*    PL011 UART console backend for the Armv8-R AEM FVP.                 */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UART_PL011_H
 #define UART_PL011_H
 
-/* Configure and enable UART0.  The model leaves it disabled at reset.  */
+/* Configure and enable UART0.  The model leaves it disabled at reset.    */
 
 void pl011_init(void);
 
-/* Send one character, expanding a newline into CR LF.  */
+/* Send one character, expanding a newline into CR LF.                    */
 
 void pl011_putc(char character);
 
-/* Send a NUL-terminated string.  */
+/* Send a NUL-terminated string.                                          */
 
 void pl011_puts(const char *string_ptr);
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,31 +18,31 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    timer.c                                          Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Arm generic timer tick for Cortex-R52 on the Armv8-R AEM FVP.       */
 /*                                                                        */
-/*    Two model behaviours make this longer than a bare timer setup, both  */
+/*    Two model behaviours make this longer than a bare timer setup, both */
 /*    confirmed by reading the hardware rather than assumed:              */
 /*                                                                        */
-/*      1. The system counter is STOPPED at reset (CNTCR = 0, CNTCV = 0).  */
-/*         The model documents that firmware is expected to start it, so   */
-/*         the counter control frame is enabled here.  Without this the    */
+/*      1. The system counter is STOPPED at reset (CNTCR = 0, CNTCV = 0). */
+/*         The model documents that firmware is expected to start it, so  */
+/*         the counter control frame is enabled here.  Without this the   */
 /*         timer never counts and no tick is ever delivered.              */
-/*      2. CNTFRQ resets to ZERO.  It is writable only at the highest      */
-/*         implemented exception level, so entry.S programs it at EL2;     */
-/*         this file only reads it.  Deriving the tick interval from an    */
+/*      2. CNTFRQ resets to ZERO.  It is writable only at the highest     */
+/*         implemented exception level, so entry.S programs it at EL2;    */
+/*         this file only reads it.  Deriving the tick interval from an   */
 /*         unprogrammed CNTFRQ would divide by zero.                      */
 /*                                                                        */
-/*    EL1 access to the physical timer and counter also depends on         */
-/*    CNTHCTL.PL1PCEN/PL1PCTEN, which reset disabled and are set by        */
+/*    EL1 access to the physical timer and counter also depends on        */
+/*    CNTHCTL.PL1PCEN/PL1PCTEN, which reset disabled and are set by       */
 /*    entry.S at EL2; otherwise these accesses would trap to EL2.         */
 /*                                                                        */
-/*  MISRA C:2012 deviations (justified)                                    */
+/*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 -- the generic timer is only reachable through CP15     */
-/*      registers; every such access is encapsulated in an accessor below. */
+/*    Directive 4.3 -- the generic timer is only reachable through CP15   */
+/*      registers; every such access is encapsulated in an accessor below.*/
 /*                                                                        */
 /**************************************************************************/
 
@@ -50,13 +50,13 @@
 #include "platform.h"
 #include "timer.h"
 
-/* Counter control frame (CNTControlBase).  */
+/* Counter control frame (CNTControlBase).                                */
 
 #define CNTCR                   0x0000U
 #define CNTCR_EN                (1UL << 0)
 #define CNTSR                   0x0004U
 
-/* CNTP_CTL bits.  */
+/* CNTP_CTL bits.                                                         */
 
 #define CNTP_CTL_ENABLE         (1UL << 0)
 #define CNTP_CTL_IMASK          (1UL << 1)

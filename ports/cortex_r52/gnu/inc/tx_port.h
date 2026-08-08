@@ -1,6 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
- * Copyright (c) 2026-present Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -27,11 +27,14 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                        Cortex-R52/GNU     */
-/*                                                           6.1.12       */
+/*                                                           6.5.2        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
+/*    Derived from the Cortex-R5/GNU port originally written by           */
+/*    William E. Lamie, Microsoft Corporation.                            */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -50,7 +53,7 @@
 #define TX_PORT_H
 
 
-/* Determine if the optional ThreadX user define file should be used.  */
+/* Determine if the optional ThreadX user define file should be used.     */
 
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
 
@@ -62,13 +65,13 @@
 #endif
 
 
-/* Define compiler library include files.  */
+/* Define compiler library include files.                                 */
 
 #include <stdlib.h>
 #include <string.h>
 
 
-/* Define ThreadX basic types for this port.  */
+/* Define ThreadX basic types for this port.                              */
 
 #define VOID                                    void
 typedef char                                    CHAR;
@@ -109,7 +112,7 @@ typedef unsigned short                          USHORT;
 #endif
 
 
-/* Define various constants for the ThreadX ARM port.  */
+/* Define various constants for the ThreadX ARM port.                     */
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
 #define TX_INT_DISABLE                          0xC0        /* Disable IRQ & FIQ interrupts     */
@@ -201,7 +204,7 @@ typedef unsigned short                          USHORT;
 #define TX_THREAD_EXTENSION_3
 
 
-/* Define the port extensions of the remaining ThreadX objects.  */
+/* Define the port extensions of the remaining ThreadX objects.           */
 
 #define TX_BLOCK_POOL_EXTENSION
 #define TX_BYTE_POOL_EXTENSION
@@ -230,7 +233,7 @@ typedef unsigned short                          USHORT;
 #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
 
 
-/* Define the ThreadX object creation extensions for the remaining objects.  */
+/* Define the ThreadX object creation extensions for remaining objects.   */
 
 #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
 #define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
@@ -241,7 +244,7 @@ typedef unsigned short                          USHORT;
 #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
 
 
-/* Define the ThreadX object deletion extensions for the remaining objects.  */
+/* Define the ThreadX object deletion extensions for remaining objects.   */
 
 #define TX_BLOCK_POOL_DELETE_EXTENSION(pool_ptr)
 #define TX_BYTE_POOL_DELETE_EXTENSION(pool_ptr)
@@ -311,7 +314,7 @@ unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
 #endif
 
 
-/* Define the interrupt lockout macros for each ThreadX object.  */
+/* Define the interrupt lockout macros for each ThreadX object.           */
 
 #define TX_BLOCK_POOL_DISABLE                   TX_DISABLE
 #define TX_BYTE_POOL_DISABLE                    TX_DISABLE
@@ -321,7 +324,7 @@ unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
 #define TX_SEMAPHORE_DISABLE                    TX_DISABLE
 
 
-/* Define the version ID of ThreadX.  This may be utilized by the application.  */
+/* Define the version ID of ThreadX.  This may be used by the application.*/
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =

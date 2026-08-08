@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,26 +18,26 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    board.h                                          Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Declarations for the objects that cross the C/assembly boundary in   */
-/*    this board support package.                                          */
+/*    Declarations for the objects that cross the C/assembly boundary in  */
+/*    this board support package.                                         */
 /*                                                                        */
-/*    These exist because assembly callers do not provide prototypes:      */
-/*    entry.S calls bsp_main, _tx_initialize_low_level calls board_init,   */
-/*    and __tx_irq_processing_return calls board_irq_handler.  Without a   */
-/*    header the definitions have external linkage and no visible          */
-/*    declaration, which MISRA C:2012 Rule 8.4 prohibits and which         */
-/*    -Wmissing-prototypes reports.  Declaring them in one place also      */
-/*    means a signature change cannot silently disagree with the assembly. */
+/*    These exist because assembly callers do not provide prototypes:     */
+/*    entry.S calls bsp_main, _tx_initialize_low_level calls board_init,  */
+/*    and __tx_irq_processing_return calls board_irq_handler.  Without a  */
+/*    header the definitions have external linkage and no visible         */
+/*    declaration, which MISRA C:2012 Rule 8.4 prohibits and which        */
+/*    -Wmissing-prototypes reports.  Declaring them in one place also     */
+/*    means a signature change cannot silently disagree with the assembly.*/
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef BOARD_H
 #define BOARD_H
 
-/* Application entry, called from entry.S once EL1 is set up.  Never returns. */
+/* Application entry, called from entry.S after EL1 setup; never returns. */
 
 void bsp_main(void);
 
@@ -51,14 +51,14 @@ void board_init(void);
 
 void board_irq_handler(void);
 
-/* Interrupt observability, maintained by board_irq_handler.  */
+/* Interrupt observability, maintained by board_irq_handler.              */
 
 extern volatile unsigned long   board_irq_count;
 extern volatile unsigned long   board_timer_intid;
 extern volatile unsigned long   board_spurious_count;
 extern volatile unsigned long   board_unexpected_intid;
 
-/* Counted by the EL2 hyp-trap handler in entry.S; the ZoneX seam.  */
+/* Counted by the EL2 hyp-trap handler in entry.S; the ZoneX seam.        */
 
 extern volatile unsigned long   _hvc_call_count;
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,19 +18,19 @@
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
 /*    entry.S                                          Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Reset entry for Cortex-R52 (Armv8-R, AArch32) on the Armv8-R AEM    */
-/*    FVP.  The R52 always implements EL2 and resets into it, so this      */
+/*    FVP.  The R52 always implements EL2 and resets into it, so this     */
 /*    file configures EL2 first, installs both the EL2 and EL1 vector     */
 /*    tables, and only then drops to EL1 (Supervisor mode) to run the     */
 /*    kernel.  The HVC entry in the EL2 table is the seam that ZoneX      */
-/*    (roadmap AR3) grows into -- it is deliberately present from AR1 so   */
+/*    (roadmap AR3) grows into -- it is deliberately present from AR1 so  */
 /*    that partitioning does not require re-architecting the boot path.   */
 /*                                                                        */
 /*    Define TX_R52_BOOT_AT_EL1 to skip EL2 configuration, for targets    */
-/*    where an earlier boot stage or a vendor EL2 monitor (for example     */
+/*    where an earlier boot stage or a vendor EL2 monitor (for example    */
 /*    NXP's EL2M on S32Z2) has already dropped privilege to EL1.          */
 /*                                                                        */
 /**************************************************************************/
@@ -41,7 +41,7 @@
     .syntax unified
     .arm
 
-/* AArch32 CPSR mode encodings and interrupt mask bits.  */
+/* AArch32 CPSR mode encodings and interrupt mask bits.                   */
 
     .equ    MODE_USR,   0x10
     .equ    MODE_FIQ,   0x11
@@ -55,7 +55,7 @@
     .equ    PSR_I,      0x80            /* IRQ mask                         */
     .equ    PSR_F,      0x40            /* FIQ mask                         */
 
-/* HCR (Hyp Configuration Register) bits used here.  */
+/* HCR (Hyp Configuration Register) bits used here.                       */
 
     .equ    HCR_VM,     (1 << 0)        /* stage-2 MPU enable               */
     .equ    HCR_AMO,    (1 << 3)        /* route aborts to EL2              */
@@ -66,12 +66,12 @@
 
     .equ    HCPTR_TCP,  (3 << 10)       /* trap EL1 access to CP10/CP11     */
 
-/* CNTHCTL: permit EL1/EL0 use of the physical counter and timer.  */
+/* CNTHCTL: permit EL1/EL0 use of the physical counter and timer.         */
 
     .equ    CNTHCTL_PL1PCTEN, (1 << 0)
     .equ    CNTHCTL_PL1PCEN,  (1 << 1)
 
-/* ICC_HSRE: enable the GICv3 system-register interface for EL1.  */
+/* ICC_HSRE: enable the GICv3 system-register interface for EL1.          */
 
     .equ    ICC_HSRE_SRE,     (1 << 0)
     .equ    ICC_HSRE_ENABLE,  (1 << 3)
@@ -329,13 +329,13 @@ _start_hang:
 /**************************************************************************/
 /*  el1_irq_entry -- IRQ vector.                                          */
 /*                                                                        */
-/*  With ThreadX linked in, the IRQ vector branches straight into          */
-/*  _tx_thread_context_save, which saves the interrupted context and       */
-/*  branches back to __tx_irq_processing_return.  The branch must be a      */
-/*  plain B: context save adjusts lr itself to find the point of           */
-/*  interrupt.  Interrupts are still disabled on return from it.           */
+/*  With ThreadX linked in, the IRQ vector branches straight into         */
+/*  _tx_thread_context_save, which saves the interrupted context and      */
+/*  branches back to __tx_irq_processing_return.  The branch must be a    */
+/*  plain B: context save adjusts lr itself to find the point of          */
+/*  interrupt.  Interrupts are still disabled on return from it.          */
 /*                                                                        */
-/*  Images that do not link ThreadX (the M1 boot check) keep the           */
+/*  Images that do not link ThreadX (the M1 boot check) keep the          */
 /*  self-identifying fault reporter instead.                              */
 /**************************************************************************/
 
@@ -356,13 +356,13 @@ __tx_irq_processing_return:
 /**************************************************************************/
 /*  el2_hyp_trap_entry -- the ZoneX (AR3) seam.                           */
 /*                                                                        */
-/*  Reached for every exception routed to EL2 from EL1/EL0, so the cause    */
-/*  is decoded from HSR.EC before dispatch.  AR1 handles only HVC, which    */
-/*  it counts before returning to EL1; that proves EL2 is live and          */
-/*  reachable without the boot path changing later.  AR3 grows the          */
-/*  dispatch table here (stage-2 faults, trapped accesses, IRQ paravirt).   */
+/*  Reached for every exception routed to EL2 from EL1/EL0, so the cause  */
+/*  is decoded from HSR.EC before dispatch.  AR1 handles only HVC, which  */
+/*  it counts before returning to EL1; that proves EL2 is live and        */
+/*  reachable without the boot path changing later.  AR3 grows the        */
+/*  dispatch table here (stage-2 faults, trapped accesses, IRQ paravirt). */
 /*                                                                        */
-/*  EL1's registers must be preserved -- this runs on the Hyp stack.       */
+/*  EL1's registers must be preserved -- this runs on the Hyp stack.      */
 /**************************************************************************/
 
     .global el2_hyp_trap_entry
@@ -388,9 +388,9 @@ el2_hyp_trap_unhandled:
     FAULT_REPORT msg_el2_hyp
 
 /**************************************************************************/
-/*  Unhandled exceptions.  Each records a distinct code in r12 so a halted */
-/*  model or a later fault dump (AR1/M5) can identify the cause.  Real     */
-/*  handlers arrive with the interrupt work in M3.                         */
+/*  Unhandled exceptions.  Each records a distinct code in r12 so a halted*/
+/*  model or a later fault dump (AR1/M5) can identify the cause.  Real    */
+/*  handlers arrive with the interrupt work in M3.                        */
 /**************************************************************************/
 
 /* Unhandled exceptions.  Real handlers arrive with the interrupt work in
@@ -471,7 +471,7 @@ msg_el1_fiq:        .asciz  "[FAULT] EL1 FIQ (no handler yet)\n"
 _hvc_call_count:
     .word   0
 
-/* Used by the MPU enforcement self-test (see el1_trap_dabt).  */
+/* Used by the MPU enforcement self-test (see el1_trap_dabt).             */
 
     .global mpu_expect_abort
 mpu_expect_abort:

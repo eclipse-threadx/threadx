@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright (C) 2026 Eclipse ThreadX contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -18,19 +18,19 @@
 /*  DEMONSTRATION                                          RELEASE        */
 /*                                                                        */
 /*    demo_verify.h                                    Cortex-R52/GNU     */
-/*                                                                        */
+/*                                                           6.5.2        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Verification harness for the standard ThreadX demo, kept separate    */
-/*    so demo_threadx.c stays byte-identical to the shipped sample apart   */
-/*    from its header note and a single call to demo_verify_create().      */
+/*    Verification harness for the standard ThreadX demo, kept separate   */
+/*    so demo_threadx.c stays byte-identical to the shipped sample apart  */
+/*    from its header note and a single call to demo_verify_create().     */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef DEMO_VERIFY_H
 #define DEMO_VERIFY_H
 
-/* Create the verification thread.  Called from tx_application_define.  */
+/* Create the verification thread.  Called from tx_application_define.    */
 
 void demo_verify_create(void);
 
