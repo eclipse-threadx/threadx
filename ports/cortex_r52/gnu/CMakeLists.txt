@@ -75,3 +75,12 @@ option(TX_R52_BUILD_FVP_EXAMPLE "Build the Armv8-R AEM FVP example targets" OFF)
 if(TX_R52_BUILD_FVP_EXAMPLE)
     add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/example_build/fvp_baser_aemv8r)
 endif()
+
+# NXP S32Z280-594EVB example build.  Separate option from the FVP example so
+# that FVP regression stays green while silicon bring-up is in progress, and so
+# neither build can perturb the other: the two boards differ in reset state,
+# memory map and instruction set at reset.
+option(TX_R52_BUILD_S32Z280_EXAMPLE "Build the NXP S32Z280-594EVB example targets" OFF)
+if(TX_R52_BUILD_S32Z280_EXAMPLE)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/example_build/s32z280_evb)
+endif()
