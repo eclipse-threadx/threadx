@@ -22,6 +22,11 @@
    that are only known at run time. Every allocation result is checked for NULL
    and every buffer is released before its pointer is reused.  */
 
+/* MISRA C:2012 Rule 15.5 (advisory) deviation: main() returns from several
+   error paths instead of having a single point of exit. The project forbids
+   goto, so an early return is the only way to abandon the conversion, and this
+   matches the style already used by the parameter and file open checks.  */
+
 
 /* Define the file handles.  */
 
@@ -146,13 +151,52 @@ unsigned char   *buffer;
 }
 
 
+/* Close the files and release the ELF areas allocated by main(). This is called
+   from every exit path taken after the files have been opened, so it must
+   tolerate being called with resources that were never acquired. The areas it
+   releases are the file scope pointers declared above.  */
+
+static void converter_cleanup(void)
+{
+
+    /* Determine if the source file is open.  */
+    if (source_file != NULL)
+    {
+
+        /* Close it.  */
+        fclose(source_file);
+        source_file =  NULL;
+    }
+
+    /* Determine if the binary output file is open.  */
+    if (binary_file != NULL)
+    {
+
+        /* Close it.  */
+        fclose(binary_file);
+        binary_file =  NULL;
+    }
+
+    /* Release the ELF areas. Note that free() is defined to do nothing when it
+       is supplied a NULL pointer, so no test is required here.  */
+    free(program_header);
+    program_header =  NULL;
+    free(section_header);
+    section_header =  NULL;
+    free(section_string_table);
+    section_string_table =  NULL;
+    free(code_section_array);
+    code_section_array =  NULL;
+}
+
+
 int main(int argc, char* argv[])
 {
 
 unsigned long           i, j;
-unsigned long           current_total;
 unsigned long           address;
 unsigned long           size;
+unsigned long           allocation_size;
 unsigned char           *code_buffer;
 unsigned long			code_section_index;
 CODE_SECTION_ENTRY		code_section_temp;
@@ -164,8 +208,11 @@ unsigned char           zero_value;
     {
 
         /* Print an error message out and wait for user key hit.  */
-		printf("module_to_binary.exe - Copyright (c) Microsoft Corporation v5.8\n");
-        printf("**** Error: invalid input parameter for module_to_binary.exe **** \n");
+		printf("module_to_binary\n");
+		printf("(c) 2024 Microsoft Corp\n");
+		printf("(c) 2026 Eclipse ThreadX contributors\n");
+		printf("v6.5.2.202603\n");
+        printf("**** Error: invalid input parameter for module_to_binary **** \n");
         printf("     Command Line Should be:\n\n");
         printf("     > module_to_binary source_elf_file c_binary_file <cr> \n\n");
         return(1);
@@ -198,29 +245,140 @@ unsigned char           zero_value;
     }
 
     /* Read the ELF header.  */
-    elf_object_read(0, &header, sizeof(header));
+    if (elf_object_read(0, &header, sizeof(header)) != 0)
+    {
+
+        /* Print an error message out.  */
+        printf("**** Error: read failed on the ELF header **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(6);
+    }
 
     /* Allocate memory for the program header(s).  */
-    program_header =  malloc(sizeof(ELF_PROGRAM_HEADER)*header.elf_header_program_header_entries);
+    allocation_size =  sizeof(ELF_PROGRAM_HEADER)*header.elf_header_program_header_entries;
+    program_header =   malloc(allocation_size);
+
+    /* Determine if the memory allocation was successful. Note that an empty area
+       is not an error, since malloc() is permitted to return NULL for it.  */
+    if ((program_header == NULL) && (allocation_size != 0))
+    {
+
+        /* Print an error message out.  */
+        printf("**** Error: memory allocation failed for the program header(s) **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(5);
+    }
 
     /* Read the program header(s).  */
-    elf_object_read(header.elf_header_program_header_offset, program_header, (sizeof(ELF_PROGRAM_HEADER)*header.elf_header_program_header_entries));
+    if (elf_object_read(header.elf_header_program_header_offset, program_header, allocation_size) != 0)
+    {
+
+        /* Print an error message out.  */
+        printf("**** Error: read failed on the program header(s) **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(6);
+    }
 
     /* Allocate memory for the section header(s).  */
-    section_header =  malloc(sizeof(ELF_SECTION_HEADER)*header.elf_header_section_header_entries);
+    allocation_size =  sizeof(ELF_SECTION_HEADER)*header.elf_header_section_header_entries;
+    section_header =   malloc(allocation_size);
+
+    /* Determine if the memory allocation was successful.  */
+    if ((section_header == NULL) && (allocation_size != 0))
+    {
+
+        /* Print an error message out.  */
+        printf("**** Error: memory allocation failed for the section header(s) **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(5);
+    }
 
     /* Read the section header(s).  */
-    elf_object_read(header.elf_header_section_header_offset, section_header, (sizeof(ELF_SECTION_HEADER)*header.elf_header_section_header_entries));
+    if (elf_object_read(header.elf_header_section_header_offset, section_header, allocation_size) != 0)
+    {
 
+        /* Print an error message out.  */
+        printf("**** Error: read failed on the section header(s) **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(6);
+    }
+
+    /* Determine if the section string table index supplied by the ELF header is
+       inside the section header area that was just read.  */
+    if (header.elf_header_section_string_index >= header.elf_header_section_header_entries)
+    {
+
+        /* Print an error message out.  */
+        printf("**** Error: invalid section string table index in the ELF header **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(6);
+    }
 
     /* Alocate memory for the section string table.  */
-    section_string_table =  malloc(section_header[header.elf_header_section_string_index].elf_section_header_size);
+    allocation_size =       section_header[header.elf_header_section_string_index].elf_section_header_size;
+    section_string_table =  malloc(allocation_size);
+
+    /* Determine if the memory allocation was successful.  */
+    if ((section_string_table == NULL) && (allocation_size != 0))
+    {
+
+        /* Print an error message out.  */
+        printf("**** Error: memory allocation failed for the section string table **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(5);
+    }
 
     /* Read the section string table.  */
-    elf_object_read(section_header[header.elf_header_section_string_index].elf_section_header_offset, section_string_table, section_header[header.elf_header_section_string_index].elf_section_header_size);
+    if (elf_object_read(section_header[header.elf_header_section_string_index].elf_section_header_offset, section_string_table, allocation_size) != 0)
+    {
+
+        /* Print an error message out.  */
+        printf("**** Error: read failed on the section string table **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(6);
+    }
 
     /* Allocate memory for the code section array.  */
-    code_section_array =  malloc(sizeof(CODE_SECTION_ENTRY)*header.elf_header_section_header_entries);
+    allocation_size =     sizeof(CODE_SECTION_ENTRY)*header.elf_header_section_header_entries;
+    code_section_array =  malloc(allocation_size);
+
+    /* Determine if the memory allocation was successful.  */
+    if ((code_section_array == NULL) && (allocation_size != 0))
+    {
+
+        /* Print an error message out.  */
+        printf("**** Error: memory allocation failed for the code section array **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(5);
+    }
+
 	code_section_index =  0;
 
      /* Print out the section header(s).  */
@@ -267,9 +425,8 @@ unsigned char           zero_value;
 	if (code_section_index == 0)
 	{
 
-		/* Close files.  */
-		fclose(source_file);
-		fclose(binary_file);
+		/* Close the files and release the ELF areas.  */
+		converter_cleanup();
 
 		return(4);
  	}
@@ -326,16 +483,27 @@ unsigned char           zero_value;
 			/* Print an error message out.  */
 			printf("**** Error: memory allocation failed for code section **** \n");
 
-			/* Close files.  */
-			fclose(source_file);
-			fclose(binary_file);
+			/* Close the files and release the ELF areas.  */
+			converter_cleanup();
 
 			return(5);
 		}
 
 		/* Read in the code area.  */
 		j =  code_section_array[i].code_section_index;
-		elf_object_read(section_header[j].elf_section_header_offset, code_buffer, code_section_array[i].code_section_size);
+		if (elf_object_read(section_header[j].elf_section_header_offset, code_buffer, code_section_array[i].code_section_size) != 0)
+		{
+
+			/* Print an error message out.  */
+			printf("**** Error: read failed on a code section **** \n");
+
+			/* Release the code section buffer, then close the files and release
+			   the ELF areas.  */
+			free(code_buffer);
+			converter_cleanup();
+
+			return(6);
+		}
 
 		/* Write out the contents of this program area.  */
 		size =  code_section_array[i].code_section_size;
@@ -362,9 +530,8 @@ unsigned char           zero_value;
 		code_buffer =  NULL;
 	}
 
-	/* Close files.  */
-	fclose(source_file);
-    fclose(binary_file);
+	/* Close the files and release the ELF areas.  */
+	converter_cleanup();
 
 	return 0;
 }
