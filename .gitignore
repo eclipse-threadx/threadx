@@ -27,3 +27,10 @@ CTestTestfile.cmake
 # Local build artifacts
 build_m7/
 .codex
+build_r52/
+__pycache__/
+*.pyc
+build_r52_vfp/
+build_r52_uart/
+build_r52_mpu/
+build_r52_all/

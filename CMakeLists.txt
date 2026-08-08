@@ -24,6 +24,13 @@ endif()
 
 option(THREADX_SMP "Build ThreadX SMP version" OFF)
 
+# Enable testing at the top level so that tests registered by ports and
+# example builds further down the tree are discoverable with ctest from the
+# build root.  Without this, add_test() in a subdirectory still generates a
+# CTestTestfile.cmake there, but the root does not reference it and
+# "ctest --test-dir <build>" reports no tests at all.
+enable_testing()
+
 if(THREADX_SMP)
     set(TX_PORT_DIR "ports_smp")
     set(TX_COMMON_DIR "common_smp")
