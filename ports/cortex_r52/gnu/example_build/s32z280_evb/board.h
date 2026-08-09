@@ -61,6 +61,7 @@ typedef struct r52_identity_struct
     unsigned int    cpsr_el2;           /* mode bits should read 0x1A, Hyp  */
     unsigned int    cpsr_el1;           /* mode bits should read 0x13, SVC  */
     unsigned int    mpu_regions_el1;    /* decoded from mpuir               */
+    unsigned int    console_status;     /* linflexd_init() result, 0 = OK    */
 } r52_identity_t;
 
 extern r52_identity_t   r52_identity;

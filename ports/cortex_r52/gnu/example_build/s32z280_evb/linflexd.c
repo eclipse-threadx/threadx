@@ -90,6 +90,15 @@
 /* UARTSR                                                                 */
 #define UARTSR_DTF              (1U << 1)       /* transmit complete, w1c    */
 
+/* LINSR[15:12] is the LIN state; 0x1 is initialisation mode.  Confirmed by
+   reading 0x2000 (idle) from the BootROM-configured module.               */
+#define LINSR_LINS_MASK         (0xFU << 12)
+#define LINSR_LINS_INIT         (0x1U << 12)
+
+/* Bounded rather than infinite: a console that hangs the boot is worse than
+   one that reports it could not configure itself.                        */
+#define LINFLEXD_INIT_GUARD     100000U
+
 /* 115200 from a 40 MHz P5_LIN_BAUD_CLK; see the file header.             */
 #define LINFLEXD_IBRR_115200    21U
 #define LINFLEXD_FBRR_115200    11U
@@ -97,13 +106,35 @@
 #define CONSOLE_BASE            S32Z_LINFLEX_9_BASE
 
 
-void linflexd_init(void)
+unsigned int linflexd_init(void)
 {
-    /* Enter initialisation mode: the baud and mode registers are writable
-       only there.  SLEEP is cleared at the same time, since the BootROM may
-       have left the module asleep.  */
+    unsigned int  status = LINFLEXD_INIT_OK;
+    unsigned int  guard;
+    unsigned int  wanted;
+    unsigned int  got;
+
+    /* Enter initialisation mode and WAIT until the module reports it.
+       Most of UARTCR is writable only in initialisation mode, and the module
+       does not enter it in the same cycle as the LINCR1 write.  Configuring
+       without waiting silently half-works: bits being *set* take effect while
+       bits being *cleared* do not, so PCE stays enabled and the line runs 8E1
+       against a host expecting 8N1 -- which corrupts only those characters
+       whose parity bit happens to be 0 and leaves the rest readable, looking
+       for all the world like a marginal baud rate.  */
 
     REG32(CONSOLE_BASE + LINFLEXD_LINCR1) = LINCR1_INIT;
+
+    guard = LINFLEXD_INIT_GUARD;
+    while (((REG32(CONSOLE_BASE + LINFLEXD_LINSR) & LINSR_LINS_MASK)
+                != LINSR_LINS_INIT) && (guard > 0U))
+    {
+        guard--;
+    }
+
+    if (guard == 0U)
+    {
+        status |= LINFLEXD_INIT_NO_INITMODE;
+    }
 
     /* The UART bit gates writes to the rest of UARTCR, so it has to be set
        before the fields that depend on it, not alongside them.  */
@@ -114,15 +145,27 @@ void linflexd_init(void)
        enables parity for serial boot, and a host on 8N1 would see framing
        errors.  */
 
-    REG32(CONSOLE_BASE + LINFLEXD_UARTCR) = UARTCR_UART | UARTCR_WL0
-                                          | UARTCR_TXEN | UARTCR_RXEN;
+    wanted = UARTCR_UART | UARTCR_WL0 | UARTCR_TXEN | UARTCR_RXEN;
+    REG32(CONSOLE_BASE + LINFLEXD_UARTCR) = wanted;
 
     REG32(CONSOLE_BASE + LINFLEXD_LINFBRR) = LINFLEXD_FBRR_115200;
     REG32(CONSOLE_BASE + LINFLEXD_LINIBRR) = LINFLEXD_IBRR_115200;
 
+    /* Read back before leaving initialisation mode.  A write that was
+       silently ignored is the failure this driver already made once, so it is
+       checked rather than assumed.  */
+
+    got = REG32(CONSOLE_BASE + LINFLEXD_UARTCR) & 0xFFU;
+    if (got != wanted)
+    {
+        status |= LINFLEXD_INIT_UARTCR_MISMATCH;
+    }
+
     /* Leave initialisation mode; the module starts operating.  */
 
     REG32(CONSOLE_BASE + LINFLEXD_LINCR1) = 0U;
+
+    return status;
 }
 
 
@@ -133,18 +176,43 @@ void linflexd_putc(char c)
         linflexd_putc('\r');
     }
 
+    unsigned int guard;
+
+    /* Start the byte, wait for completion, clear the flag, then wait for the
+       clear to actually take effect.
+       *
+       * The last step is the subtle one.  DTF is write-one-to-clear and does
+       * not de-assert in the same cycle as the clearing write, so without it
+       * the *next* byte's poll can observe this byte's flag, conclude the line
+       * is free while it is still busy, and have its write silently dropped by
+       * the transmitter.  That cost exactly one character after every "\r\n"
+       * pair -- the only place two bytes are sent back to back -- and showed
+       * up as the first letter of every line going missing.
+       *
+       * Clearing *before* the write instead does not fix it and is worse: the
+       * write then lands while the previous byte is still shifting and is
+       * dropped, and the poll afterwards sees the previous byte's completion,
+       * so most of the output disappears.  Order matters in both directions.
+       */
+
     REG32(CONSOLE_BASE + LINFLEXD_BDRL) = (unsigned int)(unsigned char)c;
 
-    /* Wait for the byte to be sent, then clear the flag by writing one to it.
-       Polled on purpose: this console runs before any interrupt controller is
+    /* Polled on purpose: this console runs before any interrupt controller is
        configured, and it must work inside a fault handler.  */
 
     while ((REG32(CONSOLE_BASE + LINFLEXD_UARTSR) & UARTSR_DTF) == 0U)
     {
-        /* wait */
+        /* wait for this byte to go out */
     }
 
     REG32(CONSOLE_BASE + LINFLEXD_UARTSR) = UARTSR_DTF;
+
+    guard = LINFLEXD_INIT_GUARD;
+    while (((REG32(CONSOLE_BASE + LINFLEXD_UARTSR) & UARTSR_DTF) != 0U)
+               && (guard > 0U))
+    {
+        guard--;
+    }
 }
 
 

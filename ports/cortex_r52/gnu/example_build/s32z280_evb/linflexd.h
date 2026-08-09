@@ -32,9 +32,18 @@
 #ifndef LINFLEXD_H
 #define LINFLEXD_H
 
-/* Configure LINFlex_9 for 115200 8N1 and enable the transmitter.         */
+/* Status bits returned by linflexd_init().                               */
 
-void    linflexd_init(void);
+#define LINFLEXD_INIT_OK                0x00U
+#define LINFLEXD_INIT_NO_INITMODE       0x01U   /* never entered init mode  */
+#define LINFLEXD_INIT_UARTCR_MISMATCH   0x02U   /* a write was ignored      */
+
+/* Configure LINFlex_9 for 115200 8N1 and enable the transmitter.  Returns
+   LINFLEXD_INIT_OK, or a mask of the above.  It is worth checking: writes to
+   UARTCR outside initialisation mode are silently dropped, which produces
+   output that looks like a baud-rate problem rather than a framing one.  */
+
+unsigned int    linflexd_init(void);
 
 /* Blocking single character.  Translates \n to \r\n so the output is
    readable on a terminal that does not add the carriage return itself.  */

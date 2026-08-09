@@ -188,7 +188,7 @@ void bsp_main(void)
        stays: it is what proved the boot path before a console existed, and it
        still works if the console itself is misconfigured.  */
 
-    linflexd_init();
+    r52_identity.console_status = linflexd_init();
     linflexd_puts("\n=== ThreadX Cortex-R52 :: NXP S32Z280-594EVB ===\n");
     report("MIDR     ", r52_identity.midr);
     report("MPUIR    ", r52_identity.mpuir);
@@ -203,6 +203,8 @@ void bsp_main(void)
     report("CPSR@EL1 ", r52_identity.cpsr_el1);
     linflexd_puts("EL1 MPU regions: ");
     linflexd_put_hex32(r52_identity.mpu_regions_el1);
+    linflexd_putc('\n');
+    report("CONSOLE  ", r52_identity.console_status);
     linflexd_puts("\n=== boot complete ===\n");
 
     /* Deliberate breakpoint target.  The debug script sets a hardware
