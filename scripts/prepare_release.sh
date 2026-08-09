@@ -78,6 +78,20 @@ printf "\nThreadX release preparation\n"
 printf "  Repository      : %s\n" "${REPO_ROOT}"
 printf "  Current version : %s\n" "${CURR_VER}"
 printf "  Target version  : %s\n\n" "${VERSION}"
+
+# --------------------------------------------------------------------------
+# Port consistency checks
+# --------------------------------------------------------------------------
+# Run before anything is branched or rewritten, so a release is never cut on
+# top of ports that have drifted from ports_arch or headers that cannot
+# compile. Set SKIP_PORT_CHECKS=1 to proceed anyway.
+if [ "${SKIP_PORT_CHECKS:-0}" = "1" ]; then
+    printf "Skipping the port consistency checks (SKIP_PORT_CHECKS=1).\n\n"
+elif ! "${SCRIPT_DIR}/check_ports.sh"; then
+    printf "\nRelease preparation stopped: the port consistency checks failed.\n"
+    printf "Fix the problems above, or set SKIP_PORT_CHECKS=1 to proceed anyway.\n"
+    exit 1
+fi
 printf "Proceed with update? [y/N] "
 read -r CONFIRM
 case "${CONFIRM}" in
