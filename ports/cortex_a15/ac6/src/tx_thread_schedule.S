@@ -251,4 +251,3 @@ no_fiq:
     BX      lr
 
 #endif
-

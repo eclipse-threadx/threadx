@@ -58,7 +58,7 @@ jobs:
       pull-requests: write
 
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -160,7 +160,7 @@ jobs:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}
 
   deploy_code_coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && !failure() && !cancelled()
     needs: run_tests
     environment:

@@ -78,9 +78,23 @@ elif ! command -v git >/dev/null 2>&1; then
 elif [ -n "$(git status --porcelain -uno)" ]; then
     fail "the working tree has uncommitted changes; commit or stash them, or pass --no-regen"
 else
-    ./scripts/copy_armv7_m.sh >/dev/null 2>&1
-    ./scripts/copy_armv8_m.sh >/dev/null 2>&1
-    ./scripts/copy_module_armv7_m.sh >/dev/null 2>&1
+    # A generator that fails or is missing must not leave the tree looking
+    # clean, which would be a false pass.
+    generator_failed=0
+    run_generator() {
+        if ! "$@" >/dev/null 2>&1; then
+            fail "generator failed: $*"
+            generator_failed=1
+        fi
+    }
+
+    run_generator ./scripts/copy_armv7_m.sh
+    run_generator ./scripts/copy_armv8_m.sh
+    run_generator ./scripts/copy_module_armv7_m.sh
+    run_generator env -C ports_arch/ARMv7-A ./update.sh --port-sets tx \
+        --copy-common-files --copy-port-files --copy-example --patch-files
+    run_generator env -C ports_arch/ARMv8-A ./update.sh --port-sets tx,tx_smp \
+        --copy-common-files --copy-port-files --copy-example --patch-files
 
     drift="$(git status --porcelain -uno)"
     if [ -n "$drift" ]; then

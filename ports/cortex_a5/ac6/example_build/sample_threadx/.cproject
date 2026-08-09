@@ -45,7 +45,7 @@
 
                                 <option id="com.arm.tool.c.compiler.v6.base.option.target.665260895" name="Target (--target)" superClass="com.arm.tool.c.compiler.v6.base.option.target" useByScannerDiscovery="true" value="arm-arm-none-eabi" valueType="string"/>
 
-                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.2102538095" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a7" valueType="string"/>
+                                <option id="com.arm.tool.c.compiler.v6.base.option.cpu.2102538095" name="CPU (-mcpu)" superClass="com.arm.tool.c.compiler.v6.base.option.cpu" useByScannerDiscovery="true" value="cortex-a5" valueType="string"/>
 
                                 <option id="com.arm.tool.c.compiler.v6.base.option.fpu.633771589" name="FPU (-mfpu)" superClass="com.arm.tool.c.compiler.v6.base.option.fpu" useByScannerDiscovery="true" value="none" valueType="string"/>
 
@@ -77,7 +77,7 @@
 
                                 <option id="com.arm.tool.assembler.v6.base.option.target.748329430" name="Target (--target)" superClass="com.arm.tool.assembler.v6.base.option.target" useByScannerDiscovery="false" value="arm-arm-none-eabi" valueType="string"/>
 
-                                <option id="com.arm.tool.assembler.v6.base.option.cpu.289232043" name="CPU (-mcpu)" superClass="com.arm.tool.assembler.v6.base.option.cpu" useByScannerDiscovery="false" value="cortex-a7" valueType="string"/>
+                                <option id="com.arm.tool.assembler.v6.base.option.cpu.289232043" name="CPU (-mcpu)" superClass="com.arm.tool.assembler.v6.base.option.cpu" useByScannerDiscovery="false" value="cortex-a5" valueType="string"/>
 
                                 <option id="com.arm.tool.assembler.v6.base.option.fpu.2069861530" name="FPU (-mfpu)" superClass="com.arm.tool.assembler.v6.base.option.fpu" useByScannerDiscovery="true" value="none" valueType="string"/>
 
