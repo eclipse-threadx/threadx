@@ -41,6 +41,24 @@ jobs:
       cmake_path: ./test/smp/cmake
       result_affix: SMP
       skip_deploy: true
+  freertos:
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/regression_template.yml
+    with:
+      build_script: ./scripts/build_freertos.sh
+      test_script: ./scripts/test_freertos.sh
+      cmake_path: ./test/freertos/cmake
+      result_affix: FreeRTOS
+      skip_deploy: true
+      # No coverage build configuration yet; the suite covers the creation
+      # paths of the layer rather than all of it.
+      skip_coverage: true
   # riscv: disabled — re-enable when RISC-V CI is ready
   # riscv:
   #   permissions:
