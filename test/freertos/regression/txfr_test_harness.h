@@ -49,7 +49,8 @@ typedef enum TXFR_INJECT_TARGET_ENUM
     TXFR_INJECT_MUTEX_CREATE,
     TXFR_INJECT_EVENT_FLAGS_CREATE,
     TXFR_INJECT_TIMER_CREATE,
-    TXFR_INJECT_THREAD_CREATE
+    TXFR_INJECT_THREAD_CREATE,
+    TXFR_INJECT_THREAD_RESUME
 } TXFR_INJECT_TARGET;
 
 /* Counts of the ThreadX primitives the layer reached for while accounting was
@@ -70,6 +71,10 @@ typedef struct TXFR_COUNTERS_STRUCT
     int timer_delete;
     int thread_create;
     int thread_delete;
+
+    /* Counted, but not part of the object totals checked below, since a
+       resume creates nothing.  */
+    int thread_resume;
 } TXFR_COUNTERS;
 
 /* Start accounting. Pass TXFR_INJECT_NONE to only count, or a target together
