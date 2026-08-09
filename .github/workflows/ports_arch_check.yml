@@ -6,7 +6,10 @@ name: ports_arch_check
 # events but only for the master branch
 on:
   pull_request:
-    branches: [ master ]
+    # dev is included as well as master. The check only ever ran against master,
+    # so eight months of port fixes merged into dev without it, and the ports
+    # drifted from ports_arch unnoticed.
+    branches: [ master, dev ]
     paths:
       - ".github/workflows/ports_arch_check.yml"
       - 'common/**'
@@ -27,21 +30,20 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - name: Checkout sources recursively
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.REPO_SCOPED_TOKEN }}
-        submodules: true
+    # No token input: secrets are not available to pull requests from forks, so
+    # passing one made this job fail at checkout with "Input required and not
+    # supplied: token" and the check never evaluated anything. The default
+    # GITHUB_TOKEN is enough to check out a public repository, and the
+    # repository has no submodules.
+    - name: Checkout sources
+      uses: actions/checkout@v4
 
-    # Copy ports arch
-    - name: Copy ports arch
-      run: |
-        scripts/copy_armv7_m.sh && scripts/copy_armv8_m.sh && scripts/copy_module_armv7_m.sh
-        if [[ -n $(git status --porcelain -uno) ]]; then
-          echo "Ports for ARM architecture is not updated"
-          git status
-          exit 1
-        fi
+    # Check the port trees: the generated ports must be reproducible from
+    # ports_arch, and no port header may be left unbalanced or carrying code
+    # outside a function. The same script runs locally, so a contributor sees
+    # exactly what CI sees.
+    - name: Check ports
+      run: scripts/check_ports.sh
 
   cortex-a:
     # Check ports for cortex-a
@@ -50,11 +52,13 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - name: Checkout sources recursively
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.REPO_SCOPED_TOKEN }}
-        submodules: true
+    # No token input: secrets are not available to pull requests from forks, so
+    # passing one made this job fail at checkout with "Input required and not
+    # supplied: token" and the check never evaluated anything. The default
+    # GITHUB_TOKEN is enough to check out a public repository, and the
+    # repository has no submodules.
+    - name: Checkout sources
+      uses: actions/checkout@v4
 
     # Copy ports arch
     - name: Copy ports arch
