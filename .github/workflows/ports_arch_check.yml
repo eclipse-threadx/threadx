@@ -25,7 +25,7 @@ jobs:
   # Check ports for cortex-m
   cortex-m:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -46,8 +46,10 @@ jobs:
       run: scripts/check_ports.sh
 
   cortex-a:
-    # Check ports for cortex-a
-    runs-on: windows-latest
+    # Check ports for cortex-a. This ran on Windows because the A profile
+    # tooling was PowerShell only; update.sh beside each update.ps1 means it
+    # runs on the same image as every other job now.
+    runs-on: ubuntu-24.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -60,18 +62,19 @@ jobs:
     - name: Checkout sources
       uses: actions/checkout@v4
 
-    # Copy ports arch
-    - name: Copy ports arch
+    # Regenerate the A profile ports and fail if anything changed, which means
+    # a generated port was edited directly instead of ports_arch.
+    - name: Check the Cortex-A ports
       run: |
-        cd ports_arch/ARMv7-A
-        pwsh -Command ./update.ps1 -PortSets tx -CopyCommonFiles -CopyPortFiles -CopyExample -PatchFiles
-        cd ../../ports_arch/ARMv8-A
-        pwsh -Command ./update.ps1 -PortSets tx,tx_smp -CopyCommonFiles -CopyPortFiles -CopyExample -PatchFiles
-        if ((git status --porcelain -uno) -ne $null) {
-          Write-Host "Ports for ARM architecture is not updated"
-          git status
-          Exit 1
-        }
+        (cd ports_arch/ARMv7-A && ./update.sh --port-sets tx \
+            --copy-common-files --copy-port-files --copy-example --patch-files)
+        (cd ports_arch/ARMv8-A && ./update.sh --port-sets tx,tx_smp \
+            --copy-common-files --copy-port-files --copy-example --patch-files)
+        if [[ -n $(git status --porcelain -uno) ]]; then
+          echo "The Cortex-A ports are not reproducible from ports_arch:"
+          git status --porcelain -uno
+          exit 1
+        fi
 
 
 
