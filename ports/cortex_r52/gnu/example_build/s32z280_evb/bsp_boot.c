@@ -56,6 +56,7 @@
 #include "platform.h"
 #include "linflexd.h"
 #include "timer.h"
+#include "gic_probe.h"
 
 /* Captured at EL2 by entry.S, before the drop to EL1.                    */
 
@@ -246,6 +247,58 @@ void bsp_main(void)
         linflexd_put_hex32((unsigned int)(after - before));
         linflexd_puts("\n");
     }
+
+    /* --- where is the GIC, and is the port to it open? ---------------------
+       System-register reads only: a load from the GIC window stalls the core,
+       so nothing here touches memory.  */
+
+    report("IMP_CBAR ", gic_read_cbar());
+    report("PERIPHPRG", gic_read_periphpregionr());
+
+    /* The peripheral port is now enabled at EL2, so RTU peripheral space
+       should be reachable.  Marker first: if this still stalls, the run dies
+       here and says so.  */
+
+    linflexd_puts("P1 RTU0.GPR CFG_CNTDV via LLPP\n");
+    report("CFG_CNTDV", *(volatile unsigned int *)S32Z_RTU0_GPR_CFG_CNTDV);
+
+    /* The GIC is NOT read here, and the reason is now known rather than
+       guessed.  IMP_CBAR reports the distributor at 0x47800000, matching NXP's
+       map, and the Cortex-R52 TRM gives the frame layout: GICD at +0x000000,
+       redistributor control at +0x100000 and SGI/PPI at +0x110000, then
+       +0x20000 per further core.  The addresses were never the problem.
+
+       The TRM also says: "Ensure that the memory region used for the GIC
+       Distributor is configured as Device nGnRnE."  The MPU is still disabled
+       here -- SCTLR.M reads 0 -- so nothing maps that region at all, and the
+       access stalls the core outright.  Enabling the LLPP does not help: the
+       GIC sits outside that window and is reached over AXIM.
+
+       Reading it therefore has to wait for MPU programming, which the FVP
+       example already does table-driven in mpu.c and which is the next piece
+       of work here.  */
+
+    linflexd_puts("P2 probes done (GIC deferred: needs Device nGnRnE mapping)\n");
+
+    /* --- GIC: not reachable yet, probe deliberately removed ----------------
+       The GIC window NXP's memory map gives for this cluster, 0x47800000, is
+       unreachable from BOTH paths in the current state.  The debugger cannot
+       read any of it, and a load from the core stalls the core outright: the
+       run dies at the marker before the access, with no fault recorded and the
+       debug connection dropped -- the same signature as RTU0.GPR.
+
+       The Reference Manual contains no GIC base address anywhere, so that
+       address rests entirely on NXP's debugger script.  What the manual does
+       mention is the R52's "Arm low-latency peripheral port".  On Cortex-R52
+       the LLPP is an implementation-defined region that software programs and
+       enables; if it is disabled out of reset, or covers a different base,
+       accesses to a peripheral in that window stall exactly like this.
+       Settling it needs the Cortex-R52 TRM, which documents the region
+       registers -- NXP's manual does not.
+
+       The probe is removed rather than left disabled: while it was present the
+       image stalled here every run, which costs the timer and console results
+       that come before it.  */
 
     /* Deliberate breakpoint target.  The debug script sets a hardware
        breakpoint here, so "the image ran to completion" is something the script

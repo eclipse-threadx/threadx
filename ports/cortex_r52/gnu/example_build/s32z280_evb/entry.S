@@ -72,6 +72,11 @@
     .equ    ICC_HSRE_SRE,     (1 << 0)
     .equ    ICC_HSRE_ENABLE,  (1 << 3)
 
+/* IMP_PERIPHPREGIONR: peripheral port enables.  Both reset to 0.         */
+
+    .equ    PERIPHP_ENABLE_EL10, (1 << 0)
+    .equ    PERIPHP_ENABLE_EL2,  (1 << 1)
+
 /* CPSR mode and mask bits.                                               */
 
     .equ    MODE_USR,   0x10
@@ -263,6 +268,21 @@ start_a32:
     mrc     p15, 4, r0, c12, c9, 5          /* ICC_HSRE                     */
     orr     r0, r0, #(ICC_HSRE_SRE | ICC_HSRE_ENABLE)
     mcr     p15, 4, r0, c12, c9, 5
+    isb
+
+    /* Open the low-latency peripheral port.
+       IMP_PERIPHPREGIONR (Cortex-R52 TRM r1p3, 3.3.80) describes a region at
+       0x76000000 of 4 MB on this part -- the RTU peripheral space -- with
+       separate enables for EL2 and EL1/0 that BOTH RESET TO ZERO.  Until they
+       are set, any access in that window stalls the core: no abort, no fault
+       handler, no exception at all, and the debug connection drops with it.
+       Nothing in the SoC reference manual mentions this; it cost a run before
+       the TRM identified it.  Written here because EL1 writes to this register
+       trap to EL2 when HACTLR.PERIPHPREGIONR is clear.  */
+
+    mrc     p15, 0, r0, c15, c0, 0          /* IMP_PERIPHPREGIONR           */
+    orr     r0, r0, #(PERIPHP_ENABLE_EL2 | PERIPHP_ENABLE_EL10)
+    mcr     p15, 0, r0, c15, c0, 0
     isb
 
     /* Record CPSR while still at EL2: mode bits should read 0x1A (Hyp).  */

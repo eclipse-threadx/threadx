@@ -112,6 +112,19 @@
 #define S32Z_RTU0_GPR_BASE              0x76120000UL
 #define S32Z_RTU0_GPR_CFG_CNTDV         (S32Z_RTU0_GPR_BASE + 0x10UL)
 
+/* GICv3 for this R52 cluster.  IMP_CBAR reports the distributor base in  */
+/* bits [31:21] and reads 0x47800000 on this board, confirming NXP's map  */
+/* from the hardware -- the SoC reference manual gives no GIC address at  */
+/* all, and its note that the "R52 Cluster set addr [31:21]" is just      */
+/* CFGPERIPHBASE[31:21] restated.  Frame layout from Cortex-R52 TRM Table */
+/* 9-1: distributor at +0x000000, redistributor control at +0x100000,     */
+/* redistributor SGI/PPI at +0x110000, then +0x20000 per further core.    */
+/* The region must be mapped Device nGnRnE before it can be read; with the*/
+/* MPU disabled an access stalls the core.                                */
+
+#define S32Z_GIC_BASE                   0x47800000UL
+#define S32Z_GIC_SIZE                   0x00200000UL
+
 #define S32Z_MDM_AP_BASE                0x4DC11000UL
 #define S32Z_MDM_AP_CONTROL2            (S32Z_MDM_AP_BASE + 0x44UL)
 #define S32Z_MDM_AP_RTU0_CORE0_EDBGREQ  0x00010000UL
