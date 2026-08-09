@@ -350,6 +350,7 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
     ret = tx_thread_create(&pxTaskBuffer->thread, (CHAR *)pcName, txfr_thread_wrapper, (ULONG)pvParameters,
             puxStackBuffer, stack_depth_bytes, prio, prio, 0u, TX_DONT_START);
     if(ret != TX_SUCCESS) {
+        (void)tx_semaphore_delete(&pxTaskBuffer->notification_sem);
         TX_FREERTOS_ASSERT_FAIL();
         return NULL;
     }
@@ -358,6 +359,12 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
 
     ret = tx_thread_resume(&pxTaskBuffer->thread);
     if(ret != TX_SUCCESS) {
+        /* The thread exists but was never started. It has to be terminated
+           before it can be deleted, which is the order the idle task uses when
+           it reaps a deleted task.  */
+        (void)tx_thread_terminate(&pxTaskBuffer->thread);
+        (void)tx_thread_delete(&pxTaskBuffer->thread);
+        (void)tx_semaphore_delete(&pxTaskBuffer->notification_sem);
         TX_FREERTOS_ASSERT_FAIL();
         return NULL;
     }
@@ -1489,6 +1496,7 @@ QueueHandle_t xQueueCreateStatic(UBaseType_t uxQueueLength,
 
     ret = tx_semaphore_create(&pxQueueBuffer->write_sem, "", uxQueueLength);
     if(ret != TX_SUCCESS) {
+        (void)tx_semaphore_delete(&pxQueueBuffer->read_sem);
         return NULL;
     }
 

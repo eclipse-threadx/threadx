@@ -96,6 +96,22 @@ void txfr_test_body(void)
         txfr_test_check_counts("vQueueDelete on static queue", &counters, 0, 0, 0, 2);
     }
 
+    /* The static variant owns no memory, but it still creates two semaphores
+       and still hands back nothing on failure, so the caller cannot call
+       vQueueDelete(). A read semaphore left behind here would stay registered
+       in the kernel, pointing into the caller's StaticQueue_t.  */
+    txfr_test_account_start(TXFR_INJECT_SEMAPHORE_CREATE, 1);
+    queue = xQueueCreateStatic(QUEUE_LENGTH, QUEUE_ITEM_SIZE, queue_storage, &queue_control_block);
+    txfr_test_account_stop(&counters);
+    txfr_test_check("xQueueCreateStatic returns NULL on read_sem failure", queue == NULL);
+    txfr_test_check_counts("static read_sem failure leaves nothing behind", &counters, 0, 0, 1, 0);
+
+    txfr_test_account_start(TXFR_INJECT_SEMAPHORE_CREATE, 2);
+    queue = xQueueCreateStatic(QUEUE_LENGTH, QUEUE_ITEM_SIZE, queue_storage, &queue_control_block);
+    txfr_test_account_stop(&counters);
+    txfr_test_check("xQueueCreateStatic returns NULL on write_sem failure", queue == NULL);
+    txfr_test_check_counts("static write_sem failure unwinds read_sem", &counters, 0, 0, 2, 1);
+
     /* Repeated create and delete cycles must leave the pool able to serve the
        same request. This would not catch a small leak on its own, which is why
        the counts above are checked directly, but it does catch a descriptor

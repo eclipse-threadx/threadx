@@ -52,6 +52,7 @@ UINT __real__txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*ent
                                UINT preempt_threshold, ULONG time_slice, UINT auto_start,
                                UINT thread_control_block_size);
 UINT __real__txe_thread_delete(TX_THREAD *thread_ptr);
+UINT __real__txe_thread_resume(TX_THREAD *thread_ptr);
 
 
 /* Determine whether the call now being made is the one the test asked to fail.
@@ -237,6 +238,23 @@ UINT __wrap__txe_thread_delete(TX_THREAD *thread_ptr)
     }
 
     return __real__txe_thread_delete(thread_ptr);
+}
+
+
+UINT __wrap__txe_thread_resume(TX_THREAD *thread_ptr)
+{
+    if(txfr_should_fail(TXFR_INJECT_THREAD_RESUME) != 0)
+    {
+        txfr_counters.thread_resume++;
+        return TX_RESUME_ERROR;
+    }
+
+    if(txfr_accounting != 0)
+    {
+        txfr_counters.thread_resume++;
+    }
+
+    return __real__txe_thread_resume(thread_ptr);
 }
 
 

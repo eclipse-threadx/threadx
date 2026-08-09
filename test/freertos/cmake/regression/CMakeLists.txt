@@ -45,7 +45,8 @@ set(wrapped_symbols
     _txe_timer_create
     _txe_timer_delete
     _txe_thread_create
-    _txe_thread_delete)
+    _txe_thread_delete
+    _txe_thread_resume)
 
 set(wrap_link_options "")
 foreach(symbol ${wrapped_symbols})

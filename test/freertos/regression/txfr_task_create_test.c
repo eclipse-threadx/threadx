@@ -36,6 +36,18 @@
 static StaticTask_t  task_control_block;
 static StackType_t   task_stack[TASK_STACK_DEPTH];
 
+/* Each failure case gets its own buffers, for two reasons. vTaskDelete() only
+   queues a task for the idle task to reap, so the control block of a task
+   deleted above is still live while this test thread runs. And if one of these
+   paths ever regresses and leaves an object behind, a shared buffer would
+   carry that damage into the next case and report misleading counts there.  */
+static StaticTask_t  semaphore_failure_control_block;
+static StackType_t   semaphore_failure_stack[TASK_STACK_DEPTH];
+static StaticTask_t  thread_failure_control_block;
+static StackType_t   thread_failure_stack[TASK_STACK_DEPTH];
+static StaticTask_t  resume_failure_control_block;
+static StackType_t   resume_failure_stack[TASK_STACK_DEPTH];
+
 
 static void test_task_entry(void *p_arg)
 {
@@ -102,4 +114,32 @@ void txfr_test_body(void)
     {
         vTaskDelete(task);
     }
+
+    /* As with the queues, the static variant owns no memory but still creates
+       kernel objects and still returns nothing on failure. A semaphore or a
+       thread left behind here stays registered in the kernel, pointing into
+       the caller's StaticTask_t.  */
+    txfr_test_account_start(TXFR_INJECT_SEMAPHORE_CREATE, 1);
+    task = xTaskCreateStatic(test_task_entry, "s_sem", TASK_STACK_DEPTH, NULL, TASK_PRIORITY,
+                             semaphore_failure_stack, &semaphore_failure_control_block);
+    txfr_test_account_stop(&counters);
+    txfr_test_check("xTaskCreateStatic returns NULL on semaphore failure", task == NULL);
+    txfr_test_check_counts("static semaphore failure leaves nothing behind", &counters, 0, 0, 1, 0);
+
+    txfr_test_account_start(TXFR_INJECT_THREAD_CREATE, 1);
+    task = xTaskCreateStatic(test_task_entry, "s_thr", TASK_STACK_DEPTH, NULL, TASK_PRIORITY,
+                             thread_failure_stack, &thread_failure_control_block);
+    txfr_test_account_stop(&counters);
+    txfr_test_check("xTaskCreateStatic returns NULL on thread failure", task == NULL);
+    txfr_test_check_counts("static thread failure unwinds the semaphore", &counters, 0, 0, 2, 1);
+
+    /* The resume is the last step, so by then both kernel objects exist. The
+       thread has to be terminated before it can be deleted, which is the order
+       the idle task uses when it reaps a deleted task.  */
+    txfr_test_account_start(TXFR_INJECT_THREAD_RESUME, 1);
+    task = xTaskCreateStatic(test_task_entry, "s_res", TASK_STACK_DEPTH, NULL, TASK_PRIORITY,
+                             resume_failure_stack, &resume_failure_control_block);
+    txfr_test_account_stop(&counters);
+    txfr_test_check("xTaskCreateStatic returns NULL on resume failure", task == NULL);
+    txfr_test_check_counts("static resume failure unwinds thread and semaphore", &counters, 0, 0, 2, 2);
 }
