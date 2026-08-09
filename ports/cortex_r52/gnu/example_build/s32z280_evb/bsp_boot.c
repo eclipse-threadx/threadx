@@ -53,6 +53,7 @@
 /**************************************************************************/
 
 #include "board.h"
+#include "linflexd.h"
 
 /* Captured at EL2 by entry.S, before the drop to EL1.                    */
 
@@ -121,6 +122,19 @@ static unsigned int read_sctlr(void)
 
 
 /**************************************************************************/
+/*  report -- one "NAME = VALUE" line on the console.                     */
+/**************************************************************************/
+
+static void report(const char *name, unsigned int value)
+{
+    linflexd_puts(name);
+    linflexd_puts(" = 0x");
+    linflexd_put_hex32(value);
+    linflexd_putc('\n');
+}
+
+
+/**************************************************************************/
 /*  bsp_done -- breakpoint target, reached once the structure is complete.*/
 /*                                                                        */
 /*  Deliberately not static and deliberately not inlined: it exists purely*/
@@ -169,6 +183,27 @@ void bsp_main(void)
     r52_identity.mpu_regions_el1 = (r52_identity.mpuir >> 8) & 0xFFU;
 
     r52_identity.magic        = R52_IDENTITY_MAGIC;
+
+    /* Report over the console as well as through memory.  The memory copy
+       stays: it is what proved the boot path before a console existed, and it
+       still works if the console itself is misconfigured.  */
+
+    linflexd_init();
+    linflexd_puts("\n=== ThreadX Cortex-R52 :: NXP S32Z280-594EVB ===\n");
+    report("MIDR     ", r52_identity.midr);
+    report("MPUIR    ", r52_identity.mpuir);
+    report("HMPUIR   ", r52_identity.hmpuir_el2);
+    report("CTR      ", r52_identity.ctr);
+    report("MPIDR    ", r52_identity.mpidr);
+    report("ID_PFR0  ", r52_identity.id_pfr0);
+    report("ID_PFR1  ", r52_identity.id_pfr1);
+    report("SCTLR    ", r52_identity.sctlr_el1);
+    report("CNTFRQ   ", r52_identity.cntfrq_el2);
+    report("CPSR@EL2 ", r52_identity.cpsr_el2);
+    report("CPSR@EL1 ", r52_identity.cpsr_el1);
+    linflexd_puts("EL1 MPU regions: ");
+    linflexd_put_hex32(r52_identity.mpu_regions_el1);
+    linflexd_puts("\n=== boot complete ===\n");
 
     /* Deliberate breakpoint target.  The debug script sets a hardware
        breakpoint here, so "the image ran to completion" is something the script

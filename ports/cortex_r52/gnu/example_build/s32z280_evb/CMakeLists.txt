@@ -17,6 +17,7 @@ set(EVB_DIR ${CMAKE_CURRENT_LIST_DIR})
 add_executable(s32z280_boot.elf EXCLUDE_FROM_ALL
     ${EVB_DIR}/entry.S
     ${EVB_DIR}/bsp_boot.c
+    ${EVB_DIR}/linflexd.c
 )
 
 target_include_directories(s32z280_boot.elf PRIVATE ${EVB_DIR})
