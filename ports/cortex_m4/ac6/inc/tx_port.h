@@ -545,8 +545,8 @@ __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsign
 {
     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value) : "memory");
 }
-#else
 
+#else
 __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
 {
     __asm__ volatile ("CPSIE  i": : : "memory");
@@ -593,6 +593,7 @@ unsigned int interrupt_save;
         __enable_interrupts();
 #endif
         __restore_interrupt(interrupt_save);
+        __asm__ volatile ("isb 0xF " : : : "memory");
     }
 }
 
