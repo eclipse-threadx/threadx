@@ -53,7 +53,9 @@
 /**************************************************************************/
 
 #include "board.h"
+#include "platform.h"
 #include "linflexd.h"
+#include "timer.h"
 
 /* Captured at EL2 by entry.S, before the drop to EL1.                    */
 
@@ -205,7 +207,45 @@ void bsp_main(void)
     linflexd_put_hex32(r52_identity.mpu_regions_el1);
     linflexd_putc('\n');
     report("CONSOLE  ", r52_identity.console_status);
-    linflexd_puts("\n=== boot complete ===\n");
+
+    /* --- generic timer ----------------------------------------------------
+       CNTFRQ is now programmed at EL2 (8 MHz, measured and cross-checked
+       against CFG_CNTDV and FXOSC).  Prove the timer end to end: read it back,
+       then arm a one-second one-shot and poll for it, bracketed by CNTPCT
+       samples.  If the counter and the compare agree, the elapsed count is
+       CNTFRQ; if the host also sees one second pass, the rate itself is right
+       rather than merely self-consistent.
+
+       Interrupt stays masked -- no GIC yet.  Polling first means a later
+       interrupt problem cannot be confused with the timer being wrong.  */
+
+    report("CNTFRQ   ", timer_read_cntfrq());
+
+    {
+        unsigned long long before;
+        unsigned long long after;
+        unsigned int       hz = timer_read_cntfrq();
+
+        /* Sample AFTER the message, not before: at 115200 the line itself is
+           about 2 ms, and sampling first puts that inside the measurement.  */
+
+        linflexd_puts("TIMER arming 1s one-shot\n");
+        before = timer_read_cntpct();
+        timer_start_oneshot(hz);
+
+        while (timer_fired() == 0U)
+        {
+            /* poll */
+        }
+
+        after = timer_read_cntpct();
+        timer_stop();
+
+        linflexd_puts("TIMER fired, elapsed counts = 0x");
+        linflexd_put_hex32((unsigned int)((after - before) >> 32));
+        linflexd_put_hex32((unsigned int)(after - before));
+        linflexd_puts("\n");
+    }
 
     /* Deliberate breakpoint target.  The debug script sets a hardware
        breakpoint here, so "the image ran to completion" is something the script

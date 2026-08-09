@@ -85,6 +85,10 @@
     .equ    PSR_I,      0x80
     .equ    PSR_A,      0x100
 
+/* System counter frequency; see where it is programmed below.            */
+
+    .equ    SYSTEM_COUNTER_HZ, 8000000
+
 /* Stage markers, recorded in boot_stage.                                 */
 
     .equ    STAGE_A32,      1           /* switched out of Thumb            */
@@ -216,9 +220,25 @@ start_a32:
     /* Record CNTFRQ as found.  Deliberately not written: see the file
        header.  */
 
-    mrc     p15, 0, r0, c14, c0, 0          /* CNTFRQ                       */
+    mrc     p15, 0, r0, c14, c0, 0          /* CNTFRQ as found              */
     ldr     r1, =cntfrq_at_el2
     str     r0, [r1]
+
+    /* Program CNTFRQ.  It is writable only at the highest implemented
+       exception level, so it must happen here rather than in bsp_main.
+       CNTFRQ is a software-declared constant: nothing derives it from the
+       hardware, and it reads zero out of reset on this silicon exactly as it
+       does on the FVP.  Any code computing a tick interval from it would
+       divide by zero.
+
+       8 MHz is not a guess.  The counter was measured against host wall-clock
+       time at 8.0227 MHz over a 32-second interval, and the clock tree agrees:
+       RTU.GPR CFG_CNTDV reads 4, so the divider is (4+1) = 5, and the board's
+       FXOSC is 40 MHz -- itself confirmed independently by the LINFlexD baud
+       divisors the BootROM left behind.  40 / 5 = 8.  */
+
+    ldr     r0, =SYSTEM_COUNTER_HZ
+    mcr     p15, 0, r0, c14, c0, 0          /* CNTFRQ                       */
 
     /* HMPUIR is EL2-only, so it has to be read here rather than in bsp_main.
        It gives the EL2 MPU region count, which stage-2 partitioning needs and

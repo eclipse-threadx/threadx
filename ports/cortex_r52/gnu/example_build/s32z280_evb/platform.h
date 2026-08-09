@@ -105,6 +105,13 @@
 /* debug request bits that must be clear for the core to execute at all.  */
 /* Reachable from the core context only.  [RM + verified on board]        */
 
+/* RTU0 general-purpose registers.  CFG_CNTDV holds the divider that makes*/
+/* the Cortex-R52 generic timer clock-enable, CNTCLKEN, from a cluster    */
+/* clock. Reset value of the CNTDV field is 4.  [RM section 9.2.1.6]      */
+
+#define S32Z_RTU0_GPR_BASE              0x76120000UL
+#define S32Z_RTU0_GPR_CFG_CNTDV         (S32Z_RTU0_GPR_BASE + 0x10UL)
+
 #define S32Z_MDM_AP_BASE                0x4DC11000UL
 #define S32Z_MDM_AP_CONTROL2            (S32Z_MDM_AP_BASE + 0x44UL)
 #define S32Z_MDM_AP_RTU0_CORE0_EDBGREQ  0x00010000UL

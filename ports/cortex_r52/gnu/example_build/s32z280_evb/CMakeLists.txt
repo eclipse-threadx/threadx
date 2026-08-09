@@ -18,6 +18,7 @@ add_executable(s32z280_boot.elf EXCLUDE_FROM_ALL
     ${EVB_DIR}/entry.S
     ${EVB_DIR}/bsp_boot.c
     ${EVB_DIR}/linflexd.c
+    ${EVB_DIR}/timer.c
 )
 
 target_include_directories(s32z280_boot.elf PRIVATE ${EVB_DIR})
