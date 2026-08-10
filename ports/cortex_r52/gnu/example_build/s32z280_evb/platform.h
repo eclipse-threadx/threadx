@@ -58,6 +58,13 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+/* Memory-mapped register access.  Kept here rather than per-driver so that
+   every peripheral in this BSP goes through one definition.
+   MISRA C:2012 Rule 11.4/11.6 deviation: casting an integer address to a
+   volatile pointer is inherent to memory-mapped device access.  */
+
+#define REG32(address)  (*(volatile unsigned long *)(unsigned long)(address))
+
 /* Code SRAM, instruction-fetch view.  7 MB.  This is where the core      */
 /* resets to, and where .text is linked and loaded.  [verified on board]  */
 
@@ -130,6 +137,19 @@
 
 #define S32Z_GIC_BASE                   0x47800000UL
 #define S32Z_GIC_SIZE                   0x00200000UL
+
+/* Frames within that window, from Cortex-R52 TRM Table 9-1: distributor at
+   +0x000000, redistributor control at +0x100000, redistributor SGI/PPI at
+   +0x110000, then +0x20000 per further core.  Both frames verified on the
+   board -- GICD_PIDR2 and GICR_PIDR2 both read 0x3B.
+
+   These must be mapped Device nGnRnE before use.  With the region Normal, or
+   with the MPU disabled, an access stalls the core outright: no abort, no
+   fault handler, and the debug connection drops.  mpu.c maps them.  */
+
+#define GICD_BASE                       (S32Z_GIC_BASE + 0x000000UL)
+#define GICR_RD_BASE                    (S32Z_GIC_BASE + 0x100000UL)
+#define GICR_SGI_BASE                   (S32Z_GIC_BASE + 0x110000UL)
 
 #define S32Z_MDM_AP_BASE                0x4DC11000UL
 #define S32Z_MDM_AP_CONTROL2            (S32Z_MDM_AP_BASE + 0x44UL)

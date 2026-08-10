@@ -58,6 +58,7 @@
 #include "timer.h"
 #include "gic_probe.h"
 #include "mpu.h"
+#include "gicv3.h"
 
 /* Captured at EL2 by entry.S, before the drop to EL1.                    */
 
@@ -155,6 +156,17 @@ static void report(const char *name, unsigned int value)
 /*  an empty static function, and then the script would have nothing to   */
 /*  attach to.                                                            */
 /**************************************************************************/
+
+/* Clear CPSR.I so the GIC can deliver to this core.  Interrupts stay masked
+   from reset all the way to here on purpose: nothing before this point is
+   prepared to service one.  */
+
+static void enable_irq_at_el1(void)
+{
+    __asm volatile ("cpsie i" ::: "memory");
+    __asm volatile ("isb");
+}
+
 
 unsigned int read_sctlr_after_mpu(void)
 {
@@ -332,6 +344,59 @@ void bsp_main(void)
         report("GICR_PIDR2", *(volatile unsigned int *)(S32Z_GIC_BASE + 0x10FFE8UL));
         MARK(0x16);
         linflexd_puts("M4 GIC reachable\n");
+
+        /* --- interrupts -------------------------------------------------
+           Bring up the GIC properly, enable the timer PPI, arm a 10 ms
+           one-shot and unmask IRQ at EL1.  Then wait and see whether the
+           handler runs.  Polling proved the timer counts and fires; this
+           proves the interrupt is delivered, which is a different claim.  */
+
+        MARK(0x50);
+        linflexd_puts("I1 gicv3_init\n");
+        gicv3_init();
+
+        MARK(0x51);
+        /* Enable the WHOLE PPI range rather than just 30.  All three counters
+           reading zero means nothing reached the CPU interface, and an enabled
+           but wrong INTID produces exactly that silence -- so let the hardware
+           say which PPI the timer actually drives.  This is how INTID 30 was
+           established on the FVP too: assume nothing, record what arrives.  */
+
+        linflexd_puts("I2 enable PPIs 16..31\n");
+        {
+            unsigned int ppi;
+            for (ppi = 16U; ppi <= 31U; ppi++)
+            {
+                gicv3_enable_ppi(ppi, 0xA0U);
+            }
+        }
+
+        MARK(0x52);
+        linflexd_puts("I3 arm timer, unmask IRQ\n");
+        timer_start_oneshot_irq(timer_read_cntfrq() / 100U);   /* 10 ms */
+        enable_irq_at_el1();
+
+        MARK(0x53);
+        {
+            unsigned int spins = 0U;
+
+            /* Wait for ticks.  Bounded: a missing interrupt must report
+               itself rather than hang the boot.  */
+
+            while ((board_irq_count < 5UL) && (spins < 30U))
+            {
+                timer_spin(200000U);
+                spins++;
+            }
+        }
+
+        MARK(0x54);
+        report("IRQ count", (unsigned int) board_irq_count);
+        report("timer INTID", (unsigned int) board_timer_intid);
+        report("spurious ", (unsigned int) board_spurious_count);
+        report("unexpected", (unsigned int) board_unexpected_intid);
+        report("first INTID", (unsigned int) board_first_intid);
+        linflexd_puts("I4 interrupt test done\n");
     }
 
     /* --- GIC: not reachable yet, probe deliberately removed ----------------

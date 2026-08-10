@@ -98,6 +98,24 @@ void timer_spin(unsigned int iterations)
 #define CNTP_CTL_ISTATUS        (1U << 2)
 
 
+void timer_start_oneshot_irq(unsigned int ticks)
+{
+    /* Same as timer_start_oneshot but with IMASK CLEAR, so the compare raises
+       an interrupt instead of only setting ISTATUS.  Keeping the two arming
+       functions separate rather than adding a flag: the polled path must never
+       accidentally unmask before the GIC is up, and an interrupt-driven path
+       that silently leaves IMASK set produces a timer that fires internally
+       while no interrupt is ever delivered -- IRQ count 0 with no spurious and
+       no unexpected INTID, which is exactly how that mistake presents.  */
+
+    unsigned int control = CNTP_CTL_ENABLE;
+
+    __asm volatile ("mcr p15, 0, %0, c14, c2, 0" :: "r" (ticks));
+    __asm volatile ("mcr p15, 0, %0, c14, c2, 1" :: "r" (control));
+    __asm volatile ("isb");
+}
+
+
 void timer_start_oneshot(unsigned int ticks)
 {
     unsigned int control = CNTP_CTL_ENABLE | CNTP_CTL_IMASK;

@@ -80,4 +80,17 @@ void    bsp_done(void);
 
 unsigned int    read_sctlr_after_mpu(void);
 
+/* Called from el1_irq_entry in entry.S; declared here to satisfy MISRA
+   Rule 8.4, which assembly cannot do for itself.  */
+
+void            board_irq_handler(void);
+
+/* Interrupt observations, written by the handler.                        */
+
+extern volatile unsigned long   board_irq_count;
+extern volatile unsigned long   board_timer_intid;
+extern volatile unsigned long   board_spurious_count;
+extern volatile unsigned long   board_unexpected_intid;
+extern volatile unsigned long   board_first_intid;
+
 #endif /* BOARD_H */

@@ -17,7 +17,7 @@
 /*                                                                        */
 /*  BOARD SUPPORT                                          RELEASE        */
 /*                                                                        */
-/*    timer.h                                          Cortex-R52/GNU     */
+/*    gicv3.h                                          Cortex-R52/GNU     */
 /*                                                           6.5.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -25,40 +25,37 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Arm generic timer access for the S32Z280-594EVB.                    */
+/*    GICv3 interrupt controller for Cortex-R52.  The CPU interface is    */
+/*    reached through AArch32 ICC_* system registers; the Distributor and */
+/*    Redistributor are memory mapped.                                    */
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef GICV3_H
+#define GICV3_H
 
-/* The physical count, CNTPCT.  64-bit, read as a pair.  Reading it is the
-   only way to find out whether the system counter is running at all: CNTFRQ
-   reads zero on this part and so says nothing about the counter itself.  */
+/* Spurious interrupt ID returned by the CPU interface when no interrupt is
+   pending.  It must be neither dispatched nor acknowledged with EOI.  */
 
-unsigned long long  timer_read_cntpct(void);
+#define GICV3_SPURIOUS_INTID    1023UL
 
-/* CNTFRQ as currently programmed.  Zero out of reset on this silicon.    */
+/* Bring up the Distributor, this core's Redistributor and the CPU
+   interface.  Interrupts remain masked at the PSTATE level.  */
 
-unsigned int        timer_read_cntfrq(void);
+void gicv3_init(void);
 
-/* Crude calibrated-by-nothing delay, used only to separate counter samples
-   far enough apart to measure a rate.  Not a time delay: the core clock is
-   not yet established, which is precisely what the measurement is for.  */
+/* Enable one private peripheral interrupt (PPI, INTID 16-31) as a
+   level-sensitive Group 1 interrupt at the given priority.  */
 
-void                timer_spin(unsigned int iterations);
+void gicv3_enable_ppi(unsigned int intid, unsigned int priority);
 
-/* One-shot compare on the EL1 physical timer, interrupt masked.  Polled
-   deliberately: this proves the timer counts and fires before the GIC is
-   configured, so a later interrupt failure cannot be confused with the timer
-   itself being wrong.  */
+/* Acknowledge the highest-priority pending Group 1 interrupt, returning its
+   INTID (possibly GICV3_SPURIOUS_INTID).  */
 
-void                timer_start_oneshot(unsigned int ticks);
+unsigned long gicv3_acknowledge(void);
 
-/* Arms with the interrupt UNMASKED, for the interrupt-driven path.       */
+/* Signal completion of the interrupt previously acknowledged.            */
 
-void                timer_start_oneshot_irq(unsigned int ticks);
-unsigned int        timer_fired(void);
-void                timer_stop(void);
+void gicv3_end_of_interrupt(unsigned long intid);
 
-#endif /* TIMER_H */
+#endif /* GICV3_H */

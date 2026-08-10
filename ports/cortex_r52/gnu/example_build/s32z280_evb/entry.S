@@ -77,6 +77,12 @@
     .equ    PERIPHP_ENABLE_EL10, (1 << 0)
     .equ    PERIPHP_ENABLE_EL2,  (1 << 1)
 
+/* SCTLR/HSCTLR.TE -- Thumb Exception enable.  Set means exceptions are entered
+   in T32 state.  It RESETS SET on this part, and every vector table here is
+   A32, so it must be cleared or no handler is reachable.  */
+
+    .equ    SCTLR_TE,   (1 << 30)
+
 /* CPSR mode and mask bits.                                               */
 
     .equ    MODE_USR,   0x10
@@ -167,7 +173,7 @@ el1_vectors:
     b       fault_el1_pabt                  /* 0x0C                         */
     b       fault_el1_dabt                  /* 0x10                         */
     b       fault_el1_reserved              /* 0x14                         */
-    b       fault_el1_irq                   /* 0x18                         */
+    b       el1_irq_entry                   /* 0x18  IRQ                    */
     b       fault_el1_fiq                   /* 0x1C                         */
 
 @/**************************************************************************/
@@ -272,6 +278,14 @@ start_a32:
     mcr     p15, 4, r0, c12, c9, 5
     isb
 
+    /* Clear HSCTLR.TE so EL2 exceptions are entered in A32, matching the EL2
+       vector table.  See the EL1 equivalent below for why this matters.  */
+
+    mrc     p15, 4, r0, c1, c0, 0           /* HSCTLR                       */
+    bic     r0, r0, #SCTLR_TE
+    mcr     p15, 4, r0, c1, c0, 0
+    isb
+
     /* Open the low-latency peripheral port.
        IMP_PERIPHPREGIONR (Cortex-R52 TRM r1p3, 3.3.80) describes a region at
        0x76000000 of 4 MB on this part -- the RTU peripheral space -- with
@@ -321,6 +335,30 @@ el1_entry:
 
     ldr     r0, =el1_vectors
     mcr     p15, 0, r0, c12, c0, 0          /* VBAR                         */
+    isb
+
+    /* Clear SCTLR.TE.  This is not cosmetic and it cost a long detour.
+       *
+       * TE resets SET on this silicon -- SCTLR reads 0x70C50838, bit 30 high --
+       * which makes the core enter every exception in T32 state.  All the vector
+       * tables here are A32.  So an exception would branch into the table, decode
+       * the A32 branch as Thumb, land mid-instruction at a misaligned address and
+       * take an undefined-instruction exception, which then did the same thing
+       * again.  No handler ever ran.
+       *
+       * The consequence was worse than a crash: every fault became invisible.
+       * boot_stage stayed at its last value, fault_vector stayed zero, and the
+       * core sat at el1_vectors+4 -- so a data abort from an unmapped peripheral,
+       * an abort from a bad MPU map, and a correctly delivered timer interrupt all
+       * presented identically, as an unexplained hang with nothing recorded.  Two
+       * real bugs were diagnosed through that fog before its cause was found.
+       *
+       * The Armv8-R AEM FVP resets with TE clear, which is why the same vector
+       * tables work there and why this never appeared during the FVP work.  */
+
+    mrc     p15, 0, r0, c1, c0, 0           /* SCTLR                        */
+    bic     r0, r0, #SCTLR_TE
+    mcr     p15, 0, r0, c1, c0, 0
     isb
 
     /* One stack per mode: an exception taken inside a handler would
@@ -385,6 +423,29 @@ park:
     b       park
 
 @/**************************************************************************/
+@/**************************************************************************/
+@/*  el1_irq_entry -- IRQ vector, standalone.                              */
+@/*                                                                        */
+@/*  The FVP example routes IRQ through _tx_thread_context_save and        */
+@/*  __tx_irq_processing_return, which this image cannot do: it does not   */
+@/*  link ThreadX, deliberately, so that a failure here is a board problem */
+@/*  and not a kernel one.  This is the classic A32 form instead.          */
+@/*                                                                        */
+@/*  lr is adjusted by 4 because an IRQ is taken with lr pointing one      */
+@/*  instruction past the one that was interrupted.  The caret on the ldm  */
+@/*  restores CPSR from SPSR_irq as it loads pc, which is what returns to  */
+@/*  the interrupted mode rather than staying in IRQ mode.                 */
+@/**************************************************************************/
+
+    .align  2
+    .global el1_irq_entry
+    .type   el1_irq_entry, %function
+el1_irq_entry:
+    sub     lr, lr, #4
+    stmfd   sp!, {r0-r3, r12, lr}
+    bl      board_irq_handler
+    ldmfd   sp!, {r0-r3, r12, pc}^
+
 @/*  Fault reporters.  Each records which vector ran, a syndrome and a     */
 @/*  faulting address, then parks.  Recording before parking is what makes */
 @/*  a fault distinguishable from a hang when there is no console.         */

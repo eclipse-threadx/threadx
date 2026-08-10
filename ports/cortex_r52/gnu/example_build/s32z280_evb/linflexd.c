@@ -63,8 +63,6 @@
 #include "linflexd.h"
 #include "platform.h"
 
-#define REG32(address)          (*(volatile unsigned int *)(address))
-
 /* Register offsets, from the S32Z2 Reference Manual section 75.5.1.      */
 
 #define LINFLEXD_LINCR1         0x00U
