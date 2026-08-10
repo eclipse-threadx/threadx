@@ -57,10 +57,15 @@
  * silicon before trusting these values there.
  */
 
-#define MPU_AP_RW_EL1       0U      /* EL1 read/write, EL0 no access       */
-#define MPU_AP_RO_EL1       1U      /* EL1 read-only,  EL0 no access       */
-#define MPU_AP_RW_EL1_EL0   2U      /* EL1 read/write, EL0 read/write      */
-#define MPU_AP_RO_EL1_EL0   3U      /* EL1 read-only,  EL0 read-only       */
+/* PRBAR.AP[2:1] as the architecture defines it: AP[2] selects read-only,
+   AP[1] grants EL0 access.  These are the published values -- the "reversed
+   bit order" recorded during the FVP work was an artefact of that code
+   shifting AP into the wrong bits, not a property of the hardware.  */
+
+#define MPU_AP_RW_EL1       0U      /* 0b00 EL1 read/write, no EL0         */
+#define MPU_AP_RW_EL1_EL0   1U      /* 0b01 EL1 read/write, EL0 read/write */
+#define MPU_AP_RO_EL1       2U      /* 0b10 EL1 read-only,  no EL0         */
+#define MPU_AP_RO_EL1_EL0   3U      /* 0b11 EL1 read-only,  EL0 read-only  */
 
 /* Shareability, PRBAR.SH.                                                */
 

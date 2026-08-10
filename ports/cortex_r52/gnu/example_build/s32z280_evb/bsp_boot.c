@@ -605,6 +605,33 @@ void bsp_main(void)
         linflexd_puts("X2 FAIL write to code did NOT fault -- code is writable\n");
     }
 
+    /* --- second protection case: execute from data -------------------------
+       The map marks the data region execute-never.  Prove that too: branch
+       into it and check a prefetch abort was taken.  Separate from the
+       write-to-code case because they exercise different permissions and
+       different fault paths -- a map could plausibly enforce one and not the
+       other, and DFSR/IFSR come from different registers.  */
+
+    MARK(0x62);
+    linflexd_puts("X3 execute from non-executable data region\n");
+    fault_taken = 0U;
+
+    try_execute_data(S32Z_DATA_SRAM_BASE);
+
+    MARK(0x63);
+    report("faults   ", fault_taken);
+    report("fault IFSR", fault_syndrome_value());
+    report("fault addr", fault_address_value());
+
+    if (fault_taken == 1U)
+    {
+        linflexd_puts("X4 PASS execute from data faulted and was recovered\n");
+    }
+    else
+    {
+        linflexd_puts("X4 FAIL data region is executable\n");
+    }
+
     /* Deliberate breakpoint target.  The debug script sets a hardware
        breakpoint here, so "the image ran to completion" is something the script
        observes rather than infers from a timeout.  */

@@ -133,6 +133,10 @@ probe_stage:    .word   0
 fault_expected: .word   0
     .global fault_taken
 fault_taken:    .word   0
+    .global fault_expected_pabt
+fault_expected_pabt: .word 0
+    .global abort_return
+abort_return:   .word   0
     .global fault_vector
 fault_vector:   .word   0
     .global fault_syndrome
@@ -472,6 +476,28 @@ __tx_irq_processing_return:
 
 #endif
 
+@/**************************************************************************/
+@/*  try_execute_data -- branch to a non-executable address on purpose.      */
+@/*                                                                        */
+@/*  Saves its own return address for the prefetch-abort handler to use,    */
+@/*  arms that handler, then branches to the address in r0.  It never       */
+@/*  returns by itself: the abort handler returns on its behalf.  Written   */
+@/*  in assembly because the return path is not something C can express.   */
+@/**************************************************************************/
+
+    .align  2
+    .global try_execute_data
+    .type   try_execute_data, %function
+try_execute_data:
+    ldr     r1, =abort_return
+    str     lr, [r1]
+    ldr     r1, =fault_expected_pabt
+    mov     r2, #1
+    str     r2, [r1]
+    dsb
+    isb
+    bx      r0                              /* fetch from XN memory: aborts   */
+
 @/*  Fault reporters.  Each records which vector ran, a syndrome and a     */
 @/*  faulting address, then parks.  Recording before parking is what makes */
 @/*  a fault distinguishable from a hang when there is no console.         */
@@ -545,6 +571,43 @@ fault_el1_svc:
     mov     r3, lr
     FAULT_TAIL 0x48
 fault_el1_pabt:
+    /* Recoverable when a test has armed fault_expected_pabt.
+       *
+       * Recovery differs from the data-abort case in kind, not degree.  There,
+       * the faulting instruction is a load or store and skipping it is enough.
+       * Here the fault is on the instruction FETCH at the target address, so
+       * there is no instruction to skip -- resuming anywhere near the fault
+       * just faults again.  So the test saves the address it wants to come back
+       * to in abort_return, and this handler returns there on its behalf.  */
+
+    ldr     r0, =fault_expected_pabt
+    ldr     r1, [r0]
+    cmp     r1, #0
+    beq     fault_el1_pabt_fatal
+
+    mov     r1, #0
+    str     r1, [r0]                        /* one-shot: disarm              */
+
+    mrc     p15, 0, r2, c5, c0, 1           /* IFSR                          */
+    ldr     r0, =fault_syndrome
+    str     r2, [r0]
+    mrc     p15, 0, r2, c6, c0, 2           /* IFAR                          */
+    ldr     r0, =fault_address
+    str     r2, [r0]
+    ldr     r0, =fault_vector
+    mov     r1, #0x4C
+    str     r1, [r0]
+    ldr     r0, =fault_taken
+    ldr     r1, [r0]
+    add     r1, r1, #1
+    str     r1, [r0]
+    dsb
+
+    ldr     lr, =abort_return
+    ldr     lr, [lr]
+    subs    pc, lr, #0                      /* return to the test, not here   */
+
+fault_el1_pabt_fatal:
     mrc     p15, 0, r0, c5, c0, 1           /* IFSR                         */
     mrc     p15, 0, r3, c6, c0, 2           /* IFAR                         */
     FAULT_TAIL 0x4C

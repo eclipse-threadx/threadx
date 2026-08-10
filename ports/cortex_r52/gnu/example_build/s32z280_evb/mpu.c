@@ -365,12 +365,27 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
     unsigned long prbar;
     unsigned long prlar;
 
-    /* PRBAR: BASE[31:6], SH[5:4], AP[3:2], XN[1].  */
+    /* PRBAR: BASE[31:6], RES0[5], SH[4:3], AP[2:1], XN[0].
+       *
+       * Per Cortex-R52 TRM r1p3 figure 3-39.  Note the field positions: the
+       * FVP example this file came from shifts every field one bit too far
+       * left -- SH<<4, AP<<2, XN<<1 -- which silently produces a different
+       * region than intended.  With XN written to bit 1 it lands in the real
+       * AP[1] (EL0 access) and the region stays EXECUTABLE, which is how this
+       * board ended up running instructions out of .data.
+       *
+       * That bug is also the origin of the "PRBAR.AP bit order is reversed"
+       * claim recorded during the FVP work.  Calibrating AP empirically under
+       * the wrong shift puts the intended AP's low bit into the real AP[2]
+       * (the read-only bit) and the intended XN into the real AP[1], which
+       * looks exactly like a reversed encoding.  The architectural order is
+       * correct as published; there was no reversal.
+       */
 
     prbar = (region_ptr->mpu_region_base & 0xFFFFFFC0UL)
-          | (((unsigned long) region_ptr->mpu_region_shareability & 0x3UL) << 4)
-          | (((unsigned long) region_ptr->mpu_region_ap & 0x3UL) << 2)
-          | (((unsigned long) region_ptr->mpu_region_execute_never & 0x1UL) << 1);
+          | (((unsigned long) region_ptr->mpu_region_shareability & 0x3UL) << 3)
+          | (((unsigned long) region_ptr->mpu_region_ap & 0x3UL) << 1)
+          | ((unsigned long) region_ptr->mpu_region_execute_never & 0x1UL);
 
     prlar = (region_ptr->mpu_region_limit & 0xFFFFFFC0UL)
           | (((unsigned long) region_ptr->mpu_region_attr_index & 0x7UL) << 1)

@@ -89,6 +89,11 @@ void            board_irq_handler(void);
 
 void            board_init(void);
 
+/* Branches to a non-executable address to provoke a prefetch abort.  Returns
+   via the abort handler, not normally.  */
+
+void            try_execute_data(unsigned long address);
+
 /* Interrupt observations, written by the handler.                        */
 
 extern volatile unsigned long   board_irq_count;
