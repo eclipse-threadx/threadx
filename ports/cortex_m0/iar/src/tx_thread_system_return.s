@@ -79,6 +79,7 @@ _tx_thread_system_return:
     MRS     r1, PRIMASK                             ; Thread context returning, pickup PRIMASK
     CPSIE   i                                       ; Enable interrupts
     MSR     PRIMASK, r1                             ; Restore original interrupt posture
+    ISB     SY                                      ; Flush pipeline
 _isr_context:
     BX      lr                                      ; Return to caller
 ;}
