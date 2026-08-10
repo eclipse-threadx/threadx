@@ -59,6 +59,7 @@
 #include "gic_probe.h"
 #include "mpu.h"
 #include "gicv3.h"
+#include "cache.h"
 
 /* Captured at EL2 by entry.S, before the drop to EL1.                    */
 
@@ -167,6 +168,28 @@ static void enable_irq_at_el1(void)
 {
     __asm volatile ("cpsie i" ::: "memory");
     __asm volatile ("isb");
+}
+
+
+/* A workload that touches enough memory repeatedly for caching to matter, and
+   that the compiler cannot fold away.  Deliberately not a pure spin loop: a
+   nop loop is bounded by fetch, so it would show an instruction-cache effect
+   and say nothing about the data cache.  */
+
+static volatile unsigned int cache_scratch[1024];
+
+static void cache_workload(void)
+{
+    unsigned int pass;
+    unsigned int i;
+
+    for (pass = 0U; pass < 64U; pass++)
+    {
+        for (i = 0U; i < 1024U; i++)
+        {
+            cache_scratch[i] = cache_scratch[i] + i + pass;
+        }
+    }
 }
 
 
@@ -434,6 +457,95 @@ void bsp_main(void)
        The probe is removed rather than left disabled: while it was present the
        image stalled here every run, which costs the timer and console results
        that come before it.  */
+
+    /* --- caches ------------------------------------------------------------
+       Enabled last, and measured rather than merely switched on.  Reading
+       SCTLR back proves a bit was set; timing the same workload before and
+       after proves the caches are actually doing something.  The generic timer
+       supplies the clock -- 8 MHz, established earlier -- so the comparison is
+       in real units rather than loop counts.  */
+
+    MARK(0x70);
+    report("CLIDR    ", (unsigned int) cache_read_clidr());
+    linflexd_puts("C1 timing a workload with caches OFF\n");
+    {
+        unsigned long long before;
+        unsigned long long after;
+        unsigned long       cold;
+        unsigned long       warm;
+
+        before = timer_read_cntpct();
+        cache_workload();
+        after  = timer_read_cntpct();
+        cold   = (unsigned long) (after - before);
+
+        MARK(0x71);
+        linflexd_puts("C2 enabling caches\n");
+        cache_enable();
+        MARK(0x72);
+        report("SCTLR    ", read_sctlr_after_mpu());
+        report("cachesOn ", cache_enabled());
+
+        before = timer_read_cntpct();
+        cache_workload();
+        after  = timer_read_cntpct();
+        warm   = (unsigned long) (after - before);
+
+        MARK(0x73);
+        report("counts off", cold);
+        report("counts on ", warm);
+
+        /* Report the two claims separately, because they are separate.
+           "Enabled" is what SCTLR says and is checkable.  "Effective" needs a
+           measurable speedup, and a criterion of merely warm < cold is
+           worthless: the first run of this test showed 609904 against 609686,
+           a 0.036% difference that is noise, and printed PASS on it.
+
+           A cache having little to offer here is plausible rather than
+           broken.  Both the code and the data this workload touches live in
+           RTU-local low-latency SRAM, which is close to core speed already;
+           there is no slow memory on this board to demonstrate against.  DDR
+           would be the place to measure a real cache effect, and DDR is not
+           initialised.  */
+
+        if (cache_enabled() == 1U)
+        {
+            linflexd_puts("C3 PASS caches enabled (SCTLR.C and SCTLR.I set)\n");
+        }
+        else
+        {
+            linflexd_puts("C3 FAIL caches did not enable\n");
+        }
+
+        if (cold > warm)
+        {
+            unsigned long gain = ((cold - warm) * 1000UL) / cold;
+
+            report("gain/1000", gain);
+
+            if (gain >= 100UL)
+            {
+                linflexd_puts("C4 speedup measurable (>=10%)\n");
+            }
+            else
+            {
+                linflexd_puts("C4 no significant speedup -- expected here,"
+                              " the workload is already in fast local SRAM\n");
+            }
+        }
+        else
+        {
+            linflexd_puts("C4 no speedup measured\n");
+        }
+
+        /* Push the markers and counters out of the write-back cache so a
+           debugger reading SRAM sees them.  Without this a post-mortem read
+           could report stale values from before the cache was enabled.  */
+
+        cache_clean_all();
+        MARK(0x74);
+        cache_clean_all();
+    }
 
     /* --- protection test ---------------------------------------------------
        The map claims code is read-only.  Prove it: arm the recoverable abort

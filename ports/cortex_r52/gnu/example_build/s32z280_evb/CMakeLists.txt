@@ -23,6 +23,7 @@ add_executable(s32z280_boot.elf EXCLUDE_FROM_ALL
     ${EVB_DIR}/mpu.c
     ${EVB_DIR}/gicv3.c
     ${EVB_DIR}/irq_dispatch.c
+    ${EVB_DIR}/cache.c
 )
 
 target_include_directories(s32z280_boot.elf PRIVATE ${EVB_DIR})
@@ -54,6 +55,7 @@ add_executable(s32z280_demo.elf EXCLUDE_FROM_ALL
     ${EVB_DIR}/gicv3.c
     ${EVB_DIR}/irq_dispatch.c
     ${EVB_DIR}/gic_probe.c
+    ${EVB_DIR}/cache.c
     ${EVB_DIR}/demo_s32z280.c
 )
 
