@@ -61,5 +61,5 @@ esac
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a15 crt0.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a15 tx_initialize_low_level.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a15 -I../../../../common/inc -I../inc sample_threadx.c
-"${CC}" ${TARGET_FLAGS} -g -mcpu=cortex-a15 -T sample_threadx.ld ${SYSCALL_LIB} -o sample_threadx.out -Wl,-Map=sample_threadx.map tx_initialize_low_level.o sample_threadx.o tx.a
+"${CC}" ${TARGET_FLAGS} -g -nostartfiles -mcpu=cortex-a15 -T sample_threadx.ld ${SYSCALL_LIB} -o sample_threadx.out -Wl,-Map=sample_threadx.map crt0.o reset.o tx_initialize_low_level.o sample_threadx.o tx.a
 
