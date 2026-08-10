@@ -264,76 +264,79 @@ void mpu_read_region(unsigned int index, unsigned long *prbar_ptr,
 
 static void build_table(void)
 {
-    /* Five regions, full coverage, no overlaps, Device nGnRnE where required.
+    /* Protection map: narrow regions with real permissions, so that anything
+       this image should not do actually faults.
        *
-       * The GIC must be Device nGnRnE -- the Cortex-R52 TRM requires it, and it
-       * was confirmed here: mapped Normal the distributor stalls the core,
-       * mapped Device it reads GICD_PIDR2 = 0x3B.  The RTU peripheral window
-       * behind the low-latency peripheral port gets the same treatment, being
-       * ordinary MMIO.
+       * This supersedes the permissive bring-up map (everything Normal RW X,
+       * whole address space covered).  That map existed because a narrow one
+       * had failed and the reason was unknown -- the failure looked like a
+       * stall with nothing recorded, and coverage was blamed.  Coverage was
+       * never the problem: an out-of-bounds write to a [3]-sized table put a
+       * region at base 0 overlapping everything, and SCTLR.TE being set meant
+       * the resulting abort could not run a handler.  Both are fixed, so a
+       * narrow map is now both correct and diagnosable: if something outside
+       * these regions is touched, the fault handler records vector, syndrome
+       * and faulting address instead of hanging mutely.
        *
-       * Overlaps are what to watch for: PMSAv8-R leaves them UNPREDICTABLE, and
-       * an accidental overlap here -- from an out-of-bounds table write -- was
-       * what made enabling the MPU kill the core.  The space is carved around
-       * the two Device windows so every address belongs to exactly one region.
-       *
-       * Still permissive: code is writable and data executable.  Correct for
-       * bring-up, where an unmapped address costs a silent stall rather than a
-       * fault, and wrong for a protection demo.  Tightening belongs with the
-       * ThreadX integration, which can verify each restriction by provoking it.
+       * Anything not described below is unmapped and faults on access.  That
+       * is the point.
        */
 
-    /* Below the GIC: code SRAM, data SRAM, LINFlexD console.  */
+    /* Code: read-only and executable.  A write here must fault.  */
 
-    mpu_regions[0].mpu_region_base          = 0x00000000UL;
-    mpu_regions[0].mpu_region_limit         = S32Z_GIC_BASE - 1UL;
-    mpu_regions[0].mpu_region_ap            = MPU_AP_RW_EL1;
+    mpu_regions[0].mpu_region_base          = S32Z_CODE_SRAM_BASE;
+    mpu_regions[0].mpu_region_limit         = (unsigned long) &__code_end__ - 1UL;
+    mpu_regions[0].mpu_region_ap            = MPU_AP_RO_EL1;
     mpu_regions[0].mpu_region_execute_never = 0U;
     mpu_regions[0].mpu_region_shareability  = MPU_SH_NON;
     mpu_regions[0].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
-    mpu_regions[0].mpu_region_name          = "low   RW X  normal-wb";
+    mpu_regions[0].mpu_region_name          = "code  RO X  normal-wb";
 
-    /* GIC, Device nGnRnE: distributor plus every redistributor frame.  */
+    /* Data, bss and every per-mode stack: writable, never executable.  Sized
+       from the SRAM bank, not from __data_end__: the stacks are NOLOAD and sit
+       above that symbol, so sizing from it would leave them unmapped and the
+       first push after enabling the MPU would abort.  */
 
-    mpu_regions[1].mpu_region_base          = S32Z_GIC_BASE;
-    mpu_regions[1].mpu_region_limit         = S32Z_GIC_BASE + S32Z_GIC_SIZE - 1UL;
+    mpu_regions[1].mpu_region_base          = S32Z_DATA_SRAM_BASE;
+    mpu_regions[1].mpu_region_limit         = S32Z_DATA_SRAM_BASE
+                                            + S32Z_DATA_SRAM_SIZE - 1UL;
     mpu_regions[1].mpu_region_ap            = MPU_AP_RW_EL1;
     mpu_regions[1].mpu_region_execute_never = 1U;
     mpu_regions[1].mpu_region_shareability  = MPU_SH_NON;
-    mpu_regions[1].mpu_region_attr_index    = MPU_ATTR_DEVICE;
-    mpu_regions[1].mpu_region_name          = "gic   RW NX device-nGnRnE";
+    mpu_regions[1].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
+    mpu_regions[1].mpu_region_name          = "data  RW NX normal-wb";
 
-    /* Between the GIC and the RTU peripheral window.  */
+    /* Console.  Mapped narrowly: one 64 KB LINFlexD instance.  */
 
-    mpu_regions[2].mpu_region_base          = S32Z_GIC_BASE + S32Z_GIC_SIZE;
-    mpu_regions[2].mpu_region_limit         = S32Z_RTU_PERIPH_BASE - 1UL;
+    mpu_regions[2].mpu_region_base          = S32Z_LINFLEX_9_BASE;
+    mpu_regions[2].mpu_region_limit         = S32Z_LINFLEX_9_BASE + 0xFFFFUL;
     mpu_regions[2].mpu_region_ap            = MPU_AP_RW_EL1;
-    mpu_regions[2].mpu_region_execute_never = 0U;
+    mpu_regions[2].mpu_region_execute_never = 1U;
     mpu_regions[2].mpu_region_shareability  = MPU_SH_NON;
-    mpu_regions[2].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
-    mpu_regions[2].mpu_region_name          = "mid   RW X  normal-wb";
+    mpu_regions[2].mpu_region_attr_index    = MPU_ATTR_DEVICE;
+    mpu_regions[2].mpu_region_name          = "uart  RW NX device";
 
-    /* RTU peripheral space behind the peripheral port, Device nGnRnE.  */
+    /* GIC.  Device nGnRnE is required by the Cortex-R52 TRM, and confirmed
+       here: mapped Normal the distributor stalls the core.  */
 
-    mpu_regions[3].mpu_region_base          = S32Z_RTU_PERIPH_BASE;
-    mpu_regions[3].mpu_region_limit         = S32Z_RTU_PERIPH_BASE
-                                            + S32Z_RTU_PERIPH_SIZE - 1UL;
+    mpu_regions[3].mpu_region_base          = S32Z_GIC_BASE;
+    mpu_regions[3].mpu_region_limit         = S32Z_GIC_BASE + S32Z_GIC_SIZE - 1UL;
     mpu_regions[3].mpu_region_ap            = MPU_AP_RW_EL1;
     mpu_regions[3].mpu_region_execute_never = 1U;
     mpu_regions[3].mpu_region_shareability  = MPU_SH_NON;
     mpu_regions[3].mpu_region_attr_index    = MPU_ATTR_DEVICE;
-    mpu_regions[3].mpu_region_name          = "rtu   RW NX device-nGnRnE";
+    mpu_regions[3].mpu_region_name          = "gic   RW NX device";
 
-    /* Above it: the code SRAM this image runs from at 0x79900000.  */
+    /* RTU peripheral window behind the low-latency peripheral port.  */
 
-    mpu_regions[4].mpu_region_base          = S32Z_RTU_PERIPH_BASE
-                                            + S32Z_RTU_PERIPH_SIZE;
-    mpu_regions[4].mpu_region_limit         = 0xFFFFFFFFUL;
+    mpu_regions[4].mpu_region_base          = S32Z_RTU_PERIPH_BASE;
+    mpu_regions[4].mpu_region_limit         = S32Z_RTU_PERIPH_BASE
+                                            + S32Z_RTU_PERIPH_SIZE - 1UL;
     mpu_regions[4].mpu_region_ap            = MPU_AP_RW_EL1;
-    mpu_regions[4].mpu_region_execute_never = 0U;
+    mpu_regions[4].mpu_region_execute_never = 1U;
     mpu_regions[4].mpu_region_shareability  = MPU_SH_NON;
-    mpu_regions[4].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
-    mpu_regions[4].mpu_region_name          = "high  RW X  normal-wb";
+    mpu_regions[4].mpu_region_attr_index    = MPU_ATTR_DEVICE;
+    mpu_regions[4].mpu_region_name          = "rtu   RW NX device";
 
     mpu_regions_used = 5U;
 }

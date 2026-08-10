@@ -68,6 +68,8 @@ extern unsigned int  cpsr_at_el1;
 extern unsigned int  cntfrq_at_el2;
 extern unsigned int  hmpuir_at_el2;
 extern unsigned int  probe_stage;
+extern unsigned int  fault_expected;
+extern unsigned int  fault_taken;
 
 /* Mirror of the console markers into memory.  The UART has twice gone away at
    the moment a marker mattered -- once when a stalled access took the debug
@@ -165,6 +167,20 @@ static void enable_irq_at_el1(void)
 {
     __asm volatile ("cpsie i" ::: "memory");
     __asm volatile ("isb");
+}
+
+
+unsigned int fault_syndrome_value(void)
+{
+    extern unsigned int fault_syndrome;
+    return fault_syndrome;
+}
+
+
+unsigned int fault_address_value(void)
+{
+    extern unsigned int fault_address;
+    return fault_address;
 }
 
 
@@ -418,6 +434,37 @@ void bsp_main(void)
        The probe is removed rather than left disabled: while it was present the
        image stalled here every run, which costs the timer and console results
        that come before it.  */
+
+    /* --- protection test ---------------------------------------------------
+       The map claims code is read-only.  Prove it: arm the recoverable abort
+       path, write to the code region, and check that a fault was actually
+       taken.  Reading SCTLR back or listing the regions would only show what
+       was programmed; provoking the violation shows it is enforced.
+
+       This is worth doing now for a second reason: until SCTLR.TE was cleared
+       no fault handler could run at all, so no protection claim about this
+       board could be checked.  */
+
+    MARK(0x60);
+    linflexd_puts("X1 write to read-only code region\n");
+    fault_taken = 0U;
+    fault_expected = 1U;
+
+    *(volatile unsigned int *)S32Z_CODE_SRAM_BASE = 0xDEADBEEFUL;
+
+    MARK(0x61);
+    report("faults   ", fault_taken);
+    report("fault DFSR", fault_syndrome_value());
+    report("fault addr", fault_address_value());
+
+    if (fault_taken == 1U)
+    {
+        linflexd_puts("X2 PASS write to code faulted and was recovered\n");
+    }
+    else
+    {
+        linflexd_puts("X2 FAIL write to code did NOT fault -- code is writable\n");
+    }
 
     /* Deliberate breakpoint target.  The debug script sets a hardware
        breakpoint here, so "the image ran to completion" is something the script

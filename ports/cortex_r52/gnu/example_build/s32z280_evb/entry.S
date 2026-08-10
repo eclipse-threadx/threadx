@@ -129,6 +129,10 @@ cntfrq_at_el2:  .word   0
 hmpuir_at_el2:  .word   0
     .global probe_stage
 probe_stage:    .word   0
+    .global fault_expected
+fault_expected: .word   0
+    .global fault_taken
+fault_taken:    .word   0
     .global fault_vector
 fault_vector:   .word   0
     .global fault_syndrome
@@ -545,6 +549,41 @@ fault_el1_pabt:
     mrc     p15, 0, r3, c6, c0, 2           /* IFAR                         */
     FAULT_TAIL 0x4C
 fault_el1_dabt:
+    /* Recoverable when a test has armed fault_expected.  The protection map is
+       only meaningful if a violation actually faults, so the test provokes one
+       deliberately and this path lets it continue: record the syndrome and
+       address, count it, then resume at the instruction AFTER the faulting one.
+       lr on data-abort entry is faulting_address + 8, so subs pc, lr, #4 skips
+       the access rather than retrying it forever.
+
+       Without the flag set, a data abort is still fatal and reported, which is
+       what any real bug should get.  */
+
+    ldr     r0, =fault_expected
+    ldr     r1, [r0]
+    cmp     r1, #0
+    beq     fault_el1_dabt_fatal
+
+    mov     r1, #0
+    str     r1, [r0]                        /* one-shot: disarm              */
+
+    mrc     p15, 0, r2, c5, c0, 0           /* DFSR                          */
+    ldr     r0, =fault_syndrome
+    str     r2, [r0]
+    mrc     p15, 0, r2, c6, c0, 0           /* DFAR                          */
+    ldr     r0, =fault_address
+    str     r2, [r0]
+    ldr     r0, =fault_vector
+    mov     r1, #0x50
+    str     r1, [r0]
+    ldr     r0, =fault_taken
+    ldr     r1, [r0]
+    add     r1, r1, #1
+    str     r1, [r0]
+    dsb
+    subs    pc, lr, #4                      /* resume after the access        */
+
+fault_el1_dabt_fatal:
     mrc     p15, 0, r0, c5, c0, 0           /* DFSR                         */
     mrc     p15, 0, r3, c6, c0, 0           /* DFAR                         */
     FAULT_TAIL 0x50
