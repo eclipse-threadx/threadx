@@ -109,6 +109,12 @@
 /* the Cortex-R52 generic timer clock-enable, CNTCLKEN, from a cluster    */
 /* clock. Reset value of the CNTDV field is 4.  [RM section 9.2.1.6]      */
 
+/* RTU peripheral window, as described by IMP_PERIPHPREGIONR: 4 MB at     */
+/* 0x76000000, reached through the low-latency peripheral port.           */
+
+#define S32Z_RTU_PERIPH_BASE            0x76000000UL
+#define S32Z_RTU_PERIPH_SIZE            0x00400000UL
+
 #define S32Z_RTU0_GPR_BASE              0x76120000UL
 #define S32Z_RTU0_GPR_CFG_CNTDV         (S32Z_RTU0_GPR_BASE + 0x10UL)
 

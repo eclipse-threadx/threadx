@@ -290,6 +290,34 @@ void bsp_main(void)
 
         MARK(0x11);
 
+    /* Read back what the region programming actually did.  Five regions die on
+       the SCTLR.M write while three survive, and the difference is the region
+       COUNT rather than the Device attribute -- so the question is whether
+       PRSELR/PRBAR/PRLAR programming takes effect at all for indices 3 and 4,
+       which nothing has ever exercised: the FVP example this code came from
+       only ever programs three regions.  The MPU is not enabled in this build,
+       so this cannot stall.  */
+
+    linflexd_puts("R  idx  PRBAR      PRLAR\n");
+    {
+        unsigned int i;
+        for (i = 0U; i < 8U; i++)
+        {
+            unsigned long prbar = 0UL;
+            unsigned long prlar = 0UL;
+
+            mpu_read_region(i, &prbar, &prlar);
+            linflexd_puts("R  ");
+            linflexd_put_hex32(i);
+            linflexd_puts(" ");
+            linflexd_put_hex32((unsigned int) prbar);
+            linflexd_puts(" ");
+            linflexd_put_hex32((unsigned int) prlar);
+            linflexd_putc('\n');
+        }
+    }
+
+
         report("MPU rgns ", regions);
         report("SCTLR    ", read_sctlr_after_mpu());
         MARK(0x12);
