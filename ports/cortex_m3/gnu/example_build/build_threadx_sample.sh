@@ -32,12 +32,18 @@ cd "$(dirname "$0")"
 case "${TOOLCHAIN}" in
     gnu)
         CC="arm-none-eabi-gcc"
+        AR="arm-none-eabi-ar"
         TARGET_FLAGS=""
         ENTRY_FLAG="-ereset_handler"
         SYSCALL_LIB="--specs=nosys.specs"
         ;;
     atfe)
         CC="${ATFE_CLANG:-clang}"
+        # llvm-ar ships beside clang in the toolchain.
+        case "${CC}" in
+            */*) AR="$(dirname "${CC}")/llvm-ar" ;;
+            *)   AR="llvm-ar" ;;
+        esac
         TARGET_FLAGS="--target=arm-none-eabi"
         ENTRY_FLAG="-Wl,--entry=reset_handler"
         # picolibc leaves _exit to the application; the toolchain's own

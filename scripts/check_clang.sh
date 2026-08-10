@@ -250,7 +250,9 @@ if [ "$no_examples" -eq 0 ]; then
             example_ok=$((example_ok + 1))
         else
             fail "$core: example build produced no image"
-            echo "$log" | grep -iE "error" | head -3 | sed 's/^/        /'
+            # Not filtered on "error": a missing tool reports "command not
+            # found" or "Permission denied", and filtering hid exactly that.
+            echo "$log" | tail -6 | sed 's/^/        /'
             failures=$((failures + 1))
         fi
         rm -f "$dir"/*.o "$dir"/*.a "$dir"/*.out "$dir"/*.map 2>/dev/null || true
