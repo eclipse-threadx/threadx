@@ -148,10 +148,6 @@ C_CORES="cortex_m0 cortex_m4 cortex_m23 cortex_m33 cortex_m55 cortex_a7 cortex_a
 # explicitly rather than silently skipped, so the gaps stay visible.
 #
 # These fail with the GNU toolchain too, so they are not LLVM problems:
-#   cortex_m0            cortexm0_crt0.S references __text_load_start__,
-#                        __text_start__ and __text_end__, which its linker
-#                        script never defines. The Cortex-M4 script defines the
-#                        equivalents, so this is a gap in that one example.
 #   arm9 arm11           need newlib multilib variants for those CPUs, which are
 #   cortex_r4 cortex_r5  not present in every GNU toolchain packaging.
 #
@@ -160,7 +156,7 @@ C_CORES="cortex_m0 cortex_m4 cortex_m23 cortex_m33 cortex_m55 cortex_a7 cortex_a
 #                        own crt0 is linked, and it needs picolibc's
 #                        __data_start, __data_source, __data_size and __bss_size,
 #                        which the example's linker script does not define.
-EXAMPLES_EXPECTED_TO_FAIL="arm9 arm11 cortex_m0 cortex_r4 cortex_r5 cortex_a12 cortex_a15 cortex_a17"
+EXAMPLES_EXPECTED_TO_FAIL="arm9 arm11 cortex_r4 cortex_r5 cortex_a12 cortex_a15 cortex_a17"
 
 failures=0
 skipped=""
