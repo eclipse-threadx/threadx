@@ -17,7 +17,7 @@
 # Builds the Arm ports with an LLVM based toolchain: every assembly source of
 # every Arm gnu port, and the common C sources for one core per architecture
 # profile. Compilation only, no linking, so no target C library is required
-# beyond whatever the toolchain ships.
+# profile, then links the example builds that have a script driver.
 #
 #     scripts/check_clang.sh                       # clang from PATH
 #     scripts/check_clang.sh --clang /path/to/clang
@@ -25,7 +25,8 @@
 #
 # Options:
 #     --clang <path>   Compiler to use; defaults to $CLANG then to clang.
-#     --asm-only       Skip the C sources.
+#     --asm-only       Skip the C sources and the example builds.
+#     --no-examples    Skip the example builds.
 #     --quiet          Print only failures and the summary.
 #
 # Exit status is 0 when everything builds and 1 otherwise.
@@ -45,12 +46,14 @@ cd "$(dirname "$(realpath "$0")")/.."
 
 CC="${CLANG:-clang}"
 asm_only=0
+no_examples=0
 quiet=0
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --clang) [ "$#" -ge 2 ] || { echo "Error: --clang needs a path" >&2; exit 2; }; CC="$2"; shift 2 ;;
-        --asm-only) asm_only=1; shift ;;
+        --asm-only) asm_only=1; no_examples=1; shift ;;
+        --no-examples) no_examples=1; shift ;;
         --quiet)    quiet=1; shift ;;
         -h|--help)  sed -n '17,33p' "$0"; exit 0 ;;
         *) echo "Error: unknown option '$1'" >&2; exit 2 ;;
@@ -131,6 +134,24 @@ declare -A PORT_TARGET=(
 # port headers differ by profile rather than by core.
 C_CORES="cortex_m0 cortex_m4 cortex_m23 cortex_m33 cortex_m55 cortex_a7 cortex_a53 cortex_r5"
 
+# Example builds that are not expected to link, with the reason. Listed
+# explicitly rather than silently skipped, so the gaps stay visible.
+#
+# These fail with the GNU toolchain too, so they are not LLVM problems:
+#   cortex_m0            cortexm0_crt0.S references __text_load_start__,
+#                        __text_start__ and __text_end__, which its linker
+#                        script never defines. The Cortex-M4 script defines the
+#                        equivalents, so this is a gap in that one example.
+#   arm9 arm11           need newlib multilib variants for those CPUs, which are
+#   cortex_r4 cortex_r5  not present in every GNU toolchain packaging.
+#
+# This one is specific to LLVM:
+#   cortex_a12 a15 a17   their link line omits -nostartfiles, so the toolchain's
+#                        own crt0 is linked, and it needs picolibc's
+#                        __data_start, __data_source, __data_size and __bss_size,
+#                        which the example's linker script does not define.
+EXAMPLES_EXPECTED_TO_FAIL="arm9 arm11 cortex_m0 cortex_r4 cortex_r5 cortex_a12 cortex_a15 cortex_a17"
+
 failures=0
 skipped=""
 
@@ -194,6 +215,41 @@ if [ "$asm_only" -eq 0 ]; then
     done
 fi
 
+
+# --------------------------------------------------------------------------
+if [ "$no_examples" -eq 0 ]; then
+    say ""
+    say "== Example builds, linked with lld =="
+
+    example_ok=0
+    example_total=0
+    example_known=""
+    for dir in ports/*/gnu/example_build; do
+        [ -f "$dir/build_threadx.sh" ] && [ -f "$dir/build_threadx_sample.sh" ] || continue
+        core="$(echo "$dir" | cut -d/ -f2)"
+        case " $EXAMPLES_EXPECTED_TO_FAIL " in
+            *" $core "*) example_known="$example_known $core"; continue ;;
+        esac
+        example_total=$((example_total + 1))
+
+        rm -f "$dir"/*.o "$dir"/*.a "$dir"/*.out "$dir"/*.map 2>/dev/null || true
+        log="$(cd "$dir" && TOOLCHAIN=atfe ATFE_CLANG="$CC" ./build_threadx.sh 2>&1 && \
+                             TOOLCHAIN=atfe ATFE_CLANG="$CC" ./build_threadx_sample.sh 2>&1)" || true
+
+        if [ -f "$dir/sample_threadx.out" ]; then
+            example_ok=$((example_ok + 1))
+        else
+            fail "$core: example build produced no image"
+            echo "$log" | grep -iE "error" | head -3 | sed 's/^/        /'
+            failures=$((failures + 1))
+        fi
+        rm -f "$dir"/*.o "$dir"/*.a "$dir"/*.out "$dir"/*.map 2>/dev/null || true
+    done
+    say "  $example_ok of $example_total example builds linked"
+    if [ -n "$example_known" ]; then
+        say "  known not to link, see the list at the top of this script:$example_known"
+    fi
+fi
 # --------------------------------------------------------------------------
 say ""
 if [ "$failures" -eq 0 ]; then
