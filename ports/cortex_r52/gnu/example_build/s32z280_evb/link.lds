@@ -144,5 +144,10 @@ SECTIONS
         __sys_stack_top = .;
     } > DATA
 
+    /* Both spellings: _tx_initialize_low_level publishes the first free
+       address to tx_application_define from _end, while C library conventions
+       use end.  */
+
     PROVIDE(end = .);
+    PROVIDE(_end = .);
 }

@@ -85,6 +85,10 @@ unsigned int    read_sctlr_after_mpu(void);
 
 void            board_irq_handler(void);
 
+/* Called from _tx_initialize_low_level when the kernel is linked.        */
+
+void            board_init(void);
+
 /* Interrupt observations, written by the handler.                        */
 
 extern volatile unsigned long   board_irq_count;

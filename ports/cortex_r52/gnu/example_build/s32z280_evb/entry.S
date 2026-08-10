@@ -441,10 +441,32 @@ park:
     .global el1_irq_entry
     .type   el1_irq_entry, %function
 el1_irq_entry:
+#ifdef TX_R52_USE_THREADX_IRQ
+
+    /* With the kernel linked, the vector goes straight into
+       _tx_thread_context_save, which saves the interrupted context and
+       branches back to __tx_irq_processing_return.  A plain B, not BL:
+       context save adjusts lr itself to find the point of interrupt.  */
+
+    b       _tx_thread_context_save
+
+    .global __tx_irq_processing_return
+__tx_irq_processing_return:
+    bl      board_irq_handler
+    b       _tx_thread_context_restore
+
+#else
+
+    /* Standalone: the classic A32 form.  lr is adjusted by 4 because an IRQ
+       is taken with lr one instruction past the interrupted one, and the
+       caret on the ldm restores CPSR from SPSR_irq as it loads pc.  */
+
     sub     lr, lr, #4
     stmfd   sp!, {r0-r3, r12, lr}
     bl      board_irq_handler
     ldmfd   sp!, {r0-r3, r12, pc}^
+
+#endif
 
 @/*  Fault reporters.  Each records which vector ran, a syndrome and a     */
 @/*  faulting address, then parks.  Recording before parking is what makes */

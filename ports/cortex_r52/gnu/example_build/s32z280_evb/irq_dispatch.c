@@ -42,6 +42,16 @@
 #include "gicv3.h"
 #include "timer.h"
 #include "board.h"
+#include "mpu.h"
+#ifdef TX_R52_USE_THREADX_IRQ
+#include "tx_api.h"
+
+/* ThreadX periodic timer entry point.  Assembly, and internal to the kernel,
+   so it is not declared by tx_api.h.  Safe to call from C: it uses only r0-r3
+   and returns through lr like an ordinary function.  */
+
+extern void _tx_timer_interrupt(void);
+#endif
 
 /* Observable from both the console and a debugger.                       */
 
@@ -62,6 +72,32 @@ volatile unsigned long  board_first_intid = 0xFFFFFFFFUL;
 /* Only the top priority bits are implemented; hence a multiple of 8.     */
 
 #define TIMER_PPI_PRIORITY      0xA0U
+
+
+#ifdef TX_R52_USE_THREADX_IRQ
+
+/**************************************************************************/
+/*  board_init -- called from _tx_initialize_low_level.                   */
+/*                                                                        */
+/*  Order matters.  mpu_init() must run before anything touches the GIC:  */
+/*  the distributor is unreachable until its region is mapped Device      */
+/*  nGnRnE, and an access before that aborts.  Arming the timer here is   */
+/*  safe because interrupts stay masked until _tx_thread_schedule enables */
+/*  them, so no tick can arrive before the kernel can service one.        */
+/**************************************************************************/
+
+void board_init(void)
+{
+    (void) mpu_init();
+    gicv3_init();
+    gicv3_enable_ppi(TIMER_PPI_INTID, TIMER_PPI_PRIORITY);
+
+    /* One tick every 10 ms at the measured 8 MHz counter rate.  */
+
+    timer_start_oneshot_irq(timer_read_cntfrq() / 100U);
+}
+
+#endif
 
 
 void board_irq_handler(void)
@@ -92,6 +128,13 @@ void board_irq_handler(void)
            interrupt would be taken again immediately on return.  */
 
         timer_start_oneshot_irq(timer_read_cntfrq() / 100U);
+
+#ifdef TX_R52_USE_THREADX_IRQ
+        /* Drive the kernel's time base.  Called after the re-arm so the next
+           interval is already running while the kernel does its bookkeeping.  */
+
+        _tx_timer_interrupt();
+#endif
     }
     else
     {
