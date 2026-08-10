@@ -275,12 +275,13 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
     unsigned long prbar;
     unsigned long prlar;
 
-    /* PRBAR: BASE[31:6], SH[5:4], AP[3:2], XN[1].  */
+    /* PRBAR: BASE[31:6], RES0[5], SH[4:3], AP[2:1], XN[0].
+       Cortex-R52 TRM r1p3 figure 3-39 / table 3-80.  */
 
     prbar = (region_ptr->mpu_region_base & 0xFFFFFFC0UL)
-          | (((unsigned long) region_ptr->mpu_region_shareability & 0x3UL) << 4)
-          | (((unsigned long) region_ptr->mpu_region_ap & 0x3UL) << 2)
-          | (((unsigned long) region_ptr->mpu_region_execute_never & 0x1UL) << 1);
+          | (((unsigned long) region_ptr->mpu_region_shareability & 0x3UL) << 3)
+          | (((unsigned long) region_ptr->mpu_region_ap & 0x3UL) << 1)
+          | ((unsigned long) region_ptr->mpu_region_execute_never & 0x1UL);
 
     prlar = (region_ptr->mpu_region_limit & 0xFFFFFFC0UL)
           | (((unsigned long) region_ptr->mpu_region_attr_index & 0x7UL) << 1)
