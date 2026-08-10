@@ -126,7 +126,7 @@ _protection_not_owned:
 @    if (_tx_thread_smp_protection.tx_thread_smp_protect_in_force == 0)
 @    {
 @
-    LDREX   r3, [r2, #0]                        @ Pickup the protection flag
+    LDREX   r3, [r2]                        @ Pickup the protection flag
     CMP     r3, #0
     BNE     _start_waiting                      @ No, protection not available
 @
@@ -146,7 +146,7 @@ _protection_not_owned:
 @    {
 @
     MOV     r3, #1                              @ Build lock value
-    STREX   r4, r3, [r2, #0]                    @ Attempt to get the protection
+    STREX   r4, r3, [r2]                    @ Attempt to get the protection
     CMP     r4, #0
     BNE     _start_waiting                      @ Did it fail?
 @

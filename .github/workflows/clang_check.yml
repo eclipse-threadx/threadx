@@ -1,0 +1,54 @@
+name: clang_check
+
+# Builds the Arm ports with Arm Toolchain for Embedded, which is LLVM based and
+# is the successor to Arm Compiler 6. The gnu ports are otherwise only ever
+# built with GNU tooling, and GNU as accepts several non-canonical forms that
+# LLVM's assembler rejects; this catches those before they accumulate.
+on:
+  pull_request:
+    branches: [ master, dev ]
+    paths:
+      - ".github/workflows/clang_check.yml"
+      - "scripts/check_clang.sh"
+      - "common/**"
+      - "ports/**"
+      - "ports_arch/**"
+      - "ports_module/**"
+      - "ports_smp/**"
+
+jobs:
+  atfe:
+    runs-on: ubuntu-24.04
+
+    env:
+      # Pinned deliberately, as the runner image is: a toolchain upgrade should
+      # be a reviewable commit rather than something that changes underneath the
+      # ports. Releases: https://github.com/arm/arm-toolchain/releases
+      ATFE_VERSION: 22.1.0
+
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v4
+
+    - name: Cache Arm Toolchain for Embedded
+      id: cache-atfe
+      uses: actions/cache@v4
+      with:
+        path: atfe
+        key: atfe-${{ env.ATFE_VERSION }}-linux-x86_64
+
+    - name: Install Arm Toolchain for Embedded
+      if: steps.cache-atfe.outputs.cache-hit != 'true'
+      run: |
+        set -eu
+        base="https://github.com/arm/arm-toolchain/releases/download/release-${ATFE_VERSION}-ATfE"
+        archive="ATfE-${ATFE_VERSION}-Linux-x86_64.tar.xz"
+        mkdir -p atfe && cd atfe
+        curl -fsSLO "$base/$archive"
+        curl -fsSLO "$base/$archive.sha256"
+        sha256sum -c "$archive.sha256"
+        tar xf "$archive"
+        rm -f "$archive"
+
+    - name: Build the Arm ports with clang
+      run: scripts/check_clang.sh --clang "atfe/ATfE-${ATFE_VERSION}-Linux-x86_64/bin/clang"
