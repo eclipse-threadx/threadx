@@ -150,13 +150,7 @@ C_CORES="cortex_m0 cortex_m4 cortex_m23 cortex_m33 cortex_m55 cortex_a7 cortex_a
 # These fail with the GNU toolchain too, so they are not LLVM problems:
 #   arm9 arm11           need newlib multilib variants for those CPUs, which are
 #   cortex_r4 cortex_r5  not present in every GNU toolchain packaging.
-#
-# This one is specific to LLVM:
-#   cortex_a12 a15 a17   their link line omits -nostartfiles, so the toolchain's
-#                        own crt0 is linked, and it needs picolibc's
-#                        __data_start, __data_source, __data_size and __bss_size,
-#                        which the example's linker script does not define.
-EXAMPLES_EXPECTED_TO_FAIL="arm9 arm11 cortex_r4 cortex_r5 cortex_a12 cortex_a15 cortex_a17"
+EXAMPLES_EXPECTED_TO_FAIL="arm9 arm11 cortex_r4 cortex_r5"
 
 failures=0
 skipped=""
