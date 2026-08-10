@@ -70,7 +70,7 @@ _tx_thread_secure_stack_initialize:
     SVC     3
     CPSID   i               // Disable interrupts
 #else
-    MOV     r0, #0xFF       // Feature not enabled
+    MOVS     r0, #0xFF       // Feature not enabled
 #endif
     BX      lr
     .end
