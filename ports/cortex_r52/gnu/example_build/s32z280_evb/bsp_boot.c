@@ -57,6 +57,7 @@
 #include "linflexd.h"
 #include "timer.h"
 #include "gic_probe.h"
+#include "mpu.h"
 
 /* Captured at EL2 by entry.S, before the drop to EL1.                    */
 
@@ -65,6 +66,15 @@ extern unsigned int  cpsr_at_el2;
 extern unsigned int  cpsr_at_el1;
 extern unsigned int  cntfrq_at_el2;
 extern unsigned int  hmpuir_at_el2;
+extern unsigned int  probe_stage;
+
+/* Mirror of the console markers into memory.  The UART has twice gone away at
+   the moment a marker mattered -- once when a stalled access took the debug
+   connection down with it, once when the USB passthrough detached -- and a
+   stalled access records no fault, so boot_stage alone cannot say how far the
+   risky sequence got.  This can be read post-mortem without a console.  */
+
+#define MARK(n)     do { probe_stage = (unsigned int)(n); } while (0)
 
 /* Filled in below and read by the debugger.  Not static: the whole point is
    for something outside this translation unit to find it.  */
@@ -145,6 +155,12 @@ static void report(const char *name, unsigned int value)
 /*  an empty static function, and then the script would have nothing to   */
 /*  attach to.                                                            */
 /**************************************************************************/
+
+unsigned int read_sctlr_after_mpu(void)
+{
+    return read_sctlr();
+}
+
 
 void bsp_done(void)
 {
@@ -262,23 +278,33 @@ void bsp_main(void)
     linflexd_puts("P1 RTU0.GPR CFG_CNTDV via LLPP\n");
     report("CFG_CNTDV", *(volatile unsigned int *)S32Z_RTU0_GPR_CFG_CNTDV);
 
-    /* The GIC is NOT read here, and the reason is now known rather than
-       guessed.  IMP_CBAR reports the distributor at 0x47800000, matching NXP's
-       map, and the Cortex-R52 TRM gives the frame layout: GICD at +0x000000,
-       redistributor control at +0x100000 and SGI/PPI at +0x110000, then
-       +0x20000 per further core.  The addresses were never the problem.
+    /* --- MPU, then the GIC ------------------------------------------------
+       The GIC needs its region mapped Device nGnRnE (Cortex-R52 TRM), which
+       needs the MPU on.  Markers around the enable: if the console survives it,
+       the UART region is right; if it does not, that is the answer.  */
 
-       The TRM also says: "Ensure that the memory region used for the GIC
-       Distributor is configured as Device nGnRnE."  The MPU is still disabled
-       here -- SCTLR.M reads 0 -- so nothing maps that region at all, and the
-       access stalls the core outright.  Enabling the LLPP does not help: the
-       GIC sits outside that window and is reached over AXIM.
+    MARK(0x10);
+    linflexd_puts("M1 enabling MPU\n");
+    {
+        unsigned int regions = mpu_init();
 
-       Reading it therefore has to wait for MPU programming, which the FVP
-       example already does table-driven in mpu.c and which is the next piece
-       of work here.  */
+        MARK(0x11);
 
-    linflexd_puts("P2 probes done (GIC deferred: needs Device nGnRnE mapping)\n");
+        report("MPU rgns ", regions);
+        report("SCTLR    ", read_sctlr_after_mpu());
+        MARK(0x12);
+        linflexd_puts("M2 MPU enabled, console alive\n");
+
+        linflexd_puts("M3 GICD_PIDR2 (was stalling before the MPU)\n");
+        MARK(0x13);
+        report("GICD_PIDR2", *(volatile unsigned int *)(S32Z_GIC_BASE + 0xFFE8UL));
+        MARK(0x14);
+        report("GICD_TYPER", *(volatile unsigned int *)(S32Z_GIC_BASE + 0x0004UL));
+        MARK(0x15);
+        report("GICR_PIDR2", *(volatile unsigned int *)(S32Z_GIC_BASE + 0x10FFE8UL));
+        MARK(0x16);
+        linflexd_puts("M4 GIC reachable\n");
+    }
 
     /* --- GIC: not reachable yet, probe deliberately removed ----------------
        The GIC window NXP's memory map gives for this cluster, 0x47800000, is

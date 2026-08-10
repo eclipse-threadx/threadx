@@ -76,4 +76,8 @@ void    bsp_main(void);
 
 void    bsp_done(void);
 
+/* SCTLR as it reads after mpu_init(); M should be set.                   */
+
+unsigned int    read_sctlr_after_mpu(void);
+
 #endif /* BOARD_H */

@@ -121,6 +121,8 @@ cpsr_at_el1:    .word   0
 cntfrq_at_el2:  .word   0
     .global hmpuir_at_el2
 hmpuir_at_el2:  .word   0
+    .global probe_stage
+probe_stage:    .word   0
     .global fault_vector
 fault_vector:   .word   0
     .global fault_syndrome
