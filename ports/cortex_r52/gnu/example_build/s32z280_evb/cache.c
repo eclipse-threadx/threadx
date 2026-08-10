@@ -279,6 +279,39 @@ void cache_enable(void)
 }
 
 
+/* L1 data cache geometry, decoded from CCSIDR with level 0 selected.     */
+
+static unsigned long dcache_ccsidr(void)
+{
+    select_cache(0UL, 0UL);
+    return cache_read_ccsidr();
+}
+
+
+unsigned long cache_dcache_line_bytes(void)
+{
+    return 1UL << ((dcache_ccsidr() & 7UL) + 4UL);
+}
+
+
+unsigned long cache_dcache_ways(void)
+{
+    return ((dcache_ccsidr() >> 3) & 0x3FFUL) + 1UL;
+}
+
+
+unsigned long cache_dcache_sets(void)
+{
+    return ((dcache_ccsidr() >> 13) & 0x7FFFUL) + 1UL;
+}
+
+
+unsigned long cache_dcache_bytes(void)
+{
+    return cache_dcache_line_bytes() * cache_dcache_ways() * cache_dcache_sets();
+}
+
+
 unsigned int cache_enabled(void)
 {
     unsigned long sctlr = read_sctlr();

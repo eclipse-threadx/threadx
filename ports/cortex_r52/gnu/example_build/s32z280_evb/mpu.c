@@ -338,7 +338,21 @@ static void build_table(void)
     mpu_regions[4].mpu_region_attr_index    = MPU_ATTR_DEVICE;
     mpu_regions[4].mpu_region_name          = "rtu   RW NX device";
 
-    mpu_regions_used = 5U;
+    /* Extended SRAM.  Deliberately mapped so the cache benchmark has memory
+       that is NOT RTU-local to work against: the fast-data bank in region 1 is
+       close to core speed, so caching it shows nothing.  Normal write-back and
+       never executable.  */
+
+    mpu_regions[5].mpu_region_base          = S32Z_EXT_SRAM_BASE;
+    mpu_regions[5].mpu_region_limit         = S32Z_EXT_SRAM_BASE
+                                            + S32Z_EXT_SRAM_SIZE - 1UL;
+    mpu_regions[5].mpu_region_ap            = MPU_AP_RW_EL1;
+    mpu_regions[5].mpu_region_execute_never = 1U;
+    mpu_regions[5].mpu_region_shareability  = MPU_SH_NON;
+    mpu_regions[5].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
+    mpu_regions[5].mpu_region_name          = "ext   RW NX normal-wb";
+
+    mpu_regions_used = 6U;
 }
 
 

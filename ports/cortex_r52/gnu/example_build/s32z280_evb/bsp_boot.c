@@ -171,23 +171,40 @@ static void enable_irq_at_el1(void)
 }
 
 
-/* A workload that touches enough memory repeatedly for caching to matter, and
-   that the compiler cannot fold away.  Deliberately not a pure spin loop: a
-   nop loop is bounded by fetch, so it would show an instruction-cache effect
-   and say nothing about the data cache.  */
+/* Cache benchmark.
+ *
+ * Two things have to be right for a cache to show a measurable effect, and the
+ * first version of this test got both wrong.  It used a 4 KB static buffer in
+ * the RTU-local fast-data bank and reported a 0.036% difference -- noise -- as a
+ * pass.  Fast local SRAM is already close to core speed, so caching it can save
+ * almost nothing.
+ *
+ *   1. The memory must be slower than the core.  This uses the extended SRAM at
+ *      S32Z_EXT_SRAM_BASE, which the Reference Manual describes as NOT
+ *      RTU-local, unlike the fast-data bank.
+ *
+ *   2. The working set must fit in the cache and be revisited.  It is sized
+ *      from CCSIDR at run time -- half the reported L1 data cache -- rather
+ *      than from a guessed constant.  A set larger than the cache would stream
+ *      and evict, and would show little benefit even over slow memory.
+ *
+ * Reported alongside the timings so the numbers can be judged, not just
+ * believed.
+ */
 
-static volatile unsigned int cache_scratch[1024];
+static unsigned long cache_bench_words;
 
 static void cache_workload(void)
 {
-    unsigned int pass;
-    unsigned int i;
+    volatile unsigned int  *buffer = (volatile unsigned int *) S32Z_EXT_SRAM_BASE;
+    unsigned long           pass;
+    unsigned long           i;
 
-    for (pass = 0U; pass < 64U; pass++)
+    for (pass = 0UL; pass < 32UL; pass++)
     {
-        for (i = 0U; i < 1024U; i++)
+        for (i = 0UL; i < cache_bench_words; i++)
         {
-            cache_scratch[i] = cache_scratch[i] + i + pass;
+            buffer[i] = buffer[i] + i + pass;
         }
     }
 }
@@ -467,7 +484,18 @@ void bsp_main(void)
 
     MARK(0x70);
     report("CLIDR    ", (unsigned int) cache_read_clidr());
-    linflexd_puts("C1 timing a workload with caches OFF\n");
+    report("D line   ", (unsigned int) cache_dcache_line_bytes());
+    report("D ways   ", (unsigned int) cache_dcache_ways());
+    report("D sets   ", (unsigned int) cache_dcache_sets());
+    report("D bytes  ", (unsigned int) cache_dcache_bytes());
+
+    /* Half the data cache, in words: fits comfortably and is revisited every
+       pass, which is the case a cache is meant to win.  */
+
+    cache_bench_words = cache_dcache_bytes() / (2UL * sizeof(unsigned int));
+    report("bench wds", (unsigned int) cache_bench_words);
+
+    linflexd_puts("C1 timing over non-RTU-local SRAM, caches OFF\n");
     {
         unsigned long long before;
         unsigned long long after;
@@ -525,12 +553,11 @@ void bsp_main(void)
 
             if (gain >= 100UL)
             {
-                linflexd_puts("C4 speedup measurable (>=10%)\n");
+                linflexd_puts("C4 PASS caches measurably faster (>=10%)\n");
             }
             else
             {
-                linflexd_puts("C4 no significant speedup -- expected here,"
-                              " the workload is already in fast local SRAM\n");
+                linflexd_puts("C4 speedup below 10% -- see gain/1000 above\n");
             }
         }
         else

@@ -52,4 +52,13 @@ void            cache_enable(void);
 
 unsigned int    cache_enabled(void);
 
+/* Decoded L1 data-cache geometry, from CCSIDR.  Sizing a cache benchmark
+   against real numbers rather than a guess is the difference between measuring
+   the cache and measuring nothing.  */
+
+unsigned long   cache_dcache_line_bytes(void);
+unsigned long   cache_dcache_ways(void);
+unsigned long   cache_dcache_sets(void);
+unsigned long   cache_dcache_bytes(void);
+
 #endif /* CACHE_H */
