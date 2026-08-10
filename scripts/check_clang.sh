@@ -70,8 +70,18 @@ if ! command -v "$CC" >/dev/null 2>&1 && [ ! -x "$CC" ]; then
     exit 1
 fi
 
+# Resolve to an absolute path. The example stage runs the build scripts from
+# inside their own directories, so a relative compiler path would stop
+# resolving there.
+if [ -e "$CC" ]; then
+    CC="$(realpath "$CC")"
+else
+    CC="$(command -v "$CC")"
+fi
+
 say ""
-say "Using: $("$CC" --version | head -1)"
+say "Using: $CC"
+say "       $("$CC" --version | head -1)"
 
 # Each port directory is mapped explicitly to a target triple and CPU. Do not
 # replace this with prefix matching: cortex_a5* also matches cortex_a53 and
