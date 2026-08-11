@@ -239,7 +239,7 @@
     <stringAttribute key="config_db_platform_name" value="Arm FVP (Installed with Arm DS) - Base_A57x1"/>
     <stringAttribute key="config_db_project_type" value="Bare Metal Debug"/>
     <stringAttribute key="config_db_project_type_id" value="BARE_METAL"/>
-    <stringAttribute key="config_db_taxonomy_id" value="/platform/armfvp_installedwitharmds_/base_a35x1"/>
+    <stringAttribute key="config_db_taxonomy_id" value="/platform/armfvp_installedwitharmds_/base_a57x1"/>
     <stringAttribute key="config_file" value="CDB://cadi_config.xml"/>
     <booleanAttribute key="connectOnly" value="false"/>
     <listAttribute key="debugger.view.DisassemblyView:current">

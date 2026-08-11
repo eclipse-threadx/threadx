@@ -94,17 +94,26 @@ $patches = (
         (('value="cortex-a35"'), ('value="cortex-$($core_short_lower)"')),
         (('Cortex-A35.AArch64.ARMv8.Neon.Crypto'), ('Cortex-$($core_short_upper).AArch64.ARMv8.Neon.Crypto'))
     )),
+    # The base_a35x<n> entries are the config database taxonomy id, which is
+    # spelt in lower case in the launch files. They used to read base_A35x<n>,
+    # which -creplace never matched, leaving every port pointing at the A35
+    # platform. The Cortex-A35x<n> SMP entries are the activity name the SMP
+    # launch files use in place of "Debug Cortex-A35"; matching the " SMP"
+    # suffix keeps them from also rewriting the FVP model name.
     ('example_build\sample_threadx\sample_threadx.launch', (
         ('Debug Cortex-A35', 'Debug Cortex-$($core_short_upper)'),
         ('Base_A35x1', 'Base_$($core_short_upper)x1'),
-        ('base_A35x1', 'base_$($core_short_lower)x1'),
+        ('base_a35x1', 'base_$($core_short_lower)x1'),
         ('FVP_Base_Cortex-A35x1', 'FVP_Base_Cortex-$($core_short_upper)x1'),
+        ('Cortex-A35x1 SMP', 'Cortex-$($core_short_upper)x1 SMP'),
         ('Base_A35x2', 'Base_$($core_short_upper)x2'),
-        ('base_A35x2', 'base_$($core_short_lower)x2'),
+        ('base_a35x2', 'base_$($core_short_lower)x2'),
         ('FVP_Base_Cortex-A35x2', 'FVP_Base_Cortex-$($core_short_upper)x2'),
+        ('Cortex-A35x2 SMP', 'Cortex-$($core_short_upper)x2 SMP'),
         ('Base_A35x4', 'Base_$($core_short_upper)x4'),
-        ('base_A35x4', 'base_$($core_short_lower)x4'),
-        ('FVP_Base_Cortex-A35x4', 'FVP_Base_Cortex-$($core_short_upper)x4')
+        ('base_a35x4', 'base_$($core_short_lower)x4'),
+        ('FVP_Base_Cortex-A35x4', 'FVP_Base_Cortex-$($core_short_upper)x4'),
+        ('Cortex-A35x4 SMP', 'Cortex-$($core_short_upper)x4 SMP')
     ))
 )
 
