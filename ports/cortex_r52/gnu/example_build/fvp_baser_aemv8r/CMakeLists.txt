@@ -6,6 +6,18 @@
 
 set(FVP_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+# A bare-metal image has one flat DRAM region and no OS page permissions; access
+# control belongs to the MPU, so an RWX segment is expected here rather than a
+# mistake. GNU ld has warned about them since binutils 2.39 and takes this flag
+# to stay quiet. ld.lld does not warn and rejects the flag outright, failing the
+# link with "unknown argument", so the suppression is chosen by toolchain
+# instead of being spelled into every target.
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    set(R52_LINK_QUIET_RWX -Wl,--no-warn-rwx-segments)
+else()
+    set(R52_LINK_QUIET_RWX)
+endif()
+
 # Console sources.  Both backends are always compiled; console.c selects one at
 # compile time and --gc-sections drops the unused one, which keeps every image
 # building in either configuration without per-target source juggling.
@@ -30,9 +42,7 @@ target_link_options(boot_check.elf PRIVATE
     -T${FVP_DIR}/link.lds
     -nostartfiles
     -Wl,-Map=boot_check.map
-    # A bare-metal image has one flat DRAM region and no OS page permissions;
-    # access control belongs to the MPU, so the RWX-segment note is expected.
-    -Wl,--no-warn-rwx-segments
+    ${R52_LINK_QUIET_RWX}
 )
 
 # AR1/M2 -- cooperative two-thread demo.  Links ThreadX and exercises the
@@ -56,7 +66,7 @@ target_link_options(demo_m2.elf PRIVATE
     -T${FVP_DIR}/link.lds
     -nostartfiles
     -Wl,-Map=demo_m2.map
-    -Wl,--no-warn-rwx-segments
+    ${R52_LINK_QUIET_RWX}
 )
 
 # AR1/M3 -- periodic tick and preemptive scheduling.  Adds GICv3, the generic
@@ -87,7 +97,7 @@ target_link_options(demo_m3.elf PRIVATE
     -T${FVP_DIR}/link.lds
     -nostartfiles
     -Wl,-Map=demo_m3.map
-    -Wl,--no-warn-rwx-segments
+    ${R52_LINK_QUIET_RWX}
 )
 
 # AR1/M4 -- the standard eight-thread ThreadX demo.  demo_threadx.c is the
@@ -118,7 +128,7 @@ target_link_options(demo_threadx.elf PRIVATE
     -T${FVP_DIR}/link.lds
     -nostartfiles
     -Wl,-Map=demo_threadx.map
-    -Wl,--no-warn-rwx-segments
+    ${R52_LINK_QUIET_RWX}
 )
 
 # AR1/M5 -- lazy VFP context save and restore.  Only meaningful when the
@@ -149,7 +159,7 @@ if(TX_R52_ENABLE_VFP)
         -T${FVP_DIR}/link.lds
         -nostartfiles
         -Wl,-Map=demo_m5.map
-        -Wl,--no-warn-rwx-segments
+        ${R52_LINK_QUIET_RWX}
     )
 endif()
 
@@ -184,7 +194,7 @@ target_link_options(demo_mpu.elf PRIVATE
     -T${FVP_DIR}/link.lds
     -nostartfiles
     -Wl,-Map=demo_mpu.map
-    -Wl,--no-warn-rwx-segments
+    ${R52_LINK_QUIET_RWX}
 )
 
 # Every image built here, in the order they should be exercised.

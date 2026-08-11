@@ -14,10 +14,11 @@
 # SPDX-License-Identifier: MIT and CC0-1.0
 ##############################################################################
 
-# Builds the Arm ports with an LLVM based toolchain, in three stages: assemble
+# Builds the Arm ports with an LLVM based toolchain, in four stages: assemble
 # every assembly source of every Arm gnu port, compile the common C sources for
-# one core per architecture profile, then link the example builds that have a
-# script driver. Only that last stage needs a target C library.
+# one core per architecture profile, link the example builds that have a script
+# driver, then link those driven by CMake. Only the two linking stages need a
+# target C library.
 #
 #     scripts/check_clang.sh                       # clang from PATH
 #     scripts/check_clang.sh --clang /path/to/clang
@@ -149,6 +150,11 @@ declare -A PORT_TARGET=(
 # accordingly, so cortex_r5 does not stand in for it.
 C_CORES="cortex_m0 cortex_m4 cortex_m23 cortex_m33 cortex_m55 cortex_a7 cortex_a53 cortex_r5 cortex_r52"
 
+# Example builds driven by CMake rather than by a build_threadx.sh pair. These
+# are covered by their own stage below, so the script-driven loop passes over
+# them without reporting them as a gap.
+CMAKE_EXAMPLE_CORES="cortex_r52"
+
 # Example builds that are not expected to link, with the reason. Named by
 # their port directory, which covers both ports/ and ports_smp/. Listed
 # explicitly rather than silently skipped, so the gaps stay visible.
@@ -249,10 +255,14 @@ if [ "$no_examples" -eq 0 ]; then
         # linux or mips32 as a gap here would be noise, not information.
         [ -n "${PORT_TARGET[$core]:-}" ] || continue
 
+        # Covered by the CMake stage below rather than here.
+        case " $CMAKE_EXAMPLE_CORES " in
+            *" $core "*) continue ;;
+        esac
+
         # A driverless example is not covered by this stage, so say so rather
         # than dropping out in silence. A port that is simply absent from the
-        # count reads as covered: the CMake based example builds under
-        # ports/cortex_r52 looked like part of the 35 while never being built.
+        # count reads as covered.
         if [ ! -f "$dir/build_threadx.sh" ]; then
             example_nodriver="$example_nodriver $core"
             continue
@@ -289,6 +299,66 @@ if [ "$no_examples" -eq 0 ]; then
         say "  no script driver, so outside this stage:$example_nodriver"
     fi
 fi
+# --------------------------------------------------------------------------
+# The Cortex-R52 examples are built by CMake, so they need a toolchain file
+# rather than TOOLCHAIN=atfe. Same compiler, same linker, same purpose as the
+# stage above: confirm the images still link when the toolchain is not GNU.
+if [ "$no_examples" -eq 0 ]; then
+    say ""
+    say "== CMake example builds, linked with lld =="
+
+    if ! command -v cmake >/dev/null 2>&1 || ! command -v ninja >/dev/null 2>&1; then
+        say "  skipped: cmake and ninja are both required"
+    else
+        for core in $CMAKE_EXAMPLE_CORES; do
+            build_dir="$(mktemp -d)"
+            # ATFE_TOOLCHAIN_PATH follows --clang, so the stage uses the same
+            # compiler as every other stage rather than whatever is on PATH.
+            if cmake -S . -B "$build_dir" -G Ninja \
+                    -DCMAKE_TOOLCHAIN_FILE="cmake/${core}_clang.cmake" \
+                    -DATFE_TOOLCHAIN_PATH="$(cd "$(dirname "$CC")" && pwd)" \
+                    -DTX_R52_BUILD_FVP_EXAMPLE=ON \
+                    -DTX_R52_ENABLE_MPU=ON >"$build_dir/configure.log" 2>&1; then
+                # Read the image list from the generated graph instead of
+                # repeating it here, so adding a target cannot silently escape
+                # this check. The images are EXCLUDE_FROM_ALL, so "ninja" alone
+                # would build none of them.
+                #
+                # The cmake_object_order_depends_target_* entries are CMake's
+                # own ordering phonies, one per real image and named after it.
+                # Counting those doubled the total and reported ten images built
+                # where there are five.
+                images="$(ninja -C "$build_dir" -t targets all 2>/dev/null \
+                          | grep -oE '^[A-Za-z0-9_]+\.elf' \
+                          | grep -v '^cmake_' | sort -u)"
+                if [ -z "$images" ]; then
+                    fail "$core: no .elf targets found in the CMake graph"
+                    failures=$((failures + 1))
+                else
+                    built=0; total=0
+                    for image in $images; do
+                        total=$((total + 1))
+                        if ninja -C "$build_dir" "$image" \
+                                >"$build_dir/$image.log" 2>&1; then
+                            built=$((built + 1))
+                        else
+                            fail "$core: $image did not build"
+                            tail -6 "$build_dir/$image.log" | sed 's/^/        /'
+                            failures=$((failures + 1))
+                        fi
+                    done
+                    say "  $core: $built of $total images linked"
+                fi
+            else
+                fail "$core: CMake configure failed"
+                tail -6 "$build_dir/configure.log" | sed 's/^/        /'
+                failures=$((failures + 1))
+            fi
+            rm -rf "$build_dir"
+        done
+    fi
+fi
+
 # --------------------------------------------------------------------------
 say ""
 if [ "$failures" -eq 0 ]; then
