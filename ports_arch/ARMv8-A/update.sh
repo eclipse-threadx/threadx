@@ -37,8 +37,14 @@ set -eu
 
 cd "$(dirname "$(realpath "$0")")"
 
-cores="cortex_a35 cortex_a53 cortex_a55 cortex_a57 cortex_a65 cortex_a65ae cortex_a72 \
-       cortex_a73 cortex_a75 cortex_a76 cortex_a76ae cortex_a77"
+cores="cortex_a34 cortex_a35 cortex_a53 cortex_a55 cortex_a57 cortex_a65 cortex_a65ae \
+       cortex_a72 cortex_a73 cortex_a75 cortex_a76 cortex_a76ae cortex_a77"
+
+# Cortex-A78 ships as an SMP port only: ports_smp/cortex_a78_smp exists but
+# ports/cortex_a78 does not. Listing it separately keeps the generator from
+# creating a ThreadX port that the tree has never had.
+cores_smp_only="cortex_a78"
+
 compilers="ac6 gnu"
 
 port_sets=""
@@ -110,7 +116,12 @@ patch_file() {
 }
 
 for port_set in ${port_sets}; do
-    for core in ${cores}; do
+    case "${port_set}" in
+        tx_smp) port_set_cores="${cores} ${cores_smp_only}" ;;
+        *)      port_set_cores="${cores}" ;;
+    esac
+
+    for core in ${port_set_cores}; do
         case "${port_set}" in
             tx)      core_directory="../../ports/${core}" ;;
             tx_smp)  core_directory="../../ports_smp/${core}_smp" ;;

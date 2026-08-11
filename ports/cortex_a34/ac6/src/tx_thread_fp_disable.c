@@ -15,16 +15,18 @@
 /**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
-/**   Module Manager                                                      */
+/**   Thread                                                              */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
 #define TX_SOURCE_CODE
 
+
+/* Include necessary system files.  */
+
 #include "tx_api.h"
 #include "tx_thread.h"
-
 
 
 /**************************************************************************/
@@ -35,7 +37,7 @@
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    Scott Larson, Microsoft Corporation                                 */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -47,7 +49,7 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    status                            Completion status                 */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -84,3 +86,4 @@ ULONG       system_state;
         }
     }
 }
+

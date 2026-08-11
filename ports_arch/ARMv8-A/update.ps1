@@ -77,7 +77,13 @@ Write-Verbose ("Copy regression test: $CopyRegressionTest")
 Write-Verbose ("Patch files: $PatchFiles")
 Write-Verbose ("LogDir: $LogDir")
 
-$cores = @("cortex_a35", "cortex_a53", "cortex_a55", "cortex_a57", "cortex_a65", "cortex_a65ae", "cortex_a72", "cortex_a73", "cortex_a75", "cortex_a76", "cortex_a76ae", "cortex_a77")
+$cores = @("cortex_a34", "cortex_a35", "cortex_a53", "cortex_a55", "cortex_a57", "cortex_a65", "cortex_a65ae", "cortex_a72", "cortex_a73", "cortex_a75", "cortex_a76", "cortex_a76ae", "cortex_a77")
+
+# Cortex-A78 ships as an SMP port only: ports_smp\cortex_a78_smp exists but
+# ports\cortex_a78 does not. Listing it separately keeps the generator from
+# creating a ThreadX port that the tree has never had.
+$cores_smp_only = @("cortex_a78")
+
 $compilers = @("ac6", "gnu")
 $patches = (
     ('example_build\sample_threadx\.cproject', (
@@ -119,7 +125,13 @@ Function Copy-FilesVerbose {
 }
 
 ForEach ($PortSet in $PortSets) {
-    ForEach ($core in $cores) {
+    If ($PortSet -eq "tx_smp") {
+        $PortSetCores = $cores + $cores_smp_only
+    } Else {
+        $PortSetCores = $cores
+    }
+
+    ForEach ($core in $PortSetCores) {
         Switch ($PortSet) {
             "tx" { $core_directory = "..\..\ports\" + $core }
             "tx_smp" { $core_directory = "..\..\ports_smp\" + $core + "_smp" }

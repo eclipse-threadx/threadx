@@ -348,7 +348,7 @@
     <stringAttribute key="config_db_activity_name" value="Cortex-A35x4 SMP"/>
     <stringAttribute key="config_db_connection_keys" value="dtsl_config dtsl_tracecapture_option connect_existing_model dtsl_config_script model_params model_iris config_file model_connection_address setup TCP_KILL_ON_EXIT TCP_DISABLE_EXTENDED_MODE"/>
     <stringAttribute key="config_db_connection_type" value="Bare Metal Debug"/>
-    <stringAttribute key="config_db_platform_name" value="Arm FVP - Base_A35x4"/>
+    <stringAttribute key="config_db_platform_name" value="Arm FVP - Base_A34x4"/>
     <stringAttribute key="config_db_project_type" value="Bare Metal Debug"/>
     <stringAttribute key="config_db_project_type_id" value="BARE_METAL"/>
     <stringAttribute key="config_db_taxonomy_id" value="/platform/armfvp/base_a35x4"/>
@@ -437,7 +437,7 @@
     </mapAttribute>
     <listAttribute key="setup">
         <listEntry value="CDB://Scripts/rtsm_launcher.py"/>
-        <listEntry value="&quot;FVP_Base_Cortex-A35x4&quot;"/>
+        <listEntry value="&quot;FVP_Base_Cortex-A34x4&quot;"/>
     </listAttribute>
     <stringAttribute key="stopAtExpression" value="*$ENTRYPOINT"/>
     <stringAttribute key="substitutePath" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;tuplelist&gt;&#10;&#9;&lt;tuple&gt;&#10;&#9;&#9;&lt;ta&gt;/tmp/dgboter/bbs/dsggnu-vm-1-x86_64--mingw32-i686/buildbot/mingw32-i686--aarch64-elf/build/src/newlib-cygwin/libgloss/aarch64/&lt;/ta&gt;&#10;&#9;&#9;&lt;tb&gt;D:\Documents\work\toolchains\newlib-cygwin\libgloss\aarch64\&lt;/tb&gt;&#10;&#9;&lt;/tuple&gt;&#10;&#9;&lt;tuple&gt;&#10;&#9;&#9;&lt;ta&gt;C:/release/threadx/sample_threadx&lt;/ta&gt;&#10;&#9;&#9;&lt;tb&gt;C:\release\threadx\sample_threadx\&lt;/tb&gt;&#10;&#9;&lt;/tuple&gt;&#10;&#9;&lt;tuple&gt;&#10;&#9;&#9;&lt;ta&gt;C:/release/threadx/tx&lt;/ta&gt;&#10;&#9;&#9;&lt;tb&gt;C:\release\threadx\sample_threadx\&lt;/tb&gt;&#10;&#9;&lt;/tuple&gt;&#10;&lt;/tuplelist&gt;&#10;"/>
