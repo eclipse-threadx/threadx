@@ -345,13 +345,13 @@
     <listAttribute key="com.arm.debugger.views.common.AddressTracker.debugger.view.DisassemblyView.ranges">
         <listEntry value="100"/>
     </listAttribute>
-    <stringAttribute key="config_db_activity_name" value="Cortex-A35x4 SMP"/>
+    <stringAttribute key="config_db_activity_name" value="Cortex-A34x4 SMP"/>
     <stringAttribute key="config_db_connection_keys" value="dtsl_config dtsl_tracecapture_option connect_existing_model dtsl_config_script model_params model_iris config_file model_connection_address setup TCP_KILL_ON_EXIT TCP_DISABLE_EXTENDED_MODE"/>
     <stringAttribute key="config_db_connection_type" value="Bare Metal Debug"/>
     <stringAttribute key="config_db_platform_name" value="Arm FVP - Base_A34x4"/>
     <stringAttribute key="config_db_project_type" value="Bare Metal Debug"/>
     <stringAttribute key="config_db_project_type_id" value="BARE_METAL"/>
-    <stringAttribute key="config_db_taxonomy_id" value="/platform/armfvp/base_a35x4"/>
+    <stringAttribute key="config_db_taxonomy_id" value="/platform/armfvp/base_a34x4"/>
     <stringAttribute key="config_file" value="CDB://iris_config.xml"/>
     <booleanAttribute key="connectOnly" value="false"/>
     <stringAttribute key="connect_existing_model" value="false"/>

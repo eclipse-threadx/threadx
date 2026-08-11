@@ -232,7 +232,7 @@
     <stringAttribute key="config_db_platform_name" value="Arm FVP (Installed with Arm DS) - Base_A75x1"/>
     <stringAttribute key="config_db_project_type" value="Bare Metal Debug"/>
     <stringAttribute key="config_db_project_type_id" value="BARE_METAL"/>
-    <stringAttribute key="config_db_taxonomy_id" value="/platform/armfvp_installedwitharmds_/base_a35x1"/>
+    <stringAttribute key="config_db_taxonomy_id" value="/platform/armfvp_installedwitharmds_/base_a75x1"/>
     <stringAttribute key="config_file" value="CDB://../../Arm FVP/Base_A75x1/iris_config.xml"/>
     <booleanAttribute key="connectOnly" value="false"/>
     <stringAttribute key="connect_existing_model" value="false"/>

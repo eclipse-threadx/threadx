@@ -169,8 +169,19 @@ for port_set in ${port_sets}; do
                 patch_file "${launch}" 'Debug Cortex-A35' "Debug Cortex-${core_short_upper}"
                 for count in 1 2 4; do
                     patch_file "${launch}" "Base_A35x${count}"             "Base_${core_short_upper}x${count}"
-                    patch_file "${launch}" "base_A35x${count}"             "base_${core_short_lower}x${count}"
+                    # The config database taxonomy id is spelt in lower case in
+                    # the launch files, so the search string must be too. It
+                    # used to read base_A35x, which matched nothing and left
+                    # every port pointing at the A35 platform. The ARMv7-A
+                    # generator gets this right, which is why its ports carry a
+                    # per-core ve_cortex_a<n>x1 id.
+                    patch_file "${launch}" "base_a35x${count}"             "base_${core_short_lower}x${count}"
                     patch_file "${launch}" "FVP_Base_Cortex-A35x${count}"  "FVP_Base_Cortex-${core_short_upper}x${count}"
+                    # The SMP launch files name the activity "Cortex-A35x4 SMP"
+                    # rather than "Debug Cortex-A35", so the rule above does not
+                    # reach them. Match the " SMP" suffix so this cannot also
+                    # rewrite the FVP model name handled on the line above.
+                    patch_file "${launch}" "Cortex-A35x${count} SMP"       "Cortex-${core_short_upper}x${count} SMP"
                 done
             fi
         done
