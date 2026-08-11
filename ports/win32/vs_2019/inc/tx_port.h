@@ -549,6 +549,10 @@ VOID                                            _tx_win32_scheduler_wake(VOID);
 #define TX_WIN32_USE_HIGH_RESOLUTION_TIMER      1
 #endif
 
+#ifndef TX_WIN32_HANDOFF_SPIN_COUNT
+#define TX_WIN32_HANDOFF_SPIN_COUNT              64
+#endif
+
 #ifndef TX_WIN32_MEMORY_SIZE
 #define TX_WIN32_MEMORY_SIZE                    256000
 #endif

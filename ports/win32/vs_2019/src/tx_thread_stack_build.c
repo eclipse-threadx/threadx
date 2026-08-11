@@ -167,6 +167,7 @@ TX_THREAD   *current_thread_ptr;
 HANDLE      threadhandle;
 int         threadpriority;
 DWORD       threadid;
+ULONG       handoff_spin_count;
 
     /* Pickup the current thread pointer.  */
     thread_ptr =  (TX_THREAD *) ptr;
@@ -175,10 +176,22 @@ DWORD       threadid;
        handoff point and is ready to be scheduled.  */
     ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
 
-    /* Spin-poll for the scheduler to release this thread to run.
-       Matches the spin-poll pattern used in _tx_thread_system_return.  */
+    /* Spin briefly for the scheduler to release this thread to run, then
+       block so dormant threads do not consume host CPU indefinitely.  */
+    handoff_spin_count =  TX_WIN32_HANDOFF_SPIN_COUNT;
     while (WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_run_semaphore, 0) != WAIT_OBJECT_0)
-        SwitchToThread();
+    {
+        if (handoff_spin_count != 0)
+        {
+            handoff_spin_count--;
+            SwitchToThread();
+        }
+        else
+        {
+            WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_run_semaphore, INFINITE);
+            break;
+        }
+    }
 
     /* Acknowledge that the host thread is now able to execute ThreadX code.  */
     ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);

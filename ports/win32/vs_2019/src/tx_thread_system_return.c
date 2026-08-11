@@ -85,6 +85,7 @@ UINT        temp_thread_state;
 HANDLE      threadhandle;
 int         threadpriority;
 DWORD       threadid;
+ULONG       handoff_spin_count;
 
 
     /* Enter Win32 critical section.  */
@@ -164,11 +165,22 @@ DWORD       threadid;
         ExitThread(0);
     }
 
-    /* Spin-poll for the scheduler to grant this thread a new time-slice.
-       SwitchToThread() between polls keeps the CPU available to the scheduler
-       and timer without paying the full kernel-wake cost of INFINITE.  */
+    /* Spin briefly for the scheduler to grant this thread a new time-slice,
+       then block so suspended threads do not consume host CPU indefinitely.  */
+    handoff_spin_count =  TX_WIN32_HANDOFF_SPIN_COUNT;
     while (WaitForSingleObject(temp_run_semaphore, 0) != WAIT_OBJECT_0)
-        SwitchToThread();
+    {
+        if (handoff_spin_count != 0)
+        {
+            handoff_spin_count--;
+            SwitchToThread();
+        }
+        else
+        {
+            WaitForSingleObject(temp_run_semaphore, INFINITE);
+            break;
+        }
+    }
 
     /* Acknowledge that the thread is once again executing ThreadX code.  */
     ReleaseSemaphore(temp_thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
