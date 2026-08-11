@@ -14,10 +14,10 @@
 # SPDX-License-Identifier: MIT and CC0-1.0
 ##############################################################################
 
-# Builds the Arm ports with an LLVM based toolchain: every assembly source of
-# every Arm gnu port, and the common C sources for one core per architecture
-# profile. Compilation only, no linking, so no target C library is required
-# profile, then links the example builds that have a script driver.
+# Builds the Arm ports with an LLVM based toolchain, in three stages: assemble
+# every assembly source of every Arm gnu port, compile the common C sources for
+# one core per architecture profile, then link the example builds that have a
+# script driver. Only that last stage needs a target C library.
 #
 #     scripts/check_clang.sh                       # clang from PATH
 #     scripts/check_clang.sh --clang /path/to/clang
