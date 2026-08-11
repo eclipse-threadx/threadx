@@ -239,13 +239,6 @@
         <listEntry value="element formatter"/>
         <listEntry value="Character"/>
     </listAttribute>
-    <listAttribute key="TREE_NODE_PROPERTIES:debugger.view.VariableTreeView">
-        <listEntry value="NODE CACHE VERSION 1"/>
-        <listEntry value="LOCALS:Locals:VALUE:B:/support/broadcom/tx58cortexa53arm/release/threadx/tx/tx_thread_system_suspend.c::_tx_thread_system_suspend::possible_cores"/>
-        <listEntry value="1"/>
-        <listEntry value="formatter"/>
-        <listEntry value="Hexadecimal"/>
-    </listAttribute>
     <booleanAttribute key="VFS_ENABLED" value="true"/>
     <stringAttribute key="VFS_LOCAL_DIR" value="${workspace_loc}"/>
     <stringAttribute key="VFS_REMOTE_MOUNT" value="/writeable"/>
@@ -424,22 +417,10 @@
     <stringAttribute key="os_extension_id" value="com.arm.debug.os.threadx"/>
     <booleanAttribute key="runAfterConnect" value="false"/>
     <stringAttribute key="runTargetInitializationScript" value="${workspace_loc:/sample_threadx/use_model_semihosting.ds}"/>
-    <mapAttribute key="scripts_view_script_links">
-        <mapEntry key="B:\support\broadcom\a53smp_el1_clean_mar25\sample_threadx\use_model_semihosting.ds" value=""/>
-        <mapEntry key="B:\support\broadcom\tx58cortexa53arm\release\threadx\sample_threadx\use_model_semihosting.ds" value=""/>
-        <mapEntry key="C:\Users\andrejm\work\git\AzureRTOS\threadx_other\ports_smp\cortex_a35_smp\gnu\example_build\sample_threadx\use_model_semihosting.ds" value=""/>
-        <mapEntry key="C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports_smp\cortex_a35_smp\gnu\example_build\sample_threadx\use_model_semihosting.ds" value=""/>
-        <mapEntry key="C:\Users\nisohack\Documents\work\x-ware_libs\threadx_github\ports\cortex_a5x_smp\gnu\example_build\common\use_model_semihosting.ds" value=""/>
-        <mapEntry key="D:\Documents\work\get_threadx-smp_cortex-a53_gnu_working\threadx_arm\threadx\common\use_model_semihosting.ds" value=""/>
-        <mapEntry key="D:\Documents\work\get_threadx-smp_cortex-a53_gnu_working\threadx_arm\threadx\sample_threadx\use_model_semihosting.ds" value=""/>
-        <mapEntry key="D:\Documents\work\get_threadx-smp_cortex-a53_gnu_working\threadx_official_workspace_no_sevice_packs\threadx\common\use_model_semihosting.ds" value=""/>
-        <mapEntry key="D:\Documents\work\get_threadx-smp_cortex-a53_gnu_working\threadx_official_workspaces_no_sevice_packs\threadx\common\use_model_semihosting.ds" value=""/>
-    </mapAttribute>
     <listAttribute key="setup">
         <listEntry value="CDB://Scripts/rtsm_launcher.py"/>
         <listEntry value="&quot;FVP_Base_Cortex-A73x4&quot;"/>
     </listAttribute>
     <stringAttribute key="stopAtExpression" value="*$ENTRYPOINT"/>
-    <stringAttribute key="substitutePath" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;tuplelist&gt;&#10;&#9;&lt;tuple&gt;&#10;&#9;&#9;&lt;ta&gt;/tmp/dgboter/bbs/dsggnu-vm-1-x86_64--mingw32-i686/buildbot/mingw32-i686--aarch64-elf/build/src/newlib-cygwin/libgloss/aarch64/&lt;/ta&gt;&#10;&#9;&#9;&lt;tb&gt;D:\Documents\work\toolchains\newlib-cygwin\libgloss\aarch64\&lt;/tb&gt;&#10;&#9;&lt;/tuple&gt;&#10;&#9;&lt;tuple&gt;&#10;&#9;&#9;&lt;ta&gt;C:/release/threadx/sample_threadx&lt;/ta&gt;&#10;&#9;&#9;&lt;tb&gt;C:\release\threadx\sample_threadx\&lt;/tb&gt;&#10;&#9;&lt;/tuple&gt;&#10;&#9;&lt;tuple&gt;&#10;&#9;&#9;&lt;ta&gt;C:/release/threadx/tx&lt;/ta&gt;&#10;&#9;&#9;&lt;tb&gt;C:\release\threadx\sample_threadx\&lt;/tb&gt;&#10;&#9;&lt;/tuple&gt;&#10;&lt;/tuplelist&gt;&#10;"/>
     <stringAttribute key="watchpoints" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;watchpoints&gt;&#10;&lt;/watchpoints&gt;&#10;"/>
 </launchConfiguration>

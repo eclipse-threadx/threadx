@@ -184,7 +184,7 @@
     <booleanAttribute key="VFS_ENABLED" value="true"/>
     <stringAttribute key="VFS_LOCAL_DIR" value="${workspace_loc}"/>
     <stringAttribute key="VFS_REMOTE_MOUNT" value="/writeable"/>
-    <stringAttribute key="breakpoints" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;breakpoints order=&quot;ALPHA&quot;&gt;&#10;&#9;&lt;breakpoint ignorecount=&quot;0&quot; threadenabled=&quot;no&quot; core_list=&quot;&quot; continue=&quot;no&quot; verboseBreakpoints=&quot;yes&quot; kind=&quot;SOURCEPOSITION&quot;&gt;&#10;&#9;&#9;&lt;master_location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;EL3:0x0000000080000800&quot; debugFile=&quot;C:/Users/nisohack/Documents/work/x-ware_libs/threadx/ports/cortex_a35/gnu/example_build/sample_threadx/vectors.S&quot; hostFile=&quot;C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a35\gnu\example_build\sample_threadx\vectors.S&quot; line=&quot;27&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;0&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;EL3:0x0000000080000800&quot; debugFile=&quot;C:/Users/nisohack/Documents/work/x-ware_libs/threadx/ports/cortex_a35/gnu/example_build/sample_threadx/vectors.S&quot; hostFile=&quot;C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a35\gnu\example_build\sample_threadx\vectors.S&quot; line=&quot;27&quot;/&gt;&#10;&#9;&#9;&lt;location index=&quot;1&quot; enabled=&quot;true&quot; version=&quot;2&quot; address=&quot;EL1N:0x0000000080000800&quot; debugFile=&quot;C:/Users/nisohack/Documents/work/x-ware_libs/threadx/ports/cortex_a35/gnu/example_build/sample_threadx/vectors.S&quot; hostFile=&quot;C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a35\gnu\example_build\sample_threadx\vectors.S&quot; line=&quot;27&quot;/&gt;&#10;&#9;&lt;/breakpoint&gt;&#10;&lt;/breakpoints&gt;&#10;"/>
+    <stringAttribute key="breakpoints" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;breakpoints order=&quot;ALPHA&quot;&gt;&#10;&lt;/breakpoints&gt;&#10;"/>
     <listAttribute key="com.arm.debug.views.common.AddressTracker.debugger.view.DisassemblyView.addresses">
         <listEntry value="&lt;Next Instruction&gt;"/>
         <listEntry value=""/>
@@ -314,15 +314,10 @@
     <stringAttribute key="model_params" value="-C bp.secure_memory=false -C cache_state_modelled=0"/>
     <booleanAttribute key="runAfterConnect" value="false"/>
     <stringAttribute key="runTargetInitializationScript" value="${workspace_loc:/sample_threadx/use_model_semihosting.ds}"/>
-    <mapAttribute key="scripts_view_script_links">
-        <mapEntry key="C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a35\ac6\example_build\sample_threadx\use_model_semihosting.ds" value=""/>
-        <mapEntry key="C:\Users\nisohack\Documents\work\x-ware_libs\threadx\ports\cortex_a35\gnu\example_build\sample_threadx\use_model_semihosting.ds" value=""/>
-    </mapAttribute>
     <listAttribute key="setup">
         <listEntry value="CDB://Scripts/rtsm_launcher.py"/>
         <listEntry value="&quot;FVP_Base_Cortex-A34x1&quot;"/>
     </listAttribute>
     <stringAttribute key="stopAtExpression" value="*$ENTRYPOINT"/>
-    <stringAttribute key="substitutePath" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;tuplelist&gt;&#10;&#9;&lt;tuple&gt;&#10;&#9;&#9;&lt;ta&gt;C:\temp1702\tx\&lt;/ta&gt;&#10;&#9;&#9;&lt;tb&gt;C:\temp1702\tx\&lt;/tb&gt;&#10;&#9;&lt;/tuple&gt;&#10;&lt;/tuplelist&gt;&#10;"/>
     <stringAttribute key="watchpoints" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;watchpoints&gt;&#10;&lt;/watchpoints&gt;&#10;"/>
 </launchConfiguration>
