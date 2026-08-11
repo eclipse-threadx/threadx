@@ -30,10 +30,10 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_initialize_low_level                             ARMv8-A        */
-/*                                                           6.1.10       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    Scott Larson, Microsoft Corporation                                 */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -49,7 +49,7 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    status                            Completion status                 */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -74,6 +74,7 @@ _tx_initialize_low_level:
 
     LDR     x0, =_tx_thread_system_stack_ptr    // Pickup address of system stack ptr
     MOV     x1, sp                              // Pickup SP
+    SUB     x1, x1, #15                         //
     BIC     x1, x1, #0xF                        // Get 16-bit alignment
     STR     x1, [x0]                            // Store system stack
 

@@ -13,7 +13,7 @@
 
 #include "v8_mmu.h"
 #include "v8_system.h"
-
+#include "GICv3_aliases.h"
 
     .section StartUp, "ax"
     .balign 4

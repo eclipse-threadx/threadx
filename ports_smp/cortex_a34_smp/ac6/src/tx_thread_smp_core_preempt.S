@@ -19,6 +19,11 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
+
+#define ICC_SGI1R_EL1 S3_0_C12_C11_5
 
 
     .text
@@ -27,8 +32,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_core_preempt                      Cortex-A35-SMP/AC6 */
-/*                                                           6.1.10       */
+/*    _tx_thread_smp_core_preempt                        ARMv8-A-SMP      */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */

@@ -19,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .text
     .align 3
@@ -28,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_save                              ARMv8-A        */
-/*                                                           6.1.10       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */

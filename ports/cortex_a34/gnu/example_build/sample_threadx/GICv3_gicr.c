@@ -293,7 +293,7 @@ void SetPrivateIntSecurityBlock(uint32_t gicr, GICIGROUPRBits_t group)
     uint32_t groupmod;
 
     /*
-     * get each bit of group config duplicated over all 32 bits
+     * get each bit of group config duplicated over all 32-bits
      */
     groupmod = (uint32_t)(((int32_t)group << (nbits - 1)) >> 31);
     group = (uint32_t)(((int32_t)group << nbits) >> 31);
