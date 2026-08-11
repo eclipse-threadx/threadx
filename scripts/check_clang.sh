@@ -142,7 +142,12 @@ declare -A PORT_TARGET=(
 # One core per architecture profile for the C sources. Compiling all of them
 # for every core would multiply the run time without adding coverage, since the
 # port headers differ by profile rather than by core.
-C_CORES="cortex_m0 cortex_m4 cortex_m23 cortex_m33 cortex_m55 cortex_a7 cortex_a53 cortex_r5"
+#
+# cortex_r52 earns a slot of its own next to cortex_r5 because Armv8-R AArch32
+# is a separate profile rather than a variant of Armv7-R. That port is written
+# by hand instead of generated from ports_arch, and its tx_port.h differs
+# accordingly, so cortex_r5 does not stand in for it.
+C_CORES="cortex_m0 cortex_m4 cortex_m23 cortex_m33 cortex_m55 cortex_a7 cortex_a53 cortex_r5 cortex_r52"
 
 # Example builds that are not expected to link, with the reason. Named by
 # their port directory, which covers both ports/ and ports_smp/. Listed
@@ -225,12 +230,37 @@ if [ "$no_examples" -eq 0 ]; then
     example_ok=0
     example_total=0
     example_known=""
+    example_nodriver=""
+    example_nosample=""
     for dir in ports/*/gnu/example_build ports_smp/*/gnu/example_build; do
-        [ -f "$dir/build_threadx.sh" ] && [ -f "$dir/build_threadx_sample.sh" ] || continue
+        [ -d "$dir" ] || continue
         core="$(echo "$dir" | cut -d/ -f2)"
+
+        # Anything on the expected-to-fail list is reported before any other
+        # filter is applied, so a name placed there can never drop out of the
+        # output. arm9 and arm11 are the cases that matter: they are Arm ports
+        # with example drivers, but they carry no PORT_TARGET entry, so the
+        # Arm test below would discard them.
         case " $EXAMPLES_EXPECTED_TO_FAIL " in
             *" $core "*) example_known="$example_known $core"; continue ;;
         esac
+
+        # Arm ports only, the same rule the assembly stage applies. Naming
+        # linux or mips32 as a gap here would be noise, not information.
+        [ -n "${PORT_TARGET[$core]:-}" ] || continue
+
+        # A driverless example is not covered by this stage, so say so rather
+        # than dropping out in silence. A port that is simply absent from the
+        # count reads as covered: the CMake based example builds under
+        # ports/cortex_r52 looked like part of the 35 while never being built.
+        if [ ! -f "$dir/build_threadx.sh" ]; then
+            example_nodriver="$example_nodriver $core"
+            continue
+        fi
+        if [ ! -f "$dir/build_threadx_sample.sh" ]; then
+            example_nosample="$example_nosample $core"
+            continue
+        fi
         example_total=$((example_total + 1))
 
         rm -f "$dir"/*.o "$dir"/*.a "$dir"/*.out "$dir"/*.map 2>/dev/null || true
@@ -251,6 +281,12 @@ if [ "$no_examples" -eq 0 ]; then
     say "  $example_ok of $example_total example builds linked"
     if [ -n "$example_known" ]; then
         say "  known not to link, see the list at the top of this script:$example_known"
+    fi
+    if [ -n "$example_nosample" ]; then
+        say "  has build_threadx.sh but no build_threadx_sample.sh, so not linked:$example_nosample"
+    fi
+    if [ -n "$example_nodriver" ]; then
+        say "  no script driver, so outside this stage:$example_nodriver"
     fi
 fi
 # --------------------------------------------------------------------------
