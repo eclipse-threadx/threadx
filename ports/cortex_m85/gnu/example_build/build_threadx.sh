@@ -59,208 +59,208 @@ esac
 
 rm -f tx.a
 
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_misra.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_context_restore.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_context_save.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_interrupt_control.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_interrupt_disable.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_interrupt_restore.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_schedule.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_secure_stack_allocate.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_secure_stack_free.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_secure_stack_initialize.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_stack_build.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_thread_system_return.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb ../src/tx_timer_interrupt.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_misra.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_context_restore.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_context_save.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_interrupt_control.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_interrupt_disable.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_interrupt_restore.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_schedule.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_secure_stack_allocate.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_secure_stack_free.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_secure_stack_initialize.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_stack_build.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_thread_system_return.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb ../src/tx_timer_interrupt.S
 
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../src/tx_thread_secure_stack.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../src/txe_thread_secure_stack_allocate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../src/txe_thread_secure_stack_free.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../src/tx_thread_secure_stack.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../src/txe_thread_secure_stack_allocate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../src/txe_thread_secure_stack_free.c
 
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_allocate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_cleanup.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_initialize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_performance_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_performance_system_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_release.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_allocate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_cleanup.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_initialize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_performance_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_performance_system_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_search.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_release.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_cleanup.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_initialize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_performance_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_performance_system_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_set.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_set_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_initialize_high_level.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_initialize_kernel_enter.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_initialize_kernel_setup.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_cleanup.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_initialize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_performance_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_performance_system_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_priority_change.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_put.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_cleanup.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_flush.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_front_send.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_initialize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_performance_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_performance_system_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_receive.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_send.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_send_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_ceiling_put.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_cleanup.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_initialize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_performance_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_performance_system_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_put.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_put_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_entry_exit_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_identify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_initialize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_performance_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_performance_system_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_preemption_change.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_priority_change.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_relinquish.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_reset.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_resume.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_shell_entry.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_sleep.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_stack_analyze.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_stack_error_handler.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_stack_error_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_suspend.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_system_preempt_check.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_system_resume.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_system_suspend.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_terminate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_time_slice.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_time_slice_change.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_timeout.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_wait_abort.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_time_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_time_set.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_activate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_change.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_deactivate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_expiration_process.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_initialize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_performance_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_performance_system_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_system_activate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_system_deactivate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_thread_entry.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_buffer_full_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_enable.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_event_filter.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_event_unfilter.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_disable.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_initialize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_interrupt_control.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_isr_enter_insert.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_isr_exit_insert.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_object_register.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_object_unregister.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_user_event_insert.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_allocate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_pool_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_pool_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_pool_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_pool_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_release.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_allocate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_pool_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_pool_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_pool_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_pool_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_release.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_set.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_set_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_put.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_flush.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_front_send.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_receive.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_send.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_send_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_ceiling_put.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_prioritize.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_put.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_put_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_entry_exit_notify.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_info_get.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_preemption_change.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_priority_change.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_relinquish.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_reset.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_resume.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_suspend.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_terminate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_time_slice_change.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_wait_abort.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_activate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_change.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_create.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_deactivate.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_delete.c
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_allocate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_pool_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_block_release.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_allocate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_pool_search.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_byte_release.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_set.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_event_flags_set_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_initialize_high_level.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_initialize_kernel_enter.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_initialize_kernel_setup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_priority_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_mutex_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_flush.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_front_send.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_receive.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_send.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_queue_send_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_ceiling_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_semaphore_put_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_entry_exit_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_identify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_preemption_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_priority_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_relinquish.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_reset.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_resume.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_shell_entry.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_sleep.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_stack_analyze.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_stack_error_handler.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_stack_error_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_suspend.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_system_preempt_check.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_system_resume.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_system_suspend.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_terminate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_time_slice.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_time_slice_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_timeout.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_thread_wait_abort.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_time_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_time_set.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_activate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_deactivate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_expiration_process.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_system_activate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_system_deactivate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_timer_thread_entry.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_buffer_full_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_enable.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_event_filter.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_event_unfilter.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_disable.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_interrupt_control.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_isr_enter_insert.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_isr_exit_insert.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_object_register.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_object_unregister.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/tx_trace_user_event_insert.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_allocate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_pool_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_pool_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_pool_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_pool_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_block_release.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_allocate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_pool_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_pool_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_pool_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_pool_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_byte_release.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_set.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_event_flags_set_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_mutex_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_flush.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_front_send.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_receive.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_send.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_queue_send_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_ceiling_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_semaphore_put_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_entry_exit_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_preemption_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_priority_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_relinquish.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_reset.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_resume.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_suspend.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_terminate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_time_slice_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_thread_wait_abort.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_activate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_deactivate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-m85 -mfloat-abi=hard -mthumb -I../../../../common/inc -I../inc ../../../../common/src/txe_timer_info_get.c
 
 "${AR}" -r tx.a tx_misra.o tx_thread_context_restore.o tx_thread_context_save.o tx_thread_interrupt_control.o tx_thread_interrupt_disable.o tx_thread_interrupt_restore.o tx_thread_schedule.o tx_thread_secure_stack_allocate.o tx_thread_secure_stack_free.o tx_thread_secure_stack_initialize.o
 "${AR}" -r tx.a tx_thread_stack_build.o tx_thread_system_return.o tx_timer_interrupt.o tx_thread_secure_stack.o txe_thread_secure_stack_allocate.o txe_thread_secure_stack_free.o tx_block_allocate.o tx_block_pool_cleanup.o tx_block_pool_create.o tx_block_pool_delete.o
