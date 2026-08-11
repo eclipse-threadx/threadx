@@ -1,6 +1,6 @@
 #!/bin/bash
 ##############################################################################
-# Copyright (C) 2026 Eclipse ThreadX contributors
+# Copyright (c) 2026 Eclipse ThreadX contributors
 #
 # This program and the accompanying materials are made available under the
 # terms of the MIT License which is available at
@@ -144,7 +144,8 @@ declare -A PORT_TARGET=(
 # port headers differ by profile rather than by core.
 C_CORES="cortex_m0 cortex_m4 cortex_m23 cortex_m33 cortex_m55 cortex_a7 cortex_a53 cortex_r5"
 
-# Example builds that are not expected to link, with the reason. Listed
+# Example builds that are not expected to link, with the reason. Named by
+# their port directory, which covers both ports/ and ports_smp/. Listed
 # explicitly rather than silently skipped, so the gaps stay visible.
 #
 # These fail with the GNU toolchain too, so they are not LLVM problems:
@@ -224,7 +225,7 @@ if [ "$no_examples" -eq 0 ]; then
     example_ok=0
     example_total=0
     example_known=""
-    for dir in ports/*/gnu/example_build; do
+    for dir in ports/*/gnu/example_build ports_smp/*/gnu/example_build; do
         [ -f "$dir/build_threadx.sh" ] && [ -f "$dir/build_threadx_sample.sh" ] || continue
         core="$(echo "$dir" | cut -d/ -f2)"
         case " $EXAMPLES_EXPECTED_TO_FAIL " in
