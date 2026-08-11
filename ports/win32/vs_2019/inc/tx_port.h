@@ -420,7 +420,7 @@ struct TX_THREAD_STRUCT;
 
 typedef struct TX_WIN32_CRITICAL_SECTION_STRUCT
 {
-    HANDLE                                      tx_win32_critical_section_mutex_handle;
+    CRITICAL_SECTION                            tx_win32_critical_section_lock;
     DWORD                                       tx_win32_critical_section_owner;
     ULONG                                       tx_win32_critical_section_nested_count;
 } TX_WIN32_CRITICAL_SECTION;
