@@ -23,7 +23,12 @@
 /**************************************************************************/
 /**************************************************************************/
 
-    .arch   armv8-r
+    /* No .arch directive.  GNU as accepts "armv8-r"; LLVM's integrated
+       assembler accepts no spelling of it at all -- not armv8-r, not armv8r --
+       and fails with "Unknown Arch".  The architecture comes from
+       -mcpu=cortex-r52 on the command line, which every toolchain file passes,
+       so the directive only restated it.  */
+
     .syntax unified
     .arm
 
