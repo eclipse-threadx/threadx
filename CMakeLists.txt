@@ -35,6 +35,13 @@ if(THREADX_SMP)
     set(TX_PORT_DIR "ports_smp")
     set(TX_COMMON_DIR "common_smp")
     set(TX_ARCH_DIR "${THREADX_ARCH}_smp")
+    # Most SMP ports are named <arch>_smp, but ports_smp/linux and
+    # ports_smp/win64 predate that convention and carry no suffix. Fall back to
+    # the bare name for them. The check only fires when the suffixed directory
+    # is absent, so no port that already resolves changes.
+    if(NOT IS_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/${TX_PORT_DIR}/${TX_ARCH_DIR}")
+        set(TX_ARCH_DIR "${THREADX_ARCH}")
+    endif()
     message(STATUS "Building ThreadX SMP version")
 else()
     set(TX_PORT_DIR "ports")
