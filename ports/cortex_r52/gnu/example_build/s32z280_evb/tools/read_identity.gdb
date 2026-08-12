@@ -92,12 +92,27 @@ STAGES = {1: "switched out of Thumb", 2: "EL2 configured", 3: "running at EL1",
 stage = int(gdb.parse_and_eval("*(unsigned int *)&boot_stage")) & 0xFFFFFFFF
 print("  boot_stage = %d (%s)" % (stage, STAGES.get(stage, "unknown")))
 
+ident = None
+
 if stage == 0xFF:
     print("  fault_vector    = 0x%02X" % (int(gdb.parse_and_eval("*(unsigned int *)&fault_vector")) & 0xFFFFFFFF))
     print("  fault_syndrome  = 0x%08X" % (int(gdb.parse_and_eval("*(unsigned int *)&fault_syndrome")) & 0xFFFFFFFF))
     print("  fault_address   = 0x%08X" % (int(gdb.parse_and_eval("*(unsigned int *)&fault_address")) & 0xFFFFFFFF))
 else:
-    ident = gdb.parse_and_eval("r52_identity")
+    # r52_identity belongs to the boot image, which is what this script is for.
+    # The kernel demo shares the same breakpoint and progress marker but carries
+    # no identity structure, so against that image the lookup raised and gdb
+    # exited 1 -- a failure report for a run that had already passed, which is
+    # worse than printing nothing.
+    try:
+        ident = gdb.parse_and_eval("r52_identity")
+    except gdb.error:
+        print("\n  This image has no r52_identity structure, so there is no "
+              "identity report to print.")
+        print("  Expected for the kernel demo, which reports its own result "
+              "over the console.")
+
+if ident is not None:
     def f(name):
         return int(ident[name]) & 0xFFFFFFFF
 
