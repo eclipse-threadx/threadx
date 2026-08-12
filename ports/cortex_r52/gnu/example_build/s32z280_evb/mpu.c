@@ -25,7 +25,7 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    PMSAv8-R memory protection and cache enable for Cortex-R52.         */
+/*    PMSAv8-R memory protection for the NXP S32Z280-594EVB.              */
 /*                                                                        */
 /*    Register model (AArch32): a region is selected through PRSELR and   */
 /*    then described by PRBAR (base, shareability, access permission,     */
@@ -47,7 +47,22 @@
 /**************************************************************************/
 
 #include "platform.h"
+
+/* Progress marker, mirrored into memory.  Enabling the MPU can take the core
+   down in a way that records no fault and takes the console with it, so each
+   step here is stamped where a debugger can read it afterwards.  */
+
+extern unsigned int probe_stage;
+#define MARK(n)     do { probe_stage = (unsigned int)(n); } while (0)
 #include "mpu.h"
+#include "platform.h"
+
+/* Progress marker, mirrored into memory.  Enabling the MPU can take the core
+   down in a way that records no fault and takes the console with it, so each
+   step here is stamped where a debugger can read it afterwards.  */
+
+extern unsigned int probe_stage;
+#define MARK(n)     do { probe_stage = (unsigned int)(n); } while (0)
 
 /* SCTLR bits.                                                            */
 
@@ -63,7 +78,6 @@
 
 /* Boundaries supplied by the linker script, all 64-byte aligned.         */
 
-extern char __code_start__;
 extern char __code_end__;
 extern char __data_start__;
 extern char __data_end__;
@@ -79,7 +93,17 @@ extern char __data_end__;
 /*  same table with per-module regions.                                   */
 /**************************************************************************/
 
-static MPU_REGION mpu_regions[3];
+/* Table capacity.  The FVP example this file came from declared this as [3],
+   matching the three regions it programs; a five-region table then wrote past
+   the end of it, and the region-3 base assignment landed outside the array.
+   The region read back with base 0 and limit 0x763FFFFF, overlapping regions
+   0-2, and PMSAv8-R makes overlapping regions UNPREDICTABLE -- which is what
+   killed the core on the SCTLR.M write.  Named and guarded so the next map
+   cannot repeat it.  */
+
+#define MPU_TABLE_REGIONS   16U
+
+static MPU_REGION mpu_regions[MPU_TABLE_REGIONS];
 static unsigned int mpu_regions_used;
 
 
@@ -230,11 +254,37 @@ void mpu_read_region(unsigned int index, unsigned long *prbar_ptr,
 /*  build_table -- describe this image's memory.                          */
 /**************************************************************************/
 
+/* Bisection switch.  probe_stage stops at 0x42 with the real five-region map,
+   meaning the SCTLR.M write itself kills the core with no exception taken.
+   That has two very different causes: the map is wrong for the first fetch or
+   stack access, or enabling the MPU on this part needs something we have not
+   done at all.  A single region spanning the whole address space, permissive
+   and Normal, distinguishes them: if the core survives with this, the map is
+   at fault; if it dies anyway, enabling M is.  */
+
 static void build_table(void)
 {
-    /* Code: read-only and executable.  */
+    /* Protection map: narrow regions with real permissions, so that anything
+       this image should not do actually faults.
+       *
+       * This supersedes the permissive bring-up map (everything Normal RW X,
+       * whole address space covered).  That map existed because a narrow one
+       * had failed and the reason was unknown -- the failure looked like a
+       * stall with nothing recorded, and coverage was blamed.  Coverage was
+       * never the problem: an out-of-bounds write to a [3]-sized table put a
+       * region at base 0 overlapping everything, and SCTLR.TE being set meant
+       * the resulting abort could not run a handler.  Both are fixed, so a
+       * narrow map is now both correct and diagnosable: if something outside
+       * these regions is touched, the fault handler records vector, syndrome
+       * and faulting address instead of hanging mutely.
+       *
+       * Anything not described below is unmapped and faults on access.  That
+       * is the point.
+       */
 
-    mpu_regions[0].mpu_region_base          = (unsigned long) &__code_start__;
+    /* Code: read-only and executable.  A write here must fault.  */
+
+    mpu_regions[0].mpu_region_base          = S32Z_CODE_SRAM_BASE;
     mpu_regions[0].mpu_region_limit         = (unsigned long) &__code_end__ - 1UL;
     mpu_regions[0].mpu_region_ap            = MPU_AP_RO_EL1;
     mpu_regions[0].mpu_region_execute_never = 0U;
@@ -242,27 +292,67 @@ static void build_table(void)
     mpu_regions[0].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
     mpu_regions[0].mpu_region_name          = "code  RO X  normal-wb";
 
-    /* Data, bss, stacks and heap: writable, never executable.  */
+    /* Data, bss and every per-mode stack: writable, never executable.  Sized
+       from the SRAM bank, not from __data_end__: the stacks are NOLOAD and sit
+       above that symbol, so sizing from it would leave them unmapped and the
+       first push after enabling the MPU would abort.  */
 
-    mpu_regions[1].mpu_region_base          = (unsigned long) &__data_start__;
-    mpu_regions[1].mpu_region_limit         = (unsigned long) &__data_end__ - 1UL;
+    mpu_regions[1].mpu_region_base          = S32Z_DATA_SRAM_BASE;
+    mpu_regions[1].mpu_region_limit         = S32Z_DATA_SRAM_BASE
+                                            + S32Z_DATA_SRAM_SIZE - 1UL;
     mpu_regions[1].mpu_region_ap            = MPU_AP_RW_EL1;
     mpu_regions[1].mpu_region_execute_never = 1U;
     mpu_regions[1].mpu_region_shareability  = MPU_SH_NON;
     mpu_regions[1].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
     mpu_regions[1].mpu_region_name          = "data  RW NX normal-wb";
 
-    /* Peripherals occupy the upper half of the BaseR map.  */
+    /* Console.  Mapped narrowly: one 64 KB LINFlexD instance.  */
 
-    mpu_regions[2].mpu_region_base          = 0x80000000UL;
-    mpu_regions[2].mpu_region_limit         = 0xFFFFFFFFUL;
+    mpu_regions[2].mpu_region_base          = S32Z_LINFLEX_9_BASE;
+    mpu_regions[2].mpu_region_limit         = S32Z_LINFLEX_9_BASE + 0xFFFFUL;
     mpu_regions[2].mpu_region_ap            = MPU_AP_RW_EL1;
     mpu_regions[2].mpu_region_execute_never = 1U;
     mpu_regions[2].mpu_region_shareability  = MPU_SH_NON;
     mpu_regions[2].mpu_region_attr_index    = MPU_ATTR_DEVICE;
-    mpu_regions[2].mpu_region_name          = "dev   RW NX device";
+    mpu_regions[2].mpu_region_name          = "uart  RW NX device";
 
-    mpu_regions_used = 3U;
+    /* GIC.  Device nGnRnE is required by the Cortex-R52 TRM, and confirmed
+       here: mapped Normal the distributor stalls the core.  */
+
+    mpu_regions[3].mpu_region_base          = S32Z_GIC_BASE;
+    mpu_regions[3].mpu_region_limit         = S32Z_GIC_BASE + S32Z_GIC_SIZE - 1UL;
+    mpu_regions[3].mpu_region_ap            = MPU_AP_RW_EL1;
+    mpu_regions[3].mpu_region_execute_never = 1U;
+    mpu_regions[3].mpu_region_shareability  = MPU_SH_NON;
+    mpu_regions[3].mpu_region_attr_index    = MPU_ATTR_DEVICE;
+    mpu_regions[3].mpu_region_name          = "gic   RW NX device";
+
+    /* RTU peripheral window behind the low-latency peripheral port.  */
+
+    mpu_regions[4].mpu_region_base          = S32Z_RTU_PERIPH_BASE;
+    mpu_regions[4].mpu_region_limit         = S32Z_RTU_PERIPH_BASE
+                                            + S32Z_RTU_PERIPH_SIZE - 1UL;
+    mpu_regions[4].mpu_region_ap            = MPU_AP_RW_EL1;
+    mpu_regions[4].mpu_region_execute_never = 1U;
+    mpu_regions[4].mpu_region_shareability  = MPU_SH_NON;
+    mpu_regions[4].mpu_region_attr_index    = MPU_ATTR_DEVICE;
+    mpu_regions[4].mpu_region_name          = "rtu   RW NX device";
+
+    /* Extended SRAM.  Deliberately mapped so the cache benchmark has memory
+       that is NOT RTU-local to work against: the fast-data bank in region 1 is
+       close to core speed, so caching it shows nothing.  Normal write-back and
+       never executable.  */
+
+    mpu_regions[5].mpu_region_base          = S32Z_EXT_SRAM_BASE;
+    mpu_regions[5].mpu_region_limit         = S32Z_EXT_SRAM_BASE
+                                            + S32Z_EXT_SRAM_SIZE - 1UL;
+    mpu_regions[5].mpu_region_ap            = MPU_AP_RW_EL1;
+    mpu_regions[5].mpu_region_execute_never = 1U;
+    mpu_regions[5].mpu_region_shareability  = MPU_SH_NON;
+    mpu_regions[5].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
+    mpu_regions[5].mpu_region_name          = "ext   RW NX normal-wb";
+
+    mpu_regions_used = 6U;
 }
 
 
@@ -276,7 +366,21 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
     unsigned long prlar;
 
     /* PRBAR: BASE[31:6], RES0[5], SH[4:3], AP[2:1], XN[0].
-       Cortex-R52 TRM r1p3 figure 3-39 / table 3-80.  */
+       *
+       * Per Cortex-R52 TRM r1p3 figure 3-39.  Note the field positions: the
+       * FVP example this file came from shifts every field one bit too far
+       * left -- SH<<4, AP<<2, XN<<1 -- which silently produces a different
+       * region than intended.  With XN written to bit 1 it lands in the real
+       * AP[1] (EL0 access) and the region stays EXECUTABLE, which is how this
+       * board ended up running instructions out of .data.
+       *
+       * That bug is also the origin of the "PRBAR.AP bit order is reversed"
+       * claim recorded during the FVP work.  Calibrating AP empirically under
+       * the wrong shift puts the intended AP's low bit into the real AP[2]
+       * (the read-only bit) and the intended XN into the real AP[1], which
+       * looks exactly like a reversed encoding.  The architectural order is
+       * correct as published; there was no reversal.
+       */
 
     prbar = (region_ptr->mpu_region_base & 0xFFFFFFC0UL)
           | (((unsigned long) region_ptr->mpu_region_shareability & 0x3UL) << 3)
@@ -306,20 +410,28 @@ unsigned int mpu_init(void)
 
     build_table();
 
+    if (mpu_regions_used > MPU_TABLE_REGIONS)
+    {
+        return 0U;              /* build_table overran the table */
+    }
+
     if (available < mpu_regions_used)
     {
-        return 0U;
+        return 0U;              /* hardware has fewer regions than we need */
     }
 
     /* Memory types first: a region's attribute index is meaningless until
        MAIR is populated.  */
 
+    MARK(0x20);
     write_mair0((MAIR_ATTR_DEVICE << 8) | MAIR_ATTR_NORMAL_WB);
     write_mair1(0UL);
+    MARK(0x21);
 
     for (index = 0U; index < mpu_regions_used; index++)
     {
         program_region(index, &mpu_regions[index]);
+        MARK(0x30U + index);
     }
 
     /* Disable any regions this image does not use, so that stale enables
@@ -332,6 +444,7 @@ unsigned int mpu_init(void)
         write_prlar(0UL);
     }
 
+    MARK(0x40);
     data_sync_barrier();
 
     /* Caches are invalidated before enabling.  The instruction cache has a
@@ -344,11 +457,30 @@ unsigned int mpu_init(void)
     data_sync_barrier();
     instruction_barrier();
 
+    /* MPU only.  Caches are deliberately left off on this first pass: the
+       point here is reaching the GIC, and enabling caches at the same time
+       would add coherency questions -- the debugger writes this image straight
+       into SRAM behind the caches' back -- to a change whose result is meant to
+       be unambiguous.  C and I are a separate step with their own check.  */
+
+    MARK(0x41);
     sctlr = read_sctlr();
-    sctlr |= SCTLR_M | SCTLR_C | SCTLR_I;
+    MARK(0x42);
+#if !defined(MPU_READBACK_ONLY)
+    sctlr |= SCTLR_M;
     write_sctlr(sctlr);
+#else
+    (void) sctlr;       /* readback experiment: MPU deliberately NOT enabled */
+#endif
+
+    /* If the map is wrong, the core dies HERE -- the next instruction fetch or
+       the next stack access is the first thing the new map has to satisfy.  A
+       marker written after this point therefore proves the map holds.  */
+
+    MARK(0x43);
     data_sync_barrier();
     instruction_barrier();
+    MARK(0x44);
 
     return mpu_regions_used;
 }

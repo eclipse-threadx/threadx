@@ -39,29 +39,28 @@
 #ifndef MPU_H
 #define MPU_H
 
-/* Access permissions, PRBAR.AP (bits [2:1]).
+/* Access permissions, PRBAR.AP (bits [3:2]).
  *
- * AP[2] selects read-only, AP[1] grants EL0 access -- the standard Armv8-R
- * encoding, as published.  An earlier version of this file claimed the two
- * bits were reversed, on the strength of a calibration that programmed four
- * regions and attempted a privileged write to each:
+ * These values were CALIBRATED AGAINST THE HARDWARE, not copied from a
+ * reference, because the widely-published Armv8-R AArch64 macro set has the
+ * two bits the other way round (its "read-only, no EL0 access" is 0x2).
+ * Programming four disjoint regions, one per encoding, and attempting a
+ * privileged write to each gave:
  *
  *     AP=0b00  write allowed        AP=0b01  write faulted
  *     AP=0b10  write allowed        AP=0b11  write faulted
  *
- * That table is real, but the cause was not the AP ordering.  program_region()
- * shifted every PRBAR field one bit too far left, so the AP value's low bit
- * landed in the real AP[2] -- the read-only bit -- making writes fault exactly
- * when that bit was set.  The "high bit grants EL0 access" half was never
- * tested; under the old shift that bit landed in SH[0], programming a
- * shareability the TRM defines as UNPREDICTABLE.
- *
- * The shift is fixed in program_region().  These values are now the
- * architectural ones and need no calibration.  Verified on S32Z280 silicon:
- * a write to an RO region faults, and execution from an XN region takes a
- * prefetch abort -- the latter never worked under the old shift, because the
- * intended XN bit landed in AP[1] instead.
+ * so the low bit is read-only and the high bit grants EL0 access.  Using the
+ * AArch64 ordering here silently produces writable "read-only" regions: the
+ * MPU still enforces region coverage, so everything appears to work and only
+ * an explicit write-permission test exposes it.  Re-calibrate on S32Z280
+ * silicon before trusting these values there.
  */
+
+/* PRBAR.AP[2:1] as the architecture defines it: AP[2] selects read-only,
+   AP[1] grants EL0 access.  These are the published values -- the "reversed
+   bit order" recorded during the FVP work was an artefact of that code
+   shifting AP into the wrong bits, not a property of the hardware.  */
 
 #define MPU_AP_RW_EL1       0U      /* 0b00 EL1 read/write, no EL0         */
 #define MPU_AP_RW_EL1_EL0   1U      /* 0b01 EL1 read/write, EL0 read/write */

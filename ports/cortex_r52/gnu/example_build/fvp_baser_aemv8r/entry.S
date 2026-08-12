@@ -416,7 +416,59 @@ el2_trap_fiq:       FAULT_REPORT msg_el2_fiq
 el1_trap_reset:     FAULT_REPORT msg_el1_reset
 el1_trap_undef:     FAULT_REPORT msg_el1_undef
 el1_trap_svc:       FAULT_REPORT msg_el1_svc
-el1_trap_pabt:      FAULT_REPORT msg_el1_pabt
+/* Prefetch abort.  Fatal, except during the MPU self-test's execute-never
+   check.  This one cannot recover the way the data-abort path does: skipping
+   "the faulting instruction" is impossible when the instruction is precisely
+   what could not be fetched.  So mpu_try_execute below records where to land
+   and this handler returns there, restoring the pre-fault mode from SPSR.  */
+
+el1_trap_pabt:
+#ifdef TX_R52_MPU_FAULT_TEST
+    push    {r0, r1}
+    ldr     r0, =mpu_expect_pabt
+    ldr     r1, [r0]
+    cmp     r1, #0
+    beq     el1_pabt_fatal
+    mov     r1, #0
+    str     r1, [r0]                        /* consume the expectation      */
+    ldr     r0, =mpu_pabt_count
+    ldr     r1, [r0]
+    add     r1, r1, #1
+    str     r1, [r0]
+    dsb
+    ldr     r0, =mpu_abort_return
+    ldr     r1, [r0]
+    mov     lr, r1                          /* land point, set before pop   */
+    pop     {r0, r1}
+    subs    pc, lr, #0                      /* return, restoring CPSR       */
+el1_pabt_fatal:
+    pop     {r0, r1}
+#endif
+    FAULT_REPORT msg_el1_pabt
+
+
+#ifdef TX_R52_MPU_FAULT_TEST
+/* mpu_try_execute(void (*target)(void))
+   Call target and return normally if the fetch is permitted.  If it is not,
+   el1_trap_pabt returns to the same place, so the caller continues either way
+   and can tell the two apart by mpu_pabt_count.  SP is untouched by the
+   faulting branch, so the saved LR is still on the stack when we land.  */
+
+    .global mpu_try_execute
+    .type   mpu_try_execute, %function
+mpu_try_execute:
+    push    {r4, lr}
+    ldr     r1, =mpu_abort_return
+    adr     r2, mpu_try_execute_land
+    str     r2, [r1]
+    dsb
+    isb
+    blx     r0
+mpu_try_execute_land:
+    pop     {r4, lr}
+    bx      lr
+    .size   mpu_try_execute, . - mpu_try_execute
+#endif
 
 /* Data abort.  Normally fatal and self-reporting, but the MPU self-test
    needs to provoke a permission fault and carry on: without that, "the MPU
@@ -488,4 +540,18 @@ mpu_expect_abort:
 
     .global mpu_abort_count
 mpu_abort_count:
+    .word   0
+
+/* Used by the execute-never self-test (see el1_trap_pabt).                */
+
+    .global mpu_expect_pabt
+mpu_expect_pabt:
+    .word   0
+
+    .global mpu_pabt_count
+mpu_pabt_count:
+    .word   0
+
+    .global mpu_abort_return
+mpu_abort_return:
     .word   0

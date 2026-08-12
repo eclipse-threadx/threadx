@@ -54,6 +54,18 @@ static ULONG        thread_check_stack[DEMO_STACK_SIZE / sizeof(ULONG)];
 
 static volatile unsigned long   writable_probe;
 
+/* Execute-never probe.  Lives in the data region, holds one A32 "bx lr", and
+   is only ever reached if XN is NOT enforced -- in which case this check has
+   already failed and the encoded instruction is simply the most harmless
+   thing to land on.  Not static: nothing in this file reads it, and an
+   optimising build would otherwise discard it.  */
+
+volatile unsigned long   executable_probe = 0xE12FFF1EUL;
+
+extern void  mpu_try_execute(void (*target)(void));
+extern volatile unsigned long   mpu_expect_pabt;
+extern volatile unsigned long   mpu_pabt_count;
+
 
 /**************************************************************************/
 /*  report                                                                */
@@ -198,6 +210,33 @@ static void thread_check_entry(ULONG thread_input)
 
         failures += report("[check] code region contents unmodified            ",
                            (*code_ptr != 0xDEADBEEFUL) ? 1U : 0U);
+    }
+
+    /* Enforcement, part 4: the execute-never data region must reject an
+       instruction fetch.  This is the counterpart to part 3 and the check that
+       pins down PRBAR.XN specifically.  It is worth stating why it exists: an
+       earlier version of program_region() shifted every PRBAR field one bit
+       too far left, which left XN in the real AP[1] and every "non-executable"
+       region freely executable.  Every check above still passed, because the
+       accidental AP bits happened to land correctly.  Only fetching from a
+       supposedly non-executable region exposed it -- on S32Z280 silicon,
+       where the core cheerfully ran instructions out of .data.  */
+
+    {
+        unsigned long pabts_before = mpu_pabt_count;
+
+        mpu_expect_pabt = 1UL;
+        mpu_try_execute((void (*)(void)) (void *) &executable_probe);
+        mpu_expect_pabt = 0UL;
+
+        console_puts("[check] prefetch aborts before/after exec from data = ");
+        console_puthex(pabts_before);
+        console_puts(" / ");
+        console_puthex(mpu_pabt_count);
+        console_puts("\n");
+
+        failures += report("[check] execute from non-executable data faulted    ",
+                           (mpu_pabt_count == (pabts_before + 1UL)) ? 1U : 0U);
     }
 
     /* And the kernel is still healthy afterwards.  */
