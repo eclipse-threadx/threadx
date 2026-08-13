@@ -197,6 +197,40 @@ target_link_options(demo_mpu.elf PRIVATE
     ${R52_LINK_QUIET_RWX}
 )
 
+# Nested IRQ handling.  Needs the library built with TX_R52_ENABLE_IRQ_NESTING,
+# because _tx_thread_irq_nesting_start only re-enables IRQ usefully when
+# tx_port.h agrees the configuration supports it, and entry.S only emits the
+# start/end pairing under the same macro.  The image therefore exists in that
+# configuration only, as demo_m5.elf does for VFP.
+if(TX_R52_ENABLE_IRQ_NESTING)
+    add_executable(demo_nesting.elf EXCLUDE_FROM_ALL
+        ${FVP_DIR}/entry.S
+        ${R52_CONSOLE_SOURCES}
+        ${FVP_DIR}/gicv3.c
+        ${FVP_DIR}/timer.c
+        ${FVP_DIR}/irq_dispatch.c
+        ${FVP_DIR}/tx_initialize_low_level.S
+        ${FVP_DIR}/demo_nesting.c
+    )
+
+    target_compile_definitions(demo_nesting.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+    target_link_libraries(demo_nesting.elf PRIVATE threadx)
+
+    target_include_directories(demo_nesting.elf PRIVATE
+        ${FVP_DIR}
+        ${CMAKE_SOURCE_DIR}/common/inc
+        ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+    )
+
+    target_link_options(demo_nesting.elf PRIVATE
+        -T${FVP_DIR}/link.lds
+        -nostartfiles
+        -Wl,-Map=demo_nesting.map
+        ${R52_LINK_QUIET_RWX}
+    )
+endif()
+
 # Every image built here, in the order they should be exercised.
 set(R52_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf demo_mpu.elf)
 
@@ -208,6 +242,9 @@ foreach(image IN LISTS R52_IMAGES)
 endforeach()
 if(TX_R52_ENABLE_VFP)
     list(APPEND R52_IMAGES demo_m5.elf)
+endif()
+if(TX_R52_ENABLE_IRQ_NESTING)
+    list(APPEND R52_IMAGES demo_nesting.elf)
 endif()
 
 # Console backend.  Semihosting is the default because it needs no peripheral

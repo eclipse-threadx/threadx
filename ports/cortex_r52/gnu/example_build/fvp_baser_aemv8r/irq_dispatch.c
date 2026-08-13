@@ -54,6 +54,12 @@ volatile unsigned long  board_timer_intid;
 volatile unsigned long  board_spurious_count;
 volatile unsigned long  board_unexpected_intid;
 
+volatile unsigned long  board_nest_depth;
+volatile unsigned long  board_nest_max;
+volatile unsigned long  board_sgi_count;
+volatile unsigned long  board_sgi_nested_count;
+volatile unsigned long  board_nest_provoke;
+
 
 /* Timer PPI priority.  Only the top 5 priority bits are implemented on this
    model, so the value is a multiple of 8.  */
@@ -73,6 +79,13 @@ void board_init(void)
 {
     gicv3_init();
     gicv3_enable_ppi(TIMER_PPI_INTID, TIMER_PPI_PRIORITY);
+
+    /* The nesting SGI must outrank the timer or it could never preempt it:
+       in the GIC a numerically lower priority value wins.  Enabling it costs
+       nothing in images that never raise it.  */
+
+    gicv3_enable_sgi(BOARD_NEST_SGI_INTID, TIMER_PPI_PRIORITY / 2U);
+
     timer_init();
 }
 
@@ -81,16 +94,32 @@ void board_init(void)
 /*  board_irq_handler                                                     */
 /**************************************************************************/
 
-void board_irq_handler(void)
-{
-    unsigned long intid = gicv3_acknowledge();
+/**************************************************************************/
+/*  board_irq_service -- service an already-acknowledged INTID.            */
+/*                                                                        */
+/*  Split out so the nesting path in entry.S can acknowledge in IRQ mode   */
+/*  before nesting starts.  Does not acknowledge and does not EOI.         */
+/**************************************************************************/
 
+void board_irq_service(unsigned long intid)
+{
     if (intid == GICV3_SPURIOUS_INTID)
     {
         /* No interrupt was actually pending; must not be acknowledged.  */
 
         board_spurious_count++;
         return;
+    }
+
+    /* Depth is incremented after the spurious check so a spurious entry does
+       not register as nesting.  It reaches 2 only if a second interrupt is
+       taken while this handler is still on the stack, which cannot happen
+       without TX_ENABLE_IRQ_NESTING.  */
+
+    board_nest_depth++;
+    if (board_nest_depth > board_nest_max)
+    {
+        board_nest_max = board_nest_depth;
     }
 
     if (intid == (unsigned long) TIMER_PPI_INTID)
@@ -102,12 +131,71 @@ void board_irq_handler(void)
            this also deasserts the level-sensitive timer output.  */
 
         timer_reload();
+
+        /* Provoke the nesting, if this image asked for it.  Raising the SGI
+           here is only useful because _tx_thread_irq_nesting_start has already
+           re-enabled IRQ; the bounded spin gives the GIC the chance to deliver
+           it before this handler returns, so the nesting is deterministic
+           rather than a race we hope wins.  The bound matters: without
+           TX_ENABLE_IRQ_NESTING the SGI can never arrive and this must not
+           become a hang.  */
+
+        if (board_nest_provoke != 0UL)
+        {
+            unsigned long seen = board_sgi_count;
+            unsigned long guard;
+
+            gicv3_send_sgi(BOARD_NEST_SGI_INTID);
+
+            for (guard = 0UL; guard < 100000UL; guard++)
+            {
+                if (board_sgi_count != seen)
+                {
+                    break;
+                }
+            }
+        }
+
         _tx_timer_interrupt();
+    }
+    else if (intid == (unsigned long) BOARD_NEST_SGI_INTID)
+    {
+        board_sgi_count++;
+
+        /* Depth above 1 means this SGI arrived inside another handler, which
+           is the whole point of the test.  */
+
+        if (board_nest_depth > 1UL)
+        {
+            board_sgi_nested_count++;
+        }
     }
     else
     {
         board_unexpected_intid = intid;
     }
 
-    gicv3_end_of_interrupt(intid);
+    board_nest_depth--;
+}
+
+
+/**************************************************************************/
+/*  board_irq_handler -- the non-nesting entry point.                      */
+/*                                                                        */
+/*  Acknowledges, services and ends the interrupt, all in IRQ mode with    */
+/*  interrupts masked.  entry.S calls this when the image was built without */
+/*  TX_ENABLE_IRQ_NESTING, so the behaviour of every existing image is      */
+/*  exactly what it was.                                                  */
+/**************************************************************************/
+
+void board_irq_handler(void)
+{
+    unsigned long intid = gicv3_acknowledge();
+
+    board_irq_service(intid);
+
+    if (intid != GICV3_SPURIOUS_INTID)
+    {
+        gicv3_end_of_interrupt(intid);
+    }
 }

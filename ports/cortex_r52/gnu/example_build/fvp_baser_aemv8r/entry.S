@@ -356,7 +356,47 @@ el1_irq_entry:
 
     .global __tx_irq_processing_return
 __tx_irq_processing_return:
+#ifdef TX_ENABLE_IRQ_NESTING
+
+    /* Nested IRQ handling.  _tx_thread_irq_nesting_start leaves IRQ mode for
+     * System mode and re-enables IRQ, so an interrupt of higher priority can
+     * preempt this handler and re-enter at el1_irq_entry above.  It is paired
+     * with _tx_thread_irq_nesting_end before _tx_thread_context_restore.
+     *
+     * The ORDER here is the whole difficulty, and getting it wrong does not
+     * fail gracefully.  The interrupt must be ACKNOWLEDGED BEFORE nesting is
+     * started.  Reading ICC_IAR1 is what raises the GIC's running priority to
+     * this interrupt's own, which is what masks it and everything of equal or
+     * lower priority; only then is re-enabling IRQ safe.  Acknowledge after
+     * nesting_start instead and the still-pending, still-level-asserted timer
+     * is taken again the instant IRQ is enabled, and again, until the IRQ and
+     * System stacks are destroyed.  That presents as garbage on the console and
+     * a hang, with no fault to point at it.  The Cortex-R5 example BSP says the
+     * same thing in one line: "ensure all IRQ interrupts are cleared prior to
+     * enabling nested IRQ interrupts".
+     *
+     * The INTID is carried in r4, which survives the mode switch because only
+     * SP and LR are banked, and is also pushed on the IRQ stack so a nested
+     * level that reuses r4 cannot lose this level's value.  End-of-interrupt is
+     * left until after nesting_end, in IRQ mode with interrupts masked, so
+     * dropping the running priority cannot re-admit this same interrupt.
+     */
+
+    bl      gicv3_acknowledge               /* IRQ mode, interrupts masked  */
+    mov     r4, r0
+    stmdb   sp!, {r4, r5}                   /* r5 keeps 8-byte alignment    */
+
+    bl      _tx_thread_irq_nesting_start
+    mov     r0, r4
+    bl      board_irq_service
+    bl      _tx_thread_irq_nesting_end
+
+    ldmia   sp!, {r4, r5}
+    mov     r0, r4
+    bl      gicv3_end_of_interrupt
+#else
     bl      board_irq_handler
+#endif
     b       _tx_thread_context_restore
 #else
     FAULT_REPORT msg_el1_irq
