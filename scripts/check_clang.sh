@@ -149,7 +149,14 @@ declare -A PORT_TARGET=(
 # and Cortex-M23 execution-profile paths: invalid on Armv6-M and Armv8-M
 # Baseline, where the 16-bit POP takes r0-r7 and pc only, and rejected by GNU as
 # well as by LLVM. Turning the feature on had never once been tried.
-FEATURE_MACROS="TX_ENABLE_VFP_SUPPORT TX_LOW_POWER TX_ENABLE_EXECUTION_CHANGE_NOTIFY"
+FEATURE_MACROS="TX_ENABLE_VFP_SUPPORT TX_ENABLE_FIQ_SUPPORT TX_LOW_POWER
+                TX_ENABLE_EXECUTION_CHANGE_NOTIFY"
+
+# TX_ENABLE_IRQ_NESTING and TX_ENABLE_FIQ_NESTING are deliberately not here.
+# They guard no assembly in the trees this script walks: the nesting start and end
+# routines are separate files compiled unconditionally, and the macros only feed
+# the TX_PORT_SPECIFIC_BUILD_OPTIONS bitfield in tx_port.h. Adding them would
+# assemble nothing new and imply coverage that does not exist.
 
 # Extra flags for the VFP paths, per core, needed only where -mcpu alone cannot
 # assemble them. Cortex-R4's FPU is an option rather than part of the core, so
