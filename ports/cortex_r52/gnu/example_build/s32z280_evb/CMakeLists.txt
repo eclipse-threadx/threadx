@@ -11,6 +11,17 @@
 
 set(EVB_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+# A bare-metal image has one flat SRAM region and no OS page permissions; access
+# control belongs to the MPU, so an RWX segment is expected rather than a mistake.
+# GNU ld has warned about them since binutils 2.39 and takes this flag to stay
+# quiet; ld.lld does not warn and rejects the flag outright, failing the link with
+# "unknown argument". Chosen by toolchain, as in the FVP example.
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    set(EVB_LINK_QUIET_RWX -Wl,--no-warn-rwx-segments)
+else()
+    set(EVB_LINK_QUIET_RWX)
+endif()
+
 # Silicon M0 -- boot verification.  Deliberately does not link ThreadX: a
 # failure here is then unambiguously a boot or board problem rather than a
 # kernel one, which is the same reasoning as the FVP's boot_check.elf.
@@ -39,7 +50,7 @@ target_link_options(s32z280_boot.elf PRIVATE
     -Wl,-Map=s32z280_boot.map
     # Bare metal: one code region and one data region, with access control
     # belonging to the MPU rather than to segment permissions.
-    -Wl,--no-warn-rwx-segments
+    ${EVB_LINK_QUIET_RWX}
 )
 
 
@@ -77,5 +88,42 @@ target_link_options(s32z280_demo.elf PRIVATE
     -T${EVB_DIR}/link.lds
     -nostartfiles
     -Wl,-Map=s32z280_demo.map
-    -Wl,--no-warn-rwx-segments
+    ${EVB_LINK_QUIET_RWX}
 )
+
+# Lazy VFP context save and restore.  Only meaningful when the library was built
+# with TX_R52_ENABLE_VFP and a floating-point ABI, so like the FVP's demo_m5.elf
+# the target exists only in that configuration.  The FPU hardware enable lives in
+# entry.S under __ARM_FP; tx_thread_vfp_enable() sets only the per-thread flag.
+if(TX_R52_ENABLE_VFP)
+    add_executable(s32z280_vfp.elf EXCLUDE_FROM_ALL
+        ${EVB_DIR}/entry.S
+        ${EVB_DIR}/tx_initialize_low_level.S
+        ${EVB_DIR}/linflexd.c
+        ${EVB_DIR}/timer.c
+        ${EVB_DIR}/mpu.c
+        ${EVB_DIR}/gicv3.c
+        ${EVB_DIR}/irq_dispatch.c
+        ${EVB_DIR}/gic_probe.c
+        ${EVB_DIR}/cache.c
+        ${EVB_DIR}/demo_vfp_s32z280.c
+    )
+
+    target_compile_definitions(s32z280_vfp.elf PRIVATE TX_R52_USE_THREADX_IRQ=1)
+    target_compile_options(s32z280_vfp.elf PRIVATE -g)
+
+    target_link_libraries(s32z280_vfp.elf PRIVATE threadx)
+
+    target_include_directories(s32z280_vfp.elf PRIVATE
+        ${EVB_DIR}
+        ${CMAKE_SOURCE_DIR}/common/inc
+        ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+    )
+
+    target_link_options(s32z280_vfp.elf PRIVATE
+        -T${EVB_DIR}/link.lds
+        -nostartfiles
+        -Wl,-Map=s32z280_vfp.map
+        ${EVB_LINK_QUIET_RWX}
+    )
+endif()
