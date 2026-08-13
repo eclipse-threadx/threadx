@@ -14,11 +14,11 @@
 # SPDX-License-Identifier: MIT and CC0-1.0
 ##############################################################################
 
-# Builds the Arm ports with an LLVM based toolchain, in four stages: assemble
-# every assembly source of every Arm gnu port, compile the common C sources for
-# one core per architecture profile, link the example builds that have a script
-# driver, then link those driven by CMake. Only the two linking stages need a
-# target C library.
+# Builds the Arm ports with an LLVM based toolchain, in five stages: assemble
+# every assembly source of every Arm gnu port, assemble again the parts guarded
+# by feature macros, compile the common C sources for one core per architecture
+# profile, then link the example builds, both the script-driven ones and those
+# driven by CMake. Only the linking stages need a target C library.
 #
 #     scripts/check_clang.sh                       # clang from PATH
 #     scripts/check_clang.sh --clang /path/to/clang
@@ -140,6 +140,28 @@ declare -A PORT_TARGET=(
  [cortex_a78_smp]="aarch64-none-elf cortex-a78"
 )
 
+# Assembly guarded by a feature macro is invisible to the stage above, which
+# assembles with default flags and so lets the preprocessor discard every #ifdef
+# block before the assembler sees it. These are the macros a user can turn on;
+# each file carrying one is assembled again with it defined.
+#
+# This is not hypothetical. It is where "POP {r0, lr}" was found in the Cortex-M0
+# and Cortex-M23 execution-profile paths: invalid on Armv6-M and Armv8-M
+# Baseline, where the 16-bit POP takes r0-r7 and pc only, and rejected by GNU as
+# well as by LLVM. Turning the feature on had never once been tried.
+FEATURE_MACROS="TX_ENABLE_VFP_SUPPORT TX_LOW_POWER TX_ENABLE_EXECUTION_CHANGE_NOTIFY"
+
+# Extra flags for the VFP paths, per core, needed only where -mcpu alone cannot
+# assemble them. Cortex-R4's FPU is an option rather than part of the core, so
+# both toolchains reject its VFP code without an -mfpu.
+#
+# Do not extend this to the A profile ports. They save D16-D31, which exists only
+# on a 32-register FPU, so naming a -d16 FPU takes those registers away and turns
+# 28 working files into "register expected". Their defaults are already correct.
+declare -A VFP_EXTRA=(
+    [cortex_r4]="-mfpu=vfpv3-d16 -mfloat-abi=softfp"
+)
+
 # One core per architecture profile for the C sources. Compiling all of them
 # for every core would multiply the run time without adding coverage, since the
 # port headers differ by profile rather than by core.
@@ -199,6 +221,46 @@ say "  $((total - failures)) of $total assembled"
 if [ -n "$skipped" ]; then
     say "  not Arm, skipped:$(echo $skipped | tr ' ' '\n' | sort -u | tr '\n' ' ')"
 fi
+
+# --------------------------------------------------------------------------
+say ""
+say "== Assembly behind feature macros =="
+
+for macro in $FEATURE_MACROS; do
+    macro_total=0
+    macro_bad=0
+    for src in $(grep -rl "$macro" ports/*/gnu/src/*.S ports_smp/*/gnu/src/*.S \
+                 2>/dev/null | sort); do
+        core="$(echo "$src" | cut -d/ -f2)"
+        spec="${PORT_TARGET[$core]:-}"
+        [ -n "$spec" ] || continue
+        # shellcheck disable=SC2086
+        set -- $spec
+        target="$1"; cpu="$2"; shift 2; extra="$*"
+
+        # The FPU flags apply to the VFP paths only; the other macros guard no
+        # floating-point code and do not need them.
+        fpu=""
+        if [ "$macro" = "TX_ENABLE_VFP_SUPPORT" ]; then
+            fpu="${VFP_EXTRA[$core]:-}"
+        fi
+
+        macro_total=$((macro_total + 1))
+        output="$("$CC" --target="$target" -mcpu="$cpu" $extra $fpu \
+                  -D"$macro" -c "$src" -o /dev/null 2>&1)"
+        if [ -n "$output" ]; then
+            fail "$src with -D$macro"
+            echo "$output" | grep "error:" | head -3 | sed 's/^/        /'
+            macro_bad=$((macro_bad + 1))
+            failures=$((failures + 1))
+        fi
+    done
+    if [ "$macro_total" -eq 0 ]; then
+        say "  $macro: no assembly is guarded by it"
+    else
+        say "  $macro: $((macro_total - macro_bad)) of $macro_total assembled"
+    fi
+done
 
 # --------------------------------------------------------------------------
 if [ "$asm_only" -eq 0 ]; then
