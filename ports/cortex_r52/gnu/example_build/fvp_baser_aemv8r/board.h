@@ -55,12 +55,35 @@ void board_init(void);
 
 void board_irq_handler(void);
 
+/* The nesting path splits the handler in three, because the acknowledge has to
+   happen in IRQ mode before nesting starts and the end-of-interrupt after it
+   finishes.  board_irq_service does the middle part on an INTID that has
+   already been acknowledged, and does not acknowledge or EOI itself.  */
+
+void board_irq_service(unsigned long intid);
+
 /* Interrupt observability, maintained by board_irq_handler.              */
 
 extern volatile unsigned long   board_irq_count;
 extern volatile unsigned long   board_timer_intid;
 extern volatile unsigned long   board_spurious_count;
 extern volatile unsigned long   board_unexpected_intid;
+
+/* Nesting observability, maintained by board_irq_handler.  All of this is inert
+   unless the image was built with TX_ENABLE_IRQ_NESTING: without it the handler
+   runs in IRQ mode with interrupts masked and can never be re-entered.  */
+
+extern volatile unsigned long   board_nest_depth;
+extern volatile unsigned long   board_nest_max;
+extern volatile unsigned long   board_sgi_count;
+extern volatile unsigned long   board_sgi_nested_count;
+
+/* Set by demo_nesting to make the timer handler provoke a nested SGI.  Left at
+   zero every other image behaves exactly as before.  */
+
+extern volatile unsigned long   board_nest_provoke;
+
+#define BOARD_NEST_SGI_INTID    8U
 
 /* Counted by the EL2 hyp-trap handler in entry.S; the ZoneX seam.        */
 
