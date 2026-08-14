@@ -58,6 +58,17 @@ void gicv3_enable_sgi(unsigned int intid, unsigned int priority);
 
 void gicv3_send_sgi(unsigned int intid);
 
+/* Group 0 support, which is what produces FIQ rather than IRQ.  With a single
+   security state the GIC routes Group 0 to FIQ and Group 1 to IRQ, so an
+   interrupt has to be moved into Group 0 to arrive as an FIQ at all.  Group 0
+   has its own acknowledge and end-of-interrupt registers; using the Group 1 ones
+   on a Group 0 interrupt does not work.  */
+
+void gicv3_enable_sgi_group0(unsigned int intid, unsigned int priority);
+void gicv3_send_sgi_group0(unsigned int intid);
+unsigned long gicv3_acknowledge_group0(void);
+void gicv3_end_of_interrupt_group0(unsigned long intid);
+
 /* Implemented priority bits, discovered by write and readback.  Leaves the
    scratch INTID's priority byte at zero.  */
 

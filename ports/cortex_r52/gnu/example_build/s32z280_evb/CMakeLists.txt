@@ -164,3 +164,40 @@ if(TX_R52_ENABLE_IRQ_NESTING)
         ${EVB_LINK_QUIET_RWX}
     )
 endif()
+
+# Nested FIQ handling on silicon.  Needs TX_R52_ENABLE_FIQ_NESTING, which the
+# port-level CMakeLists already requires TX_R52_ENABLE_FIQ alongside, so the image
+# exists only where both the FIQ vector path and the nesting pairing are compiled
+# in -- as s32z280_nesting.elf does for the IRQ side.
+if(TX_R52_ENABLE_FIQ_NESTING)
+    add_executable(s32z280_fiq.elf EXCLUDE_FROM_ALL
+        ${EVB_DIR}/entry.S
+        ${EVB_DIR}/tx_initialize_low_level.S
+        ${EVB_DIR}/linflexd.c
+        ${EVB_DIR}/timer.c
+        ${EVB_DIR}/mpu.c
+        ${EVB_DIR}/gicv3.c
+        ${EVB_DIR}/irq_dispatch.c
+        ${EVB_DIR}/gic_probe.c
+        ${EVB_DIR}/cache.c
+        ${EVB_DIR}/demo_fiq_s32z280.c
+    )
+
+    target_compile_definitions(s32z280_fiq.elf PRIVATE TX_R52_USE_THREADX_IRQ=1)
+    target_compile_options(s32z280_fiq.elf PRIVATE -g)
+
+    target_link_libraries(s32z280_fiq.elf PRIVATE threadx)
+
+    target_include_directories(s32z280_fiq.elf PRIVATE
+        ${EVB_DIR}
+        ${CMAKE_SOURCE_DIR}/common/inc
+        ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+    )
+
+    target_link_options(s32z280_fiq.elf PRIVATE
+        -T${EVB_DIR}/link.lds
+        -nostartfiles
+        -Wl,-Map=s32z280_fiq.map
+        ${EVB_LINK_QUIET_RWX}
+    )
+endif()
