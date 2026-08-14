@@ -235,6 +235,65 @@ start_a32:
     mcr     p15, 4, r0, c1, c1, 0
     isb
 
+    /* TCM: program the bases and enable all three banks, here at EL2.
+     *
+     * This is at EL2 deliberately.  Writing ENABLEEL10 from EL1 works, but
+     * ENABLEEL2 is silently ignored there -- measured, on both BTCM and CTCM:
+     * the base took and bit 0 took while bit 1 stayed clear.  The TRM does not
+     * say so outright, but EL1 being unable to change what EL2 can see is the
+     * sensible reading, and doing the whole job at EL2 avoids the question.
+     *
+     * ATCM boots enabled at address 0 because CFGTCMBOOTx is tied high here, so
+     * this also moves it off zero, which makes a null-pointer write fault rather
+     * than quietly land in tightly-coupled memory.  Each base must be
+     * size-aligned (TRM r1p3 6.2); 64KB at 0x30000000 and 16KB at 0x30100000
+     * and 0x30200000 satisfy that.
+     *
+     * SIZE and WAITSTATES are read-only descriptions of the hardware, so the
+     * values written here keep the bits the banks already report: ATCM 64KB with
+     * one wait state, BTCM 16KB with none, CTCM 16KB with one.
+     *
+     * Nothing may READ the TCMs after this until they have been written, because
+     * ECC is enabled on this part and the check bits are not initialised by the
+     * core (TRM 6.2.2).  bsp_main preloads them.
+     */
+
+    ldr     r0, =(0x30000000 | (0x07 << 2) | (1 << 8) | (1 << 1) | (1 << 0))
+    mcr     p15, 0, r0, c9, c1, 0           /* IMP_ATCMREGIONR              */
+    /* BTCM and CTCM are deliberately NOT enabled, and this costs nothing that
+     * matters: the reference manual describes TCM_A as the bank "optimized for
+     * small, regularly executed code such as interrupt service routines or OS
+     * kernels", which is what a TCM is wanted for here.
+     *
+     * Enabling a second bank on this part removes all measurable data-cache
+     * benefit.  Measured, five configurations, one variable:
+     *
+     *   ATCM only                      cache gain 24%
+     *   ATCM + BTCM                    cache gain  0%
+     *   ATCM + BTCM + CTCM             cache gain  0%
+     *   ATCM + BTCM at another base    cache gain  0%
+     *   ATCM + CTCM, BTCM disabled     cache gain  0%
+     *
+     * So it is not a particular bank, not the bank's address, and not the ECC
+     * preload -- it is enabling a second bank at all.  The benchmark buffer sits
+     * in non-RTU-local SRAM at 0x31800000, outside every TCM window, and the
+     * cache still reports 16KB with 4 ways and 64 sets throughout.
+     *
+     * No erratum covers it.  Checked the Cortex-R52 errata notice
+     * (SDEN-857344 issue 19, all 25 entries) and the S32Z2 mask set errata for
+     * 0P91J; the RTU and R52 entries there are ERR050509, ERR051107, ERR051153,
+     * ERR051441, ERR051613, ERR051614 and ERR052126, none of which describes
+     * this.  A shared RAM pool between the LLC and the TCMs would explain it,
+     * since the RTU has a last-level cache that "allocates ways to specific
+     * domains", but that is a guess and it is NXP's to confirm.
+     *
+     * Enabling them is one uncommented line each if that answer arrives.  Until
+     * then, shipping them would trade a 24% cache regression for TCM this
+     * example does not use.
+     */
+
+    isb
+
     /* Let EL1 reach the FPU: clear HCPTR.TCP10/TCP11.  The R52 always has at
        least a single-precision FPU, so this matters even for a soft-float
        kernel if application code uses it.  */
