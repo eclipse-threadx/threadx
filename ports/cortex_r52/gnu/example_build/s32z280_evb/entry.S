@@ -189,7 +189,7 @@ el1_vectors:
     b       fault_el1_dabt                  /* 0x10                         */
     b       fault_el1_reserved              /* 0x14                         */
     b       el1_irq_entry                   /* 0x18  IRQ                    */
-    b       fault_el1_fiq                   /* 0x1C                         */
+    b       el1_fiq_entry                   /* 0x1C  FIQ                    */
 
 @/**************************************************************************/
 @/*  _start -- reset entry.  Entered in THUMB state, Hyp mode (EL2).       */
@@ -330,7 +330,19 @@ start_a32:
 
     ldr     r0, =el1_entry
     msr     ELR_hyp, r0
+#ifdef TX_ENABLE_FIQ_SUPPORT
+
+    /* FIQ left unmasked, IRQ still masked.  tx_thread_stack_build only clears a
+     * thread's F bit when the library was built with FIQ support and nothing
+     * else ever clears it, so leaving PSR_F set here would mask FIQ until the
+     * first thread ran and an FIQ raised from bsp_main would silently do
+     * nothing.
+     */
+
+    ldr     r0, =(PSR_A | PSR_I | MODE_SVC)
+#else
     ldr     r0, =(PSR_A | PSR_I | PSR_F | MODE_SVC)
+#endif
     msr     SPSR_hyp, r0
     isb
     eret
@@ -536,6 +548,7 @@ __tx_irq_processing_return:
 #endif
     b       _tx_thread_context_restore
 
+
 #else
 
     /* Standalone: the classic A32 form.  lr is adjusted by 4 because an IRQ
@@ -547,6 +560,52 @@ __tx_irq_processing_return:
     bl      board_irq_handler
     ldmfd   sp!, {r0-r3, r12, pc}^
 
+#endif
+
+@/**************************************************************************/
+@/*  el1_fiq_entry -- FIQ vector at EL1.                                   */
+@/**************************************************************************/
+
+el1_fiq_entry:
+#if defined(TX_ENABLE_FIQ_SUPPORT) && defined(TX_R52_USE_THREADX_IRQ)
+
+    /* Both guards are needed.  TX_ENABLE_FIQ_SUPPORT is PUBLIC on the threadx
+     * target, so it reaches every image once the library is built with FIQ,
+     * including images that link no interrupt controller; referencing the GIC
+     * and board symbols below from those breaks the link outright.  That is why
+     * the IRQ vector is gated the same way.
+     *
+     * Group 0 is what the GIC delivers as FIQ, and it has its own acknowledge
+     * and end-of-interrupt registers -- the Group 1 pair returns the spurious
+     * INTID for a Group 0 interrupt and leaves it pending, which looks like a
+     * storm rather than a mistake.  As on the IRQ path, the acknowledge happens
+     * before nesting starts, so the running priority masks this interrupt before
+     * FIQ is re-enabled.
+     */
+
+    b       _tx_thread_fiq_context_save
+
+    .global __tx_fiq_processing_return
+__tx_fiq_processing_return:
+#ifdef TX_ENABLE_FIQ_NESTING
+    bl      gicv3_acknowledge_group0
+    mov     r4, r0
+    stmdb   sp!, {r4, r5}
+
+    bl      _tx_thread_fiq_nesting_start
+    mov     r0, r4
+    bl      board_fiq_service
+    bl      _tx_thread_fiq_nesting_end
+
+    ldmia   sp!, {r4, r5}
+    mov     r0, r4
+    bl      gicv3_end_of_interrupt_group0
+#else
+    bl      board_fiq_handler
+#endif
+    b       _tx_thread_fiq_context_restore
+#else
+    b       fault_el1_fiq
 #endif
 
 @/**************************************************************************/

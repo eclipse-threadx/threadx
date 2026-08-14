@@ -124,4 +124,22 @@ extern volatile unsigned long   board_sgi_priority;
 
 #define BOARD_NEST_SGI_INTID    8U
 
+/* FIQ observability.  Two Group 0 SGIs, because FIQ nesting means an FIQ taken
+   while an FIQ handler is running, so a single source cannot show it.  The
+   higher-priority one is raised from inside the lower one's handler.  */
+
+void board_fiq_handler(void);
+void board_fiq_service(unsigned long intid);
+
+extern volatile unsigned long   board_fiq_count;
+extern volatile unsigned long   board_fiq_high_count;
+extern volatile unsigned long   board_fiq_nested_count;
+extern volatile unsigned long   board_fiq_depth;
+extern volatile unsigned long   board_fiq_max_depth;
+extern volatile unsigned long   board_fiq_unexpected;
+extern volatile unsigned long   board_fiq_provoke;
+
+#define BOARD_FIQ_LOW_INTID     10U
+#define BOARD_FIQ_HIGH_INTID    11U
+
 #endif /* BOARD_H */
