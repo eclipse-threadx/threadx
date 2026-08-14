@@ -114,4 +114,38 @@ unsigned long tcm_read_memprotctlr(void);
 unsigned int tcm_ecc_implemented(void);
 unsigned int tcm_ecc_enabled(void);
 
+/**************************************************************************/
+/*  ENABLING                                                              */
+/*                                                                        */
+/*    Constraints, all from Cortex-R52 TRM r1p3 section 6.2 and 3.3.94:    */
+/*                                                                        */
+/*    - The base address must be SIZE-ALIGNED, not merely 8KB-aligned as   */
+/*      the BASEADDRESS field's width alone would suggest.                */
+/*    - A disabled TCM's base address is UNKNOWN, not zero, so every bank  */
+/*      must be programmed explicitly rather than adjusted from what it    */
+/*      appears to hold.                                                  */
+/*    - "Before using the TCM you must program MPU regions to cover the    */
+/*      TCM regions to give access."  An enabled TCM with no MPU region    */
+/*      still faults once the MPU is on.                                  */
+/*    - An enabled TCM always behaves as Non-cacheable Non-shareable       */
+/*      Normal memory whatever the MPU says; the MPU supplies only the     */
+/*      permissions.  So the MPU region's attribute index is irrelevant    */
+/*      here and its AP and XN bits are not.                              */
+/*    - With ECC on, every location must be written before it is read.     */
+/*                                                                        */
+/**************************************************************************/
+
+/* Program one bank's base and enable it at both exception levels.  Returns 1 on
+   success, 0 if the index is out of range, the bank reports no size, or the base
+   is not size-aligned.  Verifies by reading the register back.  */
+
+unsigned int tcm_enable(unsigned int index, unsigned long base);
+
+/* Write every location of a bank so its ECC check bits become valid.  The store
+   width is chosen from the bank: index 0 is ATCM and needs 64-bit stores, and
+   the others take 32-bit.  Must be called while the bank is enabled and
+   accessible, and before anything reads it.  */
+
+void tcm_preload(unsigned int index, unsigned long base, unsigned long bytes);
+
 #endif

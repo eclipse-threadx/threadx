@@ -152,3 +152,111 @@ unsigned int tcm_ecc_enabled(void)
 
     return ((ctlr & MEMPROT_RAMPROTEN) != 0UL) ? 1U : 0U;
 }
+
+
+static void write_regionr(unsigned int index, unsigned long value)
+{
+    switch (index)
+    {
+        case 0U:
+            __asm volatile ("mcr p15, 0, %0, c9, c1, 0" :: "r" (value) : "memory");
+            break;
+        case 1U:
+            __asm volatile ("mcr p15, 0, %0, c9, c1, 1" :: "r" (value) : "memory");
+            break;
+        case 2U:
+            __asm volatile ("mcr p15, 0, %0, c9, c1, 2" :: "r" (value) : "memory");
+            break;
+        default:
+            return;
+    }
+
+    __asm volatile ("isb sy" ::: "memory");
+}
+
+
+unsigned int tcm_enable(unsigned int index, unsigned long base)
+{
+    tcm_bank_t  bank;
+    unsigned long value;
+
+    if (index > 2U)
+    {
+        return 0U;
+    }
+
+    tcm_read_bank(index, &bank);
+
+    if (bank.size_bytes == 0UL)
+    {
+        return 0U;                      /* not implemented; nothing to enable */
+    }
+
+    /* Size-aligned, per TRM 6.2.  Rejecting a misaligned base is better than
+       programming it and discovering later that the bank answers somewhere
+       unexpected.  */
+
+    if ((base & (bank.size_bytes - 1UL)) != 0UL)
+    {
+        return 0U;
+    }
+
+    /* Preserve the read-only SIZE and WAITSTATES fields as read: they describe
+       the hardware and writing a different value there would be meaningless.  */
+
+    value = (base & ~((1UL << TCM_BASE_SHIFT) - 1UL))
+          | (bank.raw & ((TCM_SIZE_MASK << TCM_SIZE_SHIFT) | (1UL << TCM_WAITSTATES_SHIFT)))
+          | TCM_ENABLE_EL2
+          | TCM_ENABLE_EL10;
+
+    write_regionr(index, value);
+
+    /* Read back rather than trusting the write.  */
+
+    tcm_read_bank(index, &bank);
+
+    /* ENABLEEL10 is the criterion, not both enables.  Writing ENABLEEL2 from
+       EL1 is ignored -- measured on BTCM and CTCM, where the base and bit 0 took
+       while bit 1 stayed clear -- so requiring it here would report failure for
+       a bank that is perfectly usable at the level this code runs at.  EL2
+       access is arranged in entry.S, before the drop.  */
+
+    return ((bank.base == (base & ~((1UL << TCM_BASE_SHIFT) - 1UL))) &&
+            (bank.enable_el10 != 0U)) ? 1U : 0U;
+}
+
+
+void tcm_preload(unsigned int index, unsigned long base, unsigned long bytes)
+{
+    if (index == 0U)
+    {
+        /* ATCM: 64-bit stores at 64-bit alignment.  TRM 6.2.2 is explicit that
+           STR of a word is not sufficient here, so this writes unsigned long
+           long and the generated code is checked to be STRD or STM rather than
+           two word stores.  */
+
+        volatile unsigned long long *p = (volatile unsigned long long *) base;
+        unsigned long count = bytes / 8UL;
+        unsigned long i;
+
+        for (i = 0UL; i < count; i++)
+        {
+            p[i] = 0ULL;
+        }
+    }
+    else
+    {
+        /* BTCM and CTCM: 32-bit stores at 32-bit alignment are enough.  */
+
+        volatile unsigned int *p = (volatile unsigned int *) base;
+        unsigned long count = bytes / 4UL;
+        unsigned long i;
+
+        for (i = 0UL; i < count; i++)
+        {
+            p[i] = 0U;
+        }
+    }
+
+    __asm volatile ("dsb sy" ::: "memory");
+}

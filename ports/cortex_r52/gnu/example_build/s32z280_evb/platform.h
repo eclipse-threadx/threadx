@@ -74,6 +74,21 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+/* TCM bases.  The values the S32Z2 reference manual documents, which the core
+   does not use until they are programmed -- ATCM boots at 0x00000000 and the
+   other two boot disabled with an UNKNOWN base.  Each must be size-aligned
+   (Cortex-R52 TRM r1p3 6.2), which these are: 64KB, 16KB and 16KB banks at
+   64KB, 1MB and 1MB alignment respectively.  Programming ATCM here also moves
+   it off address 0, so a null-pointer write faults instead of quietly landing
+   in tightly-coupled memory.  */
+
+#define S32Z_ATCM_BASE          0x30000000UL
+#define S32Z_ATCM_SIZE          0x00010000UL    /* 64 KB, 1 wait state  */
+#define S32Z_BTCM_BASE          0x30100000UL
+#define S32Z_BTCM_SIZE          0x00004000UL    /* 16 KB, 0 wait states */
+#define S32Z_CTCM_BASE          0x30200000UL
+#define S32Z_CTCM_SIZE          0x00004000UL    /* 16 KB, 1 wait state  */
+
 /* Memory-mapped register access.  Kept here rather than per-driver so that
    every peripheral in this BSP goes through one definition.
    MISRA C:2012 Rule 11.4/11.6 deviation: casting an integer address to a

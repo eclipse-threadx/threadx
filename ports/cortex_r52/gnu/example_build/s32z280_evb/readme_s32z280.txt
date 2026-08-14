@@ -87,8 +87,40 @@ model and not an R52 at all.
     ATCM needs 64-bit aligned stores where BTCM and CTCM accept 32-bit.  Using
     TCM therefore takes more than setting an enable bit.
 
-    The DDR window at 0x7A000000 is dark until DDR is initialised.  Both TCM
-    and DDR are absent from link.lds for now.
+    entry.S now programs ATCM to 0x30000000 and enables it at both exception
+    levels, at EL2 -- writing ENABLEEL2 from EL1 is silently ignored, measured on
+    two banks.  The boot image preloads it (ECC check bits are not initialised by
+    the core) and proves it holds data both before and after the MPU is enabled.
+
+    BTCM and CTCM are left disabled on purpose, and that is a measurement rather
+    than caution.  Enabling any second bank removes all measurable data-cache
+    benefit on this part:
+
+        ATCM only                      cache gain 24%
+        ATCM + BTCM                    cache gain  0%
+        ATCM + BTCM + CTCM             cache gain  0%
+        ATCM + BTCM at another base    cache gain  0%
+        ATCM + CTCM, BTCM disabled     cache gain  0%
+
+    Five configurations, one variable.  Not a particular bank, not its address,
+    not the ECC preload -- enabling a second bank at all.  The benchmark buffer is
+    in non-RTU-local SRAM at 0x31800000, outside every TCM window, and CCSIDR
+    reports the same 16 KB four-way cache throughout.
+
+    No erratum covers this.  Checked SDEN-857344 issue 19 (all 25 Cortex-R52
+    entries) and the S32Z2 0P91J mask set errata, whose RTU and R52 entries are
+    ERR050509, ERR051107, ERR051153, ERR051441, ERR051613, ERR051614 and
+    ERR052126.  A RAM pool shared between the RTU's last-level cache and the TCMs
+    would explain it -- the LLC "allocates ways to specific domains" -- but that is
+    a guess for NXP to confirm, and worth raising with the other RTU questions.
+
+    Losing nothing by this: the reference manual describes TCM_A as the bank
+    "optimized for small, regularly executed code such as interrupt service
+    routines or OS kernels", which is what a TCM is wanted for here.  Enabling the
+    other two is one line each in entry.S when there is an answer.
+
+    The DDR window at 0x7A000000 is dark until DDR is initialised.  TCM is still
+    absent from link.lds: nothing is placed there yet.
 
 
 5.  What this image reports

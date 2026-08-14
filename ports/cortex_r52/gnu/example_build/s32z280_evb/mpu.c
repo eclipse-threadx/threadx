@@ -352,7 +352,34 @@ static void build_table(void)
     mpu_regions[5].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
     mpu_regions[5].mpu_region_name          = "ext   RW NX normal-wb";
 
-    mpu_regions_used = 6U;
+    /* One region per TCM bank.  The TRM is explicit that an enabled TCM still
+       needs an MPU region before it can be used, and that an enabled TCM always
+       behaves as Non-cacheable Non-shareable Normal memory whatever attributes
+       the MPU carries -- so the attribute index below does not describe the TCM,
+       only the permissions do.  Kept as three regions rather than one spanning
+       0x30000000 to 0x30203FFF, because a single region would also make the
+       1MB gaps between banks accessible, and those are not TCM.
+
+       Left executable on purpose: the point of TCM is deterministic access for
+       code as much as data, so an image that wants a TCM-resident handler can
+       have one.  That makes these regions writable and executable, which for
+       tightly-coupled memory is the normal arrangement rather than an
+       oversight.  */
+
+    mpu_regions[6].mpu_region_base          = S32Z_ATCM_BASE;
+    mpu_regions[6].mpu_region_limit         = S32Z_ATCM_BASE + S32Z_ATCM_SIZE - 1UL;
+    mpu_regions[6].mpu_region_ap            = MPU_AP_RW_EL1;
+    mpu_regions[6].mpu_region_execute_never = 0U;
+    mpu_regions[6].mpu_region_shareability  = MPU_SH_NON;
+    mpu_regions[6].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
+    mpu_regions[6].mpu_region_name          = "atcm  RW X  tcm";
+
+    /* No regions for BTCM and CTCM: entry.S leaves those banks disabled, and a
+       region covering a disabled TCM would map its address range to whatever
+       AXIM provides there, which is not TCM and would read as success.  See the
+       measurement in entry.S.  */
+
+    mpu_regions_used = 7U;
 }
 
 

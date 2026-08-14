@@ -398,6 +398,78 @@ void bsp_main(void)
         linflexd_putc('\n');
     }
 
+    /* --- TCM: enable, preload, prove ------------------------------------
+       Done before the MPU goes on, so a failure here is not confused with a
+       missing MPU region.  The preload is not optional: ECC is enabled on this
+       part, so a location read before it has been written reports an error, and
+       that error would look exactly like an inaccessible TCM.  */
+
+    MARK(0x20);
+    linflexd_puts("T2 TCM state as entry.S left it\n");
+    {
+        static const char *const bank_name[3] = { "ATCM", "BTCM", "CTCM" };
+        unsigned int i;
+        unsigned int atcm_ok;
+
+        /* Verification only.  Nothing is programmed here: ENABLEEL2 is ignored
+           when written from EL1, so TCM setup belongs at EL2 in entry.S, and
+           calling tcm_enable() from here would additionally switch on the banks
+           entry.S deliberately leaves off.  */
+
+        for (i = 0U; i < 3U; i++)
+        {
+            tcm_bank_t bank;
+
+            tcm_read_bank(i, &bank);
+
+            linflexd_puts(bank_name[i]);
+            linflexd_puts(" base=0x");
+            linflexd_put_hex32((unsigned int) bank.base);
+            linflexd_puts(" en2=");
+            linflexd_putc((char) ('0' + (char) bank.enable_el2));
+            linflexd_puts(" en10=");
+            linflexd_putc((char) ('0' + (char) bank.enable_el10));
+            linflexd_puts((bank.enable_el10 != 0U)
+                              ? "  enabled\n"
+                              : "  off on purpose, see entry.S\n");
+        }
+
+        tcm_read_bank(0U, &(tcm_bank_t){0});
+        {
+            tcm_bank_t atcm;
+
+            tcm_read_bank(0U, &atcm);
+            atcm_ok = ((atcm.base == S32Z_ATCM_BASE) &&
+                       (atcm.enable_el2 != 0U) && (atcm.enable_el10 != 0U)) ? 1U : 0U;
+        }
+
+        if (atcm_ok != 0U)
+        {
+            MARK(0x21);
+            linflexd_puts("T3 preloading ATCM to establish ECC check bits\n");
+            tcm_preload(0U, S32Z_ATCM_BASE, S32Z_ATCM_SIZE);
+
+            MARK(0x22);
+            linflexd_puts("T4 write and read back ATCM\n");
+            {
+                volatile unsigned int *first = (volatile unsigned int *) S32Z_ATCM_BASE;
+                volatile unsigned int *last  =
+                    (volatile unsigned int *) (S32Z_ATCM_BASE + S32Z_ATCM_SIZE - 4UL);
+
+                *first = 0xA5A5A5A5U;
+                *last  = 0x5A5A5A5AU;
+
+                linflexd_puts(((*first == 0xA5A5A5A5U) && (*last == 0x5A5A5A5AU))
+                                  ? "ATCM PASS first and last word hold\n"
+                                  : "ATCM FAIL readback mismatch\n");
+            }
+        }
+        else
+        {
+            linflexd_puts("T3 skipped: ATCM is not enabled as expected\n");
+        }
+    }
+
     /* --- MPU, then the GIC ------------------------------------------------
        The GIC needs its region mapped Device nGnRnE (Cortex-R52 TRM), which
        needs the MPU on.  Markers around the enable: if the console survives it,
@@ -452,6 +524,43 @@ void bsp_main(void)
         report("GICR_PIDR2", *(volatile unsigned int *)(S32Z_GIC_BASE + 0x10FFE8UL));
         MARK(0x16);
         linflexd_puts("M4 GIC reachable\n");
+
+        /* TCM again, now that the MPU is enforcing.  The TRM requires an MPU
+           region per TCM before it can be used, so this is the check that those
+           three regions are right -- an enabled TCM with no region faults here
+           and nowhere earlier.  */
+
+        MARK(0x23);
+        linflexd_puts("T5 ATCM still reachable with the MPU on\n");
+        {
+            volatile unsigned int *p = (volatile unsigned int *) S32Z_ATCM_BASE;
+            tcm_bank_t  atcm;
+            unsigned int answers;
+
+            tcm_read_bank(0U, &atcm);
+
+            *p = 0x5A5A0000U;
+            answers = (*p == 0x5A5A0000U) ? 1U : 0U;
+
+            /* Both halves matter.  A disabled TCM's range is serviced through
+               AXIM, so memory answering there says nothing about the TCM: an
+               earlier version of this check reported every bank accessible while
+               two of them were disabled.  */
+
+            if ((answers != 0U) && (atcm.enable_el10 != 0U))
+            {
+                linflexd_puts("ATCM PASS enabled and holding data under MPU\n");
+            }
+            else if (answers != 0U)
+            {
+                linflexd_puts("ATCM NOT TCM: address answers but the bank is\n"
+                              "     disabled, so this is AXIM behind it\n");
+            }
+            else
+            {
+                linflexd_puts("ATCM FAIL address does not answer\n");
+            }
+        }
 
         /* --- interrupts -------------------------------------------------
            Bring up the GIC properly, enable the timer PPI, arm a 10 ms
