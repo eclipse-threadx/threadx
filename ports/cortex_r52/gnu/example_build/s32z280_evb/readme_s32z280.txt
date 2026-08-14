@@ -73,11 +73,22 @@ model and not an R52 at all.
     Data, bss and the per-mode stacks live in RTU-local data SRAM at
     0x31780000 (256 KB); 0x31800000 gives 2 MB if an image outgrows it.
 
-    The TCMs at 0x30000000/0x30100000/0x30200000 are NOT accessible at reset --
-    reads fault -- until their region registers are programmed, so nothing
-    needed for early boot can live there.  The DDR window at 0x7A000000 is
-    likewise dark until DDR is initialised.  Both are absent from link.lds on
-    purpose.
+    Reads of 0x30000000/0x30100000/0x30200000 do fault, but the earlier note
+    here had the reason wrong.  Reading the region registers on this part shows
+    ATCM already ENABLED at both exception levels, 64 KB with one wait state,
+    and every BASEADDRESS field zero -- so ATCM is live at address 0x00000000,
+    not at 0x30000000.  The faulting reads were of an address the TCM is not
+    at.  ATCM's enables reset set because CFGTCMBOOTx is tied high here.  BTCM
+    (16 KB, 0 wait states) and CTCM (16 KB, 1 wait state) really are disabled.
+    Sizes and wait states agree with the S32Z2 reference manual exactly.
+
+    ECC is implemented and enabled -- IMP_MEMPROTCTLR reads 0x11 -- so per
+    Cortex-R52 TRM 6.2.2 a TCM location must be written before it is read, and
+    ATCM needs 64-bit aligned stores where BTCM and CTCM accept 32-bit.  Using
+    TCM therefore takes more than setting an enable bit.
+
+    The DDR window at 0x7A000000 is dark until DDR is initialised.  Both TCM
+    and DDR are absent from link.lds for now.
 
 
 5.  What this image reports

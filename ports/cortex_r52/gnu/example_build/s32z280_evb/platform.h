@@ -47,11 +47,27 @@
 /*    self-booting image loaded from flash would still need the data      */
 /*    alias, since the core's own data side may not write through AXI-F.  */
 /*                                                                        */
-/*    The TCMs (0x30000000, 0x30100000, 0x30200000) are NOT accessible    */
-/*    at reset -- reads fault -- because nothing has programmed the TCM   */
-/*    region registers yet.  They are therefore unusable for early boot   */
-/*    and are deliberately absent from this map.  The DDR window at       */
-/*    0x7A000000 is likewise dark until DDR is initialised.               */
+/*    The TCMs need care, and the earlier note here was wrong about why.  */
+/*    Reads of 0x30000000, 0x30100000 and 0x30200000 do fault, but not    */
+/*    because the TCMs are disabled.  Reading the region registers on     */
+/*    this part gives:                                                    */
+/*                                                                        */
+/*      ATCM  0x0000011F   64KB, 1 wait state, ENABLED at EL2 and EL1/0   */
+/*      BTCM  0x00000014   16KB, 0 wait states, disabled                  */
+/*      CTCM  0x00000114   16KB, 1 wait state, disabled                   */
+/*                                                                        */
+/*    Every BASEADDRESS field is zero, so ATCM is live as 64KB at address */
+/*    0x00000000 -- not at 0x30000000.  The faulting reads were of an     */
+/*    address the TCM is not at.  ATCM's enables reset set because        */
+/*    CFGTCMBOOTx is tied high on this part (Cortex-R52 TRM r1p3 3.3.94). */
+/*    The sizes and wait states match the S32Z2 reference manual exactly. */
+/*                                                                        */
+/*    ECC is implemented and enabled: IMP_MEMPROTCTLR reads 0x00000011,   */
+/*    so RAMPROTIMP and RAMPROTEN are both set.  TRM 6.2.2 therefore      */
+/*    applies -- a TCM location must be written before it is read, and    */
+/*    ATCM needs 64-bit aligned stores where BTCM and CTCM accept 32-bit. */
+/*                                                                        */
+/*    The DDR window at 0x7A000000 is dark until DDR is initialised.      */
 /*                                                                        */
 /**************************************************************************/
 

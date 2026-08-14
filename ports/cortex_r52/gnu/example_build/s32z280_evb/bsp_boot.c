@@ -60,6 +60,7 @@
 #include "mpu.h"
 #include "gicv3.h"
 #include "cache.h"
+#include "tcm.h"
 
 /* Captured at EL2 by entry.S, before the drop to EL1.                    */
 
@@ -345,6 +346,57 @@ void bsp_main(void)
 
     linflexd_puts("P1 RTU0.GPR CFG_CNTDV via LLPP\n");
     report("CFG_CNTDV", *(volatile unsigned int *)S32Z_RTU0_GPR_CFG_CNTDV);
+
+    /* --- TCM: what the hardware reports about itself ---------------------
+       Reads only.  platform.h has recorded since bring-up that the TCM windows
+       fault at reset, and the Cortex-R52 TRM says why: every bit of the region
+       registers resets to zero apart from SIZE and WAITSTATES, so the banks sit
+       at base 0 with both enables clear.  This confirms that on the part rather
+       than trusting it, and cross-checks the reported sizes against the S32Z2
+       reference manual, which documents TCMA 64KB, TCMB 16KB and TCMC 16KB.
+
+       Nothing is written here.  Enabling TCM also requires initialising the ECC
+       bits before any read (TRM 6.2.2), with ATCM needing 64-bit aligned stores
+       where BTCM and CTCM accept 32-bit, so the enable belongs in its own step
+       once these values are known.  */
+
+    linflexd_puts("T1 TCM configuration as reported by the core\n");
+    {
+        static const char *const bank_name[3] = { "ATCM", "BTCM", "CTCM" };
+        static const unsigned long expect_bytes[3] = { 0x10000UL, 0x4000UL, 0x4000UL };
+        unsigned int i;
+
+        for (i = 0U; i < 3U; i++)
+        {
+            tcm_bank_t bank;
+
+            tcm_read_bank(i, &bank);
+
+            linflexd_puts(bank_name[i]);
+            linflexd_puts(" raw=0x");
+            linflexd_put_hex32((unsigned int) bank.raw);
+            linflexd_puts(" base=0x");
+            linflexd_put_hex32((unsigned int) bank.base);
+            linflexd_puts(" size=0x");
+            linflexd_put_hex32((unsigned int) bank.size_bytes);
+            linflexd_puts(" ws=");
+            linflexd_putc((char) ('0' + (char) bank.wait_states));
+            linflexd_puts(" en2=");
+            linflexd_putc((char) ('0' + (char) bank.enable_el2));
+            linflexd_puts(" en10=");
+            linflexd_putc((char) ('0' + (char) bank.enable_el10));
+            linflexd_puts((bank.size_bytes == expect_bytes[i])
+                              ? "  size matches the RM\n"
+                              : "  SIZE DISAGREES WITH THE RM\n");
+        }
+
+        report("MEMPROTCTLR", (unsigned int) tcm_read_memprotctlr());
+        linflexd_puts("ECC implemented = ");
+        linflexd_putc((char) ('0' + (char) tcm_ecc_implemented()));
+        linflexd_puts(", enabled = ");
+        linflexd_putc((char) ('0' + (char) tcm_ecc_enabled()));
+        linflexd_putc('\n');
+    }
 
     /* --- MPU, then the GIC ------------------------------------------------
        The GIC needs its region mapped Device nGnRnE (Cortex-R52 TRM), which
