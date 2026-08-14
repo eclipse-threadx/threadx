@@ -35,6 +35,7 @@ add_executable(s32z280_boot.elf EXCLUDE_FROM_ALL
     ${EVB_DIR}/gicv3.c
     ${EVB_DIR}/irq_dispatch.c
     ${EVB_DIR}/cache.c
+        ${EVB_DIR}/tcm.c
 )
 
 target_include_directories(s32z280_boot.elf PRIVATE ${EVB_DIR})
@@ -67,6 +68,7 @@ add_executable(s32z280_demo.elf EXCLUDE_FROM_ALL
     ${EVB_DIR}/irq_dispatch.c
     ${EVB_DIR}/gic_probe.c
     ${EVB_DIR}/cache.c
+        ${EVB_DIR}/tcm.c
     ${EVB_DIR}/demo_s32z280.c
 )
 
@@ -106,6 +108,7 @@ if(TX_R52_ENABLE_VFP)
         ${EVB_DIR}/irq_dispatch.c
         ${EVB_DIR}/gic_probe.c
         ${EVB_DIR}/cache.c
+        ${EVB_DIR}/tcm.c
         ${EVB_DIR}/demo_vfp_s32z280.c
     )
 
@@ -143,6 +146,7 @@ if(TX_R52_ENABLE_IRQ_NESTING)
         ${EVB_DIR}/irq_dispatch.c
         ${EVB_DIR}/gic_probe.c
         ${EVB_DIR}/cache.c
+        ${EVB_DIR}/tcm.c
         ${EVB_DIR}/demo_nesting_s32z280.c
     )
 
@@ -180,6 +184,7 @@ if(TX_R52_ENABLE_FIQ_NESTING)
         ${EVB_DIR}/irq_dispatch.c
         ${EVB_DIR}/gic_probe.c
         ${EVB_DIR}/cache.c
+        ${EVB_DIR}/tcm.c
         ${EVB_DIR}/demo_fiq_s32z280.c
     )
 
