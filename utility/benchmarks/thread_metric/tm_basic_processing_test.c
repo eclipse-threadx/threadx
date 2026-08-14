@@ -41,7 +41,13 @@
 
 /* Define the counters used in the demo application...  */
 
-unsigned long   tm_basic_processing_counter;
+/* volatile because the reporting thread reads this while the processing thread
+   below increments it. The processing loop calls nothing, so without volatile
+   the compiler is free to keep the counter in a register for the lifetime of an
+   infinite loop and never write it back: at -O2 it does exactly that, and the
+   report reads 0 forever.  */
+
+volatile unsigned long   tm_basic_processing_counter;
 
 
 /* Test array.  We will just do a series of calculations on the
@@ -98,7 +104,8 @@ void  tm_basic_processing_initialize(void)
 void  tm_basic_processing_thread_0_entry(void)
 {
 
-int     i;
+int             i;
+unsigned long   snapshot;
 
     /* Initialize the test array.   */
     for (i = 0; i < 1024; i++)
@@ -111,6 +118,15 @@ int     i;
     while(1)
     {
 
+        /* Read the counter once per pass and use the copy in the loop below.
+           Reading the volatile counter inside the loop instead would add a
+           memory access to every one of the 1024 iterations and so change the
+           amount of work this test performs. That matters more here than
+           elsewhere in the suite: this test is the baseline the other results
+           are scaled against, so its throughput has to stay comparable with
+           previously published figures and with other RTOSes.  */
+        snapshot =  tm_basic_processing_counter;
+
         /* Loop through the basic processing array, add the previous
            contents with the contents of the tm_basic_processing_counter
            and xor the result with the previous value...   just to eat
@@ -119,11 +135,11 @@ int     i;
         {
 
             /* Update each array entry.  */
-            tm_basic_processing_array[i] =  (tm_basic_processing_array[i] + tm_basic_processing_counter) ^ tm_basic_processing_array[i];
+            tm_basic_processing_array[i] =  (tm_basic_processing_array[i] + snapshot) ^ tm_basic_processing_array[i];
         }
 
         /* Increment the basic processing counter.  */
-        tm_basic_processing_counter++;
+        tm_basic_processing_counter =  snapshot + 1;
     }
 }
 
