@@ -235,7 +235,20 @@ _start:
 
     ldr     r0, =el1_entry
     msr     ELR_hyp, r0
+#ifdef TX_ENABLE_FIQ_SUPPORT
+
+    /* FIQ left unmasked, IRQ still masked.  ThreadX unmasks IRQ when it
+     * schedules the first thread; FIQ is different, because tx_thread_stack_build
+     * only clears the F bit in a thread's CPSR when the library was built with
+     * FIQ support, and nothing else ever clears it.  Leaving PSR_F set here
+     * would mask FIQ until the first thread ran, which is survivable but makes
+     * an FIQ raised from bsp_main silently do nothing.
+     */
+
+    ldr     r0, =(PSR_A | PSR_I | MODE_SVC)
+#else
     ldr     r0, =(PSR_A | PSR_I | PSR_F | MODE_SVC)
+#endif
     msr     SPSR_hyp, r0
     isb
     eret
@@ -539,7 +552,56 @@ el1_dabt_fatal:
 #endif
     FAULT_REPORT msg_el1_dabt
 el1_trap_reserved:  FAULT_REPORT msg_el1_reserved
-el1_trap_fiq:       FAULT_REPORT msg_el1_fiq
+el1_trap_fiq:
+#if defined(TX_ENABLE_FIQ_SUPPORT) && defined(TX_R52_USE_THREADX_IRQ)
+
+    /* Both guards are needed, and the second is not obvious.
+     * TX_ENABLE_FIQ_SUPPORT is PUBLIC on the threadx target, so it reaches every
+     * image the moment the library is built with FIQ, including images that link
+     * no interrupt controller at all.  demo_m2 is one: it has no gicv3.c and no
+     * irq_dispatch.c, so referencing gicv3_acknowledge_group0 and
+     * board_fiq_service from here broke its link outright.  Images without the
+     * interrupt infrastructure keep the fault reporter on this vector, which is
+     * how the IRQ vector above is gated too.
+     */
+
+    /* FIQ has its own context save and restore in the port, and its own nesting
+     * pair.  The shape mirrors the IRQ path, and so does the trap: the interrupt
+     * must be acknowledged before nesting starts.  Group 0 has its own
+     * acknowledge and end-of-interrupt registers -- using the Group 1 ones here
+     * returns the spurious INTID and leaves the interrupt pending, which
+     * presents as an FIQ storm rather than as an error.
+     *
+     * FIQ mode banks r8-r12 as well as SP and LR, so the INTID cannot ride in a
+     * high register across the switch to System mode the way r4 does on the IRQ
+     * path.  r4 is not banked in FIQ mode either, so it still works, and it is
+     * pushed on the FIQ stack as well so a nested level cannot lose it.
+     */
+
+    b       _tx_thread_fiq_context_save
+
+    .global __tx_fiq_processing_return
+__tx_fiq_processing_return:
+#ifdef TX_ENABLE_FIQ_NESTING
+    bl      gicv3_acknowledge_group0
+    mov     r4, r0
+    stmdb   sp!, {r4, r5}
+
+    bl      _tx_thread_fiq_nesting_start
+    mov     r0, r4
+    bl      board_fiq_service
+    bl      _tx_thread_fiq_nesting_end
+
+    ldmia   sp!, {r4, r5}
+    mov     r0, r4
+    bl      gicv3_end_of_interrupt_group0
+#else
+    bl      board_fiq_handler
+#endif
+    b       _tx_thread_fiq_context_restore
+#else
+    FAULT_REPORT msg_el1_fiq
+#endif
 
 fault_halt:         b       fault_halt
 

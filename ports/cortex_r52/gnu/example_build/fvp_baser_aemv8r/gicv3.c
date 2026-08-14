@@ -53,6 +53,7 @@
 /* Distributor registers.                                                 */
 
 #define GICD_CTLR               0x0000U
+#define GICD_CTLR_ENABLE_GRP0   (1UL << 0)
 #define GICD_CTLR_ENABLE_GRP1   (1UL << 1)
 #define GICD_CTLR_ARE           (1UL << 4)
 
@@ -102,6 +103,18 @@ static void write_icc_bpr1(unsigned long value)
     __asm__ volatile("mcr p15, 0, %0, c12, c12, 3" : : "r"(value) : "memory");
 }
 
+static void write_icc_igrpen0(unsigned long value)
+{
+    /* ICC_IGRPEN0 sits at c12, c12, 6, beside IGRPEN1 at opc2 7.  */
+
+    __asm__ volatile("mcr p15, 0, %0, c12, c12, 6" : : "r"(value) : "memory");
+}
+
+static void write_icc_bpr0(unsigned long value)
+{
+    __asm__ volatile("mcr p15, 0, %0, c12, c8, 3" : : "r"(value) : "memory");
+}
+
 static void write_icc_igrpen1(unsigned long value)
 {
     __asm__ volatile("mcr p15, 0, %0, c12, c12, 7" : : "r"(value) : "memory");
@@ -127,6 +140,12 @@ void gicv3_init(void)
     REG32(GICD_BASE + GICD_CTLR) |= GICD_CTLR_ARE;
     REG32(GICD_BASE + GICD_CTLR) |= GICD_CTLR_ENABLE_GRP1;
 
+    /* Group 0 as well, which is what the GIC delivers as FIQ.  Enabling it costs
+       nothing while no interrupt is assigned to that group, and images that never
+       use FIQ see no change: assignment is per interrupt, in GICR_IGROUPR0.  */
+
+    REG32(GICD_BASE + GICD_CTLR) |= GICD_CTLR_ENABLE_GRP0;
+
     /* Redistributor: clear ProcessorSleep and wait for the redistributor to
        report that its children are awake, otherwise no interrupt can be
        delivered to this core.  */
@@ -150,6 +169,14 @@ void gicv3_init(void)
     write_icc_pmr(ICC_PMR_UNMASK_ALL);
     write_icc_bpr1(0UL);
     write_icc_igrpen1(ICC_IGRPEN1_ENABLE);
+
+    /* The CPU interface half of Group 0: a Group 0 interrupt reaches the core
+       only if both the distributor and this are enabled.  BPR0 at zero gives no
+       subpriority grouping, so priority alone decides preemption, which is what
+       the FIQ nesting test depends on.  */
+
+    write_icc_bpr0(0UL);
+    write_icc_igrpen0(ICC_IGRPEN1_ENABLE);
     instruction_barrier();
 }
 
@@ -242,6 +269,74 @@ void gicv3_send_sgi(unsigned int intid)
 
     __asm volatile ("mcrr p15, 0, %0, %1, c12" :: "r" (low), "r" (high) : "memory");
     instruction_barrier();
+}
+
+
+/**************************************************************************/
+/*  gicv3_enable_sgi_group0                                                */
+/*                                                                        */
+/*  As gicv3_enable_sgi, but leaves the interrupt in Group 0 so it arrives  */
+/*  as an FIQ.  The group is chosen by clearing the GICR_IGROUPR0 bit; the  */
+/*  Group 1 version sets it.                                              */
+/**************************************************************************/
+
+void gicv3_enable_sgi_group0(unsigned int intid, unsigned int priority)
+{
+    if (intid > 15U)
+    {
+        return;
+    }
+
+    REG32(GICR_SGI_BASE + GICR_IGROUPR0) &= ~(1UL << intid);
+
+    REG32(GICR_SGI_BASE + GICR_IPRIORITYR + (intid & ~3U)) &=
+        ~(0xFFUL << ((intid & 3U) * 8U));
+    REG32(GICR_SGI_BASE + GICR_IPRIORITYR + (intid & ~3U)) |=
+        ((unsigned long) priority & 0xFFUL) << ((intid & 3U) * 8U);
+
+    REG32(GICR_SGI_BASE + GICR_ISENABLER0) = (1UL << intid);
+}
+
+
+/**************************************************************************/
+/*  gicv3_send_sgi_group0                                                  */
+/*                                                                        */
+/*  ICC_SGI0R rather than ICC_SGI1R: the two differ only in opc1, 2 against */
+/*  0, and each raises the SGI into its own group.  Raising a Group 0       */
+/*  interrupt through the Group 1 register does not deliver it as an FIQ.   */
+/**************************************************************************/
+
+void gicv3_send_sgi_group0(unsigned int intid)
+{
+    unsigned long low  = (((unsigned long) intid & 0xFUL) << 24) | 1UL;
+    unsigned long high = 0UL;
+
+    __asm volatile ("mcrr p15, 2, %0, %1, c12" :: "r" (low), "r" (high) : "memory");
+    instruction_barrier();
+}
+
+
+/**************************************************************************/
+/*  gicv3_acknowledge_group0 / gicv3_end_of_interrupt_group0               */
+/*                                                                        */
+/*  Group 0 has its own pair at c12, c8, where Group 1 uses c12, c12.       */
+/*  Acknowledging a Group 0 interrupt through IAR1 returns the spurious     */
+/*  INTID and leaves the interrupt pending, which presents as an FIQ storm. */
+/**************************************************************************/
+
+unsigned long gicv3_acknowledge_group0(void)
+{
+    unsigned long intid;
+
+    __asm__ volatile("mrc p15, 0, %0, c12, c8, 0" : "=r"(intid));
+    return intid & 0xFFFFFFUL;
+}
+
+
+void gicv3_end_of_interrupt_group0(unsigned long intid)
+{
+    instruction_barrier();
+    __asm__ volatile("mcr p15, 0, %0, c12, c8, 1" : : "r"(intid) : "memory");
 }
 
 

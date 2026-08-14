@@ -60,6 +60,14 @@ volatile unsigned long  board_sgi_count;
 volatile unsigned long  board_sgi_nested_count;
 volatile unsigned long  board_nest_provoke;
 
+volatile unsigned long  board_fiq_count;
+volatile unsigned long  board_fiq_high_count;
+volatile unsigned long  board_fiq_nested_count;
+volatile unsigned long  board_fiq_depth;
+volatile unsigned long  board_fiq_max_depth;
+volatile unsigned long  board_fiq_unexpected;
+volatile unsigned long  board_fiq_provoke;
+
 
 /* Timer PPI priority.  Only the top 5 priority bits are implemented on this
    model, so the value is a multiple of 8.  */
@@ -85,6 +93,17 @@ void board_init(void)
        nothing in images that never raise it.  */
 
     gicv3_enable_sgi(BOARD_NEST_SGI_INTID, TIMER_PPI_PRIORITY / 2U);
+
+#ifdef TX_ENABLE_FIQ_SUPPORT
+
+    /* Two Group 0 SGIs for the FIQ path.  Group 0 is what the GIC delivers as
+       FIQ; the high one is given a numerically lower priority so it can preempt
+       the low one, which is what FIQ nesting means.  Both sit above the timer so
+       the two paths do not interfere.  */
+
+    gicv3_enable_sgi_group0(BOARD_FIQ_LOW_INTID,  0x40U);
+    gicv3_enable_sgi_group0(BOARD_FIQ_HIGH_INTID, 0x20U);
+#endif
 
     timer_init();
 }
@@ -199,3 +218,89 @@ void board_irq_handler(void)
         gicv3_end_of_interrupt(intid);
     }
 }
+
+
+#ifdef TX_ENABLE_FIQ_SUPPORT
+/**************************************************************************/
+/*  board_fiq_service -- service an already-acknowledged Group 0 INTID.     */
+/*                                                                        */
+/*  The FIQ counterpart of board_irq_service, and split for the same        */
+/*  reason: the acknowledge has to happen before nesting starts.  Does not  */
+/*  acknowledge and does not EOI.                                         */
+/**************************************************************************/
+
+void board_fiq_service(unsigned long intid)
+{
+    if (intid == GICV3_SPURIOUS_INTID)
+    {
+        return;
+    }
+
+    board_fiq_depth++;
+    if (board_fiq_depth > board_fiq_max_depth)
+    {
+        board_fiq_max_depth = board_fiq_depth;
+    }
+
+    if (intid == (unsigned long) BOARD_FIQ_LOW_INTID)
+    {
+        board_fiq_count++;
+
+        /* Provoke the nested FIQ from inside this handler.  Only reachable
+           because _tx_thread_fiq_nesting_start has re-enabled FIQ; the bounded
+           spin lets the GIC deliver the higher-priority Group 0 SGI before this
+           handler returns.  Bounded, because with nesting compiled out the
+           second FIQ cannot arrive and this must not hang.  */
+
+        if (board_fiq_provoke != 0UL)
+        {
+            unsigned long seen = board_fiq_high_count;
+            unsigned long guard;
+
+            gicv3_send_sgi_group0(BOARD_FIQ_HIGH_INTID);
+
+            for (guard = 0UL; guard < 100000UL; guard++)
+            {
+                if (board_fiq_high_count != seen)
+                {
+                    break;
+                }
+            }
+        }
+    }
+    else if (intid == (unsigned long) BOARD_FIQ_HIGH_INTID)
+    {
+        board_fiq_high_count++;
+
+        /* Depth above 1 means this FIQ arrived inside another FIQ handler.  */
+
+        if (board_fiq_depth > 1UL)
+        {
+            board_fiq_nested_count++;
+        }
+    }
+    else
+    {
+        board_fiq_unexpected = intid;
+    }
+
+    board_fiq_depth--;
+}
+
+
+/**************************************************************************/
+/*  board_fiq_handler -- the non-nesting FIQ entry point.                  */
+/**************************************************************************/
+
+void board_fiq_handler(void)
+{
+    unsigned long intid = gicv3_acknowledge_group0();
+
+    board_fiq_service(intid);
+
+    if (intid != GICV3_SPURIOUS_INTID)
+    {
+        gicv3_end_of_interrupt_group0(intid);
+    }
+}
+#endif
