@@ -127,3 +127,40 @@ if(TX_R52_ENABLE_VFP)
         ${EVB_LINK_QUIET_RWX}
     )
 endif()
+
+# Nested IRQ handling on silicon.  Needs the library built with
+# TX_R52_ENABLE_IRQ_NESTING, since entry.S only emits the nesting_start and
+# nesting_end pairing under that macro, so the image exists in that
+# configuration only -- as s32z280_vfp.elf does for the floating-point ABI.
+if(TX_R52_ENABLE_IRQ_NESTING)
+    add_executable(s32z280_nesting.elf EXCLUDE_FROM_ALL
+        ${EVB_DIR}/entry.S
+        ${EVB_DIR}/tx_initialize_low_level.S
+        ${EVB_DIR}/linflexd.c
+        ${EVB_DIR}/timer.c
+        ${EVB_DIR}/mpu.c
+        ${EVB_DIR}/gicv3.c
+        ${EVB_DIR}/irq_dispatch.c
+        ${EVB_DIR}/gic_probe.c
+        ${EVB_DIR}/cache.c
+        ${EVB_DIR}/demo_nesting_s32z280.c
+    )
+
+    target_compile_definitions(s32z280_nesting.elf PRIVATE TX_R52_USE_THREADX_IRQ=1)
+    target_compile_options(s32z280_nesting.elf PRIVATE -g)
+
+    target_link_libraries(s32z280_nesting.elf PRIVATE threadx)
+
+    target_include_directories(s32z280_nesting.elf PRIVATE
+        ${EVB_DIR}
+        ${CMAKE_SOURCE_DIR}/common/inc
+        ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+    )
+
+    target_link_options(s32z280_nesting.elf PRIVATE
+        -T${EVB_DIR}/link.lds
+        -nostartfiles
+        -Wl,-Map=s32z280_nesting.map
+        ${EVB_LINK_QUIET_RWX}
+    )
+endif()
