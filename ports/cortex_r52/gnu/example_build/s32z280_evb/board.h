@@ -85,6 +85,13 @@ unsigned int    read_sctlr_after_mpu(void);
 
 void            board_irq_handler(void);
 
+/* The nesting path splits the handler in three: the acknowledge happens in IRQ
+   mode before nesting starts, and the end-of-interrupt after it finishes.
+   board_irq_service does the middle part on an already-acknowledged INTID and
+   neither acknowledges nor EOIs.  */
+
+void            board_irq_service(unsigned long intid);
+
 /* Called from _tx_initialize_low_level when the kernel is linked.        */
 
 void            board_init(void);
@@ -101,5 +108,20 @@ extern volatile unsigned long   board_timer_intid;
 extern volatile unsigned long   board_spurious_count;
 extern volatile unsigned long   board_unexpected_intid;
 extern volatile unsigned long   board_first_intid;
+
+/* Nesting observability.  Inert unless the image was built with
+   TX_ENABLE_IRQ_NESTING: without it the handler runs in IRQ mode with
+   interrupts masked and can never be re-entered.  */
+
+extern volatile unsigned long   board_nest_depth;
+extern volatile unsigned long   board_nest_max;
+extern volatile unsigned long   board_sgi_count;
+extern volatile unsigned long   board_sgi_nested_count;
+extern volatile unsigned long   board_nest_provoke;
+extern volatile unsigned long   board_priority_bits;
+extern volatile unsigned long   board_timer_priority;
+extern volatile unsigned long   board_sgi_priority;
+
+#define BOARD_NEST_SGI_INTID    8U
 
 #endif /* BOARD_H */

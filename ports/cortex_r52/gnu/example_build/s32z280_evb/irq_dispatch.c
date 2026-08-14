@@ -61,6 +61,15 @@ volatile unsigned long  board_spurious_count;
 volatile unsigned long  board_unexpected_intid;
 volatile unsigned long  board_first_intid = 0xFFFFFFFFUL;
 
+volatile unsigned long  board_nest_depth;
+volatile unsigned long  board_nest_max;
+volatile unsigned long  board_sgi_count;
+volatile unsigned long  board_sgi_nested_count;
+volatile unsigned long  board_nest_provoke;
+volatile unsigned long  board_priority_bits;
+volatile unsigned long  board_timer_priority;
+volatile unsigned long  board_sgi_priority;
+
 /* The EL1 physical timer PPI.  30 is the architectural assignment and is what
    the FVP turned out to use, but it was discovered there by enabling the whole
    PPI range and recording whichever INTID arrived in ICC_IAR1 rather than by
@@ -92,6 +101,35 @@ void board_init(void)
     gicv3_init();
     gicv3_enable_ppi(TIMER_PPI_INTID, TIMER_PPI_PRIORITY);
 
+    /* How many priority bits this GIC keeps decides whether the SGI can preempt
+       the timer at all: equal priorities do not preempt, and it is the low bits
+       that vanish.  Discovered rather than assumed, because the FVP keeps five
+       and real silicon need not agree.  Recorded so the demo can report it, and
+       a nesting failure caused by the two priorities colliding is visible
+       instead of mysterious.  */
+
+    board_priority_bits = gicv3_priority_bits(BOARD_NEST_SGI_INTID);
+
+    /* Half the timer's value so the SGI outranks it: numerically lower wins.
+       With TIMER_PPI_PRIORITY at 0xA0 that is 0x50, which stays distinct even
+       if only three priority bits survive truncation.  */
+
+    gicv3_enable_sgi(BOARD_NEST_SGI_INTID, TIMER_PPI_PRIORITY / 2U);
+
+    /* The priorities as the GIC will actually compare them.  Only the top
+       board_priority_bits survive; the low ones read back as zero, so two values
+       that differ only there would collapse together and never preempt.  Recorded
+       here because this is where the constants live.  */
+
+    {
+        unsigned long keep = (board_priority_bits >= 8UL)
+                                 ? 0xFFUL
+                                 : ((0xFFUL << (8UL - board_priority_bits)) & 0xFFUL);
+
+        board_timer_priority = (unsigned long) TIMER_PPI_PRIORITY & keep;
+        board_sgi_priority   = ((unsigned long) TIMER_PPI_PRIORITY / 2UL) & keep;
+    }
+
     /* One tick every 10 ms at the measured 8 MHz counter rate.  */
 
     timer_start_oneshot_irq(timer_read_cntfrq() / 100U);
@@ -100,10 +138,15 @@ void board_init(void)
 #endif
 
 
-void board_irq_handler(void)
-{
-    unsigned long intid = gicv3_acknowledge();
+/**************************************************************************/
+/*  board_irq_service -- service an already-acknowledged INTID.            */
+/*                                                                        */
+/*  Split out so the nesting path in entry.S can acknowledge in IRQ mode   */
+/*  before nesting starts.  Does not acknowledge and does not EOI.         */
+/**************************************************************************/
 
+void board_irq_service(unsigned long intid)
+{
     if (intid == GICV3_SPURIOUS_INTID)
     {
         /* Nothing was actually pending.  Must not be acknowledged with an
@@ -111,6 +154,16 @@ void board_irq_handler(void)
 
         board_spurious_count++;
         return;
+    }
+
+    /* After the spurious check, so a spurious entry does not read as nesting.
+       Reaches 2 only if a second interrupt is taken while this one is still on
+       the stack, which cannot happen without TX_ENABLE_IRQ_NESTING.  */
+
+    board_nest_depth++;
+    if (board_nest_depth > board_nest_max)
+    {
+        board_nest_max = board_nest_depth;
     }
 
     if (board_first_intid == 0xFFFFFFFFUL)
@@ -129,6 +182,29 @@ void board_irq_handler(void)
 
         timer_start_oneshot_irq(timer_read_cntfrq() / 100U);
 
+        /* Provoke nesting, if this image asked for it.  Only useful because
+           _tx_thread_irq_nesting_start has already re-enabled IRQ; the bounded
+           spin gives the GIC time to deliver the higher-priority SGI before this
+           handler returns, so the nesting is deterministic rather than a race we
+           hope wins.  The bound matters: with nesting compiled out the SGI can
+           never arrive here and this must not become a hang.  */
+
+        if (board_nest_provoke != 0UL)
+        {
+            unsigned long seen = board_sgi_count;
+            unsigned long guard;
+
+            gicv3_send_sgi(BOARD_NEST_SGI_INTID);
+
+            for (guard = 0UL; guard < 100000UL; guard++)
+            {
+                if (board_sgi_count != seen)
+                {
+                    break;
+                }
+            }
+        }
+
 #ifdef TX_R52_USE_THREADX_IRQ
         /* Drive the kernel's time base.  Called after the re-arm so the next
            interval is already running while the kernel does its bookkeeping.  */
@@ -136,10 +212,40 @@ void board_irq_handler(void)
         _tx_timer_interrupt();
 #endif
     }
+    else if (intid == (unsigned long) BOARD_NEST_SGI_INTID)
+    {
+        board_sgi_count++;
+
+        if (board_nest_depth > 1UL)
+        {
+            board_sgi_nested_count++;
+        }
+    }
     else
     {
         board_unexpected_intid = intid;
     }
 
-    gicv3_end_of_interrupt(intid);
+    board_nest_depth--;
+}
+
+
+/**************************************************************************/
+/*  board_irq_handler -- the non-nesting entry point.                      */
+/*                                                                        */
+/*  Acknowledges, services and ends the interrupt in IRQ mode with          */
+/*  interrupts masked, which is what every image built without              */
+/*  TX_ENABLE_IRQ_NESTING did before this split.                           */
+/**************************************************************************/
+
+void board_irq_handler(void)
+{
+    unsigned long intid = gicv3_acknowledge();
+
+    board_irq_service(intid);
+
+    if (intid != GICV3_SPURIOUS_INTID)
+    {
+        gicv3_end_of_interrupt(intid);
+    }
 }

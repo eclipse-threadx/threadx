@@ -49,6 +49,20 @@ void gicv3_init(void);
 
 void gicv3_enable_ppi(unsigned int intid, unsigned int priority);
 
+/* Enable a software-generated interrupt, INTID 0-15.  Same registers as a PPI:
+   the redistributor's SGI/PPI frame covers INTIDs 0-31.  */
+
+void gicv3_enable_sgi(unsigned int intid, unsigned int priority);
+
+/* Raise an SGI on this core.  */
+
+void gicv3_send_sgi(unsigned int intid);
+
+/* Implemented priority bits, discovered by write and readback.  Leaves the
+   scratch INTID's priority byte at zero.  */
+
+unsigned int gicv3_priority_bits(unsigned int scratch_intid);
+
 /* Acknowledge the highest-priority pending Group 1 interrupt, returning its
    INTID (possibly GICV3_SPURIOUS_INTID).  */
 

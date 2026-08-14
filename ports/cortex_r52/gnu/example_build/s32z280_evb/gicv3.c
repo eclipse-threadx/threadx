@@ -195,6 +195,105 @@ void gicv3_enable_ppi(unsigned int intid, unsigned int priority)
 /*  gicv3_acknowledge                                                     */
 /**************************************************************************/
 
+/**************************************************************************/
+/*  gicv3_enable_sgi                                                      */
+/*                                                                        */
+/*  An SGI lives in the same redistributor frame as a PPI, so this is      */
+/*  gicv3_enable_ppi without the ICFGR step: INTIDs 0-15 have no           */
+/*  configurable edge/level, they are always edge-triggered.               */
+/**************************************************************************/
+
+void gicv3_enable_sgi(unsigned int intid, unsigned int priority)
+{
+    if (intid > 15U)
+    {
+        return;
+    }
+
+    REG32(GICR_SGI_BASE + GICR_IGROUPR0) |= (1UL << intid);
+
+    REG32(GICR_SGI_BASE + GICR_IPRIORITYR + (intid & ~3U)) &=
+        ~(0xFFUL << ((intid & 3U) * 8U));
+    REG32(GICR_SGI_BASE + GICR_IPRIORITYR + (intid & ~3U)) |=
+        ((unsigned long) priority & 0xFFUL) << ((intid & 3U) * 8U);
+
+    REG32(GICR_SGI_BASE + GICR_ISENABLER0) = (1UL << intid);
+}
+
+
+/**************************************************************************/
+/*  gicv3_send_sgi                                                        */
+/*                                                                        */
+/*  ICC_SGI1R is 64-bit, so in AArch32 it is an MCRR rather than an MCR.   */
+/*  Fields: INTID in [27:24], TargetList in [15:0], Aff1/2/3 and IRM zero  */
+/*  for this single-core configuration, so TargetList = 1 selects core 0.  */
+/*                                                                        */
+/*  The AArch64 name for this register is S3_0_C12_C11_5, which the        */
+/*  Cortex-A72 example uses, but that encoding does not transcribe to the  */
+/*  AArch32 64-bit CP15 space.  The CRm here was confirmed by observing    */
+/*  that the SGI is actually delivered and acknowledged with the expected  */
+/*  INTID rather than by reading it off the A-profile alias.               */
+/**************************************************************************/
+
+void gicv3_send_sgi(unsigned int intid)
+{
+    unsigned long low  = (((unsigned long) intid & 0xFUL) << 24) | 1UL;
+    unsigned long high = 0UL;
+
+    __asm volatile ("mcrr p15, 0, %0, %1, c12" :: "r" (low), "r" (high) : "memory");
+    instruction_barrier();
+}
+
+
+/**************************************************************************/
+/*  gicv3_priority_bits                                                    */
+/*                                                                        */
+/*  How many priority bits this GIC actually implements, discovered rather  */
+/*  than assumed: write 0xFF to a priority byte and see which bits stick.   */
+/*  The unimplemented bits are the low ones and they read as zero.          */
+/*                                                                        */
+/*  This matters for nesting.  Two interrupts only preempt one another if   */
+/*  their priorities differ AFTER truncation, so a test that picks values    */
+/*  0x20 apart on a GIC keeping four bits is testing nothing.  The FVP      */
+/*  keeps five; real silicon need not agree.                               */
+/*                                                                        */
+/*  Called before the SGI is configured, and it leaves the byte at zero, so */
+/*  the caller must set the priority it wants afterwards.                   */
+/**************************************************************************/
+
+unsigned int gicv3_priority_bits(unsigned int scratch_intid)
+{
+    unsigned long shift;
+    unsigned long readback;
+    unsigned int  bits = 0U;
+
+    if (scratch_intid > 31U)
+    {
+        return 0U;
+    }
+
+    shift = (unsigned long) (scratch_intid & 3U) * 8UL;
+
+    REG32(GICR_SGI_BASE + GICR_IPRIORITYR + (scratch_intid & ~3U)) |=
+        (0xFFUL << shift);
+    readback = (REG32(GICR_SGI_BASE + GICR_IPRIORITYR + (scratch_intid & ~3U))
+                >> shift) & 0xFFUL;
+    REG32(GICR_SGI_BASE + GICR_IPRIORITYR + (scratch_intid & ~3U)) &=
+        ~(0xFFUL << shift);
+
+    while (readback != 0UL)
+    {
+        if ((readback & 1UL) != 0UL)
+        {
+            bits++;
+        }
+        readback >>= 1;
+    }
+
+    return bits;
+}
+
+
 unsigned long gicv3_acknowledge(void)
 {
     unsigned long intid;

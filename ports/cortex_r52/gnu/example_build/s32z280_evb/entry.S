@@ -501,7 +501,39 @@ el1_irq_entry:
 
     .global __tx_irq_processing_return
 __tx_irq_processing_return:
+#ifdef TX_ENABLE_IRQ_NESTING
+
+    /* Nested IRQ handling, the same shape as the FVP example, and the ordering
+     * matters as much here.  The interrupt is acknowledged in IRQ mode with
+     * interrupts still masked, BEFORE nesting starts: reading ICC_IAR1 raises
+     * the GIC running priority to this interrupt's own, which masks it and
+     * everything of equal or lower priority, and only then is re-enabling IRQ
+     * safe.  Start nesting first and the still-pending, still-level-asserted
+     * timer is retaken the instant IRQ is enabled, recursing until the IRQ and
+     * System stacks are gone -- a hang with no fault to point at.
+     *
+     * The INTID rides in r4, which survives the mode switch because only SP and
+     * LR are banked, and is pushed on the IRQ stack as well so a nested level
+     * reusing r4 cannot lose this level's value.  End-of-interrupt waits for
+     * IRQ mode with interrupts masked again, so dropping the running priority
+     * cannot re-admit this same interrupt.
+     */
+
+    bl      gicv3_acknowledge
+    mov     r4, r0
+    stmdb   sp!, {r4, r5}                   /* r5 keeps 8-byte alignment    */
+
+    bl      _tx_thread_irq_nesting_start
+    mov     r0, r4
+    bl      board_irq_service
+    bl      _tx_thread_irq_nesting_end
+
+    ldmia   sp!, {r4, r5}
+    mov     r0, r4
+    bl      gicv3_end_of_interrupt
+#else
     bl      board_irq_handler
+#endif
     b       _tx_thread_context_restore
 
 #else
