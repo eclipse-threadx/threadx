@@ -31,3 +31,10 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/inc
 )
+
+# The demo program beside the port. Off by default so the ordinary build
+# produces just the library; -DTHREADX_SAMPLE=ON adds the sample_threadx target.
+option(THREADX_SAMPLE "Build the sample program for this port" OFF)
+if(THREADX_SAMPLE)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/example_build)
+endif()
