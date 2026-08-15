@@ -293,9 +293,13 @@ static void build_table(void)
     mpu_regions[0].mpu_region_name          = "code  RO X  normal-wb";
 
     /* Data, bss and every per-mode stack: writable, never executable.  Sized
-       from the SRAM bank, not from __data_end__: the stacks are NOLOAD and sit
+       from the SRAM banks, not from __data_end__: the stacks are NOLOAD and sit
        above that symbol, so sizing from it would leave them unmapped and the
-       first push after enabling the MPU would abort.  */
+       first push after enabling the MPU would abort.
+
+       This covers DRAM0 and DRAM1 together -- 512 KB, contiguous, both at full
+       core speed.  DRAM1 went undeclared until the banks were read out of the
+       Reference Manual and confirmed on the board.  */
 
     mpu_regions[1].mpu_region_base          = S32Z_DATA_SRAM_BASE;
     mpu_regions[1].mpu_region_limit         = S32Z_DATA_SRAM_BASE
@@ -338,19 +342,24 @@ static void build_table(void)
     mpu_regions[4].mpu_region_attr_index    = MPU_ATTR_DEVICE;
     mpu_regions[4].mpu_region_name          = "rtu   RW NX device";
 
-    /* Extended SRAM.  Deliberately mapped so the cache benchmark has memory
-       that is NOT RTU-local to work against: the fast-data bank in region 1 is
-       close to core speed, so caching it shows nothing.  Normal write-back and
-       never executable.  */
+    /* DRAM2.  Deliberately mapped so the cache benchmark has slower memory to
+       work against: this bank runs at half the core frequency, where region 1's
+       banks run at full speed and caching them shows little.  Normal write-back
+       and never executable.
 
-    mpu_regions[5].mpu_region_base          = S32Z_EXT_SRAM_BASE;
-    mpu_regions[5].mpu_region_limit         = S32Z_EXT_SRAM_BASE
-                                            + S32Z_EXT_SRAM_SIZE - 1UL;
+       Sized 512 KB, which is the whole bank.  An earlier revision mapped 2 MB
+       here; the upper 1.5 MB of that aliased back onto the bank, so anything
+       placed above 0x31880000 would have silently shared storage with the
+       bottom of the region -- no fault, just two objects on one address.  */
+
+    mpu_regions[5].mpu_region_base          = S32Z_DRAM2_BASE;
+    mpu_regions[5].mpu_region_limit         = S32Z_DRAM2_BASE
+                                            + S32Z_DRAM2_SIZE - 1UL;
     mpu_regions[5].mpu_region_ap            = MPU_AP_RW_EL1;
     mpu_regions[5].mpu_region_execute_never = 1U;
     mpu_regions[5].mpu_region_shareability  = MPU_SH_NON;
     mpu_regions[5].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
-    mpu_regions[5].mpu_region_name          = "ext   RW NX normal-wb";
+    mpu_regions[5].mpu_region_name          = "dram2 RW NX normal-wb";
 
     /* One region per TCM bank.  The TRM is explicit that an enabled TCM still
        needs an MPU region before it can be used, and that an enabled TCM always

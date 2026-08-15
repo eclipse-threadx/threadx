@@ -176,13 +176,13 @@ static void enable_irq_at_el1(void)
  *
  * Two things have to be right for a cache to show a measurable effect, and the
  * first version of this test got both wrong.  It used a 4 KB static buffer in
- * the RTU-local fast-data bank and reported a 0.036% difference -- noise -- as a
- * pass.  Fast local SRAM is already close to core speed, so caching it can save
- * almost nothing.
+ * DRAM0, a full-core-speed bank, and reported a 0.036% difference -- noise --
+ * as a pass.  A bank running at core speed leaves a cache almost nothing to
+ * save.  DRAM2 runs at half core speed, which is why the buffer lives there.
  *
  *   1. The memory must be slower than the core.  This uses the extended SRAM at
- *      S32Z_EXT_SRAM_BASE, which the Reference Manual describes as NOT
- *      RTU-local, unlike the fast-data bank.
+ *      S32Z_DRAM2_BASE, the RTU data bank that runs at half the core
+ *      frequency, so caching it has something to show.
  *
  *   2. The working set must fit in the cache and be revisited.  It is sized
  *      from CCSIDR at run time -- half the reported L1 data cache -- rather
@@ -197,7 +197,7 @@ static unsigned long cache_bench_words;
 
 static void cache_workload(void)
 {
-    volatile unsigned int  *buffer = (volatile unsigned int *) S32Z_EXT_SRAM_BASE;
+    volatile unsigned int  *buffer = (volatile unsigned int *) S32Z_DRAM2_BASE;
     unsigned long           pass;
     unsigned long           i;
 
@@ -656,7 +656,7 @@ void bsp_main(void)
     cache_bench_words = cache_dcache_bytes() / (2UL * sizeof(unsigned int));
     report("bench wds", (unsigned int) cache_bench_words);
 
-    linflexd_puts("C1 timing over non-RTU-local SRAM, caches OFF\n");
+    linflexd_puts("C1 timing over DRAM2, the half-speed bank, caches OFF\n");
     {
         unsigned long long before;
         unsigned long long after;
@@ -692,10 +692,9 @@ void bsp_main(void)
 
            A cache having little to offer here is plausible rather than
            broken.  Both the code and the data this workload touches live in
-           RTU-local low-latency SRAM, which is close to core speed already;
-           there is no slow memory on this board to demonstrate against.  DDR
-           would be the place to measure a real cache effect, and DDR is not
-           initialised.  */
+           full-speed RTU banks, which the core reaches at its own
+             clock; the only slower memory on this board is DRAM2 at
+             half speed, and DDR, which is not initialised.  */
 
         if (cache_enabled() == 1U)
         {
