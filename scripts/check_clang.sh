@@ -188,13 +188,18 @@ CMAKE_EXAMPLE_CORES="cortex_r52"
 # their port directory, which covers both ports/ and ports_smp/. Listed
 # explicitly rather than silently skipped, so the gaps stay visible.
 #
-# These fail with the GNU toolchain too, so they are not LLVM problems:
-#   arm9 arm11           their linker scripts do not define _init and _fini.
-#                        Those symbols come from crti.o and crtn.o, which
-#                        -nostartfiles leaves out, so newlib's fini.c fails to
-#                        link. Reproduced with arm-none-eabi-gcc 13.2.1.
-#   cortex_r4 cortex_r5  need newlib multilib variants for those CPUs, which are
-#                        not present in every GNU toolchain packaging.
+# These fail with the GNU toolchain too, so they are not LLVM problems. All four
+# fail the same way, for the same reason:
+#
+#   their linker scripts define the .init and .fini sections but not the _init
+#   and _fini symbols. Those come from crti.o and crtn.o, which -nostartfiles
+#   leaves out, so newlib's fini.c cannot resolve them and the link ends with
+#   "undefined reference to `_fini'". Reproduced with arm-none-eabi-gcc 13.2.1.
+#
+# Until 6.1.10 the four linked libc.a and libgcc.a checked in beside them, which
+# supplied those symbols. That sweep removed the archives without updating the
+# link lines, so for years the examples failed earlier still, on the missing
+# files themselves. Fixing the link lines exposed the _fini gap underneath.
 EXAMPLES_EXPECTED_TO_FAIL="arm9 arm11 cortex_r4 cortex_r5"
 
 failures=0
