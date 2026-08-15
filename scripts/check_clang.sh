@@ -96,6 +96,7 @@ declare -A PORT_TARGET=(
  [cortex_m7]="arm-none-eabi cortex-m7 -mthumb"
  [cortex_m23]="arm-none-eabi cortex-m23 -mthumb"
  [cortex_m33]="arm-none-eabi cortex-m33 -mthumb"
+ [cortex_m52]="arm-none-eabi cortex-m52 -mthumb -mfloat-abi=hard"
  [cortex_m55]="arm-none-eabi cortex-m55 -mthumb -mfloat-abi=hard"
  [cortex_m85]="arm-none-eabi cortex-m85 -mthumb -mfloat-abi=hard"
  [cortex_a5]="arm-none-eabi cortex-a5"
