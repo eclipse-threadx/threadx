@@ -61,5 +61,5 @@ esac
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=arm1136j-s crt0.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=arm1136j-s tx_initialize_low_level.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=arm1136j-s -I../../../../common/inc -I../inc sample_threadx.c
-arm-none-eabi-ld -A arm1136j-s -T sample_threadx.ld reset.o crt0.o tx_initialize_low_level.o sample_threadx.o tx.a libc.a libnosys.a libgcc.a -o sample_threadx.out -M > sample_threadx.map
+"${CC}" ${TARGET_FLAGS} -g -nostartfiles -mcpu=arm1136j-s -T sample_threadx.ld ${SYSCALL_LIB} -o sample_threadx.out -Wl,-Map=sample_threadx.map reset.o crt0.o tx_initialize_low_level.o sample_threadx.o tx.a
 
