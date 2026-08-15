@@ -108,18 +108,36 @@
 
 #define S32Z_CODE_SRAM_DATA_ALIAS       0x32100000UL
 
-/* RTU-local data SRAM.  The Reference Manual notes that when an RTU      */
-/* accesses its own blocks the traffic stays inside the RTU, so this is   */
-/* the right home for stacks and .data.  256 KB.  [verified writable]     */
+/* RTU data SRAM.  The RTU has 1 MB of it, in three contiguous banks that */
+/* are all RTU-local -- when an RTU accesses its own blocks the traffic   */
+/* stays inside the RTU.  The banks differ in speed, not in locality:     */
+/*                                                                        */
+/*     DRAM0  0x31780000  256 KB  full core speed                         */
+/*     DRAM1  0x317C0000  256 KB  full core speed                         */
+/*     DRAM2  0x31800000  512 KB  half core speed                         */
+/*                                                                        */
+/* S32Z2 Reference Manual Rev. 5, section 6.3.6 and Table 13.  Confirmed  */
+/* on the board: writing distinct values to all three banks and reading   */
+/* them back shows 1 MB of independent storage, and the first address     */
+/* past DRAM2 aliases back onto its base, which is what fixes its size at */
+/* 512 KB rather than the 2 MB an earlier revision of this file claimed.  */
+/*                                                                        */
+/* Note that NXP's own debugger memory map, s32z2e2_memory_regions.py in  */
+/* S32 Design Studio, describes this last bank as 2 MB.  The Reference    */
+/* Manual and the silicon agree it is 512 KB; the script is wrong here.   */
 
-#define S32Z_DATA_SRAM_BASE             0x31780000UL
-#define S32Z_DATA_SRAM_SIZE             0x00040000UL
+#define S32Z_DRAM0_BASE                 0x31780000UL
+#define S32Z_DRAM0_SIZE                 0x00040000UL
+#define S32Z_DRAM1_BASE                 0x317C0000UL
+#define S32Z_DRAM1_SIZE                 0x00040000UL
+#define S32Z_DRAM2_BASE                 0x31800000UL
+#define S32Z_DRAM2_SIZE                 0x00080000UL
 
-/* Larger but not RTU-local: 2 MB, for images that outgrow the above.     */
-/* [verified writable]                                                    */
+/* The full-speed pair, contiguous, and the right home for stacks and     */
+/* .data.  This is what link.lds calls DATA.                              */
 
-#define S32Z_EXT_SRAM_BASE              0x31800000UL
-#define S32Z_EXT_SRAM_SIZE              0x00200000UL
+#define S32Z_DATA_SRAM_BASE             S32Z_DRAM0_BASE
+#define S32Z_DATA_SRAM_SIZE             (S32Z_DRAM0_SIZE + S32Z_DRAM1_SIZE)
 
 /* Console.  The EVB user guide (UG10268) dedicates LIN9 to the           */
 /* daughtercard USB-UART, selected by jumper J248, so LINFlex_9 is the    */

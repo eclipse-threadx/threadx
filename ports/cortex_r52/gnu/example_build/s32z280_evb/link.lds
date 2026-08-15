@@ -44,7 +44,7 @@ __sys_stack_size__ = 0x0800;
 MEMORY
 {
     CODE (rx)  : ORIGIN = 0x79900000, LENGTH = 0x00700000    /* 7 MB   */
-    DATA (rwx) : ORIGIN = 0x31780000, LENGTH = 0x00040000    /* 256 KB */
+    DATA (rwx) : ORIGIN = 0x31780000, LENGTH = 0x00080000    /* 512 KB: DRAM0 + DRAM1, both full core speed */
 }
 
 ENTRY(_start)
