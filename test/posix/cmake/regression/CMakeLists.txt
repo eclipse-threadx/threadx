@@ -19,6 +19,7 @@ set(posix_test_cases
     ${SOURCE_DIR}/posix_mq_basic_test.c
     ${SOURCE_DIR}/posix_mq_send_abort_test.c
     ${SOURCE_DIR}/posix_pthread_basic_test.c
+    ${SOURCE_DIR}/posix_pthread_self_test.c
 )
 
 set(WEAK_DEFAULTS_SOURCE ${CMAKE_CURRENT_LIST_DIR}/../../../shared/regression/testcontrol_weak_defaults.c)
