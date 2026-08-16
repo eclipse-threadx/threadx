@@ -538,7 +538,13 @@ POSIX_TCB          *p_tcb;
     if (!thread_ptr)
     {
         /* Not called from a thread - error!  */
-           posix_internal_error(222);
+        posix_internal_error(222);
+
+        /* posix_internal_error() does not return today, but do not depend on
+           that: posix_thread2tcb() hands back NULL for this input and the read
+           below would dereference it. A pthread ID is the address of the TCB,
+           so zero is never a valid one.  */
+        return((pthread_t) 0);
     }
 
     /* Get the TCB for this pthread */

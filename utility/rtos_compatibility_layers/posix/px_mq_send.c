@@ -167,7 +167,16 @@ ULONG               msg[TX_POSIX_MESSAGE_SIZE];
 
     if (temp1 != TX_SUCCESS)
     {
-    posix_internal_error(9999);
+        posix_internal_error(9999);
+
+        /* posix_internal_error() does not return today, but do not depend on
+           that: bp is indeterminate here, so falling through would copy
+           msg_len bytes through an unset pointer.  */
+        posix_errno = ENOMEM;
+        posix_set_pthread_errno(ENOMEM);
+
+        /* Return ERROR.  */
+        return(ERROR);
     }
     /* Got the memory , Setup source and destination pointers
        Cast them in UCHAR as message length is in bytes.  */
