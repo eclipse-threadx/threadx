@@ -82,6 +82,24 @@ target_sources(freertos-threadx
 )
 target_link_libraries(freertos-threadx PUBLIC threadx)
 
+# Define the POSIX compatibility layer.  It supplies its own errno.h, fcntl.h,
+# pthread.h, sched.h, signal.h and time.h, so it cannot be combined with the
+# hosted simulation ports: those build against a full C library that already
+# provides those headers, and the layer's pthread.h even shares the _PTHREAD_H
+# include guard with glibc's.  Skip it there rather than offering a target that
+# could never build.
+#
+# It is also single-core by construction: px_int.h declares
+# _tx_thread_current_ptr as a plain pointer, which is a per-core array in an SMP
+# build, and the layer has no notion of which core it is running on.
+if(THREADX_ARCH MATCHES "^(linux|win32|win64)$")
+    message(STATUS "POSIX compatibility layer not available for ${THREADX_ARCH}")
+elseif(THREADX_SMP)
+    message(STATUS "POSIX compatibility layer not available for SMP builds")
+else()
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/utility/rtos_compatibility_layers/posix)
+endif()
+
 # If the user provided an override, copy it to the custom directory
 if (NOT TX_USER_FILE)
     message(STATUS "Using default tx_user.h file")
