@@ -104,7 +104,10 @@
 #define CONSOLE_BASE            S32Z_LINFLEX_9_BASE
 
 
-unsigned int linflexd_init(void)
+/* One full pass of the configuration sequence.  Called twice by
+   linflexd_init; see the comment there for why.  */
+
+static unsigned int linflexd_configure_once(void)
 {
     unsigned int  status = LINFLEXD_INIT_OK;
     unsigned int  guard;
@@ -162,6 +165,37 @@ unsigned int linflexd_init(void)
     /* Leave initialisation mode; the module starts operating.  */
 
     REG32(CONSOLE_BASE + LINFLEXD_LINCR1) = 0U;
+
+    return status;
+}
+
+
+unsigned int linflexd_init(void)
+{
+    unsigned int status;
+
+    /* The sequence runs twice, and one pass is genuinely not enough.
+       A single pass gives a working console when this file is compiled at -O0
+       and a corrupted one at -O2: every character partially wrong, while UARTCR
+       reads back exactly the value written, LINIBRR and LINFBRR read back
+       exactly the values written, and the returned status is
+       LINFLEXD_INIT_OK.  The registers are right and the line is wrong, so the
+       failure is invisible to the caller -- the worst property a console can
+       have, and the reason this is worth two passes at boot.
+
+       The mechanism is not understood.  Tested and rejected as explanations:
+       the wait for initialisation mode (a bound 100x larger changes nothing),
+       a settling delay before the first LINSR read, a settling delay after
+       leaving initialisation mode, a barrier and read-back between the two
+       UARTCR writes, and waiting for LINSR to report the exit from
+       initialisation mode.  None of those makes a single pass work at -O2.
+       A second pass does, reliably, at both optimisation levels.
+
+       Verified on the S32Z280-594EVB with the whole BSP at -O0 and at -O2.
+       If the underlying behaviour is ever identified, revisit this.  */
+
+    status  = linflexd_configure_once();
+    status |= linflexd_configure_once();
 
     return status;
 }
