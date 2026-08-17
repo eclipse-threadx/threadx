@@ -50,6 +50,12 @@ void            cache_clean_all(void);
 
 void            cache_enable(void);
 
+/* Clean, then disable both caches, then invalidate.  Needed by any measurement
+   that wants more than one cold pass in a single run: cache_enable is
+   one-way, and a second cold reading is otherwise impossible.  */
+
+void            cache_disable_all(void);
+
 unsigned int    cache_enabled(void);
 
 /* Decoded L1 data-cache geometry, from CCSIDR.  Sizing a cache benchmark

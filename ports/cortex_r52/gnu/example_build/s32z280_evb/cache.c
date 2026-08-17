@@ -318,3 +318,29 @@ unsigned int cache_enabled(void)
 
     return (((sctlr & SCTLR_C) != 0UL) && ((sctlr & SCTLR_I) != 0UL)) ? 1U : 0U;
 }
+
+
+void cache_disable_all(void)
+{
+    unsigned long sctlr;
+
+    /* Clean before disabling, so dirty lines reach memory while the cache is
+       still on to write them back.  Invalidate afterwards, so nothing stale is
+       left to be hit if the caches are enabled again.  */
+
+    cache_clean_all();
+    __asm__ volatile("dsb sy" ::: "memory");
+
+    __asm__ volatile("mrc p15, 0, %0, c1, c0, 0" : "=r"(sctlr));
+    sctlr &= ~((1UL << 2) | (1UL << 12));           /* SCTLR.C, SCTLR.I     */
+    __asm__ volatile("mcr p15, 0, %0, c1, c0, 0" : : "r"(sctlr) : "memory");
+
+    __asm__ volatile("dsb sy" ::: "memory");
+    __asm__ volatile("isb" ::: "memory");
+
+    cache_invalidate_dcache_all();
+    cache_invalidate_icache_all();
+
+    __asm__ volatile("dsb sy" ::: "memory");
+    __asm__ volatile("isb" ::: "memory");
+}

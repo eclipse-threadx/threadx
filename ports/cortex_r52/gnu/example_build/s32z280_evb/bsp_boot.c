@@ -193,21 +193,102 @@ static void enable_irq_at_el1(void)
  * believed.
  */
 
+/* Decimal, because a measurement read by a person should not need converting.
+   report() stays hex for register values, where hex is the right form.  */
+
+static void report_dec(unsigned long value)
+{
+    char            digits[12];
+    unsigned int    n = 0U;
+
+    if (value == 0UL) { linflexd_putc('0'); return; }
+
+    while ((value > 0UL) && (n < 12U))
+    {
+        digits[n] = (char) ('0' + (value % 10UL));
+        value /= 10UL;
+        n++;
+    }
+    while (n > 0U) { n--; linflexd_putc(digits[n]); }
+}
+
+static void report_dec_small(unsigned int value)
+{
+    report_dec((unsigned long) value);
+}
+
+#define BUFFER_BASE     S32Z_DRAM2_BASE
+
 static unsigned long cache_bench_words;
+
+/* Aligned to a cache line, and that alignment is load-bearing rather than
+   cosmetic.  Without it this measurement is bimodal: it reports either about
+   24% cache benefit or none at all, decided purely by where the loop happens
+   to fall relative to a 64-byte line, and therefore by any unrelated change
+   that shifts code ahead of it.  Adding two nop instructions to the startup
+   file was enough to flip it, which is how a run of conclusions drawn from
+   this probe -- including a defect report to NXP -- turned out to be measuring
+   code layout rather than the part.
+
+   Pinning the entry point does not make the workload fast or slow, it makes it
+   the same across builds, which is the only property that lets two numbers be
+   compared.  */
+
+/* Four copies of the same loop, each 64-byte aligned and then displaced by a
+   different offset within the line.  The measurement runs all four and reports
+   the spread.
+
+   One copy is not enough, and a single number from this workload is actively
+   misleading.  Unpinned, it reported either about 24% cache benefit or none at
+   all depending on where the loop fell relative to a 64-byte line -- two nop
+   instructions added to the startup file flipped it.  Pinning the entry to a
+   line does not fix that, it just picks one of the two modes and hides the
+   other: aligned to 64 the loop sits permanently in the low mode.
+
+   The variation is real behaviour, not noise.  Both modes reproduce exactly
+   across runs.  The cold pass runs with both caches off, so it is heavily
+   instruction-fetch bound out of code RAM at half the core frequency, and how
+   the loop straddles lines decides how much of the data cache's contribution
+   is visible at all.  Reporting min and max across alignments says that out
+   loud instead of letting one arbitrary placement stand in for the part.  */
+
+#define CACHE_WORKLOAD_COPIES   4U
+
+#define MAKE_CACHE_WORKLOAD(name, pad_words)                                  \
+__attribute__((aligned(64), noinline))                                        \
+static void name(void)                                                        \
+{                                                                             \
+    volatile unsigned int  *buffer = (volatile unsigned int *) BUFFER_BASE;    \
+    unsigned long           pass;                                             \
+    unsigned long           i;                                                \
+                                                                              \
+    __asm__ volatile(".rept " #pad_words "\n\tnop\n\t.endr");                 \
+                                                                              \
+    for (pass = 0UL; pass < 32UL; pass++)                                     \
+    {                                                                         \
+        for (i = 0UL; i < cache_bench_words; i++)                             \
+        {                                                                     \
+            buffer[i] = buffer[i] + i + pass;                                 \
+        }                                                                     \
+    }                                                                         \
+}
+
+MAKE_CACHE_WORKLOAD(cache_workload_a, 0)
+MAKE_CACHE_WORKLOAD(cache_workload_b, 4)
+MAKE_CACHE_WORKLOAD(cache_workload_c, 8)
+MAKE_CACHE_WORKLOAD(cache_workload_d, 12)
+
+static void (*const cache_workloads[CACHE_WORKLOAD_COPIES])(void) =
+{
+    cache_workload_a,       /* loop at line offset 0  */
+    cache_workload_b,       /* loop at line offset 16 */
+    cache_workload_c,       /* loop at line offset 32 */
+    cache_workload_d        /* loop at line offset 48 */
+};
 
 static void cache_workload(void)
 {
-    volatile unsigned int  *buffer = (volatile unsigned int *) S32Z_DRAM2_BASE;
-    unsigned long           pass;
-    unsigned long           i;
-
-    for (pass = 0UL; pass < 32UL; pass++)
-    {
-        for (i = 0UL; i < cache_bench_words; i++)
-        {
-            buffer[i] = buffer[i] + i + pass;
-        }
-    }
+    cache_workloads[0]();
 }
 
 
@@ -728,46 +809,57 @@ void bsp_main(void)
     cache_bench_words = cache_dcache_bytes() / (2UL * sizeof(unsigned int));
     report("bench wds", (unsigned int) cache_bench_words);
 
-    linflexd_puts("C1 timing over DRAM2, the half-speed bank, caches OFF\n");
+    /* Measured at four loop alignments, not one, and the spread is reported
+       because it is large and real.  See the comment on the workload copies.  */
+
+    linflexd_puts("C1 timing DRAM2 at four loop alignments\n");
     {
-        unsigned long long before;
-        unsigned long long after;
-        unsigned long       cold;
-        unsigned long       warm;
+        unsigned long gains[CACHE_WORKLOAD_COPIES];
+        unsigned long lo = 0xFFFFFFFFUL;
+        unsigned long hi = 0UL;
+        unsigned int  k;
 
-        before = timer_read_cntpct();
-        cache_workload();
-        after  = timer_read_cntpct();
-        cold   = (unsigned long) (after - before);
+        for (k = 0U; k < CACHE_WORKLOAD_COPIES; k++)
+        {
+            unsigned long long  before;
+            unsigned long long  after;
+            unsigned long       cold;
+            unsigned long       warm;
 
-        MARK(0x71);
-        linflexd_puts("C2 enabling caches\n");
-        cache_enable();
+            /* Cold: both caches off.  cache_disable_all also invalidates, so
+               each alignment starts from the same state as the first.  */
+
+            cache_disable_all();
+
+            before = timer_read_cntpct();
+            cache_workloads[k]();
+            after  = timer_read_cntpct();
+            cold   = (unsigned long) (after - before);
+
+            cache_enable();
+
+            before = timer_read_cntpct();
+            cache_workloads[k]();
+            after  = timer_read_cntpct();
+            warm   = (unsigned long) (after - before);
+
+            gains[k] = (cold > warm) ? (((cold - warm) * 1000UL) / cold) : 0UL;
+
+            if (gains[k] < lo) { lo = gains[k]; }
+            if (gains[k] > hi) { hi = gains[k]; }
+
+            linflexd_puts("  offset ");
+            report_dec_small(k * 16U);
+            linflexd_puts(": cold ");
+            report_dec(cold);
+            linflexd_puts("  warm ");
+            report_dec(warm);
+            linflexd_puts("  gain/1000 ");
+            report_dec(gains[k]);
+            linflexd_puts("\n");
+        }
+
         MARK(0x72);
-        report("SCTLR    ", read_sctlr_after_mpu());
-        report("cachesOn ", cache_enabled());
-
-        before = timer_read_cntpct();
-        cache_workload();
-        after  = timer_read_cntpct();
-        warm   = (unsigned long) (after - before);
-
-        MARK(0x73);
-        report("counts off", cold);
-        report("counts on ", warm);
-
-        /* Report the two claims separately, because they are separate.
-           "Enabled" is what SCTLR says and is checkable.  "Effective" needs a
-           measurable speedup, and a criterion of merely warm < cold is
-           worthless: the first run of this test showed 609904 against 609686,
-           a 0.036% difference that is noise, and printed PASS on it.
-
-           A cache having little to offer here is plausible rather than
-           broken.  Both the code and the data this workload touches live in
-           full-speed RTU banks, which the core reaches at its own
-             clock; the only slower memory on this board is DRAM2 at
-             half speed, and DDR, which is not initialised.  */
-
         if (cache_enabled() == 1U)
         {
             linflexd_puts("C3 PASS caches enabled (SCTLR.C and SCTLR.I set)\n");
@@ -777,33 +869,26 @@ void bsp_main(void)
             linflexd_puts("C3 FAIL caches did not enable\n");
         }
 
-        if (cold > warm)
+        report("gain lo  ", (unsigned int) lo);
+        report("gain hi  ", (unsigned int) hi);
+
+        /* The claim is that the caches can help this workload, which needs one
+           alignment to show it.  A criterion applied to a single arbitrary
+           alignment would report either 24% or nothing at all, and both would
+           be true of the same silicon.  */
+
+        if (hi >= 100UL)
         {
-            unsigned long gain = ((cold - warm) * 1000UL) / cold;
-
-            report("gain/1000", gain);
-
-            if (gain >= 100UL)
+            linflexd_puts("C4 PASS caches measurably faster at some alignment\n");
+            if (lo < 100UL)
             {
-                linflexd_puts("C4 PASS caches measurably faster (>=10%)\n");
-            }
-            else
-            {
-                linflexd_puts("C4 speedup below 10% -- see gain/1000 above\n");
+                linflexd_puts("  note: alignment-dependent, low mode under 10%\n");
             }
         }
         else
         {
-            linflexd_puts("C4 no speedup measured\n");
+            linflexd_puts("C4 no alignment showed a 10% speedup\n");
         }
-
-        /* Push the markers and counters out of the write-back cache so a
-           debugger reading SRAM sees them.  Without this a post-mortem read
-           could report stale values from before the cache was enabled.  */
-
-        cache_clean_all();
-        MARK(0x74);
-        cache_clean_all();
     }
 
     /* --- protection test ---------------------------------------------------
