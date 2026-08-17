@@ -260,36 +260,41 @@ start_a32:
 
     ldr     r0, =(0x30000000 | (0x07 << 2) | (1 << 8) | (1 << 1) | (1 << 0))
     mcr     p15, 0, r0, c9, c1, 0           /* IMP_ATCMREGIONR              */
-    /* BTCM and CTCM are deliberately NOT enabled, and this costs nothing that
-     * matters: the reference manual describes TCM_A as the bank "optimized for
-     * small, regularly executed code such as interrupt service routines or OS
-     * kernels", which is what a TCM is wanted for here.
+    /* BTCM and CTCM are not enabled, because nothing in this example uses them.
+     * That is the whole reason, and it is worth stating plainly because the
+     * reason given here previously was wrong.
      *
-     * Enabling a second bank on this part removes all measurable data-cache
-     * benefit.  Measured, five configurations, one variable:
+     * This comment used to claim that enabling a second bank removed all
+     * measurable data-cache benefit, and it listed five configurations to prove
+     * it: ATCM alone showing a 24% cache gain, and four combinations involving a
+     * second bank showing none.  It concluded that the trigger was not a
+     * particular bank, not the bank's address and not the ECC preload, but
+     * enabling a second bank at all.  It cited the Cortex-R52 and S32Z2 errata as
+     * not covering it, and offered a shared RAM pool between the LLC and the TCMs
+     * as an explanation.  A defect report went to NXP on that basis.
      *
-     *   ATCM only                      cache gain 24%
-     *   ATCM + BTCM                    cache gain  0%
-     *   ATCM + BTCM + CTCM             cache gain  0%
-     *   ATCM + BTCM at another base    cache gain  0%
-     *   ATCM + CTCM, BTCM disabled     cache gain  0%
+     * All of it was an artifact of the benchmark that produced the numbers.  That
+     * benchmark was bimodal with respect to where its loop fell inside a 64-byte
+     * cache line, reporting either 24% or nothing at all for identical silicon,
+     * and every one of those five configurations was an edit to this file, so
+     * every one shifted the code that followed and flipped the mode.  Adding two
+     * nop instructions here reproduces the "second bank" result exactly, to the
+     * digit.  The report to NXP has been withdrawn.
      *
-     * So it is not a particular bank, not the bank's address, and not the ECC
-     * preload -- it is enabling a second bank at all.  The benchmark buffer sits
-     * in non-RTU-local SRAM at 0x31800000, outside every TCM window, and the
-     * cache still reports 16KB with 4 ways and 64 sets throughout.
+     * Measured again with a benchmark that sweeps four loop alignments and
+     * reports the distribution, ATCM alone and ATCM plus CTCM are
+     * indistinguishable:
      *
-     * No erratum covers it.  Checked the Cortex-R52 errata notice
-     * (SDEN-857344 issue 19, all 25 entries) and the S32Z2 mask set errata for
-     * 0P91J; the RTU and R52 entries there are ERR050509, ERR051107, ERR051153,
-     * ERR051441, ERR051613, ERR051614 and ERR052126, none of which describes
-     * this.  A shared RAM pool between the LLC and the TCMs would explain it,
-     * since the RTU has a last-level cache that "allocates ways to specific
-     * domains", but that is a guess and it is NXP's to confirm.
+     *   loop offset in line      ATCM only      ATCM + CTCM
+     *   0                        gain 0         gain 0
+     *   16                       gain 0         gain 0
+     *   32                       gain 240/1000  gain 240/1000
+     *   48                       gain 240/1000  gain 240/1000
      *
-     * Enabling them is one uncommented line each if that answer arrives.  Until
-     * then, shipping them would trade a 24% cache regression for TCM this
-     * example does not use.
+     * So enabling a second bank costs nothing measurable.  Enabling one is a
+     * single line, and the only prerequisites are the ECC preload before any read
+     * (TRM 6.2.2) and an MPU region, both of which tcm.c and mpu.c already
+     * handle for ATCM.  They stay off until something needs them.
      */
 
     isb

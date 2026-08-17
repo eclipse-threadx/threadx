@@ -92,32 +92,42 @@ model and not an R52 at all.
     two banks.  The boot image preloads it (ECC check bits are not initialised by
     the core) and proves it holds data both before and after the MPU is enabled.
 
-    BTCM and CTCM are left disabled on purpose, and that is a measurement rather
-    than caution.  Enabling any second bank removes all measurable data-cache
-    benefit on this part:
+    BTCM and CTCM are left disabled because nothing in this example uses them.
 
-        ATCM only                      cache gain 24%
-        ATCM + BTCM                    cache gain  0%
-        ATCM + BTCM + CTCM             cache gain  0%
-        ATCM + BTCM at another base    cache gain  0%
-        ATCM + CTCM, BTCM disabled     cache gain  0%
+    An earlier version of this file said something much stronger and it was
+    wrong.  It claimed that enabling any second bank removes all measurable
+    data-cache benefit on this part, and gave five configurations as evidence:
+    ATCM alone at a 24% cache gain, and four combinations involving a second bank
+    at none.  It concluded the cause was not a particular bank, not its address
+    and not the ECC preload, but enabling a second bank at all.  A defect report
+    went to NXP on that basis and has since been withdrawn.
 
-    Five configurations, one variable.  Not a particular bank, not its address,
-    not the ECC preload -- enabling a second bank at all.  The benchmark buffer is
-    in non-RTU-local SRAM at 0x31800000, outside every TCM window, and CCSIDR
-    reports the same 16 KB four-way cache throughout.
+    The benchmark that produced those numbers was bimodal with respect to where
+    its timing loop fell inside a 64-byte cache line.  The same workload on the
+    same silicon reported either 24% or nothing at all depending on that
+    placement, and each of the five configurations was an edit to entry.S, so
+    each shifted the code that followed and moved the loop between the two
+    modes.  Adding two nop instructions to entry.S reproduces the "second bank"
+    figure exactly.
 
-    No erratum covers this.  Checked SDEN-857344 issue 19 (all 25 Cortex-R52
-    entries) and the S32Z2 0P91J mask set errata, whose RTU and R52 entries are
-    ERR050509, ERR051107, ERR051153, ERR051441, ERR051613, ERR051614 and
-    ERR052126.  A RAM pool shared between the RTU's last-level cache and the TCMs
-    would explain it -- the LLC "allocates ways to specific domains" -- but that is
-    a guess for NXP to confirm, and worth raising with the other RTU questions.
+    Re-measured with a benchmark that sweeps four loop alignments and reports the
+    distribution, one bank and two are indistinguishable:
 
-    Losing nothing by this: the reference manual describes TCM_A as the bank
-    "optimized for small, regularly executed code such as interrupt service
-    routines or OS kernels", which is what a TCM is wanted for here.  Enabling the
-    other two is one line each in entry.S when there is an answer.
+        loop offset in line      ATCM only      ATCM + CTCM
+        0                        gain 0         gain 0
+        16                       gain 0         gain 0
+        32                       gain 240/1000  gain 240/1000
+        48                       gain 240/1000  gain 240/1000
+
+    Enabling a second bank costs nothing measurable.  It is one line in entry.S,
+    and the prerequisites are the ECC preload before any read (TRM 6.2.2) and an
+    MPU region, both already handled for ATCM.
+
+    The wider lesson is worth more than the TCM detail: a single-figure timing
+    result from this example cannot be compared across builds unless the timed
+    loop's alignment is controlled, because almost any change shifts code.  The
+    cache and interrupt-handler measurements here now sweep alignments and report
+    the spread for that reason.
 
     The DDR window at 0x7A000000 is dark until DDR is initialised.  TCM is still
     absent from link.lds: nothing is placed there yet.
