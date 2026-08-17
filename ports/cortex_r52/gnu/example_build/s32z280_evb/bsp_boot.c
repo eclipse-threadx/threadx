@@ -569,7 +569,26 @@ void bsp_main(void)
            proves the interrupt is delivered, which is a different claim.  */
 
         MARK(0x50);
-        linflexd_puts("I1 gicv3_init\n");
+        /* Copy the handler into ATCM now, and not earlier: T4 and T5 write test
+       patterns to the first and last words of the bank, which would land on top
+       of this code.  The ECC preload in T3 has already established check bits
+       for the whole bank, and the 64-bit stores in the copy maintain them for
+       every location it writes.  */
+
+    linflexd_puts("T6 copying .atcm_text into ATCM\n");
+    {
+        unsigned long copied = tcm_copy_atcm_text();
+
+        report("atcm bytes", (unsigned int) copied);
+        if (copied == 0UL)
+        {
+            linflexd_puts("  nothing placed in ATCM in this image\n");
+        }
+    }
+
+    timer_cycles_enable();
+
+    linflexd_puts("I1 gicv3_init\n");
         gicv3_init();
 
         MARK(0x51);
@@ -595,12 +614,18 @@ void bsp_main(void)
 
         MARK(0x53);
         {
+            extern unsigned int board_service_count;
             unsigned int spins = 0U;
 
             /* Wait for ticks.  Bounded: a missing interrupt must report
                itself rather than hang the boot.  */
 
-            while ((board_irq_count < 5UL) && (spins < 30U))
+            /* Wait for a full set of latency samples, not just a few ticks:
+               the figure of interest is the worst case, and a handful of
+               samples cannot show it.  Still bounded, so a missing interrupt
+               reports itself rather than hanging the boot.  */
+
+            while ((board_service_count < 64U) && (spins < 400U))
             {
                 timer_spin(200000U);
                 spins++;
@@ -612,6 +637,53 @@ void bsp_main(void)
         report("timer INTID", (unsigned int) board_timer_intid);
         report("spurious ", (unsigned int) board_spurious_count);
         report("unexpected", (unsigned int) board_unexpected_intid);
+
+        /* Handler body execution time.  Reported as min, max and mean rather
+           than mean alone: the spread is the point.  */
+
+        {
+            extern unsigned int board_service_cycles[];
+            extern unsigned int board_service_count;
+
+            unsigned int i;
+            unsigned int lo = 0xFFFFFFFFU;
+            unsigned int hi = 0U;
+            unsigned long sum = 0UL;
+            unsigned int n;
+
+            /* Stop the source and snapshot the count before reading any of it.
+               The timer re-arms inside the handler, so samples keep arriving
+               otherwise: the first version of this read let the count grow
+               between computing the extremes and dividing for the mean, and
+               printed a mean below the minimum.  */
+
+            timer_stop();
+            n = board_service_count;
+
+            for (i = 0U; i < n; i++)
+            {
+                unsigned int v = board_service_cycles[i];
+
+                if (v < lo) { lo = v; }
+                if (v > hi) { hi = v; }
+                sum += (unsigned long) v;
+            }
+
+            linflexd_puts("I5 handler body cycles ");
+#ifdef TX_R52_ATCM_ISR
+            linflexd_puts("(body in ATCM)\n");
+#else
+            linflexd_puts("(body in code RAM)\n");
+#endif
+            report("samples  ", n);
+            if (n > 0U)
+            {
+                report("min      ", lo);
+                report("max      ", hi);
+                report("mean     ", (unsigned int) (sum / n));
+                report("spread   ", hi - lo);
+            }
+        }
         report("first INTID", (unsigned int) board_first_intid);
         linflexd_puts("I4 interrupt test done\n");
     }

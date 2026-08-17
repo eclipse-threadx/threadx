@@ -146,3 +146,41 @@ void timer_stop(void)
     __asm volatile ("mcr p15, 0, %0, c14, c2, 1" :: "r" (control));
     __asm volatile ("isb");
 }
+
+
+/**************************************************************************/
+/*  PMU cycle counter.                                                    */
+/*                                                                        */
+/*  PMCR.E gates all counters including the dedicated cycle counter, and   */
+/*  PMCNTENSET bit 31 enables that counter specifically.  Both are needed. */
+/*  PMCR.D is left clear so the counter advances every cycle rather than   */
+/*  every 64th, which is the resolution these measurements want.          */
+/**************************************************************************/
+
+#define PMCR_E      (1UL << 0)      /* enable all counters                 */
+#define PMCR_P      (1UL << 1)      /* reset event counters                */
+#define PMCR_C      (1UL << 2)      /* reset cycle counter                 */
+#define PMCNTENSET_C (1UL << 31)    /* cycle counter enable                */
+
+void timer_cycles_enable(void)
+{
+    unsigned long pmcr;
+
+    /* Allow EL0/EL1 access and enable, resetting the counter as we go.  */
+
+    __asm__ volatile("mrc p15, 0, %0, c9, c12, 0" : "=r"(pmcr));
+    pmcr |= (PMCR_E | PMCR_C);
+    __asm__ volatile("mcr p15, 0, %0, c9, c12, 0" : : "r"(pmcr) : "memory");
+
+    __asm__ volatile("mcr p15, 0, %0, c9, c12, 1"
+                     : : "r"((unsigned long) PMCNTENSET_C) : "memory");
+
+    __asm__ volatile("isb" ::: "memory");
+}
+
+unsigned int timer_read_cycles(void)
+{
+    unsigned long value;
+    __asm__ volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(value));
+    return (unsigned int) value;
+}

@@ -55,6 +55,43 @@ target_link_options(s32z280_boot.elf PRIVATE
 )
 
 
+# Same image as s32z280_boot.elf with the interrupt service body placed in ATCM
+# instead of code RAM, so the two can be compared on the same board in the same
+# session.  Separate target rather than an option so both exist at once and a
+# result can be reproduced without reconfiguring.
+add_executable(s32z280_atcm.elf EXCLUDE_FROM_ALL
+    ${EVB_DIR}/entry.S
+    ${EVB_DIR}/bsp_boot.c
+    ${EVB_DIR}/linflexd.c
+    ${EVB_DIR}/timer.c
+    ${EVB_DIR}/gic_probe.c
+    ${EVB_DIR}/mpu.c
+    ${EVB_DIR}/gicv3.c
+    ${EVB_DIR}/irq_dispatch.c
+    ${EVB_DIR}/cache.c
+        ${EVB_DIR}/tcm.c
+)
+
+target_include_directories(s32z280_atcm.elf PRIVATE ${EVB_DIR})
+
+# -g only: this image exists to be inspected through a debugger, and without
+# DWARF the identity structure has no type for GDB to walk.  No effect on the
+# generated code.
+target_compile_options(s32z280_atcm.elf PRIVATE -g)
+
+target_link_options(s32z280_atcm.elf PRIVATE
+    -T${EVB_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=s32z280_atcm.map
+    # Bare metal: one code region and one data region, with access control
+    # belonging to the MPU rather than to segment permissions.
+    ${EVB_LINK_QUIET_RWX}
+)
+
+
+target_compile_definitions(s32z280_atcm.elf PRIVATE TX_R52_ATCM_ISR)
+
+
 # ThreadX demo on silicon: threads, preemption and the timer tick.  Separate
 # target from s32z280_boot.elf, which deliberately does not link the kernel so
 # that a boot failure there is unambiguously a board problem.

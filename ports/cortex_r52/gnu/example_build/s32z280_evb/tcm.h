@@ -148,4 +148,14 @@ unsigned int tcm_enable(unsigned int index, unsigned long base);
 
 void tcm_preload(unsigned int index, unsigned long base, unsigned long bytes);
 
+/* Copy the .atcm_text section from its load address in CODE to its run address
+   in ATCM.  Must run before anything in that section is called, and after the
+   bank is enabled.  Returns the number of bytes copied, which is zero when the
+   section is empty -- the normal case for an image that places nothing there.
+
+   Uses 64-bit stores because ECC is enabled on this part and ATCM requires
+   them; see tcm_preload and Cortex-R52 TRM 6.2.2.  */
+
+unsigned long tcm_copy_atcm_text(void);
+
 #endif
