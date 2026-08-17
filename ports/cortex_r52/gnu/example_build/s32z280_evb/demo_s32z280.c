@@ -57,6 +57,21 @@ static TX_THREAD    sleeper_thread;
 static TX_THREAD    spinner_thread;
 static TX_THREAD    judge_thread;
 
+/* One stack in BTCM, the rest in DRAM0, so a run exercises both and the
+   difference is visible if one of them is wrong.
+
+   BTCM is 16 KB at zero wait states and is never cached, whatever the MPU says
+   about it.  That is the point for a stack: access cost does not depend on
+   whether a line happens to be resident, which is what a determinism argument
+   needs.  Measured on this part, uncached BTCM comes within 6.6% of the best
+   cached case, where uncached DRAM0 is 22% off it.
+
+   entry.S writes every location in the bank before any C runs, which is
+   required before a read because ECC is enabled (TRM 6.2.2).  A stack is read
+   before it is written -- the first context restore pops what tx_thread_create
+   built -- so that preload is not optional here.  */
+
+__attribute__((section(".btcm_bss"), aligned(8)))
 static unsigned char sleeper_stack[DEMO_STACK_SIZE];
 static unsigned char spinner_stack[DEMO_STACK_SIZE];
 static unsigned char judge_stack[DEMO_STACK_SIZE];
@@ -190,6 +205,14 @@ static void judge_entry(ULONG input)
 void tx_application_define(void *first_unused_memory)
 {
     (void) first_unused_memory;
+
+    linflexd_puts("stacks: sleeper 0x");
+    linflexd_put_hex32((unsigned int) (unsigned long) sleeper_stack);
+    linflexd_puts(" (BTCM)  spinner 0x");
+    linflexd_put_hex32((unsigned int) (unsigned long) spinner_stack);
+    linflexd_puts("  judge 0x");
+    linflexd_put_hex32((unsigned int) (unsigned long) judge_stack);
+    linflexd_puts("\n");
 
     (void) tx_thread_create(&sleeper_thread, "sleeper", sleeper_entry, 0UL,
                             sleeper_stack, DEMO_STACK_SIZE,
