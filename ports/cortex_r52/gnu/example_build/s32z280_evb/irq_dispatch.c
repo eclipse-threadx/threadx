@@ -193,32 +193,28 @@ unsigned int board_service_count;
 #define BOARD_ISR_SECTION
 #endif
 
-__attribute__((aligned(64)))
-static BOARD_ISR_SECTION void board_irq_service_body(unsigned long intid);
+static inline __attribute__((always_inline))
+void board_irq_service_impl(unsigned long intid);
 
-void board_irq_service(unsigned long intid)
-{
-    unsigned int before;
-    unsigned int after;
 
-    before = timer_read_cycles();
-    board_irq_service_body(intid);
-    after  = timer_read_cycles();
-
-    if (board_service_count < BOARD_LATENCY_SAMPLES)
-    {
-        board_service_cycles[board_service_count] = after - before;
-        board_service_count++;
-    }
-}
 
 
 /* Aligned for the same reason as cache_workload: this body is timed, and
    without a fixed alignment the figure moves with unrelated code changes
    elsewhere in the image.  */
 
-__attribute__((aligned(64)))
-static BOARD_ISR_SECTION void board_irq_service_body(unsigned long intid)
+/* Four placements of one implementation.  The logic below is inlined into each
+   of the four wrappers further down, each 64-byte aligned and then displaced by
+   a different offset within the line, and the measurement rotates through them.
+
+   A single placement is not measurable.  The cache benchmark in this file's
+   sibling turned out to be bimodal with respect to exactly this, reporting 24%
+   or 0% for identical silicon depending on where a loop fell in a line, and it
+   invalidated a handler comparison and a defect report to NXP before anyone
+   noticed.  Pinning one alignment does not fix that, it just chooses a mode.  */
+
+static inline __attribute__((always_inline))
+void board_irq_service_impl(unsigned long intid)
 {
     if (intid == GICV3_SPURIOUS_INTID)
     {
@@ -300,6 +296,62 @@ static BOARD_ISR_SECTION void board_irq_service_body(unsigned long intid)
     }
 
     board_nest_depth--;
+}
+
+
+/* The four placements.  pad nops shift the inlined body within its line.  */
+
+#define MAKE_ISR_BODY(name, pad)                                              \
+__attribute__((aligned(64), noinline))                                        \
+static BOARD_ISR_SECTION void name(unsigned long intid)                       \
+{                                                                             \
+    __asm__ volatile(".rept " #pad "\n\tnop\n\t.endr");                       \
+    board_irq_service_impl(intid);                                            \
+}
+
+MAKE_ISR_BODY(board_irq_body_a, 0)
+MAKE_ISR_BODY(board_irq_body_b, 4)
+MAKE_ISR_BODY(board_irq_body_c, 8)
+MAKE_ISR_BODY(board_irq_body_d, 12)
+
+#define BOARD_ISR_PLACEMENTS    4U
+#define BOARD_SAMPLES_EACH      (BOARD_LATENCY_SAMPLES / BOARD_ISR_PLACEMENTS)
+
+static void (*const board_irq_bodies[BOARD_ISR_PLACEMENTS])(unsigned long) =
+{
+    board_irq_body_a,       /* body at line offset 0  */
+    board_irq_body_b,       /* body at line offset 16 */
+    board_irq_body_c,       /* body at line offset 32 */
+    board_irq_body_d        /* body at line offset 48 */
+};
+
+
+void board_irq_service(unsigned long intid)
+{
+    unsigned int before;
+    unsigned int after;
+
+    /* A block of samples per placement, so each alignment is measured under the
+       same conditions rather than interleaved with the others.  */
+
+    {
+        unsigned int slot = board_service_count / BOARD_SAMPLES_EACH;
+
+        if (slot >= BOARD_ISR_PLACEMENTS)
+        {
+            slot = BOARD_ISR_PLACEMENTS - 1U;
+        }
+
+        before = timer_read_cycles();
+        board_irq_bodies[slot](intid);
+        after  = timer_read_cycles();
+    }
+
+    if (board_service_count < BOARD_LATENCY_SAMPLES)
+    {
+        board_service_cycles[board_service_count] = after - before;
+        board_service_count++;
+    }
 }
 
 

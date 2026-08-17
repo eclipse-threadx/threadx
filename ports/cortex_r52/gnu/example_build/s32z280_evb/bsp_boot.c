@@ -750,19 +750,58 @@ void bsp_main(void)
                 sum += (unsigned long) v;
             }
 
-            linflexd_puts("I5 handler body cycles ");
+            linflexd_puts("I5 handler body cycles, four placements ");
 #ifdef TX_R52_ATCM_ISR
-            linflexd_puts("(body in ATCM)\n");
+            linflexd_puts("(bodies in ATCM)\n");
 #else
-            linflexd_puts("(body in code RAM)\n");
+            linflexd_puts("(bodies in code RAM)\n");
 #endif
             report("samples  ", n);
-            if (n > 0U)
+
+            /* Per placement, because the aggregate hides exactly the thing that
+               invalidated the previous version of this comparison.  16 samples
+               each, in the order the wrapper rotated through them.  */
+
             {
-                report("min      ", lo);
-                report("max      ", hi);
-                report("mean     ", (unsigned int) (sum / n));
-                report("spread   ", hi - lo);
+                unsigned int slot;
+                unsigned int each = 64U / 4U;
+
+                for (slot = 0U; slot < 4U; slot++)
+                {
+                    unsigned int s_lo = 0xFFFFFFFFU;
+                    unsigned int s_hi = 0U;
+                    unsigned long s_sum = 0UL;
+                    unsigned int c = 0U;
+                    unsigned int m;
+
+                    for (m = slot * each; (m < ((slot + 1U) * each)) && (m < n); m++)
+                    {
+                        unsigned int v = board_service_cycles[m];
+
+                        if (v < s_lo) { s_lo = v; }
+                        if (v > s_hi) { s_hi = v; }
+                        s_sum += (unsigned long) v;
+                        c++;
+                    }
+
+                    linflexd_puts("  offset ");
+                    report_dec((unsigned long) (slot * 16U));
+                    linflexd_puts(": ");
+                    if (c == 0U)
+                    {
+                        linflexd_puts("no samples\n");
+                    }
+                    else
+                    {
+                        linflexd_puts("min ");
+                        report_dec((unsigned long) s_lo);
+                        linflexd_puts("  max ");
+                        report_dec((unsigned long) s_hi);
+                        linflexd_puts("  mean ");
+                        report_dec(s_sum / c);
+                        linflexd_puts("\n");
+                    }
+                }
             }
         }
         report("first INTID", (unsigned int) board_first_intid);
