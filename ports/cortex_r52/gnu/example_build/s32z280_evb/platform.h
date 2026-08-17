@@ -130,6 +130,18 @@
 #define S32Z_DRAM0_SIZE                 0x00040000UL
 #define S32Z_DRAM1_BASE                 0x317C0000UL
 #define S32Z_DRAM1_SIZE                 0x00040000UL
+/* The top 8 KB of DRAM2 is deliberately left out of the broad data region in
+   mpu.c and mapped one window at a time, per thread, instead.  Isolation is only
+   meaningful in memory that no other region already grants access to, and every
+   other region in that map is a wide RW window -- a private buffer placed inside
+   one of them would be reachable by every thread no matter what else was
+   programmed.  */
+
+#define S32Z_THREAD_WINDOW_BASE         0x3187E000UL
+#define S32Z_THREAD_WINDOW_SIZE         0x00001000UL    /* 4 KB per thread   */
+#define S32Z_THREAD_WINDOW_COUNT        2UL
+#define S32Z_DRAM2_SHARED_SIZE          (S32Z_THREAD_WINDOW_BASE - S32Z_DRAM2_BASE)
+
 #define S32Z_DRAM2_BASE                 0x31800000UL
 #define S32Z_DRAM2_SIZE                 0x00080000UL
 
