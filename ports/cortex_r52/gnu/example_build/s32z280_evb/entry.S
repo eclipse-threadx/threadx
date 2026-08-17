@@ -260,6 +260,15 @@ start_a32:
 
     ldr     r0, =(0x30000000 | (0x07 << 2) | (1 << 8) | (1 << 1) | (1 << 0))
     mcr     p15, 0, r0, c9, c1, 0           /* IMP_ATCMREGIONR              */
+
+    /* BTCM as well.  16 KB at zero wait states, where ATCM has one, so it is the
+     * faster bank for data -- which is what it is wanted for here.  The claim
+     * that a second bank costs the data cache was withdrawn; see the note below.
+     * Preloaded by bsp_main before any read, as ECC requires, and BTCM accepts
+     * 32-bit stores where ATCM needs 64-bit (TRM 6.2.2).
+     */
+    ldr     r0, =(0x30100000 | (0x05 << 2) | (0 << 8) | (1 << 1) | (1 << 0))
+    mcr     p15, 0, r0, c9, c1, 1           /* IMP_BTCMREGIONR              */
     /* BTCM and CTCM are not enabled, because nothing in this example uses them.
      * That is the whole reason, and it is worth stating plainly because the
      * reason given here previously was wrong.
