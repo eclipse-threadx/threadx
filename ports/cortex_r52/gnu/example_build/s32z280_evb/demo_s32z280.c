@@ -259,6 +259,135 @@ static void ctx_partner_entry(ULONG which)
     }
 }
 
+/**************************************************************************/
+/*  Stack-heavy work, stack in BTCM against stack in DRAM0.               */
+/*                                                                        */
+/*  #635 measured context switches and found BTCM worth about 7.4%, with   */
+/*  no determinism advantage, and said why: a switch saves sixteen          */
+/*  registers, roughly one cache line, so the stack's cache state has       */
+/*  almost nothing to contribute.  It also said the interesting case was    */
+/*  work with a large stack working set, that it had not been measured, and */
+/*  that it should not be assumed.  This measures it.                      */
+/*                                                                        */
+/*  deep_touch recurses, writing a frame on the way down and reading it on  */
+/*  the way up, so the stack working set is the whole descent rather than   */
+/*  one frame.  The cache is cleaned and invalidated before each sample, so */
+/*  the descent starts cold: a stack in DRAM0 must fill a line per frame,   */
+/*  while a stack in BTCM has no cache in the path to miss.                */
+/*                                                                        */
+/*  No partner threads and no relinquish here.  The measurement is entirely */
+/*  within one thread, which removes the confound that made the context     */
+/*  switch figure hard to read -- there, the timed region included the      */
+/*  partner's execution.                                                   */
+/*                                                                        */
+/*  Samples are kept and post-processed rather than filtered against a      */
+/*  fixed threshold, because the cost of this workload was not known in     */
+/*  advance and a guessed threshold discarded every sample once already.    */
+/**************************************************************************/
+
+#define DEEP_SAMPLES    64U
+#define DEEP_DEPTH      24U
+#define DEEP_FRAME      16U     /* words: 64 bytes, one cache line per frame */
+
+static TX_THREAD    deep_btcm_thread;
+static TX_THREAD    deep_dram_thread;
+
+/* 4 KB: 24 frames of 64 bytes plus call overhead is about 2.1 KB, and ThreadX
+   needs its own room on top.  */
+
+__attribute__((section(".btcm_bss"), aligned(8)))
+static unsigned char deep_btcm_stack[4096];
+static unsigned char deep_dram_stack[4096];
+
+static unsigned int deep_samples[CTX_PAIRS][DEEP_SAMPLES];
+static unsigned int deep_lo[CTX_PAIRS];
+static unsigned int deep_hi[CTX_PAIRS];
+static unsigned int deep_mean[CTX_PAIRS];
+static unsigned int deep_over[CTX_PAIRS];
+static volatile unsigned int deep_done[CTX_PAIRS];
+
+__attribute__((noinline))
+static unsigned int deep_touch(unsigned int depth)
+{
+    volatile unsigned int   frame[DEEP_FRAME];
+    unsigned int            acc = 0U;
+    unsigned int            i;
+
+    for (i = 0U; i < DEEP_FRAME; i++)
+    {
+        frame[i] = depth + i;
+    }
+
+    if (depth > 0U)
+    {
+        acc = deep_touch(depth - 1U);
+    }
+
+    for (i = 0U; i < DEEP_FRAME; i++)
+    {
+        acc += frame[i];
+    }
+
+    return acc;
+}
+
+static void deep_entry(ULONG which)
+{
+    unsigned int    i;
+    unsigned int    lo;
+    unsigned long   sum;
+    unsigned int    counted;
+    unsigned int    over;
+    unsigned int    hi;
+
+    for (i = 0U; i < DEEP_SAMPLES; i++)
+    {
+        unsigned int before;
+        unsigned int after;
+
+        cache_clean_all();
+        cache_invalidate_dcache_all();
+
+        before = timer_read_cycles();
+        (void) deep_touch(DEEP_DEPTH);
+        after  = timer_read_cycles();
+
+        deep_samples[which][i] = after - before;
+    }
+
+    /* Post-process: the minimum sets the scale, and anything past twice it was
+       interrupted rather than slow.  */
+
+    lo = 0xFFFFFFFFU;
+    for (i = 0U; i < DEEP_SAMPLES; i++)
+    {
+        if (deep_samples[which][i] < lo) { lo = deep_samples[which][i]; }
+    }
+
+    hi = 0U; sum = 0UL; counted = 0U; over = 0U;
+    for (i = 0U; i < DEEP_SAMPLES; i++)
+    {
+        unsigned int v = deep_samples[which][i];
+
+        if (v > (lo * 2U))
+        {
+            over++;
+        }
+        else
+        {
+            if (v > hi) { hi = v; }
+            sum += (unsigned long) v;
+            counted++;
+        }
+    }
+
+    deep_lo[which]   = lo;
+    deep_hi[which]   = hi;
+    deep_mean[which] = (counted > 0U) ? (unsigned int) (sum / counted) : 0U;
+    deep_over[which] = over;
+    deep_done[which] = 1U;
+}
+
 static void sleeper_entry(ULONG input)
 {
     unsigned long spinner_before;
@@ -313,6 +442,37 @@ static void judge_entry(ULONG input)
     ticks_end = tx_time_get();
 
     linflexd_puts("\n=== ThreadX on S32Z280: results ===\n");
+
+    linflexd_puts("stack-heavy work, cycles (24 frames, cold cache)\n");
+    {
+        static const char *const dwhere[CTX_PAIRS] = { "stack in BTCM ",
+                                                       "stack in DRAM0" };
+        unsigned int q;
+
+        for (q = 0U; q < CTX_PAIRS; q++)
+        {
+            linflexd_puts("  ");
+            linflexd_puts(dwhere[q]);
+            if (deep_done[q] == 0U)
+            {
+                linflexd_puts(": did not finish\n");
+            }
+            else
+            {
+                linflexd_puts(": min ");
+                demo_dec(deep_lo[q]);
+                linflexd_puts("  mean ");
+                demo_dec(deep_mean[q]);
+                linflexd_puts("  max ");
+                demo_dec(deep_hi[q]);
+                linflexd_puts("  interrupted ");
+                demo_dec(deep_over[q]);
+                linflexd_puts(" of ");
+                demo_dec(DEEP_SAMPLES);
+                linflexd_puts("\n");
+            }
+        }
+    }
 
     linflexd_puts("context switch round trip, cycles\n");
     {
@@ -431,6 +591,15 @@ void tx_application_define(void *first_unused_memory)
     (void) tx_thread_create(&ctx_dram_a_thread, "ctxA dram", ctx_measure_entry, 1UL,
                             ctx_dram_a_stack, DEMO_STACK_SIZE,
                             3U, 3U, TX_NO_TIME_SLICE, TX_AUTO_START);
+
+    /* Stack-heavy pair, after the context-switch pairs.  */
+
+    (void) tx_thread_create(&deep_btcm_thread, "deep btcm", deep_entry, 0UL,
+                            deep_btcm_stack, sizeof(deep_btcm_stack),
+                            4U, 4U, TX_NO_TIME_SLICE, TX_AUTO_START);
+    (void) tx_thread_create(&deep_dram_thread, "deep dram", deep_entry, 1UL,
+                            deep_dram_stack, sizeof(deep_dram_stack),
+                            5U, 5U, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     (void) tx_thread_create(&spinner_thread, "spinner", spinner_entry, 0UL,
                             spinner_stack, DEMO_STACK_SIZE,
