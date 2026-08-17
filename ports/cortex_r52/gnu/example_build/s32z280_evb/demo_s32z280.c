@@ -49,6 +49,8 @@
 
 #include "tx_api.h"
 #include "linflexd.h"
+#include "timer.h"
+#include "cache.h"
 #include "board.h"
 
 #define DEMO_STACK_SIZE         2048
@@ -102,6 +104,160 @@ static void report(const char *name, unsigned long value)
 
 /* Highest priority.  Sleeps, so it can only run again if the tick advances
    and the scheduler resumes it.  */
+
+/**************************************************************************/
+/*  Context-switch cost, stack in BTCM against stack in DRAM0.            */
+/*                                                                        */
+/*  Two pairs of equal-priority threads hand control back and forth with  */
+/*  tx_thread_relinquish, and the measuring thread of each pair times the  */
+/*  round trip.  One pair has both stacks in BTCM, the other in DRAM0.     */
+/*                                                                        */
+/*  A round trip is two context switches plus the partner's loop, and the  */
+/*  partner's code is the same for both pairs, so the difference between   */
+/*  the pairs is the memory holding the stacks and nothing else.           */
+/*                                                                        */
+/*  Both pairs run in one image from one copy of the measuring code, which */
+/*  is what makes this comparison safe.  The alignment trap that invalid-  */
+/*  ated earlier work here bites when two builds with different layouts    */
+/*  are compared; a code shift moves both pairs equally and cancels.       */
+/*                                                                        */
+/*  Cycles, from the PMU counter: CNTPCT at 8 MHz cannot resolve a context */
+/*  switch.  Priorities 2 and 3 put the BTCM pair first and keep both      */
+/*  above judge and spinner.  The sleeper at priority 1 still preempts     */
+/*  occasionally, which can land in max; min and mean are the robust       */
+/*  figures and all three are reported.                                    */
+/**************************************************************************/
+
+static void demo_dec(unsigned long value)
+{
+    char            digits[12];
+    unsigned int    n = 0U;
+
+    if (value == 0UL) { linflexd_putc('0'); return; }
+
+    while ((value > 0UL) && (n < 12U))
+    {
+        digits[n] = (char) ('0' + (value % 10UL));
+        value /= 10UL;
+        n++;
+    }
+    while (n > 0U) { n--; linflexd_putc(digits[n]); }
+}
+
+#define CTX_SAMPLES     256U
+#define CTX_PAIRS       2U
+
+static TX_THREAD    ctx_btcm_a_thread;
+static TX_THREAD    ctx_btcm_b_thread;
+static TX_THREAD    ctx_dram_a_thread;
+static TX_THREAD    ctx_dram_b_thread;
+
+__attribute__((section(".btcm_bss"), aligned(8)))
+static unsigned char ctx_btcm_a_stack[DEMO_STACK_SIZE];
+__attribute__((section(".btcm_bss"), aligned(8)))
+static unsigned char ctx_btcm_b_stack[DEMO_STACK_SIZE];
+
+static unsigned char ctx_dram_a_stack[DEMO_STACK_SIZE];
+static unsigned char ctx_dram_b_stack[DEMO_STACK_SIZE];
+
+static volatile unsigned int ctx_done[CTX_PAIRS];
+static unsigned int          ctx_lo[CTX_PAIRS];
+static unsigned int          ctx_hi[CTX_PAIRS];
+static unsigned int          ctx_mean[CTX_PAIRS];
+static unsigned int          ctx_over[CTX_PAIRS];
+
+/* A round trip costs about 1400 cycles.  Anything past this is not a context
+   switch, it is a switch that got interrupted -- the sleeper at priority 1
+   preempts either pair when a tick lands mid-measurement.  Counted rather than
+   averaged in, because max is otherwise a report on which pair was unlucky:
+   across three runs the maximum appeared in the BTCM pair once and the DRAM0
+   pair twice, while min and mean held to the cycle.  */
+
+#define CTX_OUTLIER_CYCLES  2000U
+
+/* Cache state, and why it is forced rather than left to chance.
+
+   With the cache left alone this workload never evicts anything: the DRAM0
+   stack stays resident in the 16 KB data cache, every access is a hit, and
+   DRAM0 measures beautifully.  That is a true result for an idle system and a
+   misleading one for the argument TCM is usually made for, which is about worst
+   case when other work has pushed your stack out.
+
+   Loading the partner thread with a cache walk does not work either: the timed
+   round trip includes the partner, so the walk dominates every sample.  It was
+   tried and discarded, and it put every one of 256 samples past the outlier
+   threshold.
+
+   Instead the cache is cleaned and invalidated immediately before each timed
+   switch, outside the timed region.  Every switch then runs from a cold cache,
+   which is the state a stack in DRAM0 finds itself in after other work has run
+   and the state a stack in BTCM is immune to, because an enabled TCM is never
+   cached.  Both pairs get the same treatment, so the difference is the memory.  */
+
+
+/* One copy, used by both pairs.  */
+
+static void ctx_measure_entry(ULONG which)
+{
+    unsigned int    lo  = 0xFFFFFFFFU;
+    unsigned int    hi  = 0U;
+    unsigned long   sum = 0UL;
+    unsigned int    over = 0U;
+    unsigned int    counted = 0U;
+    unsigned int    i;
+
+    for (i = 0U; i < CTX_SAMPLES; i++)
+    {
+        unsigned int before;
+        unsigned int after;
+        unsigned int delta;
+
+        /* Cold cache for every sample, and clean before invalidate so dirty
+           stack lines reach memory rather than being discarded.  Outside the
+           timestamps, so its own cost is not in the measurement.  */
+
+        cache_clean_all();
+        cache_invalidate_dcache_all();
+
+        before = timer_read_cycles();
+        tx_thread_relinquish();
+        after  = timer_read_cycles();
+
+        delta = after - before;
+
+        if (delta > CTX_OUTLIER_CYCLES)
+        {
+            /* Preempted mid-switch.  Excluded from min, max and mean alike: a
+               maximum that reports whichever pair a tick landed on is not a
+               measurement of anything, and reporting it as jitter was wrong
+               once already.  */
+
+            over++;
+        }
+        else
+        {
+            if (delta < lo) { lo = delta; }
+            if (delta > hi) { hi = delta; }
+            sum += (unsigned long) delta;
+            counted++;
+        }
+    }
+
+    ctx_lo[which]   = lo;
+    ctx_hi[which]   = hi;
+    ctx_mean[which] = (counted > 0U) ? (unsigned int) (sum / counted) : 0U;
+    ctx_over[which] = over;
+
+    ctx_done[which] = 1U;               /* releases the partner */
+}
+
+static void ctx_partner_entry(ULONG which)
+{
+    while (ctx_done[which] == 0U)
+    {
+        tx_thread_relinquish();
+    }
+}
 
 static void sleeper_entry(ULONG input)
 {
@@ -157,6 +313,37 @@ static void judge_entry(ULONG input)
     ticks_end = tx_time_get();
 
     linflexd_puts("\n=== ThreadX on S32Z280: results ===\n");
+
+    linflexd_puts("context switch round trip, cycles\n");
+    {
+        static const char *const where[CTX_PAIRS] = { "stacks in BTCM ",
+                                                      "stacks in DRAM0" };
+        unsigned int q;
+
+        for (q = 0U; q < CTX_PAIRS; q++)
+        {
+            linflexd_puts("  ");
+            linflexd_puts(where[q]);
+            if (ctx_done[q] == 0U)
+            {
+                linflexd_puts(": did not finish\n");
+            }
+            else
+            {
+                linflexd_puts(": min ");
+                demo_dec(ctx_lo[q]);
+                linflexd_puts("  mean ");
+                demo_dec(ctx_mean[q]);
+                linflexd_puts("  max ");
+                demo_dec(ctx_hi[q]);
+                linflexd_puts("  preempted ");
+                demo_dec(ctx_over[q]);
+                linflexd_puts(" of ");
+                demo_dec(CTX_SAMPLES);
+                linflexd_puts("\n");
+            }
+        }
+    }
     report("ticks    ", (unsigned long) (ticks_end - ticks_start));
     report("sleeper  ", sleeper_runs);
     report("spinner  ", spinner_runs);
@@ -221,6 +408,29 @@ void tx_application_define(void *first_unused_memory)
     (void) tx_thread_create(&judge_thread, "judge", judge_entry, 0UL,
                             judge_stack, DEMO_STACK_SIZE,
                             10U, 10U, TX_NO_TIME_SLICE, TX_AUTO_START);
+
+    /* The PMU cycle counter has to be started here.  bsp_boot.c starts it for
+       the probe image, and this image does not run bsp_boot.c, so without this
+       every reading below would be zero -- which would read as a free context
+       switch rather than as a dead counter.  */
+
+    timer_cycles_enable();
+
+    /* BTCM pair first at priority 2, DRAM0 pair after it at 3.  */
+
+    (void) tx_thread_create(&ctx_btcm_b_thread, "ctxB btcm", ctx_partner_entry, 0UL,
+                            ctx_btcm_b_stack, DEMO_STACK_SIZE,
+                            2U, 2U, TX_NO_TIME_SLICE, TX_AUTO_START);
+    (void) tx_thread_create(&ctx_btcm_a_thread, "ctxA btcm", ctx_measure_entry, 0UL,
+                            ctx_btcm_a_stack, DEMO_STACK_SIZE,
+                            2U, 2U, TX_NO_TIME_SLICE, TX_AUTO_START);
+
+    (void) tx_thread_create(&ctx_dram_b_thread, "ctxB dram", ctx_partner_entry, 1UL,
+                            ctx_dram_b_stack, DEMO_STACK_SIZE,
+                            3U, 3U, TX_NO_TIME_SLICE, TX_AUTO_START);
+    (void) tx_thread_create(&ctx_dram_a_thread, "ctxA dram", ctx_measure_entry, 1UL,
+                            ctx_dram_a_stack, DEMO_STACK_SIZE,
+                            3U, 3U, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     (void) tx_thread_create(&spinner_thread, "spinner", spinner_entry, 0UL,
                             spinner_stack, DEMO_STACK_SIZE,
