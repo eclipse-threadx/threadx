@@ -353,8 +353,13 @@ static void build_table(void)
        bottom of the region -- no fault, just two objects on one address.  */
 
     mpu_regions[5].mpu_region_base          = S32Z_DRAM2_BASE;
+    /* Stops short of the per-thread windows at the top of the bank.  Those are
+       mapped one at a time by the thread-entry hook; leaving them inside this
+       region would make them reachable from every thread and the isolation
+       below would prove nothing.  */
+
     mpu_regions[5].mpu_region_limit         = S32Z_DRAM2_BASE
-                                            + S32Z_DRAM2_SIZE - 1UL;
+                                            + S32Z_DRAM2_SHARED_SIZE - 1UL;
     mpu_regions[5].mpu_region_ap            = MPU_AP_RW_EL1;
     mpu_regions[5].mpu_region_execute_never = 1U;
     mpu_regions[5].mpu_region_shareability  = MPU_SH_NON;

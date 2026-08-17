@@ -51,6 +51,7 @@
 #include "linflexd.h"
 #include "timer.h"
 #include "cache.h"
+#include "thread_mpu.h"
 #include "board.h"
 
 #define DEMO_STACK_SIZE         2048
@@ -388,6 +389,73 @@ static void deep_entry(ULONG which)
     deep_done[which] = 1U;
 }
 
+/**************************************************************************/
+/*  Per-thread memory protection, demonstrated rather than asserted.      */
+/*                                                                        */
+/*  Two threads each own a 4 KB window at the top of DRAM2, carved out of  */
+/*  the broad data region in mpu.c so that nothing else grants access to   */
+/*  them.  Each thread writes its own window, which must succeed, and then */
+/*  reaches for the other thread's, which must fault.                     */
+/*                                                                        */
+/*  The second half is the part that matters.  A test that only shows a    */
+/*  thread reaching its own memory proves nothing about isolation: it      */
+/*  would pass just as well with no protection at all.                    */
+/*                                                                        */
+/*  The fault is made survivable the same way the boot probes do it --     */
+/*  fault_expected tells the data abort handler to record the violation    */
+/*  and resume at the instruction after the faulting access, rather than   */
+/*  treating it as fatal.  That works in thread context because the        */
+/*  handler returns to where it came from rather than to a fixed recovery  */
+/*  point.                                                                */
+/**************************************************************************/
+
+#define ISO_THREADS     2U
+
+static TX_THREAD    iso_thread[ISO_THREADS];
+
+static unsigned char iso_stack[ISO_THREADS][DEMO_STACK_SIZE];
+
+static volatile unsigned int iso_done[ISO_THREADS];
+static unsigned int          iso_own_ok[ISO_THREADS];
+static unsigned int          iso_other_faulted[ISO_THREADS];
+static unsigned long         iso_own_base[ISO_THREADS];
+
+static void iso_entry(ULONG which)
+{
+    extern unsigned int fault_expected;
+    extern unsigned int fault_taken;
+
+    unsigned long   own   = thread_mpu_window_base((unsigned int) which);
+    unsigned long   other = thread_mpu_window_base((unsigned int) (1UL - which));
+    unsigned int    before;
+    unsigned int    pattern = 0xC0DE0000U + (unsigned int) which;
+
+    iso_own_base[which] = own;
+
+    /* Install this thread's window.  */
+
+    thread_mpu_activate(tx_thread_identify());
+
+    /* Its own window: must be reachable.  */
+
+    *((volatile unsigned int *) own) = pattern;
+    iso_own_ok[which] =
+        (*((volatile unsigned int *) own) == pattern) ? 1U : 0U;
+
+    /* The other thread's window: must not be.  Only the write is attempted --
+       reading it back would fault a second time, and the point is already
+       made.  */
+
+    before          = fault_taken;
+    fault_expected  = 1U;
+    *((volatile unsigned int *) other) = 0xBADU;
+    fault_expected  = 0U;
+
+    iso_other_faulted[which] = (fault_taken > before) ? 1U : 0U;
+
+    iso_done[which] = 1U;
+}
+
 static void sleeper_entry(ULONG input)
 {
     unsigned long spinner_before;
@@ -442,6 +510,46 @@ static void judge_entry(ULONG input)
     ticks_end = tx_time_get();
 
     linflexd_puts("\n=== ThreadX on S32Z280: results ===\n");
+
+    linflexd_puts("per-thread MPU isolation\n");
+    {
+        unsigned int w;
+        unsigned int all_ok = 1U;
+
+        for (w = 0U; w < ISO_THREADS; w++)
+        {
+            linflexd_puts("  thread ");
+            demo_dec(w);
+            linflexd_puts(" window 0x");
+            linflexd_put_hex32((unsigned int) iso_own_base[w]);
+            if (iso_done[w] == 0U)
+            {
+                linflexd_puts("  did not finish\n");
+                all_ok = 0U;
+            }
+            else
+            {
+                linflexd_puts(iso_own_ok[w] ? "  own: reachable" : "  own: UNREACHABLE");
+                linflexd_puts(iso_other_faulted[w] ? "  other: faulted\n"
+                                                   : "  other: REACHED\n");
+                if ((iso_own_ok[w] == 0U) || (iso_other_faulted[w] == 0U))
+                {
+                    all_ok = 0U;
+                }
+            }
+        }
+
+        linflexd_puts(all_ok ? "  PASS each thread reached its own window and faulted on the other\n"
+                             : "  FAIL isolation not demonstrated\n");
+
+        linflexd_puts("  region switch cost, cycles: min ");
+        demo_dec(thread_mpu_min_cycles());
+        linflexd_puts("  max ");
+        demo_dec(thread_mpu_max_cycles());
+        linflexd_puts("  switches ");
+        demo_dec(thread_mpu_switch_count());
+        linflexd_puts("\n");
+    }
 
     linflexd_puts("stack-heavy work, cycles (24 frames, cold cache)\n");
     {
@@ -591,6 +699,22 @@ void tx_application_define(void *first_unused_memory)
     (void) tx_thread_create(&ctx_dram_a_thread, "ctxA dram", ctx_measure_entry, 1UL,
                             ctx_dram_a_stack, DEMO_STACK_SIZE,
                             3U, 3U, TX_NO_TIME_SLICE, TX_AUTO_START);
+
+    /* Isolation pair.  Priority 6 and 7, after the measurement threads.  */
+
+    {
+        unsigned int w;
+
+        for (w = 0U; w < ISO_THREADS; w++)
+        {
+            (void) tx_thread_create(&iso_thread[w], "iso", iso_entry,
+                                    (ULONG) w,
+                                    iso_stack[w], DEMO_STACK_SIZE,
+                                    6U + w, 6U + w,
+                                    TX_NO_TIME_SLICE, TX_AUTO_START);
+            (void) thread_mpu_grant(&iso_thread[w], w);
+        }
+    }
 
     /* Stack-heavy pair, after the context-switch pairs.  */
 

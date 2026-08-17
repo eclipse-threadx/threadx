@@ -106,6 +106,7 @@ add_executable(s32z280_demo.elf EXCLUDE_FROM_ALL
     ${EVB_DIR}/gic_probe.c
     ${EVB_DIR}/cache.c
         ${EVB_DIR}/tcm.c
+    ${EVB_DIR}/thread_mpu.c
     ${EVB_DIR}/demo_s32z280.c
 )
 
