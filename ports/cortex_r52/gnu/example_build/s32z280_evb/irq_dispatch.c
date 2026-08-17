@@ -193,6 +193,7 @@ unsigned int board_service_count;
 #define BOARD_ISR_SECTION
 #endif
 
+__attribute__((aligned(64)))
 static BOARD_ISR_SECTION void board_irq_service_body(unsigned long intid);
 
 void board_irq_service(unsigned long intid)
@@ -212,6 +213,11 @@ void board_irq_service(unsigned long intid)
 }
 
 
+/* Aligned for the same reason as cache_workload: this body is timed, and
+   without a fixed alignment the figure moves with unrelated code changes
+   elsewhere in the image.  */
+
+__attribute__((aligned(64)))
 static BOARD_ISR_SECTION void board_irq_service_body(unsigned long intid)
 {
     if (intid == GICV3_SPURIOUS_INTID)
