@@ -44,6 +44,11 @@ __sys_stack_size__ = 0x0800;
 MEMORY
 {
     CODE (rx)  : ORIGIN = 0x79900000, LENGTH = 0x00700000    /* 7 MB   */
+    /* ATCM.  entry.S programmes IMP_ATCMREGIONR to this base and enables the
+       bank before anything runs from it, and mpu.c maps it executable.  Code
+       placed here runs at full core speed with one wait state, where CODE is
+       RTU code RAM and runs at half the core frequency (S32Z2 RM 6.3.6).  */
+    ATCM (rwx) : ORIGIN = 0x30000000, LENGTH = 0x00010000    /* 64 KB  */
     DATA (rwx) : ORIGIN = 0x31780000, LENGTH = 0x00080000    /* 512 KB: DRAM0 + DRAM1, both full core speed */
 }
 
@@ -88,6 +93,26 @@ SECTIONS
         *(.glue_7)
         *(.glue_7t)
     } > CODE
+
+    /* Code that runs from tightly-coupled memory.  Loaded into CODE and copied
+       to ATCM by atcm_copy_text() before it is called, because ECC is enabled
+       on this part and a TCM location must be written before it is read
+       (Cortex-R52 TRM 6.2.2).  The copy uses 64-bit stores for the same
+       reason: ATCM requires them where BTCM and CTCM accept 32-bit.
+
+       ALIGN(8) at both ends so the copy can move whole 64-bit units without a
+       tail case, which is what keeps the ECC requirement satisfied for every
+       location written.  */
+
+    .atcm_text : ALIGN(8)
+    {
+        __atcm_text_start__ = .;
+        *(.atcm_text*)
+        . = ALIGN(8);
+        __atcm_text_end__ = .;
+    } > ATCM AT> CODE
+
+    __atcm_text_load__ = LOADADDR(.atcm_text);
 
     .rodata :
     {

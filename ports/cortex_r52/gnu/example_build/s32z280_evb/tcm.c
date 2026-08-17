@@ -260,3 +260,45 @@ void tcm_preload(unsigned int index, unsigned long base, unsigned long bytes)
 
     __asm volatile ("dsb sy" ::: "memory");
 }
+
+
+/**************************************************************************/
+/*  Copy .atcm_text into ATCM.                                            */
+/**************************************************************************/
+
+extern char __atcm_text_start__;
+extern char __atcm_text_end__;
+extern char __atcm_text_load__;
+
+unsigned long tcm_copy_atcm_text(void)
+{
+    /* The linker aligns both ends of the section to 8, so the whole extent is a
+       whole number of 64-bit units and there is no tail to handle narrowly.
+       That matters here rather than being tidiness: a 32-bit store to ATCM does
+       not establish the ECC check bits for its location, so a tail copied 32
+       bits at a time would leave words that fault when read.  */
+
+    volatile unsigned long long        *dst;
+    const volatile unsigned long long  *src;
+    unsigned long                       bytes;
+    unsigned long                       i;
+
+    dst   = (volatile unsigned long long *) (void *) &__atcm_text_start__;
+    src   = (const volatile unsigned long long *) (void *) &__atcm_text_load__;
+    bytes = (unsigned long) (&__atcm_text_end__ - &__atcm_text_start__);
+
+    for (i = 0UL; i < (bytes / 8UL); i++)
+    {
+        dst[i] = src[i];
+    }
+
+    /* Complete the writes, then discard any stale instruction-side copy of the
+       destination before it is executed.  */
+
+    __asm__ volatile("dsb sy" ::: "memory");
+    __asm__ volatile("mcr p15, 0, r0, c7, c5, 0" : : : "memory");   /* ICIALLU */
+    __asm__ volatile("dsb sy" ::: "memory");
+    __asm__ volatile("isb" ::: "memory");
+
+    return bytes;
+}

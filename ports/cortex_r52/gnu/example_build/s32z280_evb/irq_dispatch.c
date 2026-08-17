@@ -164,7 +164,55 @@ void board_init(void)
 /*  before nesting starts.  Does not acknowledge and does not EOI.         */
 /**************************************************************************/
 
+/**************************************************************************/
+/*  Handler execution time, and where the handler's instructions live.    */
+/*                                                                        */
+/*  TX_R52_ATCM_ISR places the service routine in ATCM.  ATCM runs at full */
+/*  core speed with one wait state; .text lives in RTU code RAM, which runs */
+/*  at half the core frequency (S32Z2 RM 6.3.6).  ATCM also has no cache to */
+/*  miss, which is the property that matters for a determinism argument.    */
+/*                                                                        */
+/*  Measured in cycles from the PMU counter, not CNTPCT: at 8 MHz CNTPCT    */
+/*  cannot resolve a handler body, let alone the variation in one.          */
+/*                                                                        */
+/*  The timing wrapper below stays in .text in both configurations, so its  */
+/*  own cost appears in every sample and cancels when the two are compared. */
+/*  Only the body moves.  What matters in the result is the spread: a warm  */
+/*  instruction cache can match ATCM on the mean and cannot match it on the */
+/*  worst case.                                                            */
+/**************************************************************************/
+
+#define BOARD_LATENCY_SAMPLES   64U
+
+unsigned int board_service_cycles[BOARD_LATENCY_SAMPLES];
+unsigned int board_service_count;
+
+#ifdef TX_R52_ATCM_ISR
+#define BOARD_ISR_SECTION   __attribute__((section(".atcm_text")))
+#else
+#define BOARD_ISR_SECTION
+#endif
+
+static BOARD_ISR_SECTION void board_irq_service_body(unsigned long intid);
+
 void board_irq_service(unsigned long intid)
+{
+    unsigned int before;
+    unsigned int after;
+
+    before = timer_read_cycles();
+    board_irq_service_body(intid);
+    after  = timer_read_cycles();
+
+    if (board_service_count < BOARD_LATENCY_SAMPLES)
+    {
+        board_service_cycles[board_service_count] = after - before;
+        board_service_count++;
+    }
+}
+
+
+static BOARD_ISR_SECTION void board_irq_service_body(unsigned long intid)
 {
     if (intid == GICV3_SPURIOUS_INTID)
     {

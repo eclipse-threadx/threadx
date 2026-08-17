@@ -61,4 +61,12 @@ void                timer_start_oneshot_irq(unsigned int ticks);
 unsigned int        timer_fired(void);
 void                timer_stop(void);
 
+/* PMU cycle counter.  CNTPCT runs at 8 MHz on this part, so its 125 ns
+   granularity is too coarse to resolve interrupt latency, let alone the jitter
+   in it.  The cycle counter runs at the core clock and is what those
+   measurements use.  timer_cycles_enable must be called before any read.  */
+
+void                timer_cycles_enable(void);
+unsigned int        timer_read_cycles(void);
+
 #endif /* TIMER_H */
