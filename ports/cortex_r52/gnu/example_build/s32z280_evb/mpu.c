@@ -388,7 +388,21 @@ static void build_table(void)
        AXIM provides there, which is not TCM and would read as success.  See the
        measurement in entry.S.  */
 
-    mpu_regions_used = 7U;
+    /* BTCM.  Data only, so execute-never, unlike the ATCM region above which
+       holds code.  An enabled TCM behaves as Non-cacheable Non-shareable Normal
+       memory whatever the MPU says, so the attribute index below describes the
+       permissions and nothing else -- but a region is still required before the
+       bank can be touched at all.  */
+
+    mpu_regions[7].mpu_region_base          = S32Z_BTCM_BASE;
+    mpu_regions[7].mpu_region_limit         = S32Z_BTCM_BASE + S32Z_BTCM_SIZE - 1UL;
+    mpu_regions[7].mpu_region_ap            = MPU_AP_RW_EL1;
+    mpu_regions[7].mpu_region_execute_never = 1U;
+    mpu_regions[7].mpu_region_shareability  = MPU_SH_NON;
+    mpu_regions[7].mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
+    mpu_regions[7].mpu_region_name          = "btcm  RW NX tcm";
+
+    mpu_regions_used = 8U;
 }
 
 

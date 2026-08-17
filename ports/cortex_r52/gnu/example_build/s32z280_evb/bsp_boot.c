@@ -256,9 +256,8 @@ static unsigned long cache_bench_words;
 
 #define MAKE_CACHE_WORKLOAD(name, pad_words)                                  \
 __attribute__((aligned(64), noinline))                                        \
-static void name(void)                                                        \
+static void name(volatile unsigned int *buffer)                               \
 {                                                                             \
-    volatile unsigned int  *buffer = (volatile unsigned int *) BUFFER_BASE;    \
     unsigned long           pass;                                             \
     unsigned long           i;                                                \
                                                                               \
@@ -278,7 +277,7 @@ MAKE_CACHE_WORKLOAD(cache_workload_b, 4)
 MAKE_CACHE_WORKLOAD(cache_workload_c, 8)
 MAKE_CACHE_WORKLOAD(cache_workload_d, 12)
 
-static void (*const cache_workloads[CACHE_WORKLOAD_COPIES])(void) =
+static void (*const cache_workloads[CACHE_WORKLOAD_COPIES])(volatile unsigned int *) =
 {
     cache_workload_a,       /* loop at line offset 0  */
     cache_workload_b,       /* loop at line offset 16 */
@@ -288,7 +287,7 @@ static void (*const cache_workloads[CACHE_WORKLOAD_COPIES])(void) =
 
 static void cache_workload(void)
 {
-    cache_workloads[0]();
+    cache_workloads[0]((volatile unsigned int *) BUFFER_BASE);
 }
 
 
@@ -529,6 +528,15 @@ void bsp_main(void)
             MARK(0x21);
             linflexd_puts("T3 preloading ATCM to establish ECC check bits\n");
             tcm_preload(0U, S32Z_ATCM_BASE, S32Z_ATCM_SIZE);
+
+            /* BTCM too, now that entry.S enables it.  Whole bank: nothing is
+               placed there at link time, and with ECC on, a location must be
+               written before it can be read.  BTCM accepts 32-bit stores where
+               ATCM needs 64-bit (TRM 6.2.2); tcm_preload handles the
+               difference.  */
+
+            linflexd_puts("T3b preloading BTCM\n");
+            tcm_preload(1U, S32Z_BTCM_BASE, S32Z_BTCM_SIZE);
 
             MARK(0x22);
             linflexd_puts("T4 write and read back ATCM\n");
@@ -851,51 +859,79 @@ void bsp_main(void)
     /* Measured at four loop alignments, not one, and the spread is reported
        because it is large and real.  See the comment on the workload copies.  */
 
-    linflexd_puts("C1 timing DRAM2 at four loop alignments\n");
+    /* Three memories, four loop alignments each.  The memories are the point:
+       DRAM2 runs at half the core frequency, DRAM0 at full, and BTCM at full
+       with zero wait states and no cache in the path at all -- an enabled TCM is
+       Non-cacheable Non-shareable Normal memory whatever the MPU says.
+
+       The alignment sweep is what makes the three comparable.  A single figure
+       per memory would be picking one of two modes per memory and calling it a
+       result, which is how this example previously produced a defect report that
+       had to be withdrawn.  */
+
+    linflexd_puts("C1 timing three memories, four loop alignments each\n");
     {
-        unsigned long gains[CACHE_WORKLOAD_COPIES];
-        unsigned long lo = 0xFFFFFFFFUL;
-        unsigned long hi = 0UL;
-        unsigned int  k;
-
-        for (k = 0U; k < CACHE_WORKLOAD_COPIES; k++)
+        static const struct
         {
-            unsigned long long  before;
-            unsigned long long  after;
-            unsigned long       cold;
-            unsigned long       warm;
+            const char     *name;
+            unsigned long   base;
+        } memories[3] =
+        {
+            { "DRAM2 half-speed", S32Z_DRAM2_BASE },
+            { "DRAM0 full-speed", S32Z_DRAM0_BASE + 0x10000UL },
+            { "BTCM  0 wait    ", S32Z_BTCM_BASE  }
+        };
 
-            /* Cold: both caches off.  cache_disable_all also invalidates, so
-               each alignment starts from the same state as the first.  */
+        unsigned long overall_hi = 0UL;
+        unsigned int  m;
 
-            cache_disable_all();
+        for (m = 0U; m < 3U; m++)
+        {
+            unsigned int k;
 
-            before = timer_read_cntpct();
-            cache_workloads[k]();
-            after  = timer_read_cntpct();
-            cold   = (unsigned long) (after - before);
-
-            cache_enable();
-
-            before = timer_read_cntpct();
-            cache_workloads[k]();
-            after  = timer_read_cntpct();
-            warm   = (unsigned long) (after - before);
-
-            gains[k] = (cold > warm) ? (((cold - warm) * 1000UL) / cold) : 0UL;
-
-            if (gains[k] < lo) { lo = gains[k]; }
-            if (gains[k] > hi) { hi = gains[k]; }
-
-            linflexd_puts("  offset ");
-            report_dec_small(k * 16U);
-            linflexd_puts(": cold ");
-            report_dec(cold);
-            linflexd_puts("  warm ");
-            report_dec(warm);
-            linflexd_puts("  gain/1000 ");
-            report_dec(gains[k]);
+            linflexd_puts("  ");
+            linflexd_puts(memories[m].name);
+            linflexd_puts(" at 0x");
+            linflexd_put_hex32((unsigned int) memories[m].base);
             linflexd_puts("\n");
+
+            for (k = 0U; k < CACHE_WORKLOAD_COPIES; k++)
+            {
+                volatile unsigned int *buf =
+                    (volatile unsigned int *) memories[m].base;
+                unsigned long long  before;
+                unsigned long long  after;
+                unsigned long       cold;
+                unsigned long       warm;
+                unsigned long       gain;
+
+                cache_disable_all();
+
+                before = timer_read_cntpct();
+                cache_workloads[k](buf);
+                after  = timer_read_cntpct();
+                cold   = (unsigned long) (after - before);
+
+                cache_enable();
+
+                before = timer_read_cntpct();
+                cache_workloads[k](buf);
+                after  = timer_read_cntpct();
+                warm   = (unsigned long) (after - before);
+
+                gain = (cold > warm) ? (((cold - warm) * 1000UL) / cold) : 0UL;
+                if (gain > overall_hi) { overall_hi = gain; }
+
+                linflexd_puts("    offset ");
+                report_dec((unsigned long) (k * 16U));
+                linflexd_puts(": cold ");
+                report_dec(cold);
+                linflexd_puts("  warm ");
+                report_dec(warm);
+                linflexd_puts("  gain/1000 ");
+                report_dec(gain);
+                linflexd_puts("\n");
+            }
         }
 
         MARK(0x72);
@@ -908,25 +944,19 @@ void bsp_main(void)
             linflexd_puts("C3 FAIL caches did not enable\n");
         }
 
-        report("gain lo  ", (unsigned int) lo);
-        report("gain hi  ", (unsigned int) hi);
+        /* The claim is that the caches can help somewhere, which needs one
+           memory at one alignment to show it.  BTCM is expected to show nothing:
+           it is not cached, so there is nothing for enabling the cache to
+           improve, and a zero there is the correct answer rather than a
+           failure.  */
 
-        /* The claim is that the caches can help this workload, which needs one
-           alignment to show it.  A criterion applied to a single arbitrary
-           alignment would report either 24% or nothing at all, and both would
-           be true of the same silicon.  */
-
-        if (hi >= 100UL)
+        if (overall_hi >= 100UL)
         {
-            linflexd_puts("C4 PASS caches measurably faster at some alignment\n");
-            if (lo < 100UL)
-            {
-                linflexd_puts("  note: alignment-dependent, low mode under 10%\n");
-            }
+            linflexd_puts("C4 PASS caches measurably faster somewhere\n");
         }
         else
         {
-            linflexd_puts("C4 no alignment showed a 10% speedup\n");
+            linflexd_puts("C4 no memory and alignment showed a 10% speedup\n");
         }
     }
 

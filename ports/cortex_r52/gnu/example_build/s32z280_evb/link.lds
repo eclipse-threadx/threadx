@@ -49,6 +49,11 @@ MEMORY
        placed here runs at full core speed with one wait state, where CODE is
        RTU code RAM and runs at half the core frequency (S32Z2 RM 6.3.6).  */
     ATCM (rwx) : ORIGIN = 0x30000000, LENGTH = 0x00010000    /* 64 KB  */
+    /* BTCM.  16 KB at zero wait states, enabled by entry.S, and preloaded there
+       as well because ECC means a location must be written before it is read.
+       Used for data that wants deterministic access without depending on a
+       cache -- an enabled TCM is never cached.  */
+    BTCM (rw)  : ORIGIN = 0x30100000, LENGTH = 0x00004000    /* 16 KB  */
     DATA (rwx) : ORIGIN = 0x31780000, LENGTH = 0x00080000    /* 512 KB: DRAM0 + DRAM1, both full core speed */
 }
 
@@ -129,6 +134,18 @@ SECTIONS
         . = ALIGN(8);
         __data_end__ = .;
     } > DATA
+
+    /* Data placed in BTCM.  NOLOAD: nothing is copied in, and entry.S has
+       already written every location in the bank to establish ECC check bits,
+       so anything here is safe to read before it is written by the program.  */
+
+    .btcm_bss (NOLOAD) : ALIGN(8)
+    {
+        __btcm_bss_start__ = .;
+        *(.btcm_bss*)
+        . = ALIGN(8);
+        __btcm_bss_end__ = .;
+    } > BTCM
 
     .bss (NOLOAD) :
     {
