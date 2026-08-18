@@ -205,6 +205,12 @@ DATA WBWA RA : 0b [Outer]1111 [Inner]1111
    permissions of the region instead.  */
 #define TXM_MODULE_MPU_ALIGNMENT                64
 
+/* Mask that keeps only the address bits of PRBAR and PRLAR.  The low six bits
+   hold attributes on this core, so every base and limit written into the region
+   table must be masked with this and not with the Armv8-M 32-byte equivalent.  */
+
+#define TXM_MODULE_MPU_ADDRESS_MASK             0xFFFFFFC0
+
 /* No secure-stack extension calls.  Those are the Armv8-M security extension,
    which this core does not have: privilege here is the ARM mode, EL1 against
    EL0, and there is no secure world to allocate a second stack in.  */
