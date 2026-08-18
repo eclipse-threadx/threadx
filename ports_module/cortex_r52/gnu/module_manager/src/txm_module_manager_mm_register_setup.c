@@ -72,6 +72,11 @@
    configuration would need to revisit this, and would need to revisit far more
    than this.  */
 
+/* Marks the end of the user-mode entry function, so the kernel entry region can
+   be sized to it.  */
+
+extern VOID     _txm_module_manager_user_mode_entry_end(VOID);
+
 VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance)
 {
 
@@ -84,7 +89,14 @@ ULONG   callback_stack_size;
        Mask address to proper range, inner shareable, read only. */
     module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MPU_KERNEL_ENTRY_INDEX].txm_module_mpu_region_base_address = ((ULONG) _txm_module_manager_user_mode_entry & TXM_MODULE_MPU_ADDRESS_MASK) | TXM_MODULE_ATTRIBUTE_NON_SHAREABLE | TXM_MODULE_ATTRIBUTE_READ_ONLY;
     /* Set the limit address, attribute index, and enable bit.  */
-    module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MPU_KERNEL_ENTRY_INDEX].txm_module_mpu_region_limit_address = ((ULONG) _txm_module_manager_user_mode_entry & TXM_MODULE_MPU_ADDRESS_MASK) | TXM_MODULE_ATTRIBUTE_INDEX | TXM_MODULE_ATTRIBUTE_REGION_ENABLE;
+    /* Limit taken from the end of the function rather than from its base.  The
+       whole privileged surface a module can execute is 24 bytes, so one granule
+       covers it today and the base would have done -- but if the entry ever grows
+       past 64 bytes, sizing from the base would silently leave the tail of it
+       outside the region and the module would fault on a call it is entitled to
+       make.  */
+
+    module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MPU_KERNEL_ENTRY_INDEX].txm_module_mpu_region_limit_address = (((ULONG) _txm_module_manager_user_mode_entry_end - 1) & TXM_MODULE_MPU_ADDRESS_MASK) | TXM_MODULE_ATTRIBUTE_INDEX | TXM_MODULE_ATTRIBUTE_REGION_ENABLE;
     /* End of kernel mode entry setup.  */
 
 
