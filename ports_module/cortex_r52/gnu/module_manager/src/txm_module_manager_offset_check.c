@@ -78,6 +78,23 @@ _Static_assert(offsetof(TXM_MODULE_INSTANCE, txm_module_instance_mpu_registers)
                "TXM_MODULE_INSTANCE; the scheduler would load regions from the "
                "wrong address");
 
+/* Offset the module thread stack build hard-codes.  This one decides the mode a
+   module thread starts in, so a wrong value starts it privileged when it asked
+   not to be -- protection that is absent from the first instruction and looks
+   present everywhere else.  The Cortex-R4 module port reads 0x9C here, which in
+   this port is a different field.  */
+
+_Static_assert(offsetof(TX_THREAD, tx_thread_module_user_mode) == 0xA0,
+               "txm_module_manager_thread_stack_build.S THREAD_MODULE_USER_MODE "
+               "no longer matches TX_THREAD; module threads could start in the "
+               "wrong privilege mode");
+
+_Static_assert(offsetof(TX_THREAD, tx_thread_module_user_mode)
+                   != offsetof(TX_THREAD, tx_thread_module_current_user_mode),
+               "the requested and current user-mode fields have collapsed onto "
+               "one offset; the stack build and the SVC handler would be reading "
+               "each other's field");
+
 /* Offsets the supervisor call handler hard-codes, from
    txm_module_manager_svc_handler.S.  This is the privilege boundary, so a wrong
    offset here does not merely misbehave: writing the user-mode flag to the wrong
