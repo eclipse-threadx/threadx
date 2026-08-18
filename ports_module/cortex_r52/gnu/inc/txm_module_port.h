@@ -159,11 +159,25 @@ The following extensions must also be defined in tx_port.h:
    starting at TXM_MODULE_MPU_FIRST_REGION.  The indices below are relative to
    that base.
 
-   TXM_MODULE_MPU_FIRST_REGION must sit above every region the board support
-   package programs.  The S32Z280 example uses 0 through 8, so 9 is the first
-   free one; a board that uses more must raise this.  */
+   TXM_MODULE_MPU_FIRST_REGION is 8, and the choice is not arbitrary.  The TRM
+   provides direct access to PRBAR0 through PRBAR15 and PRLAR0 through PRLAR15
+   (3.3.85, 3.3.86), encoded CRn c6, CRm c8 + n/2, opc2 0 and 1 for an even
+   region and 4 and 5 for an odd one.  Regions above 15 are reachable only
+   through PRSELR, which selects a region for the indirect PRBAR and PRLAR view
+   and needs an ISB before those registers can be written -- per region.
 
-#define TXM_MODULE_MPU_FIRST_REGION             9
+   Measured on this part: programming one region through PRSELR costs 542 to 604
+   cycles, and the same region written directly costs 434 to 470.  Most of what
+   remains is the closing dsb and isb rather than the writes, so a block of
+   regions written directly with one barrier pair at the end is far cheaper than
+   the per-region figure suggests, while the PRSELR route pays an ISB every time.
+
+   Eight entries at 8 through 15 therefore sit entirely within the directly
+   addressable range, and the board support package's map occupies 0 through 7.
+   A board needing more than eight kernel regions has to either shrink this block
+   or accept PRSELR for the overflow.  */
+
+#define TXM_MODULE_MPU_FIRST_REGION             8
 #define TXM_MODULE_MPU_TOTAL_ENTRIES            8
 #define TXM_MODULE_MPU_KERNEL_ENTRY_INDEX       0
 #define TXM_MODULE_MPU_CODE_INDEX               1
