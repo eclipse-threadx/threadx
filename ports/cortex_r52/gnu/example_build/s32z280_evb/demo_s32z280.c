@@ -289,6 +289,7 @@ static void ctx_partner_entry(ULONG which)
 #define DEEP_SAMPLES    64U
 #define DEEP_DEPTH      24U
 #define DEEP_FRAME      16U     /* words: 64 bytes, one cache line per frame */
+#define DEEP_PLACEMENTS 4U
 
 static TX_THREAD    deep_btcm_thread;
 static TX_THREAD    deep_dram_thread;
@@ -301,36 +302,65 @@ static unsigned char deep_btcm_stack[4096];
 static unsigned char deep_dram_stack[4096];
 
 static unsigned int deep_samples[CTX_PAIRS][DEEP_SAMPLES];
-static unsigned int deep_lo[CTX_PAIRS];
-static unsigned int deep_hi[CTX_PAIRS];
-static unsigned int deep_mean[CTX_PAIRS];
-static unsigned int deep_over[CTX_PAIRS];
+static unsigned int deep_lo[CTX_PAIRS][DEEP_PLACEMENTS];
+static unsigned int deep_hi[CTX_PAIRS][DEEP_PLACEMENTS];
+static unsigned int deep_mean[CTX_PAIRS][DEEP_PLACEMENTS];
+static unsigned int deep_over[CTX_PAIRS][DEEP_PLACEMENTS];
 static volatile unsigned int deep_done[CTX_PAIRS];
 
-__attribute__((noinline))
-static unsigned int deep_touch(unsigned int depth)
-{
-    volatile unsigned int   frame[DEEP_FRAME];
-    unsigned int            acc = 0U;
-    unsigned int            i;
+/* Four placements of the recursive body, each 64-byte aligned and then
+   displaced within its line, and the measurement sweeps all four.
 
-    for (i = 0U; i < DEEP_FRAME; i++)
-    {
-        frame[i] = depth + i;
-    }
+   The first version of this measurement had one placement, which is the
+   methodology this example spent two changes correcting elsewhere.  It showed
+   BTCM with a threefold tighter spread than DRAM0; that did not survive an
+   image with two more threads in it, where both spreads came out near 6500 and
+   the minima moved 15%.  A single placement was reporting where the linker had
+   put the code.
 
-    if (depth > 0U)
-    {
-        acc = deep_touch(depth - 1U);
-    }
+   The pad nops execute on every recursion level rather than once, so each
+   placement carries a slightly different constant cost -- about 0.6% at the
+   widest pad.  That cancels in the comparison that matters, because BTCM and
+   DRAM0 are measured at the same placement, and it does not affect the spread
+   within a placement.  */
 
-    for (i = 0U; i < DEEP_FRAME; i++)
-    {
-        acc += frame[i];
-    }
-
-    return acc;
+#define MAKE_DEEP_TOUCH(name, pad_words)                                      \
+__attribute__((aligned(64), noinline))                                        \
+static unsigned int name(unsigned int depth)                                   \
+{                                                                             \
+    volatile unsigned int   frame[DEEP_FRAME];                                \
+    unsigned int            acc = 0U;                                         \
+    unsigned int            i;                                                \
+                                                                              \
+    __asm__ volatile(".rept " #pad_words "\n\tnop\n\t.endr");                 \
+                                                                              \
+    for (i = 0U; i < DEEP_FRAME; i++)                                         \
+    {                                                                         \
+        frame[i] = depth + i;                                                 \
+    }                                                                         \
+                                                                              \
+    if (depth > 0U)                                                           \
+    {                                                                         \
+        acc = name(depth - 1U);                                               \
+    }                                                                         \
+                                                                              \
+    for (i = 0U; i < DEEP_FRAME; i++)                                         \
+    {                                                                         \
+        acc += frame[i];                                                      \
+    }                                                                         \
+                                                                              \
+    return acc;                                                               \
 }
+
+MAKE_DEEP_TOUCH(deep_touch_a, 0)
+MAKE_DEEP_TOUCH(deep_touch_b, 4)
+MAKE_DEEP_TOUCH(deep_touch_c, 8)
+MAKE_DEEP_TOUCH(deep_touch_d, 12)
+
+static unsigned int (*const deep_touches[DEEP_PLACEMENTS])(unsigned int) =
+{
+    deep_touch_a, deep_touch_b, deep_touch_c, deep_touch_d
+};
 
 static void deep_entry(ULONG which)
 {
@@ -345,47 +375,67 @@ static void deep_entry(ULONG which)
     {
         unsigned int before;
         unsigned int after;
+        unsigned int slot = i / (DEEP_SAMPLES / DEEP_PLACEMENTS);
+
+        if (slot >= DEEP_PLACEMENTS)
+        {
+            slot = DEEP_PLACEMENTS - 1U;
+        }
 
         cache_clean_all();
         cache_invalidate_dcache_all();
 
         before = timer_read_cycles();
-        (void) deep_touch(DEEP_DEPTH);
+        (void) deep_touches[slot](DEEP_DEPTH);
         after  = timer_read_cycles();
 
         deep_samples[which][i] = after - before;
     }
 
-    /* Post-process: the minimum sets the scale, and anything past twice it was
-       interrupted rather than slow.  */
+    /* Post-processed per placement.  A figure spanning placements would mix the
+       four constant costs and hide exactly what this sweep exists to show.  */
 
-    lo = 0xFFFFFFFFU;
-    for (i = 0U; i < DEEP_SAMPLES; i++)
     {
-        if (deep_samples[which][i] < lo) { lo = deep_samples[which][i]; }
+        unsigned int slot;
+        unsigned int each = DEEP_SAMPLES / DEEP_PLACEMENTS;
+
+        for (slot = 0U; slot < DEEP_PLACEMENTS; slot++)
+        {
+            unsigned int    s;
+            unsigned int    lo = 0xFFFFFFFFU;
+            unsigned int    hi = 0U;
+            unsigned long   sum = 0UL;
+            unsigned int    counted = 0U;
+            unsigned int    over = 0U;
+
+            for (s = slot * each; s < ((slot + 1U) * each); s++)
+            {
+                if (deep_samples[which][s] < lo) { lo = deep_samples[which][s]; }
+            }
+
+            for (s = slot * each; s < ((slot + 1U) * each); s++)
+            {
+                unsigned int v = deep_samples[which][s];
+
+                if (v > (lo * 2U))
+                {
+                    over++;
+                }
+                else
+                {
+                    if (v > hi) { hi = v; }
+                    sum += (unsigned long) v;
+                    counted++;
+                }
+            }
+
+            deep_lo[which][slot]   = lo;
+            deep_hi[which][slot]   = hi;
+            deep_mean[which][slot] = (counted > 0U) ? (unsigned int) (sum / counted) : 0U;
+            deep_over[which][slot] = over;
+        }
     }
 
-    hi = 0U; sum = 0UL; counted = 0U; over = 0U;
-    for (i = 0U; i < DEEP_SAMPLES; i++)
-    {
-        unsigned int v = deep_samples[which][i];
-
-        if (v > (lo * 2U))
-        {
-            over++;
-        }
-        else
-        {
-            if (v > hi) { hi = v; }
-            sum += (unsigned long) v;
-            counted++;
-        }
-    }
-
-    deep_lo[which]   = lo;
-    deep_hi[which]   = hi;
-    deep_mean[which] = (counted > 0U) ? (unsigned int) (sum / counted) : 0U;
-    deep_over[which] = over;
     deep_done[which] = 1U;
 }
 
@@ -551,32 +601,38 @@ static void judge_entry(ULONG input)
         linflexd_puts("\n");
     }
 
-    linflexd_puts("stack-heavy work, cycles (24 frames, cold cache)\n");
+    linflexd_puts("stack-heavy work, cycles (24 frames, cold cache, 4 placements)\n");
     {
-        static const char *const dwhere[CTX_PAIRS] = { "stack in BTCM ",
-                                                       "stack in DRAM0" };
+        static const char *const dwhere[CTX_PAIRS] = { "BTCM ", "DRAM0" };
         unsigned int q;
+        unsigned int slot;
 
         for (q = 0U; q < CTX_PAIRS; q++)
         {
-            linflexd_puts("  ");
-            linflexd_puts(dwhere[q]);
             if (deep_done[q] == 0U)
             {
+                linflexd_puts("  ");
+                linflexd_puts(dwhere[q]);
                 linflexd_puts(": did not finish\n");
+                continue;
             }
-            else
+
+            for (slot = 0U; slot < DEEP_PLACEMENTS; slot++)
             {
+                linflexd_puts("  ");
+                linflexd_puts(dwhere[q]);
+                linflexd_puts(" offset ");
+                demo_dec((unsigned long) (slot * 16U));
                 linflexd_puts(": min ");
-                demo_dec(deep_lo[q]);
+                demo_dec(deep_lo[q][slot]);
                 linflexd_puts("  mean ");
-                demo_dec(deep_mean[q]);
+                demo_dec(deep_mean[q][slot]);
                 linflexd_puts("  max ");
-                demo_dec(deep_hi[q]);
-                linflexd_puts("  interrupted ");
-                demo_dec(deep_over[q]);
-                linflexd_puts(" of ");
-                demo_dec(DEEP_SAMPLES);
+                demo_dec(deep_hi[q][slot]);
+                linflexd_puts("  spread ");
+                demo_dec(deep_hi[q][slot] - deep_lo[q][slot]);
+                linflexd_puts("  cut ");
+                demo_dec(deep_over[q][slot]);
                 linflexd_puts("\n");
             }
         }
