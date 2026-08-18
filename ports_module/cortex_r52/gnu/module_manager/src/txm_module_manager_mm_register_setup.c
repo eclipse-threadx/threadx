@@ -129,7 +129,7 @@ ULONG   callback_stack_size;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_inside_data_check              Cortex-M33       */
+/*    _txm_module_manager_inside_data_check              Cortex-R52       */
 /*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */

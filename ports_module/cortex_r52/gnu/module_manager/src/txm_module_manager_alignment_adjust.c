@@ -1,0 +1,86 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module Manager                                                      */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+#include "tx_api.h"
+#include "txm_module.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_alignment_adjust               Cortex-R52       */
+/*                                                           6.1.8        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Scott Larson, Microsoft Corporation                                 */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function adjusts the alignment and size of the code and data   */
+/*    section for a given module implementation.                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_preamble                   Pointer to module preamble        */
+/*    code_size                         Size of the code area (updated)   */
+/*    code_alignment                    Code area alignment (updated)     */
+/*    data_size                         Size of data area (updated)       */
+/*    data_alignment                    Data area alignment (updated)     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Initial thread stack frame                                          */
+/*                                                                        */
+/**************************************************************************/
+VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,
+                                           ULONG *code_size,
+                                           ULONG *code_alignment,
+                                           ULONG *data_size,
+                                           ULONG *data_alignment)
+{
+
+    /* Rounding to the granule is all this has to do, and that is a property of
+       PMSAv8-R rather than a shortcut.  The Cortex-R4 port's equivalent runs to
+       183 lines because PMSAv7 regions must be a power of two in size and
+       aligned to their own size, so a module's code and data have to be grown
+       and repositioned to fit the nearest legal region.  Base and limit pairs
+       have no such constraint: any 64-byte-aligned extent is a legal region.  */
+
+    /* Round code and data size UP to TXM_MODULE_MPU_ALIGNMENT bytes. */
+    *code_size = (*code_size + TXM_MODULE_MPU_ALIGNMENT - 1) & ~(TXM_MODULE_MPU_ALIGNMENT - 1);
+    *data_size = (*data_size + TXM_MODULE_MPU_ALIGNMENT - 1) & ~(TXM_MODULE_MPU_ALIGNMENT - 1);
+
+    /* Alignment for code and data is TXM_MODULE_MPU_ALIGNMENT bytes. */
+    *code_alignment =   TXM_MODULE_MPU_ALIGNMENT;
+    *data_alignment =   TXM_MODULE_MPU_ALIGNMENT;
+}
