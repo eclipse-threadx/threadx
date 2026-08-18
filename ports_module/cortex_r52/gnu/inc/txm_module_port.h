@@ -100,7 +100,14 @@ The following extensions must also be defined in tx_port.h:
 
 /* Define the properties for this particular module port.  */
 
-#define TXM_MODULE_PORT_DISPATCH
+/* No port dispatch.  It exists so a port can service kernel requests specific to
+   it, and this one has none: the only calls the Armv8-M port dispatches are its
+   secure-stack allocate and free, which belong to the security extension this core
+   does not have.  Defining it would have the module manager call a
+   _txm_module_manager_port_dispatch that does not exist.  The Cortex-R4 module
+   port leaves it undefined for the same reason.  */
+
+/* #define TXM_MODULE_PORT_DISPATCH */
 
 #define TXM_MODULE_MEMORY_PROTECTION_ENABLED
 
