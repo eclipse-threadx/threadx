@@ -66,11 +66,19 @@
 volatile ULONG  module_progress;
 volatile ULONG  module_scratch[16];
 
-/* Filled in by the manager before the module starts: an address the module has no
-   business touching.  Passing it in rather than hard-coding one keeps the module
-   free of assumptions about where the manager lives.  */
+/* An address the module has no business touching, used by step 3.
 
-volatile ULONG  module_forbidden_address;
+   It defaults to the base of DRAM0, which is where the manager's own data and
+   stacks live on this board and is covered by a region the module does not own.
+   The manager can overwrite this before starting the module if it wants to aim
+   the test somewhere else, but it does not have to: locating a symbol inside a
+   loaded module means walking its image, and an example should not need that to
+   make its point.
+
+   Whatever it holds must be outside every region the module owns, or step 3
+   succeeds and the test silently proves nothing.  */
+
+volatile ULONG  module_forbidden_address = 0x31780000UL;
 
 
 void demo_module_start(ULONG id)
