@@ -78,6 +78,47 @@ _Static_assert(offsetof(TXM_MODULE_INSTANCE, txm_module_instance_mpu_registers)
                "TXM_MODULE_INSTANCE; the scheduler would load regions from the "
                "wrong address");
 
+/* Offsets the supervisor call handler hard-codes, from
+   txm_module_manager_svc_handler.S.  This is the privilege boundary, so a wrong
+   offset here does not merely misbehave: writing the user-mode flag to the wrong
+   word would leave a thread believing it is privileged when it is not, or the
+   reverse, and swapping to a stack pointer read from the wrong field would put
+   the kernel on memory the module can write.  */
+
+#define THREAD_STACK_PTR        0x08
+#define THREAD_STACK_START      0x0C
+#define THREAD_STACK_END        0x10
+#define THREAD_STACK_SIZE       0x14
+#define THREAD_CUR_USER_MODE    0x9C
+#define THREAD_KSTACK_START     0xA8
+#define THREAD_KSTACK_END       0xAC
+#define THREAD_KSTACK_SIZE      0xB0
+#define THREAD_MSTACK_PTR       0xB4
+#define THREAD_MSTACK_START     0xB8
+#define THREAD_MSTACK_END       0xBC
+#define THREAD_MSTACK_SIZE      0xC0
+
+#define T_OFF(f)  offsetof(TX_THREAD, f)
+
+_Static_assert(T_OFF(tx_thread_stack_ptr)   == THREAD_STACK_PTR,   "svc handler: stack_ptr moved");
+_Static_assert(T_OFF(tx_thread_stack_start) == THREAD_STACK_START, "svc handler: stack_start moved");
+_Static_assert(T_OFF(tx_thread_stack_end)   == THREAD_STACK_END,   "svc handler: stack_end moved");
+_Static_assert(T_OFF(tx_thread_stack_size)  == THREAD_STACK_SIZE,  "svc handler: stack_size moved");
+
+_Static_assert(T_OFF(tx_thread_module_current_user_mode) == THREAD_CUR_USER_MODE,
+               "svc handler: the user-mode flag moved; a thread could be left "
+               "believing it is privileged when it is not");
+
+_Static_assert(T_OFF(tx_thread_module_kernel_stack_start) == THREAD_KSTACK_START, "svc handler: kernel_stack_start moved");
+_Static_assert(T_OFF(tx_thread_module_kernel_stack_end)   == THREAD_KSTACK_END,
+               "svc handler: kernel_stack_end moved; the kernel would run on a "
+               "stack read from the wrong field");
+_Static_assert(T_OFF(tx_thread_module_kernel_stack_size)  == THREAD_KSTACK_SIZE,  "svc handler: kernel_stack_size moved");
+_Static_assert(T_OFF(tx_thread_module_stack_ptr)   == THREAD_MSTACK_PTR,   "svc handler: module stack_ptr moved");
+_Static_assert(T_OFF(tx_thread_module_stack_start) == THREAD_MSTACK_START, "svc handler: module stack_start moved");
+_Static_assert(T_OFF(tx_thread_module_stack_end)   == THREAD_MSTACK_END,   "svc handler: module stack_end moved");
+_Static_assert(T_OFF(tx_thread_module_stack_size)  == THREAD_MSTACK_SIZE,  "svc handler: module stack_size moved");
+
 /* Offsets the fault capture hard-codes, from
    txm_module_manager_fault_capture.S.  Same hazard as the scheduler's: the
    capture runs in Abort mode with a fault in progress, and a wrong offset there
