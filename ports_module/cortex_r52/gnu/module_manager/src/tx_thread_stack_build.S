@@ -27,6 +27,7 @@
     .arm
 
 SVC_MODE        =       0x13                    @ SVC mode
+SYS_MODE        =       0x1F                    @ SYS mode, privileged
 #ifdef TX_ENABLE_FIQ_SUPPORT
 CPSR_MASK       =       0xDF                    @ Mask initial CPSR, IRQ & FIQ interrupts enabled
 #else
@@ -152,7 +153,20 @@ _tx_thread_stack_build:
     STR     r3, [r2, #68]                   @ 0 for back-trace
     MRS     r1, CPSR                        @ Pickup CPSR
     BIC     r1, r1, #CPSR_MASK              @ Mask mode bits of CPSR
-    ORR     r3, r1, #SVC_MODE               @ Build CPSR, SVC mode, interrupts enabled
+@
+@    /* SYS mode, not SVC.  In a module port no thread runs in SVC mode: SVC is
+@       reserved for the supervisor call handler, which is how a module reaches
+@       the kernel, and a thread sitting in SVC mode would be using the handler's
+@       banked stack pointer as its own.  Kernel threads therefore start in SYS
+@       mode, which is privileged and shares User mode's banked sp -- the same sp
+@       a module thread uses -- so the context save and restore paths can reach a
+@       thread's stack the same way whoever it belongs to.
+@
+@       This is the one line that differs from the base port's stack build, and
+@       leaving it as SVC would have put kernel threads on the SVC stack while the
+@       restore path looked for them on the SYS one.  */
+@
+    ORR     r3, r1, #SYS_MODE               @ Build CPSR, SYS mode, interrupts enabled
     STR     r3, [r2, #4]                    @ Store initial CPSR
 @
 @    /* Setup stack pointer.  */
