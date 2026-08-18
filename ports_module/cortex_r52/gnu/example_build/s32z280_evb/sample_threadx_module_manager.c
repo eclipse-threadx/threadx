@@ -186,6 +186,34 @@ static void report_entry(ULONG input)
 /*  Application definition.                                               */
 /**************************************************************************/
 
+/**************************************************************************/
+/*  Board entry.                                                          */
+/*                                                                        */
+/*  entry.S calls this once the core is at EL1 with the MPU and caches     */
+/*  configured.  Same shape as the other examples on this board: bring the */
+/*  console up, say so, and enter the kernel.                              */
+/**************************************************************************/
+
+void bsp_main(void)
+{
+    (void) linflexd_init();
+
+    linflexd_puts("\n=== ThreadX modules :: S32Z280-594EVB ===\n");
+    linflexd_puts("entering kernel\n");
+
+    tx_kernel_enter();
+
+    /* Not reached.  */
+
+    linflexd_puts("FAIL tx_kernel_enter returned\n");
+
+    for (;;)
+    {
+        __asm__ volatile("nop");
+    }
+}
+
+
 void tx_application_define(void *first_unused_memory)
 {
     UINT    status;

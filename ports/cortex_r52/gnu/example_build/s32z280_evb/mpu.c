@@ -302,8 +302,12 @@ static void build_table(void)
        Reference Manual and confirmed on the board.  */
 
     mpu_regions[1].mpu_region_base          = S32Z_DATA_SRAM_BASE;
+    /* Stops before the module area at the top of DRAM1.  A module's memory must
+       not be covered by a kernel region, or every thread could reach it and the
+       manager's own regions would be decoration.  */
+
     mpu_regions[1].mpu_region_limit         = S32Z_DATA_SRAM_BASE
-                                            + S32Z_DATA_SRAM_SIZE - 1UL;
+                                            + S32Z_DATA_SRAM_SHARED_SIZE - 1UL;
     mpu_regions[1].mpu_region_ap            = MPU_AP_RW_EL1;
     mpu_regions[1].mpu_region_execute_never = 1U;
     mpu_regions[1].mpu_region_shareability  = MPU_SH_NON;

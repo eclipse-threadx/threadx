@@ -238,11 +238,30 @@ typedef unsigned short                          USHORT;
 
 #define TX_BLOCK_POOL_EXTENSION
 #define TX_BYTE_POOL_EXTENSION
-#define TX_EVENT_FLAGS_GROUP_EXTENSION
+/* The four object extensions below each carry the module instance that owns the
+   object, and the module manager needs them to answer a question it must answer
+   on every service call: is the object this module is asking about one it owns?
+   Without them a module could pass any address it liked as a queue or a semaphore
+   and the kernel would act on whatever was there.
+
+   They are also why a module port cannot share the base port's ThreadX library.
+   They change the layout of TX_QUEUE, TX_SEMAPHORE, TX_EVENT_FLAGS_GROUP and
+   TX_TIMER, so a library compiled against the base port's tx_port.h and a manager
+   compiled against this one disagree about every kernel object -- and both
+   compile, so nothing says so.
+
+   Block pool, byte pool and mutex stay empty, as they are in the Armv8-M module
+   port: the manager tracks ownership of those differently.  */
+
+#define TX_EVENT_FLAGS_GROUP_EXTENSION          VOID    *tx_event_flags_group_module_instance; \
+                                                VOID   (*tx_event_flags_group_set_module_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *group_ptr);
 #define TX_MUTEX_EXTENSION
-#define TX_QUEUE_EXTENSION
-#define TX_SEMAPHORE_EXTENSION
-#define TX_TIMER_EXTENSION
+#define TX_QUEUE_EXTENSION                      VOID    *tx_queue_module_instance; \
+                                                VOID   (*tx_queue_send_module_notify)(struct TX_QUEUE_STRUCT *queue_ptr);
+#define TX_SEMAPHORE_EXTENSION                  VOID    *tx_semaphore_module_instance; \
+                                                VOID   (*tx_semaphore_put_module_notify)(struct TX_SEMAPHORE_STRUCT *semaphore_ptr);
+#define TX_TIMER_EXTENSION                      VOID    *tx_timer_module_instance; \
+                                                VOID   (*tx_timer_module_expiration_function)(ULONG id);
 
 
 /* Define the user extension field of the thread control block.  Nothing

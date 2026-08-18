@@ -71,6 +71,14 @@
 
     .global _txm_module_manager_user_mode_entry
     .global _txm_module_manager_user_mode_entry_end
+
+@   The supervisor call handler compares the faulting lr against these two, to
+@   refuse an SVC 1 or SVC 2 raised from anywhere else.  They have to be visible
+@   outside this file for that check to link, which also means they are the two
+@   addresses the whole privilege boundary rests on.
+
+    .global _txm_system_mode_enter
+    .global _txm_system_mode_exit
     .extern _txm_module_manager_kernel_dispatch
 
     .type   _txm_module_manager_user_mode_entry, %function

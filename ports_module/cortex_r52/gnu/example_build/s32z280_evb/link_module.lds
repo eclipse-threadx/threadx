@@ -95,6 +95,80 @@ SECTIONS
         KEEP(*(.vectors_el1))
     } > CODE
 
+    /* The module image, at a fixed address in the module area.
+       
+       This is the stepping-stone arrangement: the module is linked absolutely,
+       here, and loaded in place from here.  The common module manager does no
+       relocation processing -- there is no .rel.dyn handling anywhere in
+       common_modules -- so a position-independent module would have nothing to
+       fix up its references, and absolute linking is what actually works today.
+       The next step is to add that processing and build the module properly
+       position independent; the memory layout below does not change when that
+       happens, only how the image gets here.
+
+       The object names carry the source suffix and a trailing wildcard: CMake
+       compiles foo.c to foo.c.obj here, because the toolchain file sets the object
+       extension, and to foo.c.o elsewhere.  The wildcard matches either.
+
+       Getting this wrong does not fail the link.  It produces an empty section at
+       whatever address the location counter happened to hold, and an image that
+       builds, links and has no module in it -- which is what the first two
+       versions of this did, once with the suffix missing entirely and once with
+       .o where this build produces .obj.
+
+       This block sits before .text deliberately.  Placement is first match, and
+       the kernel's .text claims *(.text*) -- so with this block after it, the
+       module's code was silently absorbed into kernel .text while only its data
+       landed here.  The image built, linked, reported a plausible size, and the
+       module's code was outside the region the manager would protect.
+
+       Module objects are named individually rather than matched by wildcard.
+       A wildcard over the module's sources would quietly absorb any new file
+       added to the manager side too, and a kernel object landing in the module
+       region would be handed to a module as its own memory.
+
+       Code and data are separated by __txm_module_code_end__ so the preamble can
+       declare the two sizes the manager needs.  Both are rounded to the 64-byte
+       MPU granule, because that is what the manager can express as a region.  */
+
+    .module_image : ALIGN(64)
+    {
+        __module_image_start__ = .;
+
+        KEEP(*txm_module_preamble.S.o*(.txm_module_preamble))
+
+        *sample_threadx_module.c.o*(.text .text.*)
+        *txm_module_thread_shell_entry.c.o*(.text .text.*)
+        *txm_module_gcc_setup.S.o*(.text .text.*)
+
+        /* The whole module-side library, matched by path.  These are the module's
+           own API shims -- they run in User mode as part of the module, and if
+           they landed in kernel .text the module would fault on its first
+           service call.  Matched by directory rather than named one by one
+           because there are ninety-eight of them.  */
+
+        *common_modules/module_lib/src/*(.text .text.*)
+        *sample_threadx_module.c.o*(.rodata .rodata.*)
+        *txm_module_thread_shell_entry.c.o*(.rodata .rodata.*)
+        *common_modules/module_lib/src/*(.rodata .rodata.*)
+
+        . = ALIGN(64);
+        __txm_module_code_end__ = .;
+
+        *sample_threadx_module.c.o*(.data .data.*)
+        *txm_module_thread_shell_entry.c.o*(.data .data.*)
+        *common_modules/module_lib/src/*(.data .data.*)
+        *sample_threadx_module.c.o*(.bss .bss.* COMMON)
+        *txm_module_thread_shell_entry.c.o*(.bss .bss.* COMMON)
+        *common_modules/module_lib/src/*(.bss .bss.* COMMON)
+
+        . = ALIGN(64);
+        __module_image_end__ = .;
+    } > MODULE
+
+    __txm_module_code_size = __txm_module_code_end__ - __module_image_start__;
+    __txm_module_data_size = __module_image_end__ - __txm_module_code_end__;
+
     .text :
     {
         *(.text*)

@@ -130,6 +130,32 @@
 #define S32Z_DRAM0_SIZE                 0x00040000UL
 #define S32Z_DRAM1_BASE                 0x317C0000UL
 #define S32Z_DRAM1_SIZE                 0x00040000UL
+/* Memory for loadable modules: the top 64 KB of DRAM1, deliberately left out of
+   the broad data region in mpu.c.
+
+   It has to be outside every region the board support package programs.  The
+   manager gives a module its own regions, and if the kernel's map already covered
+   that memory then every thread could reach the module and back -- the isolation
+   would be nominal.  Carving a hole is the only way to make it real.
+
+   DRAM1 rather than DRAM2 because it runs at full core speed (S32Z2 RM 6.3.6),
+   and because code and data can be contiguous here.  Putting module code in the
+   code RAM region instead would have been the obvious choice and does not work:
+   that region is read-only, so a module's data would have to live somewhere else
+   and the module would straddle two carve-outs.
+
+   64 KB is arbitrary but not accidental: it leaves 448 KB of full-speed RAM for
+   the kernel's data, stacks and bss, which currently use about 14 KB.  */
+
+#define S32Z_MODULE_AREA_BASE           0x317F0000UL
+#define S32Z_MODULE_AREA_SIZE           0x00010000UL    /* 64 KB             */
+
+/* What is left of the full-speed pair for the kernel itself.  link.lds sizes its
+   DATA region from this, so the linker cannot place kernel data in the module
+   area by accident.  */
+
+#define S32Z_DATA_SRAM_SHARED_SIZE      (S32Z_MODULE_AREA_BASE - S32Z_DRAM0_BASE)
+
 /* The top 8 KB of DRAM2 is deliberately left out of the broad data region in
    mpu.c and mapped one window at a time, per thread, instead.  Isolation is only
    meaningful in memory that no other region already grants access to, and every
