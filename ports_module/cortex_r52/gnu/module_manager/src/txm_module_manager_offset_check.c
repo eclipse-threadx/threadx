@@ -78,6 +78,44 @@ _Static_assert(offsetof(TXM_MODULE_INSTANCE, txm_module_instance_mpu_registers)
                "TXM_MODULE_INSTANCE; the scheduler would load regions from the "
                "wrong address");
 
+/* Offsets the fault capture hard-codes, from
+   txm_module_manager_fault_capture.S.  Same hazard as the scheduler's: the
+   capture runs in Abort mode with a fault in progress, and a wrong offset there
+   writes the evidence into the wrong field of a structure the application is
+   about to read.  */
+
+#define FAULT_THREAD_PTR        0x00
+#define FAULT_CODE_LOCATION     0x04
+#define FAULT_DFSR              0x08
+#define FAULT_DFAR              0x0C
+#define FAULT_IFSR              0x10
+#define FAULT_IFAR              0x14
+#define FAULT_SP                0x18
+#define FAULT_R0                0x1C
+#define FAULT_LR                0x50
+#define FAULT_SPSR              0x54
+
+#define FAULT_OFF(f)  offsetof(TXM_MODULE_MANAGER_MEMORY_FAULT_INFO, \
+                               txm_module_manager_memory_fault_info_##f)
+
+_Static_assert(FAULT_OFF(thread_ptr)    == FAULT_THREAD_PTR,    "fault capture: thread_ptr offset moved");
+_Static_assert(FAULT_OFF(code_location) == FAULT_CODE_LOCATION, "fault capture: code_location offset moved");
+_Static_assert(FAULT_OFF(dfsr)          == FAULT_DFSR,          "fault capture: dfsr offset moved");
+_Static_assert(FAULT_OFF(dfar)          == FAULT_DFAR,          "fault capture: dfar offset moved");
+_Static_assert(FAULT_OFF(ifsr)          == FAULT_IFSR,          "fault capture: ifsr offset moved");
+_Static_assert(FAULT_OFF(ifar)          == FAULT_IFAR,          "fault capture: ifar offset moved");
+_Static_assert(FAULT_OFF(sp)            == FAULT_SP,            "fault capture: sp offset moved");
+_Static_assert(FAULT_OFF(r0)            == FAULT_R0,            "fault capture: r0 offset moved");
+_Static_assert(FAULT_OFF(lr)            == FAULT_LR,            "fault capture: lr offset moved");
+_Static_assert(FAULT_OFF(spsr)          == FAULT_SPSR,          "fault capture: spsr offset moved");
+
+/* The capture writes r4 through r11 as one block starting sixteen bytes past r0,
+   and r12 thirty-two bytes past that, which assumes the registers are laid out
+   in order with no padding.  */
+
+_Static_assert(FAULT_OFF(r4)  == (FAULT_R0 + 16),   "fault capture: r4 is not four words past r0");
+_Static_assert(FAULT_OFF(r12) == (FAULT_R0 + 0x30), "fault capture: r12 is not where the block store expects");
+
 /* The scheduler loads exactly eight regions as sixteen consecutive words, with
    LDMIA walking the table two words at a time.  If the entry stops being two
    words, or the table stops holding eight of them, the unrolled sequence walks
