@@ -37,6 +37,14 @@
     .equ    TXM_INSTANCE_DATA_START,        0x2C
     .equ    TXM_INSTANCE_MPU_REGISTERS,     0x64
 
+@ The kernel's window over the module area.  Must match MPU_MODULE_LOAD_REGION
+@ in mpu.h; the offset check asserts the two agree.
+
+    .equ    MPU_MODULE_WINDOW_REGION,       16
+
+    .global     mpu_module_window_prbar
+    .global     mpu_module_window_prlar
+
     .global     _tx_thread_execute_ptr
     .global     _tx_thread_current_ptr
     .global     _tx_timer_time_slice
@@ -204,6 +212,22 @@ __tx_thread_schedule_loop:
     MCR     p15, 0, r2, c6, c15, 4                  @ PRBAR15
     MCR     p15, 0, r3, c6, c15, 5                  @ PRLAR15
 @
+@
+@    /* Close the kernel's window over the module area.  It covers the same
+@       memory the regions just loaded do, and PMSAv8-R has no region priority:
+@       two enabled regions matching one address is CONSTRAINED UNPREDICTABLE,
+@       and on this part it aborts.  A module thread reaches its own memory
+@       through the regions above and needs nothing else.
+@
+@       Region 16 is above the direct-access encodings, so it goes through
+@       PRSELR.  Clearing PRLAR is what disables it.  */
+@
+    MOV     r2, #MPU_MODULE_WINDOW_REGION
+    MCR     p15, 0, r2, c6, c2, 1                   @ PRSELR
+    ISB
+    MOV     r2, #0
+    MCR     p15, 0, r2, c6, c3, 1                   @ PRLAR, region disabled
+@
     DSB     sy                                      @ One barrier pair for the block
     ISB
     B       __tx_module_regions_done
@@ -227,6 +251,30 @@ __tx_module_regions_off:
     MCR     p15, 0, r2, c6, c14, 5                  @ PRLAR13
     MCR     p15, 0, r2, c6, c15, 1                  @ PRLAR14
     MCR     p15, 0, r2, c6, c15, 5                  @ PRLAR15
+@
+@    /* Open the kernel's window over the module area, now that no module region
+@       is enabled to overlap it.  This is the only thing that lets privileged
+@       code reach module memory: no boot region covers it, so without this the
+@       manager cannot read a module's preamble to load it.
+@
+@       Turning it on here, rather than leaving it on permanently, is what keeps
+@       it and the module's own regions mutually exclusive without anyone having
+@       to remember to bracket a call.  A thread that owns no module gets the
+@       window; a thread that owns one gets its regions instead.
+@
+@       The two register words are computed once by mpu_module_window_init and
+@       read from memory here, so this code holds no register layout.  */
+@
+    MOV     r2, #MPU_MODULE_WINDOW_REGION
+    MCR     p15, 0, r2, c6, c2, 1                   @ PRSELR
+    ISB
+    LDR     r2, =mpu_module_window_prbar
+    LDR     r3, [r2]
+    MCR     p15, 0, r3, c6, c3, 0                   @ PRBAR
+    LDR     r2, =mpu_module_window_prlar
+    LDR     r3, [r2]
+    MCR     p15, 0, r3, c6, c3, 1                   @ PRLAR, region enabled
+@
     DSB     sy
     ISB
 @

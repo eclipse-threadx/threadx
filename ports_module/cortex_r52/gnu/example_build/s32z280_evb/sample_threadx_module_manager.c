@@ -70,7 +70,14 @@ extern unsigned char    __module_image_start__;
 #define MODULE_POOL_SIZE    (16U * 1024U)
 #endif
 
-static unsigned char    module_pool[MODULE_POOL_SIZE] __attribute__((aligned(64)));
+/* In the module area, not in .bss.  The manager carves a module's data out of
+   this pool, and that data is handed to the module as an MPU region -- so if the
+   pool lived in .bss it would sit inside the kernel's data region and the two
+   would overlap, which PMSAv8-R does not allow.  Keeping the pool in the module
+   area is what makes a module's data disjoint from every kernel region.  */
+
+static unsigned char    module_pool[MODULE_POOL_SIZE]
+                            __attribute__((aligned(64), section(".module_pool")));
 
 static TXM_MODULE_INSTANCE  demo_module;
 

@@ -132,6 +132,24 @@ SECTIONS
         __module_image_end__ = .;
     } > MODULE
 
+    /* The pool the manager allocates module data from, in the module area for
+       the same reason the image is: whatever the manager hands to a module
+       becomes an MPU region, and PMSAv8-R will not allow that region to overlap
+       a kernel one.  Anything a module can be given has to live outside every
+       region in the boot table, and this area is the only such memory.
+
+       NOLOAD because nothing is copied in -- the byte pool writes its own
+       headers when it is created.  */
+
+    .module_pool (NOLOAD) :
+    {
+        . = ALIGN(64);
+        __module_pool_start__ = .;
+        *(.module_pool)
+        . = ALIGN(64);
+        __module_pool_end__ = .;
+    } > MODULE
+
     /* The code and data sizes are not computed here any more.  They belong to
        the module's own link, which is where its preamble is assembled and where
        the boundary between its code and its data is actually known.  */

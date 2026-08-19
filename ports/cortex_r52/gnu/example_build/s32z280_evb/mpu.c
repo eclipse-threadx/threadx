@@ -458,6 +458,72 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
 
 
 /**************************************************************************/
+/*  mpu_module_load_window_open / mpu_module_load_window_close            */
+/*                                                                        */
+/*  A window over the module area, for the manager to load through.       */
+/*                                                                        */
+/*  No kernel region covers the module area, which is what stops every    */
+/*  thread from reaching a module's memory -- but the manager has to read */
+/*  the preamble and write the module's data to load it at all.  Without  */
+/*  this the load faulted on its first read of the image, and because a   */
+/*  privileged data abort ends in a handler that only spins, that looked  */
+/*  exactly like the load hanging.                                       */
+/*                                                                        */
+/*  Opened around the load and closed straight after, rather than left in */
+/*  place, because PMSAv8-R has no region priority: if this region were   */
+/*  still enabled when a module thread ran it would overlap the module's  */
+/*  own regions, and overlapping regions are CONSTRAINED UNPREDICTABLE.   */
+/*  Closing it before any module thread starts is what keeps the two from */
+/*  ever being enabled together.                                         */
+/*                                                                        */
+/*  Region 16, above both the kernel's 0-7 and the eight the manager      */
+/*  hands to a module, so neither the scheduler's per-thread region load  */
+/*  nor the boot table can disturb it.  MPUIR reports 20 EL1 regions on   */
+/*  this part.  EL1 read/write with no EL0 access: the manager can load   */
+/*  through it and a module cannot use it to reach anything.              */
+/**************************************************************************/
+
+unsigned long mpu_module_window_prbar;
+unsigned long mpu_module_window_prlar;
+
+
+void mpu_module_window_init(void)
+{
+    MPU_REGION  window;
+
+    window.mpu_region_base          = S32Z_MODULE_AREA_BASE;
+    window.mpu_region_limit         = S32Z_MODULE_AREA_BASE
+                                    + S32Z_MODULE_AREA_SIZE - 1UL;
+    window.mpu_region_ap            = MPU_AP_RW_EL1;
+    window.mpu_region_execute_never = 1U;
+    window.mpu_region_shareability  = MPU_SH_NON;
+    window.mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
+    window.mpu_region_name          = "module window RW NX EL1";
+
+    /* Published for the scheduler, which turns this region on and off on every
+       dispatch and has no business computing register layouts in assembly.  */
+
+    mpu_module_window_prbar = (window.mpu_region_base & 0xFFFFFFC0UL)
+                            | (((unsigned long) window.mpu_region_shareability & 0x3UL) << 3)
+                            | (((unsigned long) window.mpu_region_ap & 0x3UL) << 1)
+                            | ((unsigned long) window.mpu_region_execute_never & 0x1UL);
+
+    mpu_module_window_prlar = (window.mpu_region_limit & 0xFFFFFFC0UL)
+                            | (((unsigned long) window.mpu_region_attr_index & 0x7UL) << 1)
+                            | 1UL;
+
+    /* Enabled now, because everything running before the first module thread is
+       privileged code that may need to reach module memory -- the manager loads
+       a module from a kernel thread.  */
+
+    program_region(MPU_MODULE_LOAD_REGION, &window);
+
+    data_sync_barrier();
+    instruction_barrier();
+}
+
+
+/**************************************************************************/
 /*  mpu_init                                                              */
 /**************************************************************************/
 
@@ -502,6 +568,16 @@ unsigned int mpu_init(void)
         instruction_barrier();
         write_prlar(0UL);
     }
+
+#ifdef TXM_MODULE_MANAGER
+
+    /* After the loop above, which would otherwise disable it again: the module
+       window lives above the regions this table uses, so it counts as unused
+       here.  */
+
+    mpu_module_window_init();
+
+#endif
 
     MARK(0x40);
     data_sync_barrier();

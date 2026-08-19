@@ -55,6 +55,7 @@
 #include <stddef.h>
 #include "tx_api.h"
 #include "txm_module.h"
+#include "mpu.h"
 
 /* These must match the .equ values at the top of tx_thread_schedule.S.  */
 
@@ -193,3 +194,20 @@ _Static_assert(TXM_MODULE_MPU_TOTAL_ENTRIES == 8,
 _Static_assert((TXM_MODULE_MPU_FIRST_REGION + TXM_MODULE_MPU_TOTAL_ENTRIES) <= 16,
                "the module region block extends past region 15, which has no "
                "direct PRBARn encoding; the scheduler cannot reach it");
+
+/* The kernel's window over the module area.  tx_thread_schedule.S hard-codes the
+   region number in an MCR to PRSELR, because the assembler cannot include this
+   board header, so the two spellings are checked against each other here.
+
+   It also has to sit clear of the module's own block: the scheduler enables the
+   window for a thread that owns no module and the block for a thread that does,
+   and if the two ever named the same region one would silently be the other.  */
+
+_Static_assert(MPU_MODULE_LOAD_REGION == 16,
+               "tx_thread_schedule.S writes region 16 as the module window; "
+               "change MPU_MODULE_WINDOW_REGION there to match");
+
+_Static_assert(MPU_MODULE_LOAD_REGION >= (TXM_MODULE_MPU_FIRST_REGION
+                                          + TXM_MODULE_MPU_TOTAL_ENTRIES),
+               "the module window overlaps the regions handed to a module; the "
+               "scheduler would enable one believing it was the other");
