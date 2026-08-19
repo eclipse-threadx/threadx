@@ -37,6 +37,32 @@
     .equ    TXM_INSTANCE_DATA_START,        0x2C
     .equ    TXM_INSTANCE_MPU_REGISTERS,     0x64
 
+@ Every thread in this port runs on the User-banked stack pointer: kernel threads
+@ in System mode, module threads in User mode, and those two modes share SP_usr
+@ and LR_usr.  That shared bank is what lets one save and restore path reach any
+@ thread's stack without first asking who owns it.
+@
+@ So the scheduler has to run in System mode rather than SVC.  It is already in
+@ System mode when it is reached from the context restore, from the system return
+@ and from the idle path, but it is in SVC mode on the very first dispatch out of
+@ the kernel enter, so the mode is forced below instead of assumed.  Getting this
+@ wrong is silent rather than loud: writing sp in SVC mode sets SP_svc, the
+@ exception return then switches to System mode, and the thread starts life on
+@ whatever SP_usr happened to hold.
+@
+@ The return itself needs a mode that has an SPSR, which System mode has not got,
+@ so the frame is popped in System mode and only the final exception return
+@ borrows SVC.
+
+    .equ    SVC_MODE_BITS,                  0x13
+    .equ    SYS_MODE_BITS,                  0x1F
+
+@ Offsets from the saved r0 word of an interrupt frame, which is where sp points
+@ once the stack type, the saved CPSR and any VFP state have been popped.  The
+@ frame itself is built by tx_thread_stack_build.S and the context restore.
+
+    .equ    FRAME_PC_FROM_R0,               56
+
 @ The kernel's window over the module area.  Must match MPU_MODULE_LOAD_REGION
 @ in mpu.h; the offset check asserts the two agree.
 
@@ -165,6 +191,14 @@ __tx_thread_schedule_loop:
 @
     LDR     r2, =_tx_timer_time_slice           @ Pickup address of time-slice
                                                 @   variable
+@
+@    /* Enter System mode before touching sp, so that the stack pointer written
+@       below is the User-banked one every thread in this port actually runs on.
+@       Nothing between here and the write uses the stack, which matters because
+@       sp is undefined for this mode until it is set.  */
+@
+    CPS     #SYS_MODE_BITS                      @ Threads run on SP_usr
+@
     LDR     sp, [r0, #8]                        @ Switch stack pointers
     STR     r3, [r2]                            @ Setup time-slice
 @
@@ -296,7 +330,10 @@ __tx_module_regions_done:
     LDMIA   sp!, {r4, r5}                       @ Pickup the stack type and saved CPSR
     CMP     r4, #0                              @ Check for synchronous context switch
     BEQ     _tx_solicited_return
-    MSR     SPSR_cxsf, r5                       @ Setup SPSR for return
+@
+@    /* r5 holds the thread's CPSR.  It cannot go into SPSR yet: this is System
+@       mode, which has no SPSR, so it is carried to the SVC borrow below.  */
+@
 #ifdef TX_ENABLE_VFP_SUPPORT
     LDR     r1, [r0, #144]                      @ Pickup the VFP enabled flag
     CMP     r1, #0                              @ Is the VFP enabled?
@@ -306,7 +343,32 @@ __tx_module_regions_done:
     VMSR    FPSCR, r4                           @ Restore FPSCR
 _tx_skip_interrupt_vfp_restore:
 #endif
-    LDMIA   sp!, {r0-r12, lr, pc}^              @ Return to point of thread interrupt
+@
+@    /* sp now points at the saved r0, whether or not VFP state was in the way,
+@       which is why the frame position is captured here rather than computed from
+@       the thread's stack pointer.  r1 survives the mode change: r0-r7 are common
+@       to every mode.
+@
+@       The two halves of the return have to be prepared in different modes.  SVC
+@       holds the SPSR and the return address; System mode holds the sp and lr the
+@       thread itself will use.  Preparing SVC first means the frame pop can end in
+@       System mode with nothing left to do but the return.  */
+@
+    MOV     r1, sp                              @ Frame position, at the saved r0
+    CPS     #SVC_MODE_BITS                      @ Borrow a mode that has an SPSR
+    MSR     SPSR_cxsf, r5                       @ Thread's CPSR, applied by the return
+    LDR     lr, [r1, #FRAME_PC_FROM_R0]         @ Thread's resume address
+    CPS     #SYS_MODE_BITS                      @ Back to the thread's own bank
+@
+    LDMIA   sp!, {r0-r12, lr}                   @ Restore, LR_usr included
+    ADD     sp, sp, #4                          @ Step over the saved pc
+@
+@    /* SP_usr and LR_usr are now the thread's.  Only the exception return is left,
+@       and it must happen in the mode holding the SPSR -- switching back does not
+@       disturb either, because SVC banks its own sp and lr.  */
+@
+    CPS     #SVC_MODE_BITS                      @ Mode holding SPSR and the address
+    MOVS    pc, lr                              @ Return to point of thread interrupt
 @
 _tx_solicited_return:
 #ifdef TX_ENABLE_VFP_SUPPORT
