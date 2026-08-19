@@ -25,8 +25,8 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Loads the sample module twice, from two different addresses, lets it */
-/*    misbehave both times, and reports what the hardware did about it.    */
+/*    Loads the sample module three times, lets it misbehave every time,   */
+/*    and reports what the hardware did about it.                          */
 /*                                                                        */
 /*    The result this example exists to produce is the fault.  A module    */
 /*    that starts and runs proves the loader works; a module that is       */
@@ -60,6 +60,35 @@
 /*                                                                        */
 /*    All of which is checked on the console, with no help from a debugger */
 /*    and without the manager needing to know one symbol of the module.    */
+/*                                                                        */
+/*    THEN A THIRD PASS, which faults the other way.  The two passes above */
+/*    make the module read an address it does not own: a data abort,        */
+/*    reported through DFSR and DFAR.  A module can equally leave its code  */
+/*    region, which is a prefetch abort reported through IFSR and IFAR and  */
+/*    arrives at the handler by a different vector.  Both halves of the     */
+/*    port's fault path are therefore exercised, and neither is inferred    */
+/*    from the other.                                                      */
+/*                                                                        */
+/*    Which violation a pass commits is chosen here, not in the module: the */
+/*    manager writes the application-defined module ID in the instance      */
+/*    after loading it, and the manager passes that word to the module's    */
+/*    start thread.  So one blob covers both cases and the manager needs no */
+/*    symbol of the module to select between them.                         */
+/*                                                                        */
+/*    The third pass runs after the first two have been unloaded, which is  */
+/*    the other half of what this file demonstrates: a module fault must    */
+/*    leave the manager able to load and run the next module.  A fault that */
+/*    kills the manager is not isolation, and a fault that leaves the MPU   */
+/*    in a state where the next load misbehaves is not either.             */
+/*                                                                        */
+/*    AND THE NOTIFICATION IS CHECKED, not merely printed.  The manager     */
+/*    registers a fault-notify callback, and every pass must see it run     */
+/*    exactly once with the faulting thread and the right module instance.  */
+/*    That path used to be dead on this port -- the shared fault handler    */
+/*    terminates the thread before calling the hook, which only returns if  */
+/*    the port's abort vector tells the kernel it is inside an exception,    */
+/*    and this port's did not.  It does now, so the hook is a result rather */
+/*    than a known defect.                                                 */
 /*                                                                        */
 /*    What the module image is and where it comes from: it is linked into  */
 /*    this application as a separate section and loaded in place, so       */
@@ -107,6 +136,16 @@ extern unsigned char    __module_stage_end__;
 
 #define MODULE_FORBIDDEN_ADDRESS    0x31780000UL
 
+/* Which violation a pass tells the module to commit.  Written into the module
+   instance's application-defined ID after the load and before the start, because
+   that word is what the manager hands the module's start thread.  The high half
+   is the fingerprint the preamble ships; only the low byte selects the test, so a
+   module started without this still runs the data-abort case.  */
+
+#define MODULE_ID_BASE              0x52520000UL
+#define MODULE_TEST_DATA_ABORT      0x00000001UL
+#define MODULE_TEST_PREFETCH_ABORT  0x00000002UL
+
 /* Memory the manager hands out to modules: object memory, and the data region a
    module's own variables live in.  It has to be outside every region a module is
    given, or a module could reach another module's data.  */
@@ -139,11 +178,13 @@ static unsigned char    module_pool[MODULE_POOL_SIZE]
 static unsigned char    module_object_pool[MODULE_OBJECT_POOL_SIZE]
                             __attribute__((aligned(64)));
 
-/* One instance per pass.  Both are loaded at once for part of the run: pass 1 is
-   stopped but still holds its data allocation while pass 2 loads, which is what
-   pushes pass 2's data base somewhere different.  */
+/* One instance per pass.  Passes 1 and 2 are loaded at once for part of the run:
+   pass 1 is stopped but still holds its data allocation while pass 2 loads, which
+   is what pushes pass 2's data base somewhere different.  Pass 3 runs after both
+   have been unloaded, which is deliberate -- see the header.  */
 
-#define MODULE_PASSES       2U
+#define MODULE_PASSES       3U
+#define MODULE_RELOCATION_PASSES    2U
 
 static TXM_MODULE_INSTANCE  demo_module[MODULE_PASSES];
 
@@ -154,6 +195,7 @@ static TXM_MODULE_INSTANCE  demo_module[MODULE_PASSES];
 typedef struct PASS_RESULT_STRUCT
 {
     CHAR        *pass_name;
+    ULONG        pass_test;              /* MODULE_TEST_*: which abort is expected */
     ULONG        pass_load_status;
     ULONG        pass_start_status;
     ULONG        pass_stop_status;
@@ -167,8 +209,19 @@ typedef struct PASS_RESULT_STRUCT
     ULONG        pass_fault_r9;
     ULONG        pass_dfsr;
     ULONG        pass_dfar;
+    ULONG        pass_ifsr;
+    ULONG        pass_ifar;
     ULONG        pass_spsr;
     ULONG        pass_code_location;
+
+    /* What the notify callback was told, against what it should have been told.
+       Recorded as plain words rather than pointers so the console can print them
+       and a mismatch names both values.  */
+
+    ULONG        pass_notify_thread;
+    ULONG        pass_notify_instance;
+    ULONG        pass_expect_thread;
+    ULONG        pass_expect_instance;
 } PASS_RESULT;
 
 static PASS_RESULT      pass_results[MODULE_PASSES];
@@ -179,30 +232,51 @@ static PASS_RESULT      pass_results[MODULE_PASSES];
 static volatile ULONG   fault_count;
 static volatile ULONG   fault_dfsr;
 static volatile ULONG   fault_dfar;
+static volatile ULONG   fault_ifsr;
+static volatile ULONG   fault_ifar;
 static volatile ULONG   fault_spsr;
 static volatile ULONG   fault_code_location;
+static volatile ULONG   fault_notify_thread;
+static volatile ULONG   fault_notify_instance;
 
 static TX_THREAD        report_thread;
 static unsigned char    report_stack[2048] __attribute__((aligned(8)));
+
+/* The two symbols the debug harness stops on, declared here because they have
+   external linkage and are called before they are defined -- MISRA C:2012 Rule
+   8.4 wants a visible declaration either way.  Both are defined below; see each
+   for why it exists rather than a line number in a loop.  */
+
+void    manager_done(void);
+void    pass_done(void);
 
 
 /**************************************************************************/
 /*  Fault notification.                                                   */
 /*                                                                        */
 /*  Called by the module manager after it has terminated the offending     */
-/*  thread.  Records rather than prints: this runs in the fault path, and  */
-/*  the console is a polled driver that spins waiting for a transmit to    */
-/*  complete.                                                            */
+/*  thread.  Records rather than prints, for two reasons: this runs in the */
+/*  fault path, where the console is a polled driver that spins waiting    */
+/*  for a transmit to complete -- and it runs in Abort mode on the Abort    */
+/*  stack, which is a kilobyte on this board and already carries the       */
+/*  terminate underneath this frame.  A callback that printed would work    */
+/*  and would still be the wrong shape to copy.                           */
+/*                                                                        */
+/*  Its two arguments are the point of the hook, so they are recorded and  */
+/*  checked rather than discarded: an application is being told WHICH      */
+/*  thread and WHICH module faulted, and a callback that fires with the    */
+/*  wrong pair is no more use than one that never fires.                   */
 /**************************************************************************/
 
 static void module_fault_notify(TX_THREAD *thread_ptr, TXM_MODULE_INSTANCE *module_instance)
 {
-    (void) thread_ptr;
-    (void) module_instance;
-
     fault_count++;
+    fault_notify_thread   = (ULONG) thread_ptr;
+    fault_notify_instance = (ULONG) module_instance;
     fault_dfsr          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_dfsr;
     fault_dfar          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_dfar;
+    fault_ifsr          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_ifsr;
+    fault_ifar          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_ifar;
     fault_spsr          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_spsr;
     fault_code_location = (ULONG) _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_code_location;
 }
@@ -255,18 +329,21 @@ static void copy_bytes(unsigned char *destination, const unsigned char *source,
    takes it that way -- the manager stores the pointer in the instance and the API
    has never promised not to write through it.  */
 
-static void run_one_pass(UINT index, CHAR *name, VOID *location)
+static void run_one_pass(UINT index, CHAR *name, VOID *location, ULONG test)
 {
     PASS_RESULT            *result = &pass_results[index];
     TXM_MODULE_INSTANCE    *instance = &demo_module[index];
     unsigned int            waited;
 
     result -> pass_name = name;
+    result -> pass_test = test;
 
     /* Cleared before the module starts, so a fault counted here belongs to this
        pass and not the previous one.  */
 
-    fault_count = 0UL;
+    fault_count           = 0UL;
+    fault_notify_thread   = 0UL;
+    fault_notify_instance = 0UL;
 
     result -> pass_load_status = (ULONG) txm_module_manager_in_place_load(instance, name, location);
 
@@ -274,6 +351,19 @@ static void run_one_pass(UINT index, CHAR *name, VOID *location)
     {
         return;
     }
+
+    /* Which violation this pass provokes.  Written after the load, which is what
+       filled the field in from the preamble, and before the start, which is what
+       hands it to the module's start thread.  */
+
+    instance -> txm_module_instance_application_module_id = MODULE_ID_BASE | test;
+
+    /* What the notify callback must be told, recorded before the module runs so
+       the comparison afterwards is against an expectation and not against
+       whatever the callback happened to write.  */
+
+    result -> pass_expect_thread   = (ULONG) &(instance -> txm_module_instance_start_stop_thread);
+    result -> pass_expect_instance = (ULONG) instance;
 
     /* Read from the instance rather than computed here.  Where the code ended up
        is what the manager decided, and the whole point of the comparison at the
@@ -292,27 +382,21 @@ static void run_one_pass(UINT index, CHAR *name, VOID *location)
         return;
     }
 
-    /* Wait for the abort vector to capture a fault belonging to THIS pass, and
-       not for the notify callback to be told about one.
+    /* Wait for the abort vector to capture a fault belonging to THIS pass.
 
-       Those are different events, and on this port only the first of them
-       happens.  _txm_module_manager_memory_fault_handler terminates the
-       offending thread and only then calls the notify hook, and
-       _tx_thread_terminate does not return when the thread it is terminating is
-       the one running -- which it always is here.  So the hook, though correctly
-       registered, is never reached, fault_count stays 0, and a sample that waits
-       on it waits out its whole timeout and then declares that no fault
-       occurred.  That is what the first version of this file did, and it
-       reported FAIL for a module that had been stopped exactly as intended.
-       See the fault-path item in the task list; the handler is byte-for-byte
-       identical to the cortex_m33, a7 and m7 ports, so the assumption being
-       violated is upstream's rather than this port's.
+       The captured fault info is waited on rather than the notify callback, even
+       though the callback now works.  The capture happens in the abort vector
+       before anything else runs, so it is the earliest and most direct evidence
+       that a fault occurred; the callback is a later consequence of the same
+       event, and this file checks it separately.  Waiting on the earlier of the
+       two means a regression in the callback path shows up as "notified 0" next
+       to a captured fault, rather than as "no fault occurred" -- which is the
+       opposite of the truth and is exactly what an earlier version of this file
+       reported.
 
-       The fault info itself is filled in by the port's own capture code before
-       any of that, so it is the evidence that actually arrives.  Attribution is
-       by thread pointer: each pass has its own module instance and therefore its
-       own start thread, so a captured fault naming this pass's thread cannot be
-       a leftover from the previous pass.  */
+       Attribution is by thread pointer: each pass has its own module instance and
+       therefore its own start thread, so a captured fault naming this pass's
+       thread cannot be a leftover from the previous pass.  */
 
     waited = 0U;
     while ((_txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_thread_ptr
@@ -329,21 +413,30 @@ static void run_one_pass(UINT index, CHAR *name, VOID *location)
         result -> pass_captured      = 1UL;
         result -> pass_dfsr          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_dfsr;
         result -> pass_dfar          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_dfar;
+        result -> pass_ifsr          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_ifsr;
+        result -> pass_ifar          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_ifar;
         result -> pass_spsr          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_spsr;
         result -> pass_fault_r9      = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_r9;
         result -> pass_code_location = (ULONG) _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_code_location;
     }
 
-    /* Recorded for what it is worth, which is currently a report on the notify
-       path rather than on the module.  */
+    /* What the notify callback saw.  Read after the wait above, so a callback
+       that ran is recorded and one that did not shows as zero.  */
 
-    result -> pass_faults = fault_count;
+    result -> pass_faults          = fault_count;
+    result -> pass_notify_thread   = fault_notify_thread;
+    result -> pass_notify_instance = fault_notify_instance;
 
     /* Stopped, not unloaded.  The fault terminated the module's start thread but
        left the module STARTED, and unload refuses anything that is not LOADED or
        STOPPED -- so this is required, not tidiness.  */
 
     result -> pass_stop_status = (ULONG) txm_module_manager_stop(instance);
+
+    /* Still loaded, so the module's own memory is still where this pass's data
+       base says it is.  See pass_done.  */
+
+    pass_done();
 }
 
 
@@ -352,6 +445,16 @@ static void report_one_pass(const PASS_RESULT *result)
     linflexd_puts("\n--- ");
     linflexd_puts(result -> pass_name);
     linflexd_puts(" ---\n");
+
+    linflexd_puts("  expected abort   = ");
+    if (result -> pass_test == MODULE_TEST_PREFETCH_ABORT)
+    {
+        linflexd_puts("prefetch (IFSR/IFAR)\n");
+    }
+    else
+    {
+        linflexd_puts("data (DFSR/DFAR)\n");
+    }
 
     put_field("  load status      = ", result -> pass_load_status);
     put_field("  start status     = ", result -> pass_start_status);
@@ -363,12 +466,26 @@ static void report_one_pass(const PASS_RESULT *result)
     put_field("  data base (r9)   = ", result -> pass_data_base);
     put_field("  fault captured   = ", result -> pass_captured);
     put_field("  notify callbacks = ", result -> pass_faults);
+    put_field("  notified thread  = ", result -> pass_notify_thread);
+    put_field("    should be      = ", result -> pass_expect_thread);
+    put_field("  notified module  = ", result -> pass_notify_instance);
+    put_field("    should be      = ", result -> pass_expect_instance);
     put_field("  r9 at the fault  = ", result -> pass_fault_r9);
     put_field("  DFSR             = ", result -> pass_dfsr);
     put_field("  DFAR             = ", result -> pass_dfar);
+    put_field("  IFSR             = ", result -> pass_ifsr);
+    put_field("  IFAR             = ", result -> pass_ifar);
     put_field("  SPSR             = ", result -> pass_spsr);
     put_field("  faulting pc      = ", result -> pass_code_location);
-    put_field("  pc - code base   = ", result -> pass_code_location - result -> pass_code_start);
+
+    /* Meaningful for a data abort, where the module faulted inside its own code.
+       A prefetch abort faults ON the address it branched to, so the faulting pc
+       is outside the module and the difference is not an offset into it.  */
+
+    if (result -> pass_test != MODULE_TEST_PREFETCH_ABORT)
+    {
+        put_field("  pc - code base   = ", result -> pass_code_location - result -> pass_code_start);
+    }
 }
 
 
@@ -386,6 +503,31 @@ static void report_one_pass(const PASS_RESULT *result)
 /**************************************************************************/
 
 __attribute__((noinline)) void manager_done(void)
+{
+    __asm__ volatile("nop");
+}
+
+
+/**************************************************************************/
+/*  Where the debugger stops after each pass.                             */
+/*                                                                        */
+/*  A module's data is read back by the harness, not by the manager: the   */
+/*  manager deliberately knows no symbol of the module, so it cannot find  */
+/*  module_progress, while a debugger can compute its offset from the      */
+/*  module's ELF and add it to the data base this pass recorded.           */
+/*                                                                        */
+/*  But it has to read it WHILE THIS PASS STILL HOLDS THAT MEMORY.  The    */
+/*  byte pool reuses a freed block, so once a later pass has loaded, an     */
+/*  earlier pass's data base points at the later pass's data -- and reading */
+/*  every pass at the end of the run reports the last writer's progress for */
+/*  all of them.  That is not a hypothetical: pass 3 loads after passes 1   */
+/*  and 2 are unloaded and lands exactly where pass 1 was.                 */
+/*                                                                        */
+/*  So this exists to be broken on, once per pass, after the pass has       */
+/*  faulted and been stopped and before anything is unloaded.              */
+/**************************************************************************/
+
+__attribute__((noinline)) void pass_done(void)
 {
     __asm__ volatile("nop");
 }
@@ -487,17 +629,33 @@ static void manager_entry(ULONG input)
            this thread and cannot be open while a module's own regions are.  */
 
         linflexd_puts("M4 pass 1, at the linked address\n");
-        run_one_pass(0U, "linked address", (VOID *) &__module_image_start__);
+        run_one_pass(0U, "linked address, data abort", (VOID *) &__module_image_start__,
+                     MODULE_TEST_DATA_ABORT);
 
         linflexd_puts("M5 pass 2, relocated\n");
-        run_one_pass(1U, "relocated", (VOID *) &__module_stage_start__);
+        run_one_pass(1U, "relocated, data abort", (VOID *) &__module_stage_start__,
+                     MODULE_TEST_DATA_ABORT);
 
-        /* Both passes are done with their memory now.  */
+        /* Both relocation passes are done with their memory now.  Unloaded here
+           rather than at the end, so that the pass below is a load that follows
+           two faults and two unloads -- which is the state a manager is in after
+           a module has misbehaved, and the state the next load has to work in.  */
 
-        for (i = 0U; i < MODULE_PASSES; i++)
+        for (i = 0U; i < MODULE_RELOCATION_PASSES; i++)
         {
             (void) txm_module_manager_unload(&demo_module[i]);
         }
+
+        /* The other abort type, from the staging area so that it is also a
+           relocated module: the address arriving in IFAR came out of the module's
+           own initialised data through its rebased GOT, exactly as DFAR does
+           above.  */
+
+        linflexd_puts("M6 pass 3, prefetch abort\n");
+        run_one_pass(2U, "relocated, prefetch abort", (VOID *) &__module_stage_start__,
+                     MODULE_TEST_PREFETCH_ABORT);
+
+        (void) txm_module_manager_unload(&demo_module[2]);
     }
 
     /* ------------------------------------------------------------------
@@ -589,27 +747,67 @@ static void manager_entry(ULONG input)
             linflexd_puts(": faulted, but not from User mode\n");
             failures++;
         }
-        else if (result -> pass_dfar != MODULE_FORBIDDEN_ADDRESS)
+        else if (((result -> pass_test == MODULE_TEST_PREFETCH_ABORT) ?
+                        result -> pass_ifar : result -> pass_dfar)
+                            != MODULE_FORBIDDEN_ADDRESS)
         {
             /* The module got this address out of its own initialised data,
                through its rebased GOT.  Any other value means it faulted
                somewhere unintended -- most likely on its own data, which is what
-               a bad rebase looks like.  */
+               a bad rebase looks like.
+
+               Which register carries it depends on the abort: a data abort
+               reports the address it tried to touch in DFAR, a prefetch abort
+               reports the address it tried to fetch in IFAR.  Checking the wrong
+               one of the two passes for a stale value left by an earlier fault,
+               which is why this is selected on the expected type rather than on
+               whichever register happens to be non-zero.  */
 
             linflexd_puts("FAIL ");
             linflexd_puts(result -> pass_name);
             linflexd_puts(": faulted at the wrong address, so .data or the GOT is wrong\n");
             failures++;
         }
+        else if (result -> pass_faults != 1UL)
+        {
+            /* The notify callback is a public API of the module manager, so it is
+               checked and not merely reported.  Zero here with a captured fault
+               above means the fault path reached the hardware's evidence and
+               never reached the application: on this port that used to be the
+               case for every fault, because the shared fault handler terminates
+               the offending thread before calling the hook and the terminate only
+               returns if the abort vector has told the kernel it is inside an
+               exception.  More than one means a single violation was reported
+               twice.  */
+
+            linflexd_puts("FAIL ");
+            linflexd_puts(result -> pass_name);
+            linflexd_puts(": the fault-notify callback did not run exactly once\n");
+            failures++;
+        }
+        else if ((result -> pass_notify_thread != result -> pass_expect_thread) ||
+                 (result -> pass_notify_instance != result -> pass_expect_instance))
+        {
+            /* Being told that something faulted is not the service; being told
+               which thread and which module is.  */
+
+            linflexd_puts("FAIL ");
+            linflexd_puts(result -> pass_name);
+            linflexd_puts(": notified about the wrong thread or module\n");
+            failures++;
+        }
         else
         {
             linflexd_puts("PASS ");
             linflexd_puts(result -> pass_name);
-            linflexd_puts(": faulted in User mode at the forbidden address\n");
+            linflexd_puts(": faulted in User mode at the forbidden address, and was reported\n");
         }
     }
 
-    /* And the two passes against each other, which is the relocation result.  */
+    /* And the first two passes against each other, which is the relocation
+       result.  The third is not in this comparison: it faults on the address it
+       branched to rather than inside its own code, so its faulting pc is not an
+       offset into the module and there is nothing to compare.  */
 
     offset_0 = pass_results[0].pass_code_location - pass_results[0].pass_code_start;
     offset_1 = pass_results[1].pass_code_location - pass_results[1].pass_code_start;
@@ -643,14 +841,20 @@ static void manager_entry(ULONG input)
         }
     }
 
-    /* Reported apart from the verdict above, because it is a known defect in the
-       fault-notification path and not a property of this run.  The module was
-       stopped either way -- that is what the captured fault says -- but an
-       application asking to be told about it is not being told.  */
+    /* Both abort types, stated as its own line.  Each pass above already checked
+       its own registers; this says that between them the two vectors were both
+       taken, which is the claim a reader of the log wants to be able to make
+       without working out what each pass did.  */
 
-    if ((pass_results[0].pass_captured != 0UL) && (pass_results[0].pass_faults == 0UL))
+    if ((pass_results[0].pass_captured != 0UL) && (pass_results[0].pass_dfsr != 0UL) &&
+        (pass_results[2].pass_captured != 0UL) && (pass_results[2].pass_ifsr != 0UL))
     {
-        linflexd_puts("KNOWN the fault was captured but the notify callback never ran\n");
+        linflexd_puts("PASS both abort types: data through DFSR/DFAR, prefetch through IFSR/IFAR\n");
+    }
+    else
+    {
+        linflexd_puts("FAIL only one kind of abort was exercised\n");
+        failures++;
     }
 
     put_field("\nfailures           = ", (unsigned long) failures);

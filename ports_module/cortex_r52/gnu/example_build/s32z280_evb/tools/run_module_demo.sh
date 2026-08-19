@@ -47,7 +47,7 @@ done
 # What is wanted is an OFFSET, not an address.  The module is position
 # independent: the address nm reports is a nominal one from a segment the module
 # never runs at, and its real data lives wherever the manager allocated it -- a
-# different place in each of the two passes.  So the offset of module_progress
+# different place in each pass.  So the offset of module_progress
 # within the module's data segment is computed here, and the gdb script adds it
 # to each pass's data base, which it reads off the target.
 PROGRESS_SYM=$(nm "$MODULE_ELF" | awk '$3=="module_progress"{print $1}')

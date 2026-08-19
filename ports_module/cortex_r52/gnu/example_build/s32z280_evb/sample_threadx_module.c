@@ -38,13 +38,24 @@
 /*      2. Makes a kernel call, which must succeed -- proving a module in  */
 /*         User mode can reach the kernel through the supervisor call      */
 /*         boundary and come back.                                        */
-/*      3. Reads the manager's memory, which must fault.                   */
+/*      3. Violates its protection in one of the two ways the hardware     */
+/*         distinguishes, which must fault.                               */
 /*      4. Never reaches step 4, because step 3 terminates it.            */
 /*                                                                        */
 /*    Steps 1 and 2 passing without step 3 faulting would mean the module  */
 /*    is running unprotected, which is the failure this example exists to  */
 /*    detect.  A module that only ever touched its own memory would pass   */
 /*    identically with the MPU switched off.                              */
+/*                                                                        */
+/*    TWO KINDS OF VIOLATION, because the core reports them differently.   */
+/*    Reading outside the data region is a DATA abort, reported through    */
+/*    DFSR and DFAR; branching outside the code region is a PREFETCH abort,*/
+/*    reported through IFSR and IFAR.  Both arrive at the same handler by   */
+/*    different vectors, and a module that only ever does the first leaves  */
+/*    half of the port's fault path unexecuted.  Which one this module does */
+/*    is chosen by the manager, through the application-defined module ID   */
+/*    that the manager passes to the start thread -- the module needs no    */
+/*    build-time variant and the manager needs no symbol of the module.     */
 /*                                                                        */
 /*    The module cannot print.  The console belongs to the board support   */
 /*    package, outside every region a module owns, so reaching it would    */
@@ -62,6 +73,17 @@
 #define MODULE_PROGRESS_KERNEL_CALL     0x00000002UL
 #define MODULE_PROGRESS_ATTEMPTED_STEAL 0x00000004UL
 #define MODULE_PROGRESS_SURVIVED_STEAL  0x00000008UL
+#define MODULE_PROGRESS_ATTEMPTED_JUMP  0x00000010UL
+#define MODULE_PROGRESS_SURVIVED_JUMP   0x00000020UL
+
+/* Which violation to commit, taken from the low byte of the module ID the
+   manager passes to the start thread.  The rest of that word is left alone: the
+   preamble ships it as 0x52520001, so a manager that sets nothing still gets a
+   working data-abort test rather than a module that does nothing.  */
+
+#define MODULE_TEST_MASK                0x000000FFUL
+#define MODULE_TEST_DATA_ABORT          0x00000001UL
+#define MODULE_TEST_PREFETCH_ABORT      0x00000002UL
 
 volatile ULONG  module_progress;
 volatile ULONG  module_scratch[16];
@@ -81,12 +103,18 @@ volatile ULONG  module_scratch[16];
 volatile ULONG  module_forbidden_address = 0x31780000UL;
 
 
+/* The same address serves the prefetch test.  On this board it is the base of
+   the kernel's data region, which is mapped execute-never and privileged-only,
+   so a User-mode instruction fetch there is a permission fault whichever way it
+   is looked at.  An address in no region at all would fault too, but this one
+   also proves the kernel's own memory is what a module cannot reach -- which is
+   the property being demonstrated, rather than the absence of a mapping.  */
+
+
 void demo_module_start(ULONG id)
 {
     ULONG   i;
     ULONG   sum = 0UL;
-
-    (void) id;
 
     /* 1. The module's own data.  If this faults, the data region is wrong and
           nothing else in this file will be reached.  */
@@ -117,18 +145,42 @@ void demo_module_start(ULONG id)
         module_progress |= MODULE_PROGRESS_KERNEL_CALL;
     }
 
-    /* 3. Somebody else's memory.  This must fault, and the fault must terminate
-          this thread.  Marked before the access rather than after, because after
-          is not reached if the port is working.  */
+    /* 3. The violation, and 4. the flag that says it was tolerated.  Each is
+          marked before the access rather than after, because after is not
+          reached if the port is working.  */
 
-    module_progress |= MODULE_PROGRESS_ATTEMPTED_STEAL;
+    if ((id & MODULE_TEST_MASK) == MODULE_TEST_PREFETCH_ABORT)
+    {
+        /* Branch outside the code region: a prefetch abort, reported through
+           IFSR and IFAR.  Nothing is executed at the target -- the fault is on
+           the fetch itself, so the thread never arrives.  */
 
-    sum += *((volatile ULONG *) module_forbidden_address);
+        module_progress |= MODULE_PROGRESS_ATTEMPTED_JUMP;
 
-    /* 4. Only reached if the access above was permitted, which means the module
-          is running unprotected.  The manager treats this flag as a failure.  */
+        /* MISRA C:2012 Rule 11.1 (no conversion between a pointer to a function
+           and any other type) is deliberately violated here, and Rule 11.6
+           (no conversion between an integer and a pointer to void) with it.
+           Provoking a fetch from an address that holds no function is the entire
+           purpose of these three lines; there is no conforming way to write it.
+           The address is read from the module's own initialised data so that the
+           value arriving in IFAR also proves the GOT rebase, exactly as the data
+           case uses DFAR.  */
 
-    module_progress |= MODULE_PROGRESS_SURVIVED_STEAL;
+        ((void (*)(void)) module_forbidden_address)();
+
+        module_progress |= MODULE_PROGRESS_SURVIVED_JUMP;
+    }
+    else
+    {
+        /* Read outside the data region: a data abort, reported through DFSR and
+           DFAR.  */
+
+        module_progress |= MODULE_PROGRESS_ATTEMPTED_STEAL;
+
+        sum += *((volatile ULONG *) module_forbidden_address);
+
+        module_progress |= MODULE_PROGRESS_SURVIVED_STEAL;
+    }
 
     /* Keep the compiler from discarding the read above.  */
 

@@ -42,6 +42,38 @@
 @/*    abort is also taken in Abort mode, with its own banked sp and lr, so */
 @/*    C cannot be entered until a stack is known good.                     */
 @/*                                                                        */
+@/*    THE CONTRACT WITH THE SHARED C HANDLER                               */
+@/*                                                                        */
+@/*    _txm_module_manager_memory_fault_handler is common to every module    */
+@/*    port and it terminates the faulting thread and then calls the        */
+@/*    application's fault-notify callback.  For the second half of that to */
+@/*    happen, _tx_thread_terminate has to RETURN -- and terminating the    */
+@/*    running thread only returns if the kernel believes it is inside an   */
+@/*    exception.  _tx_thread_terminate ends in                             */
+@/*    _tx_thread_system_preempt_check, which calls                         */
+@/*    _tx_thread_system_return whenever _tx_thread_system_state and        */
+@/*    _tx_thread_preempt_disable are both zero; on this architecture that  */
+@/*    switches context immediately and never comes back.                   */
+@/*                                                                        */
+@/*    So this routine owes the handler three things, exactly as the        */
+@/*    Cortex-A7 module port's abort vector does:                           */
+@/*                                                                        */
+@/*      1. _tx_thread_system_state incremented across the call, so the     */
+@/*         terminate returns instead of scheduling from Abort mode.        */
+@/*      2. _tx_thread_current_ptr cleared afterwards -- the thread it      */
+@/*         names is terminated and the scheduler must not save into it.    */
+@/*      3. an exception return into _tx_thread_schedule in System mode,    */
+@/*         which is where the next thread is chosen.                       */
+@/*                                                                        */
+@/*    Without step 1 the notify callback is unreachable, and the           */
+@/*    _tx_thread_system_return that runs in its place saves a solicited    */
+@/*    frame on the ABORT stack and writes that Abort-mode sp into the      */
+@/*    dead thread's stack pointer.  It looks like it works, because the    */
+@/*    thread is never resumed -- but nothing gives the Abort stack back,   */
+@/*    so each module fault costs it about 56 bytes for the life of the     */
+@/*    run.  The Cortex-M ports do not need step 1: there                   */
+@/*    _tx_thread_system_return only pends PendSV and returns.              */
+@/*                                                                        */
 @/**************************************************************************/
 
     .arm
@@ -53,6 +85,8 @@
     .extern _txm_module_manager_memory_fault_info
     .extern _txm_module_manager_memory_fault_handler
     .extern _tx_thread_current_ptr
+    .extern _tx_thread_system_state
+    .extern _tx_thread_schedule
 
 @ Offsets into TXM_MODULE_MANAGER_MEMORY_FAULT_INFO.  Checked against offsetof at
 @ compile time in txm_module_manager_offset_check.c.
@@ -67,6 +101,18 @@
     .equ    FAULT_R0,               0x1C
     .equ    FAULT_LR,               0x50
     .equ    FAULT_SPSR,             0x54
+
+@ Processor mode and state bits.  System mode is used for the return because
+@ every kernel thread in this port runs in it, and it is the mode
+@ _tx_thread_schedule expects to choose the next thread from.
+
+    .equ    MODE_MASK,              0x1F
+    .equ    SYS_MODE_BITS,          0x1F
+    .equ    THUMB_BIT,              0x20
+
+@ Bytes pushed on the Abort stack by the capture below, so it can be given back.
+
+    .equ    CAPTURE_FRAME_SIZE,     20
 
 
 @/**************************************************************************/
@@ -106,6 +152,15 @@ _txm_module_manager_fault_common:
 @   the values recorded below are the module's and not ours.
 
     STMDB   sp!, {r0-r3, r12}
+
+@   Tell the kernel it is inside an exception, before any kernel service runs.
+@   This is what makes _tx_thread_terminate return to the C handler rather than
+@   scheduling from Abort mode; see THE CONTRACT WITH THE SHARED C HANDLER above.
+
+    LDR     r0, =_tx_thread_system_state
+    LDR     r1, [r0]
+    ADD     r1, r1, #1
+    STR     r1, [r0]
 
     LDR     r0, =_txm_module_manager_memory_fault_info
 
@@ -180,15 +235,51 @@ _txm_module_manager_fault_common:
     ADD     r1, r0, #(FAULT_R0 + 16)
     STMIA   r1, {r4-r11}
 
-@   Hand over.  The handler terminates the thread and notifies the application;
-@   it does not return here.
+@   Give the Abort stack back.  The five words above were read out of it rather
+@   than popped, because the copies needed them in place; nothing needs them now.
+@   This routine does not return to the faulting code, so an unbalanced sp here
+@   would never be corrected and every module fault would cost the Abort stack
+@   twenty bytes until it ran out.
+
+    ADD     sp, sp, #CAPTURE_FRAME_SIZE
+
+@   Hand over.  The handler terminates the offending thread and then calls the
+@   application's fault-notify callback, and it DOES return here -- the
+@   incremented system state above is what makes that true.
 
     BL      _txm_module_manager_memory_fault_handler
 
-@   Not reached.  The handler terminates the offending thread and the scheduler
-@   runs something else, so it does not come back.  If it ever did, returning
-@   would resume the instruction that faulted and fault again immediately, for
-@   ever -- so stop here instead, where a debugger can see why.
+@   Out of the exception.  Balanced against the increment above.
 
-__txm_module_fault_unexpected_return:
-    B       __txm_module_fault_unexpected_return
+    LDR     r0, =_tx_thread_system_state
+    LDR     r1, [r0]
+    SUB     r1, r1, #1
+    STR     r1, [r0]
+
+@   The current thread is terminated, so there is no context to save into it and
+@   the scheduler must not try.  Clearing the pointer is how this port says "no
+@   thread is running", the same state _tx_thread_system_return leaves behind.
+
+    MOV     r1, #0
+    LDR     r0, =_tx_thread_current_ptr
+    STR     r1, [r0]
+
+@   Return into the scheduler rather than to the faulting instruction, which
+@   would fault again immediately and for ever.  An exception return, not a
+@   branch: it leaves Abort mode properly and restores the interrupt mask the
+@   faulting context had, where a branch would run the scheduler in Abort mode
+@   on the Abort stack.
+@
+@   SPSR is rewritten for the mode this port's kernel threads run in, with the
+@   Thumb bit cleared because _tx_thread_schedule is A32.  The value recorded in
+@   the fault info was stored before this, so what an application reads is still
+@   the mode the module faulted in.
+
+    MRS     r0, SPSR
+    BIC     r0, r0, #MODE_MASK
+    ORR     r0, r0, #SYS_MODE_BITS
+    BIC     r0, r0, #THUMB_BIT
+    MSR     SPSR_cxsf, r0
+
+    LDR     lr, =_tx_thread_schedule
+    SUBS    pc, lr, #0

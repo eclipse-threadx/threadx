@@ -25,26 +25,45 @@
 # WHAT A PASS LOOKS LIKE, and why it is a fault
 #
 # The sample module writes its own data, calls the kernel through SVC, and then
-# deliberately reads an address the manager never granted it.  The expected end
-# state is therefore a data abort taken in User mode, captured by the abort
-# vector, reported through the fault-notify callback, and terminating the module
-# thread -- with the manager still alive to report it.  A run with no fault is a
-# FAILURE: it means a module reached kernel memory and was not stopped.
+# deliberately violates its protection.  The expected end state is therefore an
+# abort taken in User mode, captured by the abort vector, reported through the
+# fault-notify callback, and terminating the module thread -- with the manager
+# still alive to report it.  A run with no fault is a FAILURE: it means a module
+# reached kernel memory and was not stopped.
 #
-#   module_progress bit 0x1  wrote and summed its own scratch      expect SET
-#                   bit 0x2  reached the kernel through SVC        expect SET
-#                   bit 0x4  about to touch the forbidden address  expect SET
-#                   bit 0x8  survived the forbidden access         expect CLEAR
+#   module_progress bit 0x01  wrote and summed its own scratch     expect SET
+#                   bit 0x02  reached the kernel through SVC       expect SET
+#                   bit 0x04  about to READ the forbidden address  data pass only
+#                   bit 0x08  survived the forbidden read          expect CLEAR
+#                   bit 0x10  about to BRANCH to it                prefetch pass only
+#                   bit 0x20  survived the forbidden branch        expect CLEAR
 #
-# so module_progress == 0x7 exactly, and fault_count >= 1 with SPSR mode 0x10.
+# so module_progress == 0x7 for a data-abort pass and 0x13 for the prefetch pass.
 #
-# AND IT HAPPENS TWICE, from two different load addresses
+# THREE PASSES, because one run proves neither relocation nor both abort types
 #
 # The module is position independent, so a single run at the address it was
 # linked for would prove nothing: the GOT rebase would map every address to
-# itself and a rebase that did nothing would look the same.  The sample therefore
-# loads the same blob twice -- once where the linker put it, once from a staging
-# area -- and this script checks both.
+# itself and a rebase that did nothing would look the same.  So passes 1 and 2
+# run the same blob from two addresses -- once where the linker put it, once from
+# a staging area -- and this script compares them.
+#
+# Pass 3 faults the other way.  Passes 1 and 2 read an address they do not own,
+# which is a DATA abort reported through DFSR and DFAR.  Pass 3 branches outside
+# its code region, which is a PREFETCH abort reported through IFSR and IFAR and
+# arrives at the handler by a different vector.  It runs after passes 1 and 2 have
+# been unloaded, so it also shows that a module fault leaves the manager able to
+# load and run the next module.
+#
+# THE NOTIFY CALLBACK IS A CHECK NOW, not a note
+#
+# It used to be dead on this port: the shared fault handler terminates the
+# offending thread and only then calls the hook, and _tx_thread_terminate returns
+# for the running thread only if the abort vector has told the kernel it is inside
+# an exception -- which this port's vector did not do.  It does now, so every pass
+# must see the callback run exactly once, with the faulting thread and the right
+# module instance.  Zero notifications next to a captured fault is a regression in
+# that bracket and nothing else.
 #
 # Finding module_progress is no longer a matter of reading the module's ELF.  A
 # relocated module's data lives wherever the manager allocated it, so the address
@@ -52,6 +71,13 @@
 # module's data segment).  The first number is read from the module instance on
 # the target, the second from the module's ELF, and neither is a constant that
 # can be written down here.
+#
+# AND IT HAS TO BE READ WHILE THE PASS STILL OWNS THE MEMORY.  The byte pool
+# reuses freed blocks, so pass 3 -- which loads after passes 1 and 2 are unloaded
+# -- lands exactly where pass 1 was.  Reading all three at the end of the run
+# therefore reports pass 3's progress as pass 1's, and pass 1 looks like it took
+# the wrong branch.  So this script breaks on pass_done once per pass and reads
+# that pass's word there, before anything is unloaded.
 
 py _PROBE_IP = "s32dbg:192.168.50.238"
 py _SOC_NAME = "S32Z280"
@@ -113,7 +139,35 @@ print("PC set to 0x%08X" % start)
 #
 # hbreak, not break: the code region is mapped read-only by the MPU, so a
 # software breakpoint would have to write to it.
+gdb.execute("hbreak pass_done")
 gdb.execute("hbreak manager_done")
+
+# Each pass's module_progress, read at pass_done while that pass still holds its
+# data.  Kept in a global the reporting block below picks up; gdb's python runs in
+# one persistent namespace, and the reader falls back to "skipped" rather than a
+# traceback if that ever stops being true.
+PROGRESS_BY_PASS = []
+
+_offset = os.environ.get("S32Z280_MODULE_PROGRESS_OFFSET")
+_offset = int(_offset, 0) if _offset else None
+
+for _i in range(3):
+    gdb.execute("continue")
+    if _offset is None:
+        PROGRESS_BY_PASS.append(None)
+        continue
+    _base = int(gdb.parse_and_eval("pass_results[%d].pass_data_base" % _i)) & 0xFFFFFFFF
+    if _base == 0:
+        # The pass never loaded, so there is no data base and nothing to read.
+        PROGRESS_BY_PASS.append(None)
+    else:
+        _addr = _base + _offset
+        PROGRESS_BY_PASS.append(
+            int(gdb.parse_and_eval("*(unsigned int *)0x%x" % _addr)) & 0xFFFFFFFF)
+        print("pass %d: module_progress 0x%08X at 0x%08X (read while loaded)"
+              % (_i + 1, PROGRESS_BY_PASS[-1], _addr))
+
+# On to the report the manager prints for itself.
 gdb.execute("continue")
 end
 
@@ -129,9 +183,17 @@ def ev(expr):
 
 failures = 0
 
-OWN_DATA, KERNEL_CALL, ATTEMPTED_STEAL, SURVIVED_STEAL = 0x1, 0x2, 0x4, 0x8
+OWN_DATA, KERNEL_CALL = 0x01, 0x02
+ATTEMPTED_STEAL, SURVIVED_STEAL = 0x04, 0x08
+ATTEMPTED_JUMP, SURVIVED_JUMP = 0x10, 0x20
 FORBIDDEN = 0x31780000
 MODE = {0x10: "User", 0x13: "Supervisor", 0x1A: "Hyp", 0x1F: "System"}
+
+# Which violation each pass was told to commit, from the low byte of the module ID
+# the manager writes into the instance before starting it.
+TEST_DATA_ABORT, TEST_PREFETCH_ABORT = 0x1, 0x2
+PASSES = 3
+RELOCATION_PASSES = 2
 
 # The nominal offset of module_progress inside the module's data segment.  Both
 # halves come from the module's own ELF and neither is an address the module ever
@@ -146,13 +208,16 @@ else:
     print("  module_progress sits %d bytes into the module's data segment" % progress_offset)
 
 passes = []
-for i in range(2):
+for i in range(PASSES):
     p = {}
-    for field in ("pass_load_status", "pass_start_status", "pass_stop_status",
+    for field in ("pass_test", "pass_load_status", "pass_start_status", "pass_stop_status",
                   "pass_code_start", "pass_code_end", "pass_data_start",
                   "pass_data_end", "pass_data_base", "pass_faults",
                   "pass_captured", "pass_fault_r9",
-                  "pass_dfsr", "pass_dfar", "pass_spsr", "pass_code_location"):
+                  "pass_dfsr", "pass_dfar", "pass_ifsr", "pass_ifar",
+                  "pass_spsr", "pass_code_location",
+                  "pass_notify_thread", "pass_notify_instance",
+                  "pass_expect_thread", "pass_expect_instance"):
         p[field] = ev("pass_results[%d].%s" % (i, field))
     try:
         p["name"] = gdb.parse_and_eval("pass_results[%d].pass_name" % i).string()
@@ -161,8 +226,11 @@ for i in range(2):
     passes.append(p)
 
 for i, p in enumerate(passes):
+    prefetch = (p["pass_test"] == TEST_PREFETCH_ABORT)
     print("")
     print("  --- pass %d: %s ---" % (i + 1, p["name"]))
+    print("    expected abort        = %s"
+          % ("prefetch, through IFSR/IFAR" if prefetch else "data, through DFSR/DFAR"))
     print("    load / start / stop   = 0x%08X / 0x%08X / 0x%08X"
           % (p["pass_load_status"], p["pass_start_status"], p["pass_stop_status"]))
     print("    code region           = 0x%08X .. 0x%08X"
@@ -185,31 +253,41 @@ for i, p in enumerate(passes):
         print("    *** FAIL: this module's code and data regions overlap")
         failures += 1
 
-    if progress_offset is not None:
+    progress = globals().get("PROGRESS_BY_PASS", [None] * PASSES)[i]
+    if progress is None:
+        print("    module_progress       = not read")
+    else:
         addr = p["pass_data_base"] + progress_offset
-        progress = rd(addr)
-        print("    module_progress       = 0x%08X  (at 0x%08X)" % (progress, addr))
-        for bit, name, want_set in ((OWN_DATA, "wrote its own data", True),
-                                    (KERNEL_CALL, "reached the kernel through SVC", True),
-                                    (ATTEMPTED_STEAL, "attempted the forbidden access", True),
-                                    (SURVIVED_STEAL, "SURVIVED the forbidden access", False)):
+        print("    module_progress       = 0x%08X  (read at 0x%08X while this pass"
+              % (progress, addr))
+        print("                            still held that memory)")
+
+        # Every bit is checked, including the ones belonging to the violation this
+        # pass was NOT told to commit: a module that took both routes, or the
+        # wrong one, is not the module this pass asked for and the result would
+        # not mean what the register checks below claim.
+        wanted = [(OWN_DATA, "wrote its own data", True),
+                  (KERNEL_CALL, "reached the kernel through SVC", True),
+                  (ATTEMPTED_STEAL, "attempted the forbidden read", not prefetch),
+                  (SURVIVED_STEAL, "SURVIVED the forbidden read", False),
+                  (ATTEMPTED_JUMP, "attempted the forbidden branch", prefetch),
+                  (SURVIVED_JUMP, "SURVIVED the forbidden branch", False)]
+        for bit, name, want_set in wanted:
             got = bool(progress & bit)
             ok = (got == want_set)
             if not ok:
                 failures += 1
-            print("      0x%X %-34s %-5s  %s"
+            print("      0x%02X %-33s %-5s  %s"
                   % (bit, name, "set" if got else "clear",
                      "ok" if ok else "*** WRONG ***"))
-        if progress & SURVIVED_STEAL:
-            print("      ISOLATION FAILURE: the module read memory it was never granted.")
+        if progress & (SURVIVED_STEAL | SURVIVED_JUMP):
+            print("      ISOLATION FAILURE: the module reached memory it was never granted.")
 
-    # "captured" and "notified" are different events, and only the first of them
-    # happens on this port.  The fault handler terminates the offending thread
-    # before calling the notify hook, and _tx_thread_terminate does not return
-    # when the thread being terminated is the running one -- which it always is
-    # here.  So the hook never runs, and a check written against the callback
-    # counter reports "no fault" for a module that was stopped correctly.
-    # The abort vector's captured fault info is the evidence that arrives.
+    # "captured" and "notified" are different events: the abort vector records the
+    # fault registers before anything else runs, and the notify callback is a
+    # later consequence of the same fault.  Both are required.  Reporting them
+    # apart is what keeps a broken notify path from being read as "no fault
+    # occurred", which is the opposite of the truth.
     print("    fault captured        = %d" % p["pass_captured"])
     print("    notify callbacks      = %d" % p["pass_faults"])
     if p["pass_captured"] == 0:
@@ -217,19 +295,53 @@ for i, p in enumerate(passes):
         print("              memory and was not stopped, or never got that far.")
         failures += 1
         continue
-    if p["pass_faults"] == 0:
-        print("    KNOWN: captured but never notified -- the fault-notify path is")
-        print("           broken independently of anything this run exercises.")
+
+    # The callback is a public API of the module manager, so its arguments are
+    # checked and not merely counted.  Zero notifications beside a captured fault
+    # means the fault reached the hardware's evidence and never reached the
+    # application: on this port that is the system-state bracket in
+    # txm_module_manager_fault_capture.S having gone missing again.
+    if p["pass_faults"] != 1:
+        print("    *** FAIL: the notify callback ran %d times, not once."
+              % p["pass_faults"])
+        failures += 1
+    elif (p["pass_notify_thread"] != p["pass_expect_thread"]
+            or p["pass_notify_instance"] != p["pass_expect_instance"]):
+        print("    *** FAIL: notified about thread 0x%08X / module 0x%08X,"
+              % (p["pass_notify_thread"], p["pass_notify_instance"]))
+        print("              expected thread 0x%08X / module 0x%08X"
+              % (p["pass_expect_thread"], p["pass_expect_instance"]))
+        failures += 1
+    else:
+        print("    notified about        = thread 0x%08X, module 0x%08X (both correct)"
+              % (p["pass_notify_thread"], p["pass_notify_instance"]))
 
     dfsr, dfar, spsr, pc = (p["pass_dfsr"], p["pass_dfar"],
                             p["pass_spsr"], p["pass_code_location"])
-    print("    DFSR                  = 0x%08X  status 0x%02X  WnR %d"
-          % (dfsr, dfsr & 0x3F, (dfsr >> 11) & 1))
+    ifsr, ifar = p["pass_ifsr"], p["pass_ifar"]
+
+    # Both pairs are printed for both kinds of pass, because the capture records
+    # both and the pair that does not belong to this fault is a leftover the
+    # hardware never cleared -- worth seeing, and worth not mistaking for a
+    # result.  Which pair is meaningful is decided by the expected abort type,
+    # not by which of them looks plausible.
+    print("    DFSR                  = 0x%08X  status 0x%02X  WnR %d%s"
+          % (dfsr, dfsr & 0x3F, (dfsr >> 11) & 1,
+             "" if not prefetch else "   (stale: this pass took a prefetch abort)"))
     print("    DFAR                  = 0x%08X" % dfar)
+    print("    IFSR                  = 0x%08X  status 0x%02X%s"
+          % (ifsr, ifsr & 0x3F,
+             "   (stale: this pass took a data abort)" if not prefetch else ""))
+    print("    IFAR                  = 0x%08X" % ifar)
     print("    SPSR                  = 0x%08X  mode 0x%02X (%s)"
           % (spsr, spsr & 0x1F, MODE.get(spsr & 0x1F, "?")))
     print("    faulting pc           = 0x%08X" % pc)
-    print("    pc - code base        = 0x%08X" % ((pc - p["pass_code_start"]) & 0xFFFFFFFF))
+    if prefetch:
+        # The fault is on the fetch AT the branch target, so the faulting pc is
+        # the target and not a place inside the module.
+        print("    (the faulting pc is the branch target, outside the module)")
+    else:
+        print("    pc - code base        = 0x%08X" % ((pc - p["pass_code_start"]) & 0xFFFFFFFF))
     print("    r9 at the fault       = 0x%08X" % p["pass_fault_r9"])
 
     # r9 is the module's PIC base, seeded by the manager's thread stack build from
@@ -245,18 +357,47 @@ for i, p in enumerate(passes):
         print("              a module being stopped at the boundary.")
         failures += 1
 
-    # DFAR is the strongest single check in this script.  The module obtained
-    # this address by reading one of its own initialised globals through the
+    # The faulting address is the strongest single check in this script.  The
+    # module obtained it by reading one of its own initialised globals through the
     # rebased GOT, so the right value here means the GOT was rewritten AND .data
-    # was copied out of the image.  A wrong value usually means the module
-    # faulted on its own data instead, which is what a bad rebase looks like.
-    if dfar != FORBIDDEN:
-        print("    *** FAIL: expected DFAR 0x%08X, the address the module was told" % FORBIDDEN)
+    # was copied out of the image.  A wrong value usually means the module faulted
+    # on its own data instead, which is what a bad rebase looks like.
+    #
+    # A data abort reports it in DFAR, a prefetch abort in IFAR.  Both registers
+    # are sticky, so checking the pair that does not belong to this fault would
+    # pass on a value some earlier fault left behind -- including the boot probes,
+    # which take a prefetch abort of their own before ThreadX starts.
+    reg_name, reg_value = ("IFAR", ifar) if prefetch else ("DFAR", dfar)
+    if reg_value != FORBIDDEN:
+        print("    *** FAIL: expected %s 0x%08X, the address the module was told"
+              % (reg_name, FORBIDDEN))
         print("              not to touch.  A different one means .data was not")
         print("              copied or the GOT was not rebased.")
         failures += 1
 
+    # A prefetch abort with nothing in IFSR would mean the vector reached the
+    # capture without the core having recorded an instruction fault, which is the
+    # one way this pass could look right and be meaningless.
+    if prefetch and (ifsr & 0x3F) == 0:
+        print("    *** FAIL: IFSR reports no instruction fault status")
+        failures += 1
+
 # --- the relocation result, which is the comparison between the passes --------
+print("")
+print("  ===== both abort types =====")
+data_passes = [q for q in passes if q["pass_test"] != TEST_PREFETCH_ABORT
+               and q["pass_captured"] and (q["pass_dfsr"] & 0x3F)]
+pabt_passes = [q for q in passes if q["pass_test"] == TEST_PREFETCH_ABORT
+               and q["pass_captured"] and (q["pass_ifsr"] & 0x3F)]
+print("    data aborts captured     = %d" % len(data_passes))
+print("    prefetch aborts captured = %d" % len(pabt_passes))
+if not data_passes or not pabt_passes:
+    print("    *** FAIL: only one kind of abort was exercised, so half of the")
+    print("              port's fault path never ran")
+    failures += 1
+else:
+    print("    PASS: both vectors were taken and both register pairs reported")
+
 print("")
 print("  ===== relocation =====")
 a, b = passes[0], passes[1]
@@ -294,7 +435,7 @@ except gdb.error as e:
     print("  boot_stage      = unavailable (%s)" % e)
 print("")
 if failures == 0:
-    print("===== PASS: relocated, and stopped at the boundary, both times =====")
+    print("===== PASS: relocated, stopped at the boundary both ways, and reported =====")
 else:
     print("===== FAIL: %d check(s) wrong =====" % failures)
 end
