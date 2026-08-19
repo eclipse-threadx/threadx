@@ -322,8 +322,63 @@ if(TX_R52_BUILD_S32Z280_MODULE_EXAMPLE)
 
     file(GLOB TXM_MANAGER_SRC ${CMAKE_SOURCE_DIR}/common_modules/module_manager/src/*.c)
 
-    # The module-side library: the API shims that run inside the module.
+    # The module-side library: the API shims that run inside the module.  These
+    # belong to the module's image and must not reach the manager's link -- they
+    # define the same names as the kernel's own entry points, and as objects they
+    # beat the kernel's static library, so in one link every service call the
+    # manager makes is redirected into the module.  See link_demo_module.lds.
+
     file(GLOB TXM_MODULE_LIB_SRC ${CMAKE_SOURCE_DIR}/common_modules/module_lib/src/*.c)
+
+    # ------------------------------------------------------------------------
+    # The module, built as its own image and reduced to a raw binary.
+    # ------------------------------------------------------------------------
+
+    add_executable(s32z280_demo_module.elf EXCLUDE_FROM_ALL
+        ${MOD_EVB}/txm_module_preamble.S
+        ${MOD_EVB}/sample_threadx_module.c
+        ${MOD_DIR}/module_lib/src/txm_module_thread_shell_entry.c
+        ${MOD_DIR}/module_lib/src/txm_module_gcc_setup.S
+        ${TXM_MODULE_LIB_SRC}
+    )
+
+    # No TXM_MODULE_MANAGER here: that define selects the kernel side of the
+    # shared headers, and this is the other side.
+
+    target_include_directories(s32z280_demo_module.elf PRIVATE
+        ${EVB_DIR}
+        ${MOD_DIR}/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/module_lib/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/inc
+        ${CMAKE_SOURCE_DIR}/common/inc
+    )
+
+    target_compile_options(s32z280_demo_module.elf PRIVATE -g)
+
+    target_link_options(s32z280_demo_module.elf PRIVATE
+        -T${MOD_EVB}/link_demo_module.lds
+        -nostartfiles
+        -nostdlib
+        -Wl,-Map=s32z280_demo_module.map
+        ${EVB_LINK_QUIET_RWX}
+    )
+
+    # The raw image the manager embeds.  Written into the binary directory
+    # because that is the include path module_blob.S searches.
+
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+        COMMAND ${CMAKE_OBJCOPY} -O binary
+                $<TARGET_FILE:s32z280_demo_module.elf>
+                ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+        DEPENDS s32z280_demo_module.elf
+        COMMENT "Converting the demonstration module to a raw image"
+        VERBATIM
+    )
+
+    add_custom_target(s32z280_demo_module_bin
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+    )
 
     add_executable(s32z280_module.elf EXCLUDE_FROM_ALL
         # Board support, shared with the other examples
@@ -356,12 +411,10 @@ if(TX_R52_BUILD_S32Z280_MODULE_EXAMPLE)
         ${MOD_DIR}/module_manager/src/txm_module_manager_external_memory_enable.c
         ${MOD_DIR}/module_manager/src/txm_module_manager_offset_check.c
 
-        # The module itself, placed in the module area by link_module.lds
-        ${MOD_EVB}/txm_module_preamble.S
-        ${MOD_EVB}/sample_threadx_module.c
-        ${MOD_DIR}/module_lib/src/txm_module_thread_shell_entry.c
-        ${MOD_DIR}/module_lib/src/txm_module_gcc_setup.S
-        ${TXM_MODULE_LIB_SRC}
+        # The module, as bytes rather than as objects.  module_blob.S includes the
+        # raw image built by s32z280_demo_module.elf, so none of the module's
+        # symbols enter this link.
+        ${MOD_EVB}/module_blob.S
 
         # The application
         ${MOD_EVB}/sample_threadx_module_manager.c
@@ -384,6 +437,17 @@ if(TX_R52_BUILD_S32Z280_MODULE_EXAMPLE)
     )
 
     target_compile_options(s32z280_module.elf PRIVATE -g)
+
+    # .incbin searches the assembler's include paths, not the source tree, and
+    # demo_module.bin is generated -- so the build directory has to be on that
+    # path or module_blob.S cannot find the image.
+
+    set_source_files_properties(${MOD_EVB}/module_blob.S PROPERTIES
+        OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+        COMPILE_OPTIONS "-Wa,-I${CMAKE_CURRENT_BINARY_DIR}"
+    )
+
+    add_dependencies(s32z280_module.elf s32z280_demo_module_bin)
 
     target_link_options(s32z280_module.elf PRIVATE
         -T${MOD_EVB}/link_module.lds
