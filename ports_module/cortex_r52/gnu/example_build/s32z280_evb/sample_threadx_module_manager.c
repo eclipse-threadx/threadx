@@ -25,8 +25,8 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Loads the sample module, lets it misbehave, and reports what the     */
-/*    hardware did about it.                                              */
+/*    Loads the sample module twice, from two different addresses, lets it */
+/*    misbehave both times, and reports what the hardware did about it.    */
 /*                                                                        */
 /*    The result this example exists to produce is the fault.  A module    */
 /*    that starts and runs proves the loader works; a module that is       */
@@ -34,6 +34,32 @@
 /*    own memory proves the port works.  So the fault notification is not  */
 /*    an error path here, it is the expected outcome, and its absence is   */
 /*    the failure.                                                        */
+/*                                                                        */
+/*    TWO passes, because one proves nothing about relocation.  The module */
+/*    is position independent: it is linked against nominal addresses it   */
+/*    never runs at, and _gcc_setup rewrites its global offset table to    */
+/*    wherever the manager actually put it.  A single run at the linked    */
+/*    address would exercise a rebase whose input and output are the same  */
+/*    number, and would look identical if the rebase did nothing at all.   */
+/*                                                                        */
+/*    So pass 1 loads the blob where the linker placed it and pass 2 loads */
+/*    a byte-for-byte copy of it from the staging area, with pass 1 still  */
+/*    holding its pool memory so that pass 2's data lands somewhere else    */
+/*    too.  Both the code base and the data base therefore differ between  */
+/*    the passes, which is what makes the comparison at the end mean       */
+/*    something:                                                          */
+/*                                                                        */
+/*      * the same instruction faults in both passes -- equal offsets from */
+/*        each pass's own code base, at two different absolute addresses.  */
+/*        The module ran relocated.                                       */
+/*      * DFAR is the forbidden address in both passes.  The module got    */
+/*        that value by reading one of its own initialised globals through */
+/*        the rebased GOT, so this single register proves the GOT was      */
+/*        rewritten and .data was copied.                                 */
+/*      * SPSR says User mode in both passes.  The boundary held.         */
+/*                                                                        */
+/*    All of which is checked on the console, with no help from a debugger */
+/*    and without the manager needing to know one symbol of the module.    */
 /*                                                                        */
 /*    What the module image is and where it comes from: it is linked into  */
 /*    this application as a separate section and loaded in place, so       */
@@ -49,6 +75,7 @@
 #include "linflexd.h"
 #include "platform.h"
 #include "thread_mpu.h"
+#include "cache.h"
 
 /* The fault information the abort vector captured.  Declared here because the
    module manager expands it into the port's fault handler through the
@@ -61,6 +88,24 @@ extern TXM_MODULE_MANAGER_MEMORY_FAULT_INFO     _txm_module_manager_memory_fault
    module's preamble first so this address is also the preamble address.  */
 
 extern unsigned char    __module_image_start__;
+extern unsigned char    __module_image_end__;
+
+/* The second address the same blob is loaded from, so relocation can be shown
+   rather than assumed.  Reserved by the linker script and left empty by it --
+   see .module_stage in link_module.lds for why it is not pre-filled.  */
+
+extern unsigned char    __module_stage_start__;
+extern unsigned char    __module_stage_end__;
+
+/* The address the module is going to reach for and must not be allowed to have.
+   Declared here only so the console check can name it; the value lives in the
+   module's own initialised data, which is the point -- the module reads it
+   through its rebased GOT, so seeing it arrive in DFAR proves the rebase and
+   the .data copy both worked.  Kept in step with sample_threadx_module.c by
+   hand, and checked at run time rather than trusted: if the two ever disagree
+   the relocation verdict says so instead of quietly passing.  */
+
+#define MODULE_FORBIDDEN_ADDRESS    0x31780000UL
 
 /* Memory the manager hands out to modules: object memory, and the data region a
    module's own variables live in.  It has to be outside every region a module is
@@ -94,7 +139,39 @@ static unsigned char    module_pool[MODULE_POOL_SIZE]
 static unsigned char    module_object_pool[MODULE_OBJECT_POOL_SIZE]
                             __attribute__((aligned(64)));
 
-static TXM_MODULE_INSTANCE  demo_module;
+/* One instance per pass.  Both are loaded at once for part of the run: pass 1 is
+   stopped but still holds its data allocation while pass 2 loads, which is what
+   pushes pass 2's data base somewhere different.  */
+
+#define MODULE_PASSES       2U
+
+static TXM_MODULE_INSTANCE  demo_module[MODULE_PASSES];
+
+/* What each pass produced.  Recorded rather than printed as it happens, because
+   the comparison between the two passes is the actual result and it cannot be
+   made until both have run.  */
+
+typedef struct PASS_RESULT_STRUCT
+{
+    CHAR        *pass_name;
+    ULONG        pass_load_status;
+    ULONG        pass_start_status;
+    ULONG        pass_stop_status;
+    ULONG        pass_code_start;
+    ULONG        pass_code_end;
+    ULONG        pass_data_start;
+    ULONG        pass_data_end;
+    ULONG        pass_data_base;
+    ULONG        pass_faults;
+    ULONG        pass_captured;
+    ULONG        pass_fault_r9;
+    ULONG        pass_dfsr;
+    ULONG        pass_dfar;
+    ULONG        pass_spsr;
+    ULONG        pass_code_location;
+} PASS_RESULT;
+
+static PASS_RESULT      pass_results[MODULE_PASSES];
 
 /* What the fault handler saw.  Read by the reporting thread after the module has
    been terminated.  */
@@ -137,13 +214,195 @@ static void put_hex(unsigned long value)
 }
 
 
+static void put_field(const char *label, unsigned long value)
+{
+    linflexd_puts(label);
+    put_hex(value);
+    linflexd_puts("\n");
+}
+
+
+/**************************************************************************/
+/*  A byte copy, written out rather than called for.                      */
+/*                                                                        */
+/*  The manager links -nostdlib, and reaching for memcpy would pull in a   */
+/*  libc whose presence this example does not otherwise depend on.  The    */
+/*  blob is under two kilobytes and this runs once.                       */
+/**************************************************************************/
+
+static void copy_bytes(unsigned char *destination, const unsigned char *source,
+                       unsigned long length)
+{
+    unsigned long   i;
+
+    for (i = 0UL; i < length; i++)
+    {
+        destination[i] = source[i];
+    }
+}
+
+
+/**************************************************************************/
+/*  One pass: load the blob from a given address, start it, wait for the   */
+/*  fault it is written to provoke, and stop it.                          */
+/*                                                                        */
+/*  The module is left loaded.  Its data allocation is what moves the next */
+/*  pass's data base, and releasing it here would defeat half the test.    */
+/*  Unloading happens after both passes have run.                         */
+/**************************************************************************/
+
+/* name is CHAR * and not const CHAR *, because txm_module_manager_in_place_load
+   takes it that way -- the manager stores the pointer in the instance and the API
+   has never promised not to write through it.  */
+
+static void run_one_pass(UINT index, CHAR *name, VOID *location)
+{
+    PASS_RESULT            *result = &pass_results[index];
+    TXM_MODULE_INSTANCE    *instance = &demo_module[index];
+    unsigned int            waited;
+
+    result -> pass_name = name;
+
+    /* Cleared before the module starts, so a fault counted here belongs to this
+       pass and not the previous one.  */
+
+    fault_count = 0UL;
+
+    result -> pass_load_status = (ULONG) txm_module_manager_in_place_load(instance, name, location);
+
+    if (result -> pass_load_status != (ULONG) TX_SUCCESS)
+    {
+        return;
+    }
+
+    /* Read from the instance rather than computed here.  Where the code ended up
+       is what the manager decided, and the whole point of the comparison at the
+       end is to check the module against the manager's own numbers.  */
+
+    result -> pass_code_start  = (ULONG) instance -> txm_module_instance_code_start;
+    result -> pass_code_end    = (ULONG) instance -> txm_module_instance_code_end;
+    result -> pass_data_start  = (ULONG) instance -> txm_module_instance_data_start;
+    result -> pass_data_end    = (ULONG) instance -> txm_module_instance_data_end;
+    result -> pass_data_base   = (ULONG) instance -> txm_module_instance_module_data_base_address;
+
+    result -> pass_start_status = (ULONG) txm_module_manager_start(instance);
+
+    if (result -> pass_start_status != (ULONG) TX_SUCCESS)
+    {
+        return;
+    }
+
+    /* Wait for the abort vector to capture a fault belonging to THIS pass, and
+       not for the notify callback to be told about one.
+
+       Those are different events, and on this port only the first of them
+       happens.  _txm_module_manager_memory_fault_handler terminates the
+       offending thread and only then calls the notify hook, and
+       _tx_thread_terminate does not return when the thread it is terminating is
+       the one running -- which it always is here.  So the hook, though correctly
+       registered, is never reached, fault_count stays 0, and a sample that waits
+       on it waits out its whole timeout and then declares that no fault
+       occurred.  That is what the first version of this file did, and it
+       reported FAIL for a module that had been stopped exactly as intended.
+       See the fault-path item in the task list; the handler is byte-for-byte
+       identical to the cortex_m33, a7 and m7 ports, so the assumption being
+       violated is upstream's rather than this port's.
+
+       The fault info itself is filled in by the port's own capture code before
+       any of that, so it is the evidence that actually arrives.  Attribution is
+       by thread pointer: each pass has its own module instance and therefore its
+       own start thread, so a captured fault naming this pass's thread cannot be
+       a leftover from the previous pass.  */
+
+    waited = 0U;
+    while ((_txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_thread_ptr
+                != &(instance -> txm_module_instance_start_stop_thread)) &&
+           (waited < 50U))
+    {
+        tx_thread_sleep(2UL);
+        waited++;
+    }
+
+    if (_txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_thread_ptr
+            == &(instance -> txm_module_instance_start_stop_thread))
+    {
+        result -> pass_captured      = 1UL;
+        result -> pass_dfsr          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_dfsr;
+        result -> pass_dfar          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_dfar;
+        result -> pass_spsr          = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_spsr;
+        result -> pass_fault_r9      = _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_r9;
+        result -> pass_code_location = (ULONG) _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_code_location;
+    }
+
+    /* Recorded for what it is worth, which is currently a report on the notify
+       path rather than on the module.  */
+
+    result -> pass_faults = fault_count;
+
+    /* Stopped, not unloaded.  The fault terminated the module's start thread but
+       left the module STARTED, and unload refuses anything that is not LOADED or
+       STOPPED -- so this is required, not tidiness.  */
+
+    result -> pass_stop_status = (ULONG) txm_module_manager_stop(instance);
+}
+
+
+static void report_one_pass(const PASS_RESULT *result)
+{
+    linflexd_puts("\n--- ");
+    linflexd_puts(result -> pass_name);
+    linflexd_puts(" ---\n");
+
+    put_field("  load status      = ", result -> pass_load_status);
+    put_field("  start status     = ", result -> pass_start_status);
+    put_field("  stop status      = ", result -> pass_stop_status);
+    put_field("  code region      = ", result -> pass_code_start);
+    put_field("       .. to        = ", result -> pass_code_end);
+    put_field("  data region      = ", result -> pass_data_start);
+    put_field("       .. to        = ", result -> pass_data_end);
+    put_field("  data base (r9)   = ", result -> pass_data_base);
+    put_field("  fault captured   = ", result -> pass_captured);
+    put_field("  notify callbacks = ", result -> pass_faults);
+    put_field("  r9 at the fault  = ", result -> pass_fault_r9);
+    put_field("  DFSR             = ", result -> pass_dfsr);
+    put_field("  DFAR             = ", result -> pass_dfar);
+    put_field("  SPSR             = ", result -> pass_spsr);
+    put_field("  faulting pc      = ", result -> pass_code_location);
+    put_field("  pc - code base   = ", result -> pass_code_location - result -> pass_code_start);
+}
+
+
+/**************************************************************************/
+/*  Where the debugger stops.                                             */
+/*                                                                        */
+/*  A symbol and not a line number in the report loop.  The harness used   */
+/*  to break on sample_threadx_module_manager.c:259, and every edit to     */
+/*  this file moved that line -- after which the run stops somewhere       */
+/*  arbitrary and reports whatever memory happens to hold, which looks     */
+/*  like a result rather than a mistake.  This does not move.              */
+/*                                                                        */
+/*  Not static, and noinline, so it survives to the symbol table with an   */
+/*  address a breakpoint can be set on.                                   */
+/**************************************************************************/
+
+__attribute__((noinline)) void manager_done(void)
+{
+    __asm__ volatile("nop");
+}
+
+
 /**************************************************************************/
 /*  Reporting.                                                            */
 /**************************************************************************/
 
 static void manager_entry(ULONG input)
 {
-    UINT    status;
+    UINT            status;
+    UINT            i;
+    unsigned long   blob_size;
+    ULONG           offset_0;
+    ULONG           offset_1;
+    UINT            failures = 0U;
 
     (void) input;
 
@@ -178,81 +437,238 @@ static void manager_entry(ULONG input)
     linflexd_puts("M2 fault notify\n");
     txm_module_manager_memory_fault_notify(module_fault_notify);
 
-    /* Nothing to bracket here.  No kernel region covers the module area, but the
-       window that reaches it is owned by the scheduler, which enables it for
-       every thread that does not own a module and disables it for every thread
-       that does -- so it is already open on this thread and cannot be open at
-       the same time as a module's own regions.  */
+    /* The copy that makes pass 2 a relocation test.  The staging area is left
+       empty by the linker on purpose: if the blob were already there, a failure
+       to copy would be invisible because the right bytes would be present
+       anyway.  */
 
-    linflexd_puts("M3 in_place_load\n");
-    status = txm_module_manager_in_place_load(&demo_module, "demo module",
-                                             (VOID *) &__module_image_start__);
+    blob_size = (unsigned long) (&__module_image_end__ - &__module_image_start__);
 
-    linflexd_puts("in_place_load      = ");
-    put_hex(status);
-    linflexd_puts("  ready = ");
-    put_hex((ULONG) _txm_module_manager_ready);
-    linflexd_puts("\n");
+    linflexd_puts("M3 staging the blob\n");
+    put_field("  blob size        = ", blob_size);
+    put_field("  from             = ", (unsigned long) &__module_image_start__);
+    put_field("  to               = ", (unsigned long) &__module_stage_start__);
 
-    if (status == TX_SUCCESS)
+    if (blob_size > (unsigned long) (&__module_stage_end__ - &__module_stage_start__))
     {
-        status = txm_module_manager_start(&demo_module);
-        linflexd_puts("module start       = ");
-        put_hex(status);
-        linflexd_puts("\n");
-    }
+        /* Reported rather than allowed to overrun.  The staging area is a fixed
+           size in the linker script and the module is free to grow.  */
 
-    /* Give the module time to run its three steps and be terminated by the
-       third.  Bounded: if the fault never arrives, that is the result to
-       report, not a reason to wait for ever.  */
-
-    {
-        unsigned int waited = 0U;
-
-        while ((fault_count == 0UL) && (waited < 50U))
-        {
-            tx_thread_sleep(2UL);
-            waited++;
-        }
-    }
-
-    linflexd_puts("\n=== ThreadX modules on S32Z280: protection boundary ===\n");
-
-    linflexd_puts("module faults      = ");
-    put_hex(fault_count);
-    linflexd_puts("\n");
-
-    if (fault_count == 0UL)
-    {
-        linflexd_puts("FAIL the module reached outside its memory and was not stopped\n");
+        linflexd_puts("FAIL the module image does not fit the staging area\n");
+        failures++;
     }
     else
     {
-        linflexd_puts("DFSR               = ");
-        put_hex(fault_dfsr);
-        linflexd_puts("\nDFAR               = ");
-        put_hex(fault_dfar);
-        linflexd_puts("\nSPSR               = ");
-        put_hex(fault_spsr);
-        linflexd_puts("\nfaulting pc        = ");
-        put_hex(fault_code_location);
-        linflexd_puts("\n");
+        copy_bytes(&__module_stage_start__, &__module_image_start__, blob_size);
 
-        /* SPSR's mode field says who faulted.  0x10 is User mode, which is where
-           a protected module runs; anything else means the fault came from
-           privileged code and this is not the test passing.  */
+        /* Those were data writes to memory that is about to be fetched as
+           instructions, and the module area is mapped Normal write-back
+           (MAIR attribute 0 is 0xFF).  So the copied bytes may sit in dirty D
+           cache lines while the instruction side, which is not coherent with
+           the D cache on this core, fetches whatever main memory still holds.
+           Clean first so memory is correct, then invalidate the I cache so no
+           stale line from a previous image can be served.
 
-        if ((fault_spsr & 0x1FUL) == 0x10UL)
+           This is not a precaution the passing run justifies.  It ran correctly
+           before this was added, which is exactly the problem: a cold I cache
+           over a never-executed address happens to work, and it keeps happening
+           to work until the staging area is reused or an eviction lands
+           differently.  Any loader that copies code owes this pair of
+           operations, and by-range variants would be tighter than these
+           all-cache sweeps -- fine here, where it runs once at startup.  */
+
+        cache_clean_all();
+        cache_invalidate_icache_all();
+
+        /* Nothing to bracket for the MPU here.  No kernel region covers the
+           module area, but the window that reaches it is owned by the scheduler,
+           which enables it for every thread that does not own a module and
+           disables it for every thread that does -- so it is already open on
+           this thread and cannot be open while a module's own regions are.  */
+
+        linflexd_puts("M4 pass 1, at the linked address\n");
+        run_one_pass(0U, "linked address", (VOID *) &__module_image_start__);
+
+        linflexd_puts("M5 pass 2, relocated\n");
+        run_one_pass(1U, "relocated", (VOID *) &__module_stage_start__);
+
+        /* Both passes are done with their memory now.  */
+
+        for (i = 0U; i < MODULE_PASSES; i++)
         {
-            linflexd_puts("PASS the module faulted in User mode and was terminated\n");
-        }
-        else
-        {
-            linflexd_puts("FAIL a fault was taken, but not from User mode\n");
+            (void) txm_module_manager_unload(&demo_module[i]);
         }
     }
 
+    /* ------------------------------------------------------------------
+       The verdict.
+       ------------------------------------------------------------------ */
+
+    linflexd_puts("\n=== ThreadX modules on S32Z280: relocation and protection ===\n");
+
+    for (i = 0U; i < MODULE_PASSES; i++)
+    {
+        report_one_pass(&pass_results[i]);
+    }
+
+    linflexd_puts("\n");
+
+    /* Before anything else: a module's code and data regions are enabled at the
+       same time, and PMSAv8-R has no region priority -- two enabled regions that
+       overlap are CONSTRAINED UNPREDICTABLE, and on this part that means aborts
+       from addresses that look perfectly legal.  Nothing in the manager checks
+       for it, so this example does.
+
+       The risk is real here and not theoretical: pass 2 loads its code from the
+       staging area, which sits in the same 64 KB as the byte pool its data comes
+       out of.  A module grown large enough, or a pool sized differently, and the
+       two would meet.  */
+
+    for (i = 0U; i < MODULE_PASSES; i++)
+    {
+        const PASS_RESULT *result = &pass_results[i];
+
+        if (result -> pass_load_status != (ULONG) TX_SUCCESS)
+        {
+            continue;
+        }
+
+        if ((result -> pass_code_start <= result -> pass_data_end) &&
+            (result -> pass_data_start <= result -> pass_code_end))
+        {
+            linflexd_puts("FAIL ");
+            linflexd_puts(result -> pass_name);
+            linflexd_puts(": its code and data regions overlap\n");
+            failures++;
+        }
+    }
+
+    /* Each pass on its own: it has to have loaded, started, faulted once, and
+       faulted in User mode at the address it was told not to touch.  */
+
+    for (i = 0U; i < MODULE_PASSES; i++)
+    {
+        const PASS_RESULT *result = &pass_results[i];
+
+        if ((result -> pass_load_status != (ULONG) TX_SUCCESS) ||
+            (result -> pass_start_status != (ULONG) TX_SUCCESS))
+        {
+            linflexd_puts("FAIL ");
+            linflexd_puts(result -> pass_name);
+            linflexd_puts(": did not load and start\n");
+            failures++;
+        }
+        else if (result -> pass_captured == 0UL)
+        {
+            linflexd_puts("FAIL ");
+            linflexd_puts(result -> pass_name);
+            linflexd_puts(": reached outside its memory and was not stopped\n");
+            failures++;
+        }
+        else if (result -> pass_fault_r9 != result -> pass_data_base)
+        {
+            /* r9 is the module's PIC base and the manager seeded it from the
+               thread entry info.  If the value captured at the fault is not the
+               data base the manager handed out, the seeding is wrong and every
+               data reference the module made went somewhere unintended -- so
+               check it explicitly rather than inferring it from a symptom.  */
+
+            linflexd_puts("FAIL ");
+            linflexd_puts(result -> pass_name);
+            linflexd_puts(": r9 was not the module's data base\n");
+            failures++;
+        }
+        else if ((result -> pass_spsr & 0x1FUL) != 0x10UL)
+        {
+            /* A fault from anywhere but User mode is not this test passing: the
+               module runs unprivileged, so a privileged fault means the fault
+               came from the kernel and something else is wrong.  */
+
+            linflexd_puts("FAIL ");
+            linflexd_puts(result -> pass_name);
+            linflexd_puts(": faulted, but not from User mode\n");
+            failures++;
+        }
+        else if (result -> pass_dfar != MODULE_FORBIDDEN_ADDRESS)
+        {
+            /* The module got this address out of its own initialised data,
+               through its rebased GOT.  Any other value means it faulted
+               somewhere unintended -- most likely on its own data, which is what
+               a bad rebase looks like.  */
+
+            linflexd_puts("FAIL ");
+            linflexd_puts(result -> pass_name);
+            linflexd_puts(": faulted at the wrong address, so .data or the GOT is wrong\n");
+            failures++;
+        }
+        else
+        {
+            linflexd_puts("PASS ");
+            linflexd_puts(result -> pass_name);
+            linflexd_puts(": faulted in User mode at the forbidden address\n");
+        }
+    }
+
+    /* And the two passes against each other, which is the relocation result.  */
+
+    offset_0 = pass_results[0].pass_code_location - pass_results[0].pass_code_start;
+    offset_1 = pass_results[1].pass_code_location - pass_results[1].pass_code_start;
+
+    if ((pass_results[0].pass_captured == 0UL) || (pass_results[1].pass_captured == 0UL))
+    {
+        linflexd_puts("FAIL relocation: a pass did not fault, nothing to compare\n");
+        failures++;
+    }
+    else if (pass_results[0].pass_code_start == pass_results[1].pass_code_start)
+    {
+        linflexd_puts("FAIL relocation: both passes ran from the same address\n");
+        failures++;
+    }
+    else if (offset_0 != offset_1)
+    {
+        linflexd_puts("FAIL relocation: the two passes faulted at different offsets\n");
+        failures++;
+    }
+    else
+    {
+        linflexd_puts("PASS relocation: the same blob ran correctly from two addresses\n");
+
+        if (pass_results[0].pass_data_base == pass_results[1].pass_data_base)
+        {
+            /* Not a failure -- the code rebase is still proven -- but worth
+               saying, because it means the data rebase produced the same
+               numbers twice and was not exercised as thoroughly.  */
+
+            linflexd_puts("NOTE both passes shared a data base; the data rebase was not varied\n");
+        }
+    }
+
+    /* Reported apart from the verdict above, because it is a known defect in the
+       fault-notification path and not a property of this run.  The module was
+       stopped either way -- that is what the captured fault says -- but an
+       application asking to be told about it is not being told.  */
+
+    if ((pass_results[0].pass_captured != 0UL) && (pass_results[0].pass_faults == 0UL))
+    {
+        linflexd_puts("KNOWN the fault was captured but the notify callback never ran\n");
+    }
+
+    put_field("\nfailures           = ", (unsigned long) failures);
+
+    if (failures == 0U)
+    {
+        linflexd_puts("=== PASS ===\n");
+    }
+    else
+    {
+        linflexd_puts("=== FAIL ===\n");
+    }
+
     linflexd_puts("=== end ===\n");
+
+    /* Everything worth reading is in memory now.  */
+
+    manager_done();
 
     while (1)
     {

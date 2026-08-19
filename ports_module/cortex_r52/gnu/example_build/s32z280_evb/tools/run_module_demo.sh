@@ -44,12 +44,26 @@ done
 # gdb-py needs the source-built interpreter: its embedded Python has a minimal
 # builtin set and loads _struct/_socket/_ctypes as separate .so files.  Compute
 # the module address BEFORE exporting PYTHONHOME, since that breaks system tools.
-PROGRESS_ADDR=0x$(nm "$MODULE_ELF" | awk '$3=="module_progress"{print $1}')
-if [ "$PROGRESS_ADDR" = "0x" ]; then
-    echo "ERROR: module_progress not found in $MODULE_ELF" >&2
+# What is wanted is an OFFSET, not an address.  The module is position
+# independent: the address nm reports is a nominal one from a segment the module
+# never runs at, and its real data lives wherever the manager allocated it -- a
+# different place in each of the two passes.  So the offset of module_progress
+# within the module's data segment is computed here, and the gdb script adds it
+# to each pass's data base, which it reads off the target.
+PROGRESS_SYM=$(nm "$MODULE_ELF" | awk '$3=="module_progress"{print $1}')
+DATA_SEG=$(nm "$MODULE_ELF" | awk '$3=="__data_segment_start__"{print $1}')
+if [ -z "$PROGRESS_SYM" ] || [ -z "$DATA_SEG" ]; then
+    echo "ERROR: module_progress or __data_segment_start__ not found in $MODULE_ELF" >&2
     exit 1
 fi
-echo "module_progress lives at $PROGRESS_ADDR (from the module's own ELF)"
+PROGRESS_OFFSET=$(( 0x$PROGRESS_SYM - 0x$DATA_SEG ))
+if [ "$PROGRESS_OFFSET" -lt 0 ]; then
+    echo "ERROR: module_progress is below the module's data segment; the link map" >&2
+    echo "       and this script disagree about where the module's data starts." >&2
+    exit 1
+fi
+echo "module_progress is $PROGRESS_OFFSET bytes into the module's data segment"
+echo "  (nominal 0x$PROGRESS_SYM, data segment 0x$DATA_SEG -- neither is a real address)"
 
 if pgrep -x ccs > /dev/null; then
     echo "ERROR: a Linux CCS is running (pid $(pgrep -x ccs | tr '\n' ' '))." >&2
@@ -90,7 +104,7 @@ export PYTHONHOME=$P
 export PYTHONPATH=$P/lib/python3.10:$P/lib/python3.10/lib-dynload:$P/lib/python3.10/site-packages
 export S32Z280_ELF=$MANAGER_ELF
 export S32Z280_MODULE_ELF=$MODULE_ELF
-export S32Z280_MODULE_PROGRESS_ADDR=$PROGRESS_ADDR
+export S32Z280_MODULE_PROGRESS_OFFSET=$PROGRESS_OFFSET
 
 # pkill -x, not -f: these run as ./gta, so a -f pattern like 'gta/gta' never
 # matches and a stale server silently serves the next attach.

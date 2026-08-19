@@ -37,6 +37,21 @@
 #                   bit 0x8  survived the forbidden access         expect CLEAR
 #
 # so module_progress == 0x7 exactly, and fault_count >= 1 with SPSR mode 0x10.
+#
+# AND IT HAPPENS TWICE, from two different load addresses
+#
+# The module is position independent, so a single run at the address it was
+# linked for would prove nothing: the GOT rebase would map every address to
+# itself and a rebase that did nothing would look the same.  The sample therefore
+# loads the same blob twice -- once where the linker put it, once from a staging
+# area -- and this script checks both.
+#
+# Finding module_progress is no longer a matter of reading the module's ELF.  A
+# relocated module's data lives wherever the manager allocated it, so the address
+# is (this pass's data base) + (the nominal offset of module_progress within the
+# module's data segment).  The first number is read from the module instance on
+# the target, the second from the module's ELF, and neither is a constant that
+# can be written down here.
 
 py _PROBE_IP = "s32dbg:192.168.50.238"
 py _SOC_NAME = "S32Z280"
@@ -90,13 +105,15 @@ start = int(gdb.parse_and_eval("(unsigned int)&_start")) & ~1
 gdb.execute("set $pc = 0x%x" % start)
 print("PC set to 0x%08X" % start)
 
-# Stop after the manager has printed its whole report.  manager_entry ends in an
-# endless sleep, so this line is reached exactly once the verdict is out -- there
-# is no bsp_done in this image to break on, unlike the boot example.
+# Stop after the manager has printed its whole report.  manager_done exists for
+# this and nothing else: the previous version of this script broke on
+# sample_threadx_module_manager.c:259, and every edit to that file moved the line
+# out from under the breakpoint, after which the run stopped somewhere arbitrary
+# and reported whatever memory happened to hold.
 #
 # hbreak, not break: the code region is mapped read-only by the MPU, so a
 # software breakpoint would have to write to it.
-gdb.execute("hbreak sample_threadx_module_manager.c:259")
+gdb.execute("hbreak manager_done")
 gdb.execute("continue")
 end
 
@@ -107,78 +124,177 @@ import gdb, os
 def rd(addr):
     return int(gdb.parse_and_eval("*(unsigned int *)0x%x" % addr)) & 0xFFFFFFFF
 
-def sym(name):
-    return int(gdb.parse_and_eval("(unsigned int)&%s" % name)) & 0xFFFFFFFF
+def ev(expr):
+    return int(gdb.parse_and_eval(expr)) & 0xFFFFFFFF
 
 failures = 0
 
-# --- the module's own progress, read from the module image -------------------
-#
-# module_progress belongs to the module, which is a separate link unit embedded
-# as a blob, so the manager's ELF has no symbol for it.  The address comes from
-# the module's own ELF, and it is valid because the module is linked absolutely
-# and loaded in place: it runs, and writes its data, where it lies.  Once T3
-# makes modules relocatable this has to be derived from the load address
-# instead, and this comment is the reminder.
-progress_addr = os.environ.get("S32Z280_MODULE_PROGRESS_ADDR")
-
 OWN_DATA, KERNEL_CALL, ATTEMPTED_STEAL, SURVIVED_STEAL = 0x1, 0x2, 0x4, 0x8
+FORBIDDEN = 0x31780000
+MODE = {0x10: "User", 0x13: "Supervisor", 0x1A: "Hyp", 0x1F: "System"}
 
-if progress_addr:
-    progress = rd(int(progress_addr, 0))
-    print("  module_progress = 0x%08X  (at %s)" % (progress, progress_addr))
-    for bit, name, want_set in ((OWN_DATA, "wrote its own data", True),
-                                (KERNEL_CALL, "reached the kernel through SVC", True),
-                                (ATTEMPTED_STEAL, "attempted the forbidden access", True),
-                                (SURVIVED_STEAL, "SURVIVED the forbidden access", False)):
-        got = bool(progress & bit)
-        ok = (got == want_set)
-        if not ok:
-            failures += 1
-        print("    0x%X %-34s %-5s  %s" % (bit, name, "set" if got else "clear",
-                                           "ok" if ok else "*** WRONG ***"))
-    if progress & SURVIVED_STEAL:
-        print("    ISOLATION FAILURE: the module read memory it was never granted.")
+# The nominal offset of module_progress inside the module's data segment.  Both
+# halves come from the module's own ELF and neither is an address the module ever
+# runs at -- see link_demo_module.lds.  The run-time address is this offset plus
+# whatever data base the manager handed the module, which differs per pass.
+progress_offset = os.environ.get("S32Z280_MODULE_PROGRESS_OFFSET")
+progress_offset = int(progress_offset, 0) if progress_offset else None
+
+if progress_offset is None:
+    print("  NOTE S32Z280_MODULE_PROGRESS_OFFSET unset; skipping the progress checks")
 else:
-    print("  module_progress not read (S32Z280_MODULE_PROGRESS_ADDR unset)")
+    print("  module_progress sits %d bytes into the module's data segment" % progress_offset)
 
-# --- what the fault handler captured ----------------------------------------
+passes = []
+for i in range(2):
+    p = {}
+    for field in ("pass_load_status", "pass_start_status", "pass_stop_status",
+                  "pass_code_start", "pass_code_end", "pass_data_start",
+                  "pass_data_end", "pass_data_base", "pass_faults",
+                  "pass_captured", "pass_fault_r9",
+                  "pass_dfsr", "pass_dfar", "pass_spsr", "pass_code_location"):
+        p[field] = ev("pass_results[%d].%s" % (i, field))
+    try:
+        p["name"] = gdb.parse_and_eval("pass_results[%d].pass_name" % i).string()
+    except gdb.error:
+        p["name"] = "pass %d" % (i + 1)
+    passes.append(p)
+
+for i, p in enumerate(passes):
+    print("")
+    print("  --- pass %d: %s ---" % (i + 1, p["name"]))
+    print("    load / start / stop   = 0x%08X / 0x%08X / 0x%08X"
+          % (p["pass_load_status"], p["pass_start_status"], p["pass_stop_status"]))
+    print("    code region           = 0x%08X .. 0x%08X"
+          % (p["pass_code_start"], p["pass_code_end"]))
+    print("    data region           = 0x%08X .. 0x%08X"
+          % (p["pass_data_start"], p["pass_data_end"]))
+    print("    data base (r9)        = 0x%08X" % p["pass_data_base"])
+
+    if p["pass_load_status"] != 0 or p["pass_start_status"] != 0:
+        print("    *** FAIL: did not load and start")
+        failures += 1
+        continue
+
+    # Code and data regions are enabled together and PMSAv8-R has no region
+    # priority, so an overlap is CONSTRAINED UNPREDICTABLE rather than merely
+    # untidy.  Checked here as well as on the target because a debugger can say
+    # which two regions met, and the target can only say that something did.
+    if (p["pass_code_start"] <= p["pass_data_end"]
+            and p["pass_data_start"] <= p["pass_code_end"]):
+        print("    *** FAIL: this module's code and data regions overlap")
+        failures += 1
+
+    if progress_offset is not None:
+        addr = p["pass_data_base"] + progress_offset
+        progress = rd(addr)
+        print("    module_progress       = 0x%08X  (at 0x%08X)" % (progress, addr))
+        for bit, name, want_set in ((OWN_DATA, "wrote its own data", True),
+                                    (KERNEL_CALL, "reached the kernel through SVC", True),
+                                    (ATTEMPTED_STEAL, "attempted the forbidden access", True),
+                                    (SURVIVED_STEAL, "SURVIVED the forbidden access", False)):
+            got = bool(progress & bit)
+            ok = (got == want_set)
+            if not ok:
+                failures += 1
+            print("      0x%X %-34s %-5s  %s"
+                  % (bit, name, "set" if got else "clear",
+                     "ok" if ok else "*** WRONG ***"))
+        if progress & SURVIVED_STEAL:
+            print("      ISOLATION FAILURE: the module read memory it was never granted.")
+
+    # "captured" and "notified" are different events, and only the first of them
+    # happens on this port.  The fault handler terminates the offending thread
+    # before calling the notify hook, and _tx_thread_terminate does not return
+    # when the thread being terminated is the running one -- which it always is
+    # here.  So the hook never runs, and a check written against the callback
+    # counter reports "no fault" for a module that was stopped correctly.
+    # The abort vector's captured fault info is the evidence that arrives.
+    print("    fault captured        = %d" % p["pass_captured"])
+    print("    notify callbacks      = %d" % p["pass_faults"])
+    if p["pass_captured"] == 0:
+        print("    *** FAIL: no fault was captured.  The module reached outside its")
+        print("              memory and was not stopped, or never got that far.")
+        failures += 1
+        continue
+    if p["pass_faults"] == 0:
+        print("    KNOWN: captured but never notified -- the fault-notify path is")
+        print("           broken independently of anything this run exercises.")
+
+    dfsr, dfar, spsr, pc = (p["pass_dfsr"], p["pass_dfar"],
+                            p["pass_spsr"], p["pass_code_location"])
+    print("    DFSR                  = 0x%08X  status 0x%02X  WnR %d"
+          % (dfsr, dfsr & 0x3F, (dfsr >> 11) & 1))
+    print("    DFAR                  = 0x%08X" % dfar)
+    print("    SPSR                  = 0x%08X  mode 0x%02X (%s)"
+          % (spsr, spsr & 0x1F, MODE.get(spsr & 0x1F, "?")))
+    print("    faulting pc           = 0x%08X" % pc)
+    print("    pc - code base        = 0x%08X" % ((pc - p["pass_code_start"]) & 0xFFFFFFFF))
+    print("    r9 at the fault       = 0x%08X" % p["pass_fault_r9"])
+
+    # r9 is the module's PIC base, seeded by the manager's thread stack build from
+    # the thread entry info.  Before T3 it was left at 0, which is what made every
+    # module data reference resolve to a small absolute address.  Checking it
+    # directly turns that class of bug into one line instead of a fault to explain.
+    if p["pass_fault_r9"] != p["pass_data_base"]:
+        print("    *** FAIL: r9 should be the data base 0x%08X" % p["pass_data_base"])
+        failures += 1
+
+    if (spsr & 0x1F) != 0x10:
+        print("    *** FAIL: the fault did not come from User mode, so it is not")
+        print("              a module being stopped at the boundary.")
+        failures += 1
+
+    # DFAR is the strongest single check in this script.  The module obtained
+    # this address by reading one of its own initialised globals through the
+    # rebased GOT, so the right value here means the GOT was rewritten AND .data
+    # was copied out of the image.  A wrong value usually means the module
+    # faulted on its own data instead, which is what a bad rebase looks like.
+    if dfar != FORBIDDEN:
+        print("    *** FAIL: expected DFAR 0x%08X, the address the module was told" % FORBIDDEN)
+        print("              not to touch.  A different one means .data was not")
+        print("              copied or the GOT was not rebased.")
+        failures += 1
+
+# --- the relocation result, which is the comparison between the passes --------
 print("")
-count = rd(sym("fault_count"))
-print("  fault_count     = %d" % count)
+print("  ===== relocation =====")
+a, b = passes[0], passes[1]
+off_a = (a["pass_code_location"] - a["pass_code_start"]) & 0xFFFFFFFF
+off_b = (b["pass_code_location"] - b["pass_code_start"]) & 0xFFFFFFFF
 
-if count == 0:
-    print("  *** FAIL: no fault was taken.  The module reached outside its memory")
-    print("            and was not stopped, or it never got as far as trying.")
+if a["pass_captured"] == 0 or b["pass_captured"] == 0:
+    print("    *** FAIL: a pass did not fault, so there is nothing to compare")
+    failures += 1
+elif a["pass_code_start"] == b["pass_code_start"]:
+    print("    *** FAIL: both passes ran from the same address 0x%08X"
+          % a["pass_code_start"])
+    failures += 1
+elif off_a != off_b:
+    print("    *** FAIL: the passes faulted at different offsets, 0x%08X and 0x%08X"
+          % (off_a, off_b))
     failures += 1
 else:
-    dfsr = rd(sym("fault_dfsr"))
-    dfar = rd(sym("fault_dfar"))
-    spsr = rd(sym("fault_spsr"))
-    pc   = rd(sym("fault_code_location"))
-    print("  DFSR            = 0x%08X  status 0x%02X  WnR %d"
-          % (dfsr, dfsr & 0x3F, (dfsr >> 11) & 1))
-    print("  DFAR            = 0x%08X" % dfar)
-    print("  SPSR            = 0x%08X  mode 0x%02X (%s)"
-          % (spsr, spsr & 0x1F,
-             {0x10: "User", 0x13: "Supervisor", 0x1A: "Hyp",
-              0x1F: "System"}.get(spsr & 0x1F, "?")))
-    print("  faulting pc     = 0x%08X" % pc)
-
-    # The mode field is the whole point.  A fault from anywhere but User mode
-    # means privileged code faulted, which is not this test passing.
-    if (spsr & 0x1F) != 0x10:
-        print("  *** FAIL: the fault did not come from User mode, so it is not")
-        print("            a module being stopped at the boundary.")
-        failures += 1
-    else:
-        print("  the fault came from User mode, which is where a module runs")
+    print("    code bases 0x%08X and 0x%08X, %d bytes apart"
+          % (a["pass_code_start"], b["pass_code_start"],
+             (b["pass_code_start"] - a["pass_code_start"]) & 0xFFFFFFFF))
+    print("    both faulted at offset 0x%08X into their own image" % off_a)
+    print("    PASS: the same blob ran correctly from two different addresses")
+    if a["pass_data_base"] == b["pass_data_base"]:
+        print("    NOTE both passes shared a data base 0x%08X, so the data half of"
+              % a["pass_data_base"])
+        print("         the rebase produced the same numbers twice")
 
 print("")
-print("  boot_stage      = %d" % rd(sym("boot_stage")))
+# Cast, because this symbol has no debug type in the manager image and gdb
+# refuses to read an untyped symbol without being told its width.
+try:
+    print("  boot_stage      = %d" % ev("*(unsigned int *)&boot_stage"))
+except gdb.error as e:
+    print("  boot_stage      = unavailable (%s)" % e)
 print("")
 if failures == 0:
-    print("===== PASS: the module was stopped at the boundary =====")
+    print("===== PASS: relocated, and stopped at the boundary, both times =====")
 else:
     print("===== FAIL: %d check(s) wrong =====" % failures)
 end

@@ -150,6 +150,32 @@ SECTIONS
         __module_pool_end__ = .;
     } > MODULE
 
+    /* A second place to load the same module from, which is how this example
+       proves the module is relocatable rather than merely built to be.
+
+       A module that runs correctly at the address it was linked for proves
+       nothing about relocation -- the GOT rebase would produce the same
+       addresses it started with and a broken rebase would look identical.  So
+       the manager copies the blob here and loads it a second time, and the two
+       runs are compared.  Any address in the module area would do; what matters
+       is that it is not __module_image_start__ and that it does not overlap the
+       pool, because the code region of the second instance and the data regions
+       the pool hands out are live at the same time and PMSAv8-R does not permit
+       two enabled regions to overlap.
+
+       NOLOAD, and deliberately not initialised at link time: if the blob were
+       placed here by the linker as well, a failure to copy it would be invisible
+       because the right bytes would already be present.  */
+
+    .module_stage (NOLOAD) :
+    {
+        . = ALIGN(64);
+        __module_stage_start__ = .;
+        . = . + 0x1000;
+        . = ALIGN(64);
+        __module_stage_end__ = .;
+    } > MODULE
+
     /* The code and data sizes are not computed here any more.  They belong to
        the module's own link, which is where its preamble is assembled and where
        the boundary between its code and its data is actually known.  */
