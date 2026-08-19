@@ -131,6 +131,22 @@ _txm_module_manager_thread_stack_build:
 @
 @    Stack Bottom: (higher memory address)  */
 @
+@   The thread entry information pointer, which _txm_module_manager_thread_create
+@   parked in the stack pointer position of the control block for exactly this
+@   purpose.  It has to be read before the frame is built, because the initial
+@   stack pointer is written over that same field further down.
+@
+@   The module's shell entry takes two arguments -- the thread and this pointer --
+@   and everything the module needs to start is behind it: its own entry point,
+@   its parameter, its data and code bases, and the callback queue.  ThreadX's
+@   thread shell passes only one argument, so the second one can only arrive as a
+@   seeded register, which is what the two stores below are for.  Left at zero,
+@   as the base port's stack build leaves them, the shell entry dereferences NULL
+@   on its first instruction and the module faults before it runs a line of its
+@   own code.
+
+    LDR     r12, [r0, #8]                   @ Pickup thread entry info pointer
+@
     LDR     r2, [r0, #16]                   @ Pickup end of stack area
     BIC     r2, r2, #7                      @ Ensure 8-byte alignment
     SUB     r2, r2, #76                     @ Allocate space for the stack frame
@@ -139,9 +155,9 @@ _txm_module_manager_thread_stack_build:
 @
     MOV     r3, #1                          @ Build interrupt stack type
     STR     r3, [r2, #0]                    @ Store stack type
+    STR     r0, [r2, #8]                    @ Store initial r0, the thread pointer
+    STR     r12, [r2, #12]                  @ Store initial r1, the entry info
     MOV     r3, #0                          @ Build initial register value
-    STR     r3, [r2, #8]                    @ Store initial r0
-    STR     r3, [r2, #12]                   @ Store initial r1
     STR     r3, [r2, #16]                   @ Store initial r2
     STR     r3, [r2, #20]                   @ Store initial r3
     STR     r3, [r2, #24]                   @ Store initial r4
