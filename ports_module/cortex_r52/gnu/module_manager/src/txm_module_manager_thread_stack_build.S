@@ -165,7 +165,28 @@ _txm_module_manager_thread_stack_build:
     STR     r3, [r2, #32]                   @ Store initial r6
     STR     r3, [r2, #36]                   @ Store initial r7
     STR     r3, [r2, #40]                   @ Store initial r8
-    STR     r3, [r2, #44]                   @ Store initial r9
+@
+@   r9 is the module's PIC base, and seeding it is not optional for a module
+@   built -fpic -msingle-pic-base.  Every reference the module makes to one of
+@   its own globals compiles to LDR rX, [r9, #offset] -- an offset into the
+@   global offset table, measured from whatever r9 holds -- and -msingle-pic-base
+@   is precisely the promise that nothing in the module will set r9 up, because
+@   the caller already did.  Here is the caller.
+@
+@   The value is the module's data base, which is also where _gcc_setup puts the
+@   GOT, because the compiler measures its offsets from the GOT origin and the
+@   linker script puts the GOT first in the data segment for that reason.  Offset
+@   8 in the thread entry info is txm_module_thread_entry_info_data_base_address,
+@   whose declaration in txm_module.h carries the comment "Don't move this,
+@   referenced in stack build to setup module data base register."  This is the
+@   reference it means.
+@
+@   Left at zero, as the base port's stack build leaves it and as this port did
+@   until now, every module data reference reads address 0 + a small offset.
+@   Silicon showed exactly that: r9 was 0 in every fault captured on the S32Z280.
+@
+    LDR     r3, [r12, #8]                   @ Pickup the module's data base
+    STR     r3, [r2, #44]                   @ Store initial r9, the PIC base
     LDR     r3, [r0, #12]                   @ Pickup stack starting address
     STR     r3, [r2, #48]                   @ Store initial r10 (sl)
     LDR     r3,=_tx_thread_schedule         @ Pickup address of _tx_thread_schedule for GDB backtrace

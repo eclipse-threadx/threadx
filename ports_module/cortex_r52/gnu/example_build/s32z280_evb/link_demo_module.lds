@@ -29,28 +29,60 @@
  * called into unmapped memory and the core took a prefetch abort with nothing on
  * the console to say so.
  *
- * The manager embeds the binary produced from this link at the same address it
- * is linked for, so the two agree on where the module lives without either one
- * needing the other's symbols.
+ * POSITION INDEPENDENT, and the two addresses below are fictions
+ * ==============================================================
  *
- * Absolute, not position independent.  This is the stepping-stone arrangement:
- * the common module manager does no relocation processing -- there is no
- * .rel.dyn handling anywhere in common_modules -- so a position-independent
- * module would have nothing to fix up its references.  Making the module
- * genuinely relocatable is the next step, and it changes how the image gets
- * here, not where it ends up.
+ * The module is built -fpic -msingle-pic-base, so every reference it makes to
+ * its own data goes through the global offset table with r9 as the base.  It
+ * therefore does not run at the addresses in this file and is not meant to: the
+ * two segment origins are nominal, chosen only so that the loader can tell a
+ * code address from a data address by comparing against __data_segment_start__.
+ * What actually happens at run time is that _gcc_setup rewrites every GOT entry
+ * from these nominal addresses to the addresses the manager decided on.
+ *
+ * That is why they are far apart and why neither is zero.  Far apart, because
+ * the whole discrimination is "below the data origin means code"; non-zero,
+ * because _gcc_setup treats a zero GOT entry as one the linker never filled in
+ * and skips it, so a real address of zero would be silently dropped.
+ *
+ *   0x01000000  code    preamble, text, rodata, and the load images of the
+ *                       GOT and .data -- this is the blob the manager embeds
+ *   0x02000000  data    the GOT the module runs against, .data and .bss, all
+ *                       of which live in memory the manager allocates
+ *
+ * The load images matter.  A module's .data cannot be used where it was linked,
+ * because the manager never copies it there: _txm_module_manager_internal_load
+ * allocates the module's data area from its byte pool and TX_MEMSETs it to zero,
+ * and that is the only memory the module is given a region for.  The module's
+ * own .data, wherever it was linked, is outside every region the module owns.
+ * On silicon that faulted at the first write to an initialised variable, with
+ * DFAR pointing into the gap between the granted code and the granted data.
+ *
+ * So .data and .got have their VMAs in the data segment, where the module will
+ * run, and their LMAs in the code segment, inside the blob, where _gcc_setup can
+ * find them and copy them out.  AT>CODE is what says that.
  */
 
 MEMORY
 {
-    /* Must match S32Z_MODULE_AREA_BASE and S32Z_MODULE_AREA_SIZE in platform.h,
-       and the MODULE region in the manager's link_module.lds.  */
-    MODULE (rwx) : ORIGIN = 0x317F0000, LENGTH = 0x00010000    /* 64 KB */
+    /* Nominal.  See the note above: the module runs where the manager puts it,
+       not here.  Sized generously because nothing is reserved by being large --
+       the raw binary is only as long as the sections actually emitted.  */
+
+    CODE (rx) : ORIGIN = 0x01000000, LENGTH = 0x00100000
+    DATA (rw) : ORIGIN = 0x02000000, LENGTH = 0x00100000
 }
+
+__code_segment_start__ = 0x01000000;
+__data_segment_start__ = 0x02000000;
 
 SECTIONS
 {
-    .module_image :
+    /* ---------------------------------------------------------------------
+       The code segment, which is the blob byte for byte.
+       --------------------------------------------------------------------- */
+
+    .module_image : ALIGN(64)
     {
         __module_image_start__ = .;
 
@@ -65,32 +97,88 @@ SECTIONS
         *(.glue_7t)
         *(.rodata .rodata.*)
 
-        /* Code and data are separated here so the preamble can declare the two
-           sizes the manager needs, each rounded to the 64-byte PMSAv8-R granule
-           because that is the smallest region the manager can express.  */
+        . = ALIGN(4);
+    } >CODE AT>CODE
 
-        . = ALIGN(64);
-        __txm_module_code_end__ = .;
+    /* ---------------------------------------------------------------------
+       The data segment.  VMAs here, load images back in the code segment.
+       --------------------------------------------------------------------- */
 
+    /* The GOT, and it must be first in the data segment.  r9 is the GOT base as
+       far as the compiler is concerned -- every R_ARM_GOT32 is an offset from
+       it -- and the manager sets r9 to txm_module_instance_module_data_base_address,
+       which is the start of the module's data area.  So GOT origin and data
+       origin have to be the same address, or every offset the compiler emitted
+       is measured from the wrong place.  __data_segment_start__ above is that
+       address on the nominal side; r9 is that address on the real side, and
+       _gcc_setup's rebase is the difference between the two.  */
+
+    .got : ALIGN(4)
+    {
+        __new_got_start__ = .;
+        *(.got.plt)
+        *(.igot.plt)
+        *(.got)
+        __new_got_end__ = .;
+    } >DATA AT>CODE
+
+    __got_load_start__ = LOADADDR(.got);
+
+    .data : ALIGN(4)
+    {
+        __data_start__ = .;
         *(.data .data.*)
+        *(.gnu.linkonce.d.*)
+        . = ALIGN(4);
+        __data_end__ = .;
+    } >DATA AT>CODE
 
-        /* .bss last, and deliberately inside the image rather than discarded.
-           An in-place load does not zero it -- the manager copies nothing and
-           runs the module where it lies -- so a module that relies on .bss being
-           zero would read whatever the SRAM held.  The sample initialises what
-           it reads for that reason.  */
+    __data_load_start__ = LOADADDR(.data);
 
-        *(.bss .bss.* COMMON)
+    /* NOLOAD, so .bss contributes nothing to the blob.  The manager has already
+       zeroed the whole data allocation by the time the module runs -- but
+       _gcc_setup zeroes .bss anyway, because "the manager happens to memset it"
+       is a property of one loader and not something a module may rely on.  */
 
+    .bss (NOLOAD) : ALIGN(4)
+    {
+        __bss_start__ = .;
+        *(.bss .bss.*)
+        *(.gnu.linkonce.b.*)
+        *(COMMON)
         . = ALIGN(64);
-        __module_image_end__ = .;
-    } > MODULE
+        __bss_end__ = .;
+    } >DATA
 
-    __txm_module_code_size = __txm_module_code_end__ - __module_image_start__;
-    __txm_module_data_size = __module_image_end__ - __txm_module_code_end__;
+    /* ---------------------------------------------------------------------
+       The two sizes the preamble declares.
+       --------------------------------------------------------------------- */
+
+    /* Code covers everything in the blob, the load images of the GOT and .data
+       included, because the module has to be able to read them to copy them out
+       and the code region is the only mapping it has over the blob.  Ending it
+       at .rodata instead would put the GOT template outside every region the
+       module owns and _gcc_setup would fault on its first read.  */
+
+    __txm_module_code_end__  = __data_load_start__ + SIZEOF(.data);
+    __txm_module_code_size   = __txm_module_code_end__ - __code_segment_start__;
+
+    /* Data covers the GOT, .data and .bss.  Not the thread stacks: the manager
+       adds the start/stop and callback stack sizes to this figure itself, from
+       the two stack-size words further down the preamble.  Counting them here
+       as well would double them.  */
+
+    __txm_module_data_size   = __bss_end__ - __data_segment_start__;
 
     /* Unwind tables and toolchain notes would otherwise land at address zero and
-       be carried into the raw binary.  A module has no unwinder.  */
+       be carried into the raw binary.  A module has no unwinder.
+
+       .rel.dyn and friends are discarded because this is a static link: ld
+       resolves every R_ARM_GOT32 itself and writes the finished address into the
+       GOT, so there is nothing left for a dynamic loader to do.  If one of these
+       ever stops being empty, the assumption above has broken and the module
+       needs relocation processing rather than a rebase -- so they are listed
+       explicitly, to be found by whoever goes looking.  */
 
     /DISCARD/ :
     {
@@ -98,5 +186,14 @@ SECTIONS
         *(.ARM.extab*)
         *(.comment)
         *(.note.*)
+        *(.dynsym)
+        *(.dynstr)
+        *(.hash)
+        *(.gnu.hash)
+        *(.dynamic)
+        *(.interp)
+        *(.rel.dyn)
+        *(.rel.plt)
+        *(.plt)
     }
 }

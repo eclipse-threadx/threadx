@@ -353,7 +353,58 @@ if(TX_R52_BUILD_S32Z280_MODULE_EXAMPLE)
         ${CMAKE_SOURCE_DIR}/common/inc
     )
 
-    target_compile_options(s32z280_demo_module.elf PRIVATE -g)
+    # Position independent, and only here.  These four flags are what make the
+    # module relocatable, and putting any of them on the manager would be a bug:
+    # the manager is the resident image, linked absolutely at the address it
+    # boots from, and -msingle-pic-base in particular would have it treat r9 as
+    # a PIC base that nothing sets up.
+    #
+    #   -fpic                            data references go through the GOT
+    #   -msingle-pic-base                r9 is the GOT base, and the caller sets
+    #                                    it -- which is what the manager's
+    #                                    thread stack build now does
+    #   -mno-pic-data-is-text-relative   the module's data is NOT at a fixed
+    #                                    offset from its code.  It is not: code
+    #                                    is loaded in place in the module area
+    #                                    and data is allocated from the byte
+    #                                    pool, so the gap between them is
+    #                                    decided at run time
+    #   -fno-plt                         no procedure linkage table, which a
+    #                                    module has no loader to populate
+    #   -mno-long-calls                  see below -- this one is ours, not the
+    #                                    reference port's, and without it the
+    #                                    module cannot start at all
+    #
+    # -mno-long-calls is the interesting one, and it is here because of a bug
+    # this build found before silicon did.  The project-wide C flags carry
+    # -mlong-calls, which the manager needs: its image spans TCM at 0x30000000
+    # and code at 0x79900000, far beyond the +/-32 MB a direct BL reaches.  But
+    # -mlong-calls under -fpic makes GCC route EVERY call through the GOT --
+    # R_ARM_GOT32 instead of R_ARM_CALL -- and one of those calls is the shell
+    # entry's call to _gcc_setup, which is the function that fills the GOT in.
+    # The module would have loaded, entered its shell entry, loaded a zero out
+    # of the not-yet-written GOT and branched to address 0.
+    #
+    # A module does not need long calls.  It is one contiguous blob under two
+    # kilobytes, every internal call is a few hundred bytes away, and it never
+    # calls out of itself: kernel services go through the dispatcher function
+    # pointer in its entry info, which is data and reached through the GOT
+    # either way.  So the flag is pure cost here, and dropping it is what makes
+    # the bootstrap possible rather than a workaround for it.
+    #
+    # The same four, in the same order, are what the Cortex-A7 GNU module
+    # example uses.  Verified on the generated code rather than assumed: with
+    # these flags every reference to a module global comes out as an R_ARM_GOT32
+    # and loads through LDR rX, [r9, rY], while calls stay direct R_ARM_CALL.
+
+    target_compile_options(s32z280_demo_module.elf PRIVATE
+        -g
+        -fpic
+        -fno-plt
+        -mno-pic-data-is-text-relative
+        -msingle-pic-base
+        -mno-long-calls
+    )
 
     target_link_options(s32z280_demo_module.elf PRIVATE
         -T${MOD_EVB}/link_demo_module.lds
