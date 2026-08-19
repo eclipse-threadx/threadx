@@ -79,6 +79,21 @@ extern unsigned char    __module_image_start__;
 static unsigned char    module_pool[MODULE_POOL_SIZE]
                             __attribute__((aligned(64), section(".module_pool")));
 
+/* The object pool, which is a separate allocation from the module pool above and
+   is not optional here.  A module that runs in User mode needs a kernel stack
+   for the privileged side of each system call, and the manager allocates that
+   from this pool -- txm_module_manager_initialize deliberately leaves the pool
+   uncreated, so without this a User-mode module fails to start with
+   TX_NOT_AVAILABLE from deep inside the thread create, which is not an obvious
+   way to be told that a pool is missing.  */
+
+#ifndef MODULE_OBJECT_POOL_SIZE
+#define MODULE_OBJECT_POOL_SIZE     (8U * 1024U)
+#endif
+
+static unsigned char    module_object_pool[MODULE_OBJECT_POOL_SIZE]
+                            __attribute__((aligned(64)));
+
 static TXM_MODULE_INSTANCE  demo_module;
 
 /* What the fault handler saw.  Read by the reporting thread after the module has
@@ -126,9 +141,66 @@ static void put_hex(unsigned long value)
 /*  Reporting.                                                            */
 /**************************************************************************/
 
-static void report_entry(ULONG input)
+static void manager_entry(ULONG input)
 {
+    UINT    status;
+
     (void) input;
+
+    /* Every manager call happens here, in a thread, and not in
+       tx_application_define.  Loading a module takes the manager's mutex, and a
+       service that can block cannot be called before the scheduler runs: the
+       first version of this drove the manager from tx_application_define,
+       printed its way as far as the load, and stopped there for ever.  The
+       Armv8-M sample does all of this from a thread for the same reason.  */
+
+    linflexd_puts("M1 initialize\n");
+    status = txm_module_manager_initialize((VOID *) module_pool, MODULE_POOL_SIZE);
+
+    linflexd_puts("initialize         = ");
+    put_hex(status);
+    linflexd_puts("  ready = ");
+    put_hex((ULONG) _txm_module_manager_ready);
+    linflexd_puts("\n");
+
+    /* The pool the module's kernel stacks come from.  See module_object_pool.  */
+
+    status = txm_module_manager_object_pool_create((VOID *) module_object_pool,
+                                                  MODULE_OBJECT_POOL_SIZE);
+
+    linflexd_puts("object pool create = ");
+    put_hex(status);
+    linflexd_puts("\n");
+
+    /* Registered before anything is loaded, so there is no window in which a
+       module could fault with nobody listening.  */
+
+    linflexd_puts("M2 fault notify\n");
+    txm_module_manager_memory_fault_notify(module_fault_notify);
+
+    /* Nothing to bracket here.  No kernel region covers the module area, but the
+       window that reaches it is owned by the scheduler, which enables it for
+       every thread that does not own a module and disables it for every thread
+       that does -- so it is already open on this thread and cannot be open at
+       the same time as a module's own regions.  */
+
+    linflexd_puts("M3 in_place_load\n");
+    status = txm_module_manager_in_place_load(&demo_module, "demo module",
+                                             (VOID *) &__module_image_start__);
+
+    linflexd_puts("in_place_load      = ");
+    put_hex(status);
+    linflexd_puts("  ready = ");
+    put_hex((ULONG) _txm_module_manager_ready);
+    linflexd_puts("\n");
+
+    if (status == TX_SUCCESS)
+    {
+        status = txm_module_manager_start(&demo_module);
+        linflexd_puts("module start       = ");
+        put_hex(status);
+        linflexd_puts("\n");
+    }
 
     /* Give the module time to run its three steps and be terminated by the
        third.  Bounded: if the fault never arrives, that is the result to
@@ -229,32 +301,26 @@ void tx_application_define(void *first_unused_memory)
 
     linflexd_puts("\n=== module manager starting ===\n");
 
-    /* Bring the manager up on its pool, then register the fault handler before
-       anything is loaded.  Registering afterwards would leave a window in which
-       a module could fault with nobody listening.  */
+    /* Nothing but the thread.  See manager_entry for why the manager cannot be
+       driven from here.  */
 
-    txm_module_manager_initialize((VOID *) module_pool, MODULE_POOL_SIZE);
-    txm_module_manager_memory_fault_notify(module_fault_notify);
+    status = tx_thread_create(&report_thread, "module manager", manager_entry, 0UL,
+                              report_stack, sizeof(report_stack),
+                              20U, 20U, TX_NO_TIME_SLICE, TX_AUTO_START);
 
-    /* Load in place, from where the linker put the image.  */
-
-    status = txm_module_manager_in_place_load(&demo_module, "demo module",
-                                             (VOID *) &__module_image_start__);
-
-    linflexd_puts("in_place_load      = ");
-    put_hex(status);
-    linflexd_puts("\n");
+    /* Reported rather than discarded.  A thread that was never created and a
+       thread that was created but never scheduled produce exactly the same
+       silence on the console, and telling those two apart is most of the work
+       when the port itself is what is under test.  */
 
     if (status == TX_SUCCESS)
     {
-        status = txm_module_manager_start(&demo_module);
-
-        linflexd_puts("module start       = ");
-        put_hex(status);
+        linflexd_puts("M0 thread created\n");
+    }
+    else
+    {
+        linflexd_puts("FAIL tx_thread_create status 0x");
+        put_hex((ULONG) status);
         linflexd_puts("\n");
     }
-
-    (void) tx_thread_create(&report_thread, "report", report_entry, 0UL,
-                            report_stack, sizeof(report_stack),
-                            20U, 20U, TX_NO_TIME_SLICE, TX_AUTO_START);
 }
