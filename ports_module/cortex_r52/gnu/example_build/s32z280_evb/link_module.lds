@@ -188,6 +188,24 @@ SECTIONS
         __code_end__ = .;
     } > CODE
 
+    /* The module's gateway into the kernel, deliberately after __code_end__ and
+       therefore outside the kernel code region, which ends there.  A module gets
+       its own region covering exactly this function; that region would otherwise
+       overlap the kernel's, which PMSAv8-R does not allow.
+
+       Alone in its own section on purpose: anything sharing it would become
+       executable by every module.  64-byte aligned at both ends, the PMSAv8-R
+       granule, so a region can start and stop on it without covering
+       neighbours.  */
+
+    .txm_user_entry : ALIGN(64)
+    {
+        __txm_user_entry_start__ = .;
+        KEEP(*(.txm_user_entry))
+        . = ALIGN(64);
+        __txm_user_entry_end__ = .;
+    } > CODE
+
     .data :
     {
         . = ALIGN(8);

@@ -55,7 +55,22 @@
 @/**************************************************************************/
 
     .arm
-    .text
+
+@   Its own section, placed after __code_end__ by the linker script, so that this
+@   function sits OUTSIDE the kernel's code region.
+@
+@   It has to.  A module runs in User mode and the kernel code region grants no
+@   EL0 access, so the module needs a region of its own covering these
+@   instructions -- and PMSAv8-R has no region priority, so that region must not
+@   overlap the kernel's.  Two enabled regions matching one address is
+@   CONSTRAINED UNPREDICTABLE, and on this part it aborts: with this function
+@   still inside .text, the first memory access after a module's regions were
+@   loaded took a data abort in the scheduler.
+@
+@   Nothing else may share the section, because whatever does becomes executable
+@   by every module.
+
+    .section .txm_user_entry, "ax", %progbits
 
 @   64-byte aligned, which is the PMSAv8-R granule and all that is needed here.
 @
