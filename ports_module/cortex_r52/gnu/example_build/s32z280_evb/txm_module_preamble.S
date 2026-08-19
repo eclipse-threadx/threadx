@@ -80,12 +80,26 @@ __txm_module_preamble:
 
 @ Entry points, as offsets from the preamble.
 
-    .word   _txm_module_thread_shell_entry - __txm_module_preamble
-    .word   demo_module_start - __txm_module_preamble
+@   Entry points are stored relative to the word that holds them, not to the
+@   start of the preamble.  That is what the manager expects: it recovers the
+@   offset from the module base by adding the field's own byte offset back --
+@   TXM_MODULE_GNU_SHELL_ADJUST 24, START 28, STOP 32, CALLBACK 44, which are
+@   exactly the offsets of the four words below.  Storing these relative to
+@   __txm_module_preamble instead counts that offset twice, and the module is
+@   then entered that many bytes into its shell entry: past the prologue, with
+@   the arguments never saved and the frame pointer never set up, so the first
+@   dereference goes through a register the stack build had zeroed.  On silicon
+@   that read faulted at 0x1C, which is offset 0x1C from a null r3.
+@
+@   Every other GNU module port writes these the same way; cortex_m33's
+@   preamble, which this port was seeded from, spells it "symbol - . - 0".
+
+    .word   _txm_module_thread_shell_entry - .
+    .word   demo_module_start - .
     .word   0                               @ No stop thread
     .word   1                               @ Start/stop thread priority
     .word   1024                            @ Start/stop thread stack size
-    .word   _txm_module_callback_request_thread_entry - __txm_module_preamble
+    .word   _txm_module_callback_request_thread_entry - .
     .word   1                               @ Callback thread priority
     .word   1024                            @ Callback thread stack size
 
