@@ -465,10 +465,27 @@ TX_THREAD   *temp_thread;
     /* Restore interrupts.  */
     TX_RESTORE
 
-    /* Hit branch in _tx_thread_smp_simple_priority_change such that the
-       new priority is less than the inheritance priority.  */
-    thread_0.tx_thread_inherit_priority = 0;
+    /* Hit the branch in _tx_thread_smp_simple_priority_change where the new
+       priority is below the inheritance priority. That needs an inheritance
+       priority above the new one, so 0 does not reach it: with 0 the other
+       branch runs, and that branch records the inheritance priority as the
+       thread's priority while still linking the thread at the new priority.
+       Thread 0 came out of here claiming priority 0 while living in the
+       priority 16 list, which is what has been hanging this test in CI.
+       Priority 0 ties with the control thread, so resuming the control thread
+       raised no preemption, and once thread 0 completed, core 0 was left owned
+       by a completed thread with the control thread ready and unscheduled.
+
+       This routine is internal and expects protection to be in force, so hold
+       it here rather than calling in the open.  */
+    TX_DISABLE
+    thread_0.tx_thread_inherit_priority =  20;
     _tx_thread_smp_simple_priority_change(&thread_0, 16);
+
+    /* Put the inheritance priority back to the value that means this thread is
+       not inheriting one, so nothing downstream reasons about a phantom.  */
+    thread_0.tx_thread_inherit_priority =  TX_MAX_PRIORITIES;
+    TX_RESTORE
 
     /* Successful test.  */
     printf("SUCCESS!\n");
