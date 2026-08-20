@@ -67,13 +67,20 @@ jobs:
       with:
         submodules: true
 
+    # apt and PyPI have stalled this step twice, for 55 minutes and for over two
+    # hours, against a normal 27 to 152 seconds. Nothing here had a timeout, so a
+    # stall ran until the six hour job limit and cost a whole run rather than
+    # failing and being retried.
     - name: Install softwares
+      timeout-minutes: 10
       run: ${{ inputs.install_script }}
 
     - name: Build
+      timeout-minutes: 15
       run: ${{ inputs.build_script }}
 
     - name: Test
+      timeout-minutes: 60
       run: ${{ inputs.test_script }}
 
     - name: Publish Test Results
