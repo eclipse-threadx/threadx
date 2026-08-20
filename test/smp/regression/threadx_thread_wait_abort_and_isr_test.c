@@ -191,9 +191,39 @@ UINT    status;
    when the port's timer thread gets to run, so under load, or under coverage
    instrumentation, ticks fall behind and never catch up. A budget of 20000
    ticks, nominally 200 seconds, failed to stop a run that took 726 seconds,
-   because fewer than 20000 ticks had passed. time() does not drift that way.  */
+   because fewer than 20000 ticks had passed. time() does not drift that way.
+
+   How many windows to ask for is set by what a run can actually reach. Four CI
+   runs of the same tree measured this loop in two modes: one where a window
+   arrives in milliseconds and every window asked for costs under a second in
+   total, and one where a single window costs around forty seconds. Seven of
+   twenty configuration-runs landed in the slow mode and ran out of budget,
+   reaching 0, 3, 3, 3, 4, 7 and 7 of the ten then asked for, every one of them
+   still reporting a pass. Asking for three keeps the count reachable in both
+   modes. The later hits repeat what the first ones establish, so the coverage
+   given up is small, and what is recorded is honest. This copy reaches its
+   twenty windows in under half a second in all five of its configurations, so
+   it keeps that count; the non-SMP copy, where the slow mode was measured, asks
+   for three.
+
+   Reaching the window no times at all is different in kind, which is what the
+   ceiling below is for. The check after the loop compares semaphore bookkeeping
+   that a window has to have touched to mean anything, so a pass with a count of
+   zero claims coverage the run did not have. One of those twenty runs did
+   exactly that, and said so only in an artifact nobody reads. A run that has not
+   reached the window once keeps trying up to the ceiling, and fails if it still
+   has not.
+
+   The budget is 180 seconds rather than 120 because of what the slow mode costs
+   per window. The seven truncated runs reached their windows at between 17 and
+   40 seconds each, so three of them can need 120 seconds, which is exactly what
+   the old budget allowed and would have truncated at two. 180 leaves margin at
+   the worst rate measured, and bounds five configurations at 15 minutes against
+   a 60 minute step timeout. Locally, where a window costs 2 to 5 seconds, three
+   of them take 5 to 14 seconds and the budget is never approached.  */
 #define WAIT_ABORT_WINDOWS_WANTED   ((ULONG) 20)
-#define WAIT_ABORT_SECOND_BUDGET    ((ULONG) 120)
+#define WAIT_ABORT_SECOND_BUDGET    ((ULONG) 180)
+#define WAIT_ABORT_ZERO_WINDOW_CEILING  ((ULONG) 300)
 
 time_t  start_wall;
 
@@ -248,24 +278,46 @@ time_t  start_wall;
 
         }
 
-        /* Out of budget?  */
+        /* Out of budget?  A run that has not reached the window even once has
+           verified nothing yet, so it gets the higher ceiling before giving up.  */
+#ifdef TX_NOT_INTERRUPTABLE
         if (((ULONG) (time(TX_NULL) - start_wall)) > WAIT_ABORT_SECOND_BUDGET)
             break;
+#else
+        if (condition_count == 0)
+        {
+            if (((ULONG) (time(TX_NULL) - start_wall)) > WAIT_ABORT_ZERO_WINDOW_CEILING)
+                break;
+        }
+        else if (((ULONG) (time(TX_NULL) - start_wall)) > WAIT_ABORT_SECOND_BUDGET)
+            break;
+#endif
     }
 
     /* Clear ISR dispatch.  */
     test_isr_dispatch =  TX_NULL;
 
-    if (condition_count < WAIT_ABORT_WINDOWS_WANTED)
+    /* Say what this run reached, on every run and not only a short one. A count
+       printed only on shortfall cannot be told apart from a count nobody
+       recorded, and this line is what the CI artifacts carry. Falling short is a
+       gap in what was exercised rather than a fault in the code under test, so
+       the check below still runs and still means what it did.  */
+    printf("(reached %lu of %lu windows in %lu seconds) ",
+           (ULONG) condition_count, WAIT_ABORT_WINDOWS_WANTED,
+           (ULONG) (time(TX_NULL) - start_wall));
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+    /* Reached it no times?  Then the check below compares bookkeeping no window
+       ever touched, and a pass would report coverage this run did not have.  */
+    if (condition_count == 0)
     {
 
-        /* Say what this run reached. Falling short is a gap in what was
-           exercised rather than a fault in the code under test, so the check
-           below still runs and still means what it did.  */
-        printf("(reached %lu of %lu windows in %lu seconds) ",
-               (ULONG) condition_count, WAIT_ABORT_WINDOWS_WANTED,
-               (ULONG) (time(TX_NULL) - start_wall));
+        /* Test error!  */
+        printf("ERROR #8\n");
+        test_control_return(4);
     }
+#endif
 
 #ifdef TX_NOT_INTERRUPTABLE
     /* At this point, check to see if we got all the semaphores!  */
