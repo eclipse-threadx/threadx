@@ -138,6 +138,13 @@
 #include "thread_mpu.h"
 #include "cache.h"
 
+/* For bsp_main, which entry.S calls and therefore never declares.  Every
+   other example in the board support package includes this header for the
+   same reason; MISRA C:2012 Rule 8.4 wants the declaration visible at the
+   definition, and -Wmissing-prototypes reports it when it is not.  */
+
+#include "board.h"
+
 /* The fault information the abort vector captured.  Declared here because the
    module manager expands it into the port's fault handler through the
    TXM_MODULE_MANAGER_FAULT_INFO macro rather than declaring it in a header, so an

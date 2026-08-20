@@ -66,9 +66,9 @@
 @ Processor mode encodings and the CPSR mode field.
 
     .equ    MODE_MASK,          0x1F
-    .equ    USR_MODE,           0x10
-    .equ    SVC_MODE,           0x13
-    .equ    SYS_MODE,           0x1F
+    .equ    USR_MODE_BITS,      0x10
+    .equ    SVC_MODE_BITS,      0x13
+    .equ    SYS_MODE_BITS,      0x1F
     .equ    THUMB_MASK,         0x20
 
 @ Offsets into TX_THREAD.  Checked against offsetof at compile time in
@@ -160,7 +160,7 @@ _tx_module_svc_enter:
 
     LDMFD   sp!, {r0, r3}                   @ SPSR back off the stack
     BIC     r0, r0, #MODE_MASK
-    ORR     r0, r0, #SYS_MODE
+    ORR     r0, r0, #SYS_MODE_BITS
     MSR     SPSR_cxsf, r0
 
 @   Swap stacks.  The module's sp is saved so SVC 2 can restore it, and sp is set
@@ -168,10 +168,10 @@ _tx_module_svc_enter:
 @   System mode shares User mode's banked sp, which is why the swap happens there.
 
     LDR     r1, [r2, #THREAD_KSTACK_END]    @ Top of the kernel stack
-    CPS     #SYS_MODE
+    CPS     #SYS_MODE_BITS
     MOV     r3, sp                          @ The module's own sp
     MOV     sp, r1
-    CPS     #SVC_MODE
+    CPS     #SVC_MODE_BITS
     STR     r3, [r2, #THREAD_MSTACK_PTR]
 
 @   Point ThreadX's stack checking at the kernel stack while it is in use.
@@ -211,15 +211,15 @@ _tx_module_svc_exit:
 
     LDMFD   sp!, {r0, r3}
     BIC     r0, r0, #MODE_MASK
-    ORR     r0, r0, #USR_MODE
+    ORR     r0, r0, #USR_MODE_BITS
     MSR     SPSR_cxsf, r0
 
 @   Put the module's own stack back.
 
     LDR     r1, [r2, #THREAD_MSTACK_PTR]
-    CPS     #SYS_MODE
+    CPS     #SYS_MODE_BITS
     MOV     sp, r1
-    CPS     #SVC_MODE
+    CPS     #SVC_MODE_BITS
 
 @   And its own bounds, for the same reason they were changed on the way in.
 

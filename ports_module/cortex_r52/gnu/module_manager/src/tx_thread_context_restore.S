@@ -26,12 +26,17 @@
 
     .arm
 
+@ Whole CPSR values, mode field and interrupt masks together -- which is what a
+@ plain _MODE name means throughout this port.  The bare mode field is spelled
+@ _MODE_BITS instead; see tx_thread_stack_build.S.  The base port's SVC_MODE is
+@ absent because this port restores kernel threads into System mode, so nothing
+@ here needs it and a name that is never used is a name waiting to be picked by
+@ mistake.
+
 #ifdef TX_ENABLE_FIQ_SUPPORT
-SVC_MODE        =     0xD3               @ Disable IRQ/FIQ, SVC mode
 SYS_MODE        =     0xDF               @ Disable IRQ/FIQ, SYS mode
 IRQ_MODE        =     0xD2               @ Disable IRQ/FIQ, IRQ mode
 #else
-SVC_MODE        =     0x93               @ Disable IRQ, SVC mode
 SYS_MODE        =     0x9F               @ Disable IRQ, SYS mode
 IRQ_MODE        =     0x92               @ Disable IRQ, IRQ mode
 #endif

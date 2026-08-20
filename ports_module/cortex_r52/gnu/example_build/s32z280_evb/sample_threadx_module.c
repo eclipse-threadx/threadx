@@ -171,6 +171,16 @@ volatile ULONG  module_scratch[16];
 volatile ULONG  module_forbidden_address = 0x31780000UL;
 
 
+/* Declared as well as defined because the only caller is assembly:
+   txm_module_preamble.S names it with .extern and stores its offset in the
+   START entry-point word.  An assembly caller supplies no prototype, so
+   without this the definition has external linkage and no visible
+   declaration -- prohibited by MISRA C:2012 Rule 8.4 and reported by
+   -Wmissing-prototypes.  Same reason the board support has board.h.  */
+
+void demo_module_start(ULONG id);
+
+
 void demo_module_start(ULONG id)
 {
     ULONG   i;

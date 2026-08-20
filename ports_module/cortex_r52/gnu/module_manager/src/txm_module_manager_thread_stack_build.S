@@ -27,9 +27,13 @@
     .syntax unified
     .arm
 
-SVC_MODE        =       0x13                    @ SVC mode
-USR_MODE        =       0x10                    @ User mode, unprivileged
-SYS_MODE        =       0x1F                    @ System mode, privileged
+@ Bare CPSR mode field.  See tx_thread_stack_build.S for why the _MODE_BITS
+@ suffix is not optional in this port: a plain _MODE name is a whole CPSR value
+@ with the interrupt masks in it.  SVC is not among them -- no thread in a module
+@ port runs in SVC mode, which is reserved for the supervisor call handler.
+
+USR_MODE_BITS   =       0x10                    @ User mode, unprivileged
+SYS_MODE_BITS   =       0x1F                    @ System mode, privileged
 THUMB_MASK      =       0x20                    @ CPSR Thumb bit
 
 @ Offset of tx_thread_module_user_mode, checked against offsetof at compile time
@@ -219,8 +223,8 @@ _txm_module_manager_thread_stack_build:
 @
     LDR     r3, [r0, #THREAD_MODULE_USER_MODE]  @ Pickup the requested user mode
     TST     r3, #1
-    ORREQ   r3, r1, #SYS_MODE               @ Clear: privileged, System mode
-    ORRNE   r3, r1, #USR_MODE               @ Set: unprivileged, User mode
+    ORREQ   r3, r1, #SYS_MODE_BITS          @ Clear: privileged, System mode
+    ORRNE   r3, r1, #USR_MODE_BITS          @ Set: unprivileged, User mode
     STR     r3, [r2, #4]                    @ Store initial CPSR
 @
 @    /* Setup stack pointer.  */

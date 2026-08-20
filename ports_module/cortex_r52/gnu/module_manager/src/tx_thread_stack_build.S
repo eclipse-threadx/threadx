@@ -26,8 +26,15 @@
 
     .arm
 
-SVC_MODE        =       0x13                    @ SVC mode
-SYS_MODE        =       0x1F                    @ SYS mode, privileged
+@ Bare CPSR mode field, spelled _MODE_BITS as the base port does in
+@ tx_thread_irq_nesting_start.S and tx_thread_fiq_context_restore.S.  In this
+@ port a plain _MODE name means a whole CPSR value with the interrupt masks
+@ already in it -- tx_thread_context_restore.S defines SYS_MODE as 0xDF or 0x9F
+@ -- so the two must not share a name.  The base port's SVC_MODE = 0x13 here was
+@ the frame's mode before this port moved kernel threads to System mode; nothing
+@ uses it now, so it is gone rather than left to be picked up by mistake.
+
+SYS_MODE_BITS   =       0x1F                    @ SYS mode, privileged
 #ifdef TX_ENABLE_FIQ_SUPPORT
 CPSR_MASK       =       0xDF                    @ Mask initial CPSR, IRQ & FIQ interrupts enabled
 #else
@@ -166,7 +173,7 @@ _tx_thread_stack_build:
 @       leaving it as SVC would have put kernel threads on the SVC stack while the
 @       restore path looked for them on the SYS one.  */
 @
-    ORR     r3, r1, #SYS_MODE               @ Build CPSR, SYS mode, interrupts enabled
+    ORR     r3, r1, #SYS_MODE_BITS          @ Build CPSR, SYS mode, interrupts enabled
     STR     r3, [r2, #4]                    @ Store initial CPSR
 @
 @    /* Setup stack pointer.  */
