@@ -51,7 +51,7 @@ baseline selects the soft ABI rather than removing the FPU.
           -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_r52.cmake \
           -DTX_R52_BUILD_FVP_EXAMPLE=ON .
     ninja -C build_r52 boot_check.elf demo_m2.elf demo_m3.elf \
-                       demo_threadx.elf demo_mpu.elf
+                       demo_threadx.elf demo_mpu.elf demo_clz.elf
     ctest --test-dir build_r52
 
 The images target the free Armv8-R AEM FVP (FVP_BaseR_AEMv8R):
@@ -61,6 +61,7 @@ The images target the free Armv8-R AEM FVP (FVP_BaseR_AEMv8R):
     demo_m3.elf         generic timer tick, GICv3 and preemption
     demo_threadx.elf    the standard eight-thread demo plus verification
     demo_mpu.elf        PMSAv8-R protection and cache enable
+    demo_clz.elf        the CLZ lowest-set-bit priority search
     demo_m5.elf         lazy VFP context save (needs TX_R52_ENABLE_VFP)
 
 Each image reports its own result and terminates the model through the
@@ -135,6 +136,20 @@ and the thread stack pointer and run counter offsets, at compile time: a
 layout change becomes a build failure instead of silent corruption.
 
 
+Also worth knowing: this port replaces tx_thread.h's portable lowest-set-bit
+search with the CLZ instruction, which is what the scheduler uses to pick the
+next thread to run.  Upstream gates that on __TARGET_ARCH_ARM, an Arm Compiler
+5 predefine that GCC does not define, so the optimisation had never once been
+compiled in under GCC; the guard here asks __ARM_FEATURE_CLZ instead.  It is
+worth 40% of the priority search's code size (2188 to 1316 bytes in
+tx_thread_system_suspend.o) and it applies in the default 32-priority
+configuration, not only above 32.  A Thumb build deliberately keeps the
+portable loop, because __ARM_FEATURE_CLZ describes the architecture rather
+than the instruction set and Thumb-1 has no CLZ.  demo_clz.elf is the
+regression test, and it fails to build rather than silently testing the
+portable loop if the CLZ path is ever disabled again.
+
+
 7.  Memory Protection
 
 PMSAv8-R regions are described by a table rather than a sequence of
@@ -145,13 +160,24 @@ disables the regions it does not use.
 
 Two cautions for anyone reusing this code on silicon:
 
-  - The PRBAR.AP encoding used here was calibrated against the hardware.
-    The low bit is read-only and the high bit grants EL0 access, which is
-    the reverse of the widely-published Armv8-R AArch64 macro set.  Getting
-    it wrong produces regions that report as read-only and accept writes,
-    because region coverage is still enforced: an unmapped address faults
-    while a "read-only" region does not.  Re-calibrate before trusting
-    these values on a different implementation.
+  - The PRBAR.AP encoding is the standard Armv8-R one, as published:
+    AP[2] selects read-only and AP[1] grants EL0 access.  No calibration is
+    needed, and an earlier revision of this file said otherwise -- it
+    claimed the two bits were reversed, on the strength of a real
+    measurement with a wrong cause.  program_region() had been shifting
+    every PRBAR field one bit too far left, so the AP value's low bit
+    landed in the true AP[2] and writes faulted exactly when that bit was
+    set, which looks precisely like a reversed encoding.  The shift is
+    fixed; see the comment on the MPU_AP_* macros in mpu.h for the full
+    calibration table and what it actually proved.
+
+    The reason it took a silicon run to notice: region coverage is enforced
+    even when permissions are not what you asked for, so an unmapped
+    address faults while a "read-only" region quietly accepts writes.  A
+    configuration-only review cannot tell the two apart -- provoke a real
+    fault instead.  Verified on S32Z280 silicon: a write to an RO region
+    faults and execution from an XN region takes a prefetch abort, the
+    latter never having worked under the old shift.
 
   - The code and data regions must not share a 64-byte granule.  The
     linker script separates them with ".data ALIGN(64) :" on the output
