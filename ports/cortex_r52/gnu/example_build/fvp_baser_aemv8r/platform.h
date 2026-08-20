@@ -71,6 +71,46 @@
 
 #define SYSTEM_COUNTER_HZ       100000000
 
+/* ---------------------------------------------------------------------------
+   Memory for ThreadX modules.
+
+   Only the module manager build uses this, but the addresses are stated here
+   rather than in the module example because they are a property of the board's
+   memory map: a module's code and data are handed to it as MPU regions, and
+   PMSAv8-R will not allow those to overlap a kernel region.  So module memory
+   has to be memory NO kernel region covers, and deciding that is the memory
+   map's job.
+
+   link_module.lds ends the kernel's DRAM region at this base and gives the
+   64 KB above it to the module area; mpu.c covers exactly the same range with
+   the manager's load window (region 16), which is the only mapping privileged
+   code has over it.  The three have to agree, so all three read these two
+   values.
+
+   Chosen at 0x003F0000 -- just under 4 MB -- because the manager image with its
+   stacks and its 1 MB of heap is far smaller than that, and the link script
+   asserts the two do not meet rather than trusting the margin.  */
+
+#define FVP_MODULE_AREA_BASE            0x003F0000
+#define FVP_MODULE_AREA_SIZE            0x00010000      /* 64 KB             */
+
+/* The status word the sample module reports its progress through, at the base
+   of the module area.
+
+   It exists because the FVP has no debugger seam: on silicon a GDB harness
+   reads the module's own progress variable out of its data area, and here
+   nothing outside the image can read anything.  So the manager grants the
+   module a shared region over this word and reads it back afterwards, which is
+   what lets the FVP test judge what the module actually managed to do rather
+   than only that it faulted.
+
+   A fixed address on both sides, and checked at run time rather than trusted:
+   the manager grants the region at the linker's symbol and refuses to continue
+   if that is not this address.  */
+
+#define FVP_MODULE_STATUS_BASE          0x003F0000
+#define FVP_MODULE_STATUS_SIZE          0x40            /* one MPU granule   */
+
 #ifndef __ASSEMBLER__
 
 /* 32-bit device register access.                                         */

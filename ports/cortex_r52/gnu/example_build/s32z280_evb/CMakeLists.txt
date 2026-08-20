@@ -286,6 +286,13 @@ if(TX_R52_BUILD_S32Z280_MODULE_EXAMPLE)
     # so, and it is better to find out here than on the board.
     # ---------------------------------------------------------------------
 
+    # Guarded by if(NOT TARGET) because the FVP module example defines the same
+    # library from its own directory, and the two example options can be on at
+    # once.  The definitions are identical -- both describe the module port, not
+    # a board -- so whichever directory CMake reaches first may create it.
+
+    if(NOT TARGET threadx_module)
+
     file(GLOB TX_COMMON_SRC ${CMAKE_SOURCE_DIR}/common/src/*.c)
 
     set(TX_R52_PORT_SRC ${CMAKE_SOURCE_DIR}/ports/cortex_r52/gnu/src)
@@ -315,6 +322,8 @@ if(TX_R52_BUILD_S32Z280_MODULE_EXAMPLE)
     )
 
     target_compile_definitions(threadx_module PUBLIC TXM_MODULE_MANAGER)
+
+    endif()
 
     # The portable half of the module manager.  Globbed rather than listed: it is
     # a whole upstream component, not a selection from one, and a file added to it
