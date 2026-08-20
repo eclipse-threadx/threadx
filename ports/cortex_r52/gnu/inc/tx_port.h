@@ -255,17 +255,72 @@ typedef unsigned short                          USHORT;
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
 
 
-/* Determine if the ARM architecture has the CLZ instruction. This is available on
-   architectures v5 and above. If available, redefine the macro for calculating the
-   lowest bit set.  */
+/* Determine whether this core has the CLZ instruction and this compiler will
+   admit to it, and if so replace the portable lowest-set-bit search with it.
 
-#if __TARGET_ARCH_ARM > 4
+   The guard is not upstream's.  Upstream asks __TARGET_ARCH_ARM > 4, which is an
+   Arm Compiler 5 predefine.  GCC does not define it -- it predefines the ACLE
+   macros __ARM_ARCH and __ARM_FEATURE_CLZ instead -- so under GCC the test reads
+   0 > 4, this whole block is dropped and tx_thread.h's portable loop runs on a
+   core that has had the instruction since Armv5.  Measured with
+   arm-none-eabi-gcc 14.3 on 20 Aug 2026: zero CLZ instructions in the built
+   scheduler objects.
+
+   That was not a dormant path.  Half the TX_LOWEST_SET_BIT_CALCULATE call sites
+   in tx_thread_suspend.c and tx_thread_system_suspend.c sit OUTSIDE the
+   TX_MAX_PRIORITIES > 32 guards, so the portable loop was running in the
+   scheduler's priority search in the default 32-priority configuration, which is
+   the one every R52 build uses.
+
+   __ARM_FEATURE_CLZ is the ACLE answer to the question actually being asked, and
+   the compiler defines it exactly when the architecture has the instruction, so
+   a core without CLZ is excluded by construction rather than by an architecture
+   number.  Arm Compiler 5's spelling is kept beside it, now wrapped in defined()
+   so the test no longer leans on an undefined identifier evaluating to zero --
+   which is what -Wundef reports and how this was found.
+
+   The __thumb__ guard stays, and it is load-bearing rather than inherited
+   caution: __ARM_FEATURE_CLZ describes the ARCHITECTURE, not the instruction
+   set.  Checked on 20 Aug 2026 -- GCC defines it for -mthumb -march=armv5te,
+   where Thumb-1 has no CLZ at all and this asm would fail to assemble.  A Thumb
+   build therefore keeps the portable loop on purpose.  (On this core it is moot:
+   the R52 toolchain file builds -marm.)
+
+   Two deliberate deviations, per AGENTS.md:
+
+     - Rule 1.2, language extensions.  Inline assembly is the entire point of the
+       macro; there is no conforming way to reach CLZ.  Spelled __asm__ and not
+       asm, because the asm keyword is rejected under -std=c99 -- verified, it is
+       an "'asm' undeclared" error -- and AGENTS.md requires C99 compatibility.
+
+     - Rule 10.1 / 10.3 on the isolation step, which is why it is respelled.
+       Upstream isolates the lowest set bit with (ULONG) (-((LONG) m)): that
+       converts an unsigned map to signed and negates it, which is undefined for
+       the one input whose top bit is set.  (~(m)) + 1 is the same value in
+       well-defined unsigned arithmetic, and it is character-for-character what
+       tx_thread.h's portable version uses -- so the two implementations now
+       visibly compute the same thing instead of merely agreeing.
+
+   Rule 20.7 is a straight fix rather than a deviation: upstream leaves m and b
+   unparenthesised in the expansion.
+
+   PRECONDITION: m must be non-zero, and the two implementations DISAGREE when it
+   is not.  CLZ(0) is 32, so this yields 31 - 32; the portable loop yields 0.
+   All twelve call sites in common/src reach the macro only on a map already
+   tested against zero -- every one checked on 20 Aug 2026 -- so the divergence is
+   unreachable today.  It is written down because a new call site is exactly how
+   it would stop being unreachable, and demo_clz.c pins both answers so that
+   changing this has to be a decision.  */
+
+#if defined(__ARM_FEATURE_CLZ) || (defined(__TARGET_ARCH_ARM) && (__TARGET_ARCH_ARM > 4))
 
 #ifndef __thumb__
 
-#define TX_LOWEST_SET_BIT_CALCULATE(m, b)       m = m & ((ULONG) (-((LONG) m))); \
-                                                asm volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) ); \
-                                                b = 31 - b;
+#define TX_LOWEST_SET_BIT_CALCULATE(m, b)                                       \
+    (m) =  (m) & ((~(m)) + ((ULONG) 1));                                        \
+    __asm__ volatile (" CLZ  %0,%1 " : "=r" (b) : "r" (m));                     \
+    (b) =  31 - (b);
+
 #endif
 #endif
 

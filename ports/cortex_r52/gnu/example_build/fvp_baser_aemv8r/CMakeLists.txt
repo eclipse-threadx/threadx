@@ -131,6 +131,38 @@ target_link_options(demo_threadx.elf PRIVATE
     ${R52_LINK_QUIET_RWX}
 )
 
+# CLZ lowest-set-bit regression.  tx_port.h replaces tx_thread.h's portable
+# priority search with a CLZ instruction, and that macro decides which thread
+# runs next on every suspend and resume -- so it gets an image of its own rather
+# than being covered incidentally by demos that would merely hang if it broke.
+# Needs the tick because the checks run in a thread; needs nothing else.
+add_executable(demo_clz.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${R52_CONSOLE_SOURCES}
+    ${FVP_DIR}/gicv3.c
+    ${FVP_DIR}/timer.c
+    ${FVP_DIR}/irq_dispatch.c
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_clz.c
+)
+
+target_compile_definitions(demo_clz.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+target_link_libraries(demo_clz.elf PRIVATE threadx)
+
+target_include_directories(demo_clz.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_clz.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_clz.map
+    ${R52_LINK_QUIET_RWX}
+)
+
 # AR1/M5 -- lazy VFP context save and restore.  Only meaningful when the
 # library was built with TX_R52_ENABLE_VFP and a floating-point ABI, so the
 # target exists only in that configuration.
@@ -264,7 +296,8 @@ if(TX_R52_ENABLE_FIQ_NESTING)
 endif()
 
 # Every image built here, in the order they should be exercised.
-set(R52_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf demo_mpu.elf)
+set(R52_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf demo_mpu.elf
+               demo_clz.elf)
 
 # The linker script is passed with -T, which CMake does not treat as a
 # dependency, so editing it would not trigger a relink and stale images would
@@ -613,6 +646,8 @@ if(FVP_BASER_AEMV8R)
         "Running AR1/M3 tick and preemption demo on FVP_BaseR_AEMv8R...")
     threadx_r52_add_fvp_run(demo_threadx.elf run-demo-threadx-r52
         "Running the standard ThreadX demo on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_clz.elf run-demo-clz-r52
+        "Running the CLZ lowest-set-bit regression on FVP_BaseR_AEMv8R...")
     if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
         threadx_r52_add_fvp_run(fvp_module.elf run-module-r52
             "Running the AR2 module isolation example on FVP_BaseR_AEMv8R...")
