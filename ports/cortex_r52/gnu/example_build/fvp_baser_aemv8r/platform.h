@@ -94,22 +94,35 @@
 #define FVP_MODULE_AREA_BASE            0x003F0000
 #define FVP_MODULE_AREA_SIZE            0x00010000      /* 64 KB             */
 
-/* The status word the sample module reports its progress through, at the base
-   of the module area.
+/* The shared granules the sample module reports its progress through, at the
+   base of the module area.
 
-   It exists because the FVP has no debugger seam: on silicon a GDB harness
-   reads the module's own progress variable out of its data area, and here
-   nothing outside the image can read anything.  So the manager grants the
-   module a shared region over this word and reads it back afterwards, which is
-   what lets the FVP test judge what the module actually managed to do rather
+   The first of them exists because the FVP has no debugger seam: on silicon a
+   GDB harness reads the module's own progress variable out of its data area,
+   and here nothing outside the image can read anything.  So the manager grants
+   the module a shared region over this word and reads it back afterwards, which
+   is what lets the FVP test judge what the module actually managed to do rather
    than only that it faulted.
 
-   A fixed address on both sides, and checked at run time rather than trusted:
-   the manager grants the region at the linker's symbol and refuses to continue
-   if that is not this address.  */
+   The rest exist to exercise the shared-region machinery itself.  A module may
+   be granted TXM_MODULE_MPU_SHARED_ENTRIES regions, and one grant proves only
+   that the first entry works, so the area holds one granule per entry -- plus
+   one more that the manager NEVER grants, sandwiched between two that it does.
+   A limit register masked the wrong way, or a base off by a granule, leaks into
+   that gap from one side or the other, and a module that can write it is a
+   module whose grant covered more than was asked for.
+
+   FVP_MODULE_STATUS_SIZE is the size of ONE granule, which is the length of
+   each individual grant; the area is FVP_MODULE_STATUS_GRANULES of them.
+
+   Fixed addresses on both sides, and checked at run time rather than trusted:
+   the manager grants the regions from the linker's symbol and refuses to
+   continue if that symbol is not this address.  */
 
 #define FVP_MODULE_STATUS_BASE          0x003F0000
 #define FVP_MODULE_STATUS_SIZE          0x40            /* one MPU granule   */
+#define FVP_MODULE_STATUS_GRANULES      6               /* five granted, one not */
+#define FVP_MODULE_STATUS_UNGRANTED     2               /* the one never granted */
 
 #ifndef __ASSEMBLER__
 

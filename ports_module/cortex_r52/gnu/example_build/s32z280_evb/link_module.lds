@@ -95,14 +95,41 @@ SECTIONS
         KEEP(*(.vectors_el1))
     } > CODE
 
-    /* The module image, at a fixed address in the module area.
+    /* The shared granules the module reports its progress through, and the one
+       it is not allowed to reach.
+
+       FIRST in the module area, so the base address is ORIGIN(MODULE) and the
+       module can carry it as a constant -- the manager deliberately knows no
+       symbol of the module and has no channel through which to tell it anything.
+       S32Z_MODULE_STATUS_BASE in platform.h is the same number, and the ASSERTs
+       at the bottom of this file pin the two together at link time.
+
+       Six granules.  Five are granted, one per shared entry the port provides,
+       because granting a single region only ever exercises the first of the five;
+       the sixth -- index 2, so a granted granule sits on either side of it -- is
+       never granted, and the module writes it to prove it still faults.
+
+       NOLOAD: the manager clears the area before every pass, and a granule that
+       arrived pre-filled would make a module that never wrote one look as though
+       it had.  */
+
+    .module_status (NOLOAD) :
+    {
+        __module_status_start__ = .;
+        . = . + 0x180;                  /* six 64-byte granules */
+        . = ALIGN(64);
+        __module_status_end__ = .;
+    } > MODULE
+
+    /* The module image, in the module area, just above the shared granules.
 
        The module is not linked here.  It is built as its own image by the
        s32z280_demo_module.elf target, objcopied to a raw binary and included as
        bytes by module_blob.S, and this section only decides where those bytes
-       land.  The address has to agree with what the module was linked for --
-       both come from S32Z_MODULE_AREA_BASE -- because an in-place load runs the
-       module where it lies.
+       land.  Which address that is does not matter any more: since the module
+       became relocatable it is linked against nominal addresses it never runs
+       at and _gcc_setup rebases it to wherever it was put, so this only has to
+       be inside the module area and disjoint from everything else in it.
 
        The earlier arrangement compiled the module's sources into this image and
        gathered them here by object name.  That cannot work.  The module library
@@ -298,4 +325,20 @@ SECTIONS
 
     PROVIDE(end = .);
     PROVIDE(_end = .);
+
+    /* The module carries the status base as a constant and platform.h names it
+       as S32Z_MODULE_STATUS_BASE.  Neither can see this script, so the agreement
+       is pinned here; the manager checks the same thing again at run time
+       against the symbol, so a build that skipped this file still says so.  */
+
+    ASSERT(__module_status_start__ == 0x317F0000,
+           "the module status area is not at S32Z_MODULE_STATUS_BASE")
+
+    /* And its size: the manager grants one region per granule from that base and
+       the module addresses them by index, so an area that is not exactly
+       S32Z_MODULE_STATUS_GRANULES granules long would leave a grant, or a module
+       write, outside it.  */
+
+    ASSERT(__module_status_end__ - __module_status_start__ == 0x180,
+           "the module status area is not S32Z_MODULE_STATUS_GRANULES granules long")
 }

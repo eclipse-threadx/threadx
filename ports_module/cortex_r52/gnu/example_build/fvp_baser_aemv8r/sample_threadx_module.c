@@ -28,47 +28,55 @@
 /*    A module that exercises the protection boundary rather than          */
 /*    demonstrating features, for the Armv8-R AEM FVP.                     */
 /*                                                                        */
-/*    The same four steps as the S32Z280 module, because it is the same    */
-/*    port under test:                                                    */
+/*    The S32Z280 copy of this file is the same module for the same port;   */
+/*    what differs is the two addresses at the bottom and the board named   */
+/*    here, so `diff` is the tool for telling whether the two have drifted. */
+/*                                                                        */
+/*    Four steps:                                                          */
 /*                                                                        */
 /*      1. Writes and reads its own data, which must succeed.             */
 /*      2. Makes a kernel call, which must succeed -- proving a module in  */
 /*         User mode can reach the kernel through the supervisor call      */
 /*         boundary and come back.                                        */
-/*      3. Violates its protection in one of the two ways the hardware     */
-/*         distinguishes, which must fault.                               */
+/*      3. Violates its protection in one of three ways the manager        */
+/*         selects, which must fault.                                     */
 /*      4. Never reaches step 4, because step 3 terminates it.            */
+/*                                                                        */
+/*    THE THREE VIOLATIONS.  Two of them are the two aborts the hardware   */
+/*    distinguishes: reading the kernel's data is a DATA abort reported     */
+/*    through DFSR and DFAR, branching out of the code region is a         */
+/*    PREFETCH abort reported through IFSR and IFAR.  The third writes a   */
+/*    granule of the SHARED area that the manager deliberately did not     */
+/*    grant, after writing and reading back every granule it did -- so it   */
+/*    is the shared-region machinery under test rather than the kernel's    */
+/*    own memory, and a grant that covered one granule too many is what it  */
+/*    is looking for.                                                      */
 /*                                                                        */
 /*    Steps 1 and 2 passing without step 3 faulting would mean the module  */
 /*    is running unprotected, which is the failure this example exists to  */
 /*    detect.  A module that only ever touched its own memory would pass   */
 /*    identically with the MPU switched off.                              */
 /*                                                                        */
-/*    ONE DIFFERENCE FROM THE SILICON MODULE, and it is what makes this    */
-/*    one testable without a person: progress is written to a shared word  */
-/*    as well as to the module's own data.                                */
+/*    HOW PROGRESS GETS OUT.  A module cannot print: the console belongs    */
+/*    to the board support package, outside every region a module owns, so  */
+/*    reaching it would fault as surely as step 3 does.  So progress is     */
+/*    recorded twice -- in the module's own data, and in the first granule  */
+/*    of the shared area the manager granted it.                           */
 /*                                                                        */
-/*    A module cannot print -- the console belongs to the board support    */
-/*    package, outside every region a module owns, so reaching it would    */
-/*    fault as surely as step 3 does.  On silicon that is answered by a    */
-/*    GDB harness, which reads the module's own progress variable out of   */
-/*    the data area the manager allocated for it.  The FVP has no such     */
-/*    seam: it exposes an Iris server and no GDB stub, so whatever the run  */
-/*    is going to report has to be reported by the image itself.           */
+/*    Which of the two can be read depends on the board.  On silicon a GDB  */
+/*    harness reads the module's own copy out of the data area the manager  */
+/*    allocated for it; the FVP has no such seam -- it exposes an Iris      */
+/*    server and no GDB stub -- so there only the shared copy is readable    */
+/*    and everything the run reports has to be reported by the image        */
+/*    itself.  Both writes are kept on both boards deliberately: if the     */
+/*    shared write were the only one, a module that could not reach its own */
+/*    data would still report progress.                                    */
 /*                                                                        */
-/*    So the manager grants this module a shared MPU region over one       */
-/*    64-byte granule at a fixed address and the module records its        */
-/*    progress there, where the manager can read it back after the fault.  */
-/*    The address is a constant on both sides -- the module has no loader  */
-/*    to tell it anything and the manager deliberately knows no symbol of   */
-/*    the module -- and the manager checks the two agree rather than       */
-/*    trusting them to.                                                    */
-/*                                                                        */
-/*    The module's own progress variable is kept as well, unread.  It      */
-/*    costs nothing, it keeps this file next to the silicon one, and it    */
-/*    means the two writes are the same code path: if the shared write     */
-/*    were the only one, a module that could not reach its own data would   */
-/*    still report progress.                                              */
+/*    The shared address is a literal on this side.  The module has no      */
+/*    loader to tell it anything and the manager deliberately knows no      */
+/*    symbol of the module, so the two agree by convention -- and the       */
+/*    manager checks that they do, against the linker's own symbol, rather  */
+/*    than trusting them to.                                               */
 /*                                                                        */
 /**************************************************************************/
 
@@ -84,6 +92,9 @@
 #define MODULE_PROGRESS_SURVIVED_STEAL  0x00000008UL
 #define MODULE_PROGRESS_ATTEMPTED_JUMP  0x00000010UL
 #define MODULE_PROGRESS_SURVIVED_JUMP   0x00000020UL
+#define MODULE_PROGRESS_SHARED_WROTE    0x00000040UL
+#define MODULE_PROGRESS_ATTEMPTED_GAP   0x00000080UL
+#define MODULE_PROGRESS_SURVIVED_GAP    0x00000100UL
 
 /* Which violation to commit, taken from the low byte of the module ID the
    manager passes to the start thread.  The rest of that word is left alone: the
@@ -93,6 +104,7 @@
 #define MODULE_TEST_MASK                0x000000FFUL
 #define MODULE_TEST_DATA_ABORT          0x00000001UL
 #define MODULE_TEST_PREFETCH_ABORT      0x00000002UL
+#define MODULE_TEST_SHARED_ABORT        0x00000003UL
 
 /* The shared status word, at the base of the module area.
 
@@ -111,6 +123,33 @@
 #define MODULE_STATUS_ADDRESS           0x003F0000UL
 
 #define MODULE_STATUS   (*((volatile ULONG *) MODULE_STATUS_ADDRESS))
+
+/* And the rest of the shared area, which exists to exercise the shared-region
+   machinery rather than to report anything.
+
+   The manager may grant a module TXM_MODULE_MPU_SHARED_ENTRIES regions and one
+   grant only ever proves the first entry works, so the area holds one granule
+   per entry -- five granted, and a sixth that the manager never grants.  The
+   ungranted one is index 2, which puts a granted granule on either side of it:
+   a limit register masked the wrong way, or a base off by a granule, leaks into
+   that gap from below or from above, and either way a module that can write it
+   was given more than was asked for.
+
+   The mark for each granule goes at WORD 1, because word 0 of granule 0 is the
+   progress word above.  Uniform across all six so the address the gap write
+   faults on is one expression on both sides of the agreement.  */
+
+#define MODULE_STATUS_GRANULE           0x40UL
+#define MODULE_STATUS_GRANULES          6UL
+#define MODULE_STATUS_UNGRANTED         2UL
+#define MODULE_STATUS_MARK_OFFSET       4UL
+
+#define MODULE_SHARED_SIGNATURE         0x5A5A0000UL
+
+#define MODULE_SHARED_MARK(index)                                             \
+    (*((volatile ULONG *) (MODULE_STATUS_ADDRESS                              \
+                            + ((index) * MODULE_STATUS_GRANULE)               \
+                            + MODULE_STATUS_MARK_OFFSET)))
 
 volatile ULONG  module_progress;
 volatile ULONG  module_scratch[16];
@@ -136,6 +175,7 @@ void demo_module_start(ULONG id)
 {
     ULONG   i;
     ULONG   sum = 0UL;
+    ULONG   shared_ok = 1UL;
 
     /* 1. The module's own data.  If this faults, the data region is wrong and
           nothing else in this file will be reached.  */
@@ -174,7 +214,57 @@ void demo_module_start(ULONG id)
           manager fails on: they can only appear if the hardware allowed an
           access it was configured to refuse.  */
 
-    if ((id & MODULE_TEST_MASK) == MODULE_TEST_PREFETCH_ABORT)
+    if ((id & MODULE_TEST_MASK) == MODULE_TEST_SHARED_ABORT)
+    {
+        /* Write every granule the manager granted, read all of them back, and
+           then write the one it did not grant.
+
+           The readback matters as much as the write.  A shared entry programmed
+           with the wrong base still accepts a store -- it just lands somewhere
+           else -- so a write that is never read back proves only that the core
+           did not object.  Reading each granule's own mark out of its own
+           granule is what says the five entries describe five distinct
+           extents.  */
+
+        for (i = 0UL; i < MODULE_STATUS_GRANULES; i++)
+        {
+            if (i != MODULE_STATUS_UNGRANTED)
+            {
+                MODULE_SHARED_MARK(i) = MODULE_SHARED_SIGNATURE | i;
+            }
+        }
+
+        for (i = 0UL; i < MODULE_STATUS_GRANULES; i++)
+        {
+            if ((i != MODULE_STATUS_UNGRANTED) &&
+                (MODULE_SHARED_MARK(i) != (MODULE_SHARED_SIGNATURE | i)))
+            {
+                shared_ok = 0UL;
+            }
+        }
+
+        if (shared_ok != 0UL)
+        {
+            module_progress |= MODULE_PROGRESS_SHARED_WROTE;
+            MODULE_STATUS   |= MODULE_PROGRESS_SHARED_WROTE;
+        }
+
+        /* The gap.  A WRITE rather than a read, so DFSR reports WnR set and the
+           fault cannot be confused with the read the data-abort passes do.  It
+           lies between two granules this module was granted, so surviving it
+           means a grant covered a granule nobody asked for -- which is the
+           whole reason this pass exists.  */
+
+        module_progress |= MODULE_PROGRESS_ATTEMPTED_GAP;
+        MODULE_STATUS   |= MODULE_PROGRESS_ATTEMPTED_GAP;
+
+        MODULE_SHARED_MARK(MODULE_STATUS_UNGRANTED) =
+            MODULE_SHARED_SIGNATURE | MODULE_STATUS_UNGRANTED;
+
+        module_progress |= MODULE_PROGRESS_SURVIVED_GAP;
+        MODULE_STATUS   |= MODULE_PROGRESS_SURVIVED_GAP;
+    }
+    else if ((id & MODULE_TEST_MASK) == MODULE_TEST_PREFETCH_ABORT)
     {
         /* Branch outside the code region: a prefetch abort, reported through
            IFSR and IFAR.  Nothing is executed at the target -- the fault is on

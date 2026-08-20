@@ -173,19 +173,33 @@ except gdb.error as e:
     print("  cannot read demo_module: %s" % e)
 
 print("")
-print("  the module's own symbols, for comparison (absolute link):")
-print("    module_progress            = 0x317F0584")
-print("    module_scratch             = (just below it)")
-print("    __module_image_start__     = 0x%08X" % u32("(unsigned int)&__module_image_start__"))
+print("  where the module area's pieces ended up:")
+_status = u32("(unsigned int)&__module_status_start__")
+_image = u32("(unsigned int)&__module_image_start__")
+print("    __module_status_start__    = 0x%08X" % _status)
+print("    __module_image_start__     = 0x%08X" % _image)
 print("    __module_pool_start__      = 0x%08X" % u32("(unsigned int)&__module_pool_start__"))
+print("    __module_stage_start__     = 0x%08X" % u32("(unsigned int)&__module_stage_start__"))
 print("")
-print("  first words of the module image, to confirm the blob is really there:")
+print("  first words of the module image, to confirm the blob is really there.")
+print("  Read from the linker's symbol, not from a literal: the module moves")
+print("  whenever anything above it in the area changes size, and a stale")
+print("  address here prints whatever now lives there as though it were the blob.")
 for off in (0x00, 0x04, 0x14, 0x18):
-    a = 0x317F0000 + off
+    a = _image + off
     print("    0x%08X = 0x%08X" % (a, u32("*(unsigned int *)0x%x" % a)))
-print("  module_progress / scratch area as it stands now:")
-for a in (0x317F0580, 0x317F0584, 0x317F0544, 0x317F0548):
-    print("    0x%08X = 0x%08X" % (a, u32("*(unsigned int *)0x%x" % a)))
+print("")
+print("  the shared granules, which is where the module reports progress and")
+print("  where granule %d must have stayed zero:" % 2)
+for _g in range(6):
+    a = _status + _g * 0x40
+    print("    granule %d at 0x%08X: word0 = 0x%08X  word1 = 0x%08X"
+          % (_g, a, u32("*(unsigned int *)0x%x" % a),
+             u32("*(unsigned int *)0x%x" % (a + 4))))
+print("")
+print("  module_progress itself lives in the data area the manager allocated for")
+print("  the pass, at that pass's data base plus its offset in the module's ELF;")
+print("  it has no fixed address since the module became relocatable.")
 end
 
 echo \n===== LIVE MPU REGIONS (read back from hardware) =====\n

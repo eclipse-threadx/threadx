@@ -150,6 +150,35 @@
 #define S32Z_MODULE_AREA_BASE           0x317F0000UL
 #define S32Z_MODULE_AREA_SIZE           0x00010000UL    /* 64 KB             */
 
+/* The shared granules the sample module reports its progress through, at the
+   base of the module area.
+
+   A module cannot print -- the console belongs to the board support package and
+   lies outside every region a module owns -- so the manager grants it shared
+   regions and reads them back.  On this board a GDB harness reads the module's
+   own progress variable as well, out of the data area the manager allocated;
+   these granules are the channel that needs no debugger, and having both means
+   the two agree or the run says so.
+
+   Six granules rather than one, because a module may be granted
+   TXM_MODULE_MPU_SHARED_ENTRIES regions and one grant only ever exercises the
+   first of them.  Five are granted, one granule per entry, and
+   S32Z_MODULE_STATUS_UNGRANTED -- index 2, so a granted granule sits on either
+   side of it -- is never granted to anything.  A limit register masked the wrong
+   way, or a base off by a granule, extends a region into that gap from one side
+   or the other, and a module that can write it was given more than was asked
+   for.
+
+   S32Z_MODULE_STATUS_SIZE is the size of ONE granule, which is also the length
+   of each individual grant; the area is GRANULES of them.  Fixed addresses on
+   both sides, checked at run time against the linker's symbol rather than
+   trusted.  */
+
+#define S32Z_MODULE_STATUS_BASE         0x317F0000UL
+#define S32Z_MODULE_STATUS_SIZE         0x40UL          /* one MPU granule   */
+#define S32Z_MODULE_STATUS_GRANULES     6UL             /* five granted, one not */
+#define S32Z_MODULE_STATUS_UNGRANTED    2UL             /* the one never granted */
+
 /* What is left of the full-speed pair for the kernel itself.  link.lds sizes its
    DATA region from this, so the linker cannot place kernel data in the module
    area by accident.  */

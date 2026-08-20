@@ -25,7 +25,7 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Loads the sample module three times, lets it misbehave every time,   */
+/*    Loads the sample module four times, lets it misbehave every time,    */
 /*    and reports what the hardware did about it -- on the Armv8-R AEM     */
 /*    FVP, with no debugger and no person in the loop.                     */
 /*                                                                        */
@@ -76,6 +76,30 @@
 /*    rather than only on the absence of a fault.  The two are the same     */
 /*    event seen from both ends, and a regression that showed one without   */
 /*    the other would be worth knowing about.                              */
+/*                                                                        */
+/*    AND A FOURTH PASS FOR THE SHARED REGIONS.  The three above are each   */
+/*    granted one shared region -- the status granule -- which exercises    */
+/*    the first of the five shared entries the port provides and says       */
+/*    nothing about the other four.  The fourth pass is granted all five,   */
+/*    one 64-byte granule each, and is NOT granted the granule that sits    */
+/*    between two of them.  It writes every granule it was given, reads     */
+/*    every one of them back, and then writes the gap, which must fault.    */
+/*                                                                        */
+/*    That shape is chosen against a specific defect.  A limit register     */
+/*    masked the wrong way, or a base off by one granule, extends a region  */
+/*    past what was asked for -- and with the gap sandwiched between two    */
+/*    granted granules it is reachable from either side if that happens.    */
+/*    The readback matters as much as the write: a region programmed with   */
+/*    the wrong base accepts a store and puts it elsewhere, so five marks   */
+/*    read out of five granules is what says five distinct extents were     */
+/*    programmed rather than one of them five times.                       */
+/*                                                                        */
+/*    The same pass probes the two ways the manager refuses a grant, which  */
+/*    nothing had ever called: an unaligned address must come back          */
+/*    TXM_MODULE_ALIGNMENT_ERROR, and one grant past the entry count must   */
+/*    come back TX_NO_MEMORY.  Both are checked by name.  The order is not  */
+/*    free -- the entry-count check runs before the alignment check, so the  */
+/*    unaligned probe has to happen while entries remain.                   */
 /*                                                                        */
 /*    WHAT A GREEN RUN HERE DOES NOT PROVE.  The model reports 32 EL1 MPU   */
 /*    regions.  The Cortex-R52 TRM gives MPUIR.DREGION as 16, 20 or 24, so  */
@@ -145,6 +169,41 @@ extern unsigned char    __data_end__;
 #define MODULE_STATUS_ADDRESS       FVP_MODULE_STATUS_BASE
 #define MODULE_STATUS_LENGTH        FVP_MODULE_STATUS_SIZE
 
+/* The rest of the shared area, which is there to exercise the shared-region
+   machinery rather than to report anything.
+
+   MODULE_STATUS_LENGTH is one granule and also the length of one grant.  The
+   area is MODULE_STATUS_GRANULES of them: five the shared pass is granted, one
+   entry each, and MODULE_STATUS_UNGRANTED -- index 2, so that a granted granule
+   sits on either side of it -- which is never granted to anything.  Both sides
+   of the agreement compute a granule's address the same way from the same base,
+   and each granule's mark goes at word 1 because word 0 of granule 0 is the
+   progress word.  */
+
+#define MODULE_STATUS_GRANULES      FVP_MODULE_STATUS_GRANULES
+#define MODULE_STATUS_UNGRANTED     FVP_MODULE_STATUS_UNGRANTED
+#define MODULE_STATUS_AREA_LENGTH   (MODULE_STATUS_GRANULES * MODULE_STATUS_LENGTH)
+#define MODULE_STATUS_MARK_OFFSET   4UL
+
+#define MODULE_SHARED_SIGNATURE     0x5A5A0000UL
+
+/* How many grants the shared pass makes, which must be every entry the port
+   provides -- granting fewer would leave an entry unexercised, and the point of
+   the pass is that all of them work.  */
+
+#define MODULE_SHARED_GRANTS        (MODULE_STATUS_GRANULES - 1U)
+
+/* MISRA C:2012 Rule 11.6 is deliberately violated by the second of these: the
+   address is an agreement between two separately linked images and there is no
+   conforming way to express it.  */
+
+#define MODULE_GRANULE_ADDRESS(index)                                          \
+    (MODULE_STATUS_ADDRESS + ((index) * MODULE_STATUS_LENGTH))
+
+#define MODULE_SHARED_MARK(index)                                              \
+    (*((volatile ULONG *) (MODULE_GRANULE_ADDRESS(index)                        \
+                            + MODULE_STATUS_MARK_OFFSET)))
+
 /* The progress bits the module sets, mirrored from sample_threadx_module.c.
    The two SURVIVED flags can only ever be set if the hardware allowed an access
    it was configured to refuse, so they are checked for by name.  */
@@ -155,9 +214,13 @@ extern unsigned char    __data_end__;
 #define MODULE_PROGRESS_SURVIVED_STEAL  0x00000008UL
 #define MODULE_PROGRESS_ATTEMPTED_JUMP  0x00000010UL
 #define MODULE_PROGRESS_SURVIVED_JUMP   0x00000020UL
+#define MODULE_PROGRESS_SHARED_WROTE    0x00000040UL
+#define MODULE_PROGRESS_ATTEMPTED_GAP   0x00000080UL
+#define MODULE_PROGRESS_SURVIVED_GAP    0x00000100UL
 
 #define MODULE_PROGRESS_SURVIVED        (MODULE_PROGRESS_SURVIVED_STEAL | \
-                                         MODULE_PROGRESS_SURVIVED_JUMP)
+                                         MODULE_PROGRESS_SURVIVED_JUMP  | \
+                                         MODULE_PROGRESS_SURVIVED_GAP)
 
 /* Which violation a pass tells the module to commit.  Written into the module
    instance's application-defined ID after the load and before the start, because
@@ -167,6 +230,7 @@ extern unsigned char    __data_end__;
 #define MODULE_ID_BASE              0x52520000UL
 #define MODULE_TEST_DATA_ABORT      0x00000001UL
 #define MODULE_TEST_PREFETCH_ABORT  0x00000002UL
+#define MODULE_TEST_SHARED_ABORT    0x00000003UL
 
 /* Memory the manager hands out to modules: object memory, and the data region a
    module's own variables live in.  It has to be outside every region a module is
@@ -202,7 +266,7 @@ static unsigned char    module_object_pool[MODULE_OBJECT_POOL_SIZE]
    pass 1 is stopped but still holds its data allocation while pass 2 loads, which
    is what pushes pass 2's data base somewhere different.  */
 
-#define MODULE_PASSES               3U
+#define MODULE_PASSES               4U
 #define MODULE_RELOCATION_PASSES    2U
 
 static TXM_MODULE_INSTANCE  demo_module[MODULE_PASSES];
@@ -228,6 +292,23 @@ typedef struct PASS_RESULT_STRUCT
     ULONG        pass_captured;
     ULONG        pass_progress;
     ULONG        pass_expect_progress;
+
+    /* The shared-region results.  Only the shared pass fills these in, so the
+       judge reads them only for that pass -- zero is TX_SUCCESS and a pass that
+       never probed would otherwise read as one that probed and was refused
+       nothing.  */
+
+    ULONG        pass_shared_grants;      /* grants that succeeded             */
+    ULONG        pass_shared_count;       /* entries the instance holds after  */
+    ULONG        pass_align_status;       /* refusing an unaligned grant       */
+    ULONG        pass_exhaust_status;     /* refusing one grant too many       */
+    ULONG        pass_marks[MODULE_STATUS_GRANULES];
+
+    /* The address this pass must fault on.  Per pass rather than one constant,
+       because the shared pass faults on the granule it was not granted and the
+       other three fault on the kernel's data.  */
+
+    ULONG        pass_expect_fault;
     ULONG        pass_fault_r9;
     ULONG        pass_dfsr;
     ULONG        pass_dfar;
@@ -305,7 +386,18 @@ static void put_field(const char *label, unsigned long value)
 
 static void module_status_clear(void)
 {
-    *((volatile ULONG *) MODULE_STATUS_ADDRESS) = 0UL;
+    ULONG   granule;
+
+    /* The WHOLE area, not just the progress word.  The gap granule has to start
+       at a known zero, because "the module never wrote it" is one of the results
+       and a leftover mark from the previous pass would read as a module that
+       reached memory it was never granted -- or hide one that did.  */
+
+    for (granule = 0UL; granule < MODULE_STATUS_GRANULES; granule++)
+    {
+        *((volatile ULONG *) MODULE_GRANULE_ADDRESS(granule)) = 0UL;
+        MODULE_SHARED_MARK(granule) = 0UL;
+    }
 }
 
 
@@ -336,9 +428,107 @@ static void copy_bytes(unsigned char *destination, const unsigned char *source,
 
 
 /**************************************************************************/
-/*  One pass: load the blob from a given address, grant it the status      */
-/*  granule, start it, wait for the fault it is written to provoke, and    */
-/*  stop it.                                                              */
+/*  The shared grants a pass gets, and the two ways a grant is refused.    */
+/*                                                                        */
+/*  Every pass is granted the first granule, which is the progress word it  */
+/*  reports through.  The shared pass is granted one granule per shared     */
+/*  entry the port provides, skipping the gap, because a single grant only   */
+/*  ever exercises the first of the five and this port has never run the    */
+/*  other four.                                                           */
+/*                                                                        */
+/*  It also probes the two ways a grant is refused, which can only be done  */
+/*  on a LOADED instance.  ORDER MATTERS: the manager checks the entry      */
+/*  count BEFORE it checks alignment, so the unaligned probe has to happen  */
+/*  while entries remain -- after five grants it would come back            */
+/*  TX_NO_MEMORY and say nothing about alignment at all.                    */
+/*                                                                        */
+/*  Returns the first grant status that was not TX_SUCCESS, or TX_SUCCESS.  */
+/**************************************************************************/
+
+static UINT grant_shared_regions(TXM_MODULE_INSTANCE *instance, PASS_RESULT *result)
+{
+    UINT    status;
+    UINT    first_failure = TX_SUCCESS;
+    ULONG   granule;
+
+    if (result -> pass_test != MODULE_TEST_SHARED_ABORT)
+    {
+        /* The progress word, and nothing else.  */
+
+        return txm_module_manager_external_memory_enable(instance,
+                                                         (VOID *) &__module_status_start__,
+                                                         MODULE_STATUS_LENGTH,
+                                                         TXM_MODULE_ATTRIBUTE_READ_WRITE);
+    }
+
+    /* Refused for alignment.  One word into the first granule: an address
+       inside the area, so what is being tested is the 64-byte granule rule and
+       not the range.  It must also consume no entry, which the five grants
+       below prove by all succeeding.  */
+
+    result -> pass_align_status =
+        (ULONG) txm_module_manager_external_memory_enable(
+                    instance,
+                    (VOID *) (&__module_status_start__ + MODULE_STATUS_MARK_OFFSET),
+                    MODULE_STATUS_LENGTH,
+                    TXM_MODULE_ATTRIBUTE_READ_WRITE);
+
+    /* One region per granule, every entry the port has, and never the gap.  */
+
+    for (granule = 0UL; granule < MODULE_STATUS_GRANULES; granule++)
+    {
+        if (granule != MODULE_STATUS_UNGRANTED)
+        {
+            status = txm_module_manager_external_memory_enable(
+                        instance,
+                        (VOID *) (&__module_status_start__ + (granule * MODULE_STATUS_LENGTH)),
+                        MODULE_STATUS_LENGTH,
+                        TXM_MODULE_ATTRIBUTE_READ_WRITE);
+
+            if (status == TX_SUCCESS)
+            {
+                result -> pass_shared_grants++;
+            }
+            else if (first_failure == TX_SUCCESS)
+            {
+                first_failure = status;
+            }
+            else
+            {
+                /* Already recorded; the first failure is the informative one. */
+            }
+        }
+    }
+
+    /* And one grant too many, which must be refused.  Not cosmetic: the entry
+       written is TXM_MODULE_MPU_SHARED_INDEX plus the count, so a sixth grant
+       that got past the check would write one past the end of the region table
+       and into the instance fields that follow it.
+
+       Aimed at the GAP, deliberately.  It overlaps nothing, so a refusal costs
+       nothing -- and if the check ever failed, the gap would become a granted
+       region and the module would go on to survive writing it.  The same defect
+       would then be reported twice, once as this status and once by name as
+       MODULE_PROGRESS_SURVIVED_GAP, rather than only as a status nobody reads. */
+
+    result -> pass_exhaust_status =
+        (ULONG) txm_module_manager_external_memory_enable(
+                    instance,
+                    (VOID *) (&__module_status_start__
+                                + (MODULE_STATUS_UNGRANTED * MODULE_STATUS_LENGTH)),
+                    MODULE_STATUS_LENGTH,
+                    TXM_MODULE_ATTRIBUTE_READ_WRITE);
+
+    result -> pass_shared_count = instance -> txm_module_instance_shared_memory_count;
+
+    return first_failure;
+}
+
+
+/**************************************************************************/
+/*  One pass: load the blob from a given address, grant it the shared      */
+/*  granules it is entitled to, start it, wait for the fault it is written */
+/*  to provoke, and stop it.                                              */
 /*                                                                        */
 /*  The module is left loaded.  Its data allocation is what moves the next */
 /*  pass's data base, and releasing it here would defeat half the test.    */
@@ -353,19 +543,47 @@ static void run_one_pass(UINT index, CHAR *name, VOID *location, ULONG test)
     PASS_RESULT            *result = &pass_results[index];
     TXM_MODULE_INSTANCE    *instance = &demo_module[index];
     unsigned int            waited;
+    ULONG                   granule;
 
     result -> pass_name = name;
     result -> pass_test = test;
 
     /* What the module should manage before the hardware stops it: its own data,
-       a kernel call, and the attempt.  Not the SURVIVED bit for either test --
-       that one is the failure.  */
+       a kernel call, and the attempt -- plus, for the shared pass, the five
+       granules it wrote and read back on the way.  Never a SURVIVED bit; that
+       one is the failure.
 
-    result -> pass_expect_progress = MODULE_PROGRESS_OWN_DATA
-                                   | MODULE_PROGRESS_KERNEL_CALL
-                                   | ((test == MODULE_TEST_PREFETCH_ABORT)
-                                        ? MODULE_PROGRESS_ATTEMPTED_JUMP
-                                        : MODULE_PROGRESS_ATTEMPTED_STEAL);
+       The address it must fault on goes with it, because the three tests do not
+       share one.  Two of them reach into the kernel's data; the shared pass
+       writes the mark word of the granule it was not granted, and that address
+       is computed here exactly as the module computes it.  */
+
+    if (test == MODULE_TEST_SHARED_ABORT)
+    {
+        result -> pass_expect_progress = MODULE_PROGRESS_OWN_DATA
+                                       | MODULE_PROGRESS_KERNEL_CALL
+                                       | MODULE_PROGRESS_SHARED_WROTE
+                                       | MODULE_PROGRESS_ATTEMPTED_GAP;
+
+        result -> pass_expect_fault    = MODULE_GRANULE_ADDRESS(MODULE_STATUS_UNGRANTED)
+                                       + MODULE_STATUS_MARK_OFFSET;
+    }
+    else if (test == MODULE_TEST_PREFETCH_ABORT)
+    {
+        result -> pass_expect_progress = MODULE_PROGRESS_OWN_DATA
+                                       | MODULE_PROGRESS_KERNEL_CALL
+                                       | MODULE_PROGRESS_ATTEMPTED_JUMP;
+
+        result -> pass_expect_fault    = MODULE_FORBIDDEN_ADDRESS;
+    }
+    else
+    {
+        result -> pass_expect_progress = MODULE_PROGRESS_OWN_DATA
+                                       | MODULE_PROGRESS_KERNEL_CALL
+                                       | MODULE_PROGRESS_ATTEMPTED_STEAL;
+
+        result -> pass_expect_fault    = MODULE_FORBIDDEN_ADDRESS;
+    }
 
     /* Cleared before the module starts, so a fault or a progress bit counted
        here belongs to this pass and not the previous one.  */
@@ -382,16 +600,30 @@ static void run_one_pass(UINT index, CHAR *name, VOID *location, ULONG test)
         return;
     }
 
-    /* The shared granule the module reports through.  Granted while the module
-       is LOADED and before it is STARTED, which is the only window the manager
-       accepts, and granted per pass because each pass is its own instance with
-       its own region table.  */
+    /* Read from the instance rather than computed here.  Where the code ended up
+       is what the manager decided, and the whole point of the comparison at the
+       end is to check the module against the manager's own numbers.
 
-    result -> pass_share_status =
-        (ULONG) txm_module_manager_external_memory_enable(instance,
-                                                          (VOID *) &__module_status_start__,
-                                                          MODULE_STATUS_LENGTH,
-                                                          TXM_MODULE_ATTRIBUTE_READ_WRITE);
+       Recorded HERE, immediately after the load and before anything that can
+       fail, because the load is what decided them.  Taken any later, a pass that
+       failed to be granted its shared regions would carry zeros into the overlap
+       comparison at the end of the run -- and zero against zero overlaps, so a
+       grant failure was reported a second time as "its code and data regions
+       overlap", which is not true and points at the wrong thing.  */
+
+    result -> pass_code_start  = (ULONG) instance -> txm_module_instance_code_start;
+    result -> pass_code_end    = (ULONG) instance -> txm_module_instance_code_end;
+    result -> pass_data_start  = (ULONG) instance -> txm_module_instance_data_start;
+    result -> pass_data_end    = (ULONG) instance -> txm_module_instance_data_end;
+    result -> pass_data_base   = (ULONG) instance -> txm_module_instance_module_data_base_address;
+
+    /* The shared granules the module reports through, and for the shared pass
+       every other entry as well.  Granted while the module is LOADED and before
+       it is STARTED, which is the only window the manager accepts, and granted
+       per pass because each pass is its own instance with its own region table
+       -- an instance is memset by the load, so nothing carries over.  */
+
+    result -> pass_share_status = (ULONG) grant_shared_regions(instance, result);
 
     if (result -> pass_share_status != (ULONG) TX_SUCCESS)
     {
@@ -410,16 +642,6 @@ static void run_one_pass(UINT index, CHAR *name, VOID *location, ULONG test)
 
     result -> pass_expect_thread   = (ULONG) &(instance -> txm_module_instance_start_stop_thread);
     result -> pass_expect_instance = (ULONG) instance;
-
-    /* Read from the instance rather than computed here.  Where the code ended up
-       is what the manager decided, and the whole point of the comparison at the
-       end is to check the module against the manager's own numbers.  */
-
-    result -> pass_code_start  = (ULONG) instance -> txm_module_instance_code_start;
-    result -> pass_code_end    = (ULONG) instance -> txm_module_instance_code_end;
-    result -> pass_data_start  = (ULONG) instance -> txm_module_instance_data_start;
-    result -> pass_data_end    = (ULONG) instance -> txm_module_instance_data_end;
-    result -> pass_data_base   = (ULONG) instance -> txm_module_instance_module_data_base_address;
 
     result -> pass_start_status = (ULONG) txm_module_manager_start(instance);
 
@@ -477,6 +699,17 @@ static void run_one_pass(UINT index, CHAR *name, VOID *location, ULONG test)
     result -> pass_notify_thread   = fault_notify_thread;
     result -> pass_notify_instance = fault_notify_instance;
 
+    /* Every granule's mark, granted or not.  The granted ones say the module
+       wrote and read back the granule it meant to, which is what proves five
+       distinct entries were programmed rather than one entry five times; the
+       gap's says whether it stayed untouched.  Read here, while this pass is
+       still the last thing to have written the area.  */
+
+    for (granule = 0UL; granule < MODULE_STATUS_GRANULES; granule++)
+    {
+        result -> pass_marks[granule] = MODULE_SHARED_MARK(granule);
+    }
+
     /* Stopped, not unloaded.  The fault terminated the module's start thread but
        left the module STARTED, and unload refuses anything that is not LOADED or
        STOPPED -- so this is required, not tidiness.  */
@@ -496,6 +729,10 @@ static void report_one_pass(const PASS_RESULT *result)
     {
         console_puts("prefetch (IFSR/IFAR)\n");
     }
+    else if (result -> pass_test == MODULE_TEST_SHARED_ABORT)
+    {
+        console_puts("data (DFSR/DFAR), writing an ungranted shared granule\n");
+    }
     else
     {
         console_puts("data (DFSR/DFAR)\n");
@@ -513,6 +750,7 @@ static void report_one_pass(const PASS_RESULT *result)
     put_field("  fault captured   = ", result -> pass_captured);
     put_field("  module progress  = ", result -> pass_progress);
     put_field("    should be      = ", result -> pass_expect_progress);
+    put_field("  fault address    = ", result -> pass_expect_fault);
     put_field("  notify callbacks = ", result -> pass_faults);
     put_field("  notified thread  = ", result -> pass_notify_thread);
     put_field("    should be      = ", result -> pass_expect_thread);
@@ -533,6 +771,35 @@ static void report_one_pass(const PASS_RESULT *result)
     if (result -> pass_test != MODULE_TEST_PREFETCH_ABORT)
     {
         put_field("  pc - code base   = ", result -> pass_code_location - result -> pass_code_start);
+    }
+
+    /* The shared-region half, reported only by the pass that produces it.  */
+
+    if (result -> pass_test == MODULE_TEST_SHARED_ABORT)
+    {
+        ULONG   granule;
+
+        put_field("  shared grants    = ", result -> pass_shared_grants);
+        put_field("    should be      = ", (unsigned long) MODULE_SHARED_GRANTS);
+        put_field("  entries held     = ", result -> pass_shared_count);
+        put_field("  unaligned grant  = ", result -> pass_align_status);
+        put_field("    should be      = ", (unsigned long) TXM_MODULE_ALIGNMENT_ERROR);
+        put_field("  one grant too many = ", result -> pass_exhaust_status);
+        put_field("    should be      = ", (unsigned long) TX_NO_MEMORY);
+
+        for (granule = 0UL; granule < MODULE_STATUS_GRANULES; granule++)
+        {
+            if (granule == MODULE_STATUS_UNGRANTED)
+            {
+                put_field("  gap granule mark = ", result -> pass_marks[granule]);
+                put_field("    should be      = ", 0UL);
+            }
+            else
+            {
+                put_field("  granule mark     = ", result -> pass_marks[granule]);
+                put_field("    should be      = ", MODULE_SHARED_SIGNATURE | granule);
+            }
+        }
     }
 }
 
@@ -623,12 +890,92 @@ static UINT judge_one_pass(const PASS_RESULT *result)
        expected type rather than on whichever register happens to be non-zero. */
 
     if (((result -> pass_test == MODULE_TEST_PREFETCH_ABORT)
-            ? result -> pass_ifar : result -> pass_dfar) != MODULE_FORBIDDEN_ADDRESS)
+            ? result -> pass_ifar : result -> pass_dfar) != result -> pass_expect_fault)
     {
         console_puts("FAIL ");
         console_puts(result -> pass_name);
         console_puts(": faulted at the wrong address, so .data or the GOT is wrong\n");
         return 1U;
+    }
+
+    /* The shared-region results, for the one pass that produces them.  Checked
+       after the progress word above, so a pass that never got as far as the
+       granules is reported as that rather than as a grant problem.  */
+
+    if (result -> pass_test == MODULE_TEST_SHARED_ABORT)
+    {
+        ULONG   granule;
+
+        /* Every entry the port provides, granted.  Fewer means an entry past
+           the first is not usable, which is the state this port was in before
+           this pass existed.  */
+
+        if (result -> pass_shared_grants != (ULONG) MODULE_SHARED_GRANTS)
+        {
+            console_puts("FAIL ");
+            console_puts(result -> pass_name);
+            console_puts(": not every shared entry could be granted\n");
+            return 1U;
+        }
+
+        if (result -> pass_shared_count != (ULONG) TXM_MODULE_MPU_SHARED_ENTRIES)
+        {
+            console_puts("FAIL ");
+            console_puts(result -> pass_name);
+            console_puts(": the instance does not hold the entries it granted\n");
+            return 1U;
+        }
+
+        /* An unaligned grant must be refused BY NAME.  Accepting it would not
+           fault: the low six bits of PRBAR are the shareability, permission and
+           execute-never fields, so an under-aligned base silently changes what
+           the region permits instead of where it is.  */
+
+        if (result -> pass_align_status != (ULONG) TXM_MODULE_ALIGNMENT_ERROR)
+        {
+            console_puts("FAIL ");
+            console_puts(result -> pass_name);
+            console_puts(": an unaligned shared grant was not refused as such\n");
+            return 1U;
+        }
+
+        if (result -> pass_exhaust_status != (ULONG) TX_NO_MEMORY)
+        {
+            console_puts("FAIL ");
+            console_puts(result -> pass_name);
+            console_puts(": one grant too many was not refused\n");
+            return 1U;
+        }
+
+        /* And what the module actually managed to write where.  Each granted
+           granule must hold its own mark -- a region programmed with the wrong
+           base accepts the store and puts it somewhere else -- and the gap must
+           still hold the zero the manager left in it.  */
+
+        for (granule = 0UL; granule < MODULE_STATUS_GRANULES; granule++)
+        {
+            if (granule == MODULE_STATUS_UNGRANTED)
+            {
+                if (result -> pass_marks[granule] != 0UL)
+                {
+                    console_puts("FAIL ");
+                    console_puts(result -> pass_name);
+                    console_puts(": the ungranted granule was written -- a grant covered too much\n");
+                    return 1U;
+                }
+            }
+            else if (result -> pass_marks[granule] != (MODULE_SHARED_SIGNATURE | granule))
+            {
+                console_puts("FAIL ");
+                console_puts(result -> pass_name);
+                console_puts(": a granted granule does not hold its own mark\n");
+                return 1U;
+            }
+            else
+            {
+                /* This granule is as it should be.  */
+            }
+        }
     }
 
     /* The notify callback is a public API of the module manager, so it is
@@ -715,9 +1062,9 @@ static void manager_entry(ULONG input)
     }
 
     if ((unsigned long) (&__module_status_end__ - &__module_status_start__)
-            < MODULE_STATUS_LENGTH)
+            < MODULE_STATUS_AREA_LENGTH)
     {
-        console_puts("FAIL the status granule is smaller than the region granted over it\n");
+        console_puts("FAIL the status area is smaller than the granules granted over it\n");
         failures++;
     }
 
@@ -819,6 +1166,19 @@ static void manager_entry(ULONG input)
                      MODULE_TEST_PREFETCH_ABORT);
 
         (void) txm_module_manager_unload(&demo_module[2]);
+
+        /* The shared-region pass.  Granted every entry the port provides, one
+           granule each, and never the granule between two of them -- which it
+           then writes.  This is the only pass that exercises a shared entry
+           past the first, the granule-alignment refusal, and what happens when
+           the entries run out; the three passes above grant one region each and
+           would look identical if four of the five entries did not work.  */
+
+        console_puts("M7 pass 4, shared regions\n");
+        run_one_pass(3U, "relocated, shared-region gap", (VOID *) &__module_stage_start__,
+                     MODULE_TEST_SHARED_ABORT);
+
+        (void) txm_module_manager_unload(&demo_module[3]);
     }
 
     /* ------------------------------------------------------------------
@@ -863,21 +1223,44 @@ static void manager_entry(ULONG input)
             failures++;
         }
 
-        if ((result -> pass_code_start <= (MODULE_STATUS_ADDRESS + MODULE_STATUS_LENGTH - 1UL)) &&
+        if ((result -> pass_code_start <= (MODULE_STATUS_ADDRESS + MODULE_STATUS_AREA_LENGTH - 1UL)) &&
             (MODULE_STATUS_ADDRESS <= result -> pass_code_end))
         {
             console_puts("FAIL ");
             console_puts(result -> pass_name);
-            console_puts(": the shared status region overlaps its code\n");
+            console_puts(": the shared status area overlaps its code\n");
             failures++;
         }
 
-        if ((result -> pass_data_start <= (MODULE_STATUS_ADDRESS + MODULE_STATUS_LENGTH - 1UL)) &&
+        if ((result -> pass_data_start <= (MODULE_STATUS_ADDRESS + MODULE_STATUS_AREA_LENGTH - 1UL)) &&
             (MODULE_STATUS_ADDRESS <= result -> pass_data_end))
         {
             console_puts("FAIL ");
             console_puts(result -> pass_name);
-            console_puts(": the shared status region overlaps its data\n");
+            console_puts(": the shared status area overlaps its data\n");
+            failures++;
+        }
+
+        /* And what _txm_module_manager_alignment_adjust produced.  It is called
+           by every load and has never been checked, because nothing it gets
+           wrong faults: it rounds a module's code and data sizes up to the
+           protection granule and declares the granule as their alignment, and
+           the loader allocates on that.  Get it wrong and the region bases are
+           written into PRBAR with their low six bits landing on the shareability,
+           permission and execute-never fields -- so the module runs with
+           attributes nobody asked for rather than at the wrong address.
+
+           The data region's end is checked as well as its base, because the data
+           region's length is the rounded size; the CODE region's end is not, it
+           is the true end of the image and is not rounded to anything.  */
+
+        if (((result -> pass_code_start & (TXM_MODULE_MPU_ALIGNMENT - 1UL)) != 0UL) ||
+            ((result -> pass_data_start & (TXM_MODULE_MPU_ALIGNMENT - 1UL)) != 0UL) ||
+            (((result -> pass_data_end + 1UL) & (TXM_MODULE_MPU_ALIGNMENT - 1UL)) != 0UL))
+        {
+            console_puts("FAIL ");
+            console_puts(result -> pass_name);
+            console_puts(": its regions are not aligned to the protection granule\n");
             failures++;
         }
     }

@@ -172,24 +172,35 @@ SECTIONS
        each becomes an enabled MPU region while a module runs.
        ------------------------------------------------------------------ */
 
-    /* The status word the module reports its progress through.
+    /* The shared granules the module reports its progress through, and the one
+       it is not allowed to reach.
 
-       This exists because the FVP has no debugger seam.  On silicon a GDB
-       harness reads the module's own progress variable out of the data area the
-       manager allocated for it; here nothing outside the image can read
-       anything, and the manager deliberately knows no symbol of the module.  So
-       the manager grants the module a shared MPU region over this word and
-       reads it back afterwards, which is what lets the test judge what the
-       module managed to do rather than only that it faulted.
+       The first granule exists because the FVP has no debugger seam.  On
+       silicon a GDB harness reads the module's own progress variable out of the
+       data area the manager allocated for it; here nothing outside the image
+       can read anything, and the manager deliberately knows no symbol of the
+       module.  So the manager grants the module a shared MPU region over this
+       word and reads it back afterwards, which is what lets the test judge what
+       the module managed to do rather than only that it faulted.
 
-       First in the module area, so its address is ORIGIN(MODULE) and the module
-       can carry it as a constant.  Exactly one granule: a shared region is a
-       region like any other and cannot overlap the image below it.  */
+       Six granules rather than one, because a module may be granted five shared
+       regions and granting a single one exercises only the first entry of the
+       five.  Five of these are granted, one granule per entry, and the sixth --
+       FVP_MODULE_STATUS_UNGRANTED, index 2, so that a granted granule sits on
+       either side of it -- is never granted to anything.  The module writes
+       every granted granule, reads them all back, and then writes the gap,
+       which must fault.  A limit masked the wrong way or a base off by a
+       granule leaks into that gap from one side or the other.
+
+       First in the module area, so the base address is ORIGIN(MODULE) and the
+       module can carry it as a constant.  A shared region is a region like any
+       other and cannot overlap the image below it, hence whole granules and the
+       alignment at the end.  */
 
     .module_status (NOLOAD) :
     {
         __module_status_start__ = .;
-        . = . + 0x40;
+        . = . + 0x180;                  /* six 64-byte granules */
         . = ALIGN(64);
         __module_status_end__ = .;
     } > MODULE
@@ -272,4 +283,12 @@ SECTIONS
 
     ASSERT(__module_status_start__ == 0x003F0000,
            "the module status word is not at FVP_MODULE_STATUS_BASE")
+
+    /* And its size, for the same reason: the manager grants one region per
+       granule from this base and the module addresses them by index, so an area
+       that is not exactly FVP_MODULE_STATUS_GRANULES granules long would leave
+       a grant, or a module write, outside it.  */
+
+    ASSERT(__module_status_end__ - __module_status_start__ == 0x180,
+           "the module status area is not FVP_MODULE_STATUS_GRANULES granules long")
 }

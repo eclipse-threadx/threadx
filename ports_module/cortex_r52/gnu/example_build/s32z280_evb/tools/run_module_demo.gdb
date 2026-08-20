@@ -37,10 +37,20 @@
 #                   bit 0x08  survived the forbidden read          expect CLEAR
 #                   bit 0x10  about to BRANCH to it                prefetch pass only
 #                   bit 0x20  survived the forbidden branch        expect CLEAR
+#                   bit 0x40  wrote and read back every granted
+#                             shared granule                      shared pass only
+#                   bit 0x80  about to write the UNGRANTED granule shared pass only
+#                  bit 0x100  survived writing it                  expect CLEAR
 #
-# so module_progress == 0x7 for a data-abort pass and 0x13 for the prefetch pass.
+# so module_progress == 0x7 for a data-abort pass, 0x13 for the prefetch pass and
+# 0xC3 for the shared pass.
 #
-# THREE PASSES, because one run proves neither relocation nor both abort types
+# The manager records the same word a second time, out of the first shared
+# granule, and this script reads the module's own copy out of its data area.  Two
+# independent readings of one event: if they disagree, one of the two channels is
+# lying and the run says which.
+#
+# FOUR PASSES, because one run proves neither relocation nor both abort types
 #
 # The module is position independent, so a single run at the address it was
 # linked for would prove nothing: the GOT rebase would map every address to
@@ -54,6 +64,17 @@
 # arrives at the handler by a different vector.  It runs after passes 1 and 2 have
 # been unloaded, so it also shows that a module fault leaves the manager able to
 # load and run the next module.
+#
+# Pass 4 is the shared regions.  Passes 1 to 3 are each granted ONE shared
+# region -- the granule they report progress through -- which exercises the first
+# of the five shared entries the port provides and nothing about the other four.
+# Pass 4 is granted all five, one 64-byte granule each, and is deliberately NOT
+# granted the granule that sits between two of them; it writes every granule it
+# was given, reads them all back, and then writes the gap, which must fault.  A
+# limit register masked the wrong way, or a base off by a granule, reaches into
+# that gap from one side or the other.  The same pass probes the two refusals --
+# an unaligned grant must come back TXM_MODULE_ALIGNMENT_ERROR (0xF0) and one
+# grant past the entry count must come back TX_NO_MEMORY (0x10).
 #
 # THE NOTIFY CALLBACK IS A CHECK NOW, not a note
 #
@@ -151,7 +172,7 @@ PROGRESS_BY_PASS = []
 _offset = os.environ.get("S32Z280_MODULE_PROGRESS_OFFSET")
 _offset = int(_offset, 0) if _offset else None
 
-for _i in range(3):
+for _i in range(4):
     gdb.execute("continue")
     if _offset is None:
         PROGRESS_BY_PASS.append(None)
@@ -186,13 +207,23 @@ failures = 0
 OWN_DATA, KERNEL_CALL = 0x01, 0x02
 ATTEMPTED_STEAL, SURVIVED_STEAL = 0x04, 0x08
 ATTEMPTED_JUMP, SURVIVED_JUMP = 0x10, 0x20
+SHARED_WROTE = 0x40
+ATTEMPTED_GAP, SURVIVED_GAP = 0x80, 0x100
 FORBIDDEN = 0x31780000
+
+# The shared area, mirrored from S32Z_MODULE_STATUS_* in platform.h.  Five of the
+# six granules are granted, one entry each; index 2 never is, and the marks go at
+# word 1 because word 0 of granule 0 is the progress word.
+STATUS_BASE, STATUS_GRANULE, STATUS_GRANULES = 0x317F0000, 0x40, 6
+STATUS_UNGRANTED, STATUS_MARK_OFFSET = 2, 4
+SHARED_SIGNATURE = 0x5A5A0000
+ALIGNMENT_ERROR, NO_MEMORY = 0xF0, 0x10
 MODE = {0x10: "User", 0x13: "Supervisor", 0x1A: "Hyp", 0x1F: "System"}
 
 # Which violation each pass was told to commit, from the low byte of the module ID
 # the manager writes into the instance before starting it.
-TEST_DATA_ABORT, TEST_PREFETCH_ABORT = 0x1, 0x2
-PASSES = 3
+TEST_DATA_ABORT, TEST_PREFETCH_ABORT, TEST_SHARED_ABORT = 0x1, 0x2, 0x3
+PASSES = 4
 RELOCATION_PASSES = 2
 
 # The nominal offset of module_progress inside the module's data segment.  Both
@@ -210,15 +241,21 @@ else:
 passes = []
 for i in range(PASSES):
     p = {}
-    for field in ("pass_test", "pass_load_status", "pass_start_status", "pass_stop_status",
+    for field in ("pass_test", "pass_load_status", "pass_share_status",
+                  "pass_start_status", "pass_stop_status",
                   "pass_code_start", "pass_code_end", "pass_data_start",
                   "pass_data_end", "pass_data_base", "pass_faults",
                   "pass_captured", "pass_fault_r9",
                   "pass_dfsr", "pass_dfar", "pass_ifsr", "pass_ifar",
                   "pass_spsr", "pass_code_location",
                   "pass_notify_thread", "pass_notify_instance",
-                  "pass_expect_thread", "pass_expect_instance"):
+                  "pass_expect_thread", "pass_expect_instance",
+                  "pass_progress", "pass_expect_progress", "pass_expect_fault",
+                  "pass_shared_grants", "pass_shared_count",
+                  "pass_align_status", "pass_exhaust_status"):
         p[field] = ev("pass_results[%d].%s" % (i, field))
+    p["marks"] = [ev("pass_results[%d].pass_marks[%d]" % (i, g))
+                  for g in range(STATUS_GRANULES)]
     try:
         p["name"] = gdb.parse_and_eval("pass_results[%d].pass_name" % i).string()
     except gdb.error:
@@ -227,20 +264,28 @@ for i in range(PASSES):
 
 for i, p in enumerate(passes):
     prefetch = (p["pass_test"] == TEST_PREFETCH_ABORT)
+    shared = (p["pass_test"] == TEST_SHARED_ABORT)
     print("")
     print("  --- pass %d: %s ---" % (i + 1, p["name"]))
-    print("    expected abort        = %s"
-          % ("prefetch, through IFSR/IFAR" if prefetch else "data, through DFSR/DFAR"))
-    print("    load / start / stop   = 0x%08X / 0x%08X / 0x%08X"
-          % (p["pass_load_status"], p["pass_start_status"], p["pass_stop_status"]))
+    if prefetch:
+        print("    expected abort        = prefetch, through IFSR/IFAR")
+    elif shared:
+        print("    expected abort        = data, through DFSR/DFAR, writing an")
+        print("                            ungranted shared granule")
+    else:
+        print("    expected abort        = data, through DFSR/DFAR")
+    print("    load / share / start / stop = 0x%08X / 0x%08X / 0x%08X / 0x%08X"
+          % (p["pass_load_status"], p["pass_share_status"],
+             p["pass_start_status"], p["pass_stop_status"]))
     print("    code region           = 0x%08X .. 0x%08X"
           % (p["pass_code_start"], p["pass_code_end"]))
     print("    data region           = 0x%08X .. 0x%08X"
           % (p["pass_data_start"], p["pass_data_end"]))
     print("    data base (r9)        = 0x%08X" % p["pass_data_base"])
 
-    if p["pass_load_status"] != 0 or p["pass_start_status"] != 0:
-        print("    *** FAIL: did not load and start")
+    if (p["pass_load_status"] != 0 or p["pass_share_status"] != 0
+            or p["pass_start_status"] != 0):
+        print("    *** FAIL: did not load, share and start")
         failures += 1
         continue
 
@@ -262,26 +307,45 @@ for i, p in enumerate(passes):
               % (progress, addr))
         print("                            still held that memory)")
 
-        # Every bit is checked, including the ones belonging to the violation this
-        # pass was NOT told to commit: a module that took both routes, or the
-        # wrong one, is not the module this pass asked for and the result would
-        # not mean what the register checks below claim.
+        # Every bit is checked, including the ones belonging to the violations
+        # this pass was NOT told to commit: a module that took more than one
+        # route, or the wrong one, is not the module this pass asked for and the
+        # result would not mean what the register checks below claim.
+        data = not (prefetch or shared)
         wanted = [(OWN_DATA, "wrote its own data", True),
                   (KERNEL_CALL, "reached the kernel through SVC", True),
-                  (ATTEMPTED_STEAL, "attempted the forbidden read", not prefetch),
+                  (ATTEMPTED_STEAL, "attempted the forbidden read", data),
                   (SURVIVED_STEAL, "SURVIVED the forbidden read", False),
                   (ATTEMPTED_JUMP, "attempted the forbidden branch", prefetch),
-                  (SURVIVED_JUMP, "SURVIVED the forbidden branch", False)]
+                  (SURVIVED_JUMP, "SURVIVED the forbidden branch", False),
+                  (SHARED_WROTE, "wrote and read back every granted granule", shared),
+                  (ATTEMPTED_GAP, "attempted the ungranted granule", shared),
+                  (SURVIVED_GAP, "SURVIVED the ungranted granule", False)]
         for bit, name, want_set in wanted:
             got = bool(progress & bit)
             ok = (got == want_set)
             if not ok:
                 failures += 1
-            print("      0x%02X %-33s %-5s  %s"
+            print("      0x%03X %-42s %-5s  %s"
                   % (bit, name, "set" if got else "clear",
                      "ok" if ok else "*** WRONG ***"))
-        if progress & (SURVIVED_STEAL | SURVIVED_JUMP):
+        if progress & (SURVIVED_STEAL | SURVIVED_JUMP | SURVIVED_GAP):
             print("      ISOLATION FAILURE: the module reached memory it was never granted.")
+
+        # The manager's own reading of the same word, out of the first shared
+        # granule.  Two independent channels for one event: the module writes
+        # both, this script reads its private copy and the manager read the
+        # shared one, so a disagreement means one of the two paths is lying and
+        # neither result should be trusted until it is explained.
+        if p["pass_progress"] != progress:
+            print("    *** FAIL: the manager read progress 0x%08X out of the shared"
+                  % p["pass_progress"])
+            print("              granule, the module's own copy says 0x%08X" % progress)
+            failures += 1
+        if p["pass_progress"] != p["pass_expect_progress"]:
+            print("    *** FAIL: progress 0x%08X, expected 0x%08X"
+                  % (p["pass_progress"], p["pass_expect_progress"]))
+            failures += 1
 
     # "captured" and "notified" are different events: the abort vector records the
     # fault registers before anything else runs, and the notify callback is a
@@ -367,10 +431,16 @@ for i, p in enumerate(passes):
     # are sticky, so checking the pair that does not belong to this fault would
     # pass on a value some earlier fault left behind -- including the boot probes,
     # which take a prefetch abort of their own before ThreadX starts.
+    #
+    # The shared pass is the exception: the address it faults on is the mark word
+    # of the granule it was not granted, which it computes from a literal rather
+    # than out of .data -- so for that pass this is a check on the grant and not
+    # on the rebase.  Which is why the expectation is carried per pass.
     reg_name, reg_value = ("IFAR", ifar) if prefetch else ("DFAR", dfar)
-    if reg_value != FORBIDDEN:
+    expect_fault = p["pass_expect_fault"] or FORBIDDEN
+    if reg_value != expect_fault:
         print("    *** FAIL: expected %s 0x%08X, the address the module was told"
-              % (reg_name, FORBIDDEN))
+              % (reg_name, expect_fault))
         print("              not to touch.  A different one means .data was not")
         print("              copied or the GOT was not rebased.")
         failures += 1
@@ -381,6 +451,52 @@ for i, p in enumerate(passes):
     if prefetch and (ifsr & 0x3F) == 0:
         print("    *** FAIL: IFSR reports no instruction fault status")
         failures += 1
+
+    # The shared-region results, for the one pass that produces them.  Read out
+    # of the manager's own record rather than out of the MPU: what the hardware
+    # holds is checked by the module having faulted, and what is checked here is
+    # that the manager granted what it meant to and refused what it should.
+    if shared:
+        print("    shared grants         = %d (expected %d)"
+              % (p["pass_shared_grants"], STATUS_GRANULES - 1))
+        print("    entries held          = %d" % p["pass_shared_count"])
+        print("    unaligned grant       = 0x%02X (expected 0x%02X, TXM_MODULE_ALIGNMENT_ERROR)"
+              % (p["pass_align_status"], ALIGNMENT_ERROR))
+        print("    one grant too many    = 0x%02X (expected 0x%02X, TX_NO_MEMORY)"
+              % (p["pass_exhaust_status"], NO_MEMORY))
+
+        if p["pass_shared_grants"] != STATUS_GRANULES - 1:
+            print("    *** FAIL: not every shared entry could be granted")
+            failures += 1
+        if p["pass_shared_count"] != STATUS_GRANULES - 1:
+            print("    *** FAIL: the instance does not hold the entries it granted")
+            failures += 1
+        if p["pass_align_status"] != ALIGNMENT_ERROR:
+            print("    *** FAIL: an unaligned shared grant was not refused as such.")
+            print("              Accepting one does not fault -- the low six bits of")
+            print("              PRBAR are permissions, so it changes what the region")
+            print("              allows instead of where it is.")
+            failures += 1
+        if p["pass_exhaust_status"] != NO_MEMORY:
+            print("    *** FAIL: one grant too many was not refused.  The entry index")
+            print("              is TXM_MODULE_MPU_SHARED_INDEX plus the count, so a")
+            print("              sixth grant writes past the end of the region table.")
+            failures += 1
+
+        # And what the module managed to write where.  A granted granule holding
+        # something other than its own mark means that entry was programmed with
+        # the wrong base -- the store was accepted and landed elsewhere -- and a
+        # non-zero gap means a grant covered a granule nobody asked for.
+        for g in range(STATUS_GRANULES):
+            addr = STATUS_BASE + g * STATUS_GRANULE + STATUS_MARK_OFFSET
+            want = 0 if g == STATUS_UNGRANTED else (SHARED_SIGNATURE | g)
+            got = p["marks"][g]
+            tag = "ungranted" if g == STATUS_UNGRANTED else "granted  "
+            ok = (got == want)
+            if not ok:
+                failures += 1
+            print("      granule %d %s at 0x%08X = 0x%08X (expected 0x%08X)  %s"
+                  % (g, tag, addr, got, want, "ok" if ok else "*** WRONG ***"))
 
 # --- the relocation result, which is the comparison between the passes --------
 print("")
