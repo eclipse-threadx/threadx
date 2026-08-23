@@ -10,7 +10,7 @@
 /***************************************************************************/
 
 
-.section .text
+.section .text.boot, "ax"
 .align 4
 .global _start
 .extern main
