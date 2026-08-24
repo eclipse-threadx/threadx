@@ -31,8 +31,32 @@ function validate() {
     help
 }
 
+# CMake records the compiler it detected inside the build directory and keeps using it on
+# every later configure. Changing CC would otherwise be ignored without a word: the build
+# reports success while still using the compiler the directory was first configured with,
+# so anyone verifying a change against a second compiler would be reading stale results.
+# Only the C compiler is consulted, because these test trees declare LANGUAGES C.
+function compiler_changed() {
+    local build=$1
+    local recorded requested
+
+    [ -d "build/$build" ] || return 1
+
+    recorded=$(sed -n 's/^set(CMAKE_C_COMPILER "\(.*\)")$/\1/p' build/$build/CMakeFiles/*/CMakeCCompiler.cmake 2>/dev/null | head -1)
+    [ -n "$recorded" ] || return 1
+
+    requested=$(command -v "${CC:-gcc}" 2>/dev/null)
+    [ -n "$requested" ] || return 1
+
+    [ "$recorded" != "$requested" ]
+}
+
 function generate() {
     build=$1
+    if compiler_changed $build; then
+        echo "Compiler changed since build/$build was configured. Reconfiguring from scratch."
+        rm -rf build/$build
+    fi
     cmake -Bbuild/$build -GNinja -DBUILD_SHARED_LIBS=ON -DCMAKE_TOOLCHAIN_FILE=$(dirname $(realpath $0))/../cmake/linux.cmake -DCMAKE_BUILD_TYPE=$build .
 }
 
@@ -41,6 +65,10 @@ function build() {
 }
 
 function build_libs() {
+    if compiler_changed libs; then
+        echo "Compiler changed since build/libs was configured. Reconfiguring from scratch."
+        rm -rf build/libs
+    fi
     cmake -Bbuild/libs -GNinja -DBUILD_SHARED_LIBS=ON -DCMAKE_TOOLCHAIN_FILE=$(dirname $(realpath $0))/../cmake/linux.cmake libs
     cmake --build build/libs
 }
