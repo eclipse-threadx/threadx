@@ -89,6 +89,20 @@ jobs:
   #     skip_deploy: true
   #     skip_coverage: true
   deploy:
+    # Publishing the coverage report stays on master. Adding dev to this
+    # workflow's triggers was meant to run the suites on the branch the pull
+    # requests target, not to change what gets published -- and the first
+    # push to dev after that change failed here with 'Branch "dev" is not
+    # allowed to deploy to github-pages due to environment protection rules',
+    # while all three suites passed. The github-pages environment restricts
+    # deployments to master, so the job was rejected before it ran.
+    #
+    # Guarding here rather than relaxing the environment rule, because the
+    # rule is doing its job: it is a deliberate answer to the question of
+    # which branch the published report describes. Moving that answer to dev
+    # is a separate decision, and it needs the environment setting changed
+    # as well as this line removed.
+    if: github.ref == 'refs/heads/master'
     permissions:
       contents: read
       issues: read
