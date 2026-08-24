@@ -82,13 +82,24 @@ function test() {
     else
         repeat_fail=${CTEST_REPEAT_FAIL}
     fi
-    ctest $parallel --timeout 1000 -O $1.txt -T test --no-compress-output --test-output-size-passed 4194304 --test-output-size-failed 4194304 --output-on-failure --repeat until-pass:${repeat_fail} --output-junit $1.xml
+    # ctest's status is captured rather than allowed to abort the function, and
+    # returned at the end. set -e would otherwise stop here on the first failing
+    # test, and everything below would be skipped -- including coverage.sh. The
+    # gcda files exist by that point, so a failing run threw away coverage it had
+    # already collected, and the run whose behaviour changed is exactly the one
+    # whose coverage is worth reading. Measured: the failing run of 2026-08-18
+    # produced test_reports artifacts and no coverage_report artifact at all.
+    local status=0
+    ctest $parallel --timeout 1000 -O $1.txt -T test --no-compress-output --test-output-size-passed 4194304 --test-output-size-failed 4194304 --output-on-failure --repeat until-pass:${repeat_fail} --output-junit $1.xml || status=$?
     popd
-    grep -E "^(\s*[0-9]+|Total)" build/$1/$1.txt >build/$1.txt
+    # Tolerated because this is a summary for humans, and a ctest that died early
+    # enough to leave no matching line must not be what stops the coverage below.
+    grep -E "^(\s*[0-9]+|Total)" build/$1/$1.txt >build/$1.txt || true
     sed -i "s/\x1B\[[0-9;]*[JKmsu]//g" build/$1.txt
     if [[ $1 = *"_coverage" ]]; then
         ./coverage.sh $1
     fi
+    return $status
 }
 
 cd $(dirname $0)
@@ -146,11 +157,18 @@ elif [ "$command" == "test" ]; then
         done
         exit $exit_code
     else
-        # Run builds in serial
+        # Run builds in serial. The status is collected the same way the parallel
+        # branch above collects it, so one failing configuration no longer stops
+        # the remaining ones from being tested. That mattered more after the
+        # suites moved to serial execution: a failure in the first configuration
+        # meant the other four never ran, and their coverage was never collected
+        # either.
+        exit_code=0
         for item in $builds; do
             echo "Testing $item"
-            test $item $parallel_jobs
+            test $item $parallel_jobs || exit_code=$?
         done
+        exit $exit_code
     fi
 elif [ "$command" == "build_libs" ]; then
     build_libs
