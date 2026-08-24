@@ -35,8 +35,12 @@ jobs:
     # supplied: token" and the check never evaluated anything. The default
     # GITHUB_TOKEN is enough to check out a public repository, and the
     # repository has no submodules.
+    # Actions are pinned to a commit SHA, with the version in the trailing
+    # comment. A tag can be moved; a SHA cannot, so this is what makes "which
+    # code ran in CI" answerable from the repository. Dependabot moves these
+    # pins and rewrites the comment with them -- see .github/dependabot.yml.
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     # Check the port trees: the generated ports must be reproducible from
     # ports_arch, and no port header may be left unbalanced or carrying code
@@ -60,7 +64,7 @@ jobs:
     # GITHUB_TOKEN is enough to check out a public repository, and the
     # repository has no submodules.
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     # Regenerate the A profile ports and fail if anything changed, which means
     # a generated port was edited directly instead of ports_arch.
