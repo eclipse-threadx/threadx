@@ -178,10 +178,37 @@ jobs:
       id-token: write
 
     steps:
+    # Selects the coverage artifacts by pattern rather than by name.
+    #
+    # This used to ask for ${{ steps.artifact.outputs.coverage_report }},
+    # which is set by the "Coverage Report name" step of run_tests -- a
+    # different job. The steps context does not cross jobs, so that
+    # expression evaluated to the empty string and the action fell back to
+    # its documented behaviour for an unspecified name: "No input name,
+    # artifact-ids or pattern filtered specified, downloading all
+    # artifacts". It pulled down four, the two coverage reports and the two
+    # test_reports bundles of JUnit XML, each into a directory named after
+    # the artifact -- so the published site carried the test reports as well
+    # as the coverage, under paths containing a run timestamp that changed
+    # on every publish.
+    #
+    # merge-multiple puts the contents of both coverage artifacts directly
+    # into coverage_report rather than under a directory named for each
+    # artifact. Each one holds a single directory named for its suite,
+    # ThreadX or SMP, renamed from default_build_coverage by the "Prepare
+    # Coverage GitHub Pages" step, so the merge yields exactly the two
+    # suite directories the deploy expects, and the artifact name -- with
+    # its timestamp -- stops appearing in the published path at all.
+    #
+    # The two artifacts also each carry a default_build_coverage.xml, and
+    # the merge means one overwrites the other. That file is consumed by
+    # CodeCoverageSummary back in run_tests and is not read here, so this is
+    # untidy rather than wrong.
     - uses: actions/download-artifact@v4.3.0
       if: ${{ inputs.skip_test }}
       with:
-        name: ${{ steps.artifact.outputs.coverage_report }}
+        pattern: coverage_report-*
+        merge-multiple: true
         path: ${{ inputs.cmake_path }}/coverage_report
 
     - name: Upload Code Coverage Pages
@@ -190,10 +217,16 @@ jobs:
       with:
         path: .
 
+    # The artifacts are named coverage_report-<epoch> by run_tests, so the
+    # bare name matched nothing: useGlob defaults to true in this action, and
+    # as a glob "coverage_report" matches only the literal string. The step
+    # has therefore been deleting nothing. It does not fail on a miss, which
+    # is why that went unnoticed; retention-days: 1 on the upload is what has
+    # actually been clearing these up.
     - name: Delete Duplicate Code Coverage Artifact
       uses: geekyeggo/delete-artifact@v5.1.0
       with:
-          name: coverage_report
+          name: coverage_report-*
 
     - name: Deploy GitHub Pages site
       id: deployment
