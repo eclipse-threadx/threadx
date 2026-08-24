@@ -1,8 +1,25 @@
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
-set(CMAKE_C_COMPILER    gcc)
-set(CMAKE_CXX_COMPILER  g++)
+# Let the compiler be chosen on the command line or from the environment, for example
+# -DCMAKE_C_COMPILER=gcc-14 or CC=gcc-14. CMake reads a toolchain file before it consults
+# CC and CXX, so setting these unconditionally would quietly override both and leave no
+# way to build with anything but the distribution's default gcc.
+if(NOT DEFINED CMAKE_C_COMPILER)
+  if(DEFINED ENV{CC})
+    set(CMAKE_C_COMPILER $ENV{CC})
+  else()
+    set(CMAKE_C_COMPILER gcc)
+  endif()
+endif()
+
+if(NOT DEFINED CMAKE_CXX_COMPILER)
+  if(DEFINED ENV{CXX})
+    set(CMAKE_CXX_COMPILER $ENV{CXX})
+  else()
+    set(CMAKE_CXX_COMPILER g++)
+  endif()
+endif()
 set(AS                  as)
 set(AR                  ar)
 set(OBJCOPY             objcopy)
