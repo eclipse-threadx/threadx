@@ -1,13 +1,24 @@
 name: regression_test
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
+# Runs the ThreadX, SMP and FreeRTOS-compatibility regression suites.
+#
+# dev is included as well as master, for the same reason ports_arch_check.yml
+# names it: dev is the integration branch, so a check that runs only against
+# master gates nothing that anybody opens. Until now these suites ran on no
+# pull request that anybody actually raised, and the last dev run of any kind
+# was a manual workflow_dispatch.
+#
+# That run, on 2026-08-18, failed two tests: threadx_timer_simple_test in the
+# ThreadX suite and threadx_thread_priority_change in the SMP one. Both are
+# fixed -- the first by running the suites one test at a time (#643), the
+# second by #647 -- and both suites now pass all 1030 tests across all ten
+# build configurations. The suites were never the problem; the trigger was.
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
