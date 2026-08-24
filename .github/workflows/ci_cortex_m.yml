@@ -1,14 +1,31 @@
-# This is a basic workflow to help you get started with Actions
-
 name: cortex_m
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
+# Cross-compiles the Cortex-M ports with GCC.
+#
+# Two things were wrong with this workflow and both are fixed here.
+#
+# It ran on master only, for both push and pull_request, while dev is the
+# integration branch -- the same defect ports_arch_check.yml carries a comment
+# about, where it cost eight months of ports drifting unnoticed. So this
+# gated no pull request that anybody opened.
+#
+# And it had not compiled anything since at least 2026-06-08. Every run since
+# then failed in six to eight seconds, at "Prepare all required actions",
+# before checkout: GitHub automatically fails any request using
+# actions/cache@v1. Nobody noticed, because of the first defect.
+#
+# The toolchain setup now follows clang_check.yml rather than third party
+# actions: a pinned release fetched directly, verified against Arm's published
+# checksum, and cached with actions/cache@v4. That also moves the compiler
+# from 9-2019-q4 to a version matching the project's stated GCC 14 default.
+#
+# This covers four ports of the forty under ports/ that have a gnu directory.
+# Widening that to every Arm gnu port is separate work.
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
     paths:
       - ".github/workflows/ci_cortex_m.yml"
       - 'common/**'
@@ -18,60 +35,75 @@ on:
       - 'ports/cortex_m4/gnu/**'
       - 'ports/cortex_m7/gnu/**'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-24.04
 
     strategy:
+      fail-fast: false
       matrix:
         port: [0, 3, 4, 7]
 
     name: Cortex M${{ matrix.port }} build
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    env:
+      # Pinned deliberately, as the runner image is: a toolchain upgrade should
+      # be a reviewable commit rather than something that changes underneath the
+      # ports. Releases: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
+      GCC_VERSION: 14.3.rel1
+      GCC_TARGET: arm-none-eabi
+
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Check out the repository
       uses: actions/checkout@v4
       with:
         submodules: true
 
-    # Store the arm compilers in the cache to speed up builds
-    - name: Cache arm-none-eabi-gcc tools
+    - name: Cache the Arm GNU toolchain
       id: cache-arm-gcc
-      uses: actions/cache@v1
+      uses: actions/cache@v4
       with:
-        path: $HOME/arm-none-eabi-gcc-9-2019-q4
-        key: ${{ runner.os }}-arm-gcc-9-2019-q4
+        path: toolchain
+        key: arm-gnu-toolchain-${{ env.GCC_VERSION }}-x86_64-${{ env.GCC_TARGET }}
 
-    # Get the arm-non-eabi-gcc toolchain
-    - name: Install arm-none-eabi-gcc
-      uses: fiam/arm-none-eabi-gcc@v1
+    - name: Install the Arm GNU toolchain
       if: steps.cache-arm-gcc.outputs.cache-hit != 'true'
-      with:
-          release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
-          directory: $HOME/arm-none-eabi-gcc-9-2019-q4
+      run: |
+        set -eu
+        base="https://developer.arm.com/-/media/Files/downloads/gnu/${GCC_VERSION}/binrel"
+        archive="arm-gnu-toolchain-${GCC_VERSION}-x86_64-${GCC_TARGET}.tar.xz"
+        mkdir -p toolchain && cd toolchain
+        curl -fsSLO "$base/$archive"
+        curl -fsSLO "$base/$archive.sha256asc"
+        sha256sum -c "$archive.sha256asc"
+        tar xf "$archive"
+        rm -f "$archive"
 
-    # Get CMake into the environment
-    - name: Install cmake 3.19.1
-      uses: lukka/get-cmake@v3.19.1
+    - name: Put the toolchain on PATH
+      run: |
+        set -eu
+        echo "$GITHUB_WORKSPACE/toolchain/arm-gnu-toolchain-${GCC_VERSION}-x86_64-${GCC_TARGET}/bin" >> "$GITHUB_PATH"
 
-    # Get Ninja into the environment
-    - name: Install ninja-build
-      uses: seanmiddleditch/gha-setup-ninja@v3
+    # Only reaches apt if the runner image has stopped shipping ninja. This
+    # repository has already paid for unguarded apt calls: scripts/install.sh
+    # carries a long comment about apt-get update stalling for over two hours
+    # and taking whole regression runs with it. Do not turn this into an
+    # unconditional install.
+    - name: Ensure ninja is available
+      run: |
+        set -eu
+        if command -v ninja >/dev/null 2>&1; then
+          ninja --version
+        else
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build
+        fi
 
-    # Prepare the build system
+    - name: Report the toolchain version
+      run: ${{ env.GCC_TARGET }}-gcc --version
+
     - name: Prepare build system
       run: cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m${{ matrix.port }}.cmake -GNinja .
-      env:
-        PATH: "$HOME/arm-none-eabi-gcc-9-2019-q4/bin:$PATH"
 
     - name: Compile and link
       run: cmake --build ./build
-      env:
-        PATH: "$HOME/arm-none-eabi-gcc-9-2019-q4/bin:$PATH"
-
-
