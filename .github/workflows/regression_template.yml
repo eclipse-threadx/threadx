@@ -29,8 +29,13 @@ on:
         default: false
         required: false
         type: boolean
+      # The merged report, not one configuration's. Every configuration is
+      # instrumented now (TX_COVERAGE below) and coverage.sh --merge unions
+      # them; default_build_coverage was one build of five, and the code the
+      # other four select was absent from its denominator rather than uncovered
+      # in it.
       coverage_name:
-        default: 'default_build_coverage'
+        default: 'merged'
         required: false
         type: string
       skip_deploy:
@@ -79,12 +84,20 @@ jobs:
       timeout-minutes: 10
       run: ${{ inputs.install_script }}
 
+    # TX_COVERAGE instruments every build configuration rather than only the one
+    # whose name ends in _coverage. It has to be set for the build as well as the
+    # test: the build is where -fprofile-arcs is decided, and the test run is
+    # where the reports are collected and merged.
     - name: Build
       timeout-minutes: 15
+      env:
+        TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.build_script }}
 
     - name: Test
       timeout-minutes: 60
+      env:
+        TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.test_script }}
 
     - name: Publish Test Results
@@ -163,12 +176,32 @@ jobs:
       if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       run: echo "coverage_report=coverage_report-$(date +%s)" >> $GITHUB_OUTPUT
 
+    # per_configuration is excluded deliberately. deploy_code_coverage downloads
+    # every coverage_report-* artifact with merge-multiple, so whatever is in
+    # here lands on the published site -- and each suite's per-configuration
+    # directories carry the same names, so ThreadX's would overwrite SMP's.
+    # The top level therefore holds only the suite directory and the merged XML,
+    # which is the shape the deploy already expects.
     - name: Upload Code Coverage Artifacts
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       if: ${{ !cancelled() && (inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
           name: ${{ steps.artifact.outputs.coverage_report }}
-          path: ${{ inputs.cmake_path }}/coverage_report
+          path: |
+            ${{ inputs.cmake_path }}/coverage_report
+            !${{ inputs.cmake_path }}/coverage_report/per_configuration/**
+          retention-days: 1
+
+    # The per-configuration reports, kept separately so they are downloadable
+    # when the merged number moves and the question is which configuration moved
+    # it. The name deliberately does not match coverage_report-*, so the deploy
+    # job's pattern does not pick it up and it never reaches the published site.
+    - name: Upload Per-Configuration Coverage
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
+      with:
+          name: coverage_detail ${{ inputs.result_affix }}
+          path: ${{ inputs.cmake_path }}/coverage_report/per_configuration
           retention-days: 1
 
     - name: Upload Code Coverage Pages
