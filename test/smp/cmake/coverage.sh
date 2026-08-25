@@ -14,7 +14,6 @@
 set -e
 
 cd $(dirname $0)
-threadx_smp=$(realpath ../../../common_smp/src)
 mkdir -p coverage_report/$1
 
 # gcov reads a data format tied to the compiler that produced it, so gcov has to match
@@ -42,5 +41,59 @@ if ! command -v "$GCOV" >/dev/null 2>&1; then
     exit 1
 fi
 
-gcovr --gcov-executable "$GCOV" --object-directory=build/$1/threadx_smp/CMakeFiles/threadx_smp.dir/$threadx_smp -r build/$1 -f ../../../common_smp/src --xml-pretty --output coverage_report/$1.xml
-gcovr --gcov-executable "$GCOV" --object-directory=build/$1/threadx_smp/CMakeFiles/threadx_smp.dir/$threadx_smp -r build/$1 -f ../../../common_smp/src --html --html-details --output coverage_report/$1/index.html
+# gcovr is given three paths below, and each of them has to be absolute, for a
+# different reason.
+#
+# -r is the repository root rather than the build directory, so the report names
+# files the way the repository does -- "common_smp/src/tx_block_allocate.c"
+# instead of "/home/runner/work/threadx/threadx/common_smp/src/tx_block_allocate.c".
+# With -r inside build/, gcovr cannot express the sources relative to it, because
+# they are outside it, and falls back to absolute paths. Those paths then differ
+# on every machine and disagree with the <source> element written beside them in
+# the same file, so anything that maps coverage back to the repository -- PR
+# annotations, Codecov, SonarQube -- cannot follow them.
+#
+# Both -r and -f must be absolute. "-r ../../.. -f common_smp/src" produces a
+# report containing zero files and exits 0, which is the worst failure mode
+# available here: a green run carrying an empty report. Measured, not assumed.
+repo_root=$(cd ../../.. && pwd)
+
+# This is what actually scopes the report to one build configuration, and it is
+# the positional search path -- not --object-directory, which used to be here
+# and was doing nothing at all. That flag tells gcovr how to get from a gcda
+# file back to the compiler's working directory; it does not restrict which gcda
+# files are found. Pointed at an empty directory it still produced the full
+# report, because gcovr searches -r as well.
+#
+# That matters more now than it did before. While -r was build/$1 it happened to
+# constrain the search to this configuration by accident. -r is the repository
+# root now, and every configuration's gcda lies somewhere under it, so without
+# an explicit search path the report would silently merge all five.
+#
+# The odd shape of this path is CMake's, not ours: common_smp/src sits outside
+# this directory's source tree, so CMake mangles each source file's absolute
+# path into the object path, minus the leading slash. Hence the concatenation
+# rather than a join -- $repo_root already begins with one.
+objdir=$PWD/build/$1/threadx_smp/CMakeFiles/threadx_smp.dir$repo_root/common_smp/src
+
+# The Linux port's own sources are deliberately outside -f. gcno files exist for
+# two directories -- common_smp/src and ports_smp/linux/gnu/src -- and only the
+# first is reported. The kernel is what this suite is here to cover; the
+# architecture ports are validated functionally rather than structurally, and
+# linux/gnu is a development host port that nothing ships on. Written down
+# because a filter argument on its own is not a decision the next reader can see.
+filter=$repo_root/common_smp/src
+
+gcovr --gcov-executable "$GCOV" -r "$repo_root" -f "$filter" "$objdir" --xml-pretty --output coverage_report/$1.xml
+gcovr --gcov-executable "$GCOV" -r "$repo_root" -f "$filter" "$objdir" --html --html-details --output coverage_report/$1/index.html
+
+# An empty report is not an error as far as gcovr is concerned: it warns and
+# exits 0. Worse, it advertises line-rate="1.0" alongside lines-valid="0", so
+# every downstream consumer reads "no data at all" as "100% covered". A coverage
+# threshold cannot catch that, because an empty report passes any threshold. So
+# the assertion belongs here, next to the paths that would cause it.
+if ! grep -q "<class " coverage_report/$1.xml; then
+    echo "coverage.sh: the report for '$1' contains no files." >&2
+    echo "Expected gcda files under $objdir." >&2
+    exit 1
+fi
