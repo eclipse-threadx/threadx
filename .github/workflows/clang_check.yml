@@ -27,12 +27,16 @@ jobs:
       ATFE_VERSION: 22.1.0
 
     steps:
+    # Actions are pinned to a commit SHA, with the version in the trailing
+    # comment. A tag can be moved; a SHA cannot, so this is what makes "which
+    # code ran in CI" answerable from the repository. Dependabot moves these
+    # pins and rewrites the comment with them -- see .github/dependabot.yml.
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Cache Arm Toolchain for Embedded
       id: cache-atfe
-      uses: actions/cache@v4
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: atfe
         key: atfe-${{ env.ATFE_VERSION }}-linux-x86_64
