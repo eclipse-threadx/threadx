@@ -22,7 +22,7 @@ arm-none-eabi-gcc -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_initialize_wait.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_low_level_initialize.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_protect.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_time_get.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_unprotect.S
+arm-none-eabi-gcc -c -g -mcpu=cortex-a7 -x assembler-with-cpp ../src/tx_thread_smp_unprotect.s
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_allocate.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_cleanup.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_create.c
@@ -217,7 +217,7 @@ arm-none-eabi-gcc -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ..
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_smp_core_exclude_get.c
 arm-none-eabi-gcc -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_smp_utilities.c
 arm-none-eabi-ar -r tx.a tx_thread_stack_build.o tx_thread_schedule.o tx_thread_system_return.o tx_thread_context_save.o tx_thread_context_restore.o tx_timer_interrupt.o tx_thread_interrupt_control.o
-arm-none-eabi-ar -r tx.a tx_initialize_low_level.o tx_thread_interrupt_disable.o 
+arm-none-eabi-ar -r tx.a tx_initialize_low_level.o tx_thread_interrupt_disable.o
 arm-none-eabi-ar -r tx.a tx_thread_interrupt_restore.o tx_thread_irq_nesting_end.o tx_thread_irq_nesting_start.o
 arm-none-eabi-ar -r tx.a tx_block_allocate.o tx_block_pool_cleanup.o tx_block_pool_create.o tx_block_pool_delete.o tx_block_pool_info_get.o
 arm-none-eabi-ar -r tx.a tx_block_pool_initialize.o tx_block_pool_performance_info_get.o tx_block_pool_performance_system_info_get.o tx_block_pool_prioritize.o
@@ -228,7 +228,7 @@ arm-none-eabi-ar -r tx.a tx_event_flags_info_get.o tx_event_flags_initialize.o t
 arm-none-eabi-ar -r tx.a tx_event_flags_set.o tx_event_flags_set_notify.o tx_initialize_high_level.o tx_initialize_kernel_enter.o tx_initialize_kernel_setup.o
 arm-none-eabi-ar -r tx.a tx_mutex_cleanup.o tx_mutex_create.o tx_mutex_delete.o tx_mutex_get.o tx_mutex_info_get.o tx_mutex_initialize.o tx_mutex_performance_info_get.o
 arm-none-eabi-ar -r tx.a tx_mutex_performance_system_info_get.o tx_mutex_prioritize.o tx_mutex_priority_change.o tx_mutex_put.o tx_queue_cleanup.o tx_queue_create.o
-arm-none-eabi-ar -r tx.a tx_queue_delete.o tx_queue_flush.o tx_queue_front_send.o tx_queue_info_get.o tx_queue_initialize.o tx_queue_performance_info_get.o 
+arm-none-eabi-ar -r tx.a tx_queue_delete.o tx_queue_flush.o tx_queue_front_send.o tx_queue_info_get.o tx_queue_initialize.o tx_queue_performance_info_get.o
 arm-none-eabi-ar -r tx.a tx_queue_performance_system_info_get.o tx_queue_prioritize.o tx_queue_receive.o tx_queue_send.o tx_queue_send_notify.o tx_semaphore_ceiling_put.o
 arm-none-eabi-ar -r tx.a tx_semaphore_cleanup.o tx_semaphore_create.o tx_semaphore_delete.o tx_semaphore_get.o tx_semaphore_info_get.o tx_semaphore_initialize.o
 arm-none-eabi-ar -r tx.a tx_semaphore_performance_info_get.o tx_semaphore_performance_system_info_get.o tx_semaphore_prioritize.o tx_semaphore_put.o tx_semaphore_put_notify.o
@@ -239,17 +239,17 @@ arm-none-eabi-ar -r tx.a tx_thread_stack_error_notify.o tx_thread_suspend.o tx_t
 arm-none-eabi-ar -r tx.a tx_thread_terminate.o tx_thread_time_slice.o tx_thread_time_slice_change.o tx_thread_timeout.o tx_thread_wait_abort.o tx_time_get.o
 arm-none-eabi-ar -r tx.a tx_time_set.o tx_timer_activate.o tx_timer_change.o tx_timer_create.o tx_timer_deactivate.o tx_timer_delete.o tx_timer_expiration_process.o
 arm-none-eabi-ar -r tx.a tx_timer_info_get.o tx_timer_initialize.o tx_timer_performance_info_get.o tx_timer_performance_system_info_get.o tx_timer_system_activate.o
-arm-none-eabi-ar -r tx.a tx_timer_system_deactivate.o tx_timer_thread_entry.o tx_trace_enable.o tx_trace_disable.o tx_trace_initialize.o tx_trace_interrupt_control.o 
+arm-none-eabi-ar -r tx.a tx_timer_system_deactivate.o tx_timer_thread_entry.o tx_trace_enable.o tx_trace_disable.o tx_trace_initialize.o tx_trace_interrupt_control.o
 arm-none-eabi-ar -r tx.a tx_trace_isr_enter_insert.o tx_trace_isr_exit_insert.o tx_trace_object_register.o tx_trace_object_unregister.o tx_trace_user_event_insert.o
 arm-none-eabi-ar -r tx.a tx_trace_buffer_full_notify.o tx_trace_event_filter.o tx_trace_event_unfilter.o
-arm-none-eabi-ar -r tx.a txe_block_allocate.o txe_block_pool_create.o txe_block_pool_delete.o txe_block_pool_info_get.o txe_block_pool_prioritize.o txe_block_release.o 
-arm-none-eabi-ar -r tx.a txe_byte_allocate.o txe_byte_pool_create.o txe_byte_pool_delete.o txe_byte_pool_info_get.o txe_byte_pool_prioritize.o txe_byte_release.o 
-arm-none-eabi-ar -r tx.a txe_event_flags_create.o txe_event_flags_delete.o txe_event_flags_get.o txe_event_flags_info_get.o txe_event_flags_set.o 
+arm-none-eabi-ar -r tx.a txe_block_allocate.o txe_block_pool_create.o txe_block_pool_delete.o txe_block_pool_info_get.o txe_block_pool_prioritize.o txe_block_release.o
+arm-none-eabi-ar -r tx.a txe_byte_allocate.o txe_byte_pool_create.o txe_byte_pool_delete.o txe_byte_pool_info_get.o txe_byte_pool_prioritize.o txe_byte_release.o
+arm-none-eabi-ar -r tx.a txe_event_flags_create.o txe_event_flags_delete.o txe_event_flags_get.o txe_event_flags_info_get.o txe_event_flags_set.o
 arm-none-eabi-ar -r tx.a txe_event_flags_set_notify.o txe_mutex_create.o txe_mutex_delete.o txe_mutex_get.o txe_mutex_info_get.o txe_mutex_prioritize.o
 arm-none-eabi-ar -r tx.a txe_mutex_put.o txe_queue_create.o txe_queue_delete.o txe_queue_flush.o txe_queue_front_send.o txe_queue_info_get.o txe_queue_prioritize.o
 arm-none-eabi-ar -r tx.a txe_queue_receive.o txe_queue_send.o txe_queue_send_notify.o txe_semaphore_ceiling_put.o txe_semaphore_create.o txe_semaphore_delete.o
 arm-none-eabi-ar -r tx.a txe_semaphore_get.o txe_semaphore_info_get.o txe_semaphore_prioritize.o txe_semaphore_put.o txe_semaphore_put_notify.o txe_thread_create.o
-arm-none-eabi-ar -r tx.a txe_thread_delete.o txe_thread_entry_exit_notify.o txe_thread_info_get.o txe_thread_preemption_change.o txe_thread_priority_change.o 
+arm-none-eabi-ar -r tx.a txe_thread_delete.o txe_thread_entry_exit_notify.o txe_thread_info_get.o txe_thread_preemption_change.o txe_thread_priority_change.o
 arm-none-eabi-ar -r tx.a txe_thread_relinquish.o txe_thread_reset.o txe_thread_resume.o txe_thread_suspend.o txe_thread_terminate.o txe_thread_time_slice_change.o
 arm-none-eabi-ar -r tx.a txe_thread_wait_abort.o txe_timer_activate.o txe_timer_change.o txe_timer_create.o txe_timer_deactivate.o txe_timer_delete.o txe_timer_info_get.o
 arm-none-eabi-ar -r tx.a tx_thread_smp_current_state_set.o tx_thread_smp_debug_entry_insert.o tx_thread_smp_high_level_initialize.o
