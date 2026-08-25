@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+cd "$(dirname "$0")"
 
 # this script builds the ThreadX library for the Cortex-A7 SMP port using
 # GNU toolchain or llvm/clang toolchain (defaults to GNU).
@@ -13,7 +14,10 @@ case "${TOOLCHAIN}" in
         ;;
     atfe)
         CC="${ATFE_CLANG:-clang}"
-        AR="llvm-ar"
+        case "${CC}" in
+            */*) AR="$(dirname "${CC}")/llvm-ar" ;;
+            *)   AR="llvm-ar" ;;
+        esac
         TARGET_FLAGS="--target=arm-none-eabi"
         ;;
     *)

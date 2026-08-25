@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+cd "$(dirname "$0")"
 
 # this script builds the ThreadX sample image for the Cortex-A5 SMP port using
 # GNU toolchain or llvm/clang toolchain (defaults to GNU).
@@ -7,7 +8,8 @@ set -e
 case "${TOOLCHAIN}" in
     gnu)
         CC="arm-none-eabi-gcc"
-        TARGET_FLAGS="" # GNU and Clang use different driver syntax for selecting the program's
+        TARGET_FLAGS=""
+        # GNU and Clang use different driver syntax for selecting the program's
         # entry-point symbol.
         ENTRY_FLAG="-e Vectors"
         # Bare-metal C libraries require syscall support. GNU uses newlib's nosys stubs

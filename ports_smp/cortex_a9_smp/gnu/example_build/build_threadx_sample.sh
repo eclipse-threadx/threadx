@@ -1,8 +1,9 @@
 #!/bin/sh
 set -e
+cd "$(dirname "$0")"
 
-# this script builds the ThreadX library for the Cortex-A5 SMP port using
-# GNU toolchain or llvm/clang toolchain (defaults to gnu).
+# this script builds the ThreadX sample image for the Cortex-A9 SMP port using
+# GNU toolchain or llvm/clang toolchain (defaults to GNU).
 : "${TOOLCHAIN:=gnu}"
 case "${TOOLCHAIN}" in
     gnu)
@@ -26,11 +27,17 @@ case "${TOOLCHAIN}" in
         ;;
 esac
 
-arm-none-eabi-gcc -c -g -I../../../../common_smp/inc -I../inc -mcpu=cortex-a9 sample_threadx.c
-arm-none-eabi-gcc -c -g -mcpu=cortex-a9 startup.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a9 MP_GIC.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a9 MP_SCU.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a9 MP_Mutexes.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a9 MP_PrivateTimer.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a9 v7.S
-arm-none-eabi-gcc -T sample_threadx.ld -e Vectors -mcpu=cortex-a9 --specs=nosys.specs -o sample_threadx.out MP_PrivateTimer.o MP_GIC.o MP_Mutexes.o MP_SCU.o sample_threadx.o startup.o v7.o tx.a -Wl,-M > sample_threadx.map
+"${CC}" ${TARGET_FLAGS} -c -g -I../../../../common_smp/inc -I../inc -mcpu=cortex-a9 sample_threadx.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 startup.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 MP_GIC.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 MP_SCU.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 MP_Mutexes.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 MP_PrivateTimer.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 v7.S
+"${CC}" ${TARGET_FLAGS} -g -mcpu=cortex-a9 \
+    -T sample_threadx.ld \
+    ${ENTRY_FLAG} \
+    ${SYSCALL_LIB} \
+    -o sample_threadx.out MP_PrivateTimer.o MP_GIC.o MP_Mutexes.o MP_SCU.o \
+    sample_threadx.o startup.o v7.o tx.a \
+    -Wl,-M > sample_threadx.map

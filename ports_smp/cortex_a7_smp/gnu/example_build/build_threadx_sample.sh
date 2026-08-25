@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+cd "$(dirname "$0")"
 
 # this script builds the ThreadX sample image for the Cortex-A7 SMP port using
 # GNU toolchain or llvm/clang toolchain (defaults to GNU).
@@ -32,7 +33,7 @@ esac
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 MP_GIC.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 MP_Mutexes.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 v7.S
-"${CC}" ${TARGET_FLAGS} \
+"${CC}" ${TARGET_FLAGS} -g -mcpu=cortex-a7 \
     -T sample_threadx.ld \
     ${SYSCALL_LIB} \
     ${ENTRY_FLAG} \
