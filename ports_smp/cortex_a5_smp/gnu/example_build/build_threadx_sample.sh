@@ -7,4 +7,9 @@ arm-none-eabi-gcc -c -g -mcpu=cortex-a5 MP_SCU.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a5 MP_Mutexes.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a5 MP_PrivateTimer.S
 arm-none-eabi-gcc -c -g -mcpu=cortex-a5 v7.S
-arm-none-eabi-gcc -T sample_threadx.ld -e Vectors -o sample_threadx.out MP_PrivateTimer.o MP_GIC.o MP_Mutexes.o MP_SCU.o sample_threadx.o startup.o v7.o tx.a -Wl,-M > sample_threadx.map
+arm-none-eabi-gcc -g -mcpu=cortex-a5 \
+    -T sample_threadx.ld --specs=nosys.specs -e Vectors \
+    -o sample_threadx.out \
+    MP_PrivateTimer.o MP_GIC.o MP_Mutexes.o MP_SCU.o \
+    sample_threadx.o startup.o v7.o tx.a \
+    -Wl,-M > sample_threadx.map
