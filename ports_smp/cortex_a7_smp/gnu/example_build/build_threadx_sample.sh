@@ -1,8 +1,42 @@
 #!/bin/sh
 set -e
-arm-none-eabi-gcc -c -g -I../../../../common_smp/inc -I../inc -mcpu=cortex-a7 sample_threadx.c
-arm-none-eabi-gcc -c -g -mcpu=cortex-a7 startup.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a7 MP_GIC.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a7 MP_Mutexes.S
-arm-none-eabi-gcc -c -g -mcpu=cortex-a7 v7.S
-arm-none-eabi-gcc -T sample_threadx.ld --specs=nosys.specs -e Vectors -o sample_threadx.out MP_GIC.o MP_Mutexes.o sample_threadx.o startup.o v7.o tx.a -Wl,-M > sample_threadx.map
+
+# this script builds the ThreadX sample image for the Cortex-A7 SMP port using
+# GNU toolchain or llvm/clang toolchain (defaults to GNU).
+: "${TOOLCHAIN:=gnu}"
+case "${TOOLCHAIN}" in
+    gnu)
+        CC="arm-none-eabi-gcc"
+        TARGET_FLAGS=""
+        # GNU and Clang use different driver syntax for selecting the program's
+        # entry-point symbol.
+        ENTRY_FLAG="-e Vectors"
+        # Bare-metal C libraries require syscall support. GNU uses newlib's nosys stubs
+        # while ATFE requires a semihost library.
+        SYSCALL_LIB="--specs=nosys.specs"
+        ;;
+    atfe)
+        CC="${ATFE_CLANG:-clang}"
+        TARGET_FLAGS="--target=arm-none-eabi"
+        ENTRY_FLAG="-Wl,--entry=Vectors"
+        SYSCALL_LIB="-lsemihost"
+        ;;
+    *)
+        echo "Unknown TOOLCHAIN: ${TOOLCHAIN}" >&2
+        exit 1
+        ;;
+esac
+
+"${CC}" ${TARGET_FLAGS} -c -g -I../../../../common_smp/inc -I../inc -mcpu=cortex-a7 sample_threadx.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 startup.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 MP_GIC.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 MP_Mutexes.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 v7.S
+"${CC}" ${TARGET_FLAGS} \
+    -T sample_threadx.ld \
+    ${SYSCALL_LIB} \
+    ${ENTRY_FLAG} \
+    -o sample_threadx.out \
+    MP_GIC.o MP_Mutexes.o \
+    sample_threadx.o startup.o v7.o tx.a \
+    -Wl,-M > sample_threadx.map
