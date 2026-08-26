@@ -10,7 +10,17 @@ on:
     paths:
       - ".github/workflows/clang_check.yml"
       - "scripts/check_clang.sh"
+      # CMakeLists.txt, cmake/ and common_smp/ were missing until 26 Aug 2026,
+      # so this check did not run when the files it reads changed. The
+      # ports_smp example builds compile common_smp/src and the CMake stage
+      # reads the toolchain file and the top-level project. utility/ is
+      # deliberately absent: the FreeRTOS and POSIX layers under it are not
+      # enabled by any target this workflow builds. Keep this list and
+      # gcc_check.yml's the same.
+      - "CMakeLists.txt"
+      - "cmake/**"
       - "common/**"
+      - "common_smp/**"
       - "ports/**"
       - "ports_arch/**"
       - "ports_module/**"
