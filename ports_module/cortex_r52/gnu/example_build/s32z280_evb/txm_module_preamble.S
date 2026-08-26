@@ -63,6 +63,20 @@
 @   0x02000000  TXM_MODULE_GNU_COMPILER
 @   0x00000001  TXM_MODULE_USER_MODE
 @   0x00000002  TXM_MODULE_MEMORY_PROTECTION
+@
+@ Both option bits are REQUIRED here, unlike on every other module port, and a
+@ preamble that carries either alone is refused by the loader with
+@ TXM_MODULE_INVALID_PROPERTIES.  On PMSAv8-R that is not a policy: the port
+@ programs a module's regions only when both bits are set, the scheduler closes
+@ the kernel's window over module memory before it dispatches a module thread,
+@ and there is no background region to fall back on -- so a module that asked
+@ for user mode without protection would have no mapping at all rather than a
+@ weaker one.  See TXM_MODULE_MANAGER_REQUIRED_OPTIONS in txm_module_port.h.
+@
+@   0x00000004  TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS
+@
+@ is supported and optional.  A module that does not ask for it simply never has
+@ a shared region granted to it.
 
     .equ    MODULE_PROPERTIES,  0x02000003
 

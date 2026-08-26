@@ -124,10 +124,47 @@ The following extensions must also be defined in tx_port.h:
 #define TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS    0x00000004
 
 
-/* Define the supported options for this module.   */
+/* Define the supported options for this module.
+
+   TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS is supported and optional: a module
+   that does not ask for it simply never has a shared region granted to it, and
+   everything else about it works.
+
+   TXM_MODULE_USER_MODE and TXM_MODULE_MEMORY_PROTECTION are supported and
+   REQUIRED, together, which every other module port in the tree leaves at 0.
+   The divergence is a property of PMSAv8-R rather than a policy choice, and the
+   alternative is not a module that runs unprotected -- it is a module that
+   cannot run at all:
+
+     - TXM_MODULE_MANAGER_MODULE_SETUP below programs the eight-entry region
+       table only when both bits are set, so for any other accepted combination
+       the table stays as the load memset it, all zeros.
+
+     - tx_thread_schedule.S closes the kernel's window over the module area
+       before it dispatches a module thread, because PMSAv8-R has no region
+       priority and the window covers the same memory the module's own regions
+       do.  A zeroed table therefore leaves nothing enabled over module memory.
+
+     - There is no background region to fall back on.  Per the Cortex-R52 TRM
+       section 8.2.1, the EL1-controlled background region is used only when the
+       MPU is disabled or when SCTLR.BR is set, and accesses from EL0 are
+       faulted whenever the MPU is enabled.  Neither example board support
+       package sets SCTLR.BR, and a board that did would still not help a
+       User-mode module.
+
+   So a module asking for user mode without protection, or for neither, is
+   accepted by the portable loader, started, and aborts on the fetch of its own
+   first instruction.  Requiring both bits turns that into
+   TXM_MODULE_INVALID_PROPERTIES from txm_module_manager_in_place_load, at the
+   point where the property word can still be corrected.
+
+   Supporting them for real -- a privileged module mapped through the kernel's
+   window, or an unprotected User-mode module -- needs a second mapping path in
+   the scheduler and its own tests.  Until that exists this is the honest
+   contract rather than a restriction.  */
 
 #define TXM_MODULE_MANAGER_SUPPORTED_OPTIONS    (TXM_MODULE_USER_MODE | TXM_MODULE_MEMORY_PROTECTION | TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS)
-#define TXM_MODULE_MANAGER_REQUIRED_OPTIONS     0
+#define TXM_MODULE_MANAGER_REQUIRED_OPTIONS     (TXM_MODULE_USER_MODE | TXM_MODULE_MEMORY_PROTECTION)
 
 
 /* Define offset adjustments according to the compiler used to build the module.  */
@@ -373,6 +410,12 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 
 /* Define the macro to populate the module control block with module port-specific information.
    If memory protection is enabled, set up the MPU registers.
+
+   TXM_MODULE_MANAGER_REQUIRED_OPTIONS makes both tests below true for every
+   module the loader accepts, so the nesting is redundant today.  It is kept
+   because it is the only thing that decides whether the region table is
+   programmed: a future port that learned to map a privileged module would relax
+   REQUIRED_OPTIONS, and this macro is where the second path would go.
 */
 #define TXM_MODULE_MANAGER_MODULE_SETUP(module_instance)                                            \
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_USER_MODE)               \

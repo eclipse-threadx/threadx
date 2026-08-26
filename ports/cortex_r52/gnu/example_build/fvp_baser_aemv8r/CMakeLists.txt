@@ -524,10 +524,17 @@ if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
     )
 
     # ------------------------------------------------------------------------
-    # The manager image.
+    # The manager images.
+    #
+    # Two of them, and everything except the application file is the same, so
+    # the shared part is a list and a function rather than a second copy.  The
+    # duplicate that a copy would create is not a style question here: an image
+    # built with a different set of module manager sources, or without
+    # TX_R52_ENABLE_MPU, would still link and would test something other than
+    # what its name says.
     # ------------------------------------------------------------------------
 
-    add_executable(fvp_module.elf EXCLUDE_FROM_ALL
+    set(TX_R52_MODULE_IMAGE_SRC
         # Board support, shared with the other FVP examples
         ${FVP_DIR}/entry.S
         ${FVP_DIR}/console.c
@@ -561,57 +568,77 @@ if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
         # enter this link.
         ${MOD_FVP}/module_blob.S
 
-        # The application
-        ${MOD_FVP}/sample_threadx_module_manager.c
-
         # The portable module manager
         ${TXM_MANAGER_SRC}
     )
 
-    target_include_directories(fvp_module.elf PRIVATE
-        ${FVP_DIR}
-        ${MOD_DIR}/inc
-        ${CMAKE_SOURCE_DIR}/common_modules/module_manager/inc
-        ${CMAKE_SOURCE_DIR}/common_modules/module_lib/inc
-        ${CMAKE_SOURCE_DIR}/common_modules/inc
-    )
-
-    # TX_R52_ENABLE_MPU is not optional for this image, unlike the AR1 demos
-    # where it is a switch: without protection there is no module boundary to
-    # test, and the manager's load window over the module area is programmed by
-    # mpu_init.  TX_R52_USE_THREADX_IRQ brings up the tick, which the module
-    # needs for the tx_thread_sleep that proves a kernel call returns.
-
-    target_compile_definitions(fvp_module.elf PRIVATE
-        TXM_MODULE_MANAGER
-        TX_R52_USE_THREADX_IRQ
-        TX_R52_ENABLE_MPU
-    )
-
-    target_compile_options(fvp_module.elf PRIVATE -g)
-
     # .incbin searches the assembler's include paths, not the source tree, and
     # demo_module.bin is generated -- so the build directory has to be on that
-    # path or module_blob.S cannot find the image.
+    # path or module_blob.S cannot find the image.  Set on the file rather than
+    # per target, because both images include the same blob the same way.
 
     set_source_files_properties(${MOD_FVP}/module_blob.S PROPERTIES
         OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
         COMPILE_OPTIONS "-Wa,-I${CMAKE_CURRENT_BINARY_DIR}"
     )
 
-    add_dependencies(fvp_module.elf fvp_demo_module_bin)
+    function(threadx_r52_add_module_image target_name application)
 
-    target_link_options(fvp_module.elf PRIVATE
-        -T${MOD_FVP}/link_module.lds
-        -nostartfiles
-        -Wl,-Map=fvp_module.map
-        ${R52_LINK_QUIET_RWX}
-    )
+        add_executable(${target_name} EXCLUDE_FROM_ALL
+            ${TX_R52_MODULE_IMAGE_SRC}
+            ${application}
+        )
 
-    set_target_properties(fvp_module.elf PROPERTIES
-        LINK_DEPENDS ${MOD_FVP}/link_module.lds)
+        target_include_directories(${target_name} PRIVATE
+            ${FVP_DIR}
+            ${MOD_DIR}/inc
+            ${CMAKE_SOURCE_DIR}/common_modules/module_manager/inc
+            ${CMAKE_SOURCE_DIR}/common_modules/module_lib/inc
+            ${CMAKE_SOURCE_DIR}/common_modules/inc
+        )
 
-    target_link_libraries(fvp_module.elf PRIVATE threadx_module)
+        # TX_R52_ENABLE_MPU is not optional for these images, unlike the AR1 demos
+        # where it is a switch: without protection there is no module boundary to
+        # test, and the manager's load window over the module area is programmed by
+        # mpu_init.  TX_R52_USE_THREADX_IRQ brings up the tick, which the module
+        # needs for the tx_thread_sleep that proves a kernel call returns.
+
+        target_compile_definitions(${target_name} PRIVATE
+            TXM_MODULE_MANAGER
+            TX_R52_USE_THREADX_IRQ
+            TX_R52_ENABLE_MPU
+        )
+
+        target_compile_options(${target_name} PRIVATE -g)
+
+        add_dependencies(${target_name} fvp_demo_module_bin)
+
+        target_link_options(${target_name} PRIVATE
+            -T${MOD_FVP}/link_module.lds
+            -nostartfiles
+            -Wl,-Map=${target_name}.map
+            ${R52_LINK_QUIET_RWX}
+        )
+
+        set_target_properties(${target_name} PROPERTIES
+            LINK_DEPENDS ${MOD_FVP}/link_module.lds)
+
+        target_link_libraries(${target_name} PRIVATE threadx_module)
+
+    endfunction()
+
+    # AR2.  What the hardware does about a module that misbehaves.
+
+    threadx_r52_add_module_image(fvp_module.elf
+        ${MOD_FVP}/sample_threadx_module_manager.c)
+
+    # And what the LOADER does about a module whose property word is not the
+    # 0x02000003 every example in the tree ships.  A separate image because four
+    # of its six cases never run a module at all, so it has a different subject
+    # and a different verdict; it shares the blob and nothing else.
+
+    threadx_r52_add_module_image(fvp_module_properties.elf
+        ${MOD_FVP}/sample_threadx_module_properties.c)
 
 endif()
 
@@ -651,6 +678,8 @@ if(FVP_BASER_AEMV8R)
     if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
         threadx_r52_add_fvp_run(fvp_module.elf run-module-r52
             "Running the AR2 module isolation example on FVP_BaseR_AEMv8R...")
+        threadx_r52_add_fvp_run(fvp_module_properties.elf run-module-properties-r52
+            "Running the AR2 module property contract regression on FVP_BaseR_AEMv8R...")
     endif()
 
     # Automated checks.  The runner judges each image by its self-reported
@@ -668,7 +697,7 @@ if(FVP_BASER_AEMV8R)
         # module boundary IS the MPU, and the result line has to reach the
         # runner whichever console the rest of the suite was built with.
         if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
-            list(APPEND R52_TEST_IMAGES fvp_module.elf)
+            list(APPEND R52_TEST_IMAGES fvp_module.elf fvp_module_properties.elf)
         endif()
 
         enable_testing()

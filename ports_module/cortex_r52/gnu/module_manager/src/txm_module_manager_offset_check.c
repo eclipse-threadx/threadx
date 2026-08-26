@@ -60,18 +60,43 @@
 /* These must match the .equ values at the top of tx_thread_schedule.S.  */
 
 #define TXM_THREAD_MODULE_INSTANCE      0x94
-#define TXM_INSTANCE_DATA_START         0x2C
+#define TXM_INSTANCE_PROPERTY_FLAGS     0x0C
 #define TXM_INSTANCE_MPU_REGISTERS      0x64
+
+/* The offset the scheduler no longer reads, kept as its own constant because the
+   assert below still pins it.  */
+
+#define TXM_INSTANCE_DATA_START         0x2C
 
 _Static_assert(offsetof(TX_THREAD, tx_thread_module_instance_ptr)
                    == TXM_THREAD_MODULE_INSTANCE,
                "tx_thread_schedule.S TXM_THREAD_MODULE_INSTANCE no longer matches "
                "TX_THREAD; the scheduler would read the wrong word");
 
+/* The field the scheduler decides protection on.  Reading a word that happens to
+   have both low bits set would program a region table for a module that has
+   none; reading one that does not would send a protected module down the path
+   that closes the kernel's window and enables nothing in its place.  Neither
+   shows up as a wrong number anywhere -- one is a fault in a module that asked
+   correctly, the other is the silent absence of one.  */
+
+_Static_assert(offsetof(TXM_MODULE_INSTANCE, txm_module_instance_property_flags)
+                   == TXM_INSTANCE_PROPERTY_FLAGS,
+               "tx_thread_schedule.S TXM_INSTANCE_PROPERTY_FLAGS no longer matches "
+               "TXM_MODULE_INSTANCE; the protection check would test the wrong field");
+
+/* The data start, which the assembly stopped reading when the protection check
+   moved to the property flags.  Kept, because the two offsets pin opposite ends
+   of the same region of TXM_MODULE_INSTANCE -- property flags is its fourth word
+   and data start its twelfth -- and a reordering that moved either without
+   moving the other is exactly what this file exists to catch.  It costs no
+   code.  */
+
 _Static_assert(offsetof(TXM_MODULE_INSTANCE, txm_module_instance_data_start)
                    == TXM_INSTANCE_DATA_START,
-               "tx_thread_schedule.S TXM_INSTANCE_DATA_START no longer matches "
-               "TXM_MODULE_INSTANCE; the protection check would test the wrong field");
+               "TXM_MODULE_INSTANCE has been reordered around "
+               "txm_module_instance_data_start; check every offset in this file "
+               "against tx_thread_schedule.S");
 
 _Static_assert(offsetof(TXM_MODULE_INSTANCE, txm_module_instance_mpu_registers)
                    == TXM_INSTANCE_MPU_REGISTERS,

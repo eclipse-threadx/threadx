@@ -34,8 +34,17 @@
 @ tx_thread_vfp_enable ahead of the module fields in TX_THREAD_EXTENSION_2.
 
     .equ    TXM_THREAD_MODULE_INSTANCE,     0x94
-    .equ    TXM_INSTANCE_DATA_START,        0x2C
+    .equ    TXM_INSTANCE_PROPERTY_FLAGS,    0x0C
     .equ    TXM_INSTANCE_MPU_REGISTERS,     0x64
+
+@ The property bits that say a module's region table was programmed:
+@ TXM_MODULE_USER_MODE and TXM_MODULE_MEMORY_PROTECTION, which
+@ TXM_MODULE_MANAGER_MODULE_SETUP requires together before it calls
+@ _txm_module_manager_mm_register_setup.  The instance carries the whole
+@ preamble word, compiler field included, so the two bits are masked out rather
+@ than compared against.
+
+    .equ    TXM_MODULE_PROTECTED_MASK,      0x03
 
 @ Every thread in this port runs on the User-banked stack pointer: kernel threads
 @ in System mode, module threads in User mode, and those two modes share SP_usr
@@ -207,9 +216,26 @@ __tx_thread_schedule_loop:
     LDR     r1, [r0, #TXM_THREAD_MODULE_INSTANCE]   @ Pickup module instance pointer
     CMP     r1, #0                                  @ Is this a module thread?
     BEQ     __tx_module_regions_off                 @ No, close the module regions
-    LDR     r2, [r1, #TXM_INSTANCE_DATA_START]      @ Pickup module data start
-    CMP     r2, #0                                  @ Is protection configured?
-    BEQ     __tx_module_regions_off                 @ No, close the module regions
+@
+@    /* Ask the PROPERTY FLAGS whether this module has a region table, not the
+@       data start.  The data start is set for every module the loader accepts,
+@       protected or not, so testing it says only "a module was loaded" -- and
+@       the branch not taken here is the branch that closes the kernel's window
+@       over module memory.  Programming a zeroed table and then closing the
+@       window leaves an unprotected module with no mapping at all rather than
+@       with a weaker one.
+@
+@       TXM_MODULE_MANAGER_REQUIRED_OPTIONS makes this test redundant: the loader
+@       refuses anything that does not have both bits.  It is written anyway so
+@       that the scheduler depends on a field it can see rather than on a loader
+@       invariant it cannot, and so that relaxing REQUIRED_OPTIONS degrades to
+@       "the module runs under the kernel's window" instead of to a fault on its
+@       first instruction.  */
+@
+    LDR     r2, [r1, #TXM_INSTANCE_PROPERTY_FLAGS]  @ Pickup module property flags
+    AND     r2, r2, #TXM_MODULE_PROTECTED_MASK      @ Keep user mode and protection
+    CMP     r2, #TXM_MODULE_PROTECTED_MASK          @ Both asked for?
+    BNE     __tx_module_regions_off                 @ No, close the module regions
 @
 @    /* Eight regions, written directly rather than through PRSELR.  CRm and opc2
 @       are encoded in the instruction, not held in a register, so this cannot be
@@ -217,7 +243,28 @@ __tx_thread_schedule_loop:
 @       barrier pair at the end, where PRSELR would need an ISB per region.
 @
 @       Regions 8 and 9 are CRm c12, 10 and 11 are c13, 12 and 13 are c14, 14 and
-@       15 are c15.  Even regions use opc2 0 and 1, odd ones 4 and 5.  */
+@       15 are c15.  Even regions use opc2 0 and 1, odd ones 4 and 5.
+@
+@       ON THE ORDER, which is worth stating because it looks wrong.  These eight
+@       regions describe memory the kernel's window over the module area also
+@       describes, and that window is not closed until after the last write below.
+@       Between the two, the programmed map holds an overlap -- the thing the
+@       whole design exists to avoid.
+@
+@       It is not reachable.  Nothing in that window accesses module memory:
+@       every instruction fetched between here and the close comes from the
+@       kernel's own code region, and the only data read is the region table
+@       itself, which lives in the module instance the application supplied and
+@       not in the memory being described.  An overlap that no access hits
+@       produces no fault; PMSAv8-R resolves a region hit per access, not per
+@       program.  The barrier pair at the end is therefore placed for the
+@       transition as a whole rather than to shorten this window, and adding one
+@       in the middle would not make anything safer.
+@
+@       That does put one requirement on the application: a TXM_MODULE_INSTANCE
+@       must not live inside the module area.  Both examples keep theirs in .bss,
+@       which is inside the kernel's data region and outside every region a
+@       module is given.  */
 @
     ADD     r1, r1, #TXM_INSTANCE_MPU_REGISTERS     @ Address of the region table
 @
