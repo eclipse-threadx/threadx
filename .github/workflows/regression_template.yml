@@ -38,6 +38,33 @@ on:
         default: 'merged'
         required: false
         type: string
+      # The lower and upper threshold percentages handed to
+      # CodeCoverageSummary, lower first. The lower one is a hard floor: the
+      # step below sets fail_below_min, so a run whose merged line rate falls
+      # under it turns the job red.
+      #
+      # Both must be whole numbers. Probed against the pinned action on a
+      # runner, 26 Aug 2026: '99.9 100' is rejected with
+      # 'System.ArgumentException - Threshold parameter set incorrectly.' and
+      # the step fails whether or not fail_below_min is set, because the action
+      # parses each half with an integer parse. So a floor can be 99 or 100 and
+      # nothing between, and the intended 99.9 is not expressible.
+      #
+      # The floor is compared against the LINE rate only -- not the branch
+      # rate, and not the lower of the two. Probed on the same run: the
+      # ThreadX report at 100.00% lines and 77.67% branches passes a floor of
+      # 99. Worth knowing, because branch coverage is around 78% in both
+      # suites while AGENTS.md asks for 100%, and a floor set from the
+      # headline line figure says nothing about it.
+      #
+      # Each suite sets its own in regression_test.yml, because they do not
+      # sit at the same figure. The default here is the action's own, low
+      # enough to be no floor at all in practice -- a caller that collects
+      # coverage is expected to name its number.
+      coverage_thresholds:
+        default: '50 75'
+        required: false
+        type: string
       skip_deploy:
         default: false
         required: false
@@ -128,6 +155,18 @@ jobs:
     # so a cancelled run still stops promptly -- the same idiom the
     # deploy_code_coverage job below already uses. The ${{ }} is required: a bare
     # ! opens a YAML tag, and the expression will not parse without it.
+    #
+    # fail_below_min turns the summary into a gate. Until now coverage could
+    # fall from any figure to any other and no check went red, against an
+    # AGENTS.md that asks for 100% -- a stated requirement measured with a
+    # gauge that could not fail.
+    #
+    # One thing the floor does not defend, and it is the likeliest way for
+    # coverage to break: an empty report reads as 100%. gcovr writes
+    # line-rate="1.0" beside lines-valid="0" when it finds no data, and the
+    # action reports 'Line Rate = 100% (0 / 0)' and passes any floor --
+    # probed on a runner, 26 Aug 2026. The check that catches that is the
+    # emptiness assertion in each suite's coverage.sh, not this one.
     - name: Generate Code Coverage Results Summary
       if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
@@ -137,6 +176,8 @@ jobs:
         badge: true
         hide_complexity: true
         output: file
+        thresholds: ${{ inputs.coverage_thresholds }}
+        fail_below_min: true
 
     - name: Write Code Coverage Summary
       if: ${{ !cancelled() && (!inputs.skip_coverage) }}
@@ -239,13 +280,15 @@ jobs:
     # merge-multiple puts the contents of both coverage artifacts directly
     # into coverage_report rather than under a directory named for each
     # artifact. Each one holds a single directory named for its suite,
-    # ThreadX or SMP, renamed from default_build_coverage by the "Prepare
-    # Coverage GitHub Pages" step, so the merge yields exactly the two
-    # suite directories the deploy expects, and the artifact name -- with
-    # its timestamp -- stops appearing in the published path at all.
+    # ThreadX or SMP, renamed from merged by the "Prepare Coverage GitHub
+    # Pages" step, so the merge yields exactly the two suite directories the
+    # deploy expects, and the artifact name -- with its timestamp -- stops
+    # appearing in the published path at all.
     #
-    # The two artifacts also each carry a default_build_coverage.xml, and
-    # the merge means one overwrites the other. That file is consumed by
+    # The two artifacts also each carry a merged.xml -- it was
+    # default_build_coverage.xml until #665 instrumented every configuration
+    # and unioned them -- and the merge means one overwrites the other.
+    # Verified on the runner: both hold merged.xml. That file is consumed by
     # CodeCoverageSummary back in run_tests and is not read here, so this is
     # untidy rather than wrong.
     - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1

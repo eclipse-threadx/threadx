@@ -37,6 +37,17 @@ jobs:
       cmake_path: ./test/tx/cmake
       result_affix: ThreadX
       skip_deploy: true
+      # 99 is the tightest floor available below this suite's figure. The
+      # merged report reads 4503/4503 lines -- 100.00% -- on the dev push run
+      # of #666, and two local runs of the same green tree came in at 100.00%
+      # and 99.98%: tx_thread_system_resume.c:529 is reached by timing rather
+      # than by construction and flaps between runs, and #666 could not reach
+      # it deliberately. So a floor of 100 is a check that fails on a race --
+      # probed against the pinned action, 4502/4503 fails a floor of 100 and
+      # clears one of 99 -- and the thresholds are integers, so there is
+      # nothing between the two. Ratchet this to 100 if 529 is ever covered
+      # by construction.
+      coverage_thresholds: '99 100'
   smp:
     permissions:
       contents: read
@@ -52,6 +63,15 @@ jobs:
       cmake_path: ./test/smp/cmake
       result_affix: SMP
       skip_deploy: true
+      # Lower than ThreadX's, because this suite is: the merged report reads
+      # 5114/5178 lines -- 98.76% -- on the same run, with 64 uncovered lines
+      # across 11 files of common_smp/src. #666 closed the equivalent gaps in
+      # common/src only, so common_smp still carries them, plus a family of
+      # its own in the *_delete.c teardown paths and tx_byte_pool_search.c.
+      # A shared floor of 99 would therefore red-wall this job on every run
+      # while ThreadX passed -- probed against the pinned action. Raise this
+      # towards 99 as those lines are covered.
+      coverage_thresholds: '98 100'
   freertos:
     permissions:
       contents: read
