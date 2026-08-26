@@ -39,6 +39,11 @@
 #      body in ports/cortex_m4/ac6/inc/tx_port.h, which placed statements
 #      outside any function. See issue 569.
 #
+#   4. Lowercase .s under a gnu tree. GAS preprocesses .S and not .s, so a
+#      .s file's #ifdef blocks are assembled whichever way the macro is set.
+#      Twenty-nine files were in that state, including one non-module SMP
+#      kernel port, and only one of them failed to assemble.
+#
 # The last section reports, without failing, on port families that have no copy
 # script and so cannot be checked for reproducibility.
 #
@@ -197,7 +202,56 @@ done < <(find ports ports_arch ports_module ports_smp -name "*.h" -type f \
 [ "$orphans" -eq 0 ] && say "  ok: no port header carries code at file scope"
 
 # --------------------------------------------------------------------------
-# 4. Report only: families with no copy script.
+# 4. GNU assembly that uses the preprocessor must be named .S, not .s.
+# --------------------------------------------------------------------------
+# GAS runs the C preprocessor on .S and not on .s. In a .s file every line
+# beginning with # is just a comment, so nothing fails and nothing is
+# substituted: a #define constant reaches the assembler as an undefined
+# symbol, an #ifdef block is assembled whatever the macro says, and an
+# #if/#else pair emits *both* branches. The port silently ignores its own
+# feature macros.
+#
+# Measured 26 Aug 2026, when a corrected glob in check_clang.sh first offered
+# the module ports to a compiler. Twenty-nine files were affected, and the
+# damage was not only cosmetic:
+#
+#   ports_smp/cortex_a7_smp/gnu/src/tx_thread_smp_unprotect.s -- the only .s
+#   in a directory of twenty-one .S -- wrote the caller's LR into the
+#   protection structure on every unprotect, a store guarded by
+#   TX_MPCORE_DEBUG_ENABLE, and returned through both BX lr and MOV pc, lr.
+#
+#   ports_module/cortex_m33/.../tx_thread_stack_build.s emitted both arms of
+#   an #ifdef TX_SINGLE_MODE_SECURE, so the second LR value overwrote the
+#   first and the secure build got the non-secure one.
+#
+#   ports_module/cortex_a7/.../tx_thread_schedule.s did fail to assemble, on
+#   GCC 14.3 as well as on LLVM, because #define SYS_MODE was never expanded.
+#   That is the only one of the twenty-nine any compiler complained about.
+#
+# Only the gnu trees are checked. The IAR, Arm Compiler 5 and Keil assemblers
+# preprocess .s themselves, so the same combination is correct there, and
+# around three hundred files in this repository depend on it.
+say ""
+say "== GNU assembly using the preprocessor is named .S =="
+
+lowercase=0
+while IFS= read -r f; do
+    first="$(grep -nE '^[ \t]*#[ \t]*(define|include|if|ifdef|ifndef|else|elif|endif|undef)\b' \
+             "$f" | head -1)"
+    if [ -n "$first" ]; then
+        fail "$f: preprocessor directive in a .s file, which GAS does not preprocess"
+        echo "        line $first"
+        echo "        Rename the file to .S. Check the callers first: a build script"
+        echo "        that already names it .S is the usual sign of how this happened."
+        lowercase=$((lowercase + 1))
+    fi
+done < <(find ports ports_arch ports_module ports_smp -name "*.s" -type f \
+         -path "*/gnu/*" 2>/dev/null | sort)
+
+[ "$lowercase" -eq 0 ] && say "  ok: no .s file under a gnu tree uses the preprocessor"
+
+# --------------------------------------------------------------------------
+# 5. Report only: families with no copy script.
 # --------------------------------------------------------------------------
 # These are maintained by hand, so a fix applied to one toolchain can silently
 # miss the others. Nothing here fails the run; it is a prompt to look.

@@ -211,7 +211,13 @@ say ""
 say "== Assembly sources of every Arm gnu port =="
 
 total=0
-for dir in ports/*/gnu/src ports_smp/*/gnu/src ports_module/*/gnu/src; do
+# The module ports keep their assembly in module_manager/src, not src. This
+# glob read ports_module/*/gnu/src until 26 Aug 2026; that directory does not
+# exist, the [ -d ] guard below skipped it in silence, and 116 files across
+# nine Arm module ports were assembled by no check with either compiler. The
+# count went from 724 to 840 when the path was corrected, and three of the new
+# files did not assemble.
+for dir in ports/*/gnu/src ports_smp/*/gnu/src ports_module/*/gnu/module_manager/src; do
     [ -d "$dir" ] || continue
     core="$(echo "$dir" | cut -d/ -f2)"
     spec="${PORT_TARGET[$core]:-}"
@@ -246,7 +252,13 @@ say "== Assembly behind feature macros =="
 for macro in $FEATURE_MACROS; do
     macro_total=0
     macro_bad=0
+    # The module ports are named here for the same reason as in the stage
+    # above: they were absent from this list until 26 Aug 2026 and so read as
+    # covered. Adding them found the Cortex-M23 module manager carrying the
+    # very POP {r0, lr} this comment describes, six months after the same fix
+    # landed in its non-module sibling.
     for src in $(grep -rl "$macro" ports/*/gnu/src/*.S ports_smp/*/gnu/src/*.S \
+                 ports_module/*/gnu/module_manager/src/*.S \
                  2>/dev/null | sort); do
         core="$(echo "$src" | cut -d/ -f2)"
         spec="${PORT_TARGET[$core]:-}"
