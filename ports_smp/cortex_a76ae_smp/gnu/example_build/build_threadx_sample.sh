@@ -44,6 +44,23 @@ case "${TOOLCHAIN}" in
         # initialise_monitor_handles that startup.S calls.
         SYSCALL_LIB="--specs=rdimon.specs"
         SEMIHOST_STUB=""
+        # crti.o defines _init and _fini; crtn.o closes them. The link below
+        # passes -nostartfiles, which is right for a port with its own reset
+        # path but also drops these two, and startup.S calls
+        # __libc_init_array, whose newlib implementation calls _init. Without
+        # them every AArch64 sample failed to link:
+        #
+        #   libg.a(libc_a-init.o): in function `__libc_init_array':
+        #       undefined reference to `_init'
+        #   relocation truncated to fit: R_AARCH64_CALL26 against undefined
+        #       symbol `_init'
+        #
+        # crti.o must precede every other .init contribution and crtn.o must
+        # follow all of them, which is why they bracket the object list rather
+        # than sitting with the other flags. The AArch32 scripts need none of
+        # this: they use nosys.specs and never reach __libc_init_array.
+        CRT_BEGIN="$("${CC}" -mcpu="${cpu}" -print-file-name=crti.o)"
+        CRT_END="$("${CC}" -mcpu="${cpu}" -print-file-name=crtn.o)"
         ;;
     atfe)
         CC="${ATFE_CLANG:-clang}"
@@ -52,6 +69,11 @@ case "${TOOLCHAIN}" in
         # picolibc has no initialise_monitor_handles, and neither does the
         # toolchain's semihosting library, so the weak stub stands in for it.
         SEMIHOST_STUB="sample_threadx/semihost_stub.S"
+        # Deliberately empty. picolibc's __libc_init_array does not call _init,
+        # so these images link today and adding crti.o would change a working
+        # link for no reason.
+        CRT_BEGIN=""
+        CRT_END=""
         ;;
     *)
         echo "Unknown TOOLCHAIN '${TOOLCHAIN}'; expected gnu or atfe" >&2
@@ -80,7 +102,7 @@ done
 "${CC}" ${TARGET_FLAGS} -g -mcpu="${cpu}" -nostartfiles \
     -T sample_threadx/sample_threadx.ld ${SYSCALL_LIB} \
     -o sample_threadx.out -Wl,-Map=sample_threadx.map \
-    ${objects} tx.a
+    ${CRT_BEGIN} ${objects} tx.a ${CRT_END}
 
 rm -f ${objects}
 
