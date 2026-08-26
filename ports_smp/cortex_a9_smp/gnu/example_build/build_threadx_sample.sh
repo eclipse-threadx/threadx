@@ -29,15 +29,16 @@ esac
 
 "${CC}" ${TARGET_FLAGS} -c -g -I../../../../common_smp/inc -I../inc -mcpu=cortex-a9 sample_threadx.c
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 startup.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 crt0.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 MP_GIC.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 MP_SCU.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 MP_Mutexes.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 MP_PrivateTimer.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a9 v7.S
-"${CC}" ${TARGET_FLAGS} -g -mcpu=cortex-a9 \
+"${CC}" ${TARGET_FLAGS} -g -mcpu=cortex-a9 -nostartfiles \
     -T sample_threadx.ld \
     ${ENTRY_FLAG} \
     ${SYSCALL_LIB} \
     -o sample_threadx.out MP_PrivateTimer.o MP_GIC.o MP_Mutexes.o MP_SCU.o \
-    sample_threadx.o startup.o v7.o tx.a \
+    sample_threadx.o startup.o crt0.o v7.o tx.a \
     -Wl,-M > sample_threadx.map

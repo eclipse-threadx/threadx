@@ -30,14 +30,15 @@ esac
 
 "${CC}" ${TARGET_FLAGS} -c -g -I../../../../common_smp/inc -I../inc -mcpu=cortex-a7 sample_threadx.c
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 startup.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 crt0.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 MP_GIC.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 MP_Mutexes.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 v7.S
-"${CC}" ${TARGET_FLAGS} -g -mcpu=cortex-a7 \
+"${CC}" ${TARGET_FLAGS} -g -mcpu=cortex-a7 -nostartfiles \
     -T sample_threadx.ld \
     ${SYSCALL_LIB} \
     ${ENTRY_FLAG} \
     -o sample_threadx.out \
     MP_GIC.o MP_Mutexes.o \
-    sample_threadx.o startup.o v7.o tx.a \
+    sample_threadx.o startup.o crt0.o v7.o tx.a \
     -Wl,-M > sample_threadx.map
