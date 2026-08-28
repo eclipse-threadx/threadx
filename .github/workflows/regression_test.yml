@@ -63,15 +63,22 @@ jobs:
       cmake_path: ./test/smp/cmake
       result_affix: SMP
       skip_deploy: true
-      # Lower than ThreadX's, because this suite is: the merged report reads
-      # 5114/5178 lines -- 98.76% -- on the same run, with 64 uncovered lines
-      # across 11 files of common_smp/src. #666 closed the equivalent gaps in
-      # common/src only, so common_smp still carries them, plus a family of
-      # its own in the *_delete.c teardown paths and tx_byte_pool_search.c.
-      # A shared floor of 99 would therefore red-wall this job on every run
-      # while ThreadX passed -- probed against the pinned action. Raise this
-      # towards 99 as those lines are covered.
-      coverage_thresholds: '98 100'
+      # Raised from 98 with the four tests that closed 53 of the 64 lines this
+      # comment used to list: the merged report goes from 5114/5178 -- 98.76% --
+      # to 5167/5178, 99.79%. A floor of 99 needs 5127, so there are 40 lines of
+      # headroom against a numerator measured flickering by two between runs.
+      #
+      # Still not 100, and not because the last eleven lines were skipped. Eight
+      # are tx_byte_pool_search.c's ownership delay loop, which needs another
+      # core to take the pool inside the window the search opens when it drops
+      # protection every twenty blocks; this port serialises all four cores on
+      # one pthread mutex and the thread that releases it wins the re-acquire
+      # every time -- measured over 180,003 windows, zero handovers. The other
+      # three are in tx_thread_smp_utilities.c: one is a range guard placed
+      # after the shift it is meant to guard, so reaching it needs undefined
+      # behaviour, and two are a priority-inheritance branch that needs the
+      # mutex owner genuinely executing on another core. See T17.
+      coverage_thresholds: '99 100'
   freertos:
     permissions:
       contents: read

@@ -25,6 +25,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_block_memory_thread_terminate_test.c
     ${SOURCE_DIR}/threadx_byte_memory_basic_test.c
     ${SOURCE_DIR}/threadx_byte_memory_information_test.c
+    ${SOURCE_DIR}/threadx_byte_memory_long_search_test.c
     ${SOURCE_DIR}/threadx_byte_memory_prioritize_test.c
     ${SOURCE_DIR}/threadx_byte_memory_suspension_test.c
     ${SOURCE_DIR}/threadx_byte_memory_suspension_timeout_test.c
@@ -52,6 +53,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_mutex_proritize_test.c
     ${SOURCE_DIR}/threadx_mutex_suspension_timeout_test.c
     ${SOURCE_DIR}/threadx_mutex_thread_terminate_test.c
+    ${SOURCE_DIR}/threadx_object_delete_suspension_test.c
     ${SOURCE_DIR}/threadx_queue_basic_eight_word_test.c
     ${SOURCE_DIR}/threadx_queue_basic_four_word_test.c
     ${SOURCE_DIR}/threadx_queue_basic_one_word_test.c
@@ -95,6 +97,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_thread_create_preemption_threshold_test.c
     ${SOURCE_DIR}/threadx_thread_delayed_suspension_test.c
     ${SOURCE_DIR}/threadx_thread_information_test.c
+    ${SOURCE_DIR}/threadx_thread_misaligned_stack_test.c
     ${SOURCE_DIR}/threadx_thread_multi_level_preemption_threshold_test.c
     ${SOURCE_DIR}/threadx_thread_multiple_non_current_test.c
     ${SOURCE_DIR}/threadx_thread_multiple_sleep_test.c
@@ -124,6 +127,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_multiple_test.c
     ${SOURCE_DIR}/threadx_timer_simple_test.c
     ${SOURCE_DIR}/threadx_trace_basic_test.c
+    ${SOURCE_DIR}/threadx_trace_entry_update_test.c
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
 
 add_custom_command(
