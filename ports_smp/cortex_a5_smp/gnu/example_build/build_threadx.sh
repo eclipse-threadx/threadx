@@ -37,7 +37,7 @@ case "${TOOLCHAIN}" in
 esac
 
 rm -f tx.a
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a5 -x assembler-with-cpp tx_initialize_low_level.s
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a5 tx_initialize_low_level.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a5 ../src/tx_thread_context_restore.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a5 ../src/tx_thread_context_save.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a5 ../src/tx_thread_interrupt_control.S

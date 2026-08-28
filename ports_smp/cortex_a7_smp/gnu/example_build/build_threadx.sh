@@ -58,7 +58,7 @@ rm -f tx.a
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_low_level_initialize.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_protect.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_time_get.S
-"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -x assembler-with-cpp ../src/tx_thread_smp_unprotect.s
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_unprotect.S
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_allocate.c
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_cleanup.c
 "${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_create.c
