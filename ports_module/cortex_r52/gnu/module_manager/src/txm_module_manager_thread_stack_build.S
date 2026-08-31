@@ -215,16 +215,25 @@ _txm_module_manager_thread_stack_build:
 @       unprivileged.  Copying that offset would have built cleanly and started
 @       module threads in the wrong mode.  */
 @
-    MRS     r1, CPSR                        @ Pickup CPSR
-    BIC     r1, r1, #CPSR_MASK              @ Mask mode bits of CPSR
+    MRS     r3, CPSR                        @ Pickup CPSR
+    BIC     r3, r3, #CPSR_MASK              @ Mask mode bits of CPSR
 @
-    TST     r0, #1                          @ Was a Thumb entry point requested?
-    ORRNE   r1, r1, #THUMB_MASK             @ Yes, start in Thumb state
+@       The state bit comes from bit 0 of the entry pointer, so the test has to
+@       happen while r1 still holds it -- CPSR is staged in r3 and the user mode
+@       flag is read into r1 afterwards, the same register allocation the
+@       Cortex-R4 module port uses.  The pointer stored as the initial PC above
+@       is the unmasked one on purpose: on the A and R profiles the saved T bit
+@       selects the state on exception return and the low bit of the restored PC
+@       is ignored, so masking it would be pointless and clearing it would break
+@       an interworking entry.
 @
-    LDR     r3, [r0, #THREAD_MODULE_USER_MODE]  @ Pickup the requested user mode
-    TST     r3, #1
-    ORREQ   r3, r1, #SYS_MODE_BITS          @ Clear: privileged, System mode
-    ORRNE   r3, r1, #USR_MODE_BITS          @ Set: unprivileged, User mode
+    TST     r1, #1                          @ Was a Thumb entry point requested?
+    ORRNE   r3, r3, #THUMB_MASK             @ Yes, start in Thumb state
+@
+    LDR     r1, [r0, #THREAD_MODULE_USER_MODE]  @ Pickup the requested user mode
+    TST     r1, #1
+    ORREQ   r3, r3, #SYS_MODE_BITS          @ Clear: privileged, System mode
+    ORRNE   r3, r3, #USR_MODE_BITS          @ Set: unprivileged, User mode
     STR     r3, [r2, #4]                    @ Store initial CPSR
 @
 @    /* Setup stack pointer.  */
