@@ -49,6 +49,12 @@
 /*    inherited from the Armv8-M port says 32, and TXM_MODULE_MPU_ALIGNMENT*/
 /*    below is what is actually enforced.                                 */
 /*                                                                        */
+/*    The length must describe at least one byte and must not run off the */
+/*    top of the address space; either is TX_SIZE_ERROR. It need not be a */
+/*    multiple of the granule, but the hardware grant is rounded up to    */
+/*    one -- see the limit-address comment below for what the caller is   */
+/*    therefore agreeing to hand over.                                    */
+/*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
 /*    module_instance                   Module instance pointer           */
@@ -137,7 +143,37 @@ ULONG   shared_index;
         return(TXM_MODULE_ALIGNMENT_ERROR);
     }
 
-    /* At this point, we have a valid address. Set up MPU registers.  */
+    /* Reject a grant that describes no memory, and one whose inclusive end
+       address runs off the top of the address space.  Both produce a limit
+       BELOW the base: a zero length computes address - 1 outright, and a
+       wrapping end computes some low address.  Either would be programmed into
+       PRLAR, returned as TX_SUCCESS, and would consume one of the five shared
+       entries for a region the hardware cannot honour.
+
+       Checked here rather than at the limit computation because a refused grant
+       must cost the caller nothing -- no register written and no entry spent --
+       and the entry count is incremented further down.
+
+       The wrap test is written against the room left above the base rather than
+       as (address + length) < address, which would have to commit the overflow
+       in order to detect it.  length is known non-zero by then, so length - 1 is
+       the number of bytes above the base the grant needs, and a grant ending
+       exactly at the top of memory needs precisely the room there is and is
+       accepted.
+
+       TX_SIZE_ERROR for both: the portable API already defines it as the size
+       fault, so neither case needs a new return code for callers to handle.  */
+
+    if ((length == 0UL) || ((length - 1UL) > (((ULONG) ~0UL) - address)))
+    {
+        /* Release the protection mutex.  */
+        _tx_mutex_put(&_txm_module_manager_mutex);
+
+        /* Return size error.  */
+        return(TX_SIZE_ERROR);
+    }
+
+    /* At this point, we have a valid address and length. Set up MPU registers.  */
 
     /* Pick up index into shared memory entries.  */
     shared_index = TXM_MODULE_MPU_SHARED_INDEX + module_instance -> txm_module_instance_shared_memory_count;
@@ -157,7 +193,24 @@ ULONG   shared_index;
        of the attributes: AttrIndx comes out 7 instead of 0, which selects an
        unwritten MAIR byte and gives the shared region Device memory type, and
        the two RES0 bits are set as well.  The region still works well enough to
-       pass a functional test, which is why this was worth writing down.  */
+       pass a functional test, which is why this was worth writing down.
+
+       What the mask does NOT do is round the grant down.  PRLAR describes an
+       inclusive end of LIMIT:0x3F, so the smallest region the hardware can
+       express is one 64-byte granule and the effective grant is the requested
+       range rounded UP to the next granule boundary: a one-byte grant hands the
+       module 64 bytes, a 65-byte grant hands it 128.  The caller owns every byte
+       of that rounded range and must intend the module to have it -- there is no
+       length this function can accept that gives the module less.
+
+       The length recorded below, and therefore the length
+       _txm_module_manager_inside_data_check() validates kernel-call pointers
+       against, is the UNROUNDED one the caller asked for.  So a module can reach
+       the surplus bytes directly while a kernel call carrying a pointer into
+       them is refused.  That asymmetry is deliberate and inherited: every other
+       module port computes the same rounded-up grant, and one that did not would
+       reject code moved from an Armv8-M part.  Pass a granule multiple and the
+       two lengths agree.  */
     module_instance -> txm_module_instance_mpu_registers[shared_index].txm_module_mpu_region_limit_address = ((address + length - 1) & TXM_MODULE_MPU_ADDRESS_MASK) | TXM_MODULE_ATTRIBUTE_INDEX | TXM_MODULE_ATTRIBUTE_REGION_ENABLE;
 
     /* Keep track of shared memory address and length in module instance.  */

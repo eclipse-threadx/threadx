@@ -211,6 +211,25 @@ extern unsigned char    __module_status_end__;
 
 #define MODULE_SHARED_GRANTS        (MODULE_STATUS_GRANULES - 1UL)
 
+/* The two grants that must be refused on size, and the one that must not be.
+
+   The top granule is the boundary case of the overflow guard: its inclusive end
+   is exactly 0xFFFFFFFF, so a guard written as (address + length) < address, or
+   one that tested the end against the top with the wrong comparison, would
+   refuse a perfectly legal grant.  The wrapping grant starts at the same place
+   and asks for twice the room that is left.
+
+   Neither address is ever programmed into the MPU: the guard probes run on an
+   instance that is loaded and unloaded without being started, so the accepted
+   grant is recorded in the instance and nothing more.  That matters more here
+   than on the model -- the top of the address space on this part is peripheral
+   space the boot regions already cover, and two enabled regions over one
+   address is a translation fault waiting for whoever reads it.  */
+
+#define MODULE_TOP_GRANULE_ADDRESS  (0xFFFFFFFFUL - (TXM_MODULE_MPU_ALIGNMENT - 1UL))
+#define MODULE_TOP_GRANULE_LENGTH   TXM_MODULE_MPU_ALIGNMENT
+#define MODULE_WRAP_LENGTH          (2UL * TXM_MODULE_MPU_ALIGNMENT)
+
 #define MODULE_GRANULE_ADDRESS(index)                                          \
     (MODULE_STATUS_ADDRESS + ((index) * MODULE_STATUS_LENGTH))
 
@@ -351,6 +370,34 @@ typedef struct PASS_RESULT_STRUCT
 } PASS_RESULT;
 
 static PASS_RESULT      pass_results[MODULE_PASSES];
+
+/* The shared-grant size guards, which are about the manager and not about the
+   module.  They need a LOADED instance and nothing else, so they get their own
+   -- loaded after the four passes are done with the pool, never started, and
+   unloaded again.  Not folded into the shared pass because that pass grants
+   every entry the port has and has none to spare for a grant that is meant to
+   succeed, and not folded into one of the other three because a grant they
+   accepted would be programmed into the MPU when their module ran.
+
+   The byte pool reuses a freed block, so this instance's data lands on top of
+   an earlier pass's.  Harmless: it never runs, and every pass has been read
+   back at its own pass_done() long before this loads.  */
+
+typedef struct GUARD_RESULT_STRUCT
+{
+    ULONG   guard_load_status;
+    ULONG   guard_count_start;      /* entries held before any probe       */
+    ULONG   guard_zero_status;      /* refusing a zero-length grant        */
+    ULONG   guard_count_zero;       /* entries held after it               */
+    ULONG   guard_wrap_status;      /* refusing a grant that runs off 4 GB */
+    ULONG   guard_count_wrap;
+    ULONG   guard_top_status;       /* accepting one that ends exactly at it */
+    ULONG   guard_count_top;
+    ULONG   guard_unload_status;
+} GUARD_RESULT;
+
+static TXM_MODULE_INSTANCE  guard_module;
+static GUARD_RESULT         guard_result;
 
 /* What the fault handler saw.  Read by the reporting thread after the module has
    been terminated.  */
@@ -570,6 +617,90 @@ static UINT grant_shared_regions(TXM_MODULE_INSTANCE *instance, PASS_RESULT *res
     result -> pass_shared_count = instance -> txm_module_instance_shared_memory_count;
 
     return first_failure;
+}
+
+
+/**************************************************************************/
+/*  The size guards on a shared grant.                                     */
+/*                                                                        */
+/*  A grant of no bytes and a grant whose inclusive end wraps past the top */
+/*  of the address space both used to compute a limit BELOW the base,      */
+/*  program it, return TX_SUCCESS and spend one of the five entries on a    */
+/*  region the hardware cannot honour.  Both must now be refused as         */
+/*  TX_SIZE_ERROR, and -- the half that a status code alone does not say --  */
+/*  must leave the entry count exactly where they found it, because an      */
+/*  entry spent on a refused grant is one the caller can never get back.    */
+/*                                                                        */
+/*  The third probe is the one that must SUCCEED: a grant ending exactly    */
+/*  at 0xFFFFFFFF is legal, and a guard that refused it would be a new bug   */
+/*  in place of the old one.  It is checked last so that the count it does   */
+/*  move is unambiguous.                                                   */
+/*                                                                        */
+/*  Loaded here and unloaded below without ever being started, so nothing   */
+/*  these probes accept is programmed into an MPU region.  See the comment  */
+/*  on MODULE_TOP_GRANULE_ADDRESS for why that matters on this part.        */
+/*                                                                        */
+/*  Nothing here needs the debugger: every value it produces is a manager   */
+/*  return code or a field of the manager's own instance, so the console     */
+/*  carries the whole result and there is no pass_done() for it.            */
+/**************************************************************************/
+
+static void run_guard_probes(VOID *location)
+{
+    GUARD_RESULT           *result = &guard_result;
+    TXM_MODULE_INSTANCE    *instance = &guard_module;
+
+    result -> guard_load_status = (ULONG) txm_module_manager_in_place_load(instance,
+                                                                          "shared-grant guards",
+                                                                          location);
+
+    if (result -> guard_load_status != (ULONG) TX_SUCCESS)
+    {
+        return;
+    }
+
+    result -> guard_count_start = instance -> txm_module_instance_shared_memory_count;
+
+    /* No bytes at all, at an address that is otherwise perfectly grantable --
+       the progress granule every other pass is given.  So what is refused is
+       the length and nothing else.  */
+
+    result -> guard_zero_status =
+        (ULONG) txm_module_manager_external_memory_enable(
+                    instance,
+                    (VOID *) &__module_status_start__,
+                    0UL,
+                    TXM_MODULE_ATTRIBUTE_READ_WRITE);
+
+    result -> guard_count_zero = instance -> txm_module_instance_shared_memory_count;
+
+    /* Twice the room left above the base, so the inclusive end wraps to a low
+       address.  Aligned, so again it is the length that is being refused.  */
+
+    result -> guard_wrap_status =
+        (ULONG) txm_module_manager_external_memory_enable(
+                    instance,
+                    (VOID *) MODULE_TOP_GRANULE_ADDRESS,
+                    MODULE_WRAP_LENGTH,
+                    TXM_MODULE_ATTRIBUTE_READ_WRITE);
+
+    result -> guard_count_wrap = instance -> txm_module_instance_shared_memory_count;
+
+    /* And the boundary: the same base, asking for exactly the room there is.  */
+
+    result -> guard_top_status =
+        (ULONG) txm_module_manager_external_memory_enable(
+                    instance,
+                    (VOID *) MODULE_TOP_GRANULE_ADDRESS,
+                    MODULE_TOP_GRANULE_LENGTH,
+                    TXM_MODULE_ATTRIBUTE_READ_WRITE);
+
+    result -> guard_count_top = instance -> txm_module_instance_shared_memory_count;
+
+    /* Unloaded, not stopped: it was never started.  Recorded rather than
+       discarded, because a module that will not unload holds the pool.  */
+
+    result -> guard_unload_status = (ULONG) txm_module_manager_unload(instance);
 }
 
 
@@ -991,6 +1122,89 @@ __attribute__((noinline)) void pass_done(void)
 
 
 /**************************************************************************/
+/*  The size guards, reported and judged.  Returns failures found.        */
+/**************************************************************************/
+
+static UINT report_and_judge_guards(void)
+{
+    const GUARD_RESULT *result = &guard_result;
+
+    linflexd_puts("\n--- shared-grant size guards ---\n");
+
+    put_field("  load status      = ", result -> guard_load_status);
+    put_field("  entries at start = ", result -> guard_count_start);
+    put_field("  zero length      = ", result -> guard_zero_status);
+    put_field("    should be      = ", (unsigned long) TX_SIZE_ERROR);
+    put_field("    entries after  = ", result -> guard_count_zero);
+    put_field("  wrapping end     = ", result -> guard_wrap_status);
+    put_field("    should be      = ", (unsigned long) TX_SIZE_ERROR);
+    put_field("    entries after  = ", result -> guard_count_wrap);
+    put_field("  ends at 0xFFFFFFFF = ", result -> guard_top_status);
+    put_field("    should be      = ", (unsigned long) TX_SUCCESS);
+    put_field("    entries after  = ", result -> guard_count_top);
+    put_field("  unload status    = ", result -> guard_unload_status);
+
+    if (result -> guard_load_status != (ULONG) TX_SUCCESS)
+    {
+        linflexd_puts("FAIL shared-grant guards: the probe module did not load\n");
+        return 1U;
+    }
+
+    if (result -> guard_count_start != 0UL)
+    {
+        linflexd_puts("FAIL shared-grant guards: a fresh instance already held entries\n");
+        return 1U;
+    }
+
+    if (result -> guard_zero_status != (ULONG) TX_SIZE_ERROR)
+    {
+        linflexd_puts("FAIL shared-grant guards: a zero-length grant was not refused as a size error\n");
+        return 1U;
+    }
+
+    if (result -> guard_wrap_status != (ULONG) TX_SIZE_ERROR)
+    {
+        linflexd_puts("FAIL shared-grant guards: a grant running off the top of memory was not refused\n");
+        return 1U;
+    }
+
+    /* The half a status code does not say.  A refused grant that still spent an
+       entry would report exactly the same two codes above and quietly cost the
+       caller one of the five, with nothing to show for it.  */
+
+    if ((result -> guard_count_zero != 0UL) || (result -> guard_count_wrap != 0UL))
+    {
+        linflexd_puts("FAIL shared-grant guards: a refused grant consumed an entry\n");
+        return 1U;
+    }
+
+    /* And the boundary the guard must not overreach into.  */
+
+    if (result -> guard_top_status != (ULONG) TX_SUCCESS)
+    {
+        linflexd_puts("FAIL shared-grant guards: a grant ending at 0xFFFFFFFF was refused\n");
+        return 1U;
+    }
+
+    if (result -> guard_count_top != 1UL)
+    {
+        linflexd_puts("FAIL shared-grant guards: the accepted grant did not consume exactly one entry\n");
+        return 1U;
+    }
+
+    if (result -> guard_unload_status != (ULONG) TX_SUCCESS)
+    {
+        linflexd_puts("FAIL shared-grant guards: the probe module did not unload\n");
+        return 1U;
+    }
+
+    linflexd_puts("PASS shared-grant guards: empty and wrapping grants refused, the boundary grant accepted\n");
+
+    return 0U;
+}
+
+
+/**************************************************************************/
 /*  Reporting.                                                            */
 /**************************************************************************/
 
@@ -1144,6 +1358,13 @@ static void manager_entry(ULONG input)
                      MODULE_TEST_SHARED_ABORT);
 
         (void) txm_module_manager_unload(&demo_module[3]);
+
+        /* The size guards on a grant, which are the manager's business and not
+           the module's.  Last, because it wants the pool to itself: every pass
+           above has released its data allocation by now.  */
+
+        linflexd_puts("M8 shared-grant size guards\n");
+        run_guard_probes((VOID *) &__module_image_start__);
     }
 
     /* ------------------------------------------------------------------
@@ -1156,6 +1377,8 @@ static void manager_entry(ULONG input)
     {
         report_one_pass(&pass_results[i]);
     }
+
+    failures += report_and_judge_guards();
 
     linflexd_puts("\n");
 

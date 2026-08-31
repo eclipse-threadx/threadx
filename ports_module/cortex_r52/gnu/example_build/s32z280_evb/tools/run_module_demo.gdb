@@ -218,6 +218,7 @@ STATUS_BASE, STATUS_GRANULE, STATUS_GRANULES = 0x317F0000, 0x40, 6
 STATUS_UNGRANTED, STATUS_MARK_OFFSET = 2, 4
 SHARED_SIGNATURE = 0x5A5A0000
 ALIGNMENT_ERROR, NO_MEMORY = 0xF0, 0x10
+SUCCESS, SIZE_ERROR = 0x00, 0x05
 MODE = {0x10: "User", 0x13: "Supervisor", 0x1A: "Hyp", 0x1F: "System"}
 
 # Which violation each pass was told to commit, from the low byte of the module ID
@@ -541,6 +542,75 @@ else:
         print("    NOTE both passes shared a data base 0x%08X, so the data half of"
               % a["pass_data_base"])
         print("         the rebase produced the same numbers twice")
+
+print("")
+print("  ===== shared-grant size guards =====")
+
+# The manager's own record for the fifth module, which is loaded after the four
+# passes and unloaded again without ever being started.  Read from memory for the
+# same reason everything above is: the console says what the manager believes,
+# and this says what it actually stored.
+#
+# A grant of no bytes, and one whose inclusive end wraps past 0xFFFFFFFF, both
+# used to describe a region whose limit lay below its base -- and both were
+# programmed, charged an entry and reported as TX_SUCCESS.  What is checked here
+# is the pair: the status, and that the entry count did not move.  A guard that
+# returned the right code and still spent an entry would look correct on the
+# console and would silently cost an application one of its five.
+try:
+    g = {f: ev("guard_result.guard_%s" % f) for f in
+         ("load_status", "count_start",
+          "zero_status", "count_zero",
+          "wrap_status", "count_wrap",
+          "top_status", "count_top",
+          "unload_status")}
+except gdb.error as e:
+    print("    *** FAIL: guard_result unreadable (%s)" % e)
+    failures += 1
+    g = None
+
+if g is not None:
+    print("    probe module load     = 0x%02X (expected 0x%02X)"
+          % (g["load_status"], SUCCESS))
+    print("    entries at start      = %d (expected 0)" % g["count_start"])
+    print("    zero length           = 0x%02X (expected 0x%02X, TX_SIZE_ERROR), "
+          "entries after = %d" % (g["zero_status"], SIZE_ERROR, g["count_zero"]))
+    print("    wrapping end          = 0x%02X (expected 0x%02X, TX_SIZE_ERROR), "
+          "entries after = %d" % (g["wrap_status"], SIZE_ERROR, g["count_wrap"]))
+    print("    ends at 0xFFFFFFFF    = 0x%02X (expected 0x%02X, TX_SUCCESS), "
+          "entries after = %d" % (g["top_status"], SUCCESS, g["count_top"]))
+    print("    probe module unload   = 0x%02X (expected 0x%02X)"
+          % (g["unload_status"], SUCCESS))
+
+    if g["load_status"] != SUCCESS:
+        print("    *** FAIL: the probe module did not load, so nothing below ran")
+        failures += 1
+    else:
+        if g["count_start"] != 0:
+            print("    *** FAIL: a freshly loaded instance already held shared entries")
+            failures += 1
+        if g["zero_status"] != SIZE_ERROR:
+            print("    *** FAIL: a zero-length grant was not refused as a size error.")
+            print("              Its limit is base - 1, which lies below its base.")
+            failures += 1
+        if g["wrap_status"] != SIZE_ERROR:
+            print("    *** FAIL: a grant running off the top of memory was not refused.")
+            print("              base + length - 1 wraps to a low address.")
+            failures += 1
+        if g["count_zero"] != 0 or g["count_wrap"] != 0:
+            print("    *** FAIL: a refused grant still consumed one of the five entries")
+            failures += 1
+        if g["top_status"] != SUCCESS:
+            print("    *** FAIL: a grant whose last byte is 0xFFFFFFFF was refused.")
+            print("              It needs exactly the room there is; the overflow")
+            print("              guard has overreached into a legal case.")
+            failures += 1
+        elif g["count_top"] != 1:
+            print("    *** FAIL: the accepted grant did not consume exactly one entry")
+            failures += 1
+        if g["unload_status"] != SUCCESS:
+            print("    *** FAIL: the probe module did not unload")
+            failures += 1
 
 print("")
 # Cast, because this symbol has no debug type in the manager image and gdb
