@@ -235,7 +235,9 @@ echo \n===== LIVE MPU REGIONS (read back from hardware) =====\n
 python
 import gdb
 
-# Regions 0-15 have direct MCR/MRC encodings; 16 and up need PRSELR.  Reading
+# Regions 0-15 have direct MCR/MRC encodings at CP15 op1 0; 16 and up have them
+# at op1 1 (TRM 8.4, Table 8-9), though only the PRSELR route is proven on this
+# part and that is what the manager uses for region 16.  Reading
 # them back is the only way to see what the module thread was actually given,
 # as opposed to what the manager computed.
 print("  (read via the running core; regions 8-15 are the module block, 16 the window)")

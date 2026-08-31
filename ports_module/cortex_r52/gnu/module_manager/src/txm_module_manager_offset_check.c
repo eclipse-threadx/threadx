@@ -213,12 +213,16 @@ _Static_assert(TXM_MODULE_MPU_TOTAL_ENTRIES == 8,
                "tx_thread_schedule.S has an unrolled sequence for exactly eight "
                "regions; change both together");
 
-/* The block has to sit inside the directly addressable range.  Regions above 15
-   are reachable only through PRSELR, which the scheduler does not use.  */
+/* The block has to sit inside the CP15 op1 0 direct-access range.  Regions 16
+   and above are directly addressable too, but at op1 1 (TRM 8.4, Table 8-9);
+   the scheduler emits op1 0 encodings for all eight, so a block crossing 15
+   would be programming the wrong registers rather than merely being out of
+   reach.  */
 
 _Static_assert((TXM_MODULE_MPU_FIRST_REGION + TXM_MODULE_MPU_TOTAL_ENTRIES) <= 16,
-               "the module region block extends past region 15, which has no "
-               "direct PRBARn encoding; the scheduler cannot reach it");
+               "the module region block extends past region 15; the unrolled "
+               "sequence in tx_thread_schedule.S emits CP15 op1 0 encodings, "
+               "which do not address regions 16 and above");
 
 /* The kernel's window over the module area.  tx_thread_schedule.S hard-codes the
    region number in an MCR to PRSELR, because the assembler cannot include this

@@ -311,9 +311,9 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
 /*  thread that owns no module and off for every thread that does, which   */
 /*  is what keeps it and a module's own regions -- which cover the same    */
 /*  memory -- from ever being enabled together.  PMSAv8-R has no region    */
-/*  priority, so two enabled regions over one address are CONSTRAINED      */
-/*  UNPREDICTABLE, and mutual exclusion by ownership is the only form of   */
-/*  it that does not depend on remembering to bracket a call.             */
+/*  priority, so an access hitting more than one enabled region takes a    */
+/*  translation fault (TRM 8.1), and mutual exclusion by ownership is the  */
+/*  only form of it that does not depend on remembering to bracket a call. */
 /*                                                                        */
 /*  EL1 read/write with no EL0 access, and execute-never: the manager can  */
 /*  load through it, and a module cannot use it to reach anything.        */

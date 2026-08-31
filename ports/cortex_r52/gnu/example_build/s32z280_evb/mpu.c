@@ -472,7 +472,8 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
 /*  Opened around the load and closed straight after, rather than left in */
 /*  place, because PMSAv8-R has no region priority: if this region were   */
 /*  still enabled when a module thread ran it would overlap the module's  */
-/*  own regions, and overlapping regions are CONSTRAINED UNPREDICTABLE.   */
+/*  own regions, and an access hitting both takes a translation fault     */
+/*  (TRM 8.1).                                                            */
 /*  Closing it before any module thread starts is what keeps the two from */
 /*  ever being enabled together.                                         */
 /*                                                                        */

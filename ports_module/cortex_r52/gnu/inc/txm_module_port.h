@@ -207,21 +207,34 @@ The following extensions must also be defined in tx_port.h:
 
    TXM_MODULE_MPU_FIRST_REGION is 8, and the choice is not arbitrary.  The TRM
    provides direct access to PRBAR0 through PRBAR15 and PRLAR0 through PRLAR15
-   (3.3.85, 3.3.86), encoded CRn c6, CRm c8 + n/2, opc2 0 and 1 for an even
-   region and 4 and 5 for an odd one.  Regions above 15 are reachable only
-   through PRSELR, which selects a region for the indirect PRBAR and PRLAR view
-   and needs an ISB before those registers can be written -- per region.
+   at CP15 op1 0, encoded CRn c6, CRm 0b1rrr where rrr is region_number[3:1],
+   opc2 0 and 1 for an even region and 4 and 5 for an odd one.  Regions 16
+   through 24 have direct encodings as well, at op1 1 with the same CRm and opc2
+   rule (8.4, Table 8-9), so no region on this core is reachable only through
+   PRSELR.  PRSELR remains the indirect route: it selects a region for the
+   unnumbered PRBAR and PRLAR view and needs an ISB before those can be written,
+   per region.
 
+   The TRM contradicts itself on this and the disagreement is worth recording,
+   so that a reader who checks only one half does not correct it back.  The
+   register descriptions at 3.3.85 and 3.3.86 say flatly "Direct access is
+   provided to PRBAR0 to PRBAR15" and give only the op1 0 form; 8.4 and Table
+   8-9 give both forms.  Table 8-9 is itself imprecise -- it prints opc2 0 for
+   the even limit registers where the prose of 8.4 says 1 -- so the op1 1
+   encoding has to be proven on the part before anything relies on it.
+
+   What 8 through 15 buys is that all eight regions sit in the op1 0 range, the
+   form already exercised on this part, and that they are contiguous, so a
+   module switch writes them as one unrolled block with a single barrier pair.
    Measured on this part: programming one region through PRSELR costs 542 to 604
    cycles, and the same region written directly costs 434 to 470.  Most of what
    remains is the closing dsb and isb rather than the writes, so a block of
    regions written directly with one barrier pair at the end is far cheaper than
    the per-region figure suggests, while the PRSELR route pays an ISB every time.
 
-   Eight entries at 8 through 15 therefore sit entirely within the directly
-   addressable range, and the board support package's map occupies 0 through 7.
-   A board needing more than eight kernel regions has to either shrink this block
-   or accept PRSELR for the overflow.  */
+   The board support package's map occupies 0 through 7.  A board needing more
+   than eight kernel regions has to either shrink this block or move it, and
+   moving it past 15 changes the op1 the scheduler's MCR encodings carry.  */
 
 #define TXM_MODULE_MPU_FIRST_REGION             8
 #define TXM_MODULE_MPU_TOTAL_ENTRIES            8
@@ -247,8 +260,9 @@ The following extensions must also be defined in tx_port.h:
    PRBAR[2:1], execute-never in PRBAR[0], attribute index in PRLAR[3:1] and the
    region enable in PRLAR[0].  What differs is the granule -- 64 bytes here
    against 32 on Armv8-M, so the base and limit fields are [31:6] rather than
-   [31:5] -- and that the registers are reached through CP15 with PRSELR
-   selecting the region, rather than being memory mapped.  */
+   [31:5] -- and that the registers are reached through CP15, either by a
+   region's own direct encoding or through PRSELR, rather than being memory
+   mapped.  */
 
 /* MAIR_ATTR settings
 Device-nGnRE : 0b [Outer]0000 [Inner]0100
@@ -283,7 +297,8 @@ DATA WBWA RA : 0b [Outer]1111 [Inner]1111
    which this core does not have: privilege here is the ARM mode, EL1 against
    EL0, and there is no secure world to allocate a second stack in.  */
 
-/* Two registers set up each MPU region: PRBAR and PRLAR, selected by PRSELR.
+/* Two registers set up each MPU region: PRBAR and PRLAR, reached either by the
+   region's own direct encoding or through PRSELR.
    Held per module so a switch is a sequence of register writes with nothing to
    compute -- the cost measured on this part is dominated by the barriers, not
    the writes, so a switch should program every region and issue one dsb and isb

@@ -62,10 +62,11 @@
 @   It has to.  A module runs in User mode and the kernel code region grants no
 @   EL0 access, so the module needs a region of its own covering these
 @   instructions -- and PMSAv8-R has no region priority, so that region must not
-@   overlap the kernel's.  Two enabled regions matching one address is
-@   CONSTRAINED UNPREDICTABLE, and on this part it aborts: with this function
-@   still inside .text, the first memory access after a module's regions were
-@   loaded took a data abort in the scheduler.
+@   overlap the kernel's.  An access that hits more than one enabled region takes
+@   a translation fault (TRM 8.1); the abort is specified, not a part-specific
+@   resolution of unpredictable behaviour.  With this function still inside
+@   .text, the first memory access after a module's regions were loaded took a
+@   data abort in the scheduler.
 @
 @   Nothing else may share the section, because whatever does becomes executable
 @   by every module.

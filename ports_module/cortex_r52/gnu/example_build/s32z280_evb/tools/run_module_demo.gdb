@@ -320,9 +320,10 @@ for i, p in enumerate(passes):
         continue
 
     # Code and data regions are enabled together and PMSAv8-R has no region
-    # priority, so an overlap is CONSTRAINED UNPREDICTABLE rather than merely
-    # untidy.  Checked here as well as on the target because a debugger can say
-    # which two regions met, and the target can only say that something did.
+    # priority, so an access hitting both takes a translation fault (TRM 8.1)
+    # rather than merely being untidy.  Checked here as well as on the target
+    # because a debugger can say which two regions met, and the target can only
+    # say that something did.
     if (p["pass_code_start"] <= p["pass_data_end"]
             and p["pass_data_start"] <= p["pass_code_end"]):
         print("    *** FAIL: this module's code and data regions overlap")

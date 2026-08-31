@@ -1383,10 +1383,10 @@ static void manager_entry(ULONG input)
     linflexd_puts("\n");
 
     /* Before anything else: a module's code and data regions are enabled at the
-       same time, and PMSAv8-R has no region priority -- two enabled regions that
-       overlap are CONSTRAINED UNPREDICTABLE, and on this part that means aborts
-       from addresses that look perfectly legal.  Nothing in the manager checks
-       for it, so this example does.
+       same time, and PMSAv8-R has no region priority -- an access that hits more
+       than one enabled region takes a translation fault (TRM 8.1), so an overlap
+       means aborts from addresses that look perfectly legal.  Nothing in the
+       manager checks for it, so this example does.
 
        The risk is real here and not theoretical: pass 2 loads its code from the
        staging area, which sits in the same 64 KB as the byte pool its data comes

@@ -1419,10 +1419,10 @@ static void manager_entry(ULONG input)
     console_puts("\n");
 
     /* Before anything else: a module's code, data and shared regions are enabled
-       at the same time, and PMSAv8-R has no region priority -- two enabled
-       regions that overlap are CONSTRAINED UNPREDICTABLE, and that means aborts
-       from addresses that look perfectly legal.  Nothing in the manager checks
-       for it, so this example does.
+       at the same time, and PMSAv8-R has no region priority -- an access that
+       hits more than one enabled region takes a translation fault (TRM 8.1), so
+       an overlap means aborts from addresses that look perfectly legal.  Nothing
+       in the manager checks for it, so this example does.
 
        The risk is real here and not theoretical: the image, the pool and the
        staging area all live in one 64 KB area.  A module grown large enough, or

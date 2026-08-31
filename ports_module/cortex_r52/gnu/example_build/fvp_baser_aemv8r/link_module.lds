@@ -25,12 +25,13 @@
  * requirement of the module port rather than a preference.
  *
  *   1.  DRAM stops below a MODULE region.  A module's code and data are handed
- *       to it as MPU regions, and PMSAv8-R has no region priority: two enabled
- *       regions covering one address are CONSTRAINED UNPREDICTABLE.  So module
- *       memory has to be memory no kernel region covers, and the only way to
- *       guarantee that is to end the kernel's data region where the module area
- *       begins.  __data_end__ below is ORIGIN(MODULE) for exactly that reason,
- *       not the "1 MB of heap past the image" the AR1 script uses.
+ *       to it as MPU regions, and PMSAv8-R has no region priority: an access
+ *       hitting more than one enabled region takes a translation fault
+ *       (TRM 8.1).  So module memory has to be memory no kernel region covers,
+ *       and the only way to guarantee that is to end the kernel's data region
+ *       where the module area begins.  __data_end__ below is ORIGIN(MODULE) for
+ *       exactly that reason, not the "1 MB of heap past the image" the AR1
+ *       script uses.
  *
  *   2.  .txm_user_entry sits between the code region and the data region, in a
  *       gap belonging to neither.  It holds the module's gateway into the

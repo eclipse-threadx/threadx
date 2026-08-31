@@ -249,17 +249,33 @@ __tx_thread_schedule_loop:
 @       regions describe memory the kernel's window over the module area also
 @       describes, and that window is not closed until after the last write below.
 @       Between the two, the programmed map holds an overlap -- the thing the
-@       whole design exists to avoid.
+@       whole design exists to avoid, and an access hitting two enabled regions
+@       is an architected translation fault on this core (TRM 8.1), not something
+@       left to the implementation.
 @
-@       It is not reachable.  Nothing in that window accesses module memory:
-@       every instruction fetched between here and the close comes from the
-@       kernel's own code region, and the only data read is the region table
-@       itself, which lives in the module instance the application supplied and
-@       not in the memory being described.  An overlap that no access hits
-@       produces no fault; PMSAv8-R resolves a region hit per access, not per
-@       program.  The barrier pair at the end is therefore placed for the
-@       transition as a whole rather than to shorten this window, and adding one
-@       in the middle would not make anything safer.
+@       So the window has to be bounded exactly rather than waved at.  It is not
+@       shortened by the barriers: the ISB that PRSELR needs before the window's
+@       PRLAR can be written comes first, so from that ISB to the closing ISB the
+@       eight regions and the window are both architecturally in force.  What
+@       makes the overlap harmless is that no access inside it can hit both.
+@
+@         - Every instruction fetched from the first MCR below to the closing ISB
+@           comes from this function, which lives in the kernel's own code region
+@           and not in the module area.
+@         - The only data read is the region table walked by the LDMIAs, which
+@           lives in the TXM_MODULE_INSTANCE the application supplied.
+@         - The thread's stack is module memory, and nothing here touches it: sp
+@           was loaded above, and the first access through it is the frame pop
+@           after __tx_module_regions_done, past the closing ISB.
+@         - IRQ, and FIQ where it is built in, have been masked since the CPSID
+@           taken once a thread was picked, so no exception entry can insert an
+@           access of its own.
+@
+@       Speculation does not reopen it either: the MPU stops a speculative access
+@       from reaching the bus but raises no translation or permission fault for
+@       it (TRM 8.1).  Only committed accesses fault, and the list above is all of
+@       them.  The barrier pair at the end is therefore placed for the transition
+@       as a whole rather than to shorten this window.
 @
 @       That does put one requirement on the application: a TXM_MODULE_INSTANCE
 @       must not live inside the module area.  Both examples keep theirs in .bss,
@@ -296,12 +312,18 @@ __tx_thread_schedule_loop:
 @
 @    /* Close the kernel's window over the module area.  It covers the same
 @       memory the regions just loaded do, and PMSAv8-R has no region priority:
-@       two enabled regions matching one address is CONSTRAINED UNPREDICTABLE,
-@       and on this part it aborts.  A module thread reaches its own memory
-@       through the regions above and needs nothing else.
+@       an access hitting more than one enabled region takes a translation fault
+@       (TRM 8.1).  The abort seen on this part is that architected result, not a
+@       part-specific resolution of unpredictable behaviour.  A module thread
+@       reaches its own memory through the regions above and needs nothing else.
 @
-@       Region 16 is above the direct-access encodings, so it goes through
-@       PRSELR.  Clearing PRLAR is what disables it.  */
+@       Region 16 is programmed through PRSELR here, and not because it has no
+@       direct encoding: TRM 8.4 and Table 8-9 give PRBAR16 and PRLAR16 at CP15
+@       op1 1, CRm c8, opc2 0 and 1.  The register descriptions at 3.3.85 and
+@       3.3.86 contradict that and say direct access stops at PRBAR15.  The
+@       selector sequence is the one proven on silicon, so it stays until the
+@       op1 1 form has been measured on both targets; do not "correct" this back
+@       to the 3.3.85 claim.  Clearing PRLAR is what disables the region.  */
 @
     MOV     r2, #MPU_MODULE_WINDOW_REGION
     MCR     p15, 0, r2, c6, c2, 1                   @ PRSELR
