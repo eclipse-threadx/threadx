@@ -100,12 +100,41 @@
 # the wrong branch.  So this script breaks on pass_done once per pass and reads
 # that pass's word there, before anything is unloaded.
 
-py _PROBE_IP = "s32dbg:192.168.50.238"
+# The probe and the S32DS installation, from the environment when
+# run_module_demo.sh set them and from the same defaults it uses when this
+# script is run by hand.  Mirrored in run_module_demo.gdb and
+# diagnose_module.gdb rather than shared, because gdb resolves a relative
+# "source" against the working directory and these are run from anywhere.
+python
+import os
+
+_PROBE_IP = os.environ.get("S32Z280_PROBE", "s32dbg:192.168.50.238")
+
+_S32DS_ROOT = os.environ.get("S32DS_ROOT")
+if not _S32DS_ROOT:
+    for _candidate in ("/opt/nxp/S32DS.3.6.10",
+                       os.path.expanduser("~/NXP/S32DS.3.6.10")):
+        if os.path.isdir(_candidate):
+            _S32DS_ROOT = _candidate
+            break
+
+_S32DS_SCRIPT = os.path.join(
+    _S32DS_ROOT or "",
+    "S32DS/tools/S32Debugger/Debugger/scripts/s32z2e2",
+    "s32z2e2_generic_bareboard_all_cores.py")
+
+if not os.path.isfile(_S32DS_SCRIPT):
+    raise gdb.GdbError(
+        "S32DS core script not found at %s\n"
+        "Set S32DS_ROOT to your S32 Design Studio installation."
+        % (_S32DS_SCRIPT or "<unset>"))
+
+gdb.execute("source " + _S32DS_SCRIPT)
+end
+
 py _SOC_NAME = "S32Z280"
 py _CORE_NAME = "R52_0_0"
 py _GDB_SERVER_PORT = 45000
-
-source /home/fdesbiens/NXP/S32DS.3.6.10/S32DS/tools/S32Debugger/Debugger/scripts/s32z2e2/s32z2e2_generic_bareboard_all_cores.py
 
 py board_init()
 py s32z2e2_cores.init(_CORE_NAME)

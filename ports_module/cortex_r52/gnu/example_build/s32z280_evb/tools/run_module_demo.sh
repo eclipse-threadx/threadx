@@ -8,6 +8,10 @@
 #
 # Usage:  tools/run_module_demo.sh [<build directory>]
 #
+# Paths that vary by machine come from the environment: S32DS_ROOT, S32Z280_PROBE
+# and GDB_PY_HOME, each described where it is resolved below.  UART and LOG
+# override the console device and the capture file.
+#
 # The console is the test method here, not a convenience, so this captures the
 # UART to a file before the image runs and prints the captured bytes afterwards.
 # Both LINFlexD bugs found during bring-up were invisible from the target and
@@ -24,9 +28,48 @@ BUILD=${1:-build_mod}
 EVB_BIN="$BUILD/ports/cortex_r52/gnu/example_build/s32z280_evb"
 HERE=$(cd "$(dirname "$0")" && pwd)
 
-R=/home/fdesbiens/NXP/S32DS.3.6.10
+# Where the tools live.  None of these paths are portable, so each is
+# overridable and each is checked before it is used -- a wrong one otherwise
+# surfaces as a gdb that will not start or an attach that never connects.
+#
+#   S32DS_ROOT     the S32 Design Studio installation.  Tried in order: the
+#                  variable, a system-wide install, the per-user layout.
+#   S32Z280_PROBE  the debug probe, as the gdb scripts expect to address it.
+#   GDB_PY_HOME    the source-built CPython that gdb-py needs; see PYTHONHOME
+#                  below for why the one inside gdb is not enough.
+if [ -n "${S32DS_ROOT:-}" ]; then
+    R=$S32DS_ROOT
+elif [ -d /opt/nxp/S32DS.3.6.10 ]; then
+    R=/opt/nxp/S32DS.3.6.10
+else
+    R=$HOME/NXP/S32DS.3.6.10
+fi
+
+if [ ! -d "$R" ]; then
+    echo "ERROR: S32 Design Studio not found at $R" >&2
+    echo "       Set S32DS_ROOT to your installation, for example:" >&2
+    echo "         S32DS_ROOT=/opt/nxp/S32DS.3.6.10 $0 ${1:-}" >&2
+    exit 1
+fi
+
 GDB=$R/S32DS/tools/gdb-arm/arm32-eabi/bin/arm-none-eabi-gdb-py
 GTA=$R/S32DS/tools/S32Debugger/Debugger/Server/gta
+
+for f in "$GDB" "$GTA/gta"; do
+    if [ ! -x "$f" ]; then
+        echo "ERROR: $f is missing or not executable." >&2
+        echo "       S32DS_ROOT=$R does not look like an S32 Design Studio install." >&2
+        exit 1
+    fi
+done
+
+# Resolved here and exported, so the gdb scripts use these values rather than
+# resolving the same defaults again and possibly differently.
+export S32DS_ROOT=$R
+export S32Z280_PROBE=${S32Z280_PROBE:-s32dbg:192.168.50.238}
+
+echo "S32DS_ROOT    = $R"
+echo "S32Z280_PROBE = $S32Z280_PROBE"
 
 MANAGER_ELF=$EVB_BIN/s32z280_module.elf
 MODULE_ELF=$EVB_BIN/s32z280_demo_module.elf
@@ -99,7 +142,14 @@ cleanup() {
 }
 trap cleanup EXIT
 
-P=$HOME/toolchains/py310-src
+P=${GDB_PY_HOME:-$HOME/toolchains/py310-src}
+if [ ! -d "$P/lib/python3.10" ]; then
+    echo "ERROR: no source-built CPython 3.10 at $P" >&2
+    echo "       gdb-py's embedded interpreter loads _struct, _socket and" >&2
+    echo "       _ctypes as separate .so files and needs a real install to" >&2
+    echo "       find them.  Set GDB_PY_HOME to one." >&2
+    exit 1
+fi
 export PYTHONHOME=$P
 export PYTHONPATH=$P/lib/python3.10:$P/lib/python3.10/lib-dynload:$P/lib/python3.10/site-packages
 export S32Z280_ELF=$MANAGER_ELF
