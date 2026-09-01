@@ -14,11 +14,13 @@
 # SPDX-License-Identifier: MIT and CC0-1.0
 ##############################################################################
 
-# Builds the Arm ports with the GNU toolchain, in five stages: assemble every
+# Builds the Arm ports with the GNU toolchain, in six stages: assemble every
 # assembly source of every Arm gnu port, assemble again the parts guarded by
 # feature macros, compile the common C sources for one core per architecture
-# profile, then link the example builds, both the script-driven ones and those
-# driven by CMake. Only the linking stages need a target C library.
+# profile, link the example builds, both the script-driven ones and those
+# driven by CMake, and finally assert that the option combinations the
+# Cortex-R52 port refuses are in fact refused. Only the linking stages need a
+# target C library.
 #
 #     scripts/check_gcc.sh                          # both drivers from PATH
 #     scripts/check_gcc.sh --arm-none-eabi /path/to/toolchain/bin \
@@ -557,6 +559,83 @@ if [ "$no_examples" -eq 0 ]; then
             fi
             rm -rf "$build_dir"
         done
+    fi
+fi
+
+# --------------------------------------------------------------------------
+# Option combinations the port refuses at configure time.
+#
+# ports/cortex_r52/gnu/CMakeLists.txt rejects two combinations outright rather
+# than letting them reach the compiler. Both are cheap to get wrong in a way
+# that is invisible: a typo in a variable name makes the condition constant,
+# and a guard that never fires is indistinguishable from one that is never
+# tripped. So these assert the exit status AND the text, because a guard that
+# fires for the wrong reason would otherwise pass.
+#
+# No example flags are needed: the port CMakeLists is included by the toolchain
+# file alone, so the guards are reached without configuring anything else. That
+# keeps the stage to three configures, two of which stop almost immediately.
+#
+# The third is the positive counterpart, and it is not decoration: a guard that
+# rejects everything would satisfy both negative cases on its own. Asserting
+# that the supported combination still configures is what distinguishes a guard
+# that works from one that is merely always on.
+#
+# This is the only negative check in the script. Everything else here asserts
+# that something builds; this stage asserts that two things refuse to, and that
+# a third still does not.
+if [ "$asm_only" -eq 0 ]; then
+    say ""
+    say "== Option combinations the Cortex-R52 port must refuse =="
+
+    if ! command -v cmake >/dev/null 2>&1; then
+        say "  skipped: cmake is required"
+    else
+        # name | expected text in the error | options
+        refuse_case() {
+            case_name="$1"; want="$2"; shift 2
+            build_dir="$(mktemp -d)"
+            if cmake -S . -B "$build_dir" -G Ninja \
+                    -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_r52.cmake \
+                    -DARM_TOOLCHAIN_PATH="$(dirname "$CC_ARM")" \
+                    "$@" >"$build_dir/configure.log" 2>&1; then
+                fail "$case_name: configure succeeded, but this combination cannot build"
+                failures=$((failures + 1))
+            elif ! grep -q "$want" "$build_dir/configure.log"; then
+                fail "$case_name: configure failed, but not on the expected guard"
+                fail "  wanted text: $want"
+                tail -6 "$build_dir/configure.log" | sed 's/^/        /'
+                failures=$((failures + 1))
+            else
+                say "  $case_name: refused"
+            fi
+            rm -rf "$build_dir"
+        }
+
+        refuse_case "VFP without a hard float ABI" \
+                    "TX_R52_ENABLE_VFP requires TX_R52_FLOAT_ABI=hard" \
+                    -DTX_R52_ENABLE_VFP=ON
+
+        refuse_case "FIQ nesting without FIQ" \
+                    "TX_R52_ENABLE_FIQ_NESTING requires TX_R52_ENABLE_FIQ" \
+                    -DTX_R52_ENABLE_FIQ_NESTING=ON
+
+        # The counterpart: the supported spelling of the first case must still
+        # configure, so a guard cannot pass this stage by rejecting everything.
+        build_dir="$(mktemp -d)"
+        if cmake -S . -B "$build_dir" -G Ninja \
+                -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_r52.cmake \
+                -DARM_TOOLCHAIN_PATH="$(dirname "$CC_ARM")" \
+                -DTX_R52_ENABLE_VFP=ON -DTX_R52_FLOAT_ABI=hard \
+                -DTX_R52_ENABLE_FIQ=ON -DTX_R52_ENABLE_FIQ_NESTING=ON \
+                >"$build_dir/configure.log" 2>&1; then
+            say "  the supported combination: accepted"
+        else
+            fail "the supported combination was refused"
+            tail -6 "$build_dir/configure.log" | sed 's/^/        /'
+            failures=$((failures + 1))
+        fi
+        rm -rf "$build_dir"
     fi
 fi
 
