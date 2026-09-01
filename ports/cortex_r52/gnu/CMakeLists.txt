@@ -60,13 +60,15 @@ if(TX_R52_ENABLE_FIQ_NESTING)
     target_compile_definitions(${PROJECT_NAME} PUBLIC TX_ENABLE_FIQ_NESTING)
 endif()
 if(TX_R52_ENABLE_VFP)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC TX_ENABLE_VFP_SUPPORT)
     if(NOT TX_R52_FLOAT_ABI STREQUAL "hard")
-        message(WARNING
-            "TX_R52_ENABLE_VFP is on but TX_R52_FLOAT_ABI is '${TX_R52_FLOAT_ABI}'. "
-            "The compiler will not emit floating-point instructions, so the VFP "
-            "context path will never be exercised. Use -DTX_R52_FLOAT_ABI=hard.")
+        message(FATAL_ERROR
+            "TX_R52_ENABLE_VFP requires TX_R52_FLOAT_ABI=hard, but it is "
+            "'${TX_R52_FLOAT_ABI}'. TX_ENABLE_VFP_SUPPORT enables the VMRS, "
+            "VSTMDB and VLDMIA blocks in the port assembly, and a soft float "
+            "ABI leaves the assembler with no FPU to accept them, so this "
+            "combination fails to assemble. Use -DTX_R52_FLOAT_ABI=hard.")
     endif()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC TX_ENABLE_VFP_SUPPORT)
 endif()
 
 # Armv8-R AEM FVP example builds (boot check now, kernel demo from AR1/M2).
