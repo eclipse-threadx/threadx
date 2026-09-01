@@ -25,6 +25,7 @@ is empty, so no A- or R-profile port could previously be built this way.
 
     -DTX_R52_FLOAT_ABI=soft|hard      floating-point ABI, default soft
     -DTX_R52_ENABLE_VFP=ON            lazy VFP context save and restore
+                                      (requires TX_R52_FLOAT_ABI=hard)
     -DTX_R52_ENABLE_FIQ=ON            FIQ support
     -DTX_R52_ENABLE_IRQ_NESTING=ON    nested IRQ support
     -DTX_R52_ENABLE_FIQ_NESTING=ON    nested FIQ support (requires the above)
@@ -33,9 +34,11 @@ is empty, so no A- or R-profile port could previously be built this way.
     -DTX_R52_CONSOLE_PL011=ON         console on the PL011 UART, not semihosting
 
 TX_R52_ENABLE_VFP is PUBLIC: it changes which registers the context switch
-saves, so the library and the application must agree.  Pair it with
-TX_R52_FLOAT_ABI=hard, otherwise the compiler emits no floating-point
-instructions and the VFP path is never exercised.
+saves, so the library and the application must agree.  It requires
+TX_R52_FLOAT_ABI=hard, and configure refuses the combination rather than
+warning about it: the flag enables the VFP blocks in the port assembly, and a
+soft float ABI leaves the assembler with no FPU to accept them, so the build
+fails on the first VMRS rather than quietly skipping the VFP context path.
 
 Cortex-R52 always implements at least a single-precision FPU.  GCC rejects
 "-mcpu=cortex-r52+nofp" and offers only "+nofp.dp", so the soft-float
