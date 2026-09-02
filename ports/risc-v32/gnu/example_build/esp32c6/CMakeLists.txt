@@ -20,6 +20,9 @@ endif()
 
 project(esp32c6_threadx_example C ASM)
 
+set(ESP32C6_DIR  ${CMAKE_CURRENT_LIST_DIR})
+set(THREADX_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../../..)
+
 # ------------------------------------------------------------------------------
 # 1. ESP-IDF SDK Path Resolution (Cross-Platform: Windows & Linux)
 # ------------------------------------------------------------------------------
@@ -50,9 +53,8 @@ endif()
 message(STATUS "Using ESP-IDF hardware headers from: ${ESP_IDF_PATH}")
 
 # ------------------------------------------------------------------------------
-# 2. Include Directories
+# 2. ESP32-C6 Hardware & SoC Component Headers
 # ------------------------------------------------------------------------------
-# ESP32-C6 Hardware & SoC Component Headers
 set(ESP32C6_IDF_INCLUDES
     "${ESP_IDF_PATH}/components/soc/esp32c6/include"
     "${ESP_IDF_PATH}/components/soc/esp32c6/register"
@@ -70,80 +72,77 @@ set(ESP32C6_IDF_INCLUDES
     "${ESP_IDF_PATH}/components/riscv/include"
 )
 
-# ThreadX Core & Port Include Directories
-set(THREADX_INCLUDES
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../common/inc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../inc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
-)
-
-include_directories(
-    ${ESP32C6_IDF_INCLUDES}
-    ${THREADX_INCLUDES}
-)
-
 # ------------------------------------------------------------------------------
-# 3. ThreadX Static Library Target
+# 3. ThreadX Kernel Library
 # ------------------------------------------------------------------------------
-file(GLOB THREADX_COMMON_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../../../../common/src/*.c")
-file(GLOB THREADX_PORT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../../src/*.S")
+# The kernel is built by the project's own top-level CMakeLists rather than by
+# re-globbing common/src here, which is what every other RISC-V example does --
+# see core_v_mcu/CMakeLists.txt.
+#
+# Delegating also puts tx_user.h on the compile line, which a hand-rolled
+# add_library() here cannot: the top level copies TX_USER_FILE to
+# custom_inc/tx_user.h and defines TX_INCLUDE_USER_DEFINE_FILE as a PUBLIC
+# property of the threadx target.  That macro is the #ifdef guarding the
+# #include "tx_user.h" in ports/risc-v32/common/tx_port_riscv32_common.h, so
+# without it the file below is parsed by nothing and every setting in it
+# silently falls back to the port default.  Linking threadx is therefore what
+# makes the kernel and this example agree on one configuration.
+set(THREADX_ARCH      "risc-v32")
+set(THREADX_TOOLCHAIN "gnu")
+set(TX_USER_FILE      ${ESP32C6_DIR}/include/tx_user.h)
 
-add_library(threadx STATIC
-    ${THREADX_COMMON_SOURCES}
-    ${THREADX_PORT_SOURCES}
-)
-
-target_include_directories(threadx PUBLIC ${THREADX_INCLUDES})
+add_subdirectory(${THREADX_ROOT} threadx)
 
 # ------------------------------------------------------------------------------
 # 4. ESP32-C6 Board Support Object Library (Assembly Startup & Pinned HAL)
 # ------------------------------------------------------------------------------
 set(ESP32C6_BOARD_BSP_SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/entry.S"
-    "${CMAKE_CURRENT_SOURCE_DIR}/vectors.S"
-    "${CMAKE_CURRENT_SOURCE_DIR}/tx_initialize_low_level.S"
-    "${CMAKE_CURRENT_SOURCE_DIR}/platform/console.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/platform/interrupt.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/platform/systimer.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/platform/startup.c"
+    "${ESP32C6_DIR}/entry.S"
+    "${ESP32C6_DIR}/vectors.S"
+    "${ESP32C6_DIR}/tx_initialize_low_level.S"
+    "${ESP32C6_DIR}/platform/console.c"
+    "${ESP32C6_DIR}/platform/interrupt.c"
+    "${ESP32C6_DIR}/platform/systimer.c"
+    "${ESP32C6_DIR}/platform/startup.c"
     "${ESP_IDF_PATH}/components/hal/systimer_hal.c"
 )
 
 add_library(esp32c6_bsp OBJECT
     ${ESP32C6_BOARD_BSP_SOURCES}
 )
-target_include_directories(esp32c6_bsp PUBLIC ${THREADX_INCLUDES} ${ESP32C6_IDF_INCLUDES})
 
-# ------------------------------------------------------------------------------
-# 5. Linker Configuration
-# ------------------------------------------------------------------------------
-set(ESP32C6_LINKER_SEARCH_PATHS
-    "${ESP_IDF_PATH}/components/soc/esp32c6/ld"
-    "${ESP_IDF_PATH}/components/esp_rom/esp32c6/ld"
+target_include_directories(esp32c6_bsp PRIVATE
+    ${ESP32C6_DIR}/include
+    ${ESP32C6_IDF_INCLUDES}
 )
 
-set(ESP32C6_LINK_FLAGS "-T${CMAKE_CURRENT_SOURCE_DIR}/link.ld")
-foreach(LD_PATH ${ESP32C6_LINKER_SEARCH_PATHS})
-    string(APPEND ESP32C6_LINK_FLAGS " -L${LD_PATH}")
-endforeach()
+# Linking an OBJECT library against threadx compiles nothing extra into it and
+# archives nothing: it takes the target's usage requirements, which is how the
+# ThreadX headers, custom_inc and TX_INCLUDE_USER_DEFINE_FILE reach these
+# sources.  The assembly files pick up the same include path, which is what
+# they need to resolve tx_port.h.
+target_link_libraries(esp32c6_bsp PRIVATE threadx)
 
 # ------------------------------------------------------------------------------
-# 6. Executable Firmware Target & Image Generation (.elf -> .bin)
+# 5. Executable Firmware Target & Image Generation (.elf -> .bin)
 # ------------------------------------------------------------------------------
 add_executable(esp32c6_demo.elf
-    "${CMAKE_CURRENT_SOURCE_DIR}/demo_threadx.c"
+    "${ESP32C6_DIR}/demo_threadx.c"
     $<TARGET_OBJECTS:esp32c6_bsp>
 )
 
-target_include_directories(esp32c6_demo.elf PUBLIC ${THREADX_INCLUDES} ${ESP32C6_IDF_INCLUDES})
-
-target_link_options(esp32c6_demo.elf PRIVATE
-    "-T${CMAKE_CURRENT_SOURCE_DIR}/link.ld"
-    "-L${ESP_IDF_PATH}/components/soc/esp32c6/ld"
-    "-L${ESP_IDF_PATH}/components/esp_rom/esp32c6/ld"
+target_include_directories(esp32c6_demo.elf PRIVATE
+    ${ESP32C6_DIR}/include
+    ${ESP32C6_IDF_INCLUDES}
 )
 
 target_link_libraries(esp32c6_demo.elf PRIVATE threadx)
+
+target_link_options(esp32c6_demo.elf PRIVATE
+    "-T${ESP32C6_DIR}/link.ld"
+    "-L${ESP_IDF_PATH}/components/soc/esp32c6/ld"
+    "-L${ESP_IDF_PATH}/components/esp_rom/esp32c6/ld"
+)
 
 # Locate Python interpreter for esptool.py image conversion
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
