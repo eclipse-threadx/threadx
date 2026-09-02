@@ -73,7 +73,7 @@ static TX_SEMAPHORE    semaphore_0;
 
 static UCHAR           trace_buffer[16384];
 
-/* Four blocks of 20 bytes: 100 / (20 + sizeof(void *)) on a 32-bit build.  */
+/* Enough storage for several 20-byte blocks on both 32-bit and 64-bit builds.  */
 
 static UCHAR           block_pool_area[100];
 static UCHAR           byte_pool_area[512];
@@ -213,13 +213,21 @@ void    *byte_ptr;
 UINT    i;
 
 
-    /* Empty the block pool. The first of these takes the immediate-success path
-       through tx_block_allocate, which carries the first update block.  */
+    /* Empty the block pool. The first allocation takes the immediate-success
+       path through tx_block_allocate, which carries the first update block.
+       The exact capacity is port-dependent because each block has a pointer-
+       sized header, so allocate until the pool reports that it is empty.  */
     held_block =  TX_NULL;
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 6u; i++)
     {
 
         status =  tx_block_allocate(&block_pool_0, &block_ptr, TX_NO_WAIT);
+
+        if (status == TX_NO_MEMORY)
+        {
+
+            break;
+        }
 
         if (status != TX_SUCCESS)
         {
@@ -234,6 +242,12 @@ UINT    i;
 
             held_block =  block_ptr;
         }
+    }
+
+    if ((status != TX_NO_MEMORY) || (held_block == TX_NULL))
+    {
+
+        error++;
     }
 
     /* The pool is empty now, so this suspends. It completes in thread 1's
