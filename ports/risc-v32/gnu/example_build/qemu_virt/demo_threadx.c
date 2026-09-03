@@ -20,7 +20,9 @@
 #define     DEMO_BYTE_POOL_SIZE     9120
 #define     DEMO_BLOCK_POOL_SIZE    100
 #define     DEMO_QUEUE_SIZE         100
+#ifdef __riscv_flen
 float           fpu_test_val = 0.0f;
+#endif
 
 char *_to_str(ULONG val)
 {
@@ -375,8 +377,10 @@ UINT    status;
         if (status != TX_SUCCESS)
             break;
 
+#ifdef __riscv_flen
         /* FPU Test */
         fpu_test_val += 1.1f;
+#endif
         /* Get the mutex again with suspension.  This shows
            that an owning thread may retrieve the mutex it
            owns multiple times.  */

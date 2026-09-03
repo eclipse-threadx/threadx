@@ -21,6 +21,13 @@
 
 
     .section .text
+
+#if defined(__riscv_float_abi_double)
+    .equ    TX_SOL_FRAME_SIZE, 176
+#else
+    .equ    TX_SOL_FRAME_SIZE, 128
+#endif
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -63,54 +70,33 @@ _tx_thread_system_return:
     /* Save minimal context on the stack.  */
     /* sp -= sizeof(stack_frame);  */
 
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    sp, sp, -29*4                               // Allocate space on the stack - with floating point enabled
-#else
-    addi    sp, sp, -16*4                               // Allocate space on the stack - without floating point enabled
-#endif
+    addi    sp, sp, -TX_SOL_FRAME_SIZE                  // Allocate the solicited stack frame
 
-    sw      zero,  0(sp)                                // Solicited stack type (store early so slot is always written)
+    sw      zero,  0*4(sp)                                // Solicited stack type (store early so slot is always written)
 
     /* Read and save mstatus first; use it to guard FP register save.  */
     csrr    t0, mstatus                                 // Pickup current mstatus
     sw      t0, 14*4(sp)                                // Save mstatus
 
     /* Store floating point preserved registers — only if FS != Off.  */
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+#if defined(__riscv_float_abi_double)
     srli    t1, t0, 13                                  // Shift FS field to bits [1:0]
     andi    t1, t1, 0x3                                 // Isolate FS bits
     beqz    t1, _tx_thread_system_return_skip_fp        // Skip FP save if FS == Off
-#if defined(__riscv_float_abi_single)
-    fsw     f8,  15*4(sp)                               // Store fs0
-    fsw     f9,  16*4(sp)                               // Store fs1
-    fsw     f18, 17*4(sp)                               // Store fs2
-    fsw     f19, 18*4(sp)                               // Store fs3
-    fsw     f20, 19*4(sp)                               // Store fs4
-    fsw     f21, 20*4(sp)                               // Store fs5
-    fsw     f22, 21*4(sp)                               // Store fs6
-    fsw     f23, 22*4(sp)                               // Store fs7
-    fsw     f24, 23*4(sp)                               // Store fs8
-    fsw     f25, 24*4(sp)                               // Store fs9
-    fsw     f26, 25*4(sp)                               // Store fs10
-    fsw     f27, 26*4(sp)                               // Store fs11
+    fsd     f8,  8*8(sp)                                // Store fs0
+    fsd     f9,  9*8(sp)                                // Store fs1
+    fsd     f18, 10*8(sp)                               // Store fs2
+    fsd     f19, 11*8(sp)                               // Store fs3
+    fsd     f20, 12*8(sp)                               // Store fs4
+    fsd     f21, 13*8(sp)                               // Store fs5
+    fsd     f22, 14*8(sp)                               // Store fs6
+    fsd     f23, 15*8(sp)                               // Store fs7
+    fsd     f24, 16*8(sp)                               // Store fs8
+    fsd     f25, 17*8(sp)                               // Store fs9
+    fsd     f26, 18*8(sp)                               // Store fs10
+    fsd     f27, 19*8(sp)                               // Store fs11
     csrr    t0, fcsr
-    sw      t0, 27*4(sp)                                // Store fcsr
-#elif defined(__riscv_float_abi_double)
-    fsd     f8,  15*4(sp)                               // Store fs0
-    fsd     f9,  16*4(sp)                               // Store fs1
-    fsd     f18, 17*4(sp)                               // Store fs2
-    fsd     f19, 18*4(sp)                               // Store fs3
-    fsd     f20, 19*4(sp)                               // Store fs4
-    fsd     f21, 20*4(sp)                               // Store fs5
-    fsd     f22, 21*4(sp)                               // Store fs6
-    fsd     f23, 22*4(sp)                               // Store fs7
-    fsd     f24, 23*4(sp)                               // Store fs8
-    fsd     f25, 24*4(sp)                               // Store fs9
-    fsd     f26, 25*4(sp)                               // Store fs10
-    fsd     f27, 26*4(sp)                               // Store fs11
-    csrr    t0, fcsr
-    sw      t0, 27*4(sp)                                // Store fcsr
-#endif
+    sw      t0, 40*4(sp)                                // Store fcsr
 _tx_thread_system_return_skip_fp:
 #endif
 

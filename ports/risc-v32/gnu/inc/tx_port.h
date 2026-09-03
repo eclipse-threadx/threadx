@@ -25,7 +25,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                          RISC-V32/GNU     */
-/*                                                           6.4.x        */
+/*                                                       6.5.1.202602a    */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -46,6 +46,38 @@
 
 #ifndef TX_PORT_H
 #define TX_PORT_H
+
+#ifdef __riscv_vector
+#error "The ThreadX RISC-V32 GNU port does not save or restore vector state. Build without the V extension."
+#endif
+
+#ifdef __riscv_32e
+#error "The ThreadX RISC-V32 GNU port requires the RV32I register set. RV32E is not supported."
+#endif
+
+#ifdef __riscv_float_abi_single
+#error "The ThreadX RISC-V32 GNU port does not support ILP32F. Use ILP32D or a soft-float ABI."
+#endif
+
+#ifdef __riscv_float_abi_quad
+#error "The ThreadX RISC-V32 GNU port does not support ILP32Q."
+#endif
+
+#if defined(__riscv_flen) && !defined(__riscv_float_abi_double)
+#error "The ThreadX RISC-V32 GNU port requires ILP32D when the ISA enables floating-point state."
+#endif
+
+#if defined(__riscv_float_abi_double) && (!defined(__riscv_flen) || (__riscv_flen != 64))
+#error "The ThreadX RISC-V32 GNU ILP32D port requires FLEN=64."
+#endif
+
+/* Publish the interrupt frame contract to GNU BSP assembly files. */
+#if defined(__riscv_float_abi_double)
+#define TX_RISCV_TRAP_FRAME_SIZE                400
+#else
+#define TX_RISCV_TRAP_FRAME_SIZE                128
+#endif
+#define TX_RISCV_TRAP_CALL_FRAME_SIZE           16
 
 /* Include shared RISC-V32 port definitions common to all toolchain ports.  */
 #include "../../common/tx_port_riscv32_common.h"
