@@ -30,6 +30,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -92,7 +93,7 @@ _tx_thread_stack_build:
                     x11     26      Initial a1
                     x10     27      Initial a0
                     x1      28      Initial ra
-                    --      29      reserved
+                    mstatus 29      Initial mstatus
                     mepc    30      Initial mepc
 If floating point support:
                     f0      31      Inital ft0
@@ -192,6 +193,8 @@ If vector extension support:
     sd      zero, 26*8(t0)                              // Initial a1
     sd      zero, 27*8(t0)                              // Initial a0
     sd      zero, 28*8(t0)                              // Initial ra
+    li      t1, 0x2000                                  // mstatus.FS = Initial
+    sd      t1, 29*8(t0)                                // Initial mstatus
     sd      a1, 30*8(t0)                                // Initial mepc/sepc (thread entry point)
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     sd      zero, 31*8(t0)                              // Initial ft0
