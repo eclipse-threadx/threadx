@@ -21,6 +21,13 @@
 
 
     .section .text
+
+#if defined(__riscv_float_abi_double)
+    .equ    TX_TRAP_FRAME_SIZE, 400
+#else
+    .equ    TX_TRAP_FRAME_SIZE, 128
+#endif
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -92,42 +99,14 @@ _tx_thread_stack_build:
                     x11     26      Initial a1
                     x10     27      Initial a0
                     x1      28      Initial ra
-                    --      29      reserved
+                    mstatus 29      Initial mstatus seed 
                     mepc    30      Initial mepc
-If floating point support:
-                    f0      31      Initial ft0
-                    f1      32      Initial ft1
-                    f2      33      Initial ft2
-                    f3      34      Initial ft3
-                    f4      35      Initial ft4
-                    f5      36      Initial ft5
-                    f6      37      Initial ft6
-                    f7      38      Initial ft7
-                    f8      39      Initial fs0
-                    f9      40      Initial fs1
-                    f10     41      Initial fa0
-                    f11     42      Initial fa1
-                    f12     43      Initial fa2
-                    f13     44      Initial fa3
-                    f14     45      Initial fa4
-                    f15     46      Initial fa5
-                    f16     47      Initial fa6
-                    f17     48      Initial fa7
-                    f18     49      Initial fs2
-                    f19     50      Initial fs3
-                    f20     51      Initial fs4
-                    f21     52      Initial fs5
-                    f22     53      Initial fs6
-                    f23     54      Initial fs7
-                    f24     55      Initial fs8
-                    f25     56      Initial fs9
-                    f26     57      Initial fs10
-                    f27     58      Initial fs11
-                    f28     59      Initial ft8
-                    f29     60      Initial ft9
-                    f30     61      Initial ft10
-                    f31     62      Initial ft11
-                    fscr    63      Initial fscr
+                    --      31      pad (0)
+        If floating point support (double ABI), byte offsets from 
+        the frame base:
+                    f0-f31  128 + i*8   Initial FP registers (all 0)
+                    fcsr    384         Initial fcsr (0)
+                    pad     388-399     (0)
 
     Stack Bottom: (higher memory address)  */
 
@@ -137,11 +116,7 @@ If floating point support:
 
     /* Actually build the stack frame.  */
 
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    t0, t0, -65*4
-#else
-    addi    t0, t0, -32*4                               // Allocate space for the stack frame
-#endif
+    addi    t0, t0, -TX_TRAP_FRAME_SIZE                 // Allocate space for the stack frame
     li      t1, 1                                       // Build stack type
     sw      t1,  0*4(t0)                                // Place stack type on the top
     sw      zero,  1*4(t0)                              // Initial s11
@@ -173,44 +148,22 @@ If floating point support:
     sw      zero, 27*4(t0)                              // Initial a0
     sw      zero, 28*4(t0)                              // Initial ra
     sw      a1, 30*4(t0)                                // Initial mepc (thread entry point)
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    sw      zero, 31*4(t0)                              // Initial ft0
-    sw      zero, 32*4(t0)                              // Initial ft1
-    sw      zero, 33*4(t0)                              // Initial ft2
-    sw      zero, 34*4(t0)                              // Initial ft3
-    sw      zero, 35*4(t0)                              // Initial ft4
-    sw      zero, 36*4(t0)                              // Initial ft5
-    sw      zero, 37*4(t0)                              // Initial ft6
-    sw      zero, 38*4(t0)                              // Initial ft7
-    sw      zero, 39*4(t0)                              // Initial fs0
-    sw      zero, 40*4(t0)                              // Initial fs1
-    sw      zero, 41*4(t0)                              // Initial fa0
-    sw      zero, 42*4(t0)                              // Initial fa1
-    sw      zero, 43*4(t0)                              // Initial fa2
-    sw      zero, 44*4(t0)                              // Initial fa3
-    sw      zero, 45*4(t0)                              // Initial fa4
-    sw      zero, 46*4(t0)                              // Initial fa5
-    sw      zero, 47*4(t0)                              // Initial fa6
-    sw      zero, 48*4(t0)                              // Initial fa7
-    sw      zero, 49*4(t0)                              // Initial fs2
-    sw      zero, 50*4(t0)                              // Initial fs3
-    sw      zero, 51*4(t0)                              // Initial fs4
-    sw      zero, 52*4(t0)                              // Initial fs5
-    sw      zero, 53*4(t0)                              // Initial fs6
-    sw      zero, 54*4(t0)                              // Initial fs7
-    sw      zero, 55*4(t0)                              // Initial fs8
-    sw      zero, 56*4(t0)                              // Initial fs9
-    sw      zero, 57*4(t0)                              // Initial fs10
-    sw      zero, 58*4(t0)                              // Initial fs11
-    sw      zero, 59*4(t0)                              // Initial ft8
-    sw      zero, 60*4(t0)                              // Initial ft9
-    sw      zero, 61*4(t0)                              // Initial ft10
-    sw      zero, 62*4(t0)                              // Initial ft11
-    csrr    a1, fcsr                                    // Read fcsr for initial value
-    sw      a1, 63*4(t0)                                // Initial fcsr
-    sw      zero, 64*4(t0)                              // Reserved word (0)
+    sw      zero, 31*4(t0)                              // Pad word (0)
+#if defined(__riscv_float_abi_double)
+    li      t1, 0x6000                                  // mstatus seed: FS = Dirty (bits 14:13 = 11)
+    sw      t1, 29*4(t0)                                //   so the first dispatch restores the clean FP state
+
+    /* Zero the whole FP area: f0-f31 double slots (128-383), fcsr (384)
+       and the pad words up to the frame end.  Threads start with clean
+       FP registers and fcsr = 0.  */
+    addi    t1, t0, 32*4                                // First FP-area word (offset 128)
+    addi    t2, t0, TX_TRAP_FRAME_SIZE                  // One past the frame end (offset 400)
+_tx_thread_stack_build_fp_zero:
+    sw      zero, 0(t1)                                 // Clear FP-area word
+    addi    t1, t1, 4
+    bne     t1, t2, _tx_thread_stack_build_fp_zero
 #else
-    sw      zero, 31*4(t0)                              // Reserved word (0)
+    sw      zero, 29*4(t0)                              // Initial mstatus slot (0, no FP gate)
 #endif
 
     /* Setup stack pointer.  */

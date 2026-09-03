@@ -59,12 +59,15 @@
     .global  trap_entry
     .extern  trap_handler
     .extern  _tx_thread_context_restore
-    trap_entry:
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-	addi sp, sp, -260         // Allocate space for all registers - with floating point enabled (65*4)
+/* Trap frame: integer slots 0-31 at i*4; FP build adds f0-f31 as doubles
+   at 128 + i*8, fcsr at 384, pad to 400 (total mod 16 = 0).  */
+#if defined(__riscv_float_abi_double)
+    .equ TX_TRAP_FRAME_SIZE, 400
 #else
-	addi sp, sp, -128         // Allocate space for all registers - without floating point enabled (32*4)
+    .equ TX_TRAP_FRAME_SIZE, 128
 #endif
+    trap_entry:
+	addi sp, sp, -TX_TRAP_FRAME_SIZE  // Allocate space for all registers (400 with FP double, 128 without)
 
 	sw   x1, 112(sp)         // Store RA (28*4 = 112, because call will override ra [ra is a callee register in riscv])
 
@@ -73,11 +76,11 @@
 	csrr a0, mcause
 	csrr a1, mepc
         csrr a2, mtval
-	addi    sp, sp, -4
+	addi    sp, sp, -16      // 16-byte temporary frame: ilp32 psABI requires sp = 0 mod 16 at the call
     	sw      ra, 0(sp)
     	call    trap_handler
     	lw      ra, 0(sp)
-    	addi    sp, sp, 4
+    addi    sp, sp, 16
 	call _tx_thread_context_restore
 	// it will nerver return
 _err:
@@ -128,7 +131,6 @@ _err:
 /* VOID   _tx_initialize_low_level(VOID)
 {  */
     .global  _tx_initialize_low_level
-    .weak    _tx_initialize_low_level
     .extern  _end
     .extern  board_init
 _tx_initialize_low_level:
@@ -147,16 +149,16 @@ _tx_initialize_low_level:
     csrrs   zero, mstatus, t0			            // set MSTATUS_MPP, MPIE bit
     li	    t0, (MIE_MTIE | MIE_MSIE | MIE_MEIE)
     csrrs   zero, mie, t0			                // set mie
-#ifdef __riscv_flen
+#if defined(__riscv_float_abi_double)
     li      t0, MSTATUS_FS
     csrrs   zero, mstatus, t0			            // set MSTATUS_FS bit to open f/d isa in riscv
     fscsr   x0
 #endif
-    addi    sp, sp, -4
+    addi    sp, sp, -16                             // 16-byte temporary frame: ilp32 psABI requires sp = 0 mod 16 at the call
     sw	    ra, 0(sp)
     call    board_init
     lw	    ra, 0(sp)
-    addi    sp, sp, 4
+    addi    sp, sp, 16
     la	    t0, trap_entry
     csrw    mtvec, t0
     ret

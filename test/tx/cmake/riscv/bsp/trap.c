@@ -36,9 +36,6 @@ extern void _exit(int code) __attribute__((noreturn));
 
 void trap_handler(uintptr_t mcause, uintptr_t mepc, uintptr_t mtval)
 {
-    (void)mepc;
-    (void)mtval;
-
     if (OS_IS_INTERUPT(mcause))
     {
         if (OS_IS_TICK_INT(mcause))

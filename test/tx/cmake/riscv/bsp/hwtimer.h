@@ -13,8 +13,8 @@
 
 #include <stdint.h>
 
-#define TICKNUM_PER_SECOND  10000000
-#define TICKNUM_PER_TIMER   (TICKNUM_PER_SECOND / 10)
+#define TICKNUM_PER_SECOND  10000000UL
+#define TICKNUM_PER_TIMER   (TICKNUM_PER_SECOND / TX_TIMER_TICKS_PER_SECOND)
 
 int hwtimer_init(void);
 int hwtimer_handler(void);

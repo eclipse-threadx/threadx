@@ -62,7 +62,7 @@ __tx_free_memory_start:
 /**************************************************************************/
 /* VOID   _tx_initialize_low_level(VOID)
 {  */
-    .weak    _tx_initialize_low_level
+    .global  _tx_initialize_low_level
     .weak    _tx_initialize_low_level
 _tx_initialize_low_level:
 
@@ -79,8 +79,10 @@ _tx_initialize_low_level:
     la      t1, _tx_initialize_unused_memory        // Pickup address of unused memory
     sw      t0, 0(t1)                               // Save unused memory address
 
-    /* Initialize floating point control/status register if floating point is enabled.  */
-#ifdef __riscv_flen
+    /* Initialize floating point state if floating point is enabled.  */
+#if defined(__riscv_float_abi_double)
+    li      t0, 0x2000                              // mstatus.FS = Initial (bits 14:13 = 01)
+    csrrs   zero, mstatus, t0                       // Enable the FP unit before touching fcsr
     li      t0, 0
     csrw    fcsr, t0                                // Clear FP control/status register
 #endif
