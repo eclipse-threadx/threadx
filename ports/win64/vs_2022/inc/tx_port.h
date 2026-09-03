@@ -160,6 +160,7 @@ extern TEST_FLAG        test_forced_mutex_timeout;
 
 #endif
 
+#if 0
 
 /* Define performance metric symbols.  */
 
@@ -195,7 +196,7 @@ extern TEST_FLAG        test_forced_mutex_timeout;
 #define TX_TIMER_ENABLE_PERFORMANCE_INFO
 #endif
 
-
+#endif
 
 /* Define ThreadX basic types for this port.  */
 
