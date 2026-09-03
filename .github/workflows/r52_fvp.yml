@@ -1,0 +1,321 @@
+name: r52_fvp
+
+# Builds every Cortex-R52 CMake image in both supported configurations and
+# EXECUTES them on the Armv8-R AEM FVP, asserting each image's self-reported
+# result.
+#
+# Why this exists: until this workflow landed, nothing in CI ran a single
+# instruction of any ThreadX port. gcc_check compiles and links -- its own
+# header says so, "it compiles and links and **executes nothing**" -- and its
+# CMake stage covers exactly one R52 configuration, the base FVP example with
+# -DTX_R52_ENABLE_MPU=ON. So a change that assembles cleanly and links cleanly
+# and then hangs on the first context switch passes every required check.
+#
+# That gap matters more for cortex_r52 than for the other ports, because the
+# R52 is the foundation the partitioning work is sequenced behind: the EL2 boot
+# path in entry.S, the MPU programming, and the generic-timer plumbing are all
+# things later work attaches to rather than replaces. A regression in any of
+# them has to be caught by an execution test; there is no static check for
+# "the scheduler still schedules".
+#
+# What it covers:
+#
+#   - the default configuration -- the images gcc_check's CMake stage builds,
+#     but run rather than merely linked;
+#   - the feature configuration -- VFP with the hard float ABI, FIQ, IRQ
+#     nesting and FIQ nesting. Those four options gate whole assembly blocks
+#     (the VMRS/VSTMDB/VLDMIA sequences, the FIQ context paths, the nesting
+#     start/end pairs) that the default configuration never assembles, let
+#     alone runs.
+#
+# What it does not cover: the module manager port and the S32Z280 targets are
+# not on dev yet -- they are PR #639. When that merges, add their lanes here
+# rather than starting a second workflow; the matrix already has the shape.
+#
+# The S32Z280 targets will be build-only in CI regardless. They need silicon,
+# and a hosted runner has none.
+
+on:
+  # push as well as pull_request, for the reason gcc_check.yml states at
+  # length: dev needs its own baseline so a bad squash-merge is caught then
+  # rather than by whoever opens the next pull request.
+  push:
+    branches: [ master, dev ]
+    paths:
+      - ".github/workflows/r52_fvp.yml"
+      - "CMakeLists.txt"
+      - "cmake/cortex_r52*.cmake"
+      - "common/**"
+      - "ports/cortex_r52/**"
+      - "ports_module/cortex_r52/**"
+  pull_request:
+    branches: [ master, dev ]
+    # Duplicated rather than shared through a YAML anchor. GitHub Actions'
+    # parser does not dependably honour anchors and the failure mode is the
+    # whole workflow refusing to parse -- a job that dies before it does
+    # anything, which is the exact defect gcc_check.yml carries a comment
+    # about. **Edit both.**
+    paths:
+      - ".github/workflows/r52_fvp.yml"
+      - "CMakeLists.txt"
+      - "cmake/cortex_r52*.cmake"
+      - "common/**"
+      - "ports/cortex_r52/**"
+      - "ports_module/cortex_r52/**"
+
+jobs:
+  # One job rather than one per configuration, for the reason gcc_check.yml
+  # gives for folding its two toolchains together: the checks list stays short,
+  # and a single run sees every configuration so a cross-configuration
+  # regression shows up in one log instead of two.
+  r52:
+    runs-on: ubuntu-24.04
+
+    env:
+      # Pinned deliberately. Matches gcc_check.yml and ci_cortex_m.yml so all
+      # three share one cache entry rather than each holding its own copy of
+      # the same archive; change them together or the sharing silently stops.
+      # 14.3.rel1 is AGENTS.md's declared GCC 14 default.
+      GCC_VERSION: 14.3.rel1
+
+      # Where the Armv8-R AEM FVP comes from.
+      #
+      # Arm distributes it free of charge but behind a click-through licence,
+      # with no stable unauthenticated download URL we can hard-code -- the
+      # permalink forms under developer.arm.com/-/cdn-downloads all 404 for
+      # this model. So the URL is a repository variable rather than a literal
+      # here, and the maintainer sets it once to a location the runner can
+      # reach (an Eclipse-hosted mirror, a release asset, or Arm's own URL if
+      # a durable one appears).
+      #
+      # Set FVP_AEMV8R_URL to a .tgz/.tar.gz of the model, and optionally
+      # FVP_AEMV8R_SHA256 to its checksum. With the checksum set the download
+      # is verified; without it the run says so rather than pretending.
+      #
+      # When the variable is unset the build lanes still run and still gate the
+      # pull request -- only execution is skipped, loudly, in the log and in
+      # the job summary. A silent green here would recreate the exact hole this
+      # workflow exists to close.
+      FVP_URL: ${{ vars.FVP_AEMV8R_URL }}
+      FVP_SHA256: ${{ vars.FVP_AEMV8R_SHA256 }}
+
+    steps:
+    # Actions are pinned to a commit SHA with the version in the trailing
+    # comment. A tag can be moved; a SHA cannot. Dependabot moves these pins
+    # and rewrites the comments -- see .github/dependabot.yml.
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    # Path and key match gcc_check.yml's AArch32 entry exactly, so the two
+    # workflows share one cache entry. Only the AArch32 toolchain is needed
+    # here: cortex_r52 is Armv8-R AArch32, and nothing this workflow builds
+    # targets aarch64.
+    - name: Cache the AArch32 Arm GNU toolchain
+      id: cache-arm32
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: toolchain
+        key: arm-gnu-toolchain-${{ env.GCC_VERSION }}-x86_64-arm-none-eabi
+
+    # The checksum suffix is .sha256asc and not .sha256. Arm publishes both,
+    # and for arm-none-eabi the .sha256 file contains a 32-character MD5, so
+    # sha256sum -c on it fails with "no properly formatted checksum lines
+    # found". Do not "simplify" the suffix. (Same note as gcc_check.yml, which
+    # is where it was first paid for.)
+    - name: Install the AArch32 Arm GNU toolchain
+      if: steps.cache-arm32.outputs.cache-hit != 'true'
+      run: |
+        set -eu
+        base="https://developer.arm.com/-/media/Files/downloads/gnu/${GCC_VERSION}/binrel"
+        archive="arm-gnu-toolchain-${GCC_VERSION}-x86_64-arm-none-eabi.tar.xz"
+        mkdir -p toolchain && cd toolchain
+        curl -fsSLO "$base/$archive"
+        curl -fsSLO "$base/$archive.sha256asc"
+        sha256sum -c "$archive.sha256asc"
+        tar xf "$archive"
+        rm -f "$archive"
+
+    # Only reaches apt if the runner image has stopped shipping ninja. This
+    # repository has already paid for unguarded apt calls -- scripts/install.sh
+    # carries a long comment about apt-get update stalling for over two hours
+    # and taking whole regression runs with it. Do not make this
+    # unconditional.
+    - name: Ensure ninja is available
+      run: |
+        set -eu
+        if command -v ninja >/dev/null 2>&1; then
+          ninja --version
+        else
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build
+        fi
+
+    # Keyed on the URL rather than a version string, so pointing the variable
+    # at a different model fetches it instead of serving the old one from
+    # cache. The key is the URL's own hash because a raw URL may contain
+    # characters a cache key cannot.
+    - name: Cache the Armv8-R AEM FVP
+      id: cache-fvp
+      if: env.FVP_URL != ''
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: fvp
+        key: fvp-aemv8r-${{ hashFiles('.github/workflows/r52_fvp.yml') }}-${{ env.FVP_SHA256 || 'nosum' }}
+
+    - name: Install the Armv8-R AEM FVP
+      if: env.FVP_URL != '' && steps.cache-fvp.outputs.cache-hit != 'true'
+      run: |
+        set -eu
+        mkdir -p fvp && cd fvp
+        curl -fsSL -o fvp.tgz "$FVP_URL"
+        if [ -n "${FVP_SHA256:-}" ]; then
+          echo "$FVP_SHA256  fvp.tgz" | sha256sum -c -
+        else
+          echo "::warning::FVP_AEMV8R_SHA256 is not set; the download was not verified."
+        fi
+        tar xf fvp.tgz
+        rm -f fvp.tgz
+
+    # The model links against libatomic. Everything else it needs
+    # (libstdc++, libgcc_s, librt, libpthread) is already on the runner image,
+    # and its own libscxframework/libsystemc ship inside the tarball. The
+    # runner usually has libatomic1 by way of gcc, so this is guarded for the
+    # same reason the ninja step is.
+    - name: Ensure the FVP's runtime dependencies are present
+      if: env.FVP_URL != ''
+      run: |
+        set -eu
+        if ldconfig -p | grep -q 'libatomic\.so\.1'; then
+          echo "libatomic1 present"
+        else
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libatomic1
+        fi
+
+    # Resolve the model once and hand its absolute path to CMake below.
+    #
+    # ports/cortex_r52/gnu/example_build/fvp_baser_aemv8r/CMakeLists.txt finds
+    # it with find_program(... HINTS $ENV{HOME}/FVP_Base_AEMv8R_11.32_19/bin),
+    # a hint that is right on a developer's machine and meaningless here, so
+    # the path is passed explicitly. find_program caches into FVP_BASER_AEMV8R,
+    # which means -DFVP_BASER_AEMV8R=<path> overrides it with no change to the
+    # CMake files.
+    #
+    # FVP_PRESENT, not a bare "did the variable exist", so that a URL which
+    # downloads something that is not the model fails here rather than
+    # silently skipping every test later.
+    - name: Locate the FVP
+      id: fvp
+      run: |
+        set -eu
+        if [ -z "${FVP_URL:-}" ]; then
+          echo "present=false" >>"$GITHUB_OUTPUT"
+          echo "::warning::FVP_AEMV8R_URL is not set for this repository, so the Cortex-R52 images were built but NOT executed. Set the repository variable to enable the execution lanes."
+          {
+            echo "### Cortex-R52 FVP execution: SKIPPED"
+            echo ""
+            echo "\`FVP_AEMV8R_URL\` is not set, so this run built the images but executed none of them."
+            echo "Set the repository variable (Settings -> Secrets and variables -> Actions -> Variables)"
+            echo "to a download URL for the Armv8-R AEM FVP to turn the execution lanes on."
+          } >>"$GITHUB_STEP_SUMMARY"
+          exit 0
+        fi
+        binary="$(find fvp -type f -name FVP_BaseR_AEMv8R -perm -u+x | head -1)"
+        if [ -z "$binary" ]; then
+          echo "FVP_AEMV8R_URL was set, but no FVP_BaseR_AEMv8R binary was found in the archive." >&2
+          find fvp -maxdepth 3 -type d | sed 's/^/  /' >&2
+          exit 1
+        fi
+        binary="$(cd "$(dirname "$binary")" && pwd)/$(basename "$binary")"
+        echo "present=true" >>"$GITHUB_OUTPUT"
+        echo "binary=$binary" >>"$GITHUB_OUTPUT"
+        "$binary" --version
+
+    # Both configurations are configured, built and (when the model is here)
+    # run by one script, so that adding a configuration is one line rather
+    # than three near-identical blocks of YAML.
+    #
+    # Every image is named explicitly from the generated ninja graph rather
+    # than from a list kept here. The images are EXCLUDE_FROM_ALL -- a bare
+    # "cmake --build" reports "no work to do" and would compare nothing --
+    # and reading the graph means a target added to CMakeLists.txt cannot
+    # escape this check by nobody remembering to list it. This is the same
+    # technique, and the same reasoning, as scripts/check_gcc.sh's CMake stage.
+    #
+    # TX_R52_FLOAT_ABI=hard is not optional alongside TX_R52_ENABLE_VFP: the
+    # port's CMakeLists.txt refuses the combination outright (#686), because
+    # TX_ENABLE_VFP_SUPPORT enables VMRS/VSTMDB/VLDMIA blocks that a soft
+    # float ABI leaves the assembler unable to accept.
+    - name: Build and run the Cortex-R52 images
+      run: |
+        set -eu
+        export PATH="$GITHUB_WORKSPACE/toolchain/arm-gnu-toolchain-${GCC_VERSION}-x86_64-arm-none-eabi/bin:$PATH"
+        arm-none-eabi-gcc --version | head -1
+
+        fvp_present='${{ steps.fvp.outputs.present }}'
+        fvp_binary='${{ steps.fvp.outputs.binary }}'
+
+        fvp_arg=""
+        if [ "$fvp_present" = "true" ]; then
+          fvp_arg="-DFVP_BASER_AEMV8R=$fvp_binary"
+        fi
+
+        status=0
+
+        run_configuration() {
+          name="$1"; shift
+          build="build/$name"
+
+          echo ""
+          echo "=============================================================="
+          echo "== $name"
+          echo "=============================================================="
+
+          if ! cmake -S . -B "$build" -G Ninja \
+                  -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_r52.cmake \
+                  $fvp_arg "$@"; then
+            echo "::error::$name: CMake configure failed"
+            status=1
+            return
+          fi
+
+          images="$(ninja -C "$build" -t targets all 2>/dev/null \
+                    | grep -oE '^[A-Za-z0-9_]+\.elf' \
+                    | grep -v '^cmake_' | sort -u)"
+          if [ -z "$images" ]; then
+            echo "::error::$name: no .elf targets found in the CMake graph"
+            status=1
+            return
+          fi
+
+          echo "$name: building $(echo "$images" | wc -l) images"
+          # shellcheck disable=SC2086
+          if ! cmake --build "$build" --target $images; then
+            echo "::error::$name: one or more images did not build"
+            status=1
+            return
+          fi
+
+          if [ "$fvp_present" != "true" ]; then
+            echo "$name: built, not executed (no FVP configured)"
+            return
+          fi
+
+          if ! ctest --test-dir "$build" --output-on-failure; then
+            echo "::error::$name: one or more images failed on the FVP"
+            status=1
+          fi
+        }
+
+        run_configuration default \
+            -DTX_R52_BUILD_FVP_EXAMPLE=ON
+
+        run_configuration feature \
+            -DTX_R52_BUILD_FVP_EXAMPLE=ON \
+            -DTX_R52_ENABLE_VFP=ON \
+            -DTX_R52_FLOAT_ABI=hard \
+            -DTX_R52_ENABLE_FIQ=ON \
+            -DTX_R52_ENABLE_IRQ_NESTING=ON \
+            -DTX_R52_ENABLE_FIQ_NESTING=ON
+
+        exit $status
