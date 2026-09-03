@@ -149,6 +149,12 @@ cntfrq_at_el2:  .word   0
 hmpuir_at_el2:  .word   0
     .global probe_stage
 probe_stage:    .word   0
+#ifdef TXM_MODULE_MANAGER
+    .extern __tx_module_svc_interrupt
+    .extern _txm_module_manager_data_abort
+    .extern _txm_module_manager_prefetch_abort
+#endif
+
     .global fault_expected
 fault_expected: .word   0
     .global fault_taken
@@ -197,7 +203,11 @@ el2_vectors:
 el1_vectors:
     b       fault_el1_reset                 /* 0x00                         */
     b       fault_el1_undef                 /* 0x04                         */
+#ifdef TXM_MODULE_MANAGER
+    b       __tx_module_svc_interrupt       /* 0x08  module kernel boundary */
+#else
     b       fault_el1_svc                   /* 0x08                         */
+#endif
     b       fault_el1_pabt                  /* 0x0C                         */
     b       fault_el1_dabt                  /* 0x10                         */
     b       fault_el1_reserved              /* 0x14                         */
@@ -891,6 +901,26 @@ fault_el1_svc:
     mov     r3, lr
     FAULT_TAIL 0x48
 fault_el1_pabt:
+#ifdef TXM_MODULE_MANAGER
+    /* A fault from User mode is a module reaching outside its regions, and it
+       belongs to the module manager, which will record it and terminate the
+       thread.  A fault from a privileged mode continues on the recoverable path
+       below, which the boot probes depend on.
+       
+       r0 is pushed and popped around the test rather than simply used.  The code
+       below clobbers r0 through r2 without saving them, which is tolerable for a
+       probe that provokes its own fault, but the module capture records the
+       faulting registers and would record ours instead.  LDM does not affect the
+       flags, so the comparison still holds after the pop.  */
+
+    stmdb   sp!, {r0}
+    mrs     r0, spsr
+    and     r0, r0, #0x1F
+    cmp     r0, #0x10                       /* User mode?                    */
+    ldmia   sp!, {r0}
+    beq     _txm_module_manager_prefetch_abort
+#endif
+
     /* Recoverable when a test has armed fault_expected_pabt.
        *
        * Recovery differs from the data-abort case in kind, not degree.  There,
@@ -932,6 +962,26 @@ fault_el1_pabt_fatal:
     mrc     p15, 0, r3, c6, c0, 2           /* IFAR                         */
     FAULT_TAIL 0x4C
 fault_el1_dabt:
+#ifdef TXM_MODULE_MANAGER
+    /* A fault from User mode is a module reaching outside its regions, and it
+       belongs to the module manager, which will record it and terminate the
+       thread.  A fault from a privileged mode continues on the recoverable path
+       below, which the boot probes depend on.
+       
+       r0 is pushed and popped around the test rather than simply used.  The code
+       below clobbers r0 through r2 without saving them, which is tolerable for a
+       probe that provokes its own fault, but the module capture records the
+       faulting registers and would record ours instead.  LDM does not affect the
+       flags, so the comparison still holds after the pop.  */
+
+    stmdb   sp!, {r0}
+    mrs     r0, spsr
+    and     r0, r0, #0x1F
+    cmp     r0, #0x10                       /* User mode?                    */
+    ldmia   sp!, {r0}
+    beq     _txm_module_manager_data_abort
+#endif
+
     /* Recoverable when a test has armed fault_expected.  The protection map is
        only meaningful if a violation actually faults, so the test provokes one
        deliberately and this path lets it continue: record the syndrome and

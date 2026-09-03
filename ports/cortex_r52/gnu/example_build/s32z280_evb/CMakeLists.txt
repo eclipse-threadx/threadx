@@ -244,3 +244,278 @@ if(TX_R52_ENABLE_FIQ_NESTING)
         ${EVB_LINK_QUIET_RWX}
     )
 endif()
+
+# ---------------------------------------------------------------------------
+# ThreadX modules: the module manager, with a sample module linked into the
+# module area and loaded in place from there.
+#
+# This target deliberately does NOT link the threadx library's port assembly.
+# The module port carries its own copies of the scheduler, context restore and
+# stack build, because the region switch happens in the scheduler and a module
+# thread starts in a different processor mode.  Linking both would give two
+# definitions of every one of them.
+#
+# Guarded by an option, off by default, because it is the only target that needs
+# TXM_MODULE_MANAGER in entry.S and the only one that links common_modules.
+# ---------------------------------------------------------------------------
+
+option(TX_R52_BUILD_S32Z280_MODULE_EXAMPLE
+       "Build the NXP S32Z280-594EVB ThreadX module manager example" OFF)
+
+if(TX_R52_BUILD_S32Z280_MODULE_EXAMPLE)
+
+    set(MOD_DIR ${CMAKE_SOURCE_DIR}/ports_module/cortex_r52/gnu)
+    set(MOD_EVB ${MOD_DIR}/example_build/s32z280_evb)
+
+    # ---------------------------------------------------------------------
+    # A second ThreadX library, built with the module port's headers.
+    #
+    # This is not optional and not a convenience.  The module port's tx_port.h
+    # adds the owning module instance to TX_QUEUE, TX_SEMAPHORE,
+    # TX_EVENT_FLAGS_GROUP and TX_TIMER, and the module fields to TX_THREAD.
+    # Measured: TX_QUEUE is 60 bytes against the base port's, TX_SEMAPHORE 40
+    # against 32, TX_THREAD 236 against 184.  A kernel compiled against the base
+    # port and a manager compiled against this one disagree about every object,
+    # and they link without complaint, because C linking does not compare struct
+    # layouts.  The result would be memory corruption at run time with nothing in
+    # the build to hint at it.
+    #
+    # The base port's assembly is reused except for the five files the module port
+    # replaces, and tx_port_offset_check.c is included deliberately: if the module
+    # headers moved any offset that assembly depends on, that check is what says
+    # so, and it is better to find out here than on the board.
+    # ---------------------------------------------------------------------
+
+    # Guarded by if(NOT TARGET) because the FVP module example defines the same
+    # library from its own directory, and the two example options can be on at
+    # once.  The definitions are identical -- both describe the module port, not
+    # a board -- so whichever directory CMake reaches first may create it.
+
+    if(NOT TARGET threadx_module)
+
+    file(GLOB TX_COMMON_SRC ${CMAKE_SOURCE_DIR}/common/src/*.c)
+
+    set(TX_R52_PORT_SRC ${CMAKE_SOURCE_DIR}/ports/cortex_r52/gnu/src)
+
+    add_library(threadx_module STATIC EXCLUDE_FROM_ALL
+        ${TX_COMMON_SRC}
+        ${TX_R52_PORT_SRC}/tx_port_offset_check.c
+        ${TX_R52_PORT_SRC}/tx_thread_fiq_context_restore.S
+        ${TX_R52_PORT_SRC}/tx_thread_fiq_context_save.S
+        ${TX_R52_PORT_SRC}/tx_thread_fiq_nesting_end.S
+        ${TX_R52_PORT_SRC}/tx_thread_fiq_nesting_start.S
+        ${TX_R52_PORT_SRC}/tx_thread_interrupt_control.S
+        ${TX_R52_PORT_SRC}/tx_thread_interrupt_disable.S
+        ${TX_R52_PORT_SRC}/tx_thread_interrupt_restore.S
+        ${TX_R52_PORT_SRC}/tx_thread_irq_nesting_end.S
+        ${TX_R52_PORT_SRC}/tx_thread_irq_nesting_start.S
+        ${TX_R52_PORT_SRC}/tx_thread_vectored_context_save.S
+        ${TX_R52_PORT_SRC}/tx_timer_interrupt.S
+    )
+
+    target_include_directories(threadx_module PUBLIC
+        ${MOD_DIR}/inc
+        ${CMAKE_SOURCE_DIR}/common/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/module_manager/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/module_lib/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/inc
+    )
+
+    target_compile_definitions(threadx_module PUBLIC TXM_MODULE_MANAGER)
+
+    endif()
+
+    # The portable half of the module manager.  Globbed rather than listed: it is
+    # a whole upstream component, not a selection from one, and a file added to it
+    # upstream should not need a change here to be compiled.
+
+    file(GLOB TXM_MANAGER_SRC ${CMAKE_SOURCE_DIR}/common_modules/module_manager/src/*.c)
+
+    # The module-side library: the API shims that run inside the module.  These
+    # belong to the module's image and must not reach the manager's link -- they
+    # define the same names as the kernel's own entry points, and as objects they
+    # beat the kernel's static library, so in one link every service call the
+    # manager makes is redirected into the module.  See link_demo_module.lds.
+
+    file(GLOB TXM_MODULE_LIB_SRC ${CMAKE_SOURCE_DIR}/common_modules/module_lib/src/*.c)
+
+    # ------------------------------------------------------------------------
+    # The module, built as its own image and reduced to a raw binary.
+    # ------------------------------------------------------------------------
+
+    add_executable(s32z280_demo_module.elf EXCLUDE_FROM_ALL
+        ${MOD_EVB}/txm_module_preamble.S
+        ${MOD_EVB}/sample_threadx_module.c
+        ${MOD_DIR}/module_lib/src/txm_module_thread_shell_entry.c
+        ${MOD_DIR}/module_lib/src/txm_module_gcc_setup.S
+        ${TXM_MODULE_LIB_SRC}
+    )
+
+    # No TXM_MODULE_MANAGER here: that define selects the kernel side of the
+    # shared headers, and this is the other side.
+
+    target_include_directories(s32z280_demo_module.elf PRIVATE
+        ${EVB_DIR}
+        ${MOD_DIR}/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/module_lib/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/inc
+        ${CMAKE_SOURCE_DIR}/common/inc
+    )
+
+    # Position independent, and only here.  These four flags are what make the
+    # module relocatable, and putting any of them on the manager would be a bug:
+    # the manager is the resident image, linked absolutely at the address it
+    # boots from, and -msingle-pic-base in particular would have it treat r9 as
+    # a PIC base that nothing sets up.
+    #
+    #   -fpic                            data references go through the GOT
+    #   -msingle-pic-base                r9 is the GOT base, and the caller sets
+    #                                    it -- which is what the manager's
+    #                                    thread stack build now does
+    #   -mno-pic-data-is-text-relative   the module's data is NOT at a fixed
+    #                                    offset from its code.  It is not: code
+    #                                    is loaded in place in the module area
+    #                                    and data is allocated from the byte
+    #                                    pool, so the gap between them is
+    #                                    decided at run time
+    #   -fno-plt                         no procedure linkage table, which a
+    #                                    module has no loader to populate
+    #   -mno-long-calls                  see below -- this one is ours, not the
+    #                                    reference port's, and without it the
+    #                                    module cannot start at all
+    #
+    # -mno-long-calls is the interesting one, and it is here because of a bug
+    # this build found before silicon did.  The project-wide C flags carry
+    # -mlong-calls, which the manager needs: its image spans TCM at 0x30000000
+    # and code at 0x79900000, far beyond the +/-32 MB a direct BL reaches.  But
+    # -mlong-calls under -fpic makes GCC route EVERY call through the GOT --
+    # R_ARM_GOT32 instead of R_ARM_CALL -- and one of those calls is the shell
+    # entry's call to _gcc_setup, which is the function that fills the GOT in.
+    # The module would have loaded, entered its shell entry, loaded a zero out
+    # of the not-yet-written GOT and branched to address 0.
+    #
+    # A module does not need long calls.  It is one contiguous blob under two
+    # kilobytes, every internal call is a few hundred bytes away, and it never
+    # calls out of itself: kernel services go through the dispatcher function
+    # pointer in its entry info, which is data and reached through the GOT
+    # either way.  So the flag is pure cost here, and dropping it is what makes
+    # the bootstrap possible rather than a workaround for it.
+    #
+    # The same four, in the same order, are what the Cortex-A7 GNU module
+    # example uses.  Verified on the generated code rather than assumed: with
+    # these flags every reference to a module global comes out as an R_ARM_GOT32
+    # and loads through LDR rX, [r9, rY], while calls stay direct R_ARM_CALL.
+
+    target_compile_options(s32z280_demo_module.elf PRIVATE
+        -g
+        -fpic
+        -fno-plt
+        -mno-pic-data-is-text-relative
+        -msingle-pic-base
+        -mno-long-calls
+    )
+
+    target_link_options(s32z280_demo_module.elf PRIVATE
+        -T${MOD_EVB}/link_demo_module.lds
+        -nostartfiles
+        -nostdlib
+        -Wl,-Map=s32z280_demo_module.map
+        ${EVB_LINK_QUIET_RWX}
+    )
+
+    # The raw image the manager embeds.  Written into the binary directory
+    # because that is the include path module_blob.S searches.
+
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+        COMMAND ${CMAKE_OBJCOPY} -O binary
+                $<TARGET_FILE:s32z280_demo_module.elf>
+                ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+        DEPENDS s32z280_demo_module.elf
+        COMMENT "Converting the demonstration module to a raw image"
+        VERBATIM
+    )
+
+    add_custom_target(s32z280_demo_module_bin
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+    )
+
+    add_executable(s32z280_module.elf EXCLUDE_FROM_ALL
+        # Board support, shared with the other examples
+        ${EVB_DIR}/entry.S
+        ${EVB_DIR}/linflexd.c
+        ${EVB_DIR}/timer.c
+        ${EVB_DIR}/mpu.c
+        ${EVB_DIR}/gicv3.c
+        ${EVB_DIR}/irq_dispatch.c
+        ${EVB_DIR}/gic_probe.c
+        ${EVB_DIR}/cache.c
+        ${EVB_DIR}/tcm.c
+        ${EVB_DIR}/thread_mpu.c
+        ${EVB_DIR}/tx_initialize_low_level.S
+
+        # Module manager port
+        ${MOD_DIR}/module_manager/src/tx_thread_schedule.S
+        ${MOD_DIR}/module_manager/src/tx_thread_context_save.S
+        ${MOD_DIR}/module_manager/src/tx_thread_context_restore.S
+        ${MOD_DIR}/module_manager/src/tx_thread_stack_build.S
+        ${MOD_DIR}/module_manager/src/tx_thread_system_return.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_svc_handler.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_fault_capture.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_user_mode_entry.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_thread_stack_build.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_mm_register_setup.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_memory_fault_handler.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_memory_fault_notify.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_alignment_adjust.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_external_memory_enable.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_offset_check.c
+
+        # The module, as bytes rather than as objects.  module_blob.S includes the
+        # raw image built by s32z280_demo_module.elf, so none of the module's
+        # symbols enter this link.
+        ${MOD_EVB}/module_blob.S
+
+        # The application
+        ${MOD_EVB}/sample_threadx_module_manager.c
+
+        # The portable module manager
+        ${TXM_MANAGER_SRC}
+    )
+
+    target_include_directories(s32z280_module.elf PRIVATE
+        ${EVB_DIR}
+        ${MOD_DIR}/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/module_manager/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/module_lib/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/inc
+    )
+
+    target_compile_definitions(s32z280_module.elf PRIVATE
+        TXM_MODULE_MANAGER
+        TX_R52_USE_THREADX_IRQ
+    )
+
+    target_compile_options(s32z280_module.elf PRIVATE -g)
+
+    # .incbin searches the assembler's include paths, not the source tree, and
+    # demo_module.bin is generated -- so the build directory has to be on that
+    # path or module_blob.S cannot find the image.
+
+    set_source_files_properties(${MOD_EVB}/module_blob.S PROPERTIES
+        OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+        COMPILE_OPTIONS "-Wa,-I${CMAKE_CURRENT_BINARY_DIR}"
+    )
+
+    add_dependencies(s32z280_module.elf s32z280_demo_module_bin)
+
+    target_link_options(s32z280_module.elf PRIVATE
+        -T${MOD_EVB}/link_module.lds
+        -nostartfiles
+        -Wl,-Map=s32z280_module.map
+        ${EVB_LINK_QUIET_RWX}
+    )
+
+    target_link_libraries(s32z280_module.elf PRIVATE threadx_module)
+
+endif()

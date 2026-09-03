@@ -200,7 +200,37 @@ typedef unsigned short                          USHORT;
 
 #define TX_THREAD_EXTENSION_0
 #define TX_THREAD_EXTENSION_1
-#define TX_THREAD_EXTENSION_2                   ULONG       tx_thread_vfp_enable;
+/* The module thread extension.  A thread that belongs to a module carries a
+   pointer to its module instance, its entry information, the user-mode state to
+   restore when it is scheduled, and two stacks: the module's own stack for user
+   mode and a kernel stack for the privileged side of a system call.
+
+   Two stacks rather than one is not an implementation detail that can be
+   simplified away.  A module thread runs in user mode on memory the module owns;
+   the moment it enters the kernel through a system call, the kernel must not be
+   writing its own state onto memory the module can also write, or the module
+   could corrupt the kernel by scribbling on its own stack.  */
+
+/* tx_thread_vfp_enable comes first and is not optional here.  The Cortex-R52
+   port keeps the floating-point lazy-enable flag in this extension, and dropping
+   it while adding the module fields would leave VFP threads with nowhere to
+   record that they have used the unit -- the kind of breakage that shows up as
+   corrupted floating-point state in a module, a long way from its cause.  */
+
+#define TX_THREAD_EXTENSION_2           ULONG   tx_thread_vfp_enable;                   \
+                                        VOID    *tx_thread_module_instance_ptr;         \
+                                        VOID    *tx_thread_module_entry_info_ptr;       \
+                                        ULONG   tx_thread_module_current_user_mode;     \
+                                        ULONG   tx_thread_module_user_mode;             \
+                                        ULONG   tx_thread_module_saved_lr;              \
+                                        VOID    *tx_thread_module_kernel_stack_start;   \
+                                        VOID    *tx_thread_module_kernel_stack_end;     \
+                                        ULONG   tx_thread_module_kernel_stack_size;     \
+                                        VOID    *tx_thread_module_stack_ptr;            \
+                                        VOID    *tx_thread_module_stack_start;          \
+                                        VOID    *tx_thread_module_stack_end;            \
+                                        ULONG   tx_thread_module_stack_size;            \
+                                        VOID    *tx_thread_module_reserved;
 #define TX_THREAD_EXTENSION_3
 
 
@@ -208,11 +238,30 @@ typedef unsigned short                          USHORT;
 
 #define TX_BLOCK_POOL_EXTENSION
 #define TX_BYTE_POOL_EXTENSION
-#define TX_EVENT_FLAGS_GROUP_EXTENSION
+/* The four object extensions below each carry the module instance that owns the
+   object, and the module manager needs them to answer a question it must answer
+   on every service call: is the object this module is asking about one it owns?
+   Without them a module could pass any address it liked as a queue or a semaphore
+   and the kernel would act on whatever was there.
+
+   They are also why a module port cannot share the base port's ThreadX library.
+   They change the layout of TX_QUEUE, TX_SEMAPHORE, TX_EVENT_FLAGS_GROUP and
+   TX_TIMER, so a library compiled against the base port's tx_port.h and a manager
+   compiled against this one disagree about every kernel object -- and both
+   compile, so nothing says so.
+
+   Block pool, byte pool and mutex stay empty, as they are in the Armv8-M module
+   port: the manager tracks ownership of those differently.  */
+
+#define TX_EVENT_FLAGS_GROUP_EXTENSION          VOID    *tx_event_flags_group_module_instance; \
+                                                VOID   (*tx_event_flags_group_set_module_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *group_ptr);
 #define TX_MUTEX_EXTENSION
-#define TX_QUEUE_EXTENSION
-#define TX_SEMAPHORE_EXTENSION
-#define TX_TIMER_EXTENSION
+#define TX_QUEUE_EXTENSION                      VOID    *tx_queue_module_instance; \
+                                                VOID   (*tx_queue_send_module_notify)(struct TX_QUEUE_STRUCT *queue_ptr);
+#define TX_SEMAPHORE_EXTENSION                  VOID    *tx_semaphore_module_instance; \
+                                                VOID   (*tx_semaphore_put_module_notify)(struct TX_SEMAPHORE_STRUCT *semaphore_ptr);
+#define TX_TIMER_EXTENSION                      VOID    *tx_timer_module_instance; \
+                                                VOID   (*tx_timer_module_expiration_function)(ULONG id);
 
 
 /* Define the user extension field of the thread control block.  Nothing

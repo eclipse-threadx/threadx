@@ -34,6 +34,8 @@ build_r52_vfp/
 build_r52_uart/
 build_r52_mpu/
 build_r52_all/
+build_mod/
+build_fvp/
 
 # Keil uVision per-user state, regenerated when a project is opened.
 # The .uvprojx / .uvproj project files are the ones worth tracking.

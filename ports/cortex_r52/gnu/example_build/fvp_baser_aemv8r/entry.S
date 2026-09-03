@@ -101,6 +101,20 @@
     .equ    HSR_EC_SHIFT,   26
     .equ    HSR_EC_HVC,     0x12        /* HVC executed in AArch32          */
 
+#ifdef TXM_MODULE_MANAGER
+
+/* The module manager owns three of the EL1 vectors in a manager build: the
+   supervisor call, which is the privilege boundary a module crosses to reach
+   the kernel, and the two aborts, which are how a module that reaches outside
+   its regions is caught.  Declared rather than merely referenced so that a
+   build with the manager half-configured fails at the link with a name in it. */
+
+    .extern __tx_module_svc_interrupt
+    .extern _txm_module_manager_data_abort
+    .extern _txm_module_manager_prefetch_abort
+
+#endif
+
 /* Report which vector was taken, then halt.  The FVP offers no GDB stub
    (Iris only), so a self-identifying fault is the primary debugging tool
    for this port.  Uses no stack: only r0/r1 and a semihosting call.  */
@@ -144,7 +158,11 @@ el2_vectors:
 el1_vectors:
     b       el1_trap_reset                  /* 0x00  reset                  */
     b       el1_trap_undef                  /* 0x04  undefined instruction  */
+#ifdef TXM_MODULE_MANAGER
+    b       __tx_module_svc_interrupt       /* 0x08  module kernel boundary */
+#else
     b       el1_trap_svc                    /* 0x08  supervisor call        */
+#endif
     b       el1_trap_pabt                   /* 0x0C  prefetch abort         */
     b       el1_trap_dabt                   /* 0x10  data abort             */
     b       el1_trap_reserved               /* 0x14  reserved               */
@@ -476,6 +494,26 @@ el1_trap_svc:       FAULT_REPORT msg_el1_svc
    and this handler returns there, restoring the pre-fault mode from SPSR.  */
 
 el1_trap_pabt:
+#ifdef TXM_MODULE_MANAGER
+
+    /* A fault from User mode is a module reaching outside its code region, and
+       it belongs to the module manager, which records it and terminates the
+       thread.  A fault from a privileged mode falls through to the paths below,
+       which the MPU self-test depends on.
+
+       r0 is pushed and popped around the test rather than simply used: the
+       capture in the manager records the faulting registers, and clobbering one
+       here would have it record ours instead.  LDM does not affect the flags,
+       so the comparison still holds after the pop.  */
+
+    stmdb   sp!, {r0}
+    mrs     r0, spsr
+    and     r0, r0, #0x1F
+    cmp     r0, #0x10                       /* User mode?                   */
+    ldmia   sp!, {r0}
+    beq     _txm_module_manager_prefetch_abort
+
+#endif
 #ifdef TX_R52_MPU_FAULT_TEST
     push    {r0, r1}
     ldr     r0, =mpu_expect_pabt
@@ -532,6 +570,19 @@ mpu_try_execute_land:
    Runs on the Abort-mode stack set up above.  */
 
 el1_trap_dabt:
+#ifdef TXM_MODULE_MANAGER
+
+    /* A fault from User mode is a module reaching outside its data region.  See
+       el1_trap_pabt above for why r0 is saved across the test.  */
+
+    stmdb   sp!, {r0}
+    mrs     r0, spsr
+    and     r0, r0, #0x1F
+    cmp     r0, #0x10                       /* User mode?                   */
+    ldmia   sp!, {r0}
+    beq     _txm_module_manager_data_abort
+
+#endif
 #ifdef TX_R52_MPU_FAULT_TEST
     push    {r0, r1}
     ldr     r0, =mpu_expect_abort

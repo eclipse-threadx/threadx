@@ -95,6 +95,118 @@ SECTIONS
         KEEP(*(.vectors_el1))
     } > CODE
 
+    /* The shared granules the module reports its progress through, and the one
+       it is not allowed to reach.
+
+       FIRST in the module area, so the base address is ORIGIN(MODULE) and the
+       module can carry it as a constant -- the manager deliberately knows no
+       symbol of the module and has no channel through which to tell it anything.
+       S32Z_MODULE_STATUS_BASE in platform.h is the same number, and the ASSERTs
+       at the bottom of this file pin the two together at link time.
+
+       Six granules.  Five are granted, one per shared entry the port provides,
+       because granting a single region only ever exercises the first of the five;
+       the sixth -- index 2, so a granted granule sits on either side of it -- is
+       never granted, and the module writes it to prove it still faults.
+
+       NOLOAD: the manager clears the area before every pass, and a granule that
+       arrived pre-filled would make a module that never wrote one look as though
+       it had.  */
+
+    .module_status (NOLOAD) :
+    {
+        __module_status_start__ = .;
+        . = . + 0x180;                  /* six 64-byte granules */
+        . = ALIGN(64);
+        __module_status_end__ = .;
+    } > MODULE
+
+    /* The module image, in the module area, just above the shared granules.
+
+       The module is not linked here.  It is built as its own image by the
+       s32z280_demo_module.elf target, objcopied to a raw binary and included as
+       bytes by module_blob.S, and this section only decides where those bytes
+       land.  Which address that is does not matter any more: since the module
+       became relocatable it is linked against nominal addresses it never runs
+       at and _gcc_setup rebases it to wherever it was put, so this only has to
+       be inside the module area and disjoint from everything else in it.
+
+       The earlier arrangement compiled the module's sources into this image and
+       gathered them here by object name.  That cannot work.  The module library
+       defines shims named after the same ThreadX entry points the kernel
+       defines, and in a single link the shims win, because they arrive as
+       objects and the kernel arrives as a static library.  The manager's own
+       tx_thread_create resolved to the module's copy at 0x317F1700, called into
+       the module area that no kernel region covers, and took a silent prefetch
+       abort before the first thread ever ran.
+
+       Keeping the module out of the link also removes a whole class of quiet
+       failure that arrangement had: matching input sections by object-file name
+       fails open.  A missing suffix or a wildcard that does not match produces an
+       empty section, a link that succeeds and an image with no module in it,
+       twice over here -- and the block had to sit before .text, because
+       placement is first match and the kernel's *(.text*) would otherwise
+       swallow the module's code while leaving its data behind.
+
+       This block still sits before .text: harmless now, and it keeps the module
+       at the head of the map where it is easy to find.  */
+
+    .module_image :
+    {
+        __module_image_start__ = .;
+        KEEP(*(.module_blob))
+        . = ALIGN(64);
+        __module_image_end__ = .;
+    } > MODULE
+
+    /* The pool the manager allocates module data from, in the module area for
+       the same reason the image is: whatever the manager hands to a module
+       becomes an MPU region, and PMSAv8-R will not allow that region to overlap
+       a kernel one.  Anything a module can be given has to live outside every
+       region in the boot table, and this area is the only such memory.
+
+       NOLOAD because nothing is copied in -- the byte pool writes its own
+       headers when it is created.  */
+
+    .module_pool (NOLOAD) :
+    {
+        . = ALIGN(64);
+        __module_pool_start__ = .;
+        *(.module_pool)
+        . = ALIGN(64);
+        __module_pool_end__ = .;
+    } > MODULE
+
+    /* A second place to load the same module from, which is how this example
+       proves the module is relocatable rather than merely built to be.
+
+       A module that runs correctly at the address it was linked for proves
+       nothing about relocation -- the GOT rebase would produce the same
+       addresses it started with and a broken rebase would look identical.  So
+       the manager copies the blob here and loads it a second time, and the two
+       runs are compared.  Any address in the module area would do; what matters
+       is that it is not __module_image_start__ and that it does not overlap the
+       pool, because the code region of the second instance and the data regions
+       the pool hands out are live at the same time and PMSAv8-R does not permit
+       two enabled regions to overlap.
+
+       NOLOAD, and deliberately not initialised at link time: if the blob were
+       placed here by the linker as well, a failure to copy it would be invisible
+       because the right bytes would already be present.  */
+
+    .module_stage (NOLOAD) :
+    {
+        . = ALIGN(64);
+        __module_stage_start__ = .;
+        . = . + 0x1000;
+        . = ALIGN(64);
+        __module_stage_end__ = .;
+    } > MODULE
+
+    /* The code and data sizes are not computed here any more.  They belong to
+       the module's own link, which is where its preamble is assembled and where
+       the boundary between its code and its data is actually known.  */
+
     .text :
     {
         *(.text*)
@@ -127,6 +239,24 @@ SECTIONS
         *(.rodata*)
         . = ALIGN(4);
         __code_end__ = .;
+    } > CODE
+
+    /* The module's gateway into the kernel, deliberately after __code_end__ and
+       therefore outside the kernel code region, which ends there.  A module gets
+       its own region covering exactly this function; that region would otherwise
+       overlap the kernel's, which PMSAv8-R does not allow.
+
+       Alone in its own section on purpose: anything sharing it would become
+       executable by every module.  64-byte aligned at both ends, the PMSAv8-R
+       granule, so a region can start and stop on it without covering
+       neighbours.  */
+
+    .txm_user_entry : ALIGN(64)
+    {
+        __txm_user_entry_start__ = .;
+        KEEP(*(.txm_user_entry))
+        . = ALIGN(64);
+        __txm_user_entry_end__ = .;
     } > CODE
 
     .data :
@@ -195,4 +325,20 @@ SECTIONS
 
     PROVIDE(end = .);
     PROVIDE(_end = .);
+
+    /* The module carries the status base as a constant and platform.h names it
+       as S32Z_MODULE_STATUS_BASE.  Neither can see this script, so the agreement
+       is pinned here; the manager checks the same thing again at run time
+       against the symbol, so a build that skipped this file still says so.  */
+
+    ASSERT(__module_status_start__ == 0x317F0000,
+           "the module status area is not at S32Z_MODULE_STATUS_BASE")
+
+    /* And its size: the manager grants one region per granule from that base and
+       the module addresses them by index, so an area that is not exactly
+       S32Z_MODULE_STATUS_GRANULES granules long would leave a grant, or a module
+       write, outside it.  */
+
+    ASSERT(__module_status_end__ - __module_status_start__ == 0x180,
+           "the module status area is not S32Z_MODULE_STATUS_GRANULES granules long")
 }
