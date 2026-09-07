@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_port.h                                          RISC-V64/GNU     */
-/*                                                           6.2.1        */
+/*                                                       6.5.1.202602a    */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -48,6 +48,45 @@
 #ifndef TX_PORT_H
 #define TX_PORT_H
 
+#ifdef __riscv_float_abi_quad
+#error "The ThreadX RISC-V64 port does not support the LP64Q ABI."
+#endif
+
+#if defined(__riscv_flen) && !defined(__riscv_float_abi_single) && !defined(__riscv_float_abi_double)
+#error "The ThreadX RISC-V64 port does not preserve FP state for a soft-float ABI. Remove F and D ISA extensions or use LP64F or LP64D."
+#endif
+
+#if defined(__riscv_float_abi_single) && (!defined(__riscv_flen) || (__riscv_flen < 32))
+#error "The ThreadX RISC-V64 LP64F port requires FLEN>=32."
+#endif
+
+#if defined(__riscv_float_abi_double) && (!defined(__riscv_flen) || (__riscv_flen < 64))
+#error "The ThreadX RISC-V64 LP64D port requires FLEN>=64."
+#endif
+
+#if defined(__riscv_flen) && (__riscv_flen != 32) && (__riscv_flen != 64)
+#error "The ThreadX RISC-V64 port supports only FLEN=32 or FLEN=64."
+#endif
+
+/* Every port .S file uses CSR instructions, so the ISA string must include
+   Zicsr. */
+
+/* Publish the interrupt frame contract to GNU BSP assembly files. */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+#define TX_RISCV_TRAP_FRAME_SIZE                528
+#else
+#define TX_RISCV_TRAP_FRAME_SIZE                256
+#endif
+#define TX_RISCV_TRAP_CALL_FRAME_SIZE           16
+
+
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+#define TX_RISCV_SOL_FRAME_SIZE                 240
+#else
+#define TX_RISCV_SOL_FRAME_SIZE                 128
+#endif
+
+
 #ifndef __ASSEMBLER__
 
 /* Include for memset.  */
@@ -61,6 +100,7 @@
 
 /* Yes, include the user defines in tx_user.h. The defines in this file may
    alternately be defined on the command line.  */
+
 
 #include "tx_user.h"
 #endif /* TX_INCLUDE_USER_DEFINE_FILE */
@@ -90,10 +130,9 @@ typedef unsigned long long                      ULONG64;
 typedef short                                   SHORT;
 typedef unsigned short                          USHORT;
 #define ULONG64_DEFINED
-#endif /* __ASSEMBLER__ */
-
 #define ALIGN_TYPE_DEFINED
 typedef unsigned long long                     ALIGN_TYPE;
+#endif /* __ASSEMBLER__ */
 
 /* On RV64, ULONG is 32-bit but pointers are 64-bit.  Store the thread
    pointer in the timer's VOID * extension field so _tx_thread_timeout

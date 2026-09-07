@@ -21,6 +21,8 @@
 /**************************************************************************/
 
     .section .text
+#include "tx_port.h"
+    .equ    TX_TRAP_FRAME_SIZE, TX_RISCV_TRAP_FRAME_SIZE
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -67,14 +69,14 @@ _tx_thread_context_save:
     sd      t1, 18*8(sp)
 
     la      t0, _tx_thread_system_state                 // Pickup address of system state
-    ld      t1, 0(t0)                                   // Pickup system state
+    lw      t1, 0(t0)                                   // Pickup system state
 
     /* Check for a nested interrupt condition.  */
     /* if (_tx_thread_system_state++)
     {  */
     beqz    t1, _tx_thread_not_nested_save              // If 0, first interrupt condition
     addi    t1, t1, 1                                   // Increment the interrupt counter
-    sd      t1, 0(t0)                                   // Store the interrupt counter
+    sw      t1, 0(t0)                                   // Store the interrupt counter
 
     /* Nested interrupt condition.
        Save the rest of the scratch registers on the stack and return to the
@@ -102,7 +104,7 @@ _tx_thread_context_save:
     sd      t0, 30*8(sp)                                // Save it on the stack
 
     /* Save floating point scratch registers if floating point is enabled.  */
-#ifdef __riscv_float_abi_single
+#if (__riscv_flen == 32)
     fsw     f0, 31*8(sp)                                // Store ft0
     fsw     f1, 32*8(sp)                                // Store ft1
     fsw     f2, 33*8(sp)                                // Store ft2
@@ -125,7 +127,7 @@ _tx_thread_context_save:
     fsw     f31,62*8(sp)                                // Store ft11
     csrr    t0, fcsr
     sd      t0, 63*8(sp)                                // Store fcsr
-#elif defined(__riscv_float_abi_double)
+#elif (__riscv_flen == 64)
     fsd     f0, 31*8(sp)                                // Store ft0
     fsd     f1, 32*8(sp)                                // Store ft1
     fsd     f2, 33*8(sp)                                // Store ft2
@@ -134,6 +136,20 @@ _tx_thread_context_save:
     fsd     f5, 36*8(sp)                                // Store ft5
     fsd     f6, 37*8(sp)                                // Store ft6
     fsd     f7, 38*8(sp)                                // Store ft7
+#if defined(__riscv_float_abi_single)
+    fsd     f8,  39*8(sp)                               // Store fs0
+    fsd     f9,  40*8(sp)                               // Store fs1
+    fsd     f18, 49*8(sp)                               // Store fs2
+    fsd     f19, 50*8(sp)                               // Store fs3
+    fsd     f20, 51*8(sp)                               // Store fs4
+    fsd     f21, 52*8(sp)                               // Store fs5
+    fsd     f22, 53*8(sp)                               // Store fs6
+    fsd     f23, 54*8(sp)                               // Store fs7
+    fsd     f24, 55*8(sp)                               // Store fs8
+    fsd     f25, 56*8(sp)                               // Store fs9
+    fsd     f26, 57*8(sp)                               // Store fs10
+    fsd     f27, 58*8(sp)                               // Store fs11
+#endif
     fsd     f10,41*8(sp)                                // Store fa0
     fsd     f11,42*8(sp)                                // Store fa1
     fsd     f12,43*8(sp)                                // Store fa2
@@ -193,7 +209,7 @@ _tx_thread_not_nested_save:
     /* else if (_tx_thread_current_ptr)
     {  */
     addi    t1, t1, 1                                   // Increment the interrupt counter
-    sd      t1, 0(t0)                                   // Store the interrupt counter
+    sw      t1, 0(t0)                                   // Store the interrupt counter
 
     /* Not nested: Find the user thread that was running and load our SP */
 
@@ -226,7 +242,7 @@ _tx_thread_not_nested_save:
     sd      t1, 30*8(sp)                                // Save it on the stack
 
     /* Save floating point scratch registers if floating point is enabled.  */
-#ifdef __riscv_float_abi_single
+#if (__riscv_flen == 32)
     fsw     f0, 31*8(sp)                                // Store ft0
     fsw     f1, 32*8(sp)                                // Store ft1
     fsw     f2, 33*8(sp)                                // Store ft2
@@ -249,7 +265,7 @@ _tx_thread_not_nested_save:
     fsw     f31,62*8(sp)                                // Store ft11
     csrr    t0, fcsr
     sd      t0, 63*8(sp)                                // Store fcsr
-#elif defined(__riscv_float_abi_double)
+#elif (__riscv_flen == 64)
     fsd     f0, 31*8(sp)                                // Store ft0
     fsd     f1, 32*8(sp)                                // Store ft1
     fsd     f2, 33*8(sp)                                // Store ft2
@@ -258,6 +274,20 @@ _tx_thread_not_nested_save:
     fsd     f5, 36*8(sp)                                // Store ft5
     fsd     f6, 37*8(sp)                                // Store ft6
     fsd     f7, 38*8(sp)                                // Store ft7
+#if defined(__riscv_float_abi_single)
+    fsd     f8,  39*8(sp)                               // Store fs0
+    fsd     f9,  40*8(sp)                               // Store fs1
+    fsd     f18, 49*8(sp)                               // Store fs2
+    fsd     f19, 50*8(sp)                               // Store fs3
+    fsd     f20, 51*8(sp)                               // Store fs4
+    fsd     f21, 52*8(sp)                               // Store fs5
+    fsd     f22, 53*8(sp)                               // Store fs6
+    fsd     f23, 54*8(sp)                               // Store fs7
+    fsd     f24, 55*8(sp)                               // Store fs8
+    fsd     f25, 56*8(sp)                               // Store fs9
+    fsd     f26, 57*8(sp)                               // Store fs10
+    fsd     f27, 58*8(sp)                               // Store fs11
+#endif
     fsd     f10,41*8(sp)                                // Store fa0
     fsd     f11,42*8(sp)                                // Store fa1
     fsd     f12,43*8(sp)                                // Store fa2
@@ -338,18 +368,10 @@ _tx_thread_idle_system_save:
 
     /* }
 }  */
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    sp, sp, 65*8                                // Recover stack frame - with floating point enabled
-#else
-    addi    sp, sp, 32*8                                // Recover the reserved stack space
-#endif
+    addi    sp, sp, TX_TRAP_FRAME_SIZE                  // Recover stack frame - with floating point enabled (65*8 data + 8 pad)
 
 #if defined(__riscv_vector)
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    t0, sp, -65*8
-#else
-    addi    t0, sp, -32*8
-#endif
+    addi    t0, sp, -TX_TRAP_FRAME_SIZE
     csrr    t1, vlenb                                   // Get vector register byte length
     slli    t1, t1, 5                                   // Multiply by 32 (number of vector registers)
     addi    t1, t1, 4*8                                 // Add vector CSR space: vstart, vtype, vl, vcsr

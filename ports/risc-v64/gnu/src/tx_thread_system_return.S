@@ -57,17 +57,15 @@
 /**************************************************************************/
 /* VOID   _tx_thread_system_return(VOID)
 {  */
+#include "tx_port.h"
+    .equ    TX_SOL_FRAME_SIZE, TX_RISCV_SOL_FRAME_SIZE
     .global  _tx_thread_system_return
 _tx_thread_system_return:
 
     /* Save minimal context on the stack.  */
     /* sp -= sizeof(stack_frame);  */
 
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    sp, sp, -29*8                               // Allocate space on the stack - with floating point enabled
-#else
-    addi    sp, sp, -16*8                               // Allocate space on the stack - without floating point enabled
-#endif
+    addi    sp, sp, -TX_SOL_FRAME_SIZE                  // Allocate space on the stack
 #if defined(__riscv_vector)
     csrr    t1, vlenb                                   // Get vector register byte length
     slli    t1, t1, 5                                   // Multiply by 32 (number of vector registers)
@@ -76,7 +74,7 @@ _tx_thread_system_return:
 #endif
 
     /* Store floating point preserved registers.  */
-#if defined(__riscv_float_abi_single)
+#if (__riscv_flen == 32)
     fsw     f8,  15*8(sp)                               // Store fs0
     fsw     f9,  16*8(sp)                               // Store fs1
     fsw     f18, 17*8(sp)                               // Store fs2
@@ -91,7 +89,7 @@ _tx_thread_system_return:
     fsw     f27, 26*8(sp)                               // Store fs11
     csrr    t0, fcsr
     sd      t0, 27*8(sp)                                // Store fcsr
-#elif defined(__riscv_float_abi_double)
+#elif (__riscv_flen == 64)
     fsd     f8,  15*8(sp)                               // Store fs0
     fsd     f9,  16*8(sp)                               // Store fs1
     fsd     f18, 17*8(sp)                               // Store fs2
