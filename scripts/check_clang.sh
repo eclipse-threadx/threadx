@@ -311,7 +311,14 @@ if [ "$asm_only" -eq 0 ]; then
                       -Iports/"$core"/gnu/inc -Icommon/inc -c "$src" -o /dev/null 2>&1)"
             if [ -n "$output" ]; then
                 fail "$core: $src"
-                echo "$output" | grep "error:" | head -3 | sed 's/^/        /'
+                # Show the error lines when there are any, and otherwise
+                # whatever the compiler did say -- a FAIL with nothing under it
+                # sends the reader off to reproduce the command by hand.
+                if echo "$output" | grep -q "error:"; then
+                    echo "$output" | grep "error:" | head -3 | sed 's/^/        /'
+                else
+                    echo "$output" | head -3 | sed 's/^/        /'
+                fi
                 bad=$((bad + 1)); failures=$((failures + 1))
             fi
         done
@@ -362,25 +369,45 @@ if [ "$asm_only" -eq 0 ]; then
             *)     kernel_inc="common/inc" ;;
         esac
 
-        # The TrustZone ports carry cmse_nonsecure_entry, which needs -mcmse to be
-        # honoured rather than ignored. Those files also carry GCC's optimize
-        # attribute, which clang does not implement and warns about; that is a
-        # toolchain divergence in a file GCC builds cleanly, not a port defect.
+        # The TrustZone ports carry cmse_nonsecure_entry, which needs -mcmse to
+        # be honoured rather than ignored.
         port_extra=""
         if [ -f "$inc/tx_secure_interface.h" ]; then
-            port_extra="-mcmse -Wno-unknown-attributes"
+            port_extra="-mcmse"
         fi
 
         count=0; bad=0
         for src in common_modules/module_manager/src/*.c "$dir"/*.c; do
             [ -f "$src" ] || continue
             count=$((count + 1))
+            # tx_thread_secure_stack.c carries GCC's optimize attribute, which
+            # clang does not implement and warns about. That is a toolchain
+            # divergence in a file GCC builds cleanly, so it is waived for that
+            # file alone -- a stray unknown attribute anywhere else in the port
+            # must still be reported.
+            src_extra=""
+            case "$src" in
+                */tx_thread_secure_stack.c) src_extra="-Wno-unknown-attributes" ;;
+            esac
+
+            # A #pragma message is a deliberate notice to callers, not a defect
+            # in the file that carries it. txm_module_manager_absolute_load.c
+            # deprecates itself in favour of the extended entry point, and this
+            # stage compiles it once per port.
             output="$("$CC" --target="$target" -mcpu="$cpu" $extra $port_extra \
+                      $src_extra "-Wno-#pragma-messages" \
                       -I"$inc" -I"$kernel_inc" -Icommon_modules/inc \
                       -Icommon_modules/module_manager/inc -c "$src" -o /dev/null 2>&1)"
             if [ -n "$output" ]; then
                 fail "$core: $src"
-                echo "$output" | grep "error:" | head -3 | sed 's/^/        /'
+                # Show the error lines when there are any, and otherwise
+                # whatever the compiler did say -- a FAIL with nothing under it
+                # sends the reader off to reproduce the command by hand.
+                if echo "$output" | grep -q "error:"; then
+                    echo "$output" | grep "error:" | head -3 | sed 's/^/        /'
+                else
+                    echo "$output" | head -3 | sed 's/^/        /'
+                fi
                 bad=$((bad + 1)); failures=$((failures + 1))
             fi
         done
