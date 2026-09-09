@@ -55,7 +55,18 @@
 #include <stddef.h>
 #include "tx_api.h"
 #include "txm_module.h"
-#include "mpu.h"
+
+/* The board's MPU header is not on the include path when this file is compiled
+   as a port source, and it must not have to be: the region number this file
+   asserts on is the port's, spelled in txm_module_port.h. Where a board header
+   is present the two are still checked against each other below, so a board
+   support package cannot quietly disagree with the scheduler.  */
+#if defined(__has_include)
+#  if __has_include("mpu.h")
+#    include "mpu.h"
+#    define TXM_R52_BOARD_MPU_H_PRESENT
+#  endif
+#endif
 
 /* These must match the .equ values at the top of tx_thread_schedule.S.  */
 
@@ -226,17 +237,25 @@ _Static_assert((TXM_MODULE_MPU_FIRST_REGION + TXM_MODULE_MPU_TOTAL_ENTRIES) <= 1
 
 /* The kernel's window over the module area.  tx_thread_schedule.S hard-codes the
    region number in an MCR to PRSELR, because the assembler cannot include this
-   board header, so the two spellings are checked against each other here.
+   header, so the two spellings are checked against each other here.
 
    It also has to sit clear of the module's own block: the scheduler enables the
    window for a thread that owns no module and the block for a thread that does,
    and if the two ever named the same region one would silently be the other.  */
 
-_Static_assert(MPU_MODULE_LOAD_REGION == 16,
+_Static_assert(TXM_MODULE_MPU_WINDOW_REGION == 16,
                "tx_thread_schedule.S writes region 16 as the module window; "
                "change MPU_MODULE_WINDOW_REGION there to match");
 
-_Static_assert(MPU_MODULE_LOAD_REGION >= (TXM_MODULE_MPU_FIRST_REGION
-                                          + TXM_MODULE_MPU_TOTAL_ENTRIES),
+_Static_assert(TXM_MODULE_MPU_WINDOW_REGION >= (TXM_MODULE_MPU_FIRST_REGION
+                                                + TXM_MODULE_MPU_TOTAL_ENTRIES),
                "the module window overlaps the regions handed to a module; the "
                "scheduler would enable one believing it was the other");
+
+/* A board support package naming a different region than the scheduler uses
+   would program its window somewhere the scheduler never enables.  */
+#ifdef TXM_R52_BOARD_MPU_H_PRESENT
+_Static_assert(MPU_MODULE_LOAD_REGION == TXM_MODULE_MPU_WINDOW_REGION,
+               "the board's MPU_MODULE_LOAD_REGION disagrees with the port's "
+               "TXM_MODULE_MPU_WINDOW_REGION");
+#endif

@@ -236,6 +236,14 @@ The following extensions must also be defined in tx_port.h:
    than eight kernel regions has to either shrink this block or move it, and
    moving it past 15 changes the op1 the scheduler's MCR encodings carry.  */
 
+/* The kernel's window over the module area. tx_thread_schedule.S carries the
+   same number as a .equ, because the assembler cannot include this header, and
+   txm_module_manager_offset_check.c checks the two spellings against each
+   other. Moving it past 15 changes the op1 the scheduler's MCR encodings
+   carry, which is what the first assertion in that file is about.  */
+
+#define TXM_MODULE_MPU_WINDOW_REGION            16
+
 #define TXM_MODULE_MPU_FIRST_REGION             8
 #define TXM_MODULE_MPU_TOTAL_ENTRIES            8
 #define TXM_MODULE_MPU_KERNEL_ENTRY_INDEX       0
