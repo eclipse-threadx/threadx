@@ -84,6 +84,11 @@
 #define TX_RISCV_TRAP_FRAME_SIZE                256
 #endif
 
+/* Bytes a trap entry reserves around a call into C.  The RISC-V psABI
+   requires sp to stay 16-byte aligned at a call boundary, so this is 16
+   rather than one register slot.  */
+#define TX_RISCV_TRAP_CALL_FRAME_SIZE           16
+
 
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
 #define TX_RISCV_SOL_FRAME_SIZE                 240
