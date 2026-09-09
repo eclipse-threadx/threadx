@@ -219,4 +219,3 @@ _skip_solicited_fp_restore:
     MSR     DAIF, x4                            // Recover DAIF
     RET                                         // Return to caller
 // }
-

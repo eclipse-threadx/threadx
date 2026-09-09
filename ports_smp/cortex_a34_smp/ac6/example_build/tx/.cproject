@@ -7,7 +7,19 @@
 
             <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.arm.eclipse.build.config.v6.lib.debug.base.1470528944" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 
-                <externalSettings/>
+                <externalSettings>
+
+                    <externalSetting>
+
+                        <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tx"/>
+
+                        <entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tx/Debug"/>
+
+                        <entry flags="RESOLVED" kind="libraryFile" name="tx" srcPrefixMapping="" srcRootPath=""/>
+
+                    </externalSetting>
+
+                </externalSettings>
 
                 <extensions>
 
@@ -29,7 +41,7 @@
 
                         <toolChain id="com.arm.toolchain.v6.lib.debug.base.var.arm_compiler_6-6.1684503312" name="Arm Compiler 6" superClass="com.arm.toolchain.v6.lib.debug.base.var.arm_compiler_6-6">
 
-                            <option id="com.arm.toolchain.v6.base.options.target.cpu_fpu.982423385" superClass="com.arm.toolchain.v6.base.options.target.cpu_fpu" useByScannerDiscovery="false" value="cortex-a34.AArch64.ARMv8.Neon.Crypto" valueType="string"/>
+                            <option id="com.arm.toolchain.v6.base.options.target.cpu_fpu.982423385" superClass="com.arm.toolchain.v6.base.options.target.cpu_fpu" useByScannerDiscovery="false" value="Cortex-A34.AArch64.ARMv8.Neon.Crypto" valueType="string"/>
 
                             <targetPlatform id="com.arm.toolchain.v6.lib.debug.base.var.arm_compiler_6-6.1684503312.2127819066" name=""/>
 
@@ -105,9 +117,25 @@
 
                     </folderInfo>
 
+                    <fileInfo id="com.arm.eclipse.build.config.v6.lib.debug.base.1470528944.214318543" name="tx_thread_timeout.c" rcbsApplicability="disable" resourcePath="src_generic/tx_thread_timeout.c" toolsToInvoke="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428.1899536638">
+
+                        <tool id="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428.1899536638" name="Arm C Compiler 6" superClass="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428">
+
+                            <inputType id="com.arm.tool.c.compiler.v6.base.input.1006773355" superClass="com.arm.tool.c.compiler.v6.base.input"/>
+
+                        </tool>
+
+                    </fileInfo>
+
+                    <fileInfo id="com.arm.eclipse.build.config.v6.lib.debug.base.1470528944.1145515026" name="tx_misra.c" rcbsApplicability="disable" resourcePath="src_generic/tx_misra.c" toolsToInvoke="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428.1242981128">
+
+                        <tool id="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428.1242981128" name="Arm C Compiler 6" superClass="com.arm.tool.c.compiler.v6.base.var.arm_compiler_6-6.2072709428"/>
+
+                    </fileInfo>
+
                     <sourceEntries>
 
-                        <entry excluding="src_generic/tx_misra.c|src_generic/tx_thread_timeout.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 
                     </sourceEntries>
 

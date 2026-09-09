@@ -17,6 +17,8 @@ SECTIONS
 
 	.text :
 	{
+		__text_start__ = .;
+
 		*(.text*)
 
 		KEEP(*(.init))
@@ -26,6 +28,7 @@ SECTIONS
 		*crtbegin.o(.ctors)
 		*crtbegin?.o(.ctors)
 		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+		__ctors_load_start__ = .;
     __ctors_start__ = ALIGN(4);
 		*(SORT(.ctors.*))
 		*(.ctors)
@@ -35,15 +38,40 @@ SECTIONS
  		*crtbegin.o(.dtors)
  		*crtbegin?.o(.dtors)
  		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+		__dtors_load_start__ = .;
     __dtors_start__ = ALIGN(4);
  		*(SORT(.dtors.*))
  		*(.dtors)
     __dtors_end__ = ALIGN(4);
 
+		KEEP(*(.eh_frame*))
+
+		__text_end__ = ALIGN(4);
+	} > FLASH
+
+	__text_load_start__ = LOADADDR(.text);
+
+	.rodata :
+	{
+		__rodata_start__ = .;
+
 		*(.rodata*)
 
-		KEEP(*(.eh_frame*))
+		__rodata_end__ = ALIGN(4);
 	} > FLASH
+
+	__rodata_load_start__ = LOADADDR(.rodata);
+
+	/* Fast section: for time-critical code/data to be copied from FLASH to RAM at startup.
+	   No .fast content in this sample; symbols defined so crt0 startup copy is a no-op. */
+	.fast (NOLOAD) :
+	{
+		__fast_start__ = .;
+		*(.fast*)
+		__fast_end__ = .;
+	} > RAM
+
+	__fast_load_start__ = __fast_start__;
 
 	.ARM.extab :
 	{

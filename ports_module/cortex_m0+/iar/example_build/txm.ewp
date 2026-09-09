@@ -1048,7 +1048,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>C:\azure_rtos\threadx\ports_module\cortex_m0+\iar\example_build\Debug\Exe\txm.a</state>
+                    <state>###Unitialized###</state>
                 </option>
             </data>
         </settings>

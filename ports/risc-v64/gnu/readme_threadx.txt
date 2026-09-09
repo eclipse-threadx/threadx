@@ -13,6 +13,15 @@ Verify the toolchain:
   riscv64-unknown-elf-gcc --version
   riscv64-unknown-elf-objdump --version
 
+ISA and ABI requirements
+- The ISA string must include Zicsr. rv64gc and rv64imafdc imply it;
+  rv64imac does not, so write rv64imac_zicsr for an integer-only build.
+- Supported ABIs: lp64d (FLEN=64), lp64f (FLEN=32 or FLEN=64), and lp64
+  only when the ISA has no F or D extension. lp64q is not supported.
+- The vector extension (V) is optional; the port saves the full vector
+  state and sizes the frame from vlenb.
+- tx_port.h rejects every other combination at compile time.
+
 CMake-based build (recommended)
 
 From the ThreadX top-level directory:

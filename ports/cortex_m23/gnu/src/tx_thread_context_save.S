@@ -73,7 +73,14 @@ _tx_thread_context_save:
     /* Call the ISR enter function to indicate an ISR is starting.  */
     PUSH    {r0, lr}                                // Save return address
     BL      _tx_execution_isr_enter                 // Call the ISR enter function
-    POP     {r0, lr}                                // Recover return address
+    POP     {r0, r1}                                // Recover r0 and the return address
+    MOV     lr, r1                                  // This core cannot POP into LR: the
+                                                    //   16-bit Thumb POP takes r0-r7 and
+                                                    //   pc only.  MOV to a high register
+                                                    //   is permitted, so restore LR from
+                                                    //   a scratch register.  r1 is free --
+                                                    //   the BL above may clobber r0-r3,
+                                                    //   which is why r0 is saved at all.
 #endif
 
     BX      lr

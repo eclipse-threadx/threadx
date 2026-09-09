@@ -16,8 +16,80 @@
 # Remove large folder to save space
 rm -rf /opt/hostedtoolcache
 
-sudo apt-get update
-sudo apt-get install -y \
+# Everything below reaches the network, and on this runner pool that is not
+# dependable. apt-get update stalled seven times in a single day, once for more
+# than two hours, each time with the Azure mirror returning nothing and the
+# fallback to archive.ubuntu.com then going silent. Nothing here bounded a fetch
+# and nothing retried one, so a mirror being down cost a whole run rather than a
+# few seconds. Worse, this script has no set -e, so a failed update did not stop
+# the install that follows: it went on to install from whatever index it already
+# had, and the run failed later somewhere less obvious.
+#
+# Each command is wrapped in timeout rather than left to bound itself. apt's own
+# Acquire timeouts were tried first and did not help: a run still sat inside a
+# single apt-get update for nine and a half minutes without producing a line,
+# having got as far as fetching noble-security InRelease, so the retry loop never
+# got a turn and the step timeout was what eventually killed it. Whatever apt is
+# waiting on there, it is not something Acquire::http::Timeout covers. timeout
+# does not care where the wait is.
+#
+# The Acquire options are kept anyway, since they make a slow mirror give up
+# sooner. The loop covers a mirror that is down rather than merely slow. The
+# explicit exits stop a failed fetch from being carried forward into a build,
+# with one deliberate exception noted at the update below.
+APT_OPTIONS=(-o Acquire::Retries=3
+             -o Acquire::http::Timeout=20
+             -o Acquire::https::Timeout=20)
+
+# Two minutes per attempt, killed outright if it ignores the first signal. Three
+# attempts plus backoff bounds a command at about six and a half minutes, and a
+# command that exhausts its attempts exits rather than letting the next one run.
+#
+# timeout goes under sudo, not over it, so that it signals apt itself. Signalling
+# sudo instead risks the kill landing on sudo while apt carries on holding the
+# dpkg lock, which would leave every retry failing for a different reason than
+# the one being retried.
+TIMEOUT=(timeout --kill-after=10 120)
+
+retry() {
+    local attempt
+    for attempt in 1 2 3; do
+        if "$@"; then
+            return 0
+        fi
+        echo "install.sh: '$*' failed or timed out on attempt ${attempt}"
+        sleep $((attempt * 10))
+    done
+    echo "install.sh: '$*' failed after 3 attempts"
+    return 1
+}
+
+# THE UPDATE IS NOT THE GATE, AND IT MUST NOT BE.  apt-get update fails if ANY
+# configured repository serves a bad index, including ones this project does
+# not use.  On a GitHub runner the image carries Google's and Microsoft's
+# repositories, and a Hash Sum mismatch from Google's -- their CDN caught
+# mid-publish, index and Release file eight hours apart -- failed this script
+# three attempts running and turned a build red over a browser nobody was
+# installing.
+#
+# The alternative of disabling third-party sources before updating is wrong
+# here: this script also runs on a contributor's own machine, where silently
+# rewriting their apt configuration would be a far worse thing to do than
+# tolerating a stale index.
+#
+# So a failed update WARNS and the install below is the gate.  Nothing is
+# weakened by that: apt-get install still fails hard on a package it cannot
+# find, so an archive that is genuinely unreachable still stops the script --
+# one step later, and saying which package it could not get.
+if ! retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" update; then
+    echo ""
+    echo "install.sh: apt-get update did not fully succeed."
+    echo "install.sh: continuing, because a repository this project does not"
+    echo "install.sh: use can fail an update.  The install below is the real"
+    echo "install.sh: gate and fails if any package needed is unavailable."
+    echo ""
+fi
+retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" install -y \
     gcc-multilib \
     git \
     g++ \
@@ -28,10 +100,27 @@ sudo apt-get install -y \
     tofrodos \
     gawk \
     cmake \
-    software-properties-common
+    software-properties-common || exit 1
 
-python3 -m pip install --upgrade pip
-pip3 install gcovr==4.1
+retry "${TIMEOUT[@]}" python3 -m pip install --retries 3 --timeout 30 --upgrade pip || exit 1
+# gcovr was pinned to 4.1, released in 2018. That version cannot do what merging
+# the coverage of several build configurations needs: it has no --json and no
+# --add-tracefile, both of which arrived later. The pin is exact rather than
+# floating so the coverage percentage stays comparable between runs -- the
+# denominator is a property of the tool as much as of the tree -- and it is moved
+# by hand, because it lives in a shell script that Dependabot cannot parse.
+#
+# Measured before bumping, on the default_build_coverage tree of test/tx, over
+# the same gcda with the same gcov, varying only the gcovr version: 4.1, 7.0,
+# 8.3 and 8.6 all report lines-valid 3827 across 177 files and branches-valid
+# 1994. The denominator does not move with the tool, so this bump moves no
+# number and any movement in a later run belongs to a later change.
+#
+# The numerator does move, but not because of gcovr: tx_thread_system_resume.c
+# line 529 is executed on some runs of the suite and not others, so the same
+# tree reports 3826 or 3827 covered lines with every test passing either way.
+# That is a property of the suite, not of this pin.
+retry "${TIMEOUT[@]}" pip3 install --retries 3 --timeout 30 gcovr==8.6 || exit 1
 
 # Upgrade cmake to the latest version.
-pip install --upgrade cmake
+retry "${TIMEOUT[@]}" pip install --retries 3 --timeout 30 --upgrade cmake || exit 1

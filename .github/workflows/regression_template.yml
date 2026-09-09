@@ -29,8 +29,40 @@ on:
         default: false
         required: false
         type: boolean
+      # The merged report, not one configuration's. Every configuration is
+      # instrumented now (TX_COVERAGE below) and coverage.sh --merge unions
+      # them; default_build_coverage was one build of five, and the code the
+      # other four select was absent from its denominator rather than uncovered
+      # in it.
       coverage_name:
-        default: 'default_build_coverage'
+        default: 'merged'
+        required: false
+        type: string
+      # The lower and upper threshold percentages handed to
+      # CodeCoverageSummary, lower first. The lower one is a hard floor: the
+      # step below sets fail_below_min, so a run whose merged line rate falls
+      # under it turns the job red.
+      #
+      # Both must be whole numbers. Probed against the pinned action on a
+      # runner, 26 Aug 2026: '99.9 100' is rejected with
+      # 'System.ArgumentException - Threshold parameter set incorrectly.' and
+      # the step fails whether or not fail_below_min is set, because the action
+      # parses each half with an integer parse. So a floor can be 99 or 100 and
+      # nothing between, and the intended 99.9 is not expressible.
+      #
+      # The floor is compared against the LINE rate only -- not the branch
+      # rate, and not the lower of the two. Probed on the same run: the
+      # ThreadX report at 100.00% lines and 77.67% branches passes a floor of
+      # 99. Worth knowing, because branch coverage is around 78% in both
+      # suites while AGENTS.md asks for 100%, and a floor set from the
+      # headline line figure says nothing about it.
+      #
+      # Each suite sets its own in regression_test.yml, because they do not
+      # sit at the same figure. The default here is the action's own, low
+      # enough to be no floor at all in practice -- a caller that collects
+      # coverage is expected to name its number.
+      coverage_thresholds:
+        default: '50 75'
         required: false
         type: string
       skip_deploy:
@@ -58,26 +90,45 @@ jobs:
       pull-requests: write
 
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    # Actions are pinned to a commit SHA, with the version in the trailing
+    # comment. A tag can be moved; a SHA cannot, so this is what makes "which
+    # code ran in CI" answerable from the repository. Dependabot moves these
+    # pins and rewrites the comment with them -- see .github/dependabot.yml.
     - name: Check out the repository
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         submodules: true
 
+    # apt and PyPI have stalled this step twice, for 55 minutes and for over two
+    # hours, against a normal 27 to 152 seconds. Nothing here had a timeout, so a
+    # stall ran until the six hour job limit and cost a whole run rather than
+    # failing and being retried.
     - name: Install softwares
+      timeout-minutes: 10
       run: ${{ inputs.install_script }}
 
+    # TX_COVERAGE instruments every build configuration rather than only the one
+    # whose name ends in _coverage. It has to be set for the build as well as the
+    # test: the build is where -fprofile-arcs is decided, and the test run is
+    # where the reports are collected and merged.
     - name: Build
+      timeout-minutes: 15
+      env:
+        TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.build_script }}
 
     - name: Test
+      timeout-minutes: 60
+      env:
+        TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.test_script }}
 
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2.11.0
+      uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
       if: always()
       with:
         check_name: Test Results ${{ inputs.result_affix }}
@@ -86,7 +137,7 @@ jobs:
 
     - name: Upload Test Results
       if: success() || failure()
-      uses: actions/upload-artifact@v4.6.2
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: test_reports ${{ inputs.result_affix }}
         path: |
@@ -95,27 +146,48 @@ jobs:
           ${{ inputs.cmake_path }}/build/**/regression/output_files/*.bin
 
     - name: Configure GitHub Pages
-      uses: actions/configure-pages@v5.0.0
+      uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
+    # The coverage steps below run even when a test failed. cmake_bootstrap.sh
+    # now produces the report in that case, and the run whose behaviour changed
+    # is the one whose coverage is worth reading; previously a single flaky test
+    # suppressed the report for the whole run. !cancelled() rather than always(),
+    # so a cancelled run still stops promptly -- the same idiom the
+    # deploy_code_coverage job below already uses. The ${{ }} is required: a bare
+    # ! opens a YAML tag, and the expression will not parse without it.
+    #
+    # fail_below_min turns the summary into a gate. Until now coverage could
+    # fall from any figure to any other and no check went red, against an
+    # AGENTS.md that asks for 100% -- a stated requirement measured with a
+    # gauge that could not fail.
+    #
+    # One thing the floor does not defend, and it is the likeliest way for
+    # coverage to break: an empty report reads as 100%. gcovr writes
+    # line-rate="1.0" beside lines-valid="0" when it finds no data, and the
+    # action reports 'Line Rate = 100% (0 / 0)' and passes any floor --
+    # probed on a runner, 26 Aug 2026. The check that catches that is the
+    # emptiness assertion in each suite's coverage.sh, not this one.
     - name: Generate Code Coverage Results Summary
-      if: (!inputs.skip_coverage)
-      uses: irongut/CodeCoverageSummary@v1.3.0
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
+      uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
       with:
         filename: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}.xml
         format: markdown
         badge: true
         hide_complexity: true
         output: file
+        thresholds: ${{ inputs.coverage_thresholds }}
+        fail_below_min: true
 
     - name: Write Code Coverage Summary
-      if: (!inputs.skip_coverage)
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       run: |
         echo "## Coverage Report ${{ inputs.result_affix }}" >> $GITHUB_STEP_SUMMARY
         cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
     - name: Create CheckRun for Code Coverage
-      if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
-      uses: LouisBrunner/checks-action@v2.0.0
+      if: ${{ !cancelled() && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage) }}
+      uses: LouisBrunner/checks-action@937cbbcde3259005b50746dc91cde29098aac2ff # v3.1.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Code Coverage ${{ inputs.result_affix }}
@@ -125,15 +197,15 @@ jobs:
         output_text_description_file: code-coverage-results.md
 
     - name: Add Code Coverage PR Comment
-      if: ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
-      uses: marocchino/sticky-pull-request-comment@v2.9.4
+      if: ${{ !cancelled() && ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage) }}
+      uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
       with:
         header: Code Coverage ${{ inputs.result_affix }}
         path: code-coverage-results.md
 
     # Add sudo to move coverage folder created by root user
     - name: Prepare Coverage GitHub Pages
-      if: (!inputs.skip_coverage)
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       run: >-
         if [ "${{ inputs.result_affix }}" != "" ] && ${{ inputs.skip_deploy }}; then
           sudo mv ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }} \
@@ -142,25 +214,45 @@ jobs:
 
     - name: Coverage Report name
       id: artifact
-      if: (!inputs.skip_coverage)
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       run: echo "coverage_report=coverage_report-$(date +%s)" >> $GITHUB_OUTPUT
 
+    # per_configuration is excluded deliberately. deploy_code_coverage downloads
+    # every coverage_report-* artifact with merge-multiple, so whatever is in
+    # here lands on the published site -- and each suite's per-configuration
+    # directories carry the same names, so ThreadX's would overwrite SMP's.
+    # The top level therefore holds only the suite directory and the merged XML,
+    # which is the shape the deploy already expects.
     - name: Upload Code Coverage Artifacts
-      uses: actions/upload-artifact@v4.6.2
-      if: (inputs.skip_deploy && !inputs.skip_coverage)
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      if: ${{ !cancelled() && (inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
           name: ${{ steps.artifact.outputs.coverage_report }}
-          path: ${{ inputs.cmake_path }}/coverage_report
+          path: |
+            ${{ inputs.cmake_path }}/coverage_report
+            !${{ inputs.cmake_path }}/coverage_report/per_configuration/**
+          retention-days: 1
+
+    # The per-configuration reports, kept separately so they are downloadable
+    # when the merged number moves and the question is which configuration moved
+    # it. The name deliberately does not match coverage_report-*, so the deploy
+    # job's pattern does not pick it up and it never reaches the published site.
+    - name: Upload Per-Configuration Coverage
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
+      with:
+          name: coverage_detail ${{ inputs.result_affix }}
+          path: ${{ inputs.cmake_path }}/coverage_report/per_configuration
           retention-days: 1
 
     - name: Upload Code Coverage Pages
-      uses: actions/upload-pages-artifact@v3.0.1
-      if: (!inputs.skip_deploy && !inputs.skip_coverage)
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+      if: ${{ !cancelled() && (!inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}
 
   deploy_code_coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && !failure() && !cancelled()
     needs: run_tests
     environment:
@@ -171,26 +263,61 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/download-artifact@v4.3.0
+    # Selects the coverage artifacts by pattern rather than by name.
+    #
+    # This used to ask for ${{ steps.artifact.outputs.coverage_report }},
+    # which is set by the "Coverage Report name" step of run_tests -- a
+    # different job. The steps context does not cross jobs, so that
+    # expression evaluated to the empty string and the action fell back to
+    # its documented behaviour for an unspecified name: "No input name,
+    # artifact-ids or pattern filtered specified, downloading all
+    # artifacts". It pulled down four, the two coverage reports and the two
+    # test_reports bundles of JUnit XML, each into a directory named after
+    # the artifact -- so the published site carried the test reports as well
+    # as the coverage, under paths containing a run timestamp that changed
+    # on every publish.
+    #
+    # merge-multiple puts the contents of both coverage artifacts directly
+    # into coverage_report rather than under a directory named for each
+    # artifact. Each one holds a single directory named for its suite,
+    # ThreadX or SMP, renamed from merged by the "Prepare Coverage GitHub
+    # Pages" step, so the merge yields exactly the two suite directories the
+    # deploy expects, and the artifact name -- with its timestamp -- stops
+    # appearing in the published path at all.
+    #
+    # The two artifacts also each carry a merged.xml -- it was
+    # default_build_coverage.xml until #665 instrumented every configuration
+    # and unioned them -- and the merge means one overwrites the other.
+    # Verified on the runner: both hold merged.xml. That file is consumed by
+    # CodeCoverageSummary back in run_tests and is not read here, so this is
+    # untidy rather than wrong.
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       if: ${{ inputs.skip_test }}
       with:
-        name: ${{ steps.artifact.outputs.coverage_report }}
+        pattern: coverage_report-*
+        merge-multiple: true
         path: ${{ inputs.cmake_path }}/coverage_report
 
     - name: Upload Code Coverage Pages
-      uses: actions/upload-pages-artifact@v3.0.1
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
       if: ${{ inputs.skip_test }}
       with:
         path: .
 
+    # The artifacts are named coverage_report-<epoch> by run_tests, so the
+    # bare name matched nothing: useGlob defaults to true in this action, and
+    # as a glob "coverage_report" matches only the literal string. The step
+    # has therefore been deleting nothing. It does not fail on a miss, which
+    # is why that went unnoticed; retention-days: 1 on the upload is what has
+    # actually been clearing these up.
     - name: Delete Duplicate Code Coverage Artifact
-      uses: geekyeggo/delete-artifact@v5.1.0
+      uses: geekyeggo/delete-artifact@176a747ab7e287e3ff4787bf8a148716375ca118 # v6.0.0
       with:
-          name: coverage_report
+          name: coverage_report-*
 
     - name: Deploy GitHub Pages site
       id: deployment
-      uses: actions/deploy-pages@v4.0.5
+      uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
 
     - name: Write Code Coverage Report URL
       run: >-

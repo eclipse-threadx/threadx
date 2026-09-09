@@ -60,6 +60,7 @@
 /*                                                                        */
 /*    tx_thread_identify                returns currently running thread  */
 /*    tx_byte_allocate                  allocate memory                   */
+/*    tx_byte_release                   release memory                    */
 /*    tx_queue_send                     ThreadX queue send                */
 /*    posix_priority_search             search message for same priority  */
 /*                                                                        */
@@ -166,7 +167,16 @@ ULONG               msg[TX_POSIX_MESSAGE_SIZE];
 
     if (temp1 != TX_SUCCESS)
     {
-    posix_internal_error(9999);
+        posix_internal_error(9999);
+
+        /* posix_internal_error() does not return today, but do not depend on
+           that: bp is indeterminate here, so falling through would copy
+           msg_len bytes through an unset pointer.  */
+        posix_errno = ENOMEM;
+        posix_set_pthread_errno(ENOMEM);
+
+        /* Return ERROR.  */
+        return(ERROR);
     }
     /* Got the memory , Setup source and destination pointers
        Cast them in UCHAR as message length is in bytes.  */
@@ -201,9 +211,14 @@ ULONG               msg[TX_POSIX_MESSAGE_SIZE];
     temp1 = tx_queue_send(Queue, msg, TX_WAIT_FOREVER);
     if ( temp1 != TX_SUCCESS)
     {
+        /* The message was never handed over to the queue, so this function
+           still owns the private buffer. Release it before returning,
+           otherwise it is leaked from the queue's byte pool.  */
+        tx_byte_release(bp);
+
         /* POSIX doesn't have error for this, hence give default.  */
         posix_errno = EINTR ;
-	    posix_set_pthread_errno(EINTR);
+        posix_set_pthread_errno(EINTR);
 
         /* Return ERROR.  */
         return(ERROR);

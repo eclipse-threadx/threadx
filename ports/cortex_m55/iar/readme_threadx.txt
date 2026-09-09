@@ -211,7 +211,12 @@ information associated with this specific port of ThreadX:
 03-02-2021  The following files were changed/added for version 6.1.5:
             tx_port.h                       Added ULONG64_DEFINED
 
-09-30-2020  Initial ThreadX 6.1 version for Cortex-M55 using IAR's ARM tools.
+09-30-2020  Initial ThreadX 6.1 version of this Armv8-M port using IAR's ARM tools.
+
+            The dates above belong to this shared port, which every Armv8-M
+            core is generated from. They are not the date a particular core
+            gained a ThreadX port: that is when its name was added to
+            scripts/copy_armv8_m.sh.
 
 
 Copyright(c) 1996-2020 Microsoft Corporation
