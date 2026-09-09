@@ -79,6 +79,14 @@
 #endif
 #define TX_RISCV_TRAP_CALL_FRAME_SIZE           16
 
+/* Solicited (cooperative) frame built by _tx_thread_system_return: fs0-fs11
+   as doubles plus fcsr with FP, callee-saved integer state without.  */
+#if defined(__riscv_float_abi_double)
+#define TX_RISCV_SOL_FRAME_SIZE                 176
+#else
+#define TX_RISCV_SOL_FRAME_SIZE                 128
+#endif
+
 /* Include shared RISC-V32 port definitions common to all toolchain ports.  */
 #include "../../common/tx_port_riscv32_common.h"
 

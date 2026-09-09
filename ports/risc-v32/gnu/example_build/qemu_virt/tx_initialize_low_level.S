@@ -61,11 +61,8 @@
     .extern  _tx_thread_context_restore
 /* Trap frame: integer slots 0-31 at i*4; FP build adds f0-f31 as doubles
    at 128 + i*8, fcsr at 384, pad to 400 (total mod 16 = 0).  */
-#if defined(__riscv_float_abi_double)
-    .equ TX_TRAP_FRAME_SIZE, 400
-#else
-    .equ TX_TRAP_FRAME_SIZE, 128
-#endif
+#include "tx_port.h"
+    .equ TX_TRAP_FRAME_SIZE, TX_RISCV_TRAP_FRAME_SIZE
     trap_entry:
 	addi sp, sp, -TX_TRAP_FRAME_SIZE  // Allocate space for all registers (400 with FP double, 128 without)
 

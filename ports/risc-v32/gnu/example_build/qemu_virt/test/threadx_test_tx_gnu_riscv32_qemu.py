@@ -316,7 +316,7 @@ quit
     stdout = gdb_process.stdout
     gdb_succeeded = gdb_process.returncode == 0
     timer_hit = "Breakpoint 4, _tx_timer_interrupt" in stdout
-    fpu_verified = skip_fpu
+    fpu_verified = False
     mepc_verified = "MEPC_VERIFIED_OK" in stdout
     preemption_verified = "PREEMPT_VERIFIED_OK" in stdout
     time_slice_verified = "SUCCESS: Time-slice handler called." in stdout
@@ -327,6 +327,10 @@ quit
 
     if skip_fpu and "FPU_VERIFIED_SKIP_SOFT_FLOAT" in stdout:
         print_content("SUCCESS: Soft-float mode omitted the hardware FPU check.")
+        fpu_verified = True
+    elif skip_fpu:
+        print_content("FAILURE: Soft-float build did not report the FPU skip, so "
+                      "the GDB script did not run to that point.")
     elif "Breakpoint 3, thread_6_and_7_entry" in stdout:
         if "FPU_VERIFIED_OK" in stdout:
              print_content("SUCCESS: FPU instructions executed and registers inspected.")

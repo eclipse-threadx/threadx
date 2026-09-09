@@ -25,11 +25,8 @@
    FP build (double ABI): integer slots 0-31 at i*4 (0-127; slot 31 is pad),
    f0-f31 as doubles at 128 + i*8 (128-383), fcsr at 384, pad 388-399.
    SOFT_FLOAT build: integer slots 0-31 at i*4 only.  */
-#if defined(__riscv_float_abi_double)
-    .equ    TX_TRAP_FRAME_SIZE, 400
-#else
-    .equ    TX_TRAP_FRAME_SIZE, 128
-#endif
+#include "tx_port.h"
+    .equ    TX_TRAP_FRAME_SIZE, TX_RISCV_TRAP_FRAME_SIZE
 
 /**************************************************************************/
 /*                                                                        */

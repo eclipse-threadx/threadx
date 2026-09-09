@@ -22,13 +22,9 @@
 
     .section .text
 
-#if defined(__riscv_float_abi_double)
-    .equ    TX_TRAP_FRAME_SIZE, 400
-    .equ    TX_SOL_FRAME_SIZE, 176
-#else
-    .equ    TX_TRAP_FRAME_SIZE, 128
-    .equ    TX_SOL_FRAME_SIZE, 128
-#endif
+#include "tx_port.h"
+    .equ    TX_TRAP_FRAME_SIZE, TX_RISCV_TRAP_FRAME_SIZE
+    .equ    TX_SOL_FRAME_SIZE, TX_RISCV_SOL_FRAME_SIZE
 
 /**************************************************************************/
 /*                                                                        */
