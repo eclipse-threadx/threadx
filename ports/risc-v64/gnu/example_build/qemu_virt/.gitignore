@@ -1,4 +1,4 @@
 # Ignore generated QEMU test files.
 kernel.elf
-qemu-riscv32.log
+qemu-riscv64.log
 test_cmds.gdb
