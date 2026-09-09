@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdint.h>
+#include <time.h>
 
 #define UART0_THR   (*(volatile unsigned char *)0x10000000L)
 #define UART0_LSR   (*(volatile unsigned char *)0x10000005L)
@@ -24,6 +25,39 @@
 #define VIRT_TEST       (*(volatile uint32_t *)0x100000L)
 #define VIRT_TEST_PASS  0x5555u
 #define VIRT_TEST_FAIL  0x3333u
+
+#define QEMU_TIMEBASE_HZ 10000000ULL
+
+static uint64_t read_time_counter(void)
+{
+#if __riscv_xlen == 64
+    uint64_t value;
+    __asm__ volatile("rdtime %0" : "=r" (value));
+    return value;
+#else
+    uint32_t high;
+    uint32_t low;
+    uint32_t high_check;
+
+    do
+    {
+        __asm__ volatile("rdtimeh %0" : "=r" (high));
+        __asm__ volatile("rdtime %0" : "=r" (low));
+        __asm__ volatile("rdtimeh %0" : "=r" (high_check));
+    } while (high != high_check);
+
+    return ((uint64_t)high << 32) | low;
+#endif
+}
+
+time_t time(time_t *timer)
+{
+    time_t seconds = (time_t)(read_time_counter() / QEMU_TIMEBASE_HZ);
+
+    if (timer != NULL)
+        *timer = seconds;
+    return seconds;
+}
 
 /* Called by testcontrol.c when EXTERNAL_EXIT is defined. */
 __attribute__((noreturn)) void external_exit(unsigned int code)
@@ -50,13 +84,24 @@ int _write(int fd, const char *buf, int count)
     return count;
 }
 
-extern char _end[];
+/* Fixed 64 KiB heap window from the linker script.  It keeps the newlib
+   heap out of the ThreadX first-unused-memory area, which starts at
+   _end (placed after _heap_end).  */
+extern char _heap_start[];
+extern char _heap_end[];
 static char *heap_ptr = 0;
 
 void *_sbrk(int incr)
 {
     if (heap_ptr == 0)
-        heap_ptr = _end;
+        heap_ptr = _heap_start;
+
+    if ((incr > 0 && _heap_end - heap_ptr < incr) ||
+        (incr < 0 && heap_ptr - _heap_start < -incr))
+    {
+        errno = ENOMEM;
+        return (void *)-1;
+    }
 
     char *prev = heap_ptr;
     heap_ptr += incr;

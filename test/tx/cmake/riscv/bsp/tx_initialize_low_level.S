@@ -99,7 +99,7 @@ _tx_initialize_low_level:
     csrrc   zero, mstatus, t0
     li      t0, (MSTATUS_MPP_M | MSTATUS_MPIE)
     csrrs   zero, mstatus, t0
-    li      t0, (MIE_MTIE | MIE_MSIE | MIE_MEIE)
+    li      t0, (MIE_MTIE | MIE_MEIE)    // No MSIE: software interrupts are never dispatched here
     csrrs   zero, mie, t0
 
 #ifdef __riscv_flen
