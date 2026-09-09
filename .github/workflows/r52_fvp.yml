@@ -150,17 +150,26 @@ jobs:
           sudo apt-get install -y --no-install-recommends ninja-build
         fi
 
-    # Keyed on the URL rather than a version string, so pointing the variable
-    # at a different model fetches it instead of serving the old one from
-    # cache. The key is the URL's own hash because a raw URL may contain
-    # characters a cache key cannot.
+    # The cache key has to move when the model does, and stay put when it does
+    # not. hashFiles() reads files, so it cannot hash a variable: pointing it
+    # at this workflow keyed the cache on the file's own contents, which is
+    # wrong twice over -- repointing FVP_AEMV8R_URL kept serving the old model,
+    # and editing anything here forced a needless refetch of a large archive.
+    # The URL is hashed here instead, so the key tracks exactly what it names.
+    - name: Key the FVP cache on the download URL
+      id: fvp-key
+      if: env.FVP_URL != ''
+      run: |
+        set -eu
+        printf 'hash=%s\n' "$(printf '%s' "$FVP_URL" | sha256sum | cut -d' ' -f1)" >>"$GITHUB_OUTPUT"
+
     - name: Cache the Armv8-R AEM FVP
       id: cache-fvp
       if: env.FVP_URL != ''
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: fvp
-        key: fvp-aemv8r-${{ hashFiles('.github/workflows/r52_fvp.yml') }}-${{ env.FVP_SHA256 || 'nosum' }}
+        key: fvp-aemv8r-${{ steps.fvp-key.outputs.hash }}-${{ env.FVP_SHA256 || 'nosum' }}
 
     - name: Install the Armv8-R AEM FVP
       if: env.FVP_URL != '' && steps.cache-fvp.outputs.cache-hit != 'true'
@@ -301,8 +310,13 @@ jobs:
             return
           fi
 
-          if ! ctest --test-dir "$build" --output-on-failure; then
-            echo "::error::$name: one or more images failed on the FVP"
+          # --no-tests=error, because ctest's default is to report success
+          # when it finds nothing to run. The example registers its tests
+          # inside if(FVP found) and if(Python3_FOUND), so either one going
+          # unmet would leave this stage green having executed nothing -- the
+          # very hole this workflow exists to close.
+          if ! ctest --test-dir "$build" --output-on-failure --no-tests=error; then
+            echo "::error::$name: one or more images failed on the FVP, or no tests were registered"
             status=1
           fi
         }
