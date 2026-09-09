@@ -82,7 +82,7 @@
                 _tx_thread_stack_error_handler((thread_ptr));                                                                   \
                 TX_DISABLE                                                                                                      \
             }                                                                                                                   \
-            if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                                \
+            else if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                           \
             {                                                                                                                   \
                 TX_RESTORE                                                                                                      \
                 _tx_thread_stack_analyze((thread_ptr));                                                                         \

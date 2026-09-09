@@ -80,6 +80,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_thread_create_preemption_threshold_test.c
     ${SOURCE_DIR}/threadx_thread_delayed_suspension_test.c
     ${SOURCE_DIR}/threadx_thread_information_test.c
+    ${SOURCE_DIR}/threadx_thread_misaligned_stack_test.c
     ${SOURCE_DIR}/threadx_thread_multi_level_preemption_threshold_test.c
     ${SOURCE_DIR}/threadx_thread_multiple_non_current_test.c
     ${SOURCE_DIR}/threadx_thread_multiple_sleep_test.c
@@ -109,6 +110,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_multiple_test.c
     ${SOURCE_DIR}/threadx_timer_simple_test.c
     ${SOURCE_DIR}/threadx_trace_basic_test.c
+    ${SOURCE_DIR}/threadx_trace_entry_update_test.c
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
 
 add_custom_command(

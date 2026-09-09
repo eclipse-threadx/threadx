@@ -25,6 +25,13 @@
 #include "tx_block_pool.h"
 #include "tx_byte_pool.h"
 #include "tx_event_flags.h"
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <signal.h>
+#include <time.h>
+#include <pthread.h>
 
 
 #define TEST_STACK_SIZE         6144
@@ -1335,6 +1342,241 @@ TX_THREAD   *thread_ptr;
 }
 
 
+/* ---------------------------------------------------------------------------
+   Teardown diagnostics.
+
+   When this suite hangs, CI reports nothing but a ctest timeout. The last
+   flush of stdout happens on entry to test_control_return(), so a test that
+   wedges after that point leaves the rest of its output sitting in stdout's
+   block buffer, which is discarded when ctest kills the process. The log
+   stops at the test's own result line and says nothing about where the
+   process stopped.
+
+   Two things close that gap. A stage variable records how far teardown has
+   progressed, and a watchdog thread, armed on entry to test_control_return()
+   and stood down once the next test is about to be dispatched, reports the
+   last stage reached along with the scheduler state, then exits non-zero.
+
+   The watchdog covers teardown only, never the test body. Several tests here
+   wait on a probabilistic interrupt window and have no bounded runtime:
+   threadx_thread_wait_abort_and_isr_test has been observed taking anywhere
+   from 0.34 to 439 seconds while passing. Teardown is a fixed amount of work
+   that takes milliseconds, so bounding it cannot turn a slow pass into a
+   failure.
+
+   The report is written with write() rather than printf() deliberately. A
+   wedged thread may hold the stdio lock, and a watchdog that blocked on that
+   lock would reproduce the silent timeout it exists to replace.
+
+   TX_TEST_TEARDOWN_TIMEOUT overrides the bound, in seconds; zero disables the
+   watchdog. TX_TEST_TEARDOWN_TRACE echoes every stage as it is reached and
+   puts stdout in line-buffered mode so the surrounding output survives too.
+   --------------------------------------------------------------------------- */
+
+#define TEST_TEARDOWN_TIMEOUT_DEFAULT           60      /* Seconds allowed for teardown.  */
+#define TEST_TEARDOWN_POLL_MS                   250     /* Watchdog poll interval.  */
+#define TEST_TEARDOWN_WALK_LIMIT                100000  /* Cap on the unbounded walk in cleanup.  */
+
+static const char * volatile    test_teardown_stage_name =  "test body";
+static volatile UINT            test_teardown_armed =       TX_FALSE;
+static UINT                     test_teardown_timeout =     TEST_TEARDOWN_TIMEOUT_DEFAULT;
+static UINT                     test_teardown_trace =       TX_FALSE;
+
+
+/* Record how far teardown has progressed, and echo it when tracing is on.  */
+static void  test_teardown_stage(const char *stage)
+{
+
+    test_teardown_stage_name =  stage;
+
+    if (test_teardown_trace != TX_FALSE)
+    {
+        (void) write(2, "[teardown] ", 11);
+        (void) write(2, stage, strlen(stage));
+        (void) write(2, "\n", 1);
+    }
+}
+
+
+/* Name a thread for the report, without dereferencing a null pointer.  */
+static const char  *test_teardown_thread_name(TX_THREAD *thread_ptr)
+{
+
+    if (thread_ptr == TX_NULL)
+        return "(none)";
+
+    if (thread_ptr -> tx_thread_name == TX_NULL)
+        return "(unnamed)";
+
+    return thread_ptr -> tx_thread_name;
+}
+
+
+/* Write out the state that matters for a teardown hang.  */
+static void  test_teardown_report(const char *reason)
+{
+
+char        buffer[512];
+int         length;
+UINT        core;
+UINT        count;
+TX_THREAD   *thread_ptr;
+
+
+    length =  snprintf(buffer, sizeof(buffer),
+                       "\n**** TEARDOWN WATCHDOG: %s ****\n"
+                       "  last stage reached:         %s\n"
+                       "  _tx_thread_preempt_disable: %u\n"
+                       "  _tx_thread_created_count:   %lu\n",
+                       reason, test_teardown_stage_name,
+                       (UINT) _tx_thread_preempt_disable,
+                       (ULONG) _tx_thread_created_count);
+    if (length > 0)
+        (void) write(2, buffer, (size_t) length);
+
+    for (core = 0; core < ((UINT) TX_THREAD_SMP_MAX_CORES); core++)
+    {
+
+        length =  snprintf(buffer, sizeof(buffer),
+                           "  core %u: system_state=%lu time_slice=%lu current=%s execute=%s\n",
+                           core, (ULONG) _tx_thread_system_state[core],
+                           (ULONG) _tx_timer_time_slice[core],
+                           test_teardown_thread_name(_tx_thread_current_ptr[core]),
+                           test_teardown_thread_name(_tx_thread_execute_ptr[core]));
+        if (length > 0)
+            (void) write(2, buffer, (size_t) length);
+    }
+
+    /* Walk the created list, stopping at the head, and after a fixed number of
+       entries, so a corrupt list cannot trap us in here.  */
+    thread_ptr =  _tx_thread_created_ptr;
+    for (count = 0; (thread_ptr != TX_NULL) && (count < ((UINT) 64)); count++)
+    {
+
+        length =  snprintf(buffer, sizeof(buffer),
+                           "  thread %-24s state=%u priority=%u threshold=%u inherit=%u "
+                           "core_mapped=%u core_control=%lu deferred_preempt=%u suspension=%u\n",
+                           test_teardown_thread_name(thread_ptr),
+                           thread_ptr -> tx_thread_state,
+                           thread_ptr -> tx_thread_priority,
+                           thread_ptr -> tx_thread_preempt_threshold,
+                           thread_ptr -> tx_thread_inherit_priority,
+                           thread_ptr -> tx_thread_smp_core_mapped,
+                           (ULONG) thread_ptr -> tx_thread_smp_core_control,
+                           thread_ptr -> tx_thread_linux_deferred_preempt,
+                           thread_ptr -> tx_thread_linux_suspension_type);
+        if (length > 0)
+            (void) write(2, buffer, (size_t) length);
+
+        thread_ptr =  thread_ptr -> tx_thread_created_next;
+        if (thread_ptr == _tx_thread_created_ptr)
+            break;
+    }
+}
+
+
+/* Report and leave. Used by the watchdog and by the bounded walk in cleanup.  */
+static void  test_teardown_abort(const char *reason)
+{
+
+    test_teardown_report(reason);
+    _exit(99);
+}
+
+
+/* Watch an armed teardown, and only an armed one.  */
+static void  *test_teardown_watchdog(void *input)
+{
+
+sigset_t            mask;
+struct timespec     interval;
+ULONG               waited_ms;
+ULONG               limit_ms;
+
+
+    /* The port drives thread suspend and resume with SIGUSR1 and SIGUSR2.
+       Block both here so this thread never takes one.  */
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGUSR1);
+    sigaddset(&mask, SIGUSR2);
+    pthread_sigmask(SIG_BLOCK, &mask, TX_NULL);
+
+    limit_ms =  ((ULONG) test_teardown_timeout) * ((ULONG) 1000);
+    waited_ms =  ((ULONG) 0);
+
+    while (1)
+    {
+
+        interval.tv_sec =   0;
+        interval.tv_nsec =  ((long) TEST_TEARDOWN_POLL_MS) * 1000000L;
+        while (nanosleep(&interval, &interval) != 0)
+        {
+            if (errno != EINTR)
+                break;
+        }
+
+        /* Nothing to watch while teardown is stood down.  */
+        if (test_teardown_armed == TX_FALSE)
+        {
+            waited_ms =  ((ULONG) 0);
+            continue;
+        }
+
+        waited_ms =  waited_ms + ((ULONG) TEST_TEARDOWN_POLL_MS);
+        if (waited_ms >= limit_ms)
+            test_teardown_abort("teardown did not complete");
+    }
+
+    return input;
+}
+
+
+/* Start the watchdog, stood down. Called before any test runs, so that no
+   thread is created inside the window under investigation.  */
+static void  test_teardown_watchdog_start(void)
+{
+
+pthread_t   watchdog_id;
+char        *value;
+
+
+    value =  getenv("TX_TEST_TEARDOWN_TIMEOUT");
+    if (value != TX_NULL)
+        test_teardown_timeout =  (UINT) atoi(value);
+
+    if (getenv("TX_TEST_TEARDOWN_TRACE") != TX_NULL)
+    {
+
+        /* Tracing wants the stages in the log next to the output around them,
+           which block buffering would otherwise discard on a kill.  */
+        test_teardown_trace =  TX_TRUE;
+        setvbuf(stdout, TX_NULL, _IOLBF, 0);
+    }
+
+    /* A timeout of zero turns the watchdog off.  */
+    if (test_teardown_timeout == ((UINT) 0))
+        return;
+
+    if (pthread_create(&watchdog_id, TX_NULL, test_teardown_watchdog, TX_NULL) == 0)
+        pthread_detach(watchdog_id);
+}
+
+
+static void  test_teardown_arm(const char *stage)
+{
+
+    test_teardown_stage(stage);
+    test_teardown_armed =  TX_TRUE;
+}
+
+
+static void  test_teardown_stand_down(void)
+{
+
+    test_teardown_armed =  TX_FALSE;
+    test_teardown_stage("test body");
+}
+
 
 /* Define the test control thread.  This thread is responsible for dispatching all of the
    tests in the ThreadX test suite.  */
@@ -1346,6 +1588,9 @@ UINT    i;
 
     /* Raise the priority of the control thread to 0.  */
     tx_thread_priority_change(&test_control_thread, 0, &i);
+
+    /* Bring up the teardown watchdog, stood down for now.  */
+    test_teardown_watchdog_start();
 #ifdef CTEST
     test_control_cleanup();
 #endif
@@ -1364,6 +1609,10 @@ UINT    i;
     while (test_control_tests[i].test_entry != TX_NULL)
     {
 
+        /* Teardown of the previous test is done. The watchdog covers teardown
+           only, so stand it down before dispatching the next test.  */
+        test_teardown_stand_down();
+
         /* Clear the ISR dispatch.  */
         test_isr_dispatch =  TX_NULL;
 
@@ -1381,12 +1630,15 @@ UINT    i;
         tx_thread_suspend(&test_control_thread);
 
         /* Test finished, cleanup in preparation for the next test.  */
+        test_teardown_stage("control thread resumed after test");
         test_control_cleanup();
     }
 
     /* Finished with all tests, print results and return!  */
+    test_teardown_stage("all tests dispatched, printing summary");
     printf("**** Testing Complete ****\n");
     printf("**** Test Summary:  Tests Passed:  %lu   Tests Failed:  %lu    System Errors:   %lu\n", test_control_successful_tests, test_control_failed_tests, test_control_system_errors);
+    test_teardown_stage("calling exit()");
 #ifndef EXTERNAL_EXIT
     exit(test_control_failed_tests + test_control_system_errors);
 #else
@@ -1403,6 +1655,10 @@ TX_INTERRUPT_SAVE_AREA
 UINT    old_posture =  TX_INT_ENABLE;
 
     fflush(stdout);
+
+    /* This is the last flush before the test either finishes or wedges, so
+       everything from here on is invisible in the log. Arm the watchdog.  */
+    test_teardown_arm("test_control_return entered");
 
     /* Save the status in a global.  */
     test_control_return_status =  status;
@@ -1456,7 +1712,9 @@ UINT    old_posture =  TX_INT_ENABLE;
 #endif
 
     /* Resume the control thread to fully exit the test.  */
+    test_teardown_stage("test_control_return: resuming control thread");
     tx_thread_resume(&test_control_thread);
+    test_teardown_stage("test_control_return: control thread resume returned");
 }
 
 
@@ -1465,7 +1723,10 @@ void  test_control_cleanup(void)
 
 TX_MUTEX    *mutex_ptr;
 TX_THREAD   *thread_ptr;
+UINT        walk_guard;
 
+
+    test_teardown_stage("cleanup: deleting threads");
 
     /* Delete all threads, except for timer thread, and test control thread.
        This ensures application-owned objects are no longer referenced before
@@ -1497,8 +1758,17 @@ TX_THREAD   *thread_ptr;
             break;
 
         /* Move to the thread not protected.  */
+        walk_guard =  ((UINT) 0);
         while ((thread_ptr == &_tx_timer_thread) || (thread_ptr == &test_control_thread))
         {
+
+            /* This walk has no natural bound. Should the created count and the
+               created list ever disagree, it spins here for good, which is one
+               of the shapes the CI timeout could be taking. Say so and stop
+               instead of hanging.  */
+            walk_guard =  walk_guard + ((UINT) 1);
+            if (walk_guard > ((UINT) TEST_TEARDOWN_WALK_LIMIT))
+                test_teardown_abort("cleanup thread walk did not terminate");
 
             /* Yes, move to the next thread.  */
             thread_ptr =  thread_ptr -> tx_thread_created_next;
@@ -1512,6 +1782,8 @@ TX_THREAD   *thread_ptr;
         tx_thread_delete(thread_ptr);
     }
 
+    test_teardown_stage("cleanup: deleting queues");
+
     /* Delete all queues.  */
     while(_tx_queue_created_ptr)
     {
@@ -1519,6 +1791,8 @@ TX_THREAD   *thread_ptr;
         /* Delete queue.  */
         tx_queue_delete(_tx_queue_created_ptr);
     }
+
+    test_teardown_stage("cleanup: deleting semaphores");
 
     /* Delete all semaphores.  */
     while(_tx_semaphore_created_ptr)
@@ -1528,6 +1802,8 @@ TX_THREAD   *thread_ptr;
         tx_semaphore_delete(_tx_semaphore_created_ptr);
     }
 
+    test_teardown_stage("cleanup: deleting event flag groups");
+
     /* Delete all event flag groups.  */
     while(_tx_event_flags_created_ptr)
     {
@@ -1535,6 +1811,8 @@ TX_THREAD   *thread_ptr;
         /* Delete event flag group.  */
         tx_event_flags_delete(_tx_event_flags_created_ptr);
     }
+
+    test_teardown_stage("cleanup: deleting byte pools");
 
     /* Delete all byte pools.  */
     while(_tx_byte_pool_created_ptr)
@@ -1544,6 +1822,8 @@ TX_THREAD   *thread_ptr;
         tx_byte_pool_delete(_tx_byte_pool_created_ptr);
     }
 
+    test_teardown_stage("cleanup: deleting block pools");
+
     /* Delete all block pools.  */
     while(_tx_block_pool_created_ptr)
     {
@@ -1551,6 +1831,8 @@ TX_THREAD   *thread_ptr;
         /* Delete block pool.  */
         tx_block_pool_delete(_tx_block_pool_created_ptr);
     }
+
+    test_teardown_stage("cleanup: deleting timers");
 
     /* Delete all timers.  */
     while(_tx_timer_created_ptr)
@@ -1562,6 +1844,8 @@ TX_THREAD   *thread_ptr;
         /* Delete timer.  */
         tx_timer_delete(_tx_timer_created_ptr);
     }
+
+    test_teardown_stage("cleanup: deleting mutexes");
 
     /* Delete all mutexes (except for system mutex).  */
     while(_tx_mutex_created_ptr)
@@ -1588,6 +1872,8 @@ TX_THREAD   *thread_ptr;
         /* Delete mutex.  */
         tx_mutex_delete(mutex_ptr);
     }
+
+    test_teardown_stage("cleanup: complete");
 
     /* At this point, only the test control thread and the system timer thread and/or mutex should still be
        in the system.  */

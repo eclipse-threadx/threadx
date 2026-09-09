@@ -1,13 +1,24 @@
 name: regression_test
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
+# Runs the ThreadX, SMP and FreeRTOS-compatibility regression suites.
+#
+# dev is included as well as master, for the same reason ports_arch_check.yml
+# names it: dev is the integration branch, so a check that runs only against
+# master gates nothing that anybody opens. Until now these suites ran on no
+# pull request that anybody actually raised, and the last dev run of any kind
+# was a manual workflow_dispatch.
+#
+# That run, on 2026-08-18, failed two tests: threadx_timer_simple_test in the
+# ThreadX suite and threadx_thread_priority_change in the SMP one. Both are
+# fixed -- the first by running the suites one test at a time (#643), the
+# second by #647 -- and both suites now pass all 1030 tests across all ten
+# build configurations. The suites were never the problem; the trigger was.
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -26,6 +37,17 @@ jobs:
       cmake_path: ./test/tx/cmake
       result_affix: ThreadX
       skip_deploy: true
+      # 99 is the tightest floor available below this suite's figure. The
+      # merged report reads 4503/4503 lines -- 100.00% -- on the dev push run
+      # of #666, and two local runs of the same green tree came in at 100.00%
+      # and 99.98%: tx_thread_system_resume.c:529 is reached by timing rather
+      # than by construction and flaps between runs, and #666 could not reach
+      # it deliberately. So a floor of 100 is a check that fails on a race --
+      # probed against the pinned action, 4502/4503 fails a floor of 100 and
+      # clears one of 99 -- and the thresholds are integers, so there is
+      # nothing between the two. Ratchet this to 100 if 529 is ever covered
+      # by construction.
+      coverage_thresholds: '99 100'
   smp:
     permissions:
       contents: read
@@ -41,6 +63,40 @@ jobs:
       cmake_path: ./test/smp/cmake
       result_affix: SMP
       skip_deploy: true
+      # Raised from 98 with the four tests that closed 53 of the 64 lines this
+      # comment used to list: the merged report goes from 5114/5178 -- 98.76% --
+      # to 5167/5178, 99.79%. A floor of 99 needs 5127, so there are 40 lines of
+      # headroom against a numerator measured flickering by two between runs.
+      #
+      # Still not 100, and not because the last eleven lines were skipped. Eight
+      # are tx_byte_pool_search.c's ownership delay loop, which needs another
+      # core to take the pool inside the window the search opens when it drops
+      # protection every twenty blocks; this port serialises all four cores on
+      # one pthread mutex and the thread that releases it wins the re-acquire
+      # every time -- measured over 180,003 windows, zero handovers. The other
+      # three are in tx_thread_smp_utilities.c: one is a range guard placed
+      # after the shift it is meant to guard, so reaching it needs undefined
+      # behaviour, and two are a priority-inheritance branch that needs the
+      # mutex owner genuinely executing on another core. See T17.
+      coverage_thresholds: '99 100'
+  freertos:
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/regression_template.yml
+    with:
+      build_script: ./scripts/build_freertos.sh
+      test_script: ./scripts/test_freertos.sh
+      cmake_path: ./test/freertos/cmake
+      result_affix: FreeRTOS
+      skip_deploy: true
+      # No coverage build configuration yet; the suite covers the creation
+      # paths of the layer rather than all of it.
+      skip_coverage: true
   # riscv: disabled — re-enable when RISC-V CI is ready
   # riscv:
   #   permissions:
@@ -60,6 +116,20 @@ jobs:
   #     skip_deploy: true
   #     skip_coverage: true
   deploy:
+    # Publishing the coverage report stays on master. Adding dev to this
+    # workflow's triggers was meant to run the suites on the branch the pull
+    # requests target, not to change what gets published -- and the first
+    # push to dev after that change failed here with 'Branch "dev" is not
+    # allowed to deploy to github-pages due to environment protection rules',
+    # while all three suites passed. The github-pages environment restricts
+    # deployments to master, so the job was rejected before it ran.
+    #
+    # Guarding here rather than relaxing the environment rule, because the
+    # rule is doing its job: it is a deliberate answer to the question of
+    # which branch the published report describes. Moving that answer to dev
+    # is a separate decision, and it needs the environment setting changed
+    # as well as this line removed.
+    if: github.ref == 'refs/heads/master'
     permissions:
       contents: read
       issues: read

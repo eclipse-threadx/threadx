@@ -538,12 +538,30 @@ POSIX_TCB          *p_tcb;
     if (!thread_ptr)
     {
         /* Not called from a thread - error!  */
-           posix_internal_error(222);
+        posix_internal_error(222);
+
+        /* posix_internal_error() does not return today, but do not depend on
+           that: posix_thread2tcb() hands back NULL for this input and the read
+           below would dereference it. A pthread ID is the address of the TCB,
+           so zero is never a valid one.  */
+        return((pthread_t) 0);
     }
 
     /* Get the TCB for this pthread */
 
     p_tcb = posix_thread2tcb(thread_ptr);
+
+    /* A running ThreadX thread that was not created through pthread_create()
+       has no TCB in the pool, and posix_thread2tcb() returns NULL for it.  It
+       has no pthread ID either, so report zero rather than reading through the
+       null pointer.  Zero can never collide with a real ID, because
+       px_pth_create.c uses the address of the TCB as the ID.  */
+    if (!p_tcb)
+    {
+
+        return((pthread_t) 0);
+    }
+
     thread_ID = p_tcb->pthreadID;
 
     /* All done.  */

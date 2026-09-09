@@ -26,7 +26,10 @@
 #include "tx_user.h"
 #endif
 
-    .text 32
+@   Plain .text rather than a numbered subsection: with .text 32, clang places
+@   the constant pool for the LDR literals below outside the range a Thumb-1
+@   PC-relative load can reach. GNU as accepts either form.
+    .text
     .align 4
     .syntax unified
 @/**************************************************************************/

@@ -18,6 +18,7 @@
 .extern _sysstack_end
 .extern _bss_start
 .extern _bss_end
+.extern __global_pointer$
 
 _start:
     csrr    t0, mhartid
@@ -55,6 +56,11 @@ _start:
     li x29, 0
     li x30, 0
     li x31, 0
+
+    .option push
+    .option norelax
+    la      gp, __global_pointer$
+    .option pop
 
     /* Set up stack pointer from linker symbol. */
     la      sp, _sysstack_end

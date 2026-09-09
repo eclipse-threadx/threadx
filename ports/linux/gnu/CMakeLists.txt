@@ -20,3 +20,10 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC "-D_GNU_SOURCE -DTX_LINUX_DEBUG_ENABLE")
+
+# The demo program beside the port. Off by default so the ordinary build
+# produces just the library; -DTHREADX_SAMPLE=ON adds the sample_threadx target.
+option(THREADX_SAMPLE "Build the sample program for this port" OFF)
+if(THREADX_SAMPLE)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/example_build)
+endif()

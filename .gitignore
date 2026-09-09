@@ -3,8 +3,7 @@
 .metadata/
 .tmp/
 _deps/
-build/
-build_qemu/
+build*/
 Debug/
 CMakeFiles/
 CMakeScripts/
@@ -25,5 +24,13 @@ CTestTestfile.cmake
 
 
 # Local build artifacts
-build_m7/
 .codex
+__pycache__/
+*.pyc
+
+# Keil uVision per-user state, regenerated when a project is opened.
+# The .uvprojx / .uvproj project files are the ones worth tracking.
+*.uvoptx
+*.uvopt
+*.uvgui
+*.uvgui.*

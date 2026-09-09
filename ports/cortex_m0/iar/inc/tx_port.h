@@ -319,6 +319,7 @@ __istate_t interrupt_save;
         interrupt_save = __get_interrupt_state();
         __enable_interrupt();
         __set_interrupt_state(interrupt_save);
+        __asm__ volatile ("isb 0xF " : : : "memory");
     }
 }
 

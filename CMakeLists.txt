@@ -24,10 +24,24 @@ endif()
 
 option(THREADX_SMP "Build ThreadX SMP version" OFF)
 
+# Enable testing at the top level so that tests registered by ports and
+# example builds further down the tree are discoverable with ctest from the
+# build root.  Without this, add_test() in a subdirectory still generates a
+# CTestTestfile.cmake there, but the root does not reference it and
+# "ctest --test-dir <build>" reports no tests at all.
+enable_testing()
+
 if(THREADX_SMP)
     set(TX_PORT_DIR "ports_smp")
     set(TX_COMMON_DIR "common_smp")
     set(TX_ARCH_DIR "${THREADX_ARCH}_smp")
+    # Most SMP ports are named <arch>_smp, but ports_smp/linux and
+    # ports_smp/win64 predate that convention and carry no suffix. Fall back to
+    # the bare name for them. The check only fires when the suffixed directory
+    # is absent, so no port that already resolves changes.
+    if(NOT IS_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/${TX_PORT_DIR}/${TX_ARCH_DIR}")
+        set(TX_ARCH_DIR "${THREADX_ARCH}")
+    endif()
     message(STATUS "Building ThreadX SMP version")
 else()
     set(TX_PORT_DIR "ports")
@@ -67,6 +81,24 @@ target_sources(freertos-threadx
     ${CMAKE_CURRENT_LIST_DIR}/utility/rtos_compatibility_layers/FreeRTOS/tx_freertos.c
 )
 target_link_libraries(freertos-threadx PUBLIC threadx)
+
+# Define the POSIX compatibility layer.  It supplies its own errno.h, fcntl.h,
+# pthread.h, sched.h, signal.h and time.h, so it cannot be combined with the
+# hosted simulation ports: those build against a full C library that already
+# provides those headers, and the layer's pthread.h even shares the _PTHREAD_H
+# include guard with glibc's.  Skip it there rather than offering a target that
+# could never build.
+#
+# It is also single-core by construction: px_int.h declares
+# _tx_thread_current_ptr as a plain pointer, which is a per-core array in an SMP
+# build, and the layer has no notion of which core it is running on.
+if(THREADX_ARCH MATCHES "^(linux|win32|win64)$")
+    message(STATUS "POSIX compatibility layer not available for ${THREADX_ARCH}")
+elseif(THREADX_SMP)
+    message(STATUS "POSIX compatibility layer not available for SMP builds")
+else()
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/utility/rtos_compatibility_layers/posix)
+endif()
 
 # If the user provided an override, copy it to the custom directory
 if (NOT TX_USER_FILE)

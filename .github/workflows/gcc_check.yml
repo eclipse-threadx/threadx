@@ -1,0 +1,175 @@
+name: gcc_check
+
+# Builds the Arm ports with the Arm GNU toolchain, in five stages: assemble
+# every assembly source of every Arm gnu port, assemble again the parts guarded
+# by feature macros, compile the common C sources for one core per architecture
+# profile, then link the example builds, both the script-driven ones and those
+# driven by CMake.
+#
+# Why this exists: GCC is the project's declared default compiler (AGENTS.md,
+# "The default compiler for the project is GCC 14 on Linux") and until this
+# workflow landed, nothing in CI compiled a line of any port with it. The only
+# cross-compilation check that ran was clang_check, so the LLVM path was better
+# guarded than the GNU one, on ports whose directory is literally named gnu.
+#
+# What it covers: 840 assembly sources across 40 port families, 469 of them
+# again behind feature macros, common/src for nine cores, 42 script-driven
+# example links and the five Cortex-R52 CMake images. Every skip is printed by
+# name with a reason -- run scripts/check_gcc.sh --help, or read its header.
+#
+# What it does not cover: it compiles and links and **executes nothing**. The
+# Cortex-R52 FVP ctest suite is not part of it. RISC-V, MIPS, RX and ARC are
+# outside it entirely -- RISC-V deliberately, as both its ports do assemble and
+# adding them widens the toolchain download for a family that is not regressing.
+#
+# It does not supersede cortex_m. That workflow builds four ports *through
+# CMake*, which is the only thing exercising cmake/cortex_m*.cmake and the
+# top-level CMakeLists for the M profile; this script's CMake stage covers
+# cortex_r52 only. The overlap is the assembly and the C sources, not the build
+# system.
+on:
+  # push as well as pull_request, so dev's own history has a baseline and a bad
+  # squash-merge is caught rather than waiting for the next PR to notice. dev is
+  # named because it is the integration branch: a workflow that triggers only on
+  # master does not gate any pull request anybody opens, which is the defect
+  # ports_arch_check.yml carries a comment about and which cost cortex_m three
+  # months of failing in seven seconds unnoticed.
+  push:
+    branches: [ master, dev ]
+    paths:
+      - ".github/workflows/gcc_check.yml"
+      - "scripts/check_gcc.sh"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "common/**"
+      - "common_smp/**"
+      - "ports/**"
+      - "ports_arch/**"
+      - "ports_module/**"
+      - "ports_smp/**"
+  pull_request:
+    branches: [ master, dev ]
+    # The two lists are duplicated rather than shared through a YAML anchor.
+    # GitHub Actions' workflow parser does not dependably honour anchors, and
+    # the failure mode is the whole workflow refusing to parse -- which is the
+    # cortex_m failure again, a job that dies before it does anything. Ten
+    # duplicated lines are cheaper than that. **Edit both.**
+    #
+    # common_smp, CMakeLists.txt and cmake/ are here and are absent from
+    # clang_check.yml's otherwise identical list, which is a gap in that file
+    # and is fixed alongside this one: the ports_smp example builds compile
+    # common_smp/src, and the CMake stage reads the toolchain file and the
+    # top-level project. utility/ is deliberately absent -- the FreeRTOS and
+    # POSIX layers under it are not enabled by any target this workflow builds.
+    paths:
+      - ".github/workflows/gcc_check.yml"
+      - "scripts/check_gcc.sh"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "common/**"
+      - "common_smp/**"
+      - "ports/**"
+      - "ports_arch/**"
+      - "ports_module/**"
+      - "ports_smp/**"
+
+jobs:
+  gnu:
+    runs-on: ubuntu-24.04
+
+    env:
+      # Pinned deliberately, as the runner image is: a toolchain upgrade should
+      # be a reviewable commit rather than something that changes underneath the
+      # ports. 14.3.rel1 matches AGENTS.md's GCC 14 default and the version
+      # cortex_m already pins.
+      # Releases: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
+      GCC_VERSION: 14.3.rel1
+
+    steps:
+    # Actions are pinned to a commit SHA, with the version in the trailing
+    # comment. A tag can be moved; a SHA cannot, so this is what makes "which
+    # code ran in CI" answerable from the repository. Dependabot moves these
+    # pins and rewrites the comment with them -- see .github/dependabot.yml.
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    # Two toolchains, because Arm ships AArch32 and AArch64 as separate
+    # downloads and scripts/check_gcc.sh needs both -- every port maps to one of
+    # exactly those two triples. One job with two cache steps rather than two
+    # jobs, so the checks list stays short and a single script invocation sees
+    # both compilers.
+    #
+    # The AArch32 path and key match cortex_m's exactly, so the two workflows
+    # share one cache entry rather than each holding its own copy of the same
+    # 500MB archive. Change them together or the sharing silently stops and the
+    # only symptom is a slower run.
+    - name: Cache the AArch32 Arm GNU toolchain
+      id: cache-arm32
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: toolchain
+        key: arm-gnu-toolchain-${{ env.GCC_VERSION }}-x86_64-arm-none-eabi
+
+    - name: Cache the AArch64 Arm GNU toolchain
+      id: cache-arm64
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: toolchain64
+        key: arm-gnu-toolchain-${{ env.GCC_VERSION }}-x86_64-aarch64-none-elf
+
+    # The checksum suffix is .sha256asc and not .sha256, and that is not a
+    # stylistic choice. Arm publishes both for this release, and for
+    # arm-none-eabi the .sha256 file contains a 32-character MD5 rather than a
+    # SHA-256 -- verified 26 Aug 2026 -- so sha256sum -c on it fails with "no
+    # properly formatted checksum lines found". .sha256asc is a plain
+    # sha256sum-format line for both triples. Do not "simplify" the suffix.
+    - name: Install the AArch32 Arm GNU toolchain
+      if: steps.cache-arm32.outputs.cache-hit != 'true'
+      run: |
+        set -eu
+        base="https://developer.arm.com/-/media/Files/downloads/gnu/${GCC_VERSION}/binrel"
+        archive="arm-gnu-toolchain-${GCC_VERSION}-x86_64-arm-none-eabi.tar.xz"
+        mkdir -p toolchain && cd toolchain
+        curl -fsSLO "$base/$archive"
+        curl -fsSLO "$base/$archive.sha256asc"
+        sha256sum -c "$archive.sha256asc"
+        tar xf "$archive"
+        rm -f "$archive"
+
+    - name: Install the AArch64 Arm GNU toolchain
+      if: steps.cache-arm64.outputs.cache-hit != 'true'
+      run: |
+        set -eu
+        base="https://developer.arm.com/-/media/Files/downloads/gnu/${GCC_VERSION}/binrel"
+        archive="arm-gnu-toolchain-${GCC_VERSION}-x86_64-aarch64-none-elf.tar.xz"
+        mkdir -p toolchain64 && cd toolchain64
+        curl -fsSLO "$base/$archive"
+        curl -fsSLO "$base/$archive.sha256asc"
+        sha256sum -c "$archive.sha256asc"
+        tar xf "$archive"
+        rm -f "$archive"
+
+    # Only reaches apt if the runner image has stopped shipping ninja, which
+    # the CMake stage needs. This repository has already paid for unguarded apt
+    # calls: scripts/install.sh carries a long comment about apt-get update
+    # stalling for over two hours and taking whole regression runs with it. Do
+    # not turn this into an unconditional install.
+    - name: Ensure ninja is available
+      run: |
+        set -eu
+        if command -v ninja >/dev/null 2>&1; then
+          ninja --version
+        else
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build
+        fi
+
+    # The script is told where both toolchains are rather than being left to
+    # find them on PATH, so nothing about the runner image can decide which
+    # compiler is used. The script prints both versions it resolved, which is
+    # what makes "was this really 14.3.rel1?" answerable from the log.
+    - name: Build the Arm ports with GCC
+      run: |
+        scripts/check_gcc.sh \
+          --arm-none-eabi "$GITHUB_WORKSPACE/toolchain/arm-gnu-toolchain-${GCC_VERSION}-x86_64-arm-none-eabi/bin" \
+          --aarch64-none-elf "$GITHUB_WORKSPACE/toolchain64/arm-gnu-toolchain-${GCC_VERSION}-x86_64-aarch64-none-elf/bin"

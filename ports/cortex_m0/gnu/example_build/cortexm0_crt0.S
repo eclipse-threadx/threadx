@@ -4,6 +4,12 @@
 
   .section .init, "ax"
   .code 16
+  /* Unified assembler syntax. Without it GNU as falls back to the legacy
+     divided syntax, in which a plain add or sub sets the flags implicitly.
+     LLVM implements only unified syntax, where ARMv6-M has no
+     flag-preserving encoding, so the S-forms below are required. Declaring
+     the mode makes both assemblers agree.  */
+  .syntax unified
   .align 2
   .thumb_func
 
@@ -43,16 +49,16 @@ _start:
   /* Zero bss. */
   ldr r0, =__bss_start__
   ldr r1, =__bss_end__
-  mov r2, #0
+  movs r2, #0
   bl crt0_memory_set
 
   /* Setup heap - not recommended for Threadx but here for compatibility reasons */
   ldr r0, = __heap_start__
   ldr r1, = __heap_end__
-  sub r1, r1, r0
-  mov r2, #0
+  subs r1, r1, r0
+  movs r2, #0
   str r2, [r0]
-  add r0, r0, #4
+  adds r0, r0, #4
   str r1, [r0]
 
   /* constructors in case of using C++ */
@@ -62,7 +68,7 @@ crt0_ctor_loop:
   cmp r0, r1
   beq crt0_ctor_end
   ldr r2, [r0]
-  add r0, #4
+  adds r0, #4
   push {r0-r1}
   blx r2
   pop {r0-r1}
@@ -70,14 +76,14 @@ crt0_ctor_loop:
 crt0_ctor_end:
 
   /* Setup call frame for main() */
-  mov r0, #0
+  movs r0, #0
   mov lr, r0
   mov r12, sp
 
 start:
   /* Jump to main() */
-  mov r0, #0
-  mov r1, #0
+  movs r0, #0
+  movs r1, #0
   ldr r2, =main
   blx r2
   /*  when main returns, loop forever. */
@@ -91,14 +97,14 @@ crt0_exit_loop:
 crt0_memory_copy:
   cmp r0, r1
   beq memory_copy_done
-  sub r2, r2, r1
+  subs r2, r2, r1
   beq memory_copy_done
 memory_copy_loop:
   ldrb r3, [r0]
-  add r0, r0, #1
+  adds r0, r0, #1
   strb r3, [r1]
-  add r1, r1, #1
-  sub r2, r2, #1
+  adds r1, r1, #1
+  subs r2, r2, #1
   bne memory_copy_loop
 memory_copy_done:
   bx lr
@@ -107,7 +113,7 @@ crt0_memory_set:
   cmp r0, r1
   beq memory_set_done
   strb r2, [r0]
-  add r0, r0, #1
+  adds r0, r0, #1
   b crt0_memory_set
 memory_set_done:
   bx lr

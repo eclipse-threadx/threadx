@@ -19,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .text
     .align 3
@@ -28,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_context_restore                         ARMv8-A-SMP      */
-/*                                                           6.1.11       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -277,6 +279,7 @@ __tx_thread_dont_save_ts:
 
     /* Set bit indicating this thread is ready for execution.  */
 
+    DMB     ISH                                 // Ensure that accesses to shared resource have completed
     MOV     x2, #1                              // Build ready flag
     STR     w2, [x0, #260]                      // Set thread's ready flag
     DMB     ISH                                 // Ensure that accesses to shared resource have completed

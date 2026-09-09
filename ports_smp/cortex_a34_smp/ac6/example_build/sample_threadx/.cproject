@@ -29,7 +29,7 @@
 
                         <toolChain id="com.arm.toolchain.v6.base.var.arm_compiler_6-6.1592753597" name="Arm Compiler 6" superClass="com.arm.toolchain.v6.base.var.arm_compiler_6-6">
 
-                            <option id="com.arm.toolchain.v6.base.options.target.cpu_fpu.1337922098" superClass="com.arm.toolchain.v6.base.options.target.cpu_fpu" useByScannerDiscovery="false" value="cortex-a34.AArch64.ARMv8.Neon.Crypto" valueType="string"/>
+                            <option id="com.arm.toolchain.v6.base.options.target.cpu_fpu.1337922098" superClass="com.arm.toolchain.v6.base.options.target.cpu_fpu" useByScannerDiscovery="false" value="Cortex-A34.AArch64.ARMv8.Neon.Crypto" valueType="string"/>
 
                             <targetPlatform id="com.arm.toolchain.v6.base.var.arm_compiler_6-6.1592753597.2060144338" name=""/>
 
