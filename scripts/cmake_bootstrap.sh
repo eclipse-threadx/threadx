@@ -61,7 +61,11 @@ function generate() {
 }
 
 function build() {
-    cmake --build build/$1
+    # -k 0 keeps Ninja going after a target fails, so one broken target no
+    # longer decides whether the targets after it exist. ctest reports a
+    # missing binary as a failing test, which turned a single link error into
+    # a failure count that varied with build scheduling order.
+    cmake --build build/$1 -- -k 0
 }
 
 function build_libs() {
@@ -74,7 +78,10 @@ function build_libs() {
 }
 
 function test() {
-    pushd build/$1
+    # Guard the pushd: with the caller capturing this function's status, set -e
+    # no longer aborts here, so a missing build directory would otherwise let
+    # ctest run in the source tree and report "no tests" as success.
+    pushd build/$1 || return 1
     [ -z "${CTEST_PARALLEL_LEVEL}" ] && parallel="-j$2"
     if [ -z "${CTEST_REPEAT_FAIL}" ];
     then
@@ -198,11 +205,16 @@ if [ "$command" == "build" ]; then
         echo ""
     done
 
+    # A failing configuration must not stop the ones after it: under set -e
+    # the loop would abort and leave them unbuilt, which then reads as a wall
+    # of missing-binary test failures. The status is accumulated and returned.
+    build_status=0
     for item in $builds; do
         echo "Building $item"
-        build $item
+        build $item || build_status=$?
         echo ""
     done
+    [ $build_status -eq 0 ] || exit $build_status
 elif [ "$command" == "test" ]; then
     cores=$(nproc)
     if [ -z "${CTEST_PARALLEL_LEVEL}" ];
