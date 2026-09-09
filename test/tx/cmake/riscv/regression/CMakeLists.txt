@@ -115,6 +115,14 @@ set(regression_test_cases
     # interrupt_save on RISC-V.
 )
 
+# Architecture specific tests living next to this file. The RV32 stack
+# builder still leaves the mstatus slot of the frame unwritten, so the new
+# thread FPU state test only applies to RV64 for now.
+if(THREADX_ARCH STREQUAL "risc-v64")
+    list(APPEND regression_test_cases
+        ${CMAKE_CURRENT_LIST_DIR}/threadx_riscv_new_thread_fpu_state_test.c)
+endif()
+
 # Tests that provide their own main() and must NOT link with testcontrol.
 set(standalone_test_cases
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c

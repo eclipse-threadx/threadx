@@ -73,6 +73,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${TX_COMMON_DIR})
 # Define the FreeRTOS adaptation layer
 add_library(freertos-threadx EXCLUDE_FROM_ALL)
 target_include_directories(freertos-threadx
+    SYSTEM
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/utility/rtos_compatibility_layers/FreeRTOS
 )
@@ -109,6 +110,7 @@ else()
 endif()
 configure_file(${TX_USER_FILE} ${CUSTOM_INC_DIR}/tx_user.h COPYONLY)
 target_include_directories(${PROJECT_NAME}
+    SYSTEM
     PUBLIC
     ${CUSTOM_INC_DIR}
 )

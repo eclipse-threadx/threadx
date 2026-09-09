@@ -1,0 +1,4 @@
+# Ignore generated QEMU test files.
+kernel.elf
+qemu-riscv32.log
+test_cmds.gdb
