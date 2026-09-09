@@ -10,26 +10,14 @@
 # SPDX-License-Identifier: MIT
 ##############################################################################
 
-printf "y\n" | rm -rf ../../../../../build/
-rm -f kernel.elf
+set -eu
 
-pushd ../../../../../
-cmake -Bbuild -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64_gnu.cmake .
-cmake --build ./build/
-popd
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+REPO_ROOT=$(CDPATH= cd -- "${SCRIPT_DIR}/../../../../../" && pwd)
+BUILD_DIR=${BUILD_DIR:-"${REPO_ROOT}/build/riscv64-qemu"}
 
-riscv64-unknown-elf-gcc \
-  -march=rv64gc -mabi=lp64d \
-  -mcmodel=medany -O0 -g3 -Wall \
-  -ffunction-sections -fdata-sections \
-  -I../../../../../common/inc \
-  -I../../inc \
-  entry.S \
-  tx_initialize_low_level.S \
-  board.c uart.c hwtimer.c plic.c trap.c demo_threadx.c \
-  -L../../../../../build -lthreadx \
-  -T link.lds -nostartfiles \
-  -o kernel.elf
+cmake -S "${REPO_ROOT}" -B "${BUILD_DIR}" -GNinja \
+    -DCMAKE_TOOLCHAIN_FILE="${REPO_ROOT}/cmake/riscv64_gnu.cmake"
+cmake --build "${BUILD_DIR}" --target kernel.elf
 
-
-qemu-system-riscv64 -nographic -smp 1 -bios none -m 128M -machine virt -kernel kernel.elf
+printf 'Built %s\n' "${BUILD_DIR}/ports/risc-v64/gnu/example_build/qemu_virt/kernel.elf"

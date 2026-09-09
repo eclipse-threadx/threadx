@@ -27,8 +27,8 @@
 #define PLIC_MCOMPLETE(hart)    (PLIC + 0x200004 + (hart)*0x2000)
 #define PLIC_SCOMPLETE(hart)    (PLIC + 0x201004 + (hart)*0x2000)
 
-#define PLIC_GET_PRIO(irqno)            (*(uint32_t *)(PLIC_PRIORITY + (irqno)*4))
-#define PLIC_SET_PRIO(irqno, prio)      (*(uint32_t *)(PLIC_PRIORITY + (irqno)*4) = (prio))
+#define PLIC_GET_PRIO(irqno)            (*(volatile uint32_t *)(PLIC_PRIORITY + (irqno)*4))
+#define PLIC_SET_PRIO(irqno, prio)      (*(volatile uint32_t *)(PLIC_PRIORITY + (irqno)*4) = (prio))
 
 #define MAX_CALLBACK_NUM        128
 typedef int (*irq_callback)(int irqno);

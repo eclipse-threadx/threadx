@@ -1,6 +1,12 @@
 OUTPUT_ARCH( "riscv" )
 ENTRY( _start )
 
+PHDRS
+{
+  text PT_LOAD FLAGS(5);
+  data PT_LOAD FLAGS(6);
+}
+
 SECTIONS
 {
   /*
@@ -10,43 +16,44 @@ SECTIONS
   . = 0x80000000;
 
   .text : {
+    KEEP(*(.text.entry))
     *(.text .text.*)
     . = ALIGN(0x1000);
     PROVIDE(etext = .);
-  }
+  } :text
 
   .rodata : {
     . = ALIGN(16);
     *(.srodata .srodata.*) /* do not need to distinguish this from .rodata */
     . = ALIGN(16);
     *(.rodata .rodata.*)
-  }
+  } :text
 
+  . = ALIGN(0x1000);
   .data : {
     . = ALIGN(16);
+    PROVIDE( __global_pointer$ = . + 0x800 );
     *(.sdata .sdata.*) /* do not need to distinguish this from .data */
     . = ALIGN(16);
     *(.data .data.*)
-  }
+  } :data
 
-  .bss : {
+  .bss (NOLOAD) : {
     . = ALIGN(16);
     _bss_start = .;
     *(.sbss .sbss.*) /* do not need to distinguish this from .bss */
     . = ALIGN(16);
     *(.bss .bss.*)
     _bss_end = .;
-  }
+  } :data
 
-  .stack : {
+  .stack (NOLOAD) : {
     . = ALIGN(4096);
     _sysstack_start = .;
     . += 0x1000;
-#ifdef __riscv_vector
-    . += 0x4000;
-#endif
+    . += 0x4000; /* Vector headroom */
     _sysstack_end = .;
-  }
+  } :data
 
   PROVIDE(_end = .);
 }
