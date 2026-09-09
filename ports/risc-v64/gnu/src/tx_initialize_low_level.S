@@ -79,8 +79,24 @@ _tx_initialize_low_level:
 
     /* Initialize floating point control/status register if floating point is enabled.  */
 #ifdef __riscv_flen
+#ifdef TX_RISCV_SMODE
+    li      t0, 0x2000                                  // Set sstatus.FS to Initial (bits 14:13 = 01) so the fcsr write cannot trap
+    csrrs   zero, sstatus, t0
+#else
+    li      t0, 0x2000                                  // Set mstatus.FS to Initial (bits 14:13 = 01) so the fcsr write cannot trap
+    csrrs   zero, mstatus, t0
+#endif
     li      t0, 0
     csrw    fcsr, t0                                    // Clear FP control/status register
+#endif
+
+#ifdef __riscv_vector
+    li      t0, 0x200                                   // Set VS=Initial before a vector restore
+#ifdef TX_RISCV_SMODE
+    csrrs   zero, sstatus, t0
+#else
+    csrrs   zero, mstatus, t0
+#endif
 #endif
 
     ret
