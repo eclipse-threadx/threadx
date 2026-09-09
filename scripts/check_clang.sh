@@ -14,11 +14,12 @@
 # SPDX-License-Identifier: MIT and CC0-1.0
 ##############################################################################
 
-# Builds the Arm ports with an LLVM based toolchain, in five stages: assemble
+# Builds the Arm ports with an LLVM based toolchain, in six stages: assemble
 # every assembly source of every Arm gnu port, assemble again the parts guarded
 # by feature macros, compile the common C sources for one core per architecture
-# profile, then link the example builds, both the script-driven ones and those
-# driven by CMake. Only the linking stages need a target C library.
+# profile, compile the module manager C sources once per Arm module port, then
+# link the example builds, both the script-driven ones and those driven by
+# CMake. Only the linking stages need a target C library.
 #
 #     scripts/check_clang.sh                       # clang from PATH
 #     scripts/check_clang.sh --clang /path/to/clang
@@ -310,12 +311,111 @@ if [ "$asm_only" -eq 0 ]; then
                       -Iports/"$core"/gnu/inc -Icommon/inc -c "$src" -o /dev/null 2>&1)"
             if [ -n "$output" ]; then
                 fail "$core: $src"
-                echo "$output" | grep "error:" | head -3 | sed 's/^/        /'
+                # Show the error lines when there are any, and otherwise
+                # whatever the compiler did say -- a FAIL with nothing under it
+                # sends the reader off to reproduce the command by hand.
+                if echo "$output" | grep -q "error:"; then
+                    echo "$output" | grep "error:" | head -3 | sed 's/^/        /'
+                else
+                    echo "$output" | head -3 | sed 's/^/        /'
+                fi
                 bad=$((bad + 1)); failures=$((failures + 1))
             fi
         done
         say "  $core: $((count - bad)) of $count compiled"
     done
+fi
+
+
+# --------------------------------------------------------------------------
+if [ "$asm_only" -eq 0 ]; then
+    say ""
+    say "== Module manager C sources, one per Arm module port =="
+
+    # Correcting the assembly glob above brought the module ports into the count,
+    # but only their assembly. Their C stayed outside every check: 27 files of
+    # portable module manager under common_modules, plus the per-port code under
+    # ports_module/<core>/gnu/module_manager/src. Nothing compiled either one, so
+    # by this script's own standard they read as covered while being unbuilt.
+    #
+    # Each module port ships its own tx_port.h and txm_module_port.h, carrying the
+    # control-block extensions the dispatch code needs, so a port is compiled
+    # against its own headers rather than the base port's.
+    module_skipped=""
+    for dir in ports_module/*/gnu/module_manager/src; do
+        [ -d "$dir" ] || continue
+        core="$(echo "$dir" | cut -d/ -f2)"
+        spec="${PORT_TARGET[$core]:-}"
+        if [ -z "$spec" ]; then
+            module_skipped="$module_skipped $core"
+            continue
+        fi
+
+        inc="ports_module/$core/gnu/inc"
+        if [ ! -f "$inc/tx_port.h" ] || [ ! -f "$inc/txm_module_port.h" ]; then
+            module_skipped="$module_skipped $core(headers)"
+            continue
+        fi
+
+        # shellcheck disable=SC2086
+        set -- $spec
+        target="$1"; cpu="$2"; shift 2; extra="$*"
+
+        # An SMP port's control blocks come from common_smp; pairing it with the
+        # single-core headers hides _tx_thread_smp_protect behind an implicit
+        # declaration instead of compiling the port that is actually shipped.
+        case "$core" in
+            *_smp) kernel_inc="common_smp/inc" ;;
+            *)     kernel_inc="common/inc" ;;
+        esac
+
+        # The TrustZone ports carry cmse_nonsecure_entry, which needs -mcmse to
+        # be honoured rather than ignored.
+        port_extra=""
+        if [ -f "$inc/tx_secure_interface.h" ]; then
+            port_extra="-mcmse"
+        fi
+
+        count=0; bad=0
+        for src in common_modules/module_manager/src/*.c "$dir"/*.c; do
+            [ -f "$src" ] || continue
+            count=$((count + 1))
+            # tx_thread_secure_stack.c carries GCC's optimize attribute, which
+            # clang does not implement and warns about. That is a toolchain
+            # divergence in a file GCC builds cleanly, so it is waived for that
+            # file alone -- a stray unknown attribute anywhere else in the port
+            # must still be reported.
+            src_extra=""
+            case "$src" in
+                */tx_thread_secure_stack.c) src_extra="-Wno-unknown-attributes" ;;
+            esac
+
+            # A #pragma message is a deliberate notice to callers, not a defect
+            # in the file that carries it. txm_module_manager_absolute_load.c
+            # deprecates itself in favour of the extended entry point, and this
+            # stage compiles it once per port.
+            output="$("$CC" --target="$target" -mcpu="$cpu" $extra $port_extra \
+                      $src_extra "-Wno-#pragma-messages" \
+                      -I"$inc" -I"$kernel_inc" -Icommon_modules/inc \
+                      -Icommon_modules/module_manager/inc -c "$src" -o /dev/null 2>&1)"
+            if [ -n "$output" ]; then
+                fail "$core: $src"
+                # Show the error lines when there are any, and otherwise
+                # whatever the compiler did say -- a FAIL with nothing under it
+                # sends the reader off to reproduce the command by hand.
+                if echo "$output" | grep -q "error:"; then
+                    echo "$output" | grep "error:" | head -3 | sed 's/^/        /'
+                else
+                    echo "$output" | head -3 | sed 's/^/        /'
+                fi
+                bad=$((bad + 1)); failures=$((failures + 1))
+            fi
+        done
+        say "  $core: $((count - bad)) of $count compiled"
+    done
+    if [ -n "$module_skipped" ]; then
+        say "  no target mapping, skipped:$module_skipped"
+    fi
 fi
 
 
