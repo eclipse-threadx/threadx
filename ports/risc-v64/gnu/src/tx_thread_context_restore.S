@@ -90,6 +90,16 @@ _tx_thread_context_restore:
     /* Just recover the saved registers and return to the point of
        interrupt.  */
 
+    /* Recover the FP state only when the saved mstatus.FS was not Off. The
+       save side skips the FP stores for a thread that has not touched the
+       unit, so those slots hold nothing worth loading back.  */
+#if (__riscv_flen == 32) || (__riscv_flen == 64)
+    ld      t1, 29*8(sp)                                // Pickup saved mstatus
+    srli    t1, t1, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_skip_fp_restore          // Skip if FS was Off
+#endif
+
     /* Recover floating point registers.  */
 #if (__riscv_flen == 32)
     flw     f0, 31*8(sp)                                // Recover ft0
@@ -152,6 +162,7 @@ _tx_thread_context_restore:
     ld      t0, 63*8(sp)                                // Recover fcsr
     csrw    fcsr, t0
 #endif
+_tx_thread_skip_fp_restore:
 
 #if defined(__riscv_vector)
     /* Recover vector registers v0-v31 */
@@ -297,6 +308,16 @@ _tx_thread_no_preempt_restore:
 
     ld      sp, 8(t1)                                  // Switch back to thread's stack
 
+    /* Recover the FP state only when the saved mstatus.FS was not Off. The
+       save side skips the FP stores for a thread that has not touched the
+       unit, so those slots hold nothing worth loading back.  */
+#if (__riscv_flen == 32) || (__riscv_flen == 64)
+    ld      t3, 29*8(sp)                                // Pickup saved mstatus
+    srli    t3, t3, 13
+    andi    t3, t3, 0x3
+    beqz    t3, _tx_thread_no_preempt_skip_fp_restore   // Skip if FS was Off
+#endif
+
     /* Recover floating point registers.  */
 #if (__riscv_flen == 32)
     flw     f0, 31*8(sp)                                // Recover ft0
@@ -359,6 +380,7 @@ _tx_thread_no_preempt_restore:
     ld      t0, 63*8(sp)                                // Recover fcsr
     csrw    fcsr, t0                                    // Restore fcsr
 #endif
+_tx_thread_no_preempt_skip_fp_restore:
 
 #if defined(__riscv_vector)
     /* Recover vector registers v0-v31 */

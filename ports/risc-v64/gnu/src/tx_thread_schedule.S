@@ -143,7 +143,16 @@ _tx_thread_schedule_loop:
     ld      t2, 0(sp)                                   // Pickup stack type
     beqz    t2, _tx_thread_synch_return                 // If 0, solicited thread return
 
-    /* Determine if floating point registers need to be recovered.  */
+    /* Determine if floating point registers need to be recovered.  This is an
+       interrupt frame, so _tx_thread_context_save built it and may have
+       skipped the FP stores when mstatus.FS was Off.  Read back the same slot
+       it wrote rather than reloading whatever those slots happen to hold.  */
+#if (__riscv_flen == 32) || (__riscv_flen == 64)
+    ld      t1, 29*8(sp)                                // Pickup saved mstatus
+    srli    t1, t1, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_schedule_skip_fp_restore // Skip if FS was Off
+#endif
 
 #if (__riscv_flen == 32)
     flw     f0, 31*8(sp)                                // Recover ft0
@@ -216,6 +225,7 @@ _tx_thread_schedule_loop:
     ld      t0, 63*8(sp)                                // Recover fcsr
     csrw    fcsr, t0                                    // Restore fcsr
 #endif
+_tx_thread_schedule_skip_fp_restore:
 
 #if defined(__riscv_vector)
     /* Recover vector registers v0-v31 */
