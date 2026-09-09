@@ -35,7 +35,8 @@ rm -rf /opt/hostedtoolcache
 #
 # The Acquire options are kept anyway, since they make a slow mirror give up
 # sooner. The loop covers a mirror that is down rather than merely slow. The
-# explicit exits stop a failed fetch from being carried forward into a build.
+# explicit exits stop a failed fetch from being carried forward into a build,
+# with one deliberate exception noted at the update below.
 APT_OPTIONS=(-o Acquire::Retries=3
              -o Acquire::http::Timeout=20
              -o Acquire::https::Timeout=20)
@@ -63,7 +64,31 @@ retry() {
     return 1
 }
 
-retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" update || exit 1
+# THE UPDATE IS NOT THE GATE, AND IT MUST NOT BE.  apt-get update fails if ANY
+# configured repository serves a bad index, including ones this project does
+# not use.  On a GitHub runner the image carries Google's and Microsoft's
+# repositories, and a Hash Sum mismatch from Google's -- their CDN caught
+# mid-publish, index and Release file eight hours apart -- failed this script
+# three attempts running and turned a build red over a browser nobody was
+# installing.
+#
+# The alternative of disabling third-party sources before updating is wrong
+# here: this script also runs on a contributor's own machine, where silently
+# rewriting their apt configuration would be a far worse thing to do than
+# tolerating a stale index.
+#
+# So a failed update WARNS and the install below is the gate.  Nothing is
+# weakened by that: apt-get install still fails hard on a package it cannot
+# find, so an archive that is genuinely unreachable still stops the script --
+# one step later, and saying which package it could not get.
+if ! retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" update; then
+    echo ""
+    echo "install.sh: apt-get update did not fully succeed."
+    echo "install.sh: continuing, because a repository this project does not"
+    echo "install.sh: use can fail an update.  The install below is the real"
+    echo "install.sh: gate and fails if any package needed is unavailable."
+    echo ""
+fi
 retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" install -y \
     gcc-multilib \
     git \
