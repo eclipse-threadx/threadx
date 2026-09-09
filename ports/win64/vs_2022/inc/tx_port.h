@@ -160,43 +160,12 @@ extern TEST_FLAG        test_forced_mutex_timeout;
 
 #endif
 
-#if 0
-
-/* Define performance metric symbols.  */
-
-#ifndef TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO
-#define TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_BYTE_POOL_ENABLE_PERFORMANCE_INFO
-#define TX_BYTE_POOL_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO
-#define TX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_MUTEX_ENABLE_PERFORMANCE_INFO
-#define TX_MUTEX_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_QUEUE_ENABLE_PERFORMANCE_INFO
-#define TX_QUEUE_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_SEMAPHORE_ENABLE_PERFORMANCE_INFO
-#define TX_SEMAPHORE_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_THREAD_ENABLE_PERFORMANCE_INFO
-#define TX_THREAD_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_TIMER_ENABLE_PERFORMANCE_INFO
-#define TX_TIMER_ENABLE_PERFORMANCE_INFO
-#endif
-
-#endif
+/* Performance metrics and event trace are left to the application. Set the
+   TX_*_ENABLE_PERFORMANCE_INFO symbols, or TX_ENABLE_EVENT_TRACE, in
+   tx_user.h or on the command line when they are wanted. They extend the
+   control blocks, so a port that turns them on behind the application's
+   back changes structures the application also sees. This port and the
+   win32 one were the only two that did.  */
 
 /* Define ThreadX basic types for this port.  */
 
