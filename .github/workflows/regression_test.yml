@@ -77,7 +77,8 @@ jobs:
       # three are in tx_thread_smp_utilities.c: one is a range guard placed
       # after the shift it is meant to guard, so reaching it needs undefined
       # behaviour, and two are a priority-inheritance branch that needs the
-      # mutex owner genuinely executing on another core. See T17.
+      # mutex owner genuinely executing on another core. See #677, which
+      # made these measurements and raised the floor.
       coverage_thresholds: '99 100'
   freertos:
     permissions:
