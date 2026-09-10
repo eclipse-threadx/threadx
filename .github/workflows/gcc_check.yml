@@ -7,11 +7,11 @@ name: gcc_check
 # link the example builds, both the script-driven ones and those driven by
 # CMake.
 #
-# Why this exists: GCC is the project's declared default compiler (AGENTS.md,
-# "The default compiler for the project is GCC 14 on Linux") and until this
-# workflow landed, nothing in CI compiled a line of any port with it. The only
-# cross-compilation check that ran was clang_check, so the LLVM path was better
-# guarded than the GNU one, on ports whose directory is literally named gnu.
+# Why this exists: GCC 14 on Linux is the project's default compiler, it is
+# what the gnu ports exist for, and until this workflow landed, nothing in CI
+# compiled a line of any port with it. The only cross-compilation check that
+# ran was clang_check, so the LLVM path was better guarded than the GNU one,
+# on ports whose directory is literally named gnu.
 #
 # What it covers: 840 assembly sources across 40 port families, 469 of them
 # again behind feature macros, common/src for nine cores, 302 module manager C
@@ -94,8 +94,8 @@ jobs:
     env:
       # Pinned deliberately, as the runner image is: a toolchain upgrade should
       # be a reviewable commit rather than something that changes underneath the
-      # ports. 14.3.rel1 matches AGENTS.md's GCC 14 default and the version
-      # cortex_m already pins.
+      # ports. 14.3.rel1 is the GCC 14 the project builds against, and the
+      # version cortex_m already pins.
       # Releases: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
       GCC_VERSION: 14.3.rel1
 
