@@ -21,8 +21,11 @@ name: gcc_check
 #
 # What it does not cover: it compiles and links and **executes nothing**. The
 # Cortex-R52 FVP ctest suite is not part of it. RISC-V, MIPS, RX and ARC are
-# outside it entirely -- RISC-V deliberately, as both its ports do assemble and
-# adding them widens the toolchain download for a family that is not regressing.
+# outside it entirely -- RISC-V deliberately, and now for a stronger reason
+# than when this was written: regression_test.yml builds both its ports and
+# runs 955 tests on them under QEMU, which is more than a compile check could
+# say. Adding them here would widen this workflow's toolchain download by about
+# a gigabyte to re-prove a subset of that.
 #
 # It does not supersede cortex_m. That workflow builds four ports *through
 # CMake*, which is the only thing exercising cmake/cortex_m*.cmake and the
