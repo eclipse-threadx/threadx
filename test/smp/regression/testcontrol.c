@@ -240,6 +240,8 @@ void    threadx_thread_simple_sleep_non_clear_application_define(void *);
 void    threadx_thread_sleep_for_100ticks_application_define(void *);
 void    threadx_thread_multiple_sleep_application_define(void *);
 void    threadx_thread_terminate_delete_application_define(void *);
+void    threadx_thread_exit_callback_transition_application_define(void *);
+void    threadx_smp_thread_exit_callback_remote_application_define(void *);
 void    threadx_thread_preemption_change_application_define(void *);
 void    threadx_thread_priority_change_application_define(void *);
 void    threadx_thread_time_slice_change_application_define(void *);
@@ -384,6 +386,8 @@ TEST_ENTRY  test_control_tests[] =
     threadx_thread_sleep_for_100ticks_application_define,
     threadx_thread_multiple_sleep_application_define,
     threadx_thread_terminate_delete_application_define,
+    threadx_thread_exit_callback_transition_application_define,
+    threadx_smp_thread_exit_callback_remote_application_define,
 
     threadx_thread_priority_change_application_define,
 

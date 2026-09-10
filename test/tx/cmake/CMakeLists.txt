@@ -61,6 +61,15 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../.. threadx)
 add_subdirectory(regression)
 add_subdirectory(samples)
 
+# The two configurations this change has to reach, TX_NOT_INTERRUPTABLE and
+# TX_DISABLE_ERROR_CHECKING, are not among the five above and cannot be reached
+# from the regression suite, which links one library per configuration. This
+# directory compiles the sources concerned directly. It is listed last rather than
+# beside regression on purpose: every branch in the current fix set adds an
+# add_subdirectory line immediately after regression, and putting a second one
+# there turns a set of clean merges into a set of one-line conflicts.
+add_subdirectory(thread_transition)
+
 # Coverage
 #
 # The gate here used to be the build type alone, and only one of the five
