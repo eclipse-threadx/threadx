@@ -37,13 +37,12 @@
 #
 # Exit status is 0 when everything builds and 1 otherwise.
 #
-# Why this exists: GCC is the project's declared default compiler (AGENTS.md,
-# "The default compiler for the project is GCC 14 on Linux"), it is what the
-# gnu ports exist for, and it is what nearly every downstream user builds with
-# -- and until this script landed, nothing in CI compiled a line of any port
-# with it. The only cross-compilation check that ran was the LLVM one, so the
-# ATfE path was better guarded than the GNU one, on ports whose directory is
-# literally named gnu.
+# Why this exists: GCC 14 on Linux is the project's default compiler, it is
+# what the gnu ports exist for, and it is what nearly every downstream user
+# builds with -- and until this script landed, nothing in CI compiled a line
+# of any port with it. The only cross-compilation check that ran was the LLVM
+# one, so the ATfE path was better guarded than the GNU one, on ports whose
+# directory is literally named gnu.
 #
 # This is the companion to scripts/check_clang.sh and deliberately mirrors it
 # stage for stage. They are two scripts rather than one with a --toolchain flag

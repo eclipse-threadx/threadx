@@ -30,7 +30,7 @@ set(SPEC_FLAGS "--specs=nosys.specs")
 
 include(${CMAKE_CURRENT_LIST_DIR}/arm-none-eabi.cmake)
 
-# Pin the reference cross toolchain (see AGENTS.md, "Compiler").  Absolute paths
+# Pin the project's reference cross toolchain, GCC 14 for Arm.  Absolute paths
 # are used deliberately so the build does not depend on PATH ordering.  Override
 # with -DARM_TOOLCHAIN_PATH=<dir containing arm-none-eabi-gcc> to build with a
 # different compiler -- for example the advisory newest-compiler lane.

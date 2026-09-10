@@ -75,7 +75,7 @@ jobs:
       # Pinned deliberately. Matches gcc_check.yml and ci_cortex_m.yml so all
       # three share one cache entry rather than each holding its own copy of
       # the same archive; change them together or the sharing silently stops.
-      # 14.3.rel1 is AGENTS.md's declared GCC 14 default.
+      # 14.3.rel1 is the project's GCC 14 default.
       GCC_VERSION: 14.3.rel1
 
       # Where the Armv8-R AEM FVP comes from.
