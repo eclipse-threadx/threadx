@@ -1843,6 +1843,19 @@ UINT        _tx_trace_interrupt_control(UINT new_posture);
 #endif
 
 
+/* Define the number of consecutive stack fill pattern words the thread stack analyze function must
+   observe, working towards the lowest address of the stack, before it accepts a probe location as
+   unused. A value of one restores the original behavior, where a single word that happens to still
+   hold the fill pattern - an unwritten hole inside an otherwise used region, such as the padding of
+   a partially initialized local array - can make the binary search stop early and under-report the
+   stack usage. Larger values make the result more accurate at the cost of a few additional reads
+   per binary search iteration. This can be re-defined in tx_port.h.  */
+
+#ifndef TX_THREAD_STACK_ANALYZE_FILL_WORDS
+#define TX_THREAD_STACK_ANALYZE_FILL_WORDS              ((ULONG) 8)
+#endif
+
+
 /* Add a default macro that can be re-defined in tx_port.h to add processing to the initialize kernel enter function.
    By default, this is simply defined as whitespace.  */
 
