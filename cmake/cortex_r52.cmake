@@ -30,10 +30,20 @@ set(SPEC_FLAGS "--specs=nosys.specs")
 
 include(${CMAKE_CURRENT_LIST_DIR}/arm-none-eabi.cmake)
 
-# Pin the project's reference cross toolchain, GCC 14 for Arm.  Absolute paths
-# are used deliberately so the build does not depend on PATH ordering.  Override
-# with -DARM_TOOLCHAIN_PATH=<dir containing arm-none-eabi-gcc> to build with a
-# different compiler -- for example the advisory newest-compiler lane.
+# Pin the project's reference cross toolchain, GCC 14 for Arm.  An absolute
+# path is used deliberately, so that a build on a machine which has it does not
+# depend on PATH ordering.  Override with -DARM_TOOLCHAIN_PATH=<dir containing
+# arm-none-eabi-gcc> to build with a different compiler -- for example the
+# advisory newest-compiler lane.
+#
+# The default below serves local builds and nothing else.  It fires only on a
+# machine that already has that directory, and no CI job does: the workflows
+# unpack the toolchain into the workspace and put it on PATH, and
+# scripts/check_gcc.sh passes -DARM_TOOLCHAIN_PATH at every CMake call site.
+# On a runner the EXISTS check therefore falls through and the compiler comes
+# from PATH.  Do not read the default as something CI depends on -- and do not
+# remove it as dead code either, because it is what makes a no-flag build work
+# on a developer machine.
 if(NOT DEFINED ARM_TOOLCHAIN_PATH)
     set(ARM_TOOLCHAIN_PATH
         "$ENV{HOME}/toolchains/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin")

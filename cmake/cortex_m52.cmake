@@ -29,6 +29,10 @@ include(${CMAKE_CURRENT_LIST_DIR}/arm-none-eabi.cmake)
 # reject the port outright.  Override with -DARM_TOOLCHAIN_PATH=<dir containing
 # arm-none-eabi-gcc> to build with a different compiler.  The check leaves PATH
 # alone when the pinned directory is absent.
+#
+# As in cortex_r52.cmake, the default below serves local builds and nothing
+# else -- no CI job has that directory, so on a runner the EXISTS check falls
+# through and the compiler comes from PATH.  See the longer note there.
 if(NOT DEFINED ARM_TOOLCHAIN_PATH)
     set(ARM_TOOLCHAIN_PATH
         "$ENV{HOME}/toolchains/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin")
