@@ -16,53 +16,12 @@
 # Remove large folder to save space
 rm -rf /opt/hostedtoolcache
 
-# Everything below reaches the network, and on this runner pool that is not
-# dependable. apt-get update stalled seven times in a single day, once for more
-# than two hours, each time with the Azure mirror returning nothing and the
-# fallback to archive.ubuntu.com then going silent. Nothing here bounded a fetch
-# and nothing retried one, so a mirror being down cost a whole run rather than a
-# few seconds. Worse, this script has no set -e, so a failed update did not stop
-# the install that follows: it went on to install from whatever index it already
-# had, and the run failed later somewhere less obvious.
-#
-# Each command is wrapped in timeout rather than left to bound itself. apt's own
-# Acquire timeouts were tried first and did not help: a run still sat inside a
-# single apt-get update for nine and a half minutes without producing a line,
-# having got as far as fetching noble-security InRelease, so the retry loop never
-# got a turn and the step timeout was what eventually killed it. Whatever apt is
-# waiting on there, it is not something Acquire::http::Timeout covers. timeout
-# does not care where the wait is.
-#
-# The Acquire options are kept anyway, since they make a slow mirror give up
-# sooner. The loop covers a mirror that is down rather than merely slow. The
-# explicit exits stop a failed fetch from being carried forward into a build,
-# with one deliberate exception noted at the update below.
-APT_OPTIONS=(-o Acquire::Retries=3
-             -o Acquire::http::Timeout=20
-             -o Acquire::https::Timeout=20)
-
-# Two minutes per attempt, killed outright if it ignores the first signal. Three
-# attempts plus backoff bounds a command at about six and a half minutes, and a
-# command that exhausts its attempts exits rather than letting the next one run.
-#
-# timeout goes under sudo, not over it, so that it signals apt itself. Signalling
-# sudo instead risks the kill landing on sudo while apt carries on holding the
-# dpkg lock, which would leave every retry failing for a different reason than
-# the one being retried.
-TIMEOUT=(timeout --kill-after=10 120)
-
-retry() {
-    local attempt
-    for attempt in 1 2 3; do
-        if "$@"; then
-            return 0
-        fi
-        echo "install.sh: '$*' failed or timed out on attempt ${attempt}"
-        sleep $((attempt * 10))
-    done
-    echo "install.sh: '$*' failed after 3 attempts"
-    return 1
-}
+# The network helpers -- retry, TIMEOUT, TIMEOUT_LONG and APT_OPTIONS -- live in
+# tx_ci_common.sh, alongside the comments recording why each of them is shaped
+# the way it is. They were defined here until the RISC-V suite was enabled in
+# CI, which put a second install script on every pull request's critical path
+# with none of them.
+. "$(dirname "$(realpath "$0")")/tx_ci_common.sh"
 
 # THE UPDATE IS NOT THE GATE, AND IT MUST NOT BE.  apt-get update fails if ANY
 # configured repository serves a bad index, including ones this project does
