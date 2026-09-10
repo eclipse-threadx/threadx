@@ -113,9 +113,21 @@ jobs:
       cmake_path: ./test/tx/cmake/riscv
       result_affix: RISC-V
       skip_deploy: true
-      # No coverage build configuration for the RISC-V suite yet: the CMake
-      # configurations under test/tx/cmake/riscv match the Linux suite's minus
-      # the coverage instrumentation, so gcovr has nothing to read here.
+      # No coverage from this suite, and not for want of a build configuration.
+      # These tests are bare-metal images run under QEMU with -bios none, and
+      # test/tx/cmake/riscv/bsp/syscalls.c gives them _write to the UART, _exit
+      # through the sifive_test device, and stubs for _close, _fstat, _isatty,
+      # _lseek, _read and _sbrk -- but no _open. gcov emits a .gcda by opening
+      # a path, so instrumenting these builds would produce nothing to read.
+      #
+      # test/tx/cmake/riscv/CMakeLists.txt is its own top-level project and does
+      # not declare the TX_COVERAGE option that test/tx/cmake and test/smp/cmake
+      # do, so the OFF the template exports is inert here rather than the thing
+      # holding coverage off.
+      #
+      # Collecting it therefore needs a transport off the target -- gcov's dump
+      # routines over the UART the BSP already drives, or semihosting -- and not
+      # a default_build_coverage entry beside the other five configurations.
       skip_coverage: true
   deploy:
     # Publishing the coverage report stays on master. Adding dev to this
