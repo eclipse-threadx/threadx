@@ -73,6 +73,7 @@ ULONG       *stack_ptr;
 ULONG       *stack_lowest;
 ULONG       *stack_highest;
 ULONG       *probe_ptr;
+ULONG       *stack_limit;
 ULONG       probe_count;
 UINT        fill_present;
 ULONG       size;
@@ -99,9 +100,15 @@ ULONG       size;
                 /* Pickup the highest stack pointer.  */
                 stack_highest =  TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_highest_ptr);
 
-                /* Determine if the pointer is null.  */
-                if (stack_highest != TX_NULL)
+                /* Determine if the pointer is null or if the highest stack pointer is not above the
+                   start of the stack. The latter indicates a stack overflow or a corrupted thread
+                   control block, and the unsigned pointer arithmetic in the binary search below would
+                   wrap around and never converge, hanging the caller.  */
+                if ((stack_highest != TX_NULL) && (stack_highest > stack_lowest))
                 {
+
+                    /* Remember the upper bound of the search so the scan below cannot run past it.  */
+                    stack_limit =  stack_highest;
 
                     /* Restore interrupts.  */
                     TX_RESTORE
@@ -173,7 +180,7 @@ ULONG       size;
                     } while(size > ((ULONG) 1));
 
                     /* Position to first used word - at this point we are within a few words.  */
-                    while (*stack_ptr == TX_STACK_FILL)
+                    while ((stack_ptr < stack_limit) && (*stack_ptr == TX_STACK_FILL))
                     {
 
                         /* Position to next word in stack.  */
