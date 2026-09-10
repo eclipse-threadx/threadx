@@ -1,10 +1,11 @@
 name: gcc_check
 
-# Builds the Arm ports with the Arm GNU toolchain, in five stages: assemble
+# Builds the Arm ports with the Arm GNU toolchain, in six stages: assemble
 # every assembly source of every Arm gnu port, assemble again the parts guarded
 # by feature macros, compile the common C sources for one core per architecture
-# profile, then link the example builds, both the script-driven ones and those
-# driven by CMake.
+# profile, compile the module manager C sources once per Arm module port, then
+# link the example builds, both the script-driven ones and those driven by
+# CMake.
 #
 # Why this exists: GCC is the project's declared default compiler (AGENTS.md,
 # "The default compiler for the project is GCC 14 on Linux") and until this
@@ -13,9 +14,10 @@ name: gcc_check
 # guarded than the GNU one, on ports whose directory is literally named gnu.
 #
 # What it covers: 840 assembly sources across 40 port families, 469 of them
-# again behind feature macros, common/src for nine cores, 42 script-driven
-# example links and the five Cortex-R52 CMake images. Every skip is printed by
-# name with a reason -- run scripts/check_gcc.sh --help, or read its header.
+# again behind feature macros, common/src for nine cores, 302 module manager C
+# files across the nine Arm module ports, 42 script-driven example links and
+# the five Cortex-R52 CMake images. Every skip is printed by name with a reason
+# -- run scripts/check_gcc.sh --help, or read its header.
 #
 # What it does not cover: it compiles and links and **executes nothing**. The
 # Cortex-R52 FVP ctest suite is not part of it. RISC-V, MIPS, RX and ARC are

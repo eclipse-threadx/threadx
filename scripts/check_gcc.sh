@@ -14,13 +14,13 @@
 # SPDX-License-Identifier: MIT and CC0-1.0
 ##############################################################################
 
-# Builds the Arm ports with the GNU toolchain, in six stages: assemble every
+# Builds the Arm ports with the GNU toolchain, in seven stages: assemble every
 # assembly source of every Arm gnu port, assemble again the parts guarded by
 # feature macros, compile the common C sources for one core per architecture
-# profile, link the example builds, both the script-driven ones and those
-# driven by CMake, and finally assert that the option combinations the
-# Cortex-R52 port refuses are in fact refused. Only the linking stages need a
-# target C library.
+# profile, compile the module manager C sources once per Arm module port, link
+# the example builds, both the script-driven ones and those driven by CMake,
+# and finally assert that the option combinations the Cortex-R52 port refuses
+# are in fact refused. Only the linking stages need a target C library.
 #
 #     scripts/check_gcc.sh                          # both drivers from PATH
 #     scripts/check_gcc.sh --arm-none-eabi /path/to/toolchain/bin \
@@ -92,6 +92,25 @@ done
 
 say()  { [ "$quiet" -eq 1 ] || echo "$@"; }
 fail() { echo "  FAIL: $*"; }
+
+# The C stages treat any compiler output as a failure, and a #pragma message is
+# a deliberate notice to callers rather than a defect in the file that carries
+# it -- txm_module_manager_absolute_load.c deprecates itself in favour of the
+# extended entry point, and the module manager stage compiles it once per port.
+#
+# check_clang.sh suppresses these at the compiler with -Wno-#pragma-messages.
+# GCC has no equivalent: the note is unconditional, and neither -Wno-pragmas
+# nor any other -W option silences it -- verified with 14.3.rel1. So it is
+# filtered out of the output here instead, along with the source quote and
+# caret GCC prints beneath it. The skip ends at the next line that starts a
+# diagnostic of its own, so an error following a waived note is still reported.
+strip_pragma_messages() {
+    awk '
+        /note: .#pragma message:/ { skip = 1; next }
+        skip && /^ *[0-9]* *\|/  { next }
+        { skip = 0; print }
+    '
+}
 
 # Accept either the driver itself or the directory holding it, since a
 # toolchain is unpacked as a tree and naming its bin directory is the natural
@@ -418,6 +437,86 @@ if [ "$asm_only" -eq 0 ]; then
         done
         say "  $core: $((count - bad)) of $count compiled"
     done
+fi
+
+# --------------------------------------------------------------------------
+if [ "$asm_only" -eq 0 ]; then
+    say ""
+    say "== Module manager C sources, one per Arm module port =="
+
+    # #689 added this stage to check_clang.sh alone, so the module manager C
+    # stayed unbuilt by the project's declared default compiler: 28 files of
+    # portable module manager under common_modules, plus the three to nine
+    # per-port files under ports_module/<core>/gnu/module_manager/src. This is
+    # the GCC half, and it is deliberately the same stage -- same ports, same
+    # headers, same counts -- because a port covered by one check and not the
+    # other implies a parity the checks list does not have.
+    #
+    # Each module port ships its own tx_port.h and txm_module_port.h, carrying
+    # the control-block extensions the dispatch code needs, so a port is
+    # compiled against its own headers rather than the base port's.
+    module_skipped=""
+    for dir in ports_module/*/gnu/module_manager/src; do
+        [ -d "$dir" ] || continue
+        core="$(echo "$dir" | cut -d/ -f2)"
+        spec="${PORT_TARGET[$core]:-}"
+        if [ -z "$spec" ]; then
+            module_skipped="$module_skipped $core"
+            continue
+        fi
+
+        inc="ports_module/$core/gnu/inc"
+        if [ ! -f "$inc/tx_port.h" ] || [ ! -f "$inc/txm_module_port.h" ]; then
+            module_skipped="$module_skipped $core(headers)"
+            continue
+        fi
+
+        # shellcheck disable=SC2086
+        set -- $spec
+        target="$1"; cpu="$2"; shift 2; extra="$*"
+        CC="$(cc_for "$target")"
+
+        # An SMP port's control blocks come from common_smp; pairing it with the
+        # single-core headers hides _tx_thread_smp_protect behind an implicit
+        # declaration instead of compiling the port that is actually shipped.
+        case "$core" in
+            *_smp) kernel_inc="common_smp/inc" ;;
+            *)     kernel_inc="common/inc" ;;
+        esac
+
+        # The TrustZone ports carry cmse_nonsecure_entry, which needs -mcmse to
+        # be honoured rather than ignored.
+        port_extra=""
+        if [ -f "$inc/tx_secure_interface.h" ]; then
+            port_extra="-mcmse"
+        fi
+
+        count=0; bad=0
+        for src in common_modules/module_manager/src/*.c "$dir"/*.c; do
+            [ -f "$src" ] || continue
+            count=$((count + 1))
+            output="$("$CC" -mcpu="$cpu" $extra $port_extra \
+                      -I"$inc" -I"$kernel_inc" -Icommon_modules/inc \
+                      -Icommon_modules/module_manager/inc \
+                      -c "$src" -o /dev/null 2>&1 | strip_pragma_messages)"
+            if [ -n "$output" ]; then
+                fail "$core: $src"
+                # Show the error lines when there are any, and otherwise
+                # whatever the compiler did say -- a FAIL with nothing under it
+                # sends the reader off to reproduce the command by hand.
+                if echo "$output" | grep -q "error:"; then
+                    echo "$output" | grep "error:" | head -3 | sed 's/^/        /'
+                else
+                    echo "$output" | head -3 | sed 's/^/        /'
+                fi
+                bad=$((bad + 1)); failures=$((failures + 1))
+            fi
+        done
+        say "  $core: $((count - bad)) of $count compiled"
+    done
+    if [ -n "$module_skipped" ]; then
+        say "  no target mapping, skipped:$module_skipped"
+    fi
 fi
 
 # --------------------------------------------------------------------------
