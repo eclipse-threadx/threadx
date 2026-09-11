@@ -116,4 +116,54 @@ const MPU_REGION *mpu_region_table(unsigned int *count_ptr);
 void mpu_read_region(unsigned int index, unsigned long *prbar_ptr,
                      unsigned long *prlar_ptr);
 
+/* ---------------------------------------------------------------------------
+   ThreadX modules.
+
+   Kept in this header rather than behind TXM_MODULE_MANAGER because
+   txm_module_manager_offset_check.c includes it to check the region number
+   against the one tx_thread_schedule.S writes in assembly, and a definition
+   that appears only in some builds cannot be checked in the others.
+   --------------------------------------------------------------------------- */
+
+/* Region index for the manager's load window over the module area.  Above the
+   kernel's 0-2 and above the eight the manager hands to a module (8-15), so
+   neither the boot table nor the scheduler's per-thread region load can
+   disturb it.  tx_thread_schedule.S spells the same number in an MCR to
+   PRSELR; the offset check asserts the two agree.  */
+
+#define MPU_MODULE_LOAD_REGION      16U
+
+/* How many EL1 regions a module manager build needs: 0-2 kernel, 8-15 for the
+   module block, 16 for the window.  Region 16 is the highest index used, so
+   seventeen regions is the requirement.
+
+   Checked against MPUIR rather than assumed, even though the AEMv8-R model
+   reports 32.  The model reports a region count NO Cortex-R52 can have -- the
+   TRM gives MPUIR.DREGION as 16, 20 or 24 -- so a green run here says nothing
+   about whether the budget fits silicon, and a part configured with 16 regions
+   cannot run this port at all.  The check is here so that the shortfall is a
+   refusal rather than a region that silently does not exist.  */
+
+#define MPU_MODULE_REGIONS_REQUIRED 17U
+
+/* The module area window, which is what lets privileged code reach module
+   memory at all -- no other kernel region covers it.
+
+   PMSAv8-R has no region priority, so this must never be enabled at the same
+   time as the regions a module is given, which cover the same memory.  That is
+   guaranteed by who owns it rather than by careful calling: the scheduler turns
+   this region on for every thread that is not a module thread and off for every
+   thread that is, so the window is enabled exactly when no module regions are
+   loaded.  The two register words are published for it below.
+
+   Enabled at boot, because everything before the first module thread is
+   privileged code that may need to reach module memory.  Returns 0 if the
+   implementation has fewer than MPU_MODULE_REGIONS_REQUIRED regions, in which
+   case nothing was programmed.  */
+
+unsigned int mpu_module_window_init(void);
+
+extern unsigned long mpu_module_window_prbar;
+extern unsigned long mpu_module_window_prlar;
+
 #endif /* MPU_H */

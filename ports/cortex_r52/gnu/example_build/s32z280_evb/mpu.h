@@ -115,4 +115,28 @@ const MPU_REGION *mpu_region_table(unsigned int *count_ptr);
 void mpu_read_region(unsigned int index, unsigned long *prbar_ptr,
                      unsigned long *prlar_ptr);
 
+/* Region index for the manager's load window over the module area.  Above the
+   kernel's 0-7 and above the eight the manager hands to a module, so neither
+   the boot table nor the scheduler's per-thread region load can disturb it.  */
+
+#define MPU_MODULE_LOAD_REGION  16U
+
+/* The module area window, which is what lets privileged code reach module
+   memory at all -- no other kernel region covers it.
+
+   PMSAv8-R has no region priority, so this must never be enabled at the same
+   time as the regions a module is given, which cover the same memory.  That is
+   guaranteed by who owns it rather than by careful calling: the scheduler turns
+   this region on for every thread that is not a module thread and off for every
+   thread that is, so the window is enabled exactly when no module regions are
+   loaded.  The two register words are published for it below.
+
+   Enabled here at boot, because everything before the first module thread is
+   privileged code that may need to reach module memory.  */
+
+void mpu_module_window_init(void);
+
+extern unsigned long mpu_module_window_prbar;
+extern unsigned long mpu_module_window_prlar;
+
 #endif /* MPU_H */

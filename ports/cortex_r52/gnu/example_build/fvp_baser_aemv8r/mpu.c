@@ -294,6 +294,80 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
 }
 
 
+#ifdef TXM_MODULE_MANAGER
+
+/**************************************************************************/
+/*  mpu_module_window_init                                                */
+/*                                                                        */
+/*  A window over the module area, for the manager to load through.       */
+/*                                                                        */
+/*  No region in the table above covers the module area, which is what    */
+/*  stops every thread from reaching a module's memory -- but the manager  */
+/*  has to read the preamble and write the module's data to load it at    */
+/*  all.  Without this the load faults on its first read of the image.    */
+/*                                                                        */
+/*  Not opened and closed around the load.  It is left enabled here and   */
+/*  the SCHEDULER owns it from then on: it turns this region on for every  */
+/*  thread that owns no module and off for every thread that does, which   */
+/*  is what keeps it and a module's own regions -- which cover the same    */
+/*  memory -- from ever being enabled together.  PMSAv8-R has no region    */
+/*  priority, so an access hitting more than one enabled region takes a    */
+/*  translation fault (TRM 8.1), and mutual exclusion by ownership is the  */
+/*  only form of it that does not depend on remembering to bracket a call. */
+/*                                                                        */
+/*  EL1 read/write with no EL0 access, and execute-never: the manager can  */
+/*  load through it, and a module cannot use it to reach anything.        */
+/**************************************************************************/
+
+unsigned long mpu_module_window_prbar;
+unsigned long mpu_module_window_prlar;
+
+
+unsigned int mpu_module_window_init(void)
+{
+    MPU_REGION  window;
+
+    /* Asked of the hardware rather than assumed.  See MPU_MODULE_REGIONS_REQUIRED
+       in mpu.h: this model reports a region count no real Cortex-R52 can have,
+       so the number is checked here and the shortfall is a refusal.  */
+
+    if (mpu_region_count() < MPU_MODULE_REGIONS_REQUIRED)
+    {
+        return 0U;
+    }
+
+    window.mpu_region_base          = FVP_MODULE_AREA_BASE;
+    window.mpu_region_limit         = FVP_MODULE_AREA_BASE
+                                    + FVP_MODULE_AREA_SIZE - 1UL;
+    window.mpu_region_ap            = MPU_AP_RW_EL1;
+    window.mpu_region_execute_never = 1U;
+    window.mpu_region_shareability  = MPU_SH_NON;
+    window.mpu_region_attr_index    = MPU_ATTR_NORMAL_WB;
+    window.mpu_region_name          = "module window RW NX EL1";
+
+    /* Published for the scheduler, which turns this region on and off on every
+       dispatch and has no business computing register layouts in assembly.  */
+
+    mpu_module_window_prbar = (window.mpu_region_base & 0xFFFFFFC0UL)
+                            | (((unsigned long) window.mpu_region_shareability & 0x3UL) << 3)
+                            | (((unsigned long) window.mpu_region_ap & 0x3UL) << 1)
+                            | ((unsigned long) window.mpu_region_execute_never & 0x1UL);
+
+    mpu_module_window_prlar = (window.mpu_region_limit & 0xFFFFFFC0UL)
+                            | (((unsigned long) window.mpu_region_attr_index & 0x7UL) << 1)
+                            | 1UL;
+
+    program_region(MPU_MODULE_LOAD_REGION, &window);
+
+    data_sync_barrier();
+    instruction_barrier();
+
+    return 1U;
+}
+
+#endif /* TXM_MODULE_MANAGER */
+
+
 /**************************************************************************/
 /*  mpu_init                                                              */
 /**************************************************************************/
@@ -310,6 +384,20 @@ unsigned int mpu_init(void)
     {
         return 0U;
     }
+
+#ifdef TXM_MODULE_MANAGER
+
+    /* A module manager build needs regions the table above does not describe:
+       the eight handed to a module and the window over the module area.  If the
+       implementation cannot supply them, stop here rather than enable a
+       protection map that is missing the half a module depends on.  */
+
+    if (available < MPU_MODULE_REGIONS_REQUIRED)
+    {
+        return 0U;
+    }
+
+#endif
 
     /* Memory types first: a region's attribute index is meaningless until
        MAIR is populated.  */
@@ -331,6 +419,20 @@ unsigned int mpu_init(void)
         instruction_barrier();
         write_prlar(0UL);
     }
+
+#ifdef TXM_MODULE_MANAGER
+
+    /* After the loop above, which would otherwise disable it again: the module
+       window lives above the regions this table uses, so it counts as unused
+       here.  The region count was checked at the top of this function, so the
+       call cannot fail at this point.  */
+
+    if (mpu_module_window_init() == 0U)
+    {
+        return 0U;
+    }
+
+#endif
 
     data_sync_barrier();
 
