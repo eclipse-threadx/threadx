@@ -261,7 +261,7 @@ say "== Families with no copy script (report only) =="
 if [ "$quiet" -eq 0 ]; then
     for family in ports/cortex_m0 ports/cortex_m0+ ports/cortex_m23; do
         [ -d "$family" ] || continue
-        for probe in "dsb 0xF" "isb 0xF"; do
+        for probe in "dsb sy" "isb sy"; do
             have=""; missing=""
             for header in "$family"/*/inc/tx_port.h; do
                 [ -f "$header" ] || continue
