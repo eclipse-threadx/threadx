@@ -61,7 +61,11 @@ function generate() {
 function build() {
     local arch=$1
     local build=$2
-    cmake --build "build/${arch}_${build}"
+    # -k 0 keeps Ninja going after a target fails, so one broken target no
+    # longer decides whether the targets after it exist. ctest reports a
+    # missing binary as a failing test, which turned a single link error into
+    # a failure count that varied with build scheduling order.
+    cmake --build "build/${arch}_${build}" -- -k 0
 }
 
 function run_test() {
@@ -69,13 +73,20 @@ function run_test() {
     local build=$2
     local parallel_jobs=$3
 
-    pushd "build/${arch}_${build}"
+    # Guard the pushd: with the caller capturing this function's status, set -e
+    # no longer aborts here, so a missing build directory would otherwise let
+    # ctest run in the source tree and report "no tests" as success.
+    pushd "build/${arch}_${build}" || return 1
     [ -z "${CTEST_PARALLEL_LEVEL}" ] && parallel="-j${parallel_jobs}"
     if [ -z "${CTEST_REPEAT_FAIL}" ]; then
         repeat_fail=2
     else
         repeat_fail=${CTEST_REPEAT_FAIL}
     fi
+    # ctest's status is captured and returned past the popd. popd succeeds, so
+    # without this the function would return 0 and a failing configuration
+    # would be reported as a pass.
+    local status=0
     ctest $parallel --timeout 1000 \
         -O "${arch}_${build}.txt" \
         -T test --no-compress-output \
@@ -83,8 +94,9 @@ function run_test() {
         --test-output-size-failed 4194304 \
         --output-on-failure \
         --repeat until-pass:${repeat_fail} \
-        --output-junit "${arch}_${build}.xml"
+        --output-junit "${arch}_${build}.xml" || status=$?
     popd
+    return $status
 }
 
 # Determine repo root and script directory
@@ -129,11 +141,16 @@ if [ "$command" == "build" ]; then
         echo ""
     done
 
+    # A failing configuration must not stop the ones after it: under set -e
+    # the loop would abort and leave them unbuilt, which then reads as a wall
+    # of missing-binary test failures. The status is accumulated and returned.
+    build_status=0
     for item in $builds; do
         echo "Building ${arch} ${item}"
-        build "$arch" "$item"
+        build "$arch" "$item" || build_status=$?
         echo ""
     done
+    [ $build_status -eq 0 ] || exit $build_status
 elif [ "$command" == "test" ]; then
     cores=$(nproc)
     if [ -z "${CTEST_PARALLEL_LEVEL}" ]; then
@@ -152,10 +169,16 @@ elif [ "$command" == "test" ]; then
         done
         exit $exit_code
     else
+        # ctest's status is accumulated rather than allowed to abort the loop.
+        # set -e would otherwise stop at the first failing configuration and
+        # leave every configuration after it untested. This mirrors what the
+        # parallel branch above already does with wait.
+        exit_code=0
         for item in $builds; do
             echo "Testing ${arch} ${item}"
-            run_test "$arch" "$item" "$parallel_jobs"
+            run_test "$arch" "$item" "$parallel_jobs" || exit_code=$?
         done
+        exit $exit_code
     fi
 else
     help

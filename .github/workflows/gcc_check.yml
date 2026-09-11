@@ -1,26 +1,31 @@
 name: gcc_check
 
-# Builds the Arm ports with the Arm GNU toolchain, in five stages: assemble
+# Builds the Arm ports with the Arm GNU toolchain, in six stages: assemble
 # every assembly source of every Arm gnu port, assemble again the parts guarded
 # by feature macros, compile the common C sources for one core per architecture
-# profile, then link the example builds, both the script-driven ones and those
-# driven by CMake.
+# profile, compile the module manager C sources once per Arm module port, then
+# link the example builds, both the script-driven ones and those driven by
+# CMake.
 #
-# Why this exists: GCC is the project's declared default compiler (AGENTS.md,
-# "The default compiler for the project is GCC 14 on Linux") and until this
-# workflow landed, nothing in CI compiled a line of any port with it. The only
-# cross-compilation check that ran was clang_check, so the LLVM path was better
-# guarded than the GNU one, on ports whose directory is literally named gnu.
+# Why this exists: GCC 14 on Linux is the project's default compiler, it is
+# what the gnu ports exist for, and until this workflow landed, nothing in CI
+# compiled a line of any port with it. The only cross-compilation check that
+# ran was clang_check, so the LLVM path was better guarded than the GNU one,
+# on ports whose directory is literally named gnu.
 #
 # What it covers: 840 assembly sources across 40 port families, 469 of them
-# again behind feature macros, common/src for nine cores, 42 script-driven
-# example links and the five Cortex-R52 CMake images. Every skip is printed by
-# name with a reason -- run scripts/check_gcc.sh --help, or read its header.
+# again behind feature macros, common/src for nine cores, 302 module manager C
+# files across the nine Arm module ports, 42 script-driven example links and
+# the five Cortex-R52 CMake images. Every skip is printed by name with a reason
+# -- run scripts/check_gcc.sh --help, or read its header.
 #
 # What it does not cover: it compiles and links and **executes nothing**. The
 # Cortex-R52 FVP ctest suite is not part of it. RISC-V, MIPS, RX and ARC are
-# outside it entirely -- RISC-V deliberately, as both its ports do assemble and
-# adding them widens the toolchain download for a family that is not regressing.
+# outside it entirely -- RISC-V deliberately, and now for a stronger reason
+# than when this was written: regression_test.yml builds both its ports and
+# runs 955 tests on them under QEMU, which is more than a compile check could
+# say. Adding them here would widen this workflow's toolchain download by about
+# a gigabyte to re-prove a subset of that.
 #
 # It does not supersede cortex_m. That workflow builds four ports *through
 # CMake*, which is the only thing exercising cmake/cortex_m*.cmake and the
@@ -42,6 +47,12 @@ on:
       - "CMakeLists.txt"
       - "cmake/**"
       - "common/**"
+      # common_modules/ holds the portable module manager that the module
+      # manager stage compiles once per Arm module port -- the larger half of
+      # what that stage builds. Without it a change there leaves the stage
+      # unrun, which is the same "absent from the count reads as covered" the
+      # stage exists to close.
+      - "common_modules/**"
       - "common_smp/**"
       - "ports/**"
       - "ports_arch/**"
@@ -67,6 +78,12 @@ on:
       - "CMakeLists.txt"
       - "cmake/**"
       - "common/**"
+      # common_modules/ holds the portable module manager that the module
+      # manager stage compiles once per Arm module port -- the larger half of
+      # what that stage builds. Without it a change there leaves the stage
+      # unrun, which is the same "absent from the count reads as covered" the
+      # stage exists to close.
+      - "common_modules/**"
       - "common_smp/**"
       - "ports/**"
       - "ports_arch/**"
@@ -80,8 +97,8 @@ jobs:
     env:
       # Pinned deliberately, as the runner image is: a toolchain upgrade should
       # be a reviewable commit rather than something that changes underneath the
-      # ports. 14.3.rel1 matches AGENTS.md's GCC 14 default and the version
-      # cortex_m already pins.
+      # ports. 14.3.rel1 is the GCC 14 the project builds against, and the
+      # version cortex_m already pins.
       # Releases: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
       GCC_VERSION: 14.3.rel1
 

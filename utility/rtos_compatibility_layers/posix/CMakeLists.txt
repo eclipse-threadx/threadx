@@ -12,6 +12,7 @@
 add_library(posix-threadx EXCLUDE_FROM_ALL)
 
 target_include_directories(posix-threadx
+    SYSTEM
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
 )

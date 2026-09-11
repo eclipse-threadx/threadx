@@ -54,7 +54,7 @@ on:
       # rate, and not the lower of the two. Probed on the same run: the
       # ThreadX report at 100.00% lines and 77.67% branches passes a floor of
       # 99. Worth knowing, because branch coverage is around 78% in both
-      # suites while AGENTS.md asks for 100%, and a floor set from the
+      # suites while the project asks for 100%, and a floor set from the
       # headline line figure says nothing about it.
       #
       # Each suite sets its own in regression_test.yml, because they do not
@@ -157,9 +157,9 @@ jobs:
     # ! opens a YAML tag, and the expression will not parse without it.
     #
     # fail_below_min turns the summary into a gate. Until now coverage could
-    # fall from any figure to any other and no check went red, against an
-    # AGENTS.md that asks for 100% -- a stated requirement measured with a
-    # gauge that could not fail.
+    # fall from any figure to any other and no check went red, against a
+    # project target of 100% -- a stated requirement measured with a gauge
+    # that could not fail.
     #
     # One thing the floor does not defend, and it is the likeliest way for
     # coverage to break: an empty report reads as 100%. gcovr writes

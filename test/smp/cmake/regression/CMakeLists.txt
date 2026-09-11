@@ -115,6 +115,8 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_thread_sleep_terminate_test.c
     ${SOURCE_DIR}/threadx_thread_stack_checking_test.c
     ${SOURCE_DIR}/threadx_thread_terminate_delete_test.c
+    ${SOURCE_DIR}/threadx_thread_exit_callback_transition_test.c
+    ${SOURCE_DIR}/threadx_smp_thread_exit_callback_remote_test.c
     ${SOURCE_DIR}/threadx_thread_time_slice_change_test.c
     ${SOURCE_DIR}/threadx_thread_wait_abort_and_isr_test.c
     ${SOURCE_DIR}/threadx_thread_wait_abort_test.c

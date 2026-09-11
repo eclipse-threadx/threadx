@@ -20,6 +20,12 @@ on:
       - "CMakeLists.txt"
       - "cmake/**"
       - "common/**"
+      # common_modules/ holds the portable module manager that the module
+      # manager stage compiles once per Arm module port -- the larger half of
+      # what that stage builds. Without it a change there leaves the stage
+      # unrun, which is the same "absent from the count reads as covered" the
+      # stage exists to close.
+      - "common_modules/**"
       - "common_smp/**"
       - "ports/**"
       - "ports_arch/**"
