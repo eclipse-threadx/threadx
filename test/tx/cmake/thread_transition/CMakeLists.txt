@@ -93,16 +93,20 @@ foreach(configuration ${transition_configurations})
   string(REPLACE "|" ";" configuration_macros ${configuration_macro_text})
 
   set(test_name threadx_thread_transition_${configuration_name}_test)
+  # Keep the internal target name short.  CMake includes it in every object path,
+  # and the descriptive test name can otherwise reach the legacy MSVC MAX_PATH
+  # boundary in a normally nested Windows worktree.
+  set(test_target tx_tt_${configuration_name})
 
-  add_executable(${test_name} ${transition_sources})
+  add_executable(${test_target} ${transition_sources})
 
   target_include_directories(
-    ${test_name}
+    ${test_target}
     PRIVATE ${SOURCE_DIR}
             ${REPO_ROOT}/common/inc
             ${REPO_ROOT}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc)
 
-  target_compile_definitions(${test_name} PRIVATE ${configuration_macros})
+  target_compile_definitions(${test_target} PRIVATE ${configuration_macros})
 
   # This directory is configured once per build configuration of the tree, so
   # these executables inherit whichever feature macros that configuration sets --
@@ -120,8 +124,8 @@ foreach(configuration ${transition_configurations})
   # because TX_ENABLE_EVENT_TRACE is visible to tx_api.h and the two must agree on
   # what the headers declare. Target compile options land after the directory's
   # definition flags on the command line, which is what makes them effective.
-  target_compile_options(${test_name} PRIVATE ${transition_undefine_options})
+  target_compile_options(${test_target} PRIVATE ${transition_undefine_options})
 
-  add_test(${CMAKE_BUILD_TYPE}::${test_name} ${test_name})
+  add_test(${CMAKE_BUILD_TYPE}::${test_name} ${test_target})
 
 endforeach()
