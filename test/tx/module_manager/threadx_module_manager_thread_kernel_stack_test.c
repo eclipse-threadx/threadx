@@ -96,6 +96,27 @@ unsigned int    test_interrupt_disable_depth;
 unsigned int    test_interrupt_disable_max_depth;
 unsigned int    test_interrupt_restore_underflows;
 
+/* The kernel's created lists. A created object lives on the list for its type, and
+   the manager reads those lists, so a test that stands in for the kernel has to
+   provide them. Only the thread list is populated here, by the thread this test
+   creates; the rest stay empty because nothing here creates an object of that type.  */
+TX_BLOCK_POOL           *_tx_block_pool_created_ptr;
+ULONG                   _tx_block_pool_created_count;
+TX_BYTE_POOL            *_tx_byte_pool_created_ptr;
+ULONG                   _tx_byte_pool_created_count;
+TX_EVENT_FLAGS_GROUP    *_tx_event_flags_created_ptr;
+ULONG                   _tx_event_flags_created_count;
+TX_MUTEX                *_tx_mutex_created_ptr;
+ULONG                   _tx_mutex_created_count;
+TX_QUEUE                *_tx_queue_created_ptr;
+ULONG                   _tx_queue_created_count;
+TX_SEMAPHORE            *_tx_semaphore_created_ptr;
+ULONG                   _tx_semaphore_created_count;
+TX_THREAD               *_tx_thread_created_ptr;
+ULONG                   _tx_thread_created_count;
+TX_TIMER                *_tx_timer_created_ptr;
+ULONG                   _tx_timer_created_count;
+
 /* The manager globals the sources under test refer to.  */
 TX_BYTE_POOL    _txm_module_manager_object_pool;
 UINT            _txm_module_manager_object_pool_created;
@@ -281,6 +302,13 @@ UINT  _txe_thread_delete(TX_THREAD *thread_ptr)
 
     test_deleted_thread =  thread_ptr;
 
+    /* A successful delete takes the thread off the kernel's created list.  */
+    if (test_delete_status == TX_SUCCESS)
+    {
+        _tx_thread_created_ptr =    TX_NULL;
+        _tx_thread_created_count =  (ULONG) 0;
+    }
+
     return(test_delete_status);
 }
 
@@ -343,6 +371,13 @@ VOID        *stack_ptr;
 
     thread_ptr -> tx_thread_id =                   TX_THREAD_ID;
     thread_ptr -> tx_thread_module_instance_ptr =  module_ptr;
+
+    /* Put it on the kernel's created list, which is where a created thread lives.
+       One thread exists at a time here, so the list is that thread alone.  */
+    thread_ptr -> tx_thread_created_next =      thread_ptr;
+    thread_ptr -> tx_thread_created_previous =  thread_ptr;
+    _tx_thread_created_ptr =                    thread_ptr;
+    _tx_thread_created_count =                  (ULONG) 1;
 
     if ((module_ptr -> txm_module_instance_property_flags & TXM_MODULE_USER_MODE) != 0U)
     {
@@ -460,6 +495,10 @@ ULONG                   status;
     TX_MEMSET(thread_ptr, 0, sizeof(TX_THREAD));
     thread_ptr -> tx_thread_id =                   TX_THREAD_ID;
     thread_ptr -> tx_thread_module_instance_ptr =  &module_instance;
+    thread_ptr -> tx_thread_created_next =         thread_ptr;
+    thread_ptr -> tx_thread_created_previous =     thread_ptr;
+    _tx_thread_created_ptr =                       thread_ptr;
+    _tx_thread_created_count =                     (ULONG) 1;
 
     test_expect("...and holds no kernel stack",
                 (ULONG) (thread_ptr -> tx_thread_module_kernel_stack_start == TX_NULL), (ULONG) TX_TRUE);
