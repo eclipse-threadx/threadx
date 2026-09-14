@@ -65,8 +65,34 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    # The build environment is pinned, because the coverage numbers this job
+    # produces are certification evidence and have to be reproducible from a
+    # recorded version rather than from whatever the hosted image carries today.
+    #
+    # The kernel sources declare cmake_minimum_required(VERSION 3.0.0), and CMake
+    # removed compatibility below 3.5 in 4.0. On ubuntu-latest with no pin, this
+    # branch would stop configuring the day GitHub moves that image to CMake 4.x,
+    # with no change here and no warning. Debian trixie carries CMake 3.31.6, so
+    # the distribution package settles it with no policy override and no edit to
+    # the sources.
+    #
+    # trixie is also GCC 14, and gcc-multilib with it: the coverage build is 32
+    # bit (-m32 in cmake/linux.cmake and in both test trees), so a compiler
+    # without multilib cannot build this suite at all.
+    container:
+      image: debian:trixie
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    # Before the checkout, because actions/checkout needs git and the pinned
+    # image is a bare Debian. Without it the action silently falls back to
+    # downloading a tarball over the REST API, which leaves no .git behind -- and
+    # the commit this evidence was built from is part of the evidence.
+    - name: Install git
+      run: |
+        apt-get update
+        apt-get install -y --no-install-recommends ca-certificates git
+
     - name: Check out the repository
       uses: actions/checkout@v4
       with:
@@ -151,12 +177,13 @@ jobs:
         header: Code Coverage ${{ inputs.result_affix }}
         path: code-coverage-results.md
 
-    # Add sudo to move coverage folder created by root user
+    # No sudo: the steps above run as root inside the pinned container, and the
+    # image does not carry sudo at all.
     - name: Prepare Coverage GitHub Pages
       if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       run: >-
         if [ "${{ inputs.result_affix }}" != "" ] && ${{ inputs.skip_deploy }}; then
-          sudo mv ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }} \
+          mv ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }} \
             ${{ inputs.cmake_path }}/coverage_report/${{ inputs.result_affix }}
         fi
           

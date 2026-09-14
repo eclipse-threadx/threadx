@@ -14,6 +14,18 @@ cd $(dirname $0)
 repo_root=$(cd ../../.. && pwd)
 filter=$repo_root/common/src
 
+# The coverage ratchet. CI fails below these, and they are raised as the gaps
+# close, so a change that loses coverage fails here rather than in review. They
+# are deliberately not 100%: a gate nothing can pass gets turned off, and the
+# point is to hold the floor while it rises.
+#
+# The margin below the measured figure is not slack for regressions. Branches on
+# the resume-from-ISR path are reached or missed depending on how the host
+# schedules the run, so the same tree measures a little differently each time,
+# and a gate set at the best observation fails on a tree nobody changed.
+min_line=${TX_COVERAGE_MIN_LINE:-99.50}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-80.00}
+
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
 # this pass adds them all together.
@@ -57,6 +69,12 @@ if [ "$1" = "--merge" ]; then
     for t in "${tracefiles[@]}"; do
         echo "    $(basename "$t" .json)"
     done
+
+    # Run after the reports are written, so a failed gate still leaves behind the
+    # report that explains it. stdout is the per-file table, which the reports
+    # already carry; the reason for a failure goes to stderr.
+    gcovr -r "$repo_root" "${add_args[@]}" \
+          --fail-under-line "$min_line" --fail-under-branch "$min_branch" >/dev/null || exit $?
     exit 0
 fi
 

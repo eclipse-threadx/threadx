@@ -1,13 +1,13 @@
 name: regression_test
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
+# Controls when the action will run. Triggers the workflow on push or pull
+# request events for master and for the certification branch.
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [ master, v6.4.1_cert ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, v6.4.1_cert ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -27,7 +27,12 @@ jobs:
       cmake_path: ./test/smp/cmake
       result_affix: SMP
       skip_deploy: true
+  # Publishing is master's alone. The deploy job replaces the project's public
+  # coverage site wholesale, so running it from any other branch would put that
+  # branch's numbers up as the project's. The certification branch produces its
+  # evidence as workflow artifacts instead.
   deploy:
+    if: github.ref == 'refs/heads/master'
     needs: [tx, smp]
     uses: ./.github/workflows/regression_template.yml
     with:
