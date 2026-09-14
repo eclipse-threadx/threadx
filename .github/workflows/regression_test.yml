@@ -11,7 +11,20 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  # Each calling job spells out the permissions the called workflow's own jobs
+  # ask for. A reusable workflow cannot be granted more than its caller holds,
+  # and when the repository default became read-only these calls started being
+  # rejected before any job was scheduled -- a startup failure with no log and
+  # nothing to read. Verified: v6.4.1_rel's unmodified workflow fails the same
+  # way today.
   tx:
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      pages: write
+      id-token: write
     uses: ./.github/workflows/regression_template.yml
     with:
       build_script: ./scripts/build_tx.sh
@@ -20,6 +33,13 @@ jobs:
       result_affix: ThreadX
       skip_deploy: true
   smp:
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      pages: write
+      id-token: write
     uses: ./.github/workflows/regression_template.yml
     with:
       build_script: ./scripts/build_smp.sh
@@ -33,6 +53,13 @@ jobs:
   # evidence as workflow artifacts instead.
   deploy:
     if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      pages: write
+      id-token: write
     needs: [tx, smp]
     uses: ./.github/workflows/regression_template.yml
     with:
