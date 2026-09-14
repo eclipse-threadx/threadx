@@ -62,8 +62,9 @@ jobs:
       checks: write
       pull-requests: write
       
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    # The type of runner that the job will run on. Pinned rather than "latest",
+    # for the same reason the container below is.
+    runs-on: ubuntu-24.04
 
     # The build environment is pinned, because the coverage numbers this job
     # produces are certification evidence and have to be reproducible from a
@@ -94,7 +95,7 @@ jobs:
         apt-get install -y --no-install-recommends ca-certificates git
 
     - name: Check out the repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         submodules: true
     
@@ -116,7 +117,7 @@ jobs:
       run: ${{ inputs.test_script }}
       
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2.11.0
+      uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
       if: always()
       with:
         check_name: Test Results ${{ inputs.result_affix }}
@@ -125,7 +126,7 @@ jobs:
           
     - name: Upload Test Results
       if: success() || failure()
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: test_reports ${{ inputs.result_affix }}
         path: |
@@ -134,7 +135,7 @@ jobs:
           ${{ inputs.cmake_path }}/build/**/regression/output_files/*.bin
     
     - name: Configure GitHub Pages
-      uses: actions/configure-pages@v3.0.6
+      uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
     # The coverage steps below run even when a test failed. cmake_bootstrap.sh
     # now produces the report in that case, and the run whose behaviour changed
@@ -145,7 +146,7 @@ jobs:
     # ! opens a YAML tag, and the expression will not parse without it.
     - name: Generate Code Coverage Results Summary
       if: ${{ !cancelled() && (!inputs.skip_coverage) }}
-      uses: irongut/CodeCoverageSummary@v1.3.0
+      uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
       with:
         filename: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}.xml
         format: markdown
@@ -161,7 +162,7 @@ jobs:
 
     - name: Create CheckRun for Code Coverage
       if: ${{ !cancelled() && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage) }}
-      uses: LouisBrunner/checks-action@v1.6.2
+      uses: LouisBrunner/checks-action@937cbbcde3259005b50746dc91cde29098aac2ff # v3.1.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Code Coverage ${{ inputs.result_affix }}
@@ -172,7 +173,7 @@ jobs:
 
     - name: Add Code Coverage PR Comment
       if: ${{ !cancelled() && ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage) }}
-      uses: marocchino/sticky-pull-request-comment@v2
+      uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
       with:
         header: Code Coverage ${{ inputs.result_affix }}
         path: code-coverage-results.md
@@ -187,16 +188,25 @@ jobs:
             ${{ inputs.cmake_path }}/coverage_report/${{ inputs.result_affix }}
         fi
           
-    # per_configuration is excluded deliberately. The deploy job merges the
-    # ThreadX and SMP coverage_report artifacts into one tree, and each suite's
-    # per-configuration directories carry the same names, so ThreadX's would
-    # overwrite SMP's. The top level therefore holds only the suite directory and
-    # the merged XML, which is the shape the deploy already expects.
+    # Every suite used to upload an artifact called coverage_report and rely on
+    # them merging. upload-artifact refuses a name another job has already used
+    # from v4 onwards, so the name is made unique here and the deploy job
+    # collects them by pattern.
+    - name: Coverage Report name
+      id: artifact
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
+      run: echo "coverage_report=coverage_report-$(date +%s)" >> $GITHUB_OUTPUT
+
+    # per_configuration is excluded deliberately. The deploy job merges every
+    # coverage_report-* artifact into one tree, and each suite's per-configuration
+    # directories carry the same names, so ThreadX's would overwrite SMP's. The
+    # top level therefore holds only the suite directory and the merged XML,
+    # which is the shape the deploy already expects.
     - name: Upload Code Coverage Artifacts
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       if: ${{ !cancelled() && (inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
-        name: coverage_report
+        name: ${{ steps.artifact.outputs.coverage_report }}
         path: |
           ${{ inputs.cmake_path }}/coverage_report
           !${{ inputs.cmake_path }}/coverage_report/per_configuration/**
@@ -207,7 +217,7 @@ jobs:
     # it. It is a distinct artifact name, so the deploy job never picks it up and
     # it does not reach the published site.
     - name: Upload Per-Configuration Coverage
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       with:
         name: coverage_detail ${{ inputs.result_affix }}
@@ -215,13 +225,13 @@ jobs:
         retention-days: 1
           
     - name: Upload Code Coverage Pages
-      uses: actions/upload-pages-artifact@v2.0.0
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
       if: ${{ !cancelled() && (!inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}
   
   deploy_code_coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && !failure() && !cancelled()
     needs: run_tests
     environment:
@@ -232,25 +242,32 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/download-artifact@v3
+    # By pattern, because the artifacts are now coverage_report-<epoch> and the
+    # step that names them runs in a different job, whose steps context does not
+    # reach here. merge-multiple puts both suites' contents directly into
+    # coverage_report rather than under a directory named for each artifact, so
+    # the published path holds the two suite directories and not a run timestamp.
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       if: ${{ inputs.skip_test }}
       with:
-        name: coverage_report
+        pattern: coverage_report-*
+        merge-multiple: true
+        path: ${{ inputs.cmake_path }}/coverage_report
 
     - name: Upload Code Coverage Pages
-      uses: actions/upload-pages-artifact@v2.0.0
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
       if: ${{ inputs.skip_test }}
       with:
         path: .
 
-    - name: Delete Duplicate Code Coverage Artifact 
-      uses: geekyeggo/delete-artifact@v2
+    - name: Delete Duplicate Code Coverage Artifact
+      uses: geekyeggo/delete-artifact@176a747ab7e287e3ff4787bf8a148716375ca118 # v6.0.0
       with:
-          name: coverage_report
+          name: coverage_report-*
 
     - name: Deploy GitHub Pages site
       id: deployment
-      uses: actions/deploy-pages@v1.2.9
+      uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
 
     - name: Write Code Coverage Report URL
       run: >-
