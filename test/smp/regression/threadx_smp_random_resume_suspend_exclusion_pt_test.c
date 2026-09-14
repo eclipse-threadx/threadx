@@ -2,6 +2,7 @@
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "tx_thread.h"
 
 //#define MAX_PASSES      50000000
 //#define MAX_PASSES      50000
