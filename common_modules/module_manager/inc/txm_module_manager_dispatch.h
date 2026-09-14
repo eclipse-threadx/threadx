@@ -2078,9 +2078,14 @@ ALIGN_TYPE  stack_status;
 
     return_value = (ALIGN_TYPE) _txe_thread_delete(thread_ptr);
 
-    /* Deallocate the kernel stack for a user-mode thread.  */
+    /* Deallocate the kernel stack for a user-mode thread.  The pointer is tested
+       rather than the module's properties: both thread create paths clear the whole
+       control block before filling it in, so a thread that carries no kernel stack
+       the manager allocated holds TX_NULL here, and a user-mode module can be given
+       the address of such a thread.  */
     if ((return_value == TX_SUCCESS) &&
-        (module_instance -> txm_module_instance_property_flags & TXM_MODULE_USER_MODE))
+        (module_instance -> txm_module_instance_property_flags & TXM_MODULE_USER_MODE) &&
+        (thread_ptr -> tx_thread_module_kernel_stack_start != TX_NULL))
     {
         stack_status = _txm_module_manager_object_deallocate(thread_ptr -> tx_thread_module_kernel_stack_start);
     }
