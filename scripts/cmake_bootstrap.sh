@@ -46,7 +46,7 @@ function generate() {
         echo "Compiler changed since build/$build was configured. Reconfiguring from scratch."
         rm -rf build/$build
     fi
-    cmake -Bbuild/$build -GNinja -DBUILD_SHARED_LIBS=ON -DCMAKE_TOOLCHAIN_FILE=$(dirname $(realpath $0))/../cmake/linux.cmake -DCMAKE_BUILD_TYPE=$build .
+    cmake -Bbuild/$build -GNinja -DBUILD_SHARED_LIBS=ON -DCMAKE_TOOLCHAIN_FILE=$(dirname $(realpath $0))/../cmake/linux.cmake -DCMAKE_BUILD_TYPE=$build -DTX_COVERAGE=${TX_COVERAGE:-OFF} .
 }
 
 function build() {
@@ -81,6 +81,10 @@ function test() {
     # ctest's status is captured rather than allowed to abort the function, and
     # returned at the end. It was previously discarded by the popd that follows,
     # so a configuration with failing tests returned 0 and was reported as a pass.
+    # Coverage is collected by collect_all_coverage once every configuration has
+    # been tested, not here. The gcda exist by the time a test fails, so a run
+    # that aborted at this point threw away coverage it had already collected --
+    # and that run is the one whose coverage is worth reading.
     local status=0
     ctest $parallel --timeout 1000 -O $1.txt -T test --no-compress-output --test-output-size-passed 4194304 --test-output-size-failed 4194304 --output-on-failure --repeat until-pass:${repeat_fail} --output-junit $1.xml || status=$?
     popd
@@ -88,8 +92,46 @@ function test() {
     # enough to leave no matching line must not be what stops the coverage below.
     grep -E "^(\s*[0-9]+|Total)" build/$1/$1.txt >build/$1.txt || true
     sed -i "s/\x1B\[[0-9;]*[JKmsu]//g" build/$1.txt
-    if [[ $1 = *"_coverage" ]]; then
-        ./coverage.sh $1 || status=$?
+    return $status
+}
+
+# Collect for any configuration that was instrumented, which is what TX_COVERAGE
+# decides. The build-type match is kept as well, so a single configuration built
+# by hand behaves as it did before. The coverage.sh test is a guard: it keeps
+# TX_COVERAGE=ON harmless in a tree that has no coverage script.
+function collect_coverage() {
+    if [[ $1 = *"_coverage" ]] || [ "${TX_COVERAGE:-OFF}" = "ON" ]; then
+        if [ ! -x ./coverage.sh ]; then
+            echo "No coverage.sh in $(pwd); skipping coverage for $1."
+            return 0
+        fi
+        ./coverage.sh $1
+    fi
+}
+
+# Collection runs after every configuration has been tested, and one at a time.
+# The merge below needs every tracefile to exist, and gcovr writes intermediate
+# gcov output into the directory it is rooted at -- which coverage.sh sets to the
+# repository root for all of them, so concurrent runs would share one scratch
+# directory.
+#
+# It does not stop at the first failure, for the reason given in test(): the
+# configurations that did produce data should still report.
+function collect_all_coverage() {
+    local item status=0
+    for item in $builds; do
+        collect_coverage $item || status=$?
+    done
+
+    # Union the per-configuration reports. Only the union is a coverage figure:
+    # each configuration compiles a different set of TX_ feature macros, so a
+    # line one of them compiles out is absent from its denominator rather than
+    # uncovered in it, and an average of five percentages means nothing.
+    #
+    # Done here rather than as a separate workflow step so a local run produces
+    # the same merged report CI reads.
+    if [ "${TX_COVERAGE:-OFF}" = "ON" ] && [ -x ./coverage.sh ]; then
+        ./coverage.sh --merge || status=$?
     fi
     return $status
 }
@@ -152,16 +194,27 @@ elif [ "$command" == "test" ]; then
         for p in $pids; do
             wait $p || exit_code=$?
         done
+        # A coverage failure turns the run red, but must not overwrite a test
+        # failure's status with its own.
+        coverage_status=0
+        collect_all_coverage || coverage_status=$?
+        [ $exit_code -ne 0 ] || exit_code=$coverage_status
         exit $exit_code
     else
         # Run builds in serial. The status is collected the same way the parallel
         # branch above collects it, so one failing configuration no longer stops
-        # the remaining ones from being tested.
+        # the remaining ones from being tested -- or their coverage from being
+        # collected.
         exit_code=0
         for item in $builds; do
             echo "Testing $item"
             test $item $parallel_jobs || exit_code=$?
         done
+        # A coverage failure turns the run red, but must not overwrite a test
+        # failure's status with its own.
+        coverage_status=0
+        collect_all_coverage || coverage_status=$?
+        [ $exit_code -ne 0 ] || exit_code=$coverage_status
         exit $exit_code
     fi
 elif [ "$command" == "build_libs" ]; then

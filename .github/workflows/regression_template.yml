@@ -29,8 +29,13 @@ on:
         default: false
         required: false
         type: boolean
+      # The merged report, not one configuration's. Every configuration is
+      # instrumented now (TX_COVERAGE below) and coverage.sh --merge unions
+      # them; default_build_coverage was one build of five, and the code the
+      # other four select was absent from its denominator rather than uncovered
+      # in it.
       coverage_name:
-        default: 'default_build_coverage'
+        default: 'merged'
         required: false
         type: string
       skip_deploy:
@@ -70,10 +75,18 @@ jobs:
     - name: Install softwares
       run: ${{ inputs.install_script }}
 
+    # TX_COVERAGE instruments every build configuration rather than only the one
+    # whose name ends in _coverage. It has to be set for the build as well as the
+    # test: the build is where -fprofile-arcs is decided, and the test run is
+    # where the reports are collected and merged.
     - name: Build
+      env:
+        TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.build_script }}
 
     - name: Test
+      env:
+        TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.test_script }}
       
     - name: Publish Test Results
@@ -97,8 +110,15 @@ jobs:
     - name: Configure GitHub Pages
       uses: actions/configure-pages@v3.0.6
 
+    # The coverage steps below run even when a test failed. cmake_bootstrap.sh
+    # now produces the report in that case, and the run whose behaviour changed
+    # is the one whose coverage is worth reading; previously a single flaky test
+    # suppressed the report for the whole run. !cancelled() rather than always(),
+    # so a cancelled run still stops promptly -- the same idiom the
+    # deploy_code_coverage job below already uses. The ${{ }} is required: a bare
+    # ! opens a YAML tag, and the expression will not parse without it.
     - name: Generate Code Coverage Results Summary
-      if: (!inputs.skip_coverage)
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
         filename: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}.xml
@@ -108,13 +128,13 @@ jobs:
         output: file
 
     - name: Write Code Coverage Summary
-      if: (!inputs.skip_coverage)
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       run: |
         echo "## Coverage Report ${{ inputs.result_affix }}" >> $GITHUB_STEP_SUMMARY
         cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
     - name: Create CheckRun for Code Coverage
-      if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
+      if: ${{ !cancelled() && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage) }}
       uses: LouisBrunner/checks-action@v1.6.2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -125,7 +145,7 @@ jobs:
         output_text_description_file: code-coverage-results.md
 
     - name: Add Code Coverage PR Comment
-      if: ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
+      if: ${{ !cancelled() && ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage) }}
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         header: Code Coverage ${{ inputs.result_affix }}
@@ -133,24 +153,43 @@ jobs:
 
     # Add sudo to move coverage folder created by root user
     - name: Prepare Coverage GitHub Pages
-      if: (!inputs.skip_coverage)
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       run: >-
         if [ "${{ inputs.result_affix }}" != "" ] && ${{ inputs.skip_deploy }}; then
           sudo mv ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }} \
             ${{ inputs.cmake_path }}/coverage_report/${{ inputs.result_affix }}
         fi
           
+    # per_configuration is excluded deliberately. The deploy job merges the
+    # ThreadX and SMP coverage_report artifacts into one tree, and each suite's
+    # per-configuration directories carry the same names, so ThreadX's would
+    # overwrite SMP's. The top level therefore holds only the suite directory and
+    # the merged XML, which is the shape the deploy already expects.
     - name: Upload Code Coverage Artifacts
       uses: actions/upload-artifact@v3.1.3
-      if: (inputs.skip_deploy && !inputs.skip_coverage)
+      if: ${{ !cancelled() && (inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
         name: coverage_report
-        path: ${{ inputs.cmake_path }}/coverage_report
+        path: |
+          ${{ inputs.cmake_path }}/coverage_report
+          !${{ inputs.cmake_path }}/coverage_report/per_configuration/**
+        retention-days: 1
+
+    # The per-configuration reports, kept separately so they are downloadable
+    # when the merged number moves and the question is which configuration moved
+    # it. It is a distinct artifact name, so the deploy job never picks it up and
+    # it does not reach the published site.
+    - name: Upload Per-Configuration Coverage
+      uses: actions/upload-artifact@v3.1.3
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
+      with:
+        name: coverage_detail ${{ inputs.result_affix }}
+        path: ${{ inputs.cmake_path }}/coverage_report/per_configuration
         retention-days: 1
           
     - name: Upload Code Coverage Pages
       uses: actions/upload-pages-artifact@v2.0.0
-      if: (!inputs.skip_deploy && !inputs.skip_coverage)
+      if: ${{ !cancelled() && (!inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}
   
