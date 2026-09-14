@@ -70,6 +70,11 @@ add_subdirectory(samples)
 # there turns a set of clean merges into a set of one-line conflicts.
 add_subdirectory(thread_transition)
 
+# Host tests for the Module Manager. Listed after thread_transition for the reason
+# given above it: additions here are appended rather than inserted, so that branches
+# adding a directory of their own merge cleanly.
+add_subdirectory(module_manager)
+
 # Coverage
 #
 # The gate here used to be the build type alone, and only one of the five
