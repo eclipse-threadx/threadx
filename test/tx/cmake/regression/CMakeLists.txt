@@ -38,6 +38,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_event_flag_trace_test.c
     ${SOURCE_DIR}/threadx_event_flag_zero_request_test.c
     ${SOURCE_DIR}/threadx_interrupt_control_test.c
+    ${SOURCE_DIR}/threadx_misra_shim_test.c
     ${SOURCE_DIR}/threadx_mutex_basic_test.c
     ${SOURCE_DIR}/threadx_mutex_delete_test.c
     ${SOURCE_DIR}/threadx_mutex_information_test.c
