@@ -87,6 +87,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_thread_simple_suspend_test.c
     ${SOURCE_DIR}/threadx_thread_sleep_for_100ticks_test.c
     ${SOURCE_DIR}/threadx_thread_sleep_terminate_test.c
+    ${SOURCE_DIR}/threadx_thread_stack_check_test.c
     ${SOURCE_DIR}/threadx_thread_stack_checking_test.c
     ${SOURCE_DIR}/threadx_thread_terminate_delete_test.c
     ${SOURCE_DIR}/threadx_thread_time_slice_change_test.c
