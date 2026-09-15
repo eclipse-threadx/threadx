@@ -132,7 +132,7 @@ ULONG                   stack_fill_value;
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
 
     /* Ensure the starting stack address is evenly aligned.  */
-    new_stack_start =  TX_POINTER_TO_ALIGN_TYPE_CONVERT(stack_start);
+    new_stack_start =  (ALIGN_TYPE) ((VOID *) stack_start);
     updated_stack_start =  (((new_stack_start) + ((sizeof(ULONG)) - ((ULONG) 1)) ) & (~((sizeof(ULONG)) - ((ULONG) 1))));
 
     /* Determine if the starting stack address is different.  */
@@ -144,7 +144,7 @@ ULONG                   stack_fill_value;
     }
 
     /* Update the starting stack pointer.  */
-    stack_start =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(updated_stack_start);
+    stack_start =  (VOID *) ((ALIGN_TYPE) updated_stack_start);
 #endif
 
     /* Prepare the thread control block prior to placing it on the created
