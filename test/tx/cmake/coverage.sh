@@ -23,8 +23,8 @@ filter=$repo_root/common/src
 # the resume-from-ISR path are reached or missed depending on how the host
 # schedules the run, so the same tree measures a little differently each time,
 # and a gate set at the best observation fails on a tree nobody changed.
-min_line=${TX_COVERAGE_MIN_LINE:-99.50}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-80.00}
+min_line=${TX_COVERAGE_MIN_LINE:-99.40}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-79.50}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and

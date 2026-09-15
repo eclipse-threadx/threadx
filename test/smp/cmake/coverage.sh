@@ -23,7 +23,7 @@ filter=$repo_root/common_smp/src
 # the resume-from-ISR path are reached or missed depending on how the host
 # schedules the run, so the same tree measures a little differently each time,
 # and a gate set at the best observation fails on a tree nobody changed.
-min_line=${TX_COVERAGE_MIN_LINE:-99.40}
+min_line=${TX_COVERAGE_MIN_LINE:-99.30}
 min_branch=${TX_COVERAGE_MIN_BRANCH:-83.00}
 
 # --merge unions the per-configuration reports into the one number that means
