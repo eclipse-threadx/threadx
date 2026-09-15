@@ -42,6 +42,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_mutex_proritize_test.c
     ${SOURCE_DIR}/threadx_mutex_suspension_timeout_test.c
     ${SOURCE_DIR}/threadx_mutex_thread_terminate_test.c
+    ${SOURCE_DIR}/threadx_mutex_trace_test.c
     ${SOURCE_DIR}/threadx_queue_basic_eight_word_test.c
     ${SOURCE_DIR}/threadx_queue_basic_four_word_test.c
     ${SOURCE_DIR}/threadx_queue_basic_one_word_test.c

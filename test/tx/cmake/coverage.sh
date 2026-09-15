@@ -29,9 +29,9 @@ filter=$repo_root/common/src
 # TX_INLINE_INITIALIZATION empties on this port, so a figure taken from the other
 # five configurations counts 119 fewer lines and 519 fewer branches and is not
 # comparable with this one. Measured over the six configurations: 4304/4339 lines
-# and 4300/4627 branches.
+# and 4358/4627 branches.
 min_line=${TX_COVERAGE_MIN_LINE:-99.10}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-92.50}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-94.00}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
