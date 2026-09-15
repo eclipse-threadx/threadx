@@ -24,14 +24,14 @@ filter=$repo_root/common/src
 # schedules the run, so the same tree measures a little differently each time,
 # and a gate set at the best observation fails on a tree nobody changed.
 #
-# The line gate is lower than it was, and that is not a loss of coverage. The
-# misra_build configuration compiles common/src/tx_misra.c and the six
-# *_initialize.c files that TX_INLINE_INITIALIZATION empties on this port, so
-# the denominator gained 119 lines and 519 branches that no configuration used
-# to count at all. Measured over the six configurations: 4296/4339 lines and
-# 3919/4627 branches, identical across two clean runs.
-min_line=${TX_COVERAGE_MIN_LINE:-98.90}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-84.00}
+# The denominator is the whole of common/src. The misra_build configuration
+# compiles common/src/tx_misra.c and the six *_initialize.c files that
+# TX_INLINE_INITIALIZATION empties on this port, so a figure taken from the other
+# five configurations counts 119 fewer lines and 519 fewer branches and is not
+# comparable with this one. Measured over the six configurations: 4300/4339 lines
+# on both of two clean runs, and 4097/4627 then 4096/4627 branches.
+min_line=${TX_COVERAGE_MIN_LINE:-99.00}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-88.00}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
