@@ -102,6 +102,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_multiple_accuracy_test.c
     ${SOURCE_DIR}/threadx_timer_multiple_test.c
     ${SOURCE_DIR}/threadx_timer_simple_test.c
+    ${SOURCE_DIR}/threadx_timer_trace_test.c
     ${SOURCE_DIR}/threadx_trace_basic_test.c
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
 
