@@ -23,8 +23,15 @@ filter=$repo_root/common/src
 # the resume-from-ISR path are reached or missed depending on how the host
 # schedules the run, so the same tree measures a little differently each time,
 # and a gate set at the best observation fails on a tree nobody changed.
-min_line=${TX_COVERAGE_MIN_LINE:-99.40}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-82.50}
+#
+# The line gate is lower than it was, and that is not a loss of coverage. The
+# misra_build configuration compiles common/src/tx_misra.c and the six
+# *_initialize.c files that TX_INLINE_INITIALIZATION empties on this port, so
+# the denominator gained 119 lines and 519 branches that no configuration used
+# to count at all. Measured over the six configurations: 4296/4339 lines and
+# 3919/4627 branches, identical across two clean runs.
+min_line=${TX_COVERAGE_MIN_LINE:-98.90}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-84.00}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
