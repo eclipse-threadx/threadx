@@ -66,6 +66,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_semaphore_prioritize.c
     ${SOURCE_DIR}/threadx_semaphore_thread_terminate_test.c
     ${SOURCE_DIR}/threadx_semaphore_timeout_test.c
+    ${SOURCE_DIR}/threadx_semaphore_trace_test.c
     ${SOURCE_DIR}/threadx_thread_basic_execution_test.c
     ${SOURCE_DIR}/threadx_thread_basic_time_slice_test.c
     ${SOURCE_DIR}/threadx_thread_completed_test.c
