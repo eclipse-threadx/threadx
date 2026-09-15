@@ -56,6 +56,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_queue_prioritize.c
     ${SOURCE_DIR}/threadx_queue_suspension_timeout_test.c
     ${SOURCE_DIR}/threadx_queue_thread_terminate_test.c
+    ${SOURCE_DIR}/threadx_queue_trace_test.c
     ${SOURCE_DIR}/threadx_semaphore_basic_test.c
     ${SOURCE_DIR}/threadx_semaphore_ceiling_put_test.c
     ${SOURCE_DIR}/threadx_semaphore_delete_test.c
