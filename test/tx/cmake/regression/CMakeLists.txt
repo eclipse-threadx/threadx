@@ -13,6 +13,8 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_block_memory_suspension_test.c
     ${SOURCE_DIR}/threadx_block_memory_suspension_timeout_test.c
     ${SOURCE_DIR}/threadx_block_memory_thread_terminate_test.c
+    ${SOURCE_DIR}/threadx_block_pool_trace_test.c
+    ${SOURCE_DIR}/threadx_block_pool_trace_update_test.c
     ${SOURCE_DIR}/threadx_byte_memory_basic_test.c
     ${SOURCE_DIR}/threadx_byte_memory_information_test.c
     ${SOURCE_DIR}/threadx_byte_memory_prioritize_test.c

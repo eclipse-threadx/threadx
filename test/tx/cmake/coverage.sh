@@ -28,10 +28,10 @@ filter=$repo_root/common/src
 # compiles common/src/tx_misra.c and the six *_initialize.c files that
 # TX_INLINE_INITIALIZATION empties on this port, so a figure taken from the other
 # five configurations counts 119 fewer lines and 519 fewer branches and is not
-# comparable with this one. Measured over the six configurations: 4304/4339 lines
-# and 4418/4627 branches, identical across two clean runs.
-min_line=${TX_COVERAGE_MIN_LINE:-99.10}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-95.00}
+# comparable with this one. Measured over the six configurations: 4309/4339 lines
+# and 4482/4627 branches, from a clean tree.
+min_line=${TX_COVERAGE_MIN_LINE:-99.20}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-96.50}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
