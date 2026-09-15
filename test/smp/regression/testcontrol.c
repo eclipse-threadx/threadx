@@ -255,6 +255,7 @@ void    threadx_thread_create_preemption_threshold_application_define(void *);
 void    threadx_thread_information_application_define(void *);
 void    threadx_thread_reset_application_define(void *);
 void    threadx_thread_stack_checking_application_define(void *);
+void    threadx_thread_stack_fill_value_application_define(void *);
 
 void    threadx_time_get_set_application_define(void *);
 
@@ -403,6 +404,7 @@ TEST_ENTRY  test_control_tests[] =
     threadx_thread_information_application_define,
     threadx_thread_reset_application_define,
     threadx_thread_stack_checking_application_define,
+    threadx_thread_stack_fill_value_application_define,
 
     threadx_time_get_set_application_define,
 
