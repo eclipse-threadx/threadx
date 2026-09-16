@@ -23,8 +23,14 @@ filter=$repo_root/common_smp/src
 # the resume-from-ISR path are reached or missed depending on how the host
 # schedules the run, so the same tree measures a little differently each time,
 # and a gate set at the best observation fails on a tree nobody changed.
-min_line=${TX_COVERAGE_MIN_LINE:-99.30}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-83.00}
+#
+# The line gate is lower than it was, and that is not a loss of coverage. The
+# misra_build configuration compiles common_smp/src/tx_misra.c, 832 lines that
+# no other configuration compiled at all, so the denominator gained 165 lines
+# and 567 branches it never used to count. Measured over the six
+# configurations: 5283/5343 lines and 4528/5340 branches.
+min_line=${TX_COVERAGE_MIN_LINE:-98.70}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-84.00}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and

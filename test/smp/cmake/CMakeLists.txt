@@ -7,7 +7,7 @@ project(threadx_smp_test LANGUAGES C)
 # Set build configurations
 set(BUILD_CONFIGURATIONS default_build_coverage
                          disable_notify_callbacks_build stack_checking_build stack_checking_rand_fill_build
-                         trace_build)
+                         trace_build misra_build)
 set(CMAKE_CONFIGURATION_TYPES
     ${BUILD_CONFIGURATIONS}
     CACHE STRING "list of supported configuration types" FORCE)
@@ -28,6 +28,15 @@ set(disable_notify_callbacks_build -DTX_DISABLE_NOTIFY_CALLBACKS)
 set(stack_checking_build -DTX_ENABLE_STACK_CHECKING)
 set(stack_checking_rand_fill_build -DTX_ENABLE_STACK_CHECKING -DTX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
 set(trace_build -DTX_ENABLE_EVENT_TRACE)
+
+# TX_MISRA_ENABLE routes every pointer conversion in the kernel through the
+# shim functions in common_smp/src/tx_misra.c. None of the configurations above
+# defines it, so that file's whole body is compiled out of all of them and the
+# shim -- certified source -- carries no coverage at all. It is also the source
+# the MISRA analysis is run against, so without this configuration the build
+# that is analysed and the build that is covered are different builds of the
+# same tree.
+set(misra_build -DTX_MISRA_ENABLE)
 
 add_compile_options(
   -m32
