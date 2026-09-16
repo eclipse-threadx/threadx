@@ -7,7 +7,7 @@ project(threadx_smp_test LANGUAGES C)
 # Set build configurations
 set(BUILD_CONFIGURATIONS default_build_coverage
                          disable_notify_callbacks_build stack_checking_build stack_checking_rand_fill_build
-                         trace_build misra_build)
+                         trace_build misra_build misra_trace_build)
 set(CMAKE_CONFIGURATION_TYPES
     ${BUILD_CONFIGURATIONS}
     CACHE STRING "list of supported configuration types" FORCE)
@@ -37,6 +37,17 @@ set(trace_build -DTX_ENABLE_EVENT_TRACE)
 # that is analysed and the build that is covered are different builds of the
 # same tree.
 set(misra_build -DTX_MISRA_ENABLE)
+
+# TX_MISRA_ENABLE and TX_ENABLE_EVENT_TRACE together reach a region of
+# common_smp/src/tx_misra.c that no other configuration compiles: the MISRA form
+# of the in-line trace insert and the five pointer conversions the trace sources
+# use. misra_build defines the first macro alone and trace_build the second
+# alone, so that region was absent from the coverage denominator rather than
+# uncovered in it -- the same reason misra_build itself exists.
+#
+# It needs TX_SOURCE_CODE as well, which is applied to the kernel target further
+# down rather than here -- see the comment there for why.
+set(misra_trace_build -DTX_MISRA_ENABLE -DTX_ENABLE_EVENT_TRACE)
 
 add_compile_options(
   -m32
@@ -77,6 +88,29 @@ option(TX_COVERAGE "Instrument this build for coverage regardless of build type"
 if(TX_COVERAGE OR CMAKE_BUILD_TYPE MATCHES ".*_coverage")
   target_compile_options(threadx_smp PRIVATE -fprofile-arcs -ftest-coverage)
   target_link_options(threadx_smp PRIVATE -fprofile-arcs -ftest-coverage)
+endif()
+
+# tx_misra.c is the only one of the 194 files in common_smp/src that does not
+# define TX_SOURCE_CODE for itself, and the prototypes for the five trace
+# conversions it defines sit behind that macro in tx_trace.h. Without it the file
+# defines five functions with no previous declaration. This tree does not build
+# with -Werror, so that is a warning here rather than the hard failure it is in
+# the monoprocessor tree -- which makes it easier to miss and no less wrong: the
+# coverage evidence would come from a translation unit where five certified
+# functions have no visible prototype.
+#
+# The empty value matches the plain "#define TX_SOURCE_CODE" the other 193 files
+# carry, which is why adding it changes no object code in any configuration.
+#
+# It goes on the kernel target rather than in add_compile_options above, because
+# TX_SOURCE_CODE is what tells tx_api.h it is compiling ThreadX rather than an
+# application: it suppresses the public tx_* API mappings, which the tests and the
+# sample need. Applied globally it takes the API away from every caller.
+#
+# The defect itself is in the header and is reported upstream. This keeps our
+# build independent of when it is fixed.
+if(CMAKE_BUILD_TYPE STREQUAL "misra_trace_build")
+  target_compile_definitions(threadx_smp PRIVATE TX_SOURCE_CODE=)
 endif()
 
 target_compile_options(
