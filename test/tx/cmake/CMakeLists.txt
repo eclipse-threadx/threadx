@@ -14,7 +14,8 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 # Set build configurations
 set(BUILD_CONFIGURATIONS default_build_coverage disable_notify_callbacks_build
-                         stack_checking_build stack_checking_rand_fill_build trace_build)
+                         stack_checking_build stack_checking_rand_fill_build trace_build
+                         misra_build misra_trace_build)
 set(CMAKE_CONFIGURATION_TYPES
     ${BUILD_CONFIGURATIONS}
     CACHE STRING "list of supported configuration types" FORCE)
@@ -35,6 +36,21 @@ set(disable_notify_callbacks_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_DISABLE_NOTIF
 set(stack_checking_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING)
 set(stack_checking_rand_fill_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING TX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
 set(trace_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_EVENT_TRACE)
+
+# TX_MISRA_ENABLE routes the kernel's pointer conversions, its memset and its
+# stack check through the shim in common/src/tx_misra.c, which every
+# configuration above compiles out entirely. It is also the source the MISRA
+# analysis runs against, so without this the build that is analysed and the build
+# that is tested are different builds of the same tree.
+#
+# The second adds event tracing, because the shim has a region behind
+# TX_ENABLE_EVENT_TRACE that neither macro alone reaches.
+#
+# Both defects found here were invisible for the same reason: #741 broke under
+# TX_MISRA_ENABLE and #745 under both macros together, and neither combination
+# was built anywhere.
+set(misra_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_MISRA_ENABLE)
+set(misra_trace_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_MISRA_ENABLE TX_ENABLE_EVENT_TRACE)
 
 add_compile_definitions(
   TX_REGRESSION_TEST
@@ -68,12 +84,23 @@ add_subdirectory(samples)
 # beside regression on purpose: every branch in the current fix set adds an
 # add_subdirectory line immediately after regression, and putting a second one
 # there turns a set of clean merges into a set of one-line conflicts.
-add_subdirectory(thread_transition)
+# These two compile a hand-picked set of common/src sources directly instead of
+# linking the threadx library, which is what lets them reach feature macros the
+# library-per-configuration model cannot. That does not survive TX_MISRA_ENABLE:
+# the kernel's TX_MEMSET and its conversions become calls into tx_misra.c, and
+# pulling the shim into these targets pulls its own callees after it. Neither
+# exists to test the shim, and the regression suite covers it, so the MISRA
+# configurations skip them.
+if(NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
+  add_subdirectory(thread_transition)
+endif()
 
 # Host tests for the Module Manager. Listed after thread_transition for the reason
 # given above it: additions here are appended rather than inserted, so that branches
 # adding a directory of their own merge cleanly.
-add_subdirectory(module_manager)
+if(NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
+  add_subdirectory(module_manager)
+endif()
 
 # Coverage
 #
