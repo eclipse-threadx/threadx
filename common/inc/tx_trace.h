@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -508,6 +509,21 @@ TRACE_DECLARE  ULONG                             _tx_trace_registry_search_start
 #endif
 
 
+#if defined(TX_ENABLE_EVENT_TRACE) && defined(TX_MISRA_ENABLE)
+
+/* Define the MISRA-specific conversion routines. These are defined in tx_misra.c, which is the
+   one source file in the kernel that does not compile as ThreadX source code, so the prototypes
+   cannot sit behind TX_SOURCE_CODE.  */
+
+UCHAR                   *_tx_misra_object_to_uchar_pointer_convert(TX_TRACE_OBJECT_ENTRY *pointer);
+TX_TRACE_OBJECT_ENTRY   *_tx_misra_uchar_to_object_pointer_convert(UCHAR *pointer);
+TX_TRACE_HEADER         *_tx_misra_uchar_to_header_pointer_convert(UCHAR *pointer);
+TX_TRACE_BUFFER_ENTRY   *_tx_misra_uchar_to_entry_pointer_convert(UCHAR *pointer);
+UCHAR                   *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer);
+
+#endif
+
+
 #ifdef TX_SOURCE_CODE
 
 /* Define internal function prototypes of the trace component, only if compiling ThreadX source code.  */
@@ -524,13 +540,6 @@ VOID    _tx_trace_object_unregister(VOID *object_ptr);
 #ifdef TX_MISRA_ENABLE
 
 /* Define MISRA-specific routines.  */
-
-UCHAR                   *_tx_misra_object_to_uchar_pointer_convert(TX_TRACE_OBJECT_ENTRY *pointer);
-TX_TRACE_OBJECT_ENTRY   *_tx_misra_uchar_to_object_pointer_convert(UCHAR *pointer);
-TX_TRACE_HEADER         *_tx_misra_uchar_to_header_pointer_convert(UCHAR *pointer);
-TX_TRACE_BUFFER_ENTRY   *_tx_misra_uchar_to_entry_pointer_convert(UCHAR *pointer);
-UCHAR                   *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer);
-
 
 #define TX_OBJECT_TO_UCHAR_POINTER_CONVERT(a)           _tx_misra_object_to_uchar_pointer_convert((a))
 #define TX_UCHAR_TO_OBJECT_POINTER_CONVERT(a)           _tx_misra_uchar_to_object_pointer_convert((a))
