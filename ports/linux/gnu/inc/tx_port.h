@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -317,13 +319,21 @@ void    _tx_linux_debug_entry_insert(char *action, char *file, unsigned long lin
 
 */
 
-#ifndef TX_MISRA_ENABLE
+/* The clock below is read for every trace event in both builds. The MISRA form
+   of the in-line insert takes the time stamp as an argument rather than reading
+   it itself, so the macro has to be an expression; that is why it carries no
+   trailing semicolon.  */
+
 #ifndef TX_TRACE_TIME_SOURCE
-#define TX_TRACE_TIME_SOURCE                    ((ULONG) (_tx_linux_time_stamp.tv_nsec));
+#define TX_TRACE_TIME_SOURCE                    ((ULONG) (_tx_linux_time_stamp.tv_nsec))
 #endif
-#else
+
+/* Declared here rather than used: this port supplies its own time stamp above,
+   but the generic definition in common/src/tx_misra.c is compiled for this port
+   and needs a declaration in scope.  */
+
+#ifdef TX_MISRA_ENABLE
 ULONG   _tx_misra_time_stamp_get(VOID);
-#define TX_TRACE_TIME_SOURCE                    _tx_misra_time_stamp_get()
 #endif
 
 #ifndef TX_TRACE_TIME_MASK
