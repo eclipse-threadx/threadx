@@ -14,15 +14,17 @@ cd $(dirname $0)
 repo_root=$(cd ../../.. && pwd)
 filter=$repo_root/common/src
 
-# The coverage ratchet. CI fails below these, and they are raised as the gaps
-# close, so a change that loses coverage fails here rather than in review. They
-# are deliberately not 100%: a gate nothing can pass gets turned off, and the
-# point is to hold the floor while it rises.
+# The coverage gate. CI fails below these, and they are the figures the tree
+# achieves: every line of common/src, and every branch outcome but the twenty
+# defensive ones no test can reach, which are carried as documented deviations.
 #
-# The margin below the measured figure is not slack for regressions. Branches on
-# the resume-from-ISR path are reached or missed depending on how the host
-# schedules the run, so the same tree measures a little differently each time,
-# and a gate set at the best observation fails on a tree nobody changed.
+# There is no margin below the measurement. A gate below what the tree achieves
+# is a gate a regression passes, and none is needed here: the same seven
+# configurations produce the same figure on a workstation and on a clean runner.
+#
+# The branch figure is 3150 of 3170 outcomes, 99.369%, written here to the two
+# decimal places the report prints. That reads a hundredth of a point low, which
+# is under a third of one outcome, so losing a single branch still fails.
 #
 # The denominator is the whole of common/src, over every build configuration.
 #
@@ -31,13 +33,13 @@ filter=$repo_root/common/src
 # gave it, and those numbers shift when a file compiles to a different amount of
 # code, so the same source branch is counted once per configuration that
 # renumbers it. Both figures are produced and the merged report is published
-# unchanged; the ratchet uses the union because it is the one that counts
+# unchanged; the gate uses the union because it is the one that counts
 # branches in the source, and therefore the one that does not lurch when a
 # configuration is added. Adding misra_trace_build moves the merged branch
 # denominator by roughly 830 and the union by the dozen outcomes it really
 # brings in.
-min_line=${TX_COVERAGE_MIN_LINE:-99.95}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-99.30}
+min_line=${TX_COVERAGE_MIN_LINE:-100.00}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-99.36}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
