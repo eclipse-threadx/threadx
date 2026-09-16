@@ -37,7 +37,7 @@ filter=$repo_root/common/src
 # denominator by roughly 830 and the union by the dozen outcomes it really
 # brings in.
 min_line=${TX_COVERAGE_MIN_LINE:-99.95}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-99.25}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-99.30}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
