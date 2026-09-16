@@ -43,6 +43,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_mutex_delete_test.c
     ${SOURCE_DIR}/threadx_mutex_information_test.c
     ${SOURCE_DIR}/threadx_mutex_nested_priority_inheritance_test.c
+    ${SOURCE_DIR}/threadx_mutex_misra_prioritize_test.c
     ${SOURCE_DIR}/threadx_mutex_no_preemption_test.c
     ${SOURCE_DIR}/threadx_mutex_preemption_test.c
     ${SOURCE_DIR}/threadx_mutex_priority_inheritance_test.c
@@ -109,6 +110,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_deactivate_accuracy_test.c
     ${SOURCE_DIR}/threadx_timer_information_test.c
     ${SOURCE_DIR}/threadx_timer_large_timer_accuracy_test.c
+    ${SOURCE_DIR}/threadx_timer_misra_loop_test.c
     ${SOURCE_DIR}/threadx_timer_multiple_accuracy_test.c
     ${SOURCE_DIR}/threadx_timer_multiple_test.c
     ${SOURCE_DIR}/threadx_timer_simple_test.c
