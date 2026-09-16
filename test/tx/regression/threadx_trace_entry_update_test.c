@@ -300,6 +300,43 @@ UINT    i;
         test_control_return(1);
     }
 
+#ifdef TX_ENABLE_EVENT_TRACE
+
+    /* Every update block above compares a saved time stamp against the one in
+       the entry, so a port whose time source never changes makes all of them
+       take their true branch for the wrong reason: not because the entry
+       survived, but because every entry reads the same. Check the buffer holds
+       at least one entry with a time stamp the port actually supplied. The
+       events written by this point number in the dozens, so a single zero
+       reading from a real clock cannot fail this.  */
+    {
+
+    TX_TRACE_BUFFER_ENTRY  *entry_ptr;
+    UINT                    stamped;
+
+
+        stamped =  TX_FALSE;
+
+        for (entry_ptr = _tx_trace_buffer_start_ptr; entry_ptr < _tx_trace_buffer_end_ptr; entry_ptr++)
+        {
+
+            if (entry_ptr -> tx_trace_buffer_entry_time_stamp != ((ULONG) 0))
+            {
+
+                stamped =  TX_TRUE;
+                break;
+            }
+        }
+
+        if (stamped != TX_TRUE)
+        {
+
+            printf("Running Trace Entry Update Test..................................... ERROR #13\n");
+            test_control_return(1);
+        }
+    }
+#endif
+
     if (error)
     {
 
