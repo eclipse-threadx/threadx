@@ -80,8 +80,20 @@ jobs:
     # trixie is also GCC 14, and gcc-multilib with it: the coverage build is 32
     # bit (-m32 in cmake/linux.cmake and in both test trees), so a compiler
     # without multilib cannot build this suite at all.
+    #
+    # The tag is pinned by digest as well as by name. A tag is a pointer Debian
+    # moves on every point release, so a certificate that names one names an
+    # image that can change underneath it; a digest cannot move. This is the
+    # image the published coverage figures were measured on.
+    #
+    # It fixes the base and not the whole environment: the toolchain is
+    # installed from the Debian archive at run time, so gcc, CMake and Ninja
+    # still arrive at whatever version the archive carries. scripts/install.sh
+    # prints and asserts all three, which is what makes a drifting toolchain
+    # fail the job by name and number rather than quietly produce evidence built
+    # with something else.
     container:
-      image: debian:trixie
+      image: debian:trixie@sha256:f324c7ff54321e8d9c588493a20244965938ce0aa50bbd1022d38010e9ffc4b1
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
