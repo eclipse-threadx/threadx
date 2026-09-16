@@ -222,7 +222,13 @@ jobs:
         path: |
           ${{ inputs.cmake_path }}/coverage_report
           !${{ inputs.cmake_path }}/coverage_report/per_configuration/**
-        retention-days: 1
+        # A day is the right life for a report that exists to answer "what moved
+        # in this run". On the certification branch the same report is evidence,
+        # and evidence an assessor cannot fetch from the run that produced it is
+        # evidence that has to be taken on trust. That branch therefore keeps
+        # them for the repository's own default of 90 days, which is already
+        # what the test results above get, and every other branch is unchanged.
+        retention-days: ${{ github.ref == 'refs/heads/v6.4.1_cert' && 90 || 1 }}
 
     # The per-configuration reports, kept separately so they are downloadable
     # when the merged number moves and the question is which configuration moved
@@ -234,7 +240,10 @@ jobs:
       with:
         name: coverage_detail ${{ inputs.result_affix }}
         path: ${{ inputs.cmake_path }}/coverage_report/per_configuration
-        retention-days: 1
+        # Kept as long as the merged report above, and for the same reason: these
+        # are the tracefiles the union figure and the gap inventory are computed
+        # from, so they are the ones a figure is checked against.
+        retention-days: ${{ github.ref == 'refs/heads/v6.4.1_cert' && 90 || 1 }}
           
     - name: Upload Code Coverage Pages
       uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
