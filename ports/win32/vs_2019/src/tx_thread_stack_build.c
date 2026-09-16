@@ -140,9 +140,9 @@ ALIGN_TYPE  fake_stack_ptr;
        thread's stack area and is therefore not necessarily aligned, so round the result
        down to a ULONG boundary.  This pointer is dereferenced as a ULONG below and is
        also the starting value of the stack checking logic's highest used pointer.  */
-    fake_stack_ptr =  TX_POINTER_TO_ALIGN_TYPE_CONVERT(((CHAR *) thread_ptr -> tx_thread_stack_end) - 8);
+    fake_stack_ptr =  (ALIGN_TYPE) ((VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8));
     fake_stack_ptr =  fake_stack_ptr & (~((ALIGN_TYPE) (sizeof(ULONG) - 1)));
-    thread_ptr -> tx_thread_stack_ptr =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(fake_stack_ptr);
+    thread_ptr -> tx_thread_stack_ptr =  (VOID *) ((ALIGN_TYPE) fake_stack_ptr);
 
     /* Clear the first word of the stack.  */
     *(((ULONG *) thread_ptr -> tx_thread_stack_ptr) - 1) =  0;
