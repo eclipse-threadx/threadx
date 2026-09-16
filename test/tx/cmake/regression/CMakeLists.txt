@@ -80,6 +80,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_thread_completed_test.c
     ${SOURCE_DIR}/threadx_thread_create_preemption_threshold_test.c
     ${SOURCE_DIR}/threadx_thread_delayed_suspension_test.c
+    ${SOURCE_DIR}/threadx_thread_idle_return_test.c
     ${SOURCE_DIR}/threadx_thread_information_test.c
     ${SOURCE_DIR}/threadx_thread_multi_level_preemption_threshold_test.c
     ${SOURCE_DIR}/threadx_thread_multiple_non_current_test.c
