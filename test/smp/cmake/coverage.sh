@@ -19,18 +19,33 @@ filter=$repo_root/common_smp/src
 # are deliberately not 100%: a gate nothing can pass gets turned off, and the
 # point is to hold the floor while it rises.
 #
-# The margin below the measured figure is not slack for regressions. Branches on
-# the resume-from-ISR path are reached or missed depending on how the host
-# schedules the run, so the same tree measures a little differently each time,
-# and a gate set at the best observation fails on a tree nobody changed.
+# The gate reads the union figure from coverage_union.py, not the percentage in
+# the merged report. gcovr's merge keys each branch by the basic-block pair gcov
+# gave it, and those numbers shift when a file compiles to a different amount of
+# code, so the same source branch is counted once per configuration that
+# renumbers it. Both figures are produced and the merged report is published
+# unchanged; the gate uses the union because it is the one that counts branches
+# in the source. Over the seven configurations the merged denominator reads 6334
+# where the source carries 3596, and adding misra_trace_build alone moved the
+# merged figure by 994 branches against the dozen the source really gained.
 #
-# The line gate is lower than it was, and that is not a loss of coverage. The
-# misra_build configuration compiles common_smp/src/tx_misra.c, 832 lines that
-# no other configuration compiled at all, so the denominator gained 165 lines
-# and 567 branches it never used to count. Measured over the six
-# configurations: 5283/5343 lines and 4528/5340 branches.
-min_line=${TX_COVERAGE_MIN_LINE:-98.70}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-84.00}
+# The branch gate is far below the 83.00 that preceded it and no coverage was
+# lost doing it. 83.00 was a percentage of 4773 counted branch instances; this is
+# a percentage of 3596 branches that exist in common_smp/src.
+#
+# The margin below the measured figure is not slack for regressions. Measured on
+# an unchanged tree over four clean seven-configuration runs: lines did not move
+# at all, at 5332/5396 every time, and branches read 2792, 2792, 2796 and 2798 of
+# 3596. Ten outcomes move, and every one of them is ordinal 8 or 10 of the
+# twelve-branch TX_TRACE_IN_LINE_INSERT expansion, at five sites on the thread
+# suspend, thread resume and ISR exit paths. They are reached or missed depending
+# on how the host schedules the run. Only 2790 of the 3596 were covered by every
+# one of the four runs, and the fifth site appeared for the first time on the
+# fourth -- which is the argument for the margin rather than against it. The gate
+# sits below that floor. A gate set at the best observation fails on a tree
+# nobody changed, and a zero-margin gate is earned by closing the variance.
+min_line=${TX_COVERAGE_MIN_LINE:-98.60}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-77.20}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
@@ -77,10 +92,9 @@ if [ "$1" = "--merge" ]; then
     done
 
     # Run after the reports are written, so a failed gate still leaves behind the
-    # report that explains it. stdout is the per-file table, which the reports
-    # already carry; the reason for a failure goes to stderr.
-    gcovr -r "$repo_root" "${add_args[@]}" \
-          --fail-under-line "$min_line" --fail-under-branch "$min_branch" >/dev/null || exit $?
+    # reports that explain it.
+    python3 "$(dirname "$(realpath "$0")")/coverage_union.py" \
+            coverage_report/per_configuration "$min_line" "$min_branch" || exit $?
     exit 0
 fi
 
