@@ -34,11 +34,17 @@
 
    The scratch thread is created and never started, and the stack it is given is
    a buffer of the test's own with a fence on each side, so no faulted state is
-   ever visible to the scheduler.  */
+   ever visible to the scheduler.
+
+   One of the conversions belongs to the trace component rather than the kernel
+   proper, and no kernel source uses the macro that reaches it, so it is driven
+   here alongside the others.  */
 
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#define    TX_SOURCE_CODE
+#include   "tx_trace.h"
 
 
 /* The scratch thread's stack, fenced on both sides. The check reads the word
@@ -63,6 +69,15 @@ static TX_THREAD       thread_0;
 static TX_THREAD       thread_1;
 
 static TX_TIMER        timer_0;
+
+#ifdef TX_ENABLE_EVENT_TRACE
+
+/* A trace buffer entry for the one conversion whose macro no kernel source
+   uses. Nothing reads it; the conversion only takes its address.  */
+
+static TX_TRACE_BUFFER_ENTRY  trace_entry;
+
+#endif
 
 
 /* Define thread prototypes.  */
@@ -235,6 +250,19 @@ ULONG       saved_id;
         test_control_return(1);
     }
 
+#ifdef TX_ENABLE_EVENT_TRACE
+
+    /* A trace buffer entry taken to an unsigned character pointer still
+       addresses the entry.  */
+    if (TX_ENTRY_TO_UCHAR_POINTER_CONVERT(&trace_entry) != (UCHAR *) &trace_entry)
+    {
+
+        printf("ERROR #8\n");
+        test_control_return(1);
+    }
+
+#endif
+
 #ifdef TX_MISRA_ENABLE
 
     thread_ptr =   &thread_1;
@@ -270,7 +298,7 @@ ULONG       saved_id;
     if (thread_ptr -> tx_thread_stack_highest_ptr != thread_ptr -> tx_thread_stack_ptr)
     {
 
-        printf("ERROR #8\n");
+        printf("ERROR #9\n");
         test_control_return(1);
     }
 
@@ -307,7 +335,7 @@ ULONG       saved_id;
     if (thread_ptr -> tx_thread_stack_highest_ptr != (VOID *) (stack_start + 1))
     {
 
-        printf("ERROR #9\n");
+        printf("ERROR #10\n");
         test_control_return(1);
     }
 
