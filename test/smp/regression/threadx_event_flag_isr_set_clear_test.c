@@ -1,6 +1,7 @@
 /* This test is designed to test for simultaneous thread event flag set AND ISR event flag set and clear.  */
 
 #include   <stdio.h>
+#include   <time.h>
 #include   "tx_api.h"
 #include   "tx_thread.h"
 #include   "tx_timer.h"
@@ -237,15 +238,37 @@ static void    thread_0_entry(ULONG thread_input)
 UINT    status;
 ULONG   actual;
 
+/* The window this test waits for is probabilistic, and the handler above says as
+   much: it can settle into a resonance in which the condition is never met.
+   Waiting for it without a bound means such a run never ends. This is the same
+   construction as threadx_thread_wait_abort_and_isr_test, which has been given a
+   bound already, and it is bounded here the same way and for the same reasons.
+
+   The budget is in wall clock seconds rather than ticks. A tick arrives only when
+   the port's timer thread runs, so the tick clock falls behind real time under
+   load or instrumentation, which is exactly when the wait gets long. On this port
+   that gap is wider than on the non-SMP one, because four emulated cores share a
+   single host timer thread.
+
+   The count asked for is left at forty. This loop reaches forty windows in well
+   under two seconds in all eight configurations, so there is nothing to gain by
+   asking for fewer and the budget is never approached by a healthy run.  */
+#define EVENT_FLAG_WINDOWS_WANTED   ((ULONG) 40)
+#define EVENT_FLAG_SECOND_BUDGET    ((ULONG) 120)
+
+time_t  start_wall;
+
 
     /* Inform user.  */
     printf("Running Event Flag Set/Clear from ISR Test.......................... ");
 
     /* Setup the test ISR.  */
-    test_isr_dispatch =  test_isr;  
+    test_isr_dispatch =  test_isr;
 
     /* Loop to exploit the probability window inside tx_event_flags_set call.  */
-    while (condition_count < 40)
+    start_wall =  time(TX_NULL);
+    while ((condition_count < EVENT_FLAG_WINDOWS_WANTED) &&
+           (((ULONG) (time(TX_NULL) - start_wall)) <= EVENT_FLAG_SECOND_BUDGET))
     {
 
         /* Suspend on the event_flags that is going to be set via the ISR.  */
@@ -283,6 +306,24 @@ ULONG   actual;
 
     /* Let the other threads run once more...  */
     tx_thread_relinquish();
+
+    /* Say what this run reached, on every run and not only a short one. A count
+       printed only on shortfall cannot be told apart from a count nobody
+       recorded, and this line is what the CI artifacts carry.  */
+    printf("(reached %lu of %lu windows in %lu seconds) ",
+           (ULONG) condition_count, EVENT_FLAG_WINDOWS_WANTED,
+           (ULONG) (time(TX_NULL) - start_wall));
+
+    /* Reached it no times?  Then the window this test exists to exercise was
+       never entered, and the accounting check below would pass on bookkeeping
+       that says nothing about it.  */
+    if (condition_count == 0)
+    {
+
+        /* Test error!  */
+        printf("ERROR #11\n");
+        test_control_return(4);
+    }
 
     /* At this point, check to see if we got all the event_flagss!  */
     if ((thread_0_counter != event_flags_set_counter) ||
