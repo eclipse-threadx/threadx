@@ -123,9 +123,22 @@ jobs:
         TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.build_script }}
 
+    # CTEST_REPEAT_FAIL gives ctest --repeat until-pass:N, and the runner script
+    # defaults it to 2. One attempt is what this branch wants, because a second
+    # attempt reports an intermittent failure as a pass and these runs are
+    # certification evidence. Measured on this commit: over 112 configuration
+    # runs, four were not green on the first attempt -- two SMP tests that hung
+    # for the full 1000-second timeout and two that failed outright -- and all
+    # fourteen runs reported success. A retry is a reasonable default for
+    # day-to-day CI and cannot be one here, where a green run has to mean the
+    # suite passed rather than that it passed eventually. Reading it back out of
+    # the logs afterwards is not an equivalent: a timed-out attempt prints its
+    # own 1000-second line, so the run's total matches the sum of its test times
+    # and the discrepancy that would betray it does not exist.
     - name: Test
       env:
         TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
+        CTEST_REPEAT_FAIL: 1
       run: ${{ inputs.test_script }}
       
     - name: Publish Test Results
