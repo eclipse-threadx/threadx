@@ -178,8 +178,28 @@ UINT    status;
     /* Sleep for 63 ticks.  */
     tx_thread_sleep(63);
 
-    /* Check the run counters.  */
-    if ((thread_1_counter != 33) || (thread_2_counter != 13))
+    /* Check the run counters.
+
+       Thread 1 gets a two tick timeout and thread 2 a five tick one, and both
+       increment their counter once per pass, so over a window of W ticks their
+       counters read 1 + W/2 and 1 + W/5. W is the 63 tick sleep above plus
+       whatever part of a tick separates it from the moment the two threads first
+       ran, and on this port a tick is produced by a host timer thread rather
+       than by hardware, so neither end of it is exact. W is 64 ticks nominally
+       and the counters read 33 and 13. An exact equality on either is a test
+       that fails on the port's own jitter, which is what happened here, and the
+       ThreadX copy of this test was given a margin for the same reason.
+
+       The upper bounds are what the timeouts allow: a tick more of window and
+       no more. The lower bounds carry the port's starvation instead, because a
+       thread that does not get a core simply runs fewer times. Measured over
+       four hundred runs across the eight build configurations, half of them with
+       the machine deliberately loaded, thread 1 read 31 to 33 and thread 2 read
+       13 or 14. Thirty-two and twelve leave that a margin of three and one, and
+       are still tight enough to fail a timeout one tick longer than it should
+       be, which would read 22 and 11.  */
+    if ((thread_1_counter < 28) || (thread_1_counter > 34) ||
+        (thread_2_counter < 12) || (thread_2_counter > 14))
     {
 
         /* Event flag error.  */
