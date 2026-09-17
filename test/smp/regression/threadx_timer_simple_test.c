@@ -226,6 +226,7 @@ static void    thread_0_entry(ULONG thread_input)
 UINT    tx_interrupt_save;
 UINT    status;
 ULONG   exclusion_map;
+ULONG   current_time;
 
 
     /* Inform user.  */
@@ -560,8 +561,32 @@ ULONG   exclusion_map;
     /* Sleep for 120.  */
     tx_thread_sleep(120);
 
-    /* Check the counters to make sure everything is where it should be.  */
-    if ((timer_0_counter != 23) || (tx_time_get() != 120))
+    /* Check the counters to make sure everything is where it should be.
+
+       The timer was changed to expire at tick 100 and then on every tick, the
+       clock was cleared just before it was activated, and two expirations had
+       already been counted, so the counter can never exceed the clock less 97.
+       That ceiling is exact and it is what catches a timer expiring too often.
+       Equality with it is not: expirations are processed by the system timer
+       thread rather than in the interrupt, so under load the counter lags the
+       clock by a tick or two and catches up afterwards. Measured over four
+       hundred runs across the eight build configurations, half of them with the
+       machine deliberately loaded, the counter read 22 or 23 and the clock 120,
+       121 or 122; before the port's mutex defect was fixed it reached 27 at a
+       clock of 127.
+
+       Requiring the clock to read exactly 120 fails on scheduling latency alone
+       and takes the counter check down with it, which is what happened here. The
+       floor of twenty says the timer expired at least eighteen of the twenty one
+       times it was given, which a period of two ticks -- thirteen -- does not
+       reach.
+
+       The clock is read once into a local because the interrupt that advances
+       it also advances the counter, and it advances the clock first, so two
+       separate reads can straddle a tick.  */
+    current_time =  tx_time_get();
+    if ((current_time < 120) || (timer_0_counter < 20) ||
+        (timer_0_counter > (current_time - 97)))
     {
 
         /* Application timer error.  */
