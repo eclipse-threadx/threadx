@@ -7,7 +7,7 @@ project(threadx_smp_test LANGUAGES C)
 # Set build configurations
 set(BUILD_CONFIGURATIONS default_build_coverage
                          disable_notify_callbacks_build stack_checking_build stack_checking_rand_fill_build
-                         trace_build misra_build misra_trace_build)
+                         trace_build misra_build misra_trace_build smp_debug_build)
 set(CMAKE_CONFIGURATION_TYPES
     ${BUILD_CONFIGURATIONS}
     CACHE STRING "list of supported configuration types" FORCE)
@@ -48,6 +48,15 @@ set(misra_build -DTX_MISRA_ENABLE)
 # It needs TX_SOURCE_CODE as well, which is applied to the kernel target further
 # down rather than here -- see the comment there for why.
 set(misra_trace_build -DTX_MISRA_ENABLE -DTX_ENABLE_EVENT_TRACE)
+
+# TX_THREAD_SMP_DEBUG_ENABLE is the SMP tree's second whole-file macro.
+# common_smp/src/tx_thread_smp_debug_entry_insert.c sits entirely under it and
+# nothing defined it, so the file compiled to nothing in every configuration and
+# was absent from the coverage denominator rather than uncovered in it. Eight
+# further files carry regions behind the same macro, all of them top-level rather
+# than nested inside another guard, so this one configuration reaches every one
+# of them and no combination build is needed.
+set(smp_debug_build -DTX_THREAD_SMP_DEBUG_ENABLE)
 
 add_compile_options(
   -m32

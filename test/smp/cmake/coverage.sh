@@ -25,27 +25,34 @@ filter=$repo_root/common_smp/src
 # code, so the same source branch is counted once per configuration that
 # renumbers it. Both figures are produced and the merged report is published
 # unchanged; the gate uses the union because it is the one that counts branches
-# in the source. Over the seven configurations the merged denominator reads 6334
-# where the source carries 3596, and adding misra_trace_build alone moved the
+# in the source. Over the eight configurations the merged denominator reads 6587
+# where the source carries 3608, and adding misra_trace_build alone moved the
 # merged figure by 994 branches against the dozen the source really gained.
 #
 # The branch gate is far below the 83.00 that preceded it and no coverage was
 # lost doing it. 83.00 was a percentage of 4773 counted branch instances; this is
-# a percentage of 3596 branches that exist in common_smp/src.
+# a percentage of the 3608 branches that exist in common_smp/src.
 #
-# The margin below the measured figure is not slack for regressions. Measured on
-# an unchanged tree over four clean seven-configuration runs: lines did not move
-# at all, at 5332/5396 every time, and branches read 2792, 2792, 2796 and 2798 of
-# 3596. Ten outcomes move, and every one of them is ordinal 8 or 10 of the
+# The margin below the measured figure is not slack for regressions. The same
+# unchanged tree does not measure identically twice, on either axis.
+#
+# Branches move by ten outcomes, and every one is ordinal 8 or 10 of the
 # twelve-branch TX_TRACE_IN_LINE_INSERT expansion, at five sites on the thread
-# suspend, thread resume and ISR exit paths. They are reached or missed depending
-# on how the host schedules the run. Only 2790 of the 3596 were covered by every
-# one of the four runs, and the fifth site appeared for the first time on the
-# fourth -- which is the argument for the margin rather than against it. The gate
-# sits below that floor. A gate set at the best observation fails on a tree
-# nobody changed, and a zero-margin gate is earned by closing the variance.
+# suspend, thread resume and ISR exit paths, plus one in tx_timer_info_get.c.
+# Over four seven-configuration runs the union read 2792, 2792, 2796 and 2798 of
+# 3596, and only 2790 were covered by all four -- the fifth unstable site appeared
+# for the first time on the fourth run. Over eight it reads 2805, 2808 and 2810 of
+# 3608.
+#
+# Lines move by two: tx_timer_info_get.c:164 and :166 are hit in most runs and
+# missed in some. Four seven-configuration runs hit them every time, which is why
+# they were first recorded as stable; the eighth-configuration runs read 5386,
+# 5386 and 5384 of 5450 and settled the question the other way.
+#
+# The gate sits about ten lines and sixteen outcomes below the worst observation.
+# A zero margin is earned by closing that variance rather than by asserting it.
 min_line=${TX_COVERAGE_MIN_LINE:-98.60}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-77.20}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-77.30}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
