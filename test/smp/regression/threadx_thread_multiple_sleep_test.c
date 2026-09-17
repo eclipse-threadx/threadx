@@ -161,8 +161,20 @@ static void    thread_3_entry(ULONG thread_input)
     /* Clear the tick count. */
     tx_time_set(0);
 
-    /* Sleep for 100 ticks (+1 in case tick before threads 0,1,2 have run). */
-    tx_thread_sleep(101);
+    /* Sleep long enough that the three sleepers have each run exactly four
+       times, with room for them to have started late.
+
+       Each of them increments its counter and then sleeps 33 ticks, so a thread
+       whose first pass falls at tick s has run four times over the window
+       [s+99, s+131] and five times after that. Reading the counters at tick T
+       therefore requires s to sit between T-131 and T-99. At T=101 that allows
+       s of 0, 1 or 2, and s is decided by how quickly the three get a core,
+       which on this port is a host timer thread and four emulated cores rather
+       than hardware: three ticks of start delay was enough to fail this test.
+       Reading at 115 puts the check in the middle of the 33 tick window instead
+       of at its edge and allows s up to 16, while still requiring exactly four
+       passes -- a fifth cannot arrive before tick s+132.  */
+    tx_thread_sleep(115);
 
     /* Determine if the sleep was accurate.  */
     if ((thread_0_counter == 4) && (thread_1_counter == 4) &&
