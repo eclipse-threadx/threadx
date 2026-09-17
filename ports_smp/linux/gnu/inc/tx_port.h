@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -7,6 +8,8 @@
  * 
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -512,6 +515,16 @@ typedef struct
     pthread_t       tx_linux_mutex_owner;
     ULONG           tx_linux_mutex_nested_count;
 } TX_LINUX_MUTEX;
+
+
+/* Define how long a thread waits on the Linux mutex before retrying. A thread
+   parked on the mutex can be suspended by the port's signal handler and so never
+   act on the wake-up the next release sends it, which leaves the wake-up lost
+   and every other waiter parked on a mutex that is free.  */
+
+#ifndef TX_LINUX_MUTEX_RETRY_NSEC
+#define TX_LINUX_MUTEX_RETRY_NSEC       1000000
+#endif
 
 
 /* Define Linux-specific critical section APIs.  */
