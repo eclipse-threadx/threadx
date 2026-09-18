@@ -78,8 +78,14 @@ ULONG   current_time;
     /* Call internal function to cover this function.  */
     current_time =  _tx_time_get();
 
-    /* Check Current time.  It should be 35. */
-    if (current_time != 35)
+    /* Check Current time.  It should be 35, or 36 if this thread was given a core
+       a tick after its sleep expired. The clock was cleared and then slept on for
+       35 ticks, so anything below 35 is a sleep that ended early and is a real
+       fault; above it is the latency of being scheduled again, which on this port
+       is a host timer thread and four emulated cores rather than hardware. The
+       same one tick band is already in threadx_thread_simple_sleep_test, which
+       accepts 18 or 19 after sleeping 18.  */
+    if ((current_time < 35) || (current_time > 36))
     {
 
         /* System time error.  */
