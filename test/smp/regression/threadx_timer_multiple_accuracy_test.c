@@ -97,12 +97,19 @@ static void    thread_0_entry(ULONG thread_input)
 {
 
 UINT    status;
+ULONG   start_time;
+ULONG   elapsed;
 
     /* Inform user.  */
     printf("Running Timer Multiple Timer Accuracy Test.......................... ");
 
     /* Sleep to get a fresh timer. */
     tx_thread_sleep(1);
+
+    /* Note when the timers are about to be activated, so the counters below can
+       be checked against the window that actually elapsed rather than the one
+       that was asked for.  */
+    start_time =  tx_time_get();
 
     /* Activate all the timers.  */
     status =  tx_timer_activate(&timer_0);
@@ -141,9 +148,27 @@ UINT    status;
     /* Sleep for a some ticks.  */
     tx_thread_sleep(300);
 
-    /* Insure that each timer ran twice.  */
-    if ((timer_0_counter != 300) || (timer_1_counter != 150) ||
-        (timer_2_counter != 100))
+    /* Insure that each timer ran as often as its period allows.
+
+       The three timers have periods of one, two and three ticks and the sleep
+       above asks for 300, so the nominal counts are 300, 150 and 100 and the
+       period-one timer changes its count on every single tick. An exact equality
+       therefore has no margin at all: this thread is woken by a host timer thread
+       and given one of four emulated cores, so a wake one tick late moves every
+       counter, and the expirations themselves are processed by the system timer
+       thread rather than in the interrupt, so under load the counters lag the
+       clock and catch up afterwards. It was seen failing on exactly that.
+
+       What is exact, and is the property being checked, is that a timer cannot
+       expire more often than its period allows over the window that elapsed. That
+       is the ceiling. The floors allow five ticks of lag and are still far tighter
+       than any period error: a period of two ticks on the first timer would read
+       about 150 against a floor of 295.  */
+    elapsed =  tx_time_get() - start_time;
+    if ((elapsed < 300) ||
+        (timer_0_counter > elapsed) || (timer_0_counter < 295) ||
+        (timer_1_counter > (elapsed / 2)) || (timer_1_counter < 145) ||
+        (timer_2_counter > (elapsed / 3)) || (timer_2_counter < 95))
     {
 
         /* Application timer error.  */
