@@ -227,6 +227,7 @@ static void    thread_0_entry(ULONG thread_input)
 {
 
 UINT    status;
+UINT    original_threshold;
 
 
 
@@ -245,7 +246,32 @@ UINT    status;
 
     /* Now sleep for 20 ticks to let see if all the threads execute.  */
     tx_thread_sleep(20);
-    
+
+    /* Release thread 31h's preemption threshold before asking whether everything
+       ran.
+
+       thread 31h is created with a preemption threshold of 30 against its
+       priority of 31, which is deliberate: it is what reaches the branch in
+       _tx_thread_time_slice where an expired time-slice thread is replaced by a
+       thread with preemption-threshold enabled. It also means that while the
+       scheduler has 31h recorded as the thread running under a threshold,
+       _tx_thread_smp_rebalance_execute_list will not place any thread of
+       priority at or below that threshold on any core at all -- "nothing else is
+       allowed to execute after the preemption-threshold thread". The other seven
+       are all at priority 31, so they can be locked out of all four cores for the
+       whole window, and in about one run in twenty they are: 31a, 31b and 31c
+       finish with a run count of zero, cores 2 and 3 sit idle with a null
+       execute pointer, and 31h runs unbroken. That is the scheduler doing what it
+       says it does, not a fault, so the fairness this test checks has to be asked
+       for after the threshold is released rather than while it is held.
+
+       The branch the threshold exists for has already been taken by the twenty
+       ticks above.  */
+    status += tx_thread_preemption_change(&thread_31h, 31, &original_threshold);
+
+    /* Now give everything that was locked out its turn.  */
+    tx_thread_sleep(20);
+
     /* Now check and make sure all the threads ran.  */
     if ((status != TX_SUCCESS) || (thread_31a_counter == 0) || (thread_31b_counter == 0) || (thread_31c_counter == 0) || (thread_31d_counter == 0) ||
         (thread_31e_counter == 0) || (thread_31f_counter == 0) || (thread_31g_counter == 0) || (thread_31h_counter == 0))
