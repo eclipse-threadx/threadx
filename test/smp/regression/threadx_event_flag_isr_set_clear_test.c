@@ -271,8 +271,19 @@ time_t  start_wall;
            (((ULONG) (time(TX_NULL) - start_wall)) <= EVENT_FLAG_SECOND_BUDGET))
     {
 
-        /* Suspend on the event_flags that is going to be set via the ISR.  */
-        status =  tx_event_flags_get(&event_flags_0, 2, TX_OR_CLEAR, &actual, 4);
+        /* Suspend on the event_flags that is going to be set via the ISR.
+
+           The suspension is given a hundred ticks rather than four. The ISR only
+           acts when both threads are suspended on the group at the same moment,
+           so this thread's wait has to outlast however long the other one takes
+           to come back round and suspend again -- and on this port that is four
+           emulated cores handing threads about through a single scheduler
+           thread, not a hardware context switch. Four ticks is a scheduling
+           budget with no margin, and it was observed running out: one run in a
+           thousand ended here with TX_NO_EVENTS and reported the error below
+           while nothing was wrong. What the check is for is a set that never
+           reaches a suspended thread, and a hundred ticks still catches that.  */
+        status =  tx_event_flags_get(&event_flags_0, 2, TX_OR_CLEAR, &actual, 100);
 
         /* Determine if we have an unexpected result.  */
         if (status != TX_SUCCESS) 
@@ -355,8 +366,10 @@ ULONG   actual;
     while (1)
     {
 
-        /* Suspend on the event_flags that is going to be set via the ISR.  */
-        status =  tx_event_flags_get(&event_flags_0, 1, TX_OR_CLEAR, &actual, 4);
+        /* Suspend on the event_flags that is going to be set via the ISR. The
+           hundred ticks are this thread's half of the budget described above:
+           whichever of the two suspends first has to wait for the other.  */
+        status =  tx_event_flags_get(&event_flags_0, 1, TX_OR_CLEAR, &actual, 100);
 
         /* Determine if we have an unexpected result.  */
         if (status != TX_SUCCESS) 
