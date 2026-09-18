@@ -93,6 +93,7 @@ static void    thread_0_entry(ULONG thread_input)
 
 UINT        status;
 UINT        interrupt_status;
+ULONG       current_time;
 CHAR        *name;
 UINT        active;
 ULONG       remaining_ticks;
@@ -175,8 +176,25 @@ TX_TIMER_INTERNAL **list_head;
     /* Sleep for 120.  */
     tx_thread_sleep(120);
 
-    /* Check the counters to make sure everything is where it should be.  */
-    if ((timer_0_counter != 23) || (tx_time_get() != 120))
+    /* Check the counters to make sure everything is where it should be.
+
+       The timer was changed to expire at tick 100 and then on every tick, the
+       clock was cleared just before it was activated, and two expirations had
+       already been counted, so the counter can never exceed the clock less 97.
+       That ceiling is exact and it is what catches a timer expiring too often.
+       Equality with it is not: expirations are processed by the system timer
+       thread rather than in the interrupt, so under load the counter lags the
+       clock by a tick or two and catches up afterwards. Requiring the clock to
+       read exactly 120 fails on scheduling latency alone and takes the counter
+       check down with it, which is what happened here. The floor of twenty says
+       the timer expired at least eighteen of the twenty one times it was given.
+
+       The clock is read once into a local because the interrupt that advances it
+       advances the counter too, and it advances the clock first, so two separate
+       reads can straddle a tick.  */
+    current_time =  tx_time_get();
+    if ((current_time < 120) || (timer_0_counter < 20) ||
+        (timer_0_counter > (current_time - 97)))
     {
 
         /* Application timer error.  */

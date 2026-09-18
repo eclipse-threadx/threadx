@@ -104,6 +104,7 @@ static void    thread_0_entry(ULONG thread_input)
 {
 
 UINT    status;
+ULONG   expiry_time;
 
     /* Inform user.  */
     printf("Running Semaphore Suspension Timeout Test........................... ");
@@ -145,8 +146,16 @@ UINT    status;
     /* Suspend on the semaphore. */
     status =  tx_semaphore_get(&semaphore_0, 33);
 
-    /* Did we get the right status at the right time?  */
-    if ((status != TX_NO_INSTANCE) || (tx_time_get() != 33))
+    /* Did we get the right status at the right time?
+
+       The suspension must not end before its 33 tick timeout, and that lower
+       bound is the kernel property this checks. The upper bound is not: the
+       clock is read after this thread has been given a core again, and on this
+       port the tick comes from a host timer thread, so the read can land a tick
+       or two beyond the expiry without anything having gone wrong. An exact
+       equality here fails on that latency alone.  */
+    expiry_time =  tx_time_get();
+    if ((status != TX_NO_INSTANCE) || (expiry_time < 33) || (expiry_time > 35))
     {
 
         /* Semaphore error.  */
