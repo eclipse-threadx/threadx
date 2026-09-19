@@ -36,28 +36,30 @@ filter=$repo_root/common_smp/src
 # The margin below the measured figure is not slack for regressions. The same
 # unchanged tree does not measure identically twice, on either axis.
 #
-# Branches move by up to eight outcomes. Eleven of them are unstable over seven CI
-# runs on an unchanged tree: ten are ordinal 8 or 10 of the twelve-branch
-# TX_TRACE_IN_LINE_INSERT expansion, on the thread suspend, thread resume and ISR
-# exit paths, and one is the timer list wrap in tx_timer_info_get.c. Those seven
-# runs and two clean local ones read 2906, 2908, 2909, 2909, 2909, 2910, 2911,
-# 2911 and 2914 of 3610.
+# Branches move by three outcomes and five are unstable over seven CI runs on an
+# unchanged tree: ordinals 8 and 10 of the twelve-branch TX_TRACE_IN_LINE_INSERT
+# expansion in tx_trace_isr_enter_insert.c and tx_trace_isr_exit_insert.c, which
+# are the buffer-wrap arm reached by coincidence rather than on purpose, and the
+# timer list wrap in tx_timer_info_get.c. Those seven runs and two clean local
+# ones read 3114, 3115, 3115, 3115, 3116, 3116, 3116, 3117 and 3117 of 3610.
 #
-# The floor below rises because the queue trace test closed 103 outcomes that were
-# uncovered in every earlier run and are now covered in every run. None of the
-# unstable ones is among them: they belong to the thread and trace families and
-# close with those batches.
+# That is down from eleven unstable outcomes and a spread of eight. The thread
+# trace test closed eight of the eleven -- the same two ordinals on the thread
+# resume, thread suspend, system resume and system suspend inserts -- and they are
+# now covered in every run rather than in some. The two in
+# tx_trace_isr_enter_insert.c came back the other way, from uncovered in seven
+# consecutive runs to unstable, which is the same lesson from the other side: what
+# a sample calls stable is a property of the sample.
 #
 # Lines move by two: tx_timer_info_get.c:164 and :166 are hit in most runs and
-# missed in some. The same nine runs read 5390 and 5392 of 5450.
+# missed in some. The same nine runs read 5394 and 5396 of 5450.
 #
-# The gate sits ten lines and fourteen outcomes below the worst observation, which
-# is a little wider than the margin it replaces: an outcome's stability is itself a
-# function of how many runs have been looked at, and two that seven runs called
-# unstable were uncovered in all seven of the next seven. A zero margin is earned
-# by closing that variance rather than by asserting it.
-min_line=${TX_COVERAGE_MIN_LINE:-98.70}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-80.10}
+# The gate sits ten lines and eleven outcomes below the worst observation. The
+# floor a run can honestly reach is the set covered in every run -- 5394 lines and
+# 3113 outcomes -- and the gate is ten below each of those, which is headroom for
+# the outcomes a later sample reclassifies rather than slack for a regression.
+min_line=${TX_COVERAGE_MIN_LINE:-98.78}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-85.95}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
