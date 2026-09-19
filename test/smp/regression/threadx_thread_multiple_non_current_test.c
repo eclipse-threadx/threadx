@@ -1,3 +1,13 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation 
+ * 
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ * 
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
 /* This test is designed to see if multiple non-current threads can be suspended.  
    The order the suspension and resumption occurs makes sure everything is working 
    right. Thread execution should remain predictable even after suspension and 
