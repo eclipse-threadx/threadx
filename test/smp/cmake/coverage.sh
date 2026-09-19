@@ -25,34 +25,39 @@ filter=$repo_root/common_smp/src
 # code, so the same source branch is counted once per configuration that
 # renumbers it. Both figures are produced and the merged report is published
 # unchanged; the gate uses the union because it is the one that counts branches
-# in the source. Over the eight configurations the merged denominator reads 6587
-# where the source carries 3608, and adding misra_trace_build alone moved the
+# in the source. Over the eight configurations the merged denominator reads 6595
+# where the source carries 3610, and adding misra_trace_build alone moved the
 # merged figure by 994 branches against the dozen the source really gained.
 #
 # The branch gate is far below the 83.00 that preceded it and no coverage was
 # lost doing it. 83.00 was a percentage of 4773 counted branch instances; this is
-# a percentage of the 3608 branches that exist in common_smp/src.
+# a percentage of the 3610 branches that exist in common_smp/src.
 #
 # The margin below the measured figure is not slack for regressions. The same
 # unchanged tree does not measure identically twice, on either axis.
 #
-# Branches move by ten outcomes, and every one is ordinal 8 or 10 of the
-# twelve-branch TX_TRACE_IN_LINE_INSERT expansion, at five sites on the thread
-# suspend, thread resume and ISR exit paths, plus one in tx_timer_info_get.c.
-# Over four seven-configuration runs the union read 2792, 2792, 2796 and 2798 of
-# 3596, and only 2790 were covered by all four -- the fifth unstable site appeared
-# for the first time on the fourth run. Over eight it reads 2805, 2808 and 2810 of
-# 3608.
+# Branches move by up to eight outcomes. Eleven of them are unstable over seven CI
+# runs on an unchanged tree: ten are ordinal 8 or 10 of the twelve-branch
+# TX_TRACE_IN_LINE_INSERT expansion, on the thread suspend, thread resume and ISR
+# exit paths, and one is the timer list wrap in tx_timer_info_get.c. Those seven
+# runs and two clean local ones read 2906, 2908, 2909, 2909, 2909, 2910, 2911,
+# 2911 and 2914 of 3610.
+#
+# The floor below rises because the queue trace test closed 103 outcomes that were
+# uncovered in every earlier run and are now covered in every run. None of the
+# unstable ones is among them: they belong to the thread and trace families and
+# close with those batches.
 #
 # Lines move by two: tx_timer_info_get.c:164 and :166 are hit in most runs and
-# missed in some. Four seven-configuration runs hit them every time, which is why
-# they were first recorded as stable; the eighth-configuration runs read 5386,
-# 5386 and 5384 of 5450 and settled the question the other way.
+# missed in some. The same nine runs read 5390 and 5392 of 5450.
 #
-# The gate sits about ten lines and sixteen outcomes below the worst observation.
-# A zero margin is earned by closing that variance rather than by asserting it.
-min_line=${TX_COVERAGE_MIN_LINE:-98.60}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-77.30}
+# The gate sits ten lines and fourteen outcomes below the worst observation, which
+# is a little wider than the margin it replaces: an outcome's stability is itself a
+# function of how many runs have been looked at, and two that seven runs called
+# unstable were uncovered in all seven of the next seven. A zero margin is earned
+# by closing that variance rather than by asserting it.
+min_line=${TX_COVERAGE_MIN_LINE:-98.70}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-80.10}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
