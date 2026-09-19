@@ -92,6 +92,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_thread_multiple_suspension_test.c
     ${SOURCE_DIR}/threadx_thread_multiple_time_slice_test.c
     ${SOURCE_DIR}/threadx_thread_preemptable_suspension_test.c
+    ${SOURCE_DIR}/threadx_thread_idle_core_test.c
     ${SOURCE_DIR}/threadx_thread_preemption_change_test.c
     ${SOURCE_DIR}/threadx_thread_priority_change.c
     ${SOURCE_DIR}/threadx_thread_relinquish_test.c
