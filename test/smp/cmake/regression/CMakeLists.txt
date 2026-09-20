@@ -44,6 +44,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_mutex_delete_test.c
     ${SOURCE_DIR}/threadx_mutex_information_test.c
     ${SOURCE_DIR}/threadx_mutex_inherit_priority_change_test.c
+    ${SOURCE_DIR}/threadx_misra_shim_test.c
     ${SOURCE_DIR}/threadx_mutex_misra_prioritize_test.c
     ${SOURCE_DIR}/threadx_mutex_nested_priority_inheritance_test.c
     ${SOURCE_DIR}/threadx_mutex_no_preemption_test.c
