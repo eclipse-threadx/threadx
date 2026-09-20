@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
  * 
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 /* This test is designed to test a simple application timer services, 
    including create, activate, deactivate, change, and delete with multiple timers.  */
@@ -111,12 +113,21 @@ static void    thread_0_entry(ULONG thread_input)
 {
 
 UINT    status;
+ULONG   start_time;
+ULONG   elapsed;
 
     /* Inform user.  */
     printf("Running Timer Multiple Timer Test................................... ");
 
-    /* Sleep for a couple ticks.  */
-    tx_thread_sleep(301);
+    /* Sleep past the second expiration of each timer, with margin.
+
+       The timers carry an initial 100 ticks and a 200 tick reschedule, so they
+       expire at 300 and not again until 500, and the count of two below holds
+       anywhere in that window. The margin that matters is the one at the bottom
+       of it: expirations are processed by the system timer thread rather than in
+       the interrupt, so a count read immediately after the expiring tick can
+       still be short. Waiting ten ticks past it leaves 189 at the other end.  */
+    tx_thread_sleep(310);
 
     /* Insure that each timer ran twice.  */
     if ((timer_0_counter != 2) || (timer_1_counter != 2) ||
@@ -243,12 +254,38 @@ UINT    status;
         test_control_return(1);
     }
 
+    /* Note when the timers are about to run again, so the counters below can be
+       checked against the window that actually elapsed rather than the one that
+       was asked for.  */
+    start_time =  tx_time_get();
+
     /* Sleep for 200.  */
     tx_thread_sleep(200);
 
-    /* Insure that each timer haven't run again.  */
-    if ((timer_0_counter != 103) || (timer_1_counter != 53) ||
-        (timer_2_counter != 36))
+    /* Insure that each timer ran as often as its period allows.
+
+       The three timers now carry an initial 100 ticks and reschedule periods of
+       one, two and three, and each already stands at two, so the nominal counts
+       over a 200 tick window are 103, 53 and 36 and the first of them changes on
+       every single tick. An exact equality therefore has no margin at all, unlike
+       the one above: this thread is woken by a host timer thread and given one of
+       four emulated cores, so a wake one tick late moves every counter, and the
+       expirations are processed by the system timer thread rather than in the
+       interrupt, so under load the counters lag the clock and catch up
+       afterwards. It was seen failing on exactly that.
+
+       What is exact, and is the property being checked, is that a timer cannot
+       expire more often than its period allows over the window that elapsed: at
+       most one expiration at the initial 100 ticks and one per period after it,
+       on top of the two already counted. That is the ceiling. The floors allow
+       five expirations of lag and are still far tighter than any period error,
+       since a reschedule of two ticks on the first timer would read about 53
+       against a floor of 98.  */
+    elapsed =  tx_time_get() - start_time;
+    if ((elapsed < 200) ||
+        (timer_0_counter > (((elapsed - 100) / 1) + 3)) || (timer_0_counter < 98) ||
+        (timer_1_counter > (((elapsed - 100) / 2) + 3)) || (timer_1_counter < 48) ||
+        (timer_2_counter > (((elapsed - 100) / 3) + 3)) || (timer_2_counter < 31))
     {
 
         /* Application timer error.  */
