@@ -34,32 +34,32 @@ filter=$repo_root/common_smp/src
 # a percentage of the 3610 branches that exist in common_smp/src.
 #
 # The margin below the measured figure is not slack for regressions. The same
-# unchanged tree does not measure identically twice, on either axis.
+# unchanged tree does not measure identically twice on the branch axis.
 #
-# Branches move by three outcomes and five are unstable over seven CI runs on an
-# unchanged tree: ordinals 8 and 10 of the twelve-branch TX_TRACE_IN_LINE_INSERT
-# expansion in tx_trace_isr_enter_insert.c and tx_trace_isr_exit_insert.c, which
-# are the buffer-wrap arm reached by coincidence rather than on purpose, and the
-# timer list wrap in tx_timer_info_get.c. Those seven runs and two clean local
-# ones read 3114, 3115, 3115, 3115, 3116, 3116, 3116, 3117 and 3117 of 3610.
+# It does now on the line axis. Seven CI runs read 5396 of 5450 lines, every one
+# of them, and every line is either covered in all seven or in none: the two that
+# used to move, tx_timer_info_get.c:164 and :166, are the wrapped arm of the timer
+# list calculation, which is now reached by an arrangement the test builds rather
+# than by where the tick happened to leave the list pointer.
 #
-# That is down from eleven unstable outcomes and a spread of eight. The thread
-# trace test closed eight of the eleven -- the same two ordinals on the thread
-# resume, thread suspend, system resume and system suspend inserts -- and they are
-# now covered in every run rather than in some. The two in
-# tx_trace_isr_enter_insert.c came back the other way, from uncovered in seven
-# consecutive runs to unstable, which is the same lesson from the other side: what
-# a sample calls stable is a property of the sample.
+# Branches move by five outcomes over the same seven runs, which read 3194, 3195,
+# 3195, 3195, 3197, 3199 and 3199 of 3610. The five: ordinals 8 and 10 of
+# the twelve-branch TX_TRACE_IN_LINE_INSERT expansion in tx_trace_isr_enter_insert.c
+# and tx_trace_isr_exit_insert.c, which are the buffer-wrap arm reached by
+# coincidence rather than on purpose, and the exit arm of the ready-list walk in
+# tx_thread_time_slice.c:311, which depends on the shape of the ready list when a
+# slice expires.
 #
-# Lines move by two: tx_timer_info_get.c:164 and :166 are hit in most runs and
-# missed in some. The same nine runs read 5394 and 5396 of 5450.
+# That last one was covered in all seven runs of the previous sample and in none
+# of them uncovered, so it was not on any list. A sample says what a sample saw.
 #
-# The gate sits ten lines and eleven outcomes below the worst observation. The
-# floor a run can honestly reach is the set covered in every run -- 5394 lines and
-# 3113 outcomes -- and the gate is ten below each of those, which is headroom for
-# the outcomes a later sample reclassifies rather than slack for a regression.
-min_line=${TX_COVERAGE_MIN_LINE:-98.78}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-85.95}
+# The gate is set ten lines and ten outcomes below the set covered in *every* run
+# -- 5396 lines and 3194 outcomes -- rather than below the lowest total any run
+# reported. A run in which every unstable outcome happens to be missed is a run in
+# which nothing has regressed, and an always-covered floor is a statement about
+# the tree where a worst observation is a statistic about a sample.
+min_line=${TX_COVERAGE_MIN_LINE:-98.82}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-88.20}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
