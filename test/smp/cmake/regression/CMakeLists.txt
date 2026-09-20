@@ -31,6 +31,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_event_flag_suspension_test.c
     ${SOURCE_DIR}/threadx_event_flag_suspension_timeout_test.c
     ${SOURCE_DIR}/threadx_event_flag_thread_terminate_test.c
+    ${SOURCE_DIR}/threadx_event_flag_trace_test.c
     ${SOURCE_DIR}/threadx_interrupt_control_test.c
     ${SOURCE_DIR}/threadx_mutex_basic_test.c
     ${SOURCE_DIR}/threadx_mutex_delete_test.c
