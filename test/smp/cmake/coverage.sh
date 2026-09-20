@@ -36,41 +36,43 @@ filter=$repo_root/common_smp/src
 # The margin below the measured figure is not slack for regressions. The same
 # unchanged tree does not measure identically twice on the branch axis.
 #
-# It does now on the line axis. Twenty-eight CI runs, in four samples of seven,
+# It does now on the line axis. Thirty-five CI runs, in five samples of seven,
 # read every line either in all seven of a sample or in none of it. The two that
 # used to move, tx_timer_info_get.c:164 and :166, are the wrapped arm of the
 # timer list calculation, which is now reached by an arrangement a test builds
 # rather than by where the tick happened to leave the list pointer.
 #
-# Branches move by four outcomes in this sample and moved by two in the last. The
-# four samples read 3194, 3195, 3195, 3195, 3197, 3199, 3199 -- then 3194, 3197,
-# 3197, 3197, 3197, 3197, 3197 -- then 3195, 3195, 3195, 3197, 3197, 3197, 3197
-# -- then 3395, 3395, 3397, 3397, 3397, 3399, 3399 of 3610. The always-covered
-# total went 3194, 3194, 3195, 3395.
+# Branches move by four outcomes in this sample and moved by four in the last.
+# The five samples read 3194, 3195, 3195, 3195, 3197, 3199, 3199 -- then 3194,
+# 3197, 3197, 3197, 3197, 3197, 3197 -- then 3195, 3195, 3195, 3197, 3197, 3197,
+# 3197 -- then 3395, 3395, 3397, 3397, 3397, 3399, 3399 -- then 3527, 3527, 3529,
+# 3529, 3529, 3529, 3531 of 3610. The always-covered total went 3194, 3194, 3195,
+# 3395, 3527.
 #
-# What is left unstable is four outcomes at two sites, up from two at one: the
-# buffer-wrap arms of tx_trace_isr_enter_insert.c:93 and
-# tx_trace_isr_exit_insert.c:93, ordinals 8 and 10 of each. Both are reached by
-# coincidence rather than on purpose, which is the same cause the timer and the
-# thread batches closed at their own sites.
+# What is left unstable is four outcomes at two sites, unchanged: the buffer-wrap
+# arms of tx_trace_isr_enter_insert.c:93 and tx_trace_isr_exit_insert.c:93,
+# ordinals 8 and 10 of each. Both are reached by coincidence rather than on
+# purpose, which is the same cause the timer and the thread batches closed at
+# their own sites.
 #
 # The enter insert is the one to read twice. It was unstable over fourteen
-# consecutive runs, covered in every run of the next seven with nothing having
-# touched it, and is missed in one run of seven again here. What a sample calls
-# stable is a thing that sample saw, not a property of the tree.
+# consecutive runs, covered in every run of the third sample with nothing having
+# touched it, missed in one run of the fourth, and covered in four runs of seven
+# in the fifth. What a sample calls stable is a thing that sample saw, not a
+# property of the tree.
 #
-# Four samples have now moved an outcome in every direction there is: unstable to
+# Five samples have now moved an outcome in every direction there is: unstable to
 # never, never back to unstable, always to unstable, and unstable to always and
 # back again. A sample says what a sample saw, and that is as true of what it
 # calls stable as of what it calls missing.
 #
 # The gate is set ten lines and ten outcomes below the set covered in *every* run
-# -- 5398 lines and 3395 outcomes -- rather than below the lowest total any run
+# -- 5423 lines and 3527 outcomes -- rather than below the lowest total any run
 # reported. A run in which every unstable outcome happens to be missed is a run in
 # which nothing has regressed, and an always-covered floor is a statement about
 # the tree where a worst observation is a statistic about a sample.
-min_line=${TX_COVERAGE_MIN_LINE:-98.86}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-93.76}
+min_line=${TX_COVERAGE_MIN_LINE:-99.32}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-97.42}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
