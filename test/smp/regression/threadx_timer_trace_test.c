@@ -139,6 +139,30 @@ static void    timer_0_entry(ULONG timer_input)
 }
 
 
+/* Read the clock through the published macro and through the service, under one
+   SMP protection so that a tick between the two readings cannot make them
+   disagree. The macro is a direct read of the system clock unless
+   TX_MISRA_ENABLE is defined, so the two are the same value taken twice rather
+   than two calls into the same function.  */
+
+static UINT  published_time_agrees(void)
+{
+
+TX_INTERRUPT_SAVE_AREA
+
+ULONG   published;
+ULONG   from_service;
+
+
+    TX_DISABLE
+    published =     tx_time_get();
+    from_service =  _tx_time_get();
+    TX_RESTORE
+
+    return((published == from_service) ? TX_TRUE : TX_FALSE);
+}
+
+
 /* Drive one service through its published entry point.  */
 
 static UINT  timer_service(UINT service)
@@ -472,7 +496,7 @@ ULONG   wait;
        directly unless TX_MISRA_ENABLE is defined, so it agrees with the service
        without entering it. Checking that here is what lets every pass below
        drive the service itself.  */
-    if (tx_time_get() != _tx_time_get())
+    if (published_time_agrees() != TX_TRUE)
     {
 
         printf("ERROR #3\n");
