@@ -135,6 +135,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_trace_test.c
     ${SOURCE_DIR}/threadx_timer_wrapped_list_test.c
     ${SOURCE_DIR}/threadx_trace_basic_test.c
+    ${SOURCE_DIR}/threadx_trace_enable_filtered_test.c
     ${SOURCE_DIR}/threadx_trace_enable_trace_test.c
     ${SOURCE_DIR}/threadx_trace_object_registry_test.c
     ${SOURCE_DIR}/threadx_trace_service_trace_test.c
