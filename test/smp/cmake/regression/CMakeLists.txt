@@ -23,6 +23,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_byte_memory_thread_contention_test.c
     ${SOURCE_DIR}/threadx_byte_memory_thread_terminate_test.c
     ${SOURCE_DIR}/threadx_byte_pool_trace_test.c
+    ${SOURCE_DIR}/threadx_byte_pool_trace_update_test.c
     ${SOURCE_DIR}/threadx_event_flag_basic_test.c
     ${SOURCE_DIR}/threadx_event_flag_information_test.c
     ${SOURCE_DIR}/threadx_event_flag_isr_set_clear_test.c
