@@ -36,22 +36,25 @@ filter=$repo_root/common_smp/src
 # The margin below the measured figure is not slack for regressions. The same
 # unchanged tree does not measure identically twice on the branch axis.
 #
-# It does now on the line axis. Seven CI runs read 5396 of 5450 lines, every one
-# of them, and every line is either covered in all seven or in none: the two that
-# used to move, tx_timer_info_get.c:164 and :166, are the wrapped arm of the timer
-# list calculation, which is now reached by an arrangement the test builds rather
-# than by where the tick happened to leave the list pointer.
+# It does now on the line axis. Fourteen CI runs, in two samples of seven, read
+# 5396 of 5450 lines every time, and every line is either covered in all of them
+# or in none: the two that used to move, tx_timer_info_get.c:164 and :166, are the
+# wrapped arm of the timer list calculation, which is now reached by an
+# arrangement a test builds rather than by where the tick happened to leave the
+# list pointer.
 #
-# Branches move by five outcomes over the same seven runs, which read 3194, 3195,
-# 3195, 3195, 3197, 3199 and 3199 of 3610. The five: ordinals 8 and 10 of
-# the twelve-branch TX_TRACE_IN_LINE_INSERT expansion in tx_trace_isr_enter_insert.c
-# and tx_trace_isr_exit_insert.c, which are the buffer-wrap arm reached by
-# coincidence rather than on purpose, and the exit arm of the ready-list walk in
-# tx_thread_time_slice.c:311, which depends on the shape of the ready list when a
-# slice expires.
+# Branches move by five outcomes. The two samples read 3194, 3195, 3195, 3195,
+# 3197, 3199, 3199 and 3194, 3197, 3197, 3197, 3197, 3197, 3197 of 3610, and both
+# put the same 3194 in the always-covered column and the same five in the unstable
+# one: ordinals 8 and 10 of the twelve-branch TX_TRACE_IN_LINE_INSERT expansion in
+# tx_trace_isr_enter_insert.c and tx_trace_isr_exit_insert.c, which are the
+# buffer-wrap arm reached by coincidence rather than on purpose, and the exit arm
+# of the ready-list walk in tx_thread_time_slice.c:311, which depends on the shape
+# of the ready list when a slice expires.
 #
-# That last one was covered in all seven runs of the previous sample and in none
-# of them uncovered, so it was not on any list. A sample says what a sample saw.
+# That last one was covered in all seven runs of the sample before these and in
+# none of them uncovered, so it was on no list at all. A sample says what a sample
+# saw, and that is as true of what it calls stable as of what it calls missing.
 #
 # The gate is set ten lines and ten outcomes below the set covered in *every* run
 # -- 5396 lines and 3194 outcomes -- rather than below the lowest total any run
