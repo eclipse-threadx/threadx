@@ -32,9 +32,9 @@
    run on the searching thread's own core while that thread is inside the
    search, because the walk calls nothing and yields to nothing. So the only
    agent is another core, and this is the arrangement that supplies one: the
-   test thread keeps its core to itself and the claim threads below run one to a
-   core on the rest, each making the same unsatisfiable request and so walking
-   the same pool.
+   test thread keeps the core it was created on and the claim thread below is
+   excluded from every core but the next, where it makes the same unsatisfiable
+   request and so walks the same pool.
 
    The window is also gated behind the block limit. It opens only where the
    search gives the protection up, which is once per limit's worth of blocks, so
@@ -45,16 +45,16 @@
    What the test asserts is the arrangement, because the retry itself leaves
    nothing behind that a test can read: it restores the pool's owner to the
    searching thread, which is what the walk had already set it to. The
-   assertions are therefore that the pool is fragmented past the limit, that
-   every claim thread ran on a core of its own, that every one of them was
-   already claiming before the first walk, and that they went on claiming while
-   the walks ran. Whether the retry is reached is a measurement over the eight
+   assertions are therefore that the pool is fragmented past the limit, that the
+   claim thread ran on a core other than the test thread's, that it was already
+   claiming before the first walk, and that it went on claiming while the walks
+   ran. Whether the retry is reached is a measurement over the eight
    configurations rather than something this file can check, and it is recorded
    in the step note.
 
    The test thread decides how long the run lasts: it makes a fixed number of
-   walks and then stands the claim threads down, so the claims cover the whole
-   of the searching and none of the time before it. The four threads thrash each
+   walks and then stands the claim thread down, so the claims cover the whole of
+   the searching and none of the time before it. The two threads thrash each
    other's walks, which is what the kernel's own delay is there to damp, so the
    walk count is kept low and is what bounds the run.  */
 
@@ -73,11 +73,18 @@
 
 #define BYTE_CHUNKS_REQUIRED            (2 * TX_BYTE_POOL_MULTIPLE_BLOCK_SEARCH)
 
-/* One claim thread per core other than the test thread's.  */
+/* One claim thread, on the core next to the test thread's. One is all the
+   construct needs -- it asks whether the pool can change hands under a walk, and
+   a single other core answers that -- and one is what keeps the arrangement
+   honest on a machine with fewer processors than the port simulates cores. Every
+   claim thread walks the pool holding the protection, so a second and a third
+   would spend most of their time contending with each other rather than with the
+   thread under test.  */
 
-#define CLAIM_THREADS                   (TX_THREAD_SMP_MAX_CORES - 1)
+#define CLAIM_THREADS                   1
+#define CLAIM_CORE                      1
 
-/* The claim threads run until the test thread stands them down. The cap only
+/* The claim thread runs until the test thread stands it down. The cap only
    guarantees termination if that never happens.  */
 
 #define CLAIMS_CAP                      10000000
@@ -86,7 +93,7 @@
    per limit's worth of blocks. The count is what decides how many contended
    windows the run offers.  */
 
-#define SEARCH_ROUNDS                   5
+#define SEARCH_ROUNDS                   20
 
 /* How long the test thread will wait for the core rebalance to map the claim
    threads, and then for each of them to make its first claim. Both are waited
@@ -227,9 +234,9 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    /* The claim threads are created stopped, at the test thread's own priority
-       so that neither side preempts the other, and started once the pool has
-       been fragmented.  */
+    /* The claim thread is created stopped, at the test thread's own priority so
+       that neither side preempts the other, and started once the pool has been
+       fragmented.  */
     for (i = 0; i < CLAIM_THREADS; i++)
     {
 
@@ -320,7 +327,7 @@ ULONG   test_core;
 
         status +=  tx_thread_smp_core_exclude(&claim_threads[i],
                         ((((ULONG) 1) << TX_THREAD_SMP_MAX_CORES) - ((ULONG) 1)) &
-                        (~(((ULONG) 1) << (i + ((UINT) 1)))));
+                        (~(((ULONG) 1) << (i + ((UINT) CLAIM_CORE)))));
     }
 
     if (status != TX_SUCCESS)
@@ -345,9 +352,9 @@ ULONG   test_core;
         test_control_return(1);
     }
 
-    /* Wait for the rebalance to map them one to a core. Each records its core
-       and says so on the way in, so this is the arrangement arriving rather
-       than a fixed number of ticks guessed at.  */
+    /* Wait for the rebalance to map it to its core. It records the core it
+       lands on and says so on the way in, so this is the arrangement arriving
+       rather than a fixed number of ticks guessed at.  */
     waited =  0;
 
     while ((claim_threads_started() < CLAIM_THREADS) && (waited < SETTLE_TICKS_MAX))
@@ -366,8 +373,8 @@ ULONG   test_core;
 
     claims_enabled =  1;
 
-    /* And wait for every one of them to be claiming before any searching
-       starts, so that the walks below are contended from the first one.  */
+    /* And wait for it to be claiming before any searching starts, so that the
+       walks below are contended from the first one.  */
     waited =  0;
 
     while ((claim_threads_claiming() < CLAIM_THREADS) && (waited < SETTLE_TICKS_MAX))
@@ -403,12 +410,12 @@ ULONG   test_core;
         }
     }
 
-    /* Stand the claim threads down and wait for them to notice.  */
+    /* Stand the claim thread down and wait for it to notice.  */
     claims_stopped =  1;
 
     tx_thread_sleep(SETTLE_TICKS_MAX);
 
-    /* The claim threads have to have run somewhere other than the test thread's
+    /* The claim thread has to have run somewhere other than the test thread's
        core, or nothing here was concurrent and the window was never contended.  */
     for (i = 0; i < CLAIM_THREADS; i++)
     {
@@ -428,10 +435,9 @@ ULONG   test_core;
         }
     }
 
-    /* And the claim threads have to have gone on claiming while the searching
-       was happening, rather than only before it: they are stood down after the
-       last walk, so a total that did not move would mean the two sides never
-       overlapped.  */
+    /* And it has to have gone on claiming while the searching was happening,
+       rather than only before it: it is stood down after the last walk, so a
+       total that did not move would mean the two sides never overlapped.  */
     if (claims_total() <= claims_made)
     {
 
@@ -456,7 +462,7 @@ ULONG   test_core;
 }
 
 
-/* Define a claim thread. It makes the same unsatisfiable request the test
+/* Define the claim thread. It makes the same unsatisfiable request the test
    thread makes, so it claims the pool and then walks it, holding the protection
    for a limit's worth of blocks at a time.
 
