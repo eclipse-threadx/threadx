@@ -25,48 +25,53 @@ filter=$repo_root/common_smp/src
 # code, so the same source branch is counted once per configuration that
 # renumbers it. Both figures are produced and the merged report is published
 # unchanged; the gate uses the union because it is the one that counts branches
-# in the source. Over the eight configurations the merged denominator reads 6595
-# where the source carries 3610, and adding misra_trace_build alone moved the
-# merged figure by 994 branches against the dozen the source really gained.
+# in the source. Over the eight configurations the merged denominator reads more
+# than 6500 where the source carries 3612, and adding misra_trace_build alone
+# moved the merged figure by 994 branches against the dozen the source really
+# gained.
 #
 # The branch gate is far below the 83.00 that preceded it and no coverage was
 # lost doing it. 83.00 was a percentage of 4773 counted branch instances; this is
-# a percentage of the 3610 branches that exist in common_smp/src.
+# a percentage of the 3612 branches that exist in common_smp/src.
+#
+# The branch denominator is 3612 rather than 3610 from the fault-injection sweep
+# onwards. TX_BYTE_ALLOCATE_EXTENSION in the Linux SMP port gained a second
+# clause, and the macro expands inside tx_byte_allocate.c, so the clause's `if`
+# is certified-source branch and is counted. Both of its outcomes are covered,
+# and nothing else in ports_smp enters the denominator -- the gcovr -f filter
+# excludes it.
 #
 # The margin below the measured figure is not slack for regressions. It is there
 # because the same unchanged tree has not always measured identically twice.
 #
-# The line axis has been closed for six consecutive samples, forty-two CI runs:
-# every line is covered in all seven runs of a sample or in none of them.
+# The line axis has been closed for seven consecutive samples, forty-nine CI
+# runs: every line is covered in all seven runs of a sample or in none of them.
 #
-# The branch axis is now closed too, and this is the first sample in which it is.
-# All seven runs read 3583 of 3610, with no spread at all. The six samples read
-# 3194, 3195, 3195, 3195, 3197, 3199, 3199 -- then 3194, 3197 x6 -- then 3195,
-# 3195, 3195, 3197, 3197, 3197, 3197 -- then 3395, 3395, 3397, 3397, 3397, 3399,
-# 3399 -- then 3527, 3527, 3529, 3529, 3529, 3529, 3531 -- then 3583 x7. The
-# always-covered total went 3194, 3194, 3195, 3395, 3527, 3583.
+# The branch axis is closed for a second consecutive sample. All seven runs read
+# 3587 of 3612, with no spread at all. The seven samples read 3194, 3195, 3195,
+# 3195, 3197, 3199, 3199 -- then 3194, 3197 x6 -- then 3195, 3195, 3195, 3197,
+# 3197, 3197, 3197 -- then 3395, 3395, 3397, 3397, 3397, 3399, 3399 -- then 3527,
+# 3527, 3529, 3529, 3529, 3529, 3531 -- then 3583 x7 -- then 3587 x7. The
+# always-covered total went 3194, 3194, 3195, 3395, 3527, 3583, 3587.
 #
-# So the unstable set is empty: zero outcomes and zero lines. The four that were
-# left were the buffer-wrap arms of tx_trace_isr_enter_insert.c:93 and
-# tx_trace_isr_exit_insert.c:93, reached by the buffer happening to wrap under an
-# insert. They are now reached by a test that positions the buffer instead, which
-# is the same cause the timer and the thread batches closed at their own sites.
+# So the unstable set is empty: zero outcomes and zero lines, in two consecutive
+# samples on two different trees.
 #
 # The margin stays anyway, and the reason is not the size of the set today. Five
 # earlier samples moved an outcome in every direction there is: unstable to
 # never, never back to unstable, always to unstable, and unstable to always and
-# back again -- that last one twice, on this very pair, which one sample recorded
-# as closed and the next two found moving again. A set measured empty once is a
-# thing a sample saw. An outcome is closed when a test reaches it on purpose, and
-# these four now are; whether the margin can go with them is a question for the
-# evidence step, which sees every sample rather than this one.
+# back again -- that last one twice, on the ISR insert pair, which one sample
+# recorded as closed and the next two found moving again. A set measured empty
+# twice is a thing two samples saw. An outcome is closed when a test reaches it
+# on purpose; whether the margin can go is a question for the evidence step,
+# which sees every sample rather than this one.
 #
 # The gate is therefore still set ten lines and ten outcomes below the set
-# covered in *every* run -- 5449 lines and 3583 outcomes -- rather than below the
-# lowest total any run reported. The two coincide in this sample and have not in
-# any earlier one.
+# covered in *every* run -- 5449 lines and 3587 outcomes -- rather than below the
+# lowest total any run reported. The two coincide in this sample and in the one
+# before it, and have not in any earlier one.
 min_line=${TX_COVERAGE_MIN_LINE:-99.79}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-98.97}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-99.03}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
