@@ -48,11 +48,21 @@ filter=$repo_root/common_smp/src
 # runs: every line is covered in all seven runs of a sample or in none of them.
 #
 # The branch axis is closed for a second consecutive sample. All seven runs read
-# 3587 of 3612, with no spread at all. The seven samples read 3194, 3195, 3195,
+# 3588 of 3612, with no spread at all. The seven samples read 3194, 3195, 3195,
 # 3195, 3197, 3199, 3199 -- then 3194, 3197 x6 -- then 3195, 3195, 3195, 3197,
 # 3197, 3197, 3197 -- then 3395, 3395, 3397, 3397, 3397, 3399, 3399 -- then 3527,
-# 3527, 3529, 3529, 3529, 3529, 3531 -- then 3583 x7 -- then 3587 x7. The
-# always-covered total went 3194, 3194, 3195, 3395, 3527, 3583, 3587.
+# 3527, 3529, 3529, 3529, 3529, 3531 -- then 3583 x7 -- then 3588 x7. The
+# always-covered total went 3194, 3194, 3195, 3395, 3527, 3583, 3588.
+#
+# One outcome in this figure is reached by two cores racing rather than by a
+# single thread doing something in order, and it is the only one in the suite
+# that is. tx_trace_user_event_insert.c:101's null arm needs the buffer pointer
+# cleared between the service's own check of it and the insert's, which is what
+# a tx_trace_disable on another core does -- that service takes no lock at all.
+# The test drives 300,000 inserts against a writer on a core of its own and
+# takes the arm 49 to 132 times on this workstation and 521 to 1298 times on a
+# CI runner, measured over three and seven runs. It is counted in the
+# always-covered set on that evidence, not on one sample.
 #
 # So the unstable set is empty: zero outcomes and zero lines, in two consecutive
 # samples on two different trees.
@@ -67,11 +77,11 @@ filter=$repo_root/common_smp/src
 # which sees every sample rather than this one.
 #
 # The gate is therefore still set ten lines and ten outcomes below the set
-# covered in *every* run -- 5449 lines and 3587 outcomes -- rather than below the
+# covered in *every* run -- 5449 lines and 3588 outcomes -- rather than below the
 # lowest total any run reported. The two coincide in this sample and in the one
 # before it, and have not in any earlier one.
 min_line=${TX_COVERAGE_MIN_LINE:-99.79}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-99.03}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-99.05}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
