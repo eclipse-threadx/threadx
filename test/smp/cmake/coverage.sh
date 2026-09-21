@@ -78,27 +78,36 @@ filter=$repo_root/common_smp/src
 # The evidence step settled whether the margin can go, and it stays. The reason
 # is measured on this tree rather than carried forward: the union is stable
 # because the eight configurations cover for each other, not because the suite
-# is deterministic. Read per configuration over the same eight runs, eight
-# branch outcomes and four lines move, and seven of the eight configurations
-# carry at least one mover. What the union owes that redundancy is visible in
-# gcovr's merged report over the same runs, which reads 6561, 6563 and 6564 of
-# 6601 where the union reads 3588 of 3612 eight times.
+# is deterministic. Read per configuration over sixteen runs, eight branch
+# outcomes and four lines move between runs inside at least one configuration,
+# seven of the eight configurations carry at least one mover, and the largest
+# movement in any one configuration is eight outcomes, in
+# stack_checking_rand_fill_build. The union absorbs all of it.
 #
-# Six outcomes in the figure have no configuration to cover for them. Five are
-# TX_THREAD_STACK_CHECK arms at tx_thread_relinquish.c:478 and
-# tx_thread_system_resume.c:900, compiled only by the two stack-checking
-# configurations, and stack_checking_rand_fill_build misses them in seven and
-# four runs of eight -- so stack_checking_build carries them alone in most runs.
-# The sixth is the racing outcome above, which only trace_build compiles. A
-# zero-margin gate would turn any of the six going missing into a red run on a
-# tree nobody had touched, which is the thing this gate exists not to do.
+# What the union owes that redundancy is visible in the report published beside
+# it. gcovr's merged figure reads 6561 to 6564 of 6601 over the same runs, where
+# the union reads 3588 of 3612 in every one, because block-identity keying
+# cannot absorb a miss in one configuration when another covers the same source
+# construct.
+#
+# Thirty-five outcomes in the figure are compiled by two configurations and
+# covered by only one of them in at least one run. Almost all are
+# TX_THREAD_STACK_CHECK fence ordinals that stack_checking_build holds alone,
+# because its random-fill sibling fills the stack with values that are not
+# TX_STACK_FILL and short-circuits before reaching them. A further 894 outcomes
+# are compiled by exactly one configuration at all -- 872 of them trace_build's
+# trace macros -- which is structural rather than fragile: a construct that
+# exists in one configuration is covered there or nowhere. The exception is the
+# racing outcome above, the one member of that set whose single carrier covers
+# it by winning a race rather than by executing in order.
 #
 # The gate is therefore still set ten lines and ten outcomes below the set
 # covered in *every* run -- 5449 lines and 3588 outcomes -- rather than below the
-# lowest total any run reported. The two coincide in this sample and in the one
-# before it, and have not in any earlier one. Ten covers the six exposed
-# outcomes with headroom; it is a measured size now rather than an inherited
-# one.
+# lowest total any run reported. The two coincide in the last two samples and
+# have not in any earlier one. Ten is a measured size now rather than an
+# inherited one: it covers the largest per-configuration movement observed,
+# eight outcomes, with headroom, against a set that has no second configuration
+# to fall back on.
 min_line=${TX_COVERAGE_MIN_LINE:-99.79}
 min_branch=${TX_COVERAGE_MIN_BRANCH:-99.05}
 
