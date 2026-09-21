@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  * 
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -7,6 +8,8 @@
  * 
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 /* This test is designed to test kernel setup functionality in ThreadX.  */
 
@@ -20,6 +23,7 @@ TEST_FLAG               test_forced_mutex_timeout;
 TEST_FLAG               threadx_mutex_suspension_put_test;
 TEST_FLAG               threadx_mutex_suspension_priority_test;
 TEST_FLAG               threadx_byte_allocate_loop_test;
+TEST_FLAG               threadx_byte_allocate_trace_test;
 TEST_FLAG               test_initialize_flag; 
 TEST_FLAG               threadx_byte_release_loop_test;
 TEST_FLAG               test_stack_analyze_flag;
@@ -52,6 +56,10 @@ __attribute__((weak)) void  suspend_lowest_priority(void)
 }
 
 __attribute__((weak)) void abort_and_resume_byte_allocating_thread(void)
+{
+}
+
+__attribute__((weak)) void overwrite_byte_allocate_trace_entry(void)
 {
 }
 
