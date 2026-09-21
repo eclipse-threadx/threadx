@@ -73,13 +73,32 @@ filter=$repo_root/common_smp/src
 # back again -- that last one twice, on the ISR insert pair, which one sample
 # recorded as closed and the next two found moving again. A set measured empty
 # twice is a thing two samples saw. An outcome is closed when a test reaches it
-# on purpose; whether the margin can go is a question for the evidence step,
-# which sees every sample rather than this one.
+# on purpose.
+#
+# The evidence step settled whether the margin can go, and it stays. The reason
+# is measured on this tree rather than carried forward: the union is stable
+# because the eight configurations cover for each other, not because the suite
+# is deterministic. Read per configuration over the same eight runs, eight
+# branch outcomes and four lines move, and seven of the eight configurations
+# carry at least one mover. What the union owes that redundancy is visible in
+# gcovr's merged report over the same runs, which reads 6561, 6563 and 6564 of
+# 6601 where the union reads 3588 of 3612 eight times.
+#
+# Six outcomes in the figure have no configuration to cover for them. Five are
+# TX_THREAD_STACK_CHECK arms at tx_thread_relinquish.c:478 and
+# tx_thread_system_resume.c:900, compiled only by the two stack-checking
+# configurations, and stack_checking_rand_fill_build misses them in seven and
+# four runs of eight -- so stack_checking_build carries them alone in most runs.
+# The sixth is the racing outcome above, which only trace_build compiles. A
+# zero-margin gate would turn any of the six going missing into a red run on a
+# tree nobody had touched, which is the thing this gate exists not to do.
 #
 # The gate is therefore still set ten lines and ten outcomes below the set
 # covered in *every* run -- 5449 lines and 3588 outcomes -- rather than below the
 # lowest total any run reported. The two coincide in this sample and in the one
-# before it, and have not in any earlier one.
+# before it, and have not in any earlier one. Ten covers the six exposed
+# outcomes with headroom; it is a measured size now rather than an inherited
+# one.
 min_line=${TX_COVERAGE_MIN_LINE:-99.79}
 min_branch=${TX_COVERAGE_MIN_BRANCH:-99.05}
 
