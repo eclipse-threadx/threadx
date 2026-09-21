@@ -34,12 +34,15 @@
      the test arms it.
    - Replacing it leaves everything else intact because nothing else in the
      kernel depends on what it returns. It has exactly two callers in
-     libthreadx_smp.so: this loop, and the initialisation loop in
-     _tx_thread_smp_current_state_set. The second is reached only from
-     _tx_initialize_kernel_enter, _tx_initialize_kernel_setup and
-     _tx_thread_smp_high_level_initialize, all of which run before the scheduler
-     starts a thread, so it cannot be reached from here. The shim is armed from
-     a running thread and is disarmed before the test returns.
+     libthreadx_smp.so, and this test drives both: this loop, and the per-core
+     state initialisation loop in _tx_thread_smp_current_state_set, which the
+     kernel itself reaches only from _tx_initialize_kernel_enter,
+     _tx_initialize_kernel_setup and _tx_thread_smp_high_level_initialize, all
+     of which run before the scheduler starts a thread. The second is therefore
+     called here directly, with the shim armed, and is given back the state its
+     last core already holds so that the one assignment a shortened loop
+     performs writes the value that was there. The shim is armed from a running
+     thread and is disarmed before the test returns.
    - The library's own version keeps its coverage from every other test in the
      suite, all of which drive this same loop through it thousands of times.
 
@@ -54,6 +57,7 @@
 #include   <stdio.h>
 #include   "tx_api.h"
 #define    TX_SOURCE_CODE
+#define    TX_THREAD_SMP_SOURCE_CODE
 #include   "tx_thread.h"
 #include   "tx_timer.h"
 
@@ -139,6 +143,10 @@ static void    thread_0_entry(ULONG thread_input)
 
 UINT    status;
 ULONG   deadline;
+#ifdef TEST_DRIVES_THE_LOOP
+UINT    core_index;
+ULONG   saved_state[TX_THREAD_SMP_MAX_CORES];
+#endif
 
 
     /* Increment thread 0 counter.  */
@@ -196,15 +204,52 @@ ULONG   deadline;
         }
     }
 
-    shim_armed =  TX_FALSE;
-
     /* The loop tested its condition once more and took the arm that leaves
        it.  */
     if (shim_exits != ((ULONG) 1))
     {
 
+        shim_armed =  TX_FALSE;
+
         printf("ERROR #5\n");
         test_control_return(1);
+    }
+
+    /* The same construct a second time, in the only other loop the shim
+       controls. _tx_thread_smp_current_state_set walks the cores downwards and
+       leaves through a break on the lowest, so its controlling expression is
+       never false in service. With the shim armed the highest core is written
+       and the loop leaves through the expression instead -- so the value handed
+       to it is the one that core already holds, and the state every core sees
+       is the state it saw before the call.  */
+    for (core_index = ((UINT) 0); core_index < ((UINT) TX_THREAD_SMP_MAX_CORES); core_index++)
+    {
+
+        saved_state[core_index] =  _tx_thread_system_state[core_index];
+    }
+
+    _tx_thread_smp_current_state_set(saved_state[TX_THREAD_SMP_MAX_CORES - ((UINT) 1)]);
+
+    shim_armed =  TX_FALSE;
+
+    /* The second loop tested its condition and took the same arm.  */
+    if (shim_exits != ((ULONG) 2))
+    {
+
+        printf("ERROR #6\n");
+        test_control_return(1);
+    }
+
+    /* And left every core's state as it found it.  */
+    for (core_index = ((UINT) 0); core_index < ((UINT) TX_THREAD_SMP_MAX_CORES); core_index++)
+    {
+
+        if (_tx_thread_system_state[core_index] != saved_state[core_index])
+        {
+
+            printf("ERROR #7\n");
+            test_control_return(1);
+        }
     }
 #endif
 
@@ -213,7 +258,7 @@ ULONG   deadline;
     if (status != TX_SUCCESS)
     {
 
-        printf("ERROR #6\n");
+        printf("ERROR #8\n");
         test_control_return(1);
     }
 
