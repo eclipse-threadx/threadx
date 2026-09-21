@@ -140,6 +140,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_trace_enable_trace_test.c
     ${SOURCE_DIR}/threadx_trace_object_registry_test.c
     ${SOURCE_DIR}/threadx_trace_service_trace_test.c
+    ${SOURCE_DIR}/threadx_trace_user_event_insert_disabled_test.c
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
 
 add_custom_command(
