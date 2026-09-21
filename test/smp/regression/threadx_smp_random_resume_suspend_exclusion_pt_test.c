@@ -2312,12 +2312,14 @@ UINT        status;
             exclusions =  (ULONG) (rand()%15);
             tx_thread_smp_core_exclude(thread_ptr, exclusions);
 
-            /* See if we should setup a preemption-threshold.  */
-            if ((thread_ptr -> tx_thread_priority > 40) &&
+            /* See if we should setup a preemption-threshold. The thresholds are
+               derived from TX_MAX_PRIORITIES so that the randomised phase sets one
+               whatever the port's priority count is.  */
+            if ((thread_ptr -> tx_thread_priority > (TX_MAX_PRIORITIES/2)) &&
                 (exclusions & 1))
             {
                 /* Change preemption-threshold to enable it.  */
-                tx_thread_preemption_change(thread_ptr, thread_ptr -> tx_thread_priority - 20, &original_threshold);
+                tx_thread_preemption_change(thread_ptr, thread_ptr -> tx_thread_priority - (TX_MAX_PRIORITIES/4), &original_threshold);
             }
 
             /* Save the thread pointer.  */
