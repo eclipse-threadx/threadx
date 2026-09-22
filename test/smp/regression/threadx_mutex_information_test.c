@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test the mutex information services.  */
 
 #include   <stdio.h>
@@ -134,7 +136,7 @@ static void    thread_0_entry(ULONG thread_input)
 {
 
 UINT        status;
-CHAR        *name;
+TX_NAME_CONST CHAR *name;
 ULONG       count;
 TX_THREAD   *owner;
 TX_THREAD   *first_suspended;
@@ -300,7 +302,7 @@ ULONG       inheritances;
     status += tx_mutex_info_get(&mutex_2, &name, &count, &owner, &first_suspended, &suspended_count, &next_mutex);
 
     /* Check status.  */
-    if ((status != TX_SUCCESS) || (count != mutex_2.tx_mutex_ownership_count) || (owner != mutex_2.tx_mutex_owner) ||
+    if ((status != TX_SUCCESS) || (name != mutex_2.tx_mutex_name) || (count != mutex_2.tx_mutex_ownership_count) || (owner != mutex_2.tx_mutex_owner) ||
         (first_suspended != mutex_2.tx_mutex_suspension_list) || (suspended_count != mutex_2.tx_mutex_suspended_count) || (next_mutex != mutex_2.tx_mutex_created_next))
     {
 

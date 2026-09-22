@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test immediate response queue services including create
    and delete.  This test is for queue sizes of 1 ULONG.  Two queues are used one with
    a capacity of 1 message and another with a capacity of 3 messages.  */
@@ -51,7 +53,7 @@ static void    thread_0_entry(ULONG thread_input);
 static void    thread_1_entry(ULONG thread_input);
 
 
-UINT        _txe_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size,
+UINT        _txe_queue_create(TX_QUEUE *queue_ptr, TX_NAME_CONST CHAR *name_ptr, UINT message_size,
                         VOID *queue_start, ULONG queue_size, UINT queue_control_block_size);
 
 

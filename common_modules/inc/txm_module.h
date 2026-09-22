@@ -624,7 +624,7 @@ UINT  _txm_module_manager_memory_load(TXM_MODULE_INSTANCE *module_instance, CHAR
 UINT  _txm_module_manager_properties_get(TXM_MODULE_INSTANCE *module_instance, ULONG *module_properties_ptr);
 UINT  _txm_module_manager_start(TXM_MODULE_INSTANCE *module_instance);
 UINT  _txm_module_manager_stop(TXM_MODULE_INSTANCE *module_instance);
-UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name, VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
+UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name, VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
                                VOID (*entry_function)(ULONG), ULONG entry_input,
                                VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                                ULONG time_slice, UINT auto_start, UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance);

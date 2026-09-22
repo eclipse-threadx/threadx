@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -63,6 +65,13 @@ extern   "C" {
 /* Include the port-specific data type file.  */
 
 #include "tx_port.h"
+
+/* Define the qualifier applied to object name strings.  */
+#ifdef TX_LEGACY_NON_CONST_NAMES
+#define TX_NAME_CONST
+#else
+#define TX_NAME_CONST                   const
+#endif
 
 
 /* If not defined by tx_port.h, default the port-specific memory synchronization macro to whitespace.  */
@@ -392,7 +401,7 @@ typedef struct TX_TIMER_STRUCT
     ULONG               tx_timer_id;
 
     /* Define the timer's name.  */
-    CHAR                *tx_timer_name;
+    TX_NAME_CONST CHAR *tx_timer_name;
 
     /* Define the actual contents of the timer.  This is the block that
        is used in the actual timer expiration processing.  */
@@ -466,7 +475,7 @@ typedef struct TX_THREAD_STRUCT
        is typically defined to whitespace or a pointer type in tx_port.h.  */
     TX_THREAD_EXTENSION_0
 
-    CHAR                *tx_thread_name;                /* Pointer to thread's name     */
+    TX_NAME_CONST CHAR *tx_thread_name;                 /* Pointer to thread's name     */
     UINT                tx_thread_priority;             /* Priority of thread (0-1023)  */
     UINT                tx_thread_state;                /* Thread's execution state     */
     UINT                tx_thread_delayed_suspend;      /* Delayed suspend flag         */
@@ -632,7 +641,7 @@ typedef struct TX_BLOCK_POOL_STRUCT
     ULONG               tx_block_pool_id;
 
     /* Define the block pool's name.  */
-    CHAR                *tx_block_pool_name;
+    TX_NAME_CONST CHAR *tx_block_pool_name;
 
     /* Define the number of available memory blocks in the pool.  */
     UINT                tx_block_pool_available;
@@ -710,7 +719,7 @@ typedef struct TX_BYTE_POOL_STRUCT
     ULONG               tx_byte_pool_id;
 
     /* Define the byte pool's name.  */
-    CHAR                *tx_byte_pool_name;
+    TX_NAME_CONST CHAR *tx_byte_pool_name;
 
     /* Define the number of available bytes in the pool.  */
     ULONG               tx_byte_pool_available;
@@ -789,7 +798,7 @@ typedef struct TX_EVENT_FLAGS_GROUP_STRUCT
     ULONG               tx_event_flags_group_id;
 
     /* Define the event flags group's name.  */
-    CHAR                *tx_event_flags_group_name;
+    TX_NAME_CONST CHAR *tx_event_flags_group_name;
 
     /* Define the actual current event flags in this group. A zero in a
        particular bit indicates the event flag is not set.  */
@@ -875,7 +884,7 @@ typedef struct TX_MUTEX_STRUCT
     ULONG               tx_mutex_id;
 
     /* Define the mutex's name.  */
-    CHAR                *tx_mutex_name;
+    TX_NAME_CONST CHAR *tx_mutex_name;
 
     /* Define the mutex ownership count.  */
     UINT                tx_mutex_ownership_count;
@@ -948,7 +957,7 @@ typedef struct TX_QUEUE_STRUCT
     ULONG               tx_queue_id;
 
     /* Define the queue's name.  */
-    CHAR                *tx_queue_name;
+    TX_NAME_CONST CHAR *tx_queue_name;
 
     /* Define the message size that was specified in queue creation.  */
     UINT                tx_queue_message_size;
@@ -1027,7 +1036,7 @@ typedef struct TX_SEMAPHORE_STRUCT
     ULONG               tx_semaphore_id;
 
     /* Define the semaphore's name.  */
-    CHAR                *tx_semaphore_name;
+    TX_NAME_CONST CHAR *tx_semaphore_name;
 
     /* Define the actual semaphore count.  A zero means that no semaphore
        instance is available.  */
@@ -1530,10 +1539,10 @@ VOID        tx_application_define(VOID *first_unused_memory);
 /* Define block memory pool management function prototypes.  */
 
 UINT        _tx_block_allocate(TX_BLOCK_POOL *pool_ptr, VOID **block_ptr, ULONG wait_option);
-UINT        _tx_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG block_size,
+UINT        _tx_block_pool_create(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG block_size,
                     VOID *pool_start, ULONG pool_size);
 UINT        _tx_block_pool_delete(TX_BLOCK_POOL *pool_ptr);
-UINT        _tx_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, CHAR **name, ULONG *available_blocks,
+UINT        _tx_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR **name, ULONG *available_blocks,
                     ULONG *total_blocks, TX_THREAD **first_suspended,
                     ULONG *suspended_count, TX_BLOCK_POOL **next_pool);
 UINT        _tx_block_pool_performance_info_get(TX_BLOCK_POOL *pool_ptr, ULONG *allocates, ULONG *releases,
@@ -1548,10 +1557,10 @@ UINT        _tx_block_release(VOID *block_ptr);
    application.  */
 
 UINT        _txe_block_allocate(TX_BLOCK_POOL *pool_ptr, VOID **block_ptr, ULONG wait_option);
-UINT        _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG block_size,
+UINT        _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG block_size,
                     VOID *pool_start, ULONG pool_size, UINT pool_control_block_size);
 UINT        _txe_block_pool_delete(TX_BLOCK_POOL *pool_ptr);
-UINT        _txe_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, CHAR **name, ULONG *available_blocks,
+UINT        _txe_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR **name, ULONG *available_blocks,
                     ULONG *total_blocks, TX_THREAD **first_suspended,
                     ULONG *suspended_count, TX_BLOCK_POOL **next_pool);
 UINT        _txe_block_pool_prioritize(TX_BLOCK_POOL *pool_ptr);
@@ -1562,10 +1571,10 @@ UINT        _txe_block_release(VOID *block_ptr);
 
 UINT        _tx_byte_allocate(TX_BYTE_POOL *pool_ptr, VOID **memory_ptr, ULONG memory_size,
                     ULONG wait_option);
-UINT        _tx_byte_pool_create(TX_BYTE_POOL *pool_ptr, CHAR *name_ptr, VOID *pool_start,
+UINT        _tx_byte_pool_create(TX_BYTE_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, VOID *pool_start,
                     ULONG pool_size);
 UINT        _tx_byte_pool_delete(TX_BYTE_POOL *pool_ptr);
-UINT        _tx_byte_pool_info_get(TX_BYTE_POOL *pool_ptr, CHAR **name, ULONG *available_bytes,
+UINT        _tx_byte_pool_info_get(TX_BYTE_POOL *pool_ptr, TX_NAME_CONST CHAR **name, ULONG *available_bytes,
                     ULONG *fragments, TX_THREAD **first_suspended,
                     ULONG *suspended_count, TX_BYTE_POOL **next_pool);
 UINT        _tx_byte_pool_performance_info_get(TX_BYTE_POOL *pool_ptr, ULONG *allocates, ULONG *releases,
@@ -1581,10 +1590,10 @@ UINT        _tx_byte_release(VOID *memory_ptr);
 
 UINT        _txe_byte_allocate(TX_BYTE_POOL *pool_ptr, VOID **memory_ptr, ULONG memory_size,
                     ULONG wait_option);
-UINT        _txe_byte_pool_create(TX_BYTE_POOL *pool_ptr, CHAR *name_ptr, VOID *pool_start,
+UINT        _txe_byte_pool_create(TX_BYTE_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, VOID *pool_start,
                     ULONG pool_size, UINT pool_control_block_size);
 UINT        _txe_byte_pool_delete(TX_BYTE_POOL *pool_ptr);
-UINT        _txe_byte_pool_info_get(TX_BYTE_POOL *pool_ptr, CHAR **name, ULONG *available_bytes,
+UINT        _txe_byte_pool_info_get(TX_BYTE_POOL *pool_ptr, TX_NAME_CONST CHAR **name, ULONG *available_bytes,
                     ULONG *fragments, TX_THREAD **first_suspended,
                     ULONG *suspended_count, TX_BYTE_POOL **next_pool);
 UINT        _txe_byte_pool_prioritize(TX_BYTE_POOL *pool_ptr);
@@ -1593,11 +1602,11 @@ UINT        _txe_byte_release(VOID *memory_ptr);
 
 /* Define event flags management function prototypes.  */
 
-UINT        _tx_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR *name_ptr);
+UINT        _tx_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, TX_NAME_CONST CHAR *name_ptr);
 UINT        _tx_event_flags_delete(TX_EVENT_FLAGS_GROUP *group_ptr);
 UINT        _tx_event_flags_get(TX_EVENT_FLAGS_GROUP *group_ptr, ULONG requested_flags,
                     UINT get_option, ULONG *actual_flags_ptr, ULONG wait_option);
-UINT        _tx_event_flags_info_get(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR **name, ULONG *current_flags,
+UINT        _tx_event_flags_info_get(TX_EVENT_FLAGS_GROUP *group_ptr, TX_NAME_CONST CHAR **name, ULONG *current_flags,
                     TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_EVENT_FLAGS_GROUP **next_group);
 UINT        _tx_event_flags_performance_info_get(TX_EVENT_FLAGS_GROUP *group_ptr, ULONG *sets, ULONG *gets,
@@ -1612,11 +1621,11 @@ UINT        _tx_event_flags_set_notify(TX_EVENT_FLAGS_GROUP *group_ptr, VOID (*e
 /* Define error checking shells for API services.  These are only referenced by the
    application.  */
 
-UINT        _txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR *name_ptr, UINT event_control_block_size);
+UINT        _txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, TX_NAME_CONST CHAR *name_ptr, UINT event_control_block_size);
 UINT        _txe_event_flags_delete(TX_EVENT_FLAGS_GROUP *group_ptr);
 UINT        _txe_event_flags_get(TX_EVENT_FLAGS_GROUP *group_ptr, ULONG requested_flags,
                     UINT get_option, ULONG *actual_flags_ptr, ULONG wait_option);
-UINT        _txe_event_flags_info_get(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR **name, ULONG *current_flags,
+UINT        _txe_event_flags_info_get(TX_EVENT_FLAGS_GROUP *group_ptr, TX_NAME_CONST CHAR **name, ULONG *current_flags,
                     TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_EVENT_FLAGS_GROUP **next_group);
 UINT        _txe_event_flags_set(TX_EVENT_FLAGS_GROUP *group_ptr, ULONG flags_to_set,
@@ -1631,10 +1640,10 @@ VOID        _tx_initialize_kernel_enter(VOID);
 
 /* Define mutex management function prototypes.  */
 
-UINT        _tx_mutex_create(TX_MUTEX *mutex_ptr, CHAR *name_ptr, UINT inherit);
+UINT        _tx_mutex_create(TX_MUTEX *mutex_ptr, TX_NAME_CONST CHAR *name_ptr, UINT inherit);
 UINT        _tx_mutex_delete(TX_MUTEX *mutex_ptr);
 UINT        _tx_mutex_get(TX_MUTEX *mutex_ptr, ULONG wait_option);
-UINT        _tx_mutex_info_get(TX_MUTEX *mutex_ptr, CHAR **name, ULONG *count, TX_THREAD **owner,
+UINT        _tx_mutex_info_get(TX_MUTEX *mutex_ptr, TX_NAME_CONST CHAR **name, ULONG *count, TX_THREAD **owner,
                     TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_MUTEX **next_mutex);
 UINT        _tx_mutex_performance_info_get(TX_MUTEX *mutex_ptr, ULONG *puts, ULONG *gets,
@@ -1648,10 +1657,10 @@ UINT        _tx_mutex_put(TX_MUTEX *mutex_ptr);
 /* Define error checking shells for API services.  These are only referenced by the
    application.  */
 
-UINT        _txe_mutex_create(TX_MUTEX *mutex_ptr, CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size);
+UINT        _txe_mutex_create(TX_MUTEX *mutex_ptr, TX_NAME_CONST CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size);
 UINT        _txe_mutex_delete(TX_MUTEX *mutex_ptr);
 UINT        _txe_mutex_get(TX_MUTEX *mutex_ptr, ULONG wait_option);
-UINT        _txe_mutex_info_get(TX_MUTEX *mutex_ptr, CHAR **name, ULONG *count, TX_THREAD **owner,
+UINT        _txe_mutex_info_get(TX_MUTEX *mutex_ptr, TX_NAME_CONST CHAR **name, ULONG *count, TX_THREAD **owner,
                     TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_MUTEX **next_mutex);
 UINT        _txe_mutex_prioritize(TX_MUTEX *mutex_ptr);
@@ -1660,11 +1669,11 @@ UINT        _txe_mutex_put(TX_MUTEX *mutex_ptr);
 
 /* Define queue management function prototypes.  */
 
-UINT        _tx_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size,
+UINT        _tx_queue_create(TX_QUEUE *queue_ptr, TX_NAME_CONST CHAR *name_ptr, UINT message_size,
                         VOID *queue_start, ULONG queue_size);
 UINT        _tx_queue_delete(TX_QUEUE *queue_ptr);
 UINT        _tx_queue_flush(TX_QUEUE *queue_ptr);
-UINT        _tx_queue_info_get(TX_QUEUE *queue_ptr, CHAR **name, ULONG *enqueued, ULONG *available_storage,
+UINT        _tx_queue_info_get(TX_QUEUE *queue_ptr, TX_NAME_CONST CHAR **name, ULONG *enqueued, ULONG *available_storage,
                     TX_THREAD **first_suspended, ULONG *suspended_count, TX_QUEUE **next_queue);
 UINT        _tx_queue_performance_info_get(TX_QUEUE *queue_ptr, ULONG *messages_sent, ULONG *messages_received,
                     ULONG *empty_suspensions, ULONG *full_suspensions, ULONG *full_errors, ULONG *timeouts);
@@ -1680,11 +1689,11 @@ UINT        _tx_queue_front_send(TX_QUEUE *queue_ptr, VOID *source_ptr, ULONG wa
 /* Define error checking shells for API services.  These are only referenced by the
    application.  */
 
-UINT        _txe_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size,
+UINT        _txe_queue_create(TX_QUEUE *queue_ptr, TX_NAME_CONST CHAR *name_ptr, UINT message_size,
                         VOID *queue_start, ULONG queue_size, UINT queue_control_block_size);
 UINT        _txe_queue_delete(TX_QUEUE *queue_ptr);
 UINT        _txe_queue_flush(TX_QUEUE *queue_ptr);
-UINT        _txe_queue_info_get(TX_QUEUE *queue_ptr, CHAR **name, ULONG *enqueued, ULONG *available_storage,
+UINT        _txe_queue_info_get(TX_QUEUE *queue_ptr, TX_NAME_CONST CHAR **name, ULONG *enqueued, ULONG *available_storage,
                     TX_THREAD **first_suspended, ULONG *suspended_count, TX_QUEUE **next_queue);
 UINT        _txe_queue_prioritize(TX_QUEUE *queue_ptr);
 UINT        _txe_queue_receive(TX_QUEUE *queue_ptr, VOID *destination_ptr, ULONG wait_option);
@@ -1696,10 +1705,10 @@ UINT        _txe_queue_front_send(TX_QUEUE *queue_ptr, VOID *source_ptr, ULONG w
 /* Define semaphore management function prototypes.  */
 
 UINT        _tx_semaphore_ceiling_put(TX_SEMAPHORE *semaphore_ptr, ULONG ceiling);
-UINT        _tx_semaphore_create(TX_SEMAPHORE *semaphore_ptr, CHAR *name_ptr, ULONG initial_count);
+UINT        _tx_semaphore_create(TX_SEMAPHORE *semaphore_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG initial_count);
 UINT        _tx_semaphore_delete(TX_SEMAPHORE *semaphore_ptr);
 UINT        _tx_semaphore_get(TX_SEMAPHORE *semaphore_ptr, ULONG wait_option);
-UINT        _tx_semaphore_info_get(TX_SEMAPHORE *semaphore_ptr, CHAR **name, ULONG *current_value,
+UINT        _tx_semaphore_info_get(TX_SEMAPHORE *semaphore_ptr, TX_NAME_CONST CHAR **name, ULONG *current_value,
                     TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_SEMAPHORE **next_semaphore);
 UINT        _tx_semaphore_performance_info_get(TX_SEMAPHORE *semaphore_ptr, ULONG *puts, ULONG *gets,
@@ -1714,10 +1723,10 @@ UINT        _tx_semaphore_put_notify(TX_SEMAPHORE *semaphore_ptr, VOID (*semapho
    application.  */
 
 UINT        _txe_semaphore_ceiling_put(TX_SEMAPHORE *semaphore_ptr, ULONG ceiling);
-UINT        _txe_semaphore_create(TX_SEMAPHORE *semaphore_ptr, CHAR *name_ptr, ULONG initial_count, UINT semaphore_control_block_size);
+UINT        _txe_semaphore_create(TX_SEMAPHORE *semaphore_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG initial_count, UINT semaphore_control_block_size);
 UINT        _txe_semaphore_delete(TX_SEMAPHORE *semaphore_ptr);
 UINT        _txe_semaphore_get(TX_SEMAPHORE *semaphore_ptr, ULONG wait_option);
-UINT        _txe_semaphore_info_get(TX_SEMAPHORE *semaphore_ptr, CHAR **name, ULONG *current_value,
+UINT        _txe_semaphore_info_get(TX_SEMAPHORE *semaphore_ptr, TX_NAME_CONST CHAR **name, ULONG *current_value,
                     TX_THREAD **first_suspended, ULONG *suspended_count,
                     TX_SEMAPHORE **next_semaphore);
 UINT        _txe_semaphore_prioritize(TX_SEMAPHORE *semaphore_ptr);
@@ -1729,7 +1738,7 @@ UINT        _txe_semaphore_put_notify(TX_SEMAPHORE *semaphore_ptr, VOID (*semaph
 
 VOID        _tx_thread_context_save(VOID);
 VOID        _tx_thread_context_restore(VOID);
-UINT        _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+UINT        _tx_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*entry_function)(ULONG entry_input), ULONG entry_input,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
@@ -1737,7 +1746,7 @@ UINT        _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
 UINT        _tx_thread_delete(TX_THREAD *thread_ptr);
 UINT        _tx_thread_entry_exit_notify(TX_THREAD *thread_ptr, VOID (*thread_entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type));
 TX_THREAD  *_tx_thread_identify(VOID);
-UINT        _tx_thread_info_get(TX_THREAD *thread_ptr, CHAR **name, UINT *state, ULONG *run_count,
+UINT        _tx_thread_info_get(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR **name, UINT *state, ULONG *run_count,
                 UINT *priority, UINT *preemption_threshold, ULONG *time_slice,
                 TX_THREAD **next_thread, TX_THREAD **next_suspended_thread);
 UINT        _tx_thread_interrupt_control(UINT new_posture);
@@ -1766,14 +1775,14 @@ UINT        _tx_thread_wait_abort(TX_THREAD *thread_ptr);
 /* Define error checking shells for API services.  These are only referenced by the
    application.  */
 
-UINT        _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+UINT        _txe_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*entry_function)(ULONG entry_input), ULONG entry_input,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start, UINT thread_control_block_size);
 UINT        _txe_thread_delete(TX_THREAD *thread_ptr);
 UINT        _txe_thread_entry_exit_notify(TX_THREAD *thread_ptr, VOID (*thread_entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type));
-UINT        _txe_thread_info_get(TX_THREAD *thread_ptr, CHAR **name, UINT *state, ULONG *run_count,
+UINT        _txe_thread_info_get(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR **name, UINT *state, ULONG *run_count,
                 UINT *priority, UINT *preemption_threshold, ULONG *time_slice,
                 TX_THREAD **next_thread, TX_THREAD **next_suspended_thread);
 UINT        _txe_thread_preemption_change(TX_THREAD *thread_ptr, UINT new_threshold,
@@ -1793,12 +1802,12 @@ UINT        _txe_thread_wait_abort(TX_THREAD *thread_ptr);
 
 UINT        _tx_timer_activate(TX_TIMER *timer_ptr);
 UINT        _tx_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG reschedule_ticks);
-UINT        _tx_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr,
+UINT        _tx_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*expiration_function)(ULONG input), ULONG expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate);
 UINT        _tx_timer_deactivate(TX_TIMER *timer_ptr);
 UINT        _tx_timer_delete(TX_TIMER *timer_ptr);
-UINT        _tx_timer_info_get(TX_TIMER *timer_ptr, CHAR **name, UINT *active, ULONG *remaining_ticks,
+UINT        _tx_timer_info_get(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR **name, UINT *active, ULONG *remaining_ticks,
                 ULONG *reschedule_ticks, TX_TIMER **next_timer);
 UINT        _tx_timer_performance_info_get(TX_TIMER *timer_ptr, ULONG *activates, ULONG *reactivates,
                 ULONG *deactivates, ULONG *expirations, ULONG *expiration_adjusts);
@@ -1814,12 +1823,12 @@ VOID        _tx_time_set(ULONG new_time);
 
 UINT        _txe_timer_activate(TX_TIMER *timer_ptr);
 UINT        _txe_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG reschedule_ticks);
-UINT        _txe_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr,
+UINT        _txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*expiration_function)(ULONG input), ULONG expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size);
 UINT        _txe_timer_deactivate(TX_TIMER *timer_ptr);
 UINT        _txe_timer_delete(TX_TIMER *timer_ptr);
-UINT        _txe_timer_info_get(TX_TIMER *timer_ptr, CHAR **name, UINT *active, ULONG *remaining_ticks,
+UINT        _txe_timer_info_get(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR **name, UINT *active, ULONG *remaining_ticks,
                 ULONG *reschedule_ticks, TX_TIMER **next_timer);
 
 
@@ -2343,4 +2352,3 @@ void __ghs_rnerr(char *errMsg, int stackLevels, int stackTraceDisplay, void *hex
 #endif
 
 #endif
-

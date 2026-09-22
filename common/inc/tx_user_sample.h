@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -105,6 +107,12 @@
 
 /*
 #define TX_TIMER_TICKS_PER_SECOND       (100UL)
+*/
+
+/* Define this option to expose object names without the const qualifier.  */
+
+/*
+#define TX_LEGACY_NON_CONST_NAMES
 */
 
 /* Determine if there is a FileX pointer in the thread control block.
@@ -295,4 +303,3 @@
 */
 
 #endif
-

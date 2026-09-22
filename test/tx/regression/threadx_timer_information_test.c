@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test timer information services.  */
 
 #include   <stdio.h>
@@ -104,7 +106,7 @@ static void    thread_0_entry(ULONG thread_input)
 
 UINT        status;
 UINT        interrupt_status;
-CHAR        *name;
+TX_NAME_CONST CHAR *name;
 UINT        active;
 ULONG       remaining_ticks;
 ULONG       reschedule_ticks;
@@ -231,7 +233,7 @@ TX_TIMER_INTERNAL **list_head;
     status += tx_timer_info_get(&timer_0, &name, &active, &remaining_ticks, &reschedule_ticks, &next_timer);
 
     /* Check for successful completion.  */
-    if ((status != TX_SUCCESS) || (active != TX_TRUE) || (remaining_ticks != 100) || (reschedule_ticks != 200) || (next_timer != &timer_1))
+    if ((status != TX_SUCCESS) || (name != timer_0.tx_timer_name) || (active != TX_TRUE) || (remaining_ticks != 100) || (reschedule_ticks != 200) || (next_timer != &timer_1))
     {
 
         /* Application timer error.  */

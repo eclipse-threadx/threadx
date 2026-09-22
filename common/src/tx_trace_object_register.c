@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -66,7 +68,7 @@
 /*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
-VOID  _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, CHAR *object_name, ULONG parameter_1, ULONG parameter_2)
+VOID  _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, TX_NAME_CONST CHAR *object_name, ULONG parameter_1, ULONG parameter_2)
 {
 
 #ifdef TX_ENABLE_EVENT_TRACE

@@ -84,7 +84,7 @@
 /*    _txm_module_manager_kernel_dispatch   Kernel dispatch function      */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                             VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
                             VOID (*entry_function)(ULONG id), ULONG entry_input,
                             VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
@@ -752,4 +752,3 @@ ULONG                   i;
     /* Return success.  */
     return(TX_SUCCESS);
 }
-

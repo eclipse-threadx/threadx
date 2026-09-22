@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -452,7 +454,7 @@ TRACE_DECLARE  ULONG                             _tx_trace_registry_search_start
 
 
 #define TX_TRACE_INITIALIZE                                     _tx_trace_initialize();
-#define TX_TRACE_OBJECT_REGISTER(t,p,n,a,b)                     _tx_trace_object_register((UCHAR) (t), (VOID *) (p), (CHAR *) (n), (ULONG) (a), (ULONG) (b));
+#define TX_TRACE_OBJECT_REGISTER(t,p,n,a,b)                     _tx_trace_object_register((UCHAR) (t), (VOID *) (p), (n), (ULONG) (a), (ULONG) (b));
 #define TX_TRACE_OBJECT_UNREGISTER(o)                           _tx_trace_object_unregister((VOID *) (o));
 #ifndef TX_TRACE_IN_LINE_INSERT
 #define TX_TRACE_IN_LINE_INSERT(i,a,b,c,d,e) \
@@ -515,7 +517,7 @@ TRACE_DECLARE  ULONG                             _tx_trace_registry_search_start
 /* Define internal function prototypes of the trace component, only if compiling ThreadX source code.  */
 
 VOID    _tx_trace_initialize(VOID);
-VOID    _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, CHAR *object_name, ULONG parameter_1, ULONG parameter_2);
+VOID    _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, TX_NAME_CONST CHAR *object_name, ULONG parameter_1, ULONG parameter_2);
 VOID    _tx_trace_object_unregister(VOID *object_ptr);
 
 

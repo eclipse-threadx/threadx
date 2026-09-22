@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test the mutex create/delete and immediate
    return gets and puts.  */
 
@@ -69,7 +71,7 @@ static void    thread_2_entry(ULONG thread_input);
 static void    thread_3_entry(ULONG thread_input);
 static void    thread_4_entry(ULONG thread_input);
 
-UINT        _txe_mutex_create(TX_MUTEX *mutex_ptr, CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size);
+UINT        _txe_mutex_create(TX_MUTEX *mutex_ptr, TX_NAME_CONST CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size);
 
 
 /* Prototype for test control return.  */
