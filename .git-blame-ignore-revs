@@ -1,0 +1,54 @@
+# Commits that changed file headers, copyright lines or version constants across
+# the whole tree. They carry no behavioural change, so `git blame` should look
+# through them to the commit that last touched the code itself.
+#
+# GitHub applies this file automatically. To use it locally, run once:
+#
+#     git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# Add a commit here only when it is mechanical and repository-wide. A commit
+# that changes behaviour does not belong in this file, however large it is.
+
+# 2023-10-23  Update release version to 6.3.0 and date to 10-31-2023 (#308)
+# 1366 files
+13b700fd3ed763cedcba7dbd17b859077a01aa9c
+
+# 2024-01-29  Update copyright.
+# 3618 files
+8276bcf71142197e09551e29f1779299fa591ec7
+
+# 2024-01-30  Update version id string.
+# 1048 files
+3e1da1f0b0973e6b833b08b10fb27c7c718835b3
+
+# 2024-02-23  Update the copyright for all assembly files.
+# 798 files
+039a3463974f922f6dd6bfb8afb7ee2895eaebcf
+
+# 2024-02-27  Update version number to 6.4.1
+# 237 files
+27f0ce9ca2334b975c298fd00eac1bc05ecec1f7
+
+# 2025-02-24  Updated ports version to v6.4.2.
+# 235 files
+376e26be292f7d579091650a70b5670195240539
+
+# 2026-03-05  Updated copyright headers and version number constants (#509)
+# 5970 files
+c3259a216026372e3833dd8996a68f77e8595fbd
+
+# 2026-06-03  Release 6.5.1.202602 preparation (#543)
+# 204 files
+de1c6e9bbe13e2db480e4e0ed2d3589ebdd5db27
+
+# 2026-06-06  Added copyright headers to files missing them
+# 581 files
+730b61874bc5cf40768987605ae5187fde0fa1e2
+
+# 2026-06-08  Release 6.5.1.202602a preparation (#547)
+# 207 files
+df30b8b96e4c0c6d72e0bb80d2a2ec31666e5afe
+
+# 2026-09-15  Normalized the AI disclosure comment to one fixed line per file (#740)
+# 455 files
+9e4c57138dfa004cd512b60259c1c5047a8b3dd1
