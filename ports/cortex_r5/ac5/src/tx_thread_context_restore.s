@@ -1,5 +1,6 @@
 ;/***************************************************************************
 ; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026 Eclipse ThreadX contributors
 ; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
 ; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
+; Portions of this file were generated with AI assistance.
 ;
 ;
 ;/**************************************************************************/
@@ -47,7 +49,7 @@ SVC_MODE        EQU     0x93                    ; SVC mode
     IMPORT      _tx_timer_time_slice
     IMPORT      _tx_thread_schedule
     IMPORT      _tx_thread_preempt_disable
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
     IMPORT      _tx_execution_isr_exit
     ENDIF
 ;
@@ -101,7 +103,7 @@ _tx_thread_context_restore
     CPSID   i                                   ; Disable IRQ interrupts
     ENDIF
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
 ;
 ;    /* Call the ISR exit function to indicate an ISR is complete.  */
 ;
@@ -245,4 +247,3 @@ __tx_thread_idle_system_restore
 ;}
 ;
     END
-

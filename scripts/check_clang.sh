@@ -152,7 +152,7 @@ declare -A PORT_TARGET=(
 # Baseline, where the 16-bit POP takes r0-r7 and pc only, and rejected by GNU as
 # well as by LLVM. Turning the feature on had never once been tried.
 FEATURE_MACROS="TX_ENABLE_VFP_SUPPORT TX_ENABLE_FIQ_SUPPORT TX_LOW_POWER
-                TX_ENABLE_EXECUTION_CHANGE_NOTIFY"
+                TX_ENABLE_EXECUTION_CHANGE_NOTIFY TX_EXECUTION_PROFILE_ENABLE"
 
 # TX_ENABLE_IRQ_NESTING and TX_ENABLE_FIQ_NESTING are deliberately not here.
 # They guard no assembly in the trees this script walks: the nesting start and end

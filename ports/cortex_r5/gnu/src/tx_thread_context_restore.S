@@ -1,5 +1,6 @@
 @/***************************************************************************
 @ * Copyright (c) 2024 Microsoft Corporation
+@ * Copyright (c) 2026 Eclipse ThreadX contributors
 @ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
 @ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
+@ Portions of this file were generated with AI assistance.
 @
 @
 @/**************************************************************************/
@@ -95,7 +97,7 @@ _tx_thread_context_restore:
     CPSID   i                               @ Disable IRQ interrupts
 #endif
 
-#ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+#if defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)
 @
 @    /* Call the ISR exit function to indicate an ISR is complete.  */
 @
@@ -237,6 +239,5 @@ __tx_thread_idle_system_restore:
     MSR     CPSR_c, r0                      @ Enter SVC mode
     B       _tx_thread_schedule             @ Return to scheduler
 @}
-
 
 
