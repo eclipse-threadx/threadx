@@ -22,11 +22,14 @@ filter=$repo_root/common/src
 # is a gate a regression passes, and none is needed here: the same seven
 # configurations produce the same figure on a workstation and on a clean runner.
 #
-# The branch figure is 3150 of 3170 outcomes, 99.369%, written here to the two
+# The branch figure is 3128 of 3148 outcomes, 99.365%, written here to the two
 # decimal places the report prints. That reads a hundredth of a point low, which
-# is under a third of one outcome, so losing a single branch still fails.
+# is under a fifth of one outcome, so losing a single branch still fails.
 #
-# The denominator is the whole of common/src, over every build configuration.
+# The denominator is the whole of common/src, over every build configuration,
+# less the code the regression-test hook macros inject into it -- 7 lines and 22
+# branch outcomes at 8 sites, all of them covered, which an application does not
+# compile at all. coverage_union.py holds the list and prints it with the figure.
 #
 # The gate reads the union figure from coverage_union.py, not the percentage in
 # the merged report. gcovr's merge keys each branch by the basic-block pair gcov
