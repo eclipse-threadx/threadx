@@ -26,13 +26,13 @@ filter=$repo_root/common_smp/src
 # renumbers it. Both figures are produced and the merged report is published
 # unchanged; the gate uses the union because it is the one that counts branches
 # in the source. Over the eight configurations the merged denominator reads more
-# than 6500 where the source carries 3612, and adding misra_trace_build alone
-# moved the merged figure by 994 branches against the dozen the source really
-# gained.
+# than 6500 where the certified denominator is 3576, and adding misra_trace_build
+# alone moved the merged figure by 994 branches against the dozen the source
+# really gained.
 #
 # The branch gate is far below the 83.00 that preceded it and no coverage was
 # lost doing it. 83.00 was a percentage of 4773 counted branch instances; this is
-# a percentage of the 3612 branches that exist in common_smp/src.
+# a percentage of the 3576 certified branches in common_smp/src.
 #
 # The branch denominator is 3612 rather than 3610 from the fault-injection sweep
 # onwards. TX_BYTE_ALLOCATE_EXTENSION in the Linux SMP port gained a second
@@ -40,6 +40,16 @@ filter=$repo_root/common_smp/src
 # is certified-source branch and is counted. Both of its outcomes are covered,
 # and nothing else in ports_smp enters the denominator -- the gcovr -f filter
 # excludes it.
+#
+# It is 3576 rather than 3612 from the hook exclusion onwards, and the line
+# denominator 5440 rather than 5450. Every configuration is built with
+# -DTX_REGRESSION_TEST, which opens a block in the port header defining ten
+# macros that expand to live code at eleven sites in common_smp/src. That code is
+# in no build anyone ships, so coverage_union.py drops it: 10 lines and 36 branch
+# outcomes, all of them covered, leaving the uncovered set untouched. One of the
+# eleven keeps its line, because tx_api.h gives that macro a real statement under
+# TX_MISRA_ENABLE and the line therefore ships. The sites are listed in
+# coverage_union.py and printed with the figure.
 #
 # The margin below the measured figure is not slack for regressions. It is there
 # because the same unchanged tree has not always measured identically twice.
@@ -102,14 +112,21 @@ filter=$repo_root/common_smp/src
 # it by winning a race rather than by executing in order.
 #
 # The gate is therefore still set ten lines and ten outcomes below the set
-# covered in *every* run -- 5449 lines and 3588 outcomes -- rather than below the
+# covered in *every* run -- 5439 lines and 3552 outcomes -- rather than below the
 # lowest total any run reported. The two coincide in the last two samples and
 # have not in any earlier one. Ten is a measured size now rather than an
 # inherited one: it covers the largest per-configuration movement observed,
 # eight outcomes, with headroom, against a set that has no second configuration
 # to fall back on.
+#
+# The margin is ten outcomes, not a percentage, so the branch threshold moved
+# with the denominator. Against 3576 a 99.05 gate admits 3543 and buys nine; it
+# takes 99.04 to admit 3542 and keep the ten the margin is sized at. The line
+# axis needs no change: against 5440 the 99.79 gate still admits 5429, which is
+# ten below the floor. Both are held on the achieved figure of 5439/5440 and
+# 3552/3576.
 min_line=${TX_COVERAGE_MIN_LINE:-99.79}
-min_branch=${TX_COVERAGE_MIN_BRANCH:-99.05}
+min_branch=${TX_COVERAGE_MIN_BRANCH:-99.04}
 
 # --merge unions the per-configuration reports into the one number that means
 # something. Each configuration writes an intermediate JSON beside its XML, and
