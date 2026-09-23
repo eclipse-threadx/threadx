@@ -1,5 +1,6 @@
 ;/***************************************************************************
 ; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026 Eclipse ThreadX contributors
 ; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
 ; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
+; Portions of this file were generated with AI assistance.
 ;
 ;
 ;/**************************************************************************/
@@ -32,7 +34,7 @@
     IMPORT      _tx_thread_current_ptr
     IMPORT      _tx_timer_time_slice
     IMPORT      _tx_thread_schedule
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
     IMPORT      _tx_execution_thread_exit
     ENDIF
 ;
@@ -106,7 +108,7 @@ _tx_skip_solicited_vfp_save
     STMDB   sp!, {r0-r1}                        ; Save type and CPSR
 ;
 ;
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
 ;
 ;    /* Call the thread exit function to indicate the thread is no longer executing.  */
 ;
@@ -148,4 +150,3 @@ __tx_thread_dont_save_ts
 ;
 ;}
     END
-
