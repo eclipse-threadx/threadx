@@ -12,7 +12,7 @@ Eclipse ThreadX has been integrated to the semiconductor's SDKs and development 
 
 We also provide [getting started guide](https://github.com/eclipse-threadx/getting-started) and [samples](https://github.com/eclipse-threadx/samples) using development boards from semiconductors you can build and test with.
 
-See [Overview of Eclipse ThreadX RTOS](https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/threadx/overview-threadx.md) for the high-level overview.
+See [Overview of Eclipse ThreadX RTOS](https://threadx.io/releases/6.5.1/threadx/main/overview-threadx.html) for the high-level overview.
 
 ## Repository Structure and Usage
 ### Directory layout
@@ -118,7 +118,7 @@ xtensa      cortex_a65ae
 ```
 
 ### ThreadX Modules
-[Eclipse ThreadX Modules](https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/threadx-modules/chapter1.md) component provides an infrastructure for applications to dynamically load modules that are built separately from the resident portion of the application.
+[Eclipse ThreadX Modules](https://threadx.io/releases/6.5.1/threadx-modules/main/chapter1.html) component provides an infrastructure for applications to dynamically load modules that are built separately from the resident portion of the application.
 ```
 cortex_a35
 cortex_a35_smp
@@ -134,7 +134,7 @@ rxv2
 ```
 
 ### ThreadX SMP
-[Eclipse ThreadX SMP](https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/threadx/threadx-smp/chapter1.md) is a high-performance real-time SMP kernel designed specifically for embedded applications.
+[Eclipse ThreadX SMP](https://threadx.io/releases/6.5.1/threadx/main/threadx-smp/chapter1.html) is a high-performance real-time SMP kernel designed specifically for embedded applications.
 ```
 arc_hs_smp
 cortex_a34_smp
@@ -210,7 +210,7 @@ License terms for using Eclipse ThreadX are defined in the LICENSE.txt file of t
 
 The following are references to additional ThreadX RTOS resources:
 
-- **Product introduction**: https://github.com/eclipse-threadx/rtos-docs
+- **Product introduction**: https://threadx.io/releases/latest
 - **Product issues and bugs, or feature requests**: https://github.com/eclipse-threadx/threadx/issues
 - **TraceX Installer**: https://aka.ms/azrtos-tracex-installer
 
