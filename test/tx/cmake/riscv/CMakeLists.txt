@@ -5,7 +5,7 @@ cmake_policy(SET CMP0057 NEW)
 project(threadx_riscv_test LANGUAGES C ASM)
 
 # Build configurations (same defines as Linux tests, minus coverage instrumentation)
-set(BUILD_CONFIGURATIONS default_build disable_notify_callbacks_build
+set(BUILD_CONFIGURATIONS default_build optimized_build disable_notify_callbacks_build
                          stack_checking_build stack_checking_rand_fill_build trace_build)
 set(CMAKE_CONFIGURATION_TYPES
     ${BUILD_CONFIGURATIONS}
@@ -26,14 +26,21 @@ message(STATUS "THREADX_ARCH: ${THREADX_ARCH}")
 
 # Per-configuration compile definitions
 set(default_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32)
+set(optimized_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32)
 set(disable_notify_callbacks_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_DISABLE_NOTIFY_CALLBACKS)
 set(stack_checking_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_ENABLE_STACK_CHECKING)
 set(stack_checking_rand_fill_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_ENABLE_STACK_CHECKING -DTX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
 set(trace_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_ENABLE_EVENT_TRACE)
 
+if(CMAKE_BUILD_TYPE STREQUAL "optimized_build")
+    set(REGRESSION_OPTIMIZATION -O2)
+else()
+    set(REGRESSION_OPTIMIZATION -O0)
+endif()
+
 add_compile_options(
     -std=c99
-    -O0
+    ${REGRESSION_OPTIMIZATION}
     -g3
     -fdiagnostics-color
     -Werror
