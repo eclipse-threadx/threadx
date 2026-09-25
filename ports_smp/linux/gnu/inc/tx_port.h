@@ -513,6 +513,16 @@ typedef struct
 } TX_LINUX_MUTEX;
 
 
+/* Define how long a thread waits on the Linux mutex before retrying. A thread
+   parked on the mutex can be suspended by the port's signal handler and so never
+   act on the wake-up the next release sends it, which leaves the wake-up lost
+   and every other waiter parked on a mutex that is free.  */
+
+#ifndef TX_LINUX_MUTEX_RETRY_NSEC
+#define TX_LINUX_MUTEX_RETRY_NSEC       1000000
+#endif
+
+
 /* Define Linux-specific critical section APIs.  */
 
 void _tx_linux_mutex_obtain(TX_LINUX_MUTEX *mutex);

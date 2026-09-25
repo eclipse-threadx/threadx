@@ -292,6 +292,8 @@ void _tx_linux_mutex_obtain(TX_LINUX_MUTEX *mutex)
 TX_THREAD       *thread_ptr;
 pthread_t       current_thread_id;
 UINT            i;
+INT             linux_status;
+struct timespec ts;
 
     /* Pickup the current thread ID.  */
     current_thread_id =  pthread_self();
@@ -343,8 +345,43 @@ UINT            i;
             thread_ptr -> tx_thread_linux_mutex_access =  TX_TRUE;
         }
 
-        /* Get the Linux mutex.  */
-        pthread_mutex_lock(&mutex -> tx_linux_mutex);
+        /* Get the Linux mutex.  The wait is timed and retried rather than left
+           to pthread_mutex_lock, because a thread can be signalled into the
+           port's suspend handler while it is parked on this mutex.  That handler
+           does not return until the thread is resumed, so the wake-up the next
+           release sends is delivered to a thread that never retries and is lost.
+           Any other thread parked on the mutex then waits on a mutex that is
+           free, which on this port deadlocks the whole process: the thread that
+           can resume the suspended one is the scheduler, and the scheduler takes
+           this mutex on every pass.  Retrying on a timeout costs nothing when
+           the mutex is handed over normally, and turns that lost wake-up into a
+           delay of at most the retry period.  */
+        do
+        {
+
+            /* Set the deadline for this attempt.  */
+            clock_gettime(CLOCK_REALTIME, &ts);
+            ts.tv_nsec =  ts.tv_nsec + TX_LINUX_MUTEX_RETRY_NSEC;
+            if (ts.tv_nsec >= 1000000000)
+            {
+
+                ts.tv_nsec =  ts.tv_nsec - 1000000000;
+                ts.tv_sec++;
+            }
+
+            linux_status =  pthread_mutex_timedlock(&mutex -> tx_linux_mutex, &ts);
+
+            /* Anything but the deadline expiring is a real failure to obtain the
+               mutex, so stop retrying and record it.  */
+            if ((linux_status != 0) && (linux_status != ETIMEDOUT))
+            {
+
+                /* Increment the system error counter.  */
+                _tx_linux_system_error++;
+                break;
+            }
+
+        } while (linux_status != 0);
 
         /* At this point we have the mutex.  */
 
