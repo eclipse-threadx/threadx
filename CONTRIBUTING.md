@@ -38,6 +38,7 @@ Welcome. Here is the shortest path from zero to a merged pull request.
 
 2. **Sign the Eclipse Contributor Agreement (ECA).** See the section below. This is a one-time step and covers every Eclipse Foundation project.
 
+   <br>
 
 3. **Configure Git accordingly.**
 
