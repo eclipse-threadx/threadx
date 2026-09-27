@@ -50,6 +50,24 @@ on:
         default: ''
         required: false
         type: string
+      # Extra options for the container the tests run in, empty for every job
+      # that does not ask for them.
+      #
+      # It exists for one measured case. NetX Duo's two interoperability suites
+      # build a veth pair per test and address it, which needs CAP_NET_ADMIN in
+      # the container's network namespace. A container started with the default
+      # capability set holds CAP_NET_RAW, so tcpdump and libpcap work, and does
+      # not hold CAP_NET_ADMIN, so "ip link add ... type veth" fails with
+      # "RTNETLINK answers: Operation not permitted" on the first test of every
+      # configuration -- measured, not predicted.
+      #
+      # A caller that needs it passes "--cap-add=NET_ADMIN" and nothing else
+      # changes. Granting it here for every component instead would widen the
+      # privileges of five suites that have no use for it.
+      container_options:
+        default: ''
+        required: false
+        type: string
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -94,6 +112,7 @@ jobs:
     # with something else.
     container:
       image: debian:trixie@sha256:f324c7ff54321e8d9c588493a20244965938ce0aa50bbd1022d38010e9ffc4b1
+      options: ${{ inputs.container_options }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
