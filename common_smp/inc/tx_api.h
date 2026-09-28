@@ -1942,7 +1942,8 @@ TX_THREAD               *_tx_misra_ulong_to_thread_pointer_convert(ULONG value);
 VOID                    *_tx_misra_timer_indirect_to_void_pointer_convert(TX_TIMER_INTERNAL **pointer);
 CHAR                    *_tx_misra_const_char_to_char_pointer_convert(const char *pointer);
 TX_THREAD               *_tx_misra_void_to_thread_pointer_convert(VOID  *pointer);
-UCHAR                   *_tx_misra_char_to_uchar_pointer_convert(CHAR  *pointer);
+const UCHAR             *_tx_misra_char_to_uchar_pointer_convert(TX_NAME_CONST CHAR *pointer);
+const UCHAR             *_tx_misra_const_uchar_pointer_add(const UCHAR *pointer, ULONG amount);
 VOID                    _tx_misra_event_flags_group_not_used(TX_EVENT_FLAGS_GROUP *group_ptr);
 VOID                    _tx_misra_event_flags_set_notify_not_used(VOID (*events_set_notify)(TX_EVENT_FLAGS_GROUP *notify_group_ptr));
 VOID                    _tx_misra_queue_not_used(TX_QUEUE *queue_ptr);
@@ -1954,6 +1955,7 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 
 #define TX_MEMSET(a,b,c)                                _tx_misra_memset((a), (UINT) (b), (UINT) (c))
 #define TX_UCHAR_POINTER_ADD(a,b)                       _tx_misra_uchar_pointer_add((UCHAR *) (a), (ULONG) (b))
+#define TX_CONST_UCHAR_POINTER_ADD(a,b)                 _tx_misra_const_uchar_pointer_add((const UCHAR *) (a), (ULONG) (b))
 #define TX_UCHAR_POINTER_SUB(a,b)                       _tx_misra_uchar_pointer_sub((UCHAR *) (a), (ULONG) (b))
 #define TX_UCHAR_POINTER_DIF(a,b)                       _tx_misra_uchar_pointer_dif((UCHAR *) (a), (UCHAR *) (b))
 #define TX_ULONG_POINTER_ADD(a,b)                       _tx_misra_ulong_pointer_add((ULONG *) (a), (ULONG) (b))
@@ -2014,6 +2016,7 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 #endif
 
 #define TX_UCHAR_POINTER_ADD(a,b)                       (((UCHAR *) (a)) + ((UINT) (b)))
+#define TX_CONST_UCHAR_POINTER_ADD(a,b)                 (((const UCHAR *) (a)) + ((UINT) (b)))
 #define TX_UCHAR_POINTER_SUB(a,b)                       (((UCHAR *) (a)) - ((UINT) (b)))
 #define TX_UCHAR_POINTER_DIF(a,b)                       ((ULONG)(((UCHAR *) (a)) - ((UCHAR *) (b))))
 #define TX_ULONG_POINTER_ADD(a,b)                       (((ULONG *) (a)) + ((UINT) (b)))
@@ -2061,7 +2064,7 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 #endif
 #define TX_CONST_CHAR_TO_CHAR_POINTER_CONVERT(a)        ((CHAR *) ((VOID *) (a)))
 #define TX_VOID_TO_THREAD_POINTER_CONVERT(a)            ((TX_THREAD *) ((VOID *) (a)))
-#define TX_CHAR_TO_UCHAR_POINTER_CONVERT(a)             ((UCHAR *) ((VOID *) (a)))
+#define TX_CHAR_TO_UCHAR_POINTER_CONVERT(a)             ((const UCHAR *) ((const VOID *) (a)))
 #ifndef TX_EVENT_FLAGS_GROUP_NOT_USED
 #define TX_EVENT_FLAGS_GROUP_NOT_USED(a)                ((void)(a))
 #endif

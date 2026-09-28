@@ -820,15 +820,29 @@ UCHAR  *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer)
 /***********************************************************************************************/
 /***********************************************************************************************/
 /**                                                                                            */
-/**  UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer);                           */
+/**  const UCHAR  *_tx_misra_char_to_uchar_pointer_convert(TX_NAME_CONST CHAR *pointer);       */
 /**                                                                                            */
 /***********************************************************************************************/
 /***********************************************************************************************/
-UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer)
+const UCHAR  *_tx_misra_char_to_uchar_pointer_convert(TX_NAME_CONST CHAR *pointer)
 {
 
     /* Return a UCHAR pointer.  */
-    return((UCHAR *) ((VOID *) pointer));
+    return((const UCHAR *) ((const VOID *) pointer));
+}
+
+
+/***********************************************************************************************/
+/***********************************************************************************************/
+/**                                                                                            */
+/**  const UCHAR  *_tx_misra_const_uchar_pointer_add(const UCHAR *ptr, ULONG amount);          */
+/**                                                                                            */
+/***********************************************************************************************/
+/***********************************************************************************************/
+const UCHAR  *_tx_misra_const_uchar_pointer_add(const UCHAR *ptr, ULONG amount)
+{
+    ptr =  ptr + amount;
+    return(ptr);
 }
 
 
