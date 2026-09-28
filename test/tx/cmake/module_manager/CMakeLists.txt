@@ -78,3 +78,28 @@ target_compile_options(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_thread_kernel_stack_test
          threadx_module_manager_thread_kernel_stack_test)
+
+# This test drives the manager services directly rather than through a dispatcher,
+# so it needs none of the dispatch table and no guard list.
+add_executable(
+  threadx_module_manager_object_authentication_test
+  ${SOURCE_DIR}/threadx_module_manager_object_authentication_test.c
+  ${module_manager_dir}/src/txm_module_manager_util.c
+  ${module_manager_dir}/src/txm_module_manager_object_allocate.c
+  ${module_manager_dir}/src/txm_module_manager_object_deallocate.c
+  ${module_manager_dir}/src/txm_module_manager_thread_reset.c)
+
+target_include_directories(
+  threadx_module_manager_object_authentication_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_a7_module_dir}/inc)
+
+target_compile_options(
+  threadx_module_manager_object_authentication_test
+  PRIVATE -include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_object_authentication_test
+         threadx_module_manager_object_authentication_test)
