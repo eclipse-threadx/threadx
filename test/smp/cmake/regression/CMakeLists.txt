@@ -86,6 +86,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_smp_random_resume_suspend_exclusion_test.c
     ${SOURCE_DIR}/threadx_smp_random_resume_suspend_test.c
     ${SOURCE_DIR}/threadx_smp_rebalance_exclusion_test.c
+    ${SOURCE_DIR}/threadx_smp_relinquish_rebalance_test.c
     ${SOURCE_DIR}/threadx_smp_relinquish_test.c
     ${SOURCE_DIR}/threadx_smp_resume_suspend_ascending_order_test.c
     ${SOURCE_DIR}/threadx_smp_resume_suspend_descending_order_test.c
