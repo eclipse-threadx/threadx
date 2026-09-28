@@ -47,7 +47,7 @@
 /**************************************************************************/
 VOID  _tx_misra_memset(VOID *ptr, UINT value, UINT size)
 {
-    memset(ptr, value, size);
+    memset(ptr, (INT)value, size);
 }
 
 
@@ -91,7 +91,7 @@ ULONG  _tx_misra_uchar_pointer_dif(UCHAR *ptr1, UCHAR *ptr2)
 
 ULONG   value;
 
-    value =  ptr1 - ptr2;
+    value =  (ULONG)(ptr1 - ptr2);
     return(value);
 }
 
@@ -149,7 +149,7 @@ ULONG   _tx_misra_ulong_pointer_dif(ULONG *ptr1, ULONG *ptr2)
 {
 ULONG   value;
 
-    value =  ptr1 - ptr2;
+    value =  (ULONG)(ptr1 - ptr2);
     return(value);
 }
 
@@ -219,7 +219,7 @@ ULONG  _tx_misra_timer_pointer_dif(TX_TIMER_INTERNAL **ptr1, TX_TIMER_INTERNAL *
 
 ULONG   value;
 
-    value =  ptr1 - ptr2;
+    value =  (ULONG)(ptr1 - ptr2);
     return(value);
 }
 
@@ -624,6 +624,8 @@ TX_MUTEX  *_tx_misra_void_to_mutex_pointer_convert(VOID *pointer)
 /**************************************************************************/
 UINT  _tx_misra_status_get(UINT status)
 {
+
+    (VOID)status;
 
     /* Return a successful status.  */
     return(TX_SUCCESS);
