@@ -27,6 +27,7 @@
 #include "tx_api.h"
 #include "tx_thread.h"
 #include "txm_module.h"
+#include "txm_module_manager_util.h"
 
 /**************************************************************************/
 /*                                                                        */
@@ -52,6 +53,13 @@
 /*    tx_*_delete() service is sufficient; pool deallocation is handled   */
 /*    automatically by the dispatch layer.                                */
 /*                                                                        */
+/*    Only memory the calling module allocated from the object pool is    */
+/*    released, and the allocation is identified by searching the         */
+/*    module's own allocation list rather than by reading a private       */
+/*    header from in front of the address the caller supplied.  An        */
+/*    address that names none of this module's allocations returns        */
+/*    TX_PTR_ERROR and is not dereferenced.                               */
+/*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
 /*    object_ptr                        Object pointer to deallocate      */
@@ -64,6 +72,8 @@
 /*                                                                        */
 /*    _txe_mutex_get                        Get module instance mutex     */
 /*    _txe_mutex_put                        Release module instance mutex */
+/*    _txm_module_manager_allocated_object_find                           */
+/*                                          Find the module's allocation  */
 /*    _txe_byte_release                     Release object back to pool   */
 /*                                                                        */
 /*                                                                        */
@@ -90,14 +100,32 @@ UINT                        return_value;
         /* Pickup module instance pointer.  */
         module_instance =  _tx_thread_current_ptr -> tx_thread_module_instance_ptr;
 
-        /* Setup the memory pointer.  */
-        module_allocated_object_ptr =  (TXM_MODULE_ALLOCATED_OBJECT *) object_ptr;
+        /* Find the allocation this address names.
 
-        /* Position the object pointer backwards to position back to the module manager information.  */
-        previous_object =  module_allocated_object_ptr--;
+           The private header in front of an allocation is the manager's own
+           record of who the memory belongs to, but it is only a header when the
+           address is one the manager gave out.  Reaching it by subtraction from
+           whatever address the caller supplied assumes the answer: for an object
+           the application allocated statically, or for any address outside the
+           object pool, the words in front of it are unrelated memory, and this
+           read them in privileged mode before deciding they were not a header.
+           Every delete dispatcher reaches this function with the address the
+           module named, so an object the module does not own arrived here as a
+           matter of course rather than exceptionally.
+
+           Searching the module's own allocation list answers the same question
+           without that assumption.  The address is compared against the
+           allocations the manager made for this module and is never
+           dereferenced, so an address that names none of them -- an object the
+           application owns, an object another module owns, or an address nowhere
+           near the object pool -- is refused without a privileged read.  The
+           search also establishes what the header read could not: that the
+           address is the exact start of an allocation rather than somewhere
+           inside one.  */
+        module_allocated_object_ptr =  _txm_module_manager_allocated_object_find(module_instance, (ALIGN_TYPE) object_ptr, TX_NULL);
 
         /* Make sure the object is valid.  */
-        if ((module_allocated_object_ptr == TX_NULL) || (module_allocated_object_ptr -> txm_module_allocated_object_module_instance != module_instance) || (module_instance -> txm_module_instance_object_list_count == 0))
+        if (module_allocated_object_ptr == TX_NULL)
         {
             /* Set return value to invalid pointer.  */
             return_value =  TX_PTR_ERROR;

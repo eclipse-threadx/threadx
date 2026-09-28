@@ -633,6 +633,145 @@ UINT    status;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
+/*    _txm_module_manager_allocated_object_find           PORTABLE C      */
+/*                                                           6.4.3        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Eclipse ThreadX contributors                                        */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function returns the manager's private header for the object   */
+/*    allocation an address names, or TX_NULL when the address names      */
+/*    none of the specified module's allocations.  The size the           */
+/*    allocation was made for is reported to callers that ask for it.     */
+/*                                                                        */
+/*    The allocation list is the manager's own record, built as it hands  */
+/*    object memory out, and it is searched rather than reached through   */
+/*    a header taken from in front of the caller's address.  That order   */
+/*    is what makes the answer both correct and safe.                     */
+/*                                                                        */
+/*    Correct, because the address immediately after a header is the      */
+/*    only address in an allocation that the manager ever gave out, so    */
+/*    an address chosen inside an allocation is distinguishable from the  */
+/*    start of one.  Reading a header cannot make that distinction: the   */
+/*    bytes in front of an interior address are part of the object, and   */
+/*    a module places values there through ordinary services.             */
+/*                                                                        */
+/*    Safe, because the caller's address is only ever compared, never     */
+/*    dereferenced.  An address that belongs to no allocation of this     */
+/*    module -- an object the application owns, an object another module  */
+/*    owns, or an address nowhere near the object pool -- is rejected     */
+/*    without a privileged read of the words in front of it.              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_instance                   Requesting module instance pointer*/
+/*    object_ptr                        Address of object memory area     */
+/*    object_size_ptr                   Address to return the size the    */
+/*                                        allocation was made for, or     */
+/*                                        TX_NULL to not return it        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    allocation                        The allocation's private header,  */
+/*                                        or TX_NULL when the address     */
+/*                                        names none of this module's     */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _txm_module_manager_allocated_object_check                          */
+/*                                          Module object ownership check */
+/*    _txm_module_manager_object_deallocate Module object deallocation    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-2026      Eclipse ThreadX         Initial Version 6.4.3         */
+/*                    contributors                                        */
+/*                                                                        */
+/**************************************************************************/
+TXM_MODULE_ALLOCATED_OBJECT  *_txm_module_manager_allocated_object_find(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG *object_size_ptr)
+{
+
+TX_INTERRUPT_SAVE_AREA
+
+TXM_MODULE_ALLOCATED_OBJECT     *allocated_object_ptr;
+TXM_MODULE_ALLOCATED_OBJECT     *found_object_ptr;
+ULONG                           objects_examined;
+
+
+    /* Assume the address names none of this module's allocations.  */
+    found_object_ptr =  TX_NULL;
+
+    /* Determine if there is a module whose allocations can be searched.  A request
+       that does not come from a module owns no allocation.  */
+    if (module_instance == TX_NULL)
+    {
+
+        /* Nothing to search, and nothing to report.  */
+        return(TX_NULL);
+    }
+
+    /* Disable interrupts.  The allocation list is maintained by threads holding the
+       manager protection mutex, so a scan that runs to completion with interrupts
+       disabled cannot observe it being changed, and unlike taking the mutex it adds
+       no blocking point and no priority inversion to a kernel request.  */
+    TX_DISABLE
+
+    allocated_object_ptr =  module_instance -> txm_module_instance_object_list_head;
+    objects_examined =      ((ULONG) 0);
+
+    /* Loop through the objects allocated to this module.  The loop is bounded by the
+       count the manager maintains alongside the list, so the cost of one search is
+       bounded by the number of objects this module has allocated, and a list whose
+       links have been damaged cannot make the scan run on.  */
+    while ((objects_examined < module_instance -> txm_module_instance_object_list_count) &&
+           (allocated_object_ptr != TX_NULL))
+    {
+
+        /* The address the module was given is the one immediately after the private
+           header, so that is the only address in this allocation that names it.  */
+        if (((ALIGN_TYPE) (allocated_object_ptr + 1)) == object_ptr)
+        {
+
+            /* Found it.  An address matches at most one allocation, so there is
+               nothing further to look at.  */
+            found_object_ptr =  allocated_object_ptr;
+
+            /* Report the size this allocation was made for, if the caller asked for
+               it.  It is read here, inside the scan, so that the answer cannot be
+               taken from a header that stopped being one after the search.  */
+            if (object_size_ptr != TX_NULL)
+            {
+
+                *object_size_ptr =  allocated_object_ptr -> txm_module_object_size;
+            }
+
+            break;
+        }
+
+        /* Move to the next allocated object.  */
+        objects_examined++;
+        allocated_object_ptr =  allocated_object_ptr -> txm_module_allocated_object_next;
+    }
+
+    /* Restore interrupts.  */
+    TX_RESTORE
+
+    return(found_object_ptr);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _txm_module_manager_allocated_object_check          PORTABLE C      */
 /*                                                           6.4.3        */
 /*  AUTHOR                                                                */
@@ -646,13 +785,14 @@ UINT    status;
 /*    allocations, and whether that allocation is the size the caller     */
 /*    expects.                                                            */
 /*                                                                        */
-/*    The allocation list is the manager's own record, built as it hands   */
-/*    object memory out. Comparing against it is what makes an address    */
-/*    inside the object pool distinguishable from the exact start of an    */
-/*    allocation. Reading a header in front of a candidate address cannot  */
-/*    make that distinction: the bytes in front of an address chosen       */
-/*    inside an allocation are part of the object, and a module can place  */
-/*    values there through ordinary create and set services.              */
+/*    This is the question of ownership, and it is deliberately a         */
+/*    separate question from whether an object is there at all.  A        */
+/*    module may hold, and legitimately use, a pointer to an object it    */
+/*    does not own: the manager hands application-owned objects to        */
+/*    modules by name through its object lookup service, and sharing an   */
+/*    object is what that service is for.  Destroying one is not sharing  */
+/*    it, so the delete services ask this question in addition to the     */
+/*    ones that establish that the address denotes a usable object.       */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -667,12 +807,12 @@ UINT    status;
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    None                                                                */
+/*    _txm_module_manager_allocated_object_find                           */
+/*                                          Find the module's allocation  */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    _txm_module_manager_param_check_object_for_use                      */
-/*                                          Module object authentication  */
+/*    txm_module_manager_*                  Module manager functions      */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
@@ -685,59 +825,30 @@ UINT    status;
 UINT    _txm_module_manager_allocated_object_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG object_size)
 {
 
-TX_INTERRUPT_SAVE_AREA
-
-TXM_MODULE_ALLOCATED_OBJECT     *allocated_object_ptr;
-ULONG                           objects_examined;
-UINT                            status;
+ULONG   allocated_size;
+UINT    status;
 
 
     /* Assume the address is not one of this module's allocations.  */
     status =  TX_FALSE;
 
-    /* Disable interrupts.  The allocation list is maintained by threads holding the
-       manager protection mutex, so a scan that runs to completion with interrupts
-       disabled cannot observe it being changed, and unlike taking the mutex it adds
-       no blocking point and no priority inversion to a kernel request.  */
-    TX_DISABLE
+    /* Initialize the size, so that nothing is read if no allocation is found.  */
+    allocated_size =  ((ULONG) 0);
 
-    allocated_object_ptr =  module_instance -> txm_module_instance_object_list_head;
-    objects_examined =      ((ULONG) 0);
-
-    /* Loop through the objects allocated to this module.  The loop is bounded by the
-       count the manager maintains alongside the list, so the cost of one check is
-       bounded by the number of objects this module has allocated, and a list whose
-       links have been damaged cannot make the scan run on.  */
-    while ((objects_examined < module_instance -> txm_module_instance_object_list_count) &&
-           (allocated_object_ptr != TX_NULL))
+    /* Determine if the address is the exact start of one of this module's
+       allocations.  */
+    if (_txm_module_manager_allocated_object_find(module_instance, object_ptr, &allocated_size) != TX_NULL)
     {
 
-        /* The address the module was given is the one immediately after the private
-           header, so that is the only address in this allocation that names it.  */
-        if (((ALIGN_TYPE) (allocated_object_ptr + 1)) == object_ptr)
+        /* Is the allocation the size the caller expects?  An allocation made for a
+           smaller object does not become a larger one because a service was asked
+           to treat it as one.  */
+        if (allocated_size == object_size)
         {
 
-            /* Is the allocation the size the caller expects?  An allocation made for a
-               smaller object does not become a larger one because a service was asked
-               to treat it as one.  */
-            if (allocated_object_ptr -> txm_module_object_size == object_size)
-            {
-
-                status =  TX_TRUE;
-            }
-
-            /* An address matches at most one allocation, so there is nothing further
-               to look at either way.  */
-            break;
+            status =  TX_TRUE;
         }
-
-        /* Move to the next allocated object.  */
-        objects_examined++;
-        allocated_object_ptr =  allocated_object_ptr -> txm_module_allocated_object_next;
     }
-
-    /* Restore interrupts.  */
-    TX_RESTORE
 
     return(status);
 }

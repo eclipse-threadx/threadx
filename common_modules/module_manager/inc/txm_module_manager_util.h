@@ -120,6 +120,16 @@
 #define TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_CREATION(module_instance, obj_ptr, obj_size) \
     (_txm_module_manager_param_check_object_for_creation(module_instance, obj_ptr, obj_size))
 
+/* When deleting an object, being allowed to use it is not enough.  Deletion is the
+   inverse of creation, so it asks what creation asks: that the object is one this
+   module allocated from the manager's object pool, at the exact address the manager
+   gave it, for an object of this size.  A module may hold a pointer to an object it
+   does not own -- the manager's object lookup service hands application-owned
+   objects to modules by name, and sharing an object is what that service is for --
+   and this is what separates using such an object from destroying it.  */
+#define TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, obj_ptr, obj_size) \
+    (_txm_module_manager_allocated_object_check(module_instance, obj_ptr, obj_size))
+
 /* Strings we dereference can be in RW/RO/Shared areas.  */
 #define TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, string_ptr) \
     ((TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE(module_instance, string_ptr, 1)) || \
@@ -147,6 +157,8 @@ UINT    _txm_module_manager_param_check_object_for_creation(TXM_MODULE_INSTANCE 
 UINT    _txm_module_manager_param_check_object_for_use(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG object_size);
 UINT    _txm_module_manager_param_check_typed_object_for_use(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, UINT object_type);
 UINT    _txm_module_manager_allocated_object_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG object_size);
+TXM_MODULE_ALLOCATED_OBJECT
+        *_txm_module_manager_allocated_object_find(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG *object_size_ptr);
 UINT    _txm_module_manager_object_type_size_get(UINT object_type, ULONG *object_size);
 UINT    _txm_module_manager_created_object_type_check(ALIGN_TYPE object_ptr, UINT object_type);
 UINT    _txm_module_manager_object_id_check(ALIGN_TYPE object_ptr, UINT object_type);
