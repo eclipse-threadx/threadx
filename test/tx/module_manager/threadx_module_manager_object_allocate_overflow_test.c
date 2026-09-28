@@ -148,11 +148,27 @@ ULONG                   _tx_timer_created_count;
 
 /* This test models no module memory of its own, so no address is ever inside the
    calling module's data.  */
-UINT  _txm_module_manager_inside_data_check(ULONG obj_ptr)
+UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr,
+                                            ULONG obj_size, UINT write_request)
 {
+    (VOID) module_instance;
     (VOID) obj_ptr;
+    (VOID) obj_size;
+    (VOID) write_request;
 
     return(TX_FALSE);
+}
+
+
+/* No module data is modelled here, so every range lies outside it.  */
+UINT  _txm_module_manager_outside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr,
+                                             ULONG obj_size)
+{
+    (VOID) module_instance;
+    (VOID) obj_ptr;
+    (VOID) obj_size;
+
+    return(TX_TRUE);
 }
 
 

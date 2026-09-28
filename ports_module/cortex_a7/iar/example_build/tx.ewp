@@ -2833,6 +2833,9 @@
             <name>$PROJ_DIR$\..\module_manager\src\txm_module_manager_mm_initialize.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\module_manager\src\txm_module_manager_inside_data_check.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\module_manager\src\txm_module_manager_mm_register_setup.c</name>
         </file>
         <file>

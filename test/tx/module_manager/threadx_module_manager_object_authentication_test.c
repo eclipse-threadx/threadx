@@ -330,17 +330,56 @@ UINT  _txe_mutex_put(TX_MUTEX *mutex_ptr)
 
 /* Stand in for the module port's data range check, which the portable
    outside-the-module test is built on.  */
-UINT  _txm_module_manager_inside_data_check(ULONG obj_ptr)
+UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr,
+                                            ULONG obj_size, UINT write_request)
 {
 
 ULONG   data_start;
 ULONG   data_end;
 
 
+    (VOID) module_instance;
+    (VOID) write_request;
+
     data_start =  (ULONG) (ALIGN_TYPE) test_module_data.test_data_bytes;
     data_end =    data_start + ((ULONG) TEST_MODULE_MEMORY_BYTES);
 
-    if ((obj_ptr >= data_start) && (obj_ptr < data_end))
+    /* The whole range has to lie inside the module's data, not just its first
+       address, and the subtraction is done on the end rather than the start so that
+       a size which would carry the range past the top of the address space cannot
+       wrap into an accepting answer.  */
+    if (((ULONG) obj_ptr >= data_start) && (obj_size <= (data_end - (ULONG) obj_ptr)))
+    {
+        return(TX_TRUE);
+    }
+
+    return(TX_FALSE);
+}
+
+
+/* Outside is not the negation of inside: a range that only partly reaches into the
+   module's data is neither. It has to end before that data begins or begin after it
+   ends, and a size that would carry the end past the top of the address space is
+   refused rather than allowed to compare as though it had not.  */
+UINT  _txm_module_manager_outside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr,
+                                             ULONG obj_size)
+{
+
+ULONG   data_start;
+ULONG   data_end;
+
+
+    (VOID) module_instance;
+
+    data_start =  (ULONG) (ALIGN_TYPE) test_module_data.test_data_bytes;
+    data_end =    data_start + ((ULONG) TEST_MODULE_MEMORY_BYTES);
+
+    if (obj_size > (~((ULONG) 0) - (ULONG) obj_ptr))
+    {
+        return(TX_FALSE);
+    }
+
+    if ((((ULONG) obj_ptr + obj_size) <= data_start) || ((ULONG) obj_ptr >= data_end))
     {
         return(TX_TRUE);
     }

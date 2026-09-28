@@ -45,8 +45,32 @@
 
 /* Define check macros for modules.  */
 
+/* A port supplies TXM_MODULE_MANAGER_CHECK_INSIDE_DATA to decide whether a caller-supplied
+   range lies inside the module's writable data or shared memory. Ports whose check can tell
+   a read-only region from a writable one also supply the two intent-specific variants below.
+   Ports that cannot make the distinction inherit their single check for both intents, so
+   their behaviour is unchanged.  */
+
+#ifndef TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_READ
+#define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_READ(module_instance, obj_ptr, obj_size) \
+    TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size)
+#endif
+
+#ifndef TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_WRITE
+#define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_WRITE(module_instance, obj_ptr, obj_size) \
+    TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size)
+#endif
+
+/* A range is outside the module's data only when no part of it is reachable by the module.
+   The read intent is used here because it describes the widest set of reachable addresses.
+   A port whose inside check cannot prove the whole range at once must supply its own
+   definition, because negating a partial-range check would report a partly reachable range
+   as being outside the module.  */
+
+#ifndef TXM_MODULE_MANAGER_CHECK_OUTSIDE_DATA
 #define TXM_MODULE_MANAGER_CHECK_OUTSIDE_DATA(module_instance, obj_ptr, obj_size) \
-    (!(TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size)))
+    (!(TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_READ(module_instance, obj_ptr, obj_size)))
+#endif
 
 #define TXM_MODULE_MANAGER_CHECK_INSIDE_CODE(module_instance, obj_ptr, obj_size) \
     (((obj_ptr) < ((obj_ptr) + (obj_size))) && \
@@ -65,12 +89,14 @@
 
 /* Define macros for module.  */
 
+/* The module reads from these ranges, so a read-only region is acceptable.  */
 #define TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE(module_instance, obj_ptr, obj_size) \
-    (TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size) || \
+    (TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_READ(module_instance, obj_ptr, obj_size) || \
      TXM_MODULE_MANAGER_CHECK_INSIDE_CODE(module_instance, obj_ptr, obj_size))
 
+/* The kernel writes to these ranges, so the module must be able to write them too.  */
 #define TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, obj_ptr, obj_size) \
-    TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size)
+    TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_WRITE(module_instance, obj_ptr, obj_size)
 
 #define TXM_MODULE_MANAGER_ENSURE_OUTSIDE_MODULE(module_instance, obj_ptr, obj_size) \
     (TXM_MODULE_MANAGER_CHECK_OUTSIDE_DATA(module_instance, obj_ptr, obj_size) && \

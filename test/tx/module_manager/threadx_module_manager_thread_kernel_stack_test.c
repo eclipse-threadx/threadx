@@ -252,12 +252,27 @@ ULONG   index;
 
 /* Stand in for the module port's data-range check. Nothing here is inside a module's
    own data, so every address the manager asks about is outside it.  */
-UINT  _txm_module_manager_inside_data_check(ULONG obj_ptr)
+UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr,
+                                            ULONG obj_size, UINT write_request)
 {
-
+    (VOID) module_instance;
     (VOID) obj_ptr;
+    (VOID) obj_size;
+    (VOID) write_request;
 
     return(TX_FALSE);
+}
+
+
+/* No module data is modelled here, so every range lies outside it.  */
+UINT  _txm_module_manager_outside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr,
+                                             ULONG obj_size)
+{
+    (VOID) module_instance;
+    (VOID) obj_ptr;
+    (VOID) obj_size;
+
+    return(TX_TRUE);
 }
 
 

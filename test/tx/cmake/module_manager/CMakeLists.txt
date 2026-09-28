@@ -236,3 +236,19 @@ target_compile_options(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_queue_message_range_test
          threadx_module_manager_queue_message_range_test)
+
+add_executable(
+  threadx_module_manager_cortex_a7_range_check_test
+  ${SOURCE_DIR}/threadx_module_manager_cortex_a7_range_check_test.c
+  ${cortex_a7_module_dir}/module_manager/src/txm_module_manager_inside_data_check.c)
+
+target_include_directories(
+  threadx_module_manager_cortex_a7_range_check_test
+  PRIVATE ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/ports/cortex_a7/gnu/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${REPO_ROOT}/common_modules/module_manager/inc
+          ${cortex_a7_module_dir}/inc)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_cortex_a7_range_check_test
+         threadx_module_manager_cortex_a7_range_check_test)
