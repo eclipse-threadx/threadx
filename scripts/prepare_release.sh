@@ -159,14 +159,41 @@ PORT_FILES=$(printf "%s" "${PORT_FILES}" | grep -v '^[[:space:]]*$' || true)
 if [ -z "${PORT_FILES}" ]; then
     printf "Warning: No port header files found. Skipping port version string commit.\n"
 else
+    # A port advertises its release in the string the library reports at run time.
+    # The pattern accepts three or four dotted numbers and tolerates a stray
+    # letter before the first one, so a port that writes its version slightly
+    # differently is still reached.
+    VERSION_RE='Version[[:space:]]+[A-Za-z]?[0-9]+(\.[0-9]+)+[a-z]*'
     while IFS= read -r port_file; do
-        if [ -n "${port_file}" ] && grep -qE "Version [0-9]" "${port_file}" 2>/dev/null; then
-            sed -i -E "s/Version [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+[a-z]*/Version ${VERSION}/g" "${port_file}"
+        if [ -n "${port_file}" ] && grep -qE "${VERSION_RE}" "${port_file}" 2>/dev/null; then
+            sed -i -E "s/${VERSION_RE}/Version ${VERSION}/g" "${port_file}"
             printf "  Updated: %s\n" "${port_file#${REPO_ROOT}/}"
         fi
     done <<EOF
 ${PORT_FILES}
 EOF
+
+    # Every port header that names a release must now name this one.  A port
+    # whose string is shaped in some other way is not rewritten above, and
+    # without this check the pass reports success while leaving that port
+    # advertising the previous release for the life of the version.
+    STALE=""
+    while IFS= read -r port_file; do
+        [ -n "${port_file}" ] || continue
+        advertised=$(grep -hoE '"[^"]*[0-9]+\.[0-9]+\.[0-9]+[^"]*"' "${port_file}" 2>/dev/null || true)
+        [ -n "${advertised}" ] || continue
+        if ! printf "%s" "${advertised}" | grep -qF "${VERSION}"; then
+            STALE="${STALE}  ${port_file#${REPO_ROOT}/}
+"
+        fi
+    done <<EOF
+${PORT_FILES}
+EOF
+    if [ -n "${STALE}" ]; then
+        printf "\nError: these port headers still advertise another release:\n%s" "${STALE}" >&2
+        printf "Correct them so the substitution above reaches them, then re-run.\n" >&2
+        exit 1
+    fi
 
     git -C "${REPO_ROOT}" add -u
     if git -C "${REPO_ROOT}" diff --cached --quiet; then
