@@ -880,6 +880,44 @@ char                    description[128];
     _tx_thread_current_ptr =  TX_NULL;
 
     /**********************************************************************/
+    /* The control block ID in memory the manager gives back.             */
+    /**********************************************************************/
+
+    /* Authentication reads the kernel's created list, so it refuses a recycled
+       address whatever the words in it say. The size-based check is the one that
+       reads the control block ID, and it is kept for dispatchers outside this
+       repository, so clearing the ID on the way out is what stops memory a module
+       wrote an ID into presenting that ID to whoever holds the address next.  */
+
+    test_reset(&module_a, &module_b);
+
+    kind =        &test_object_kinds[4];
+    raw_object =  test_allocate(&module_a, kind -> test_kind_size);
+
+    _tx_thread_current_ptr =  (TX_THREAD *) test_allocate(&module_a, (ULONG) sizeof(TX_THREAD));
+    _tx_thread_current_ptr -> tx_thread_module_instance_ptr =  &module_a;
+
+    (VOID) test_plant(raw_object, ((ULONG) 0), kind -> test_kind_id);
+
+    test_expect("memory carrying a planted ID reads as an object of that type",
+                (ULONG) _txm_module_manager_object_id_check((ALIGN_TYPE) raw_object, TXM_QUEUE_OBJECT),
+                (ULONG) TX_TRUE);
+
+    test_release_size(kind -> test_kind_size);
+    status =  _txm_module_manager_object_deallocate(raw_object);
+    test_expect("the allocation is given back", (ULONG) status, (ULONG) TX_SUCCESS);
+
+    object =  test_allocate(&module_a, kind -> test_kind_size);
+    test_expect("the address comes round again",
+                (ULONG) (object == raw_object), (ULONG) TX_TRUE);
+
+    test_expect("and no longer reads as an object of that type",
+                (ULONG) _txm_module_manager_object_id_check((ALIGN_TYPE) object, TXM_QUEUE_OBJECT),
+                (ULONG) TX_FALSE);
+
+    _tx_thread_current_ptr =  TX_NULL;
+
+    /**********************************************************************/
     /* Objects the application owns, and objects nobody owns.             */
     /**********************************************************************/
 
