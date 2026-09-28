@@ -251,7 +251,30 @@ done < <(find ports ports_arch ports_module ports_smp -name "*.s" -type f \
 [ "$lowercase" -eq 0 ] && say "  ok: no .s file under a gnu tree uses the preprocessor"
 
 # --------------------------------------------------------------------------
-# 5. Report only: families with no copy script.
+# 5. Cortex-R5 execution-profile guards accept both configuration names.
+# --------------------------------------------------------------------------
+# Profiling storage uses TX_EXECUTION_PROFILE_ENABLE, while
+# TX_ENABLE_EXECUTION_CHANGE_NOTIFY remains a supported compatibility symbol.
+# Every Cortex-R5 profiling hook must recognize both symbols.
+say ""
+say "== Cortex-R5 execution-profile guards accept both symbols =="
+
+profile_guards_missing=0
+while IFS=: read -r file line text; do
+    case "$text" in
+        *TX_EXECUTION_PROFILE_ENABLE*) ;;
+        *)
+            fail "$file:$line accepts the legacy execution-profile symbol only"
+            profile_guards_missing=$((profile_guards_missing + 1))
+            ;;
+    esac
+done < <(grep -Rn "TX_ENABLE_EXECUTION_CHANGE_NOTIFY" ports/cortex_r5/*/src 2>/dev/null)
+
+[ "$profile_guards_missing" -eq 0 ] && \
+    say "  ok: every Cortex-R5 profiling hook accepts both symbols"
+
+# --------------------------------------------------------------------------
+# 6. Report only: families with no copy script.
 # --------------------------------------------------------------------------
 # These are maintained by hand, so a fix applied to one toolchain can silently
 # miss the others. Nothing here fails the run; it is a prompt to look.

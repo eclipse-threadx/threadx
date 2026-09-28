@@ -242,7 +242,7 @@ declare -A PORT_TARGET=(
 # months after the identical fix landed in its non-module sibling, because no
 # glob in either script reached ports_module until #672.
 FEATURE_MACROS="TX_ENABLE_VFP_SUPPORT TX_ENABLE_FIQ_SUPPORT TX_LOW_POWER
-                TX_ENABLE_EXECUTION_CHANGE_NOTIFY"
+                TX_ENABLE_EXECUTION_CHANGE_NOTIFY TX_EXECUTION_PROFILE_ENABLE"
 
 # TX_ENABLE_IRQ_NESTING and TX_ENABLE_FIQ_NESTING are deliberately not here.
 # They guard no assembly in the trees this script walks: the nesting start and

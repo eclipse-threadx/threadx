@@ -1,5 +1,6 @@
 ;/***************************************************************************
 ; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026 Eclipse ThreadX contributors
 ; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
 ; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
+; Portions of this file were generated with AI assistance.
 ;
 ;
 ;/**************************************************************************/
@@ -31,7 +33,7 @@
 ;
     IMPORT      _tx_thread_system_state
     IMPORT      _tx_thread_current_ptr
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
     IMPORT      _tx_execution_isr_enter
     ENDIF
 ;
@@ -102,7 +104,7 @@ _tx_thread_vectored_context_save
 ;
     MOV     r10, #0                             ; Clear stack limit
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
 ;
 ;    /* Call the ISR enter function to indicate an ISR is executing.  */
 ;
@@ -142,7 +144,7 @@ __tx_thread_not_nested_save
 ;
     MOV     r10, #0                             ; Clear stack limit
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
 ;
 ;    /* Call the ISR enter function to indicate an ISR is executing.  */
 ;
@@ -170,7 +172,7 @@ __tx_thread_idle_system_save
 ;
     MOV     r10, #0                             ; Clear stack limit
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
 ;
 ;    /* Call the ISR enter function to indicate an ISR is executing.  */
 ;
@@ -190,4 +192,3 @@ __tx_thread_idle_system_save
 ;}
 ;
     END
-
