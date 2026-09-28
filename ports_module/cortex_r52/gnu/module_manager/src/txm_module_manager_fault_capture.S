@@ -25,53 +25,54 @@
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
 @/*                                                                        */
-@/*    Records why a memory protection fault happened, then hands over to   */
+@/*    Records why a memory protection fault happened, then hands over to  */
 @/*    the C handler which terminates the offending thread.                */
 @/*                                                                        */
-@/*    A board's abort vectors branch here.  Two entry points, because this */
-@/*    core reports the two kinds of violation in different registers: a    */
-@/*    module writing outside its data region raises a data abort and       */
-@/*    reports through DFSR and DFAR, while a module branching outside its  */
-@/*    code region raises a prefetch abort and reports through IFSR and     */
-@/*    IFAR.  Both are recorded either way, so a reader of the fault info   */
-@/*    can tell which pair is meaningful, and both entry points converge.   */
+@/*    A board's abort vectors branch here.  Two entry points, because     */
+@/*    this core reports the two kinds of violation in different           */
+@/*    registers: a module writing outside its data region raises a data   */
+@/*    abort and reports through DFSR and DFAR, while a module branching   */
+@/*    outside its code region raises a prefetch abort and reports through */
+@/*    IFSR and IFAR.  Both are recorded either way, so a reader of the    */
+@/*    fault info can tell which pair is meaningful, and both entry points */
+@/*    converge.                                                           */
 @/*                                                                        */
-@/*    This has to be assembly, and it has to run first.  The fault         */
-@/*    registers hold only the most recent fault, so anything that runs     */
-@/*    before the capture and faults itself destroys the evidence.  The     */
-@/*    abort is also taken in Abort mode, with its own banked sp and lr, so */
-@/*    C cannot be entered until a stack is known good.                     */
+@/*    This has to be assembly, and it has to run first.  The fault        */
+@/*    registers hold only the most recent fault, so anything that runs    */
+@/*    before the capture and faults itself destroys the evidence.  The    */
+@/*    abort is also taken in Abort mode, with its own banked sp and lr,   */
+@/*    so C cannot be entered until a stack is known good.                 */
 @/*                                                                        */
-@/*    THE CONTRACT WITH THE SHARED C HANDLER                               */
+@/*    THE CONTRACT WITH THE SHARED C HANDLER                              */
 @/*                                                                        */
-@/*    _txm_module_manager_memory_fault_handler is common to every module    */
-@/*    port and it terminates the faulting thread and then calls the        */
-@/*    application's fault-notify callback.  For the second half of that to */
-@/*    happen, _tx_thread_terminate has to RETURN -- and terminating the    */
-@/*    running thread only returns if the kernel believes it is inside an   */
-@/*    exception.  _tx_thread_terminate ends in                             */
-@/*    _tx_thread_system_preempt_check, which calls                         */
-@/*    _tx_thread_system_return whenever _tx_thread_system_state and        */
-@/*    _tx_thread_preempt_disable are both zero; on this architecture that  */
-@/*    switches context immediately and never comes back.                   */
+@/*    _txm_module_manager_memory_fault_handler is common to every module  */
+@/*    port and it terminates the faulting thread and then calls the       */
+@/*    application's fault-notify callback.  For the second half of that   */
+@/*    to happen, _tx_thread_terminate has to RETURN -- and terminating    */
+@/*    the running thread only returns if the kernel believes it is inside */
+@/*    an exception.  _tx_thread_terminate ends in                         */
+@/*    _tx_thread_system_preempt_check, which calls                        */
+@/*    _tx_thread_system_return whenever _tx_thread_system_state and       */
+@/*    _tx_thread_preempt_disable are both zero; on this architecture that */
+@/*    switches context immediately and never comes back.                  */
 @/*                                                                        */
-@/*    So this routine owes the handler three things, exactly as the        */
-@/*    Cortex-A7 module port's abort vector does:                           */
+@/*    So this routine owes the handler three things, exactly as the       */
+@/*    Cortex-A7 module port's abort vector does:                          */
 @/*                                                                        */
-@/*      1. _tx_thread_system_state incremented across the call, so the     */
-@/*         terminate returns instead of scheduling from Abort mode.        */
-@/*      2. _tx_thread_current_ptr cleared afterwards -- the thread it      */
-@/*         names is terminated and the scheduler must not save into it.    */
-@/*      3. an exception return into _tx_thread_schedule in System mode,    */
-@/*         which is where the next thread is chosen.                       */
+@/*      1. _tx_thread_system_state incremented across the call, so the    */
+@/*         terminate returns instead of scheduling from Abort mode.       */
+@/*      2. _tx_thread_current_ptr cleared afterwards -- the thread it     */
+@/*         names is terminated and the scheduler must not save into it.   */
+@/*      3. an exception return into _tx_thread_schedule in System mode,   */
+@/*         which is where the next thread is chosen.                      */
 @/*                                                                        */
-@/*    Without step 1 the notify callback is unreachable, and the           */
-@/*    _tx_thread_system_return that runs in its place saves a solicited    */
-@/*    frame on the ABORT stack and writes that Abort-mode sp into the      */
-@/*    dead thread's stack pointer.  It looks like it works, because the    */
-@/*    thread is never resumed -- but nothing gives the Abort stack back,   */
-@/*    so each module fault costs it about 56 bytes for the life of the     */
-@/*    run.                                                                 */
+@/*    Without step 1 the notify callback is unreachable, and the          */
+@/*    _tx_thread_system_return that runs in its place saves a solicited   */
+@/*    frame on the ABORT stack and writes that Abort-mode sp into the     */
+@/*    dead thread's stack pointer.  It looks like it works, because the   */
+@/*    thread is never resumed -- but nothing gives the Abort stack back,  */
+@/*    so each module fault costs it about 56 bytes for the life of the    */
+@/*    run.                                                                */
 @/*                                                                        */
 @/**************************************************************************/
 
@@ -115,7 +116,7 @@
 
 
 @/**************************************************************************/
-@/*  Data abort: a module wrote or read outside a region it owns.           */
+@/*  Data abort: a module wrote or read outside a region it owns.          */
 @/**************************************************************************/
 
     .type   _txm_module_manager_data_abort, %function
@@ -130,7 +131,7 @@ _txm_module_manager_data_abort:
 
 
 @/**************************************************************************/
-@/*  Prefetch abort: a module tried to execute outside its code region.     */
+@/*  Prefetch abort: a module tried to execute outside its code region.    */
 @/**************************************************************************/
 
     .type   _txm_module_manager_prefetch_abort, %function

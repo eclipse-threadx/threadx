@@ -32,10 +32,10 @@
 /*    so a failure here is a board or GIC problem and not a kernel one.   */
 /*    It counts ticks instead, which is what makes the interrupt visible. */
 /*                                                                        */
-/*    Every count is volatile and read by the debugger as well as printed.*/
-/*    An interrupt that never arrives and an interrupt that arrives and is*/
-/*    mishandled look identical from the console alone, and the separate  */
-/*    spurious and unexpected counters distinguish them.                  */
+/*    Every count is volatile and read by the debugger as well as         */
+/*    printed. An interrupt that never arrives and an interrupt that      */
+/*    arrives and is mishandled look identical from the console alone,    */
+/*    and the separate spurious and unexpected counters distinguish them. */
 /*                                                                        */
 /**************************************************************************/
 
@@ -158,28 +158,29 @@ void board_init(void)
 
 
 /**************************************************************************/
-/*  board_irq_service -- service an already-acknowledged INTID.            */
+/*  board_irq_service -- service an already-acknowledged INTID.           */
 /*                                                                        */
-/*  Split out so the nesting path in entry.S can acknowledge in IRQ mode   */
-/*  before nesting starts.  Does not acknowledge and does not EOI.         */
+/*  Split out so the nesting path in entry.S can acknowledge in IRQ mode  */
+/*  before nesting starts.  Does not acknowledge and does not EOI.        */
 /**************************************************************************/
 
 /**************************************************************************/
 /*  Handler execution time, and where the handler's instructions live.    */
 /*                                                                        */
-/*  TX_R52_ATCM_ISR places the service routine in ATCM.  ATCM runs at full */
-/*  core speed with one wait state; .text lives in RTU code RAM, which runs */
-/*  at half the core frequency (S32Z2 RM 6.3.6).  ATCM also has no cache to */
-/*  miss, which is the property that matters for a determinism argument.    */
+/*  TX_R52_ATCM_ISR places the service routine in ATCM.  ATCM runs at     */
+/*  full core speed with one wait state; .text lives in RTU code RAM,     */
+/*  which runs at half the core frequency (S32Z2 RM 6.3.6).  ATCM also    */
+/*  has no cache to miss, which is the property that matters for a        */
+/*  determinism argument.                                                 */
 /*                                                                        */
-/*  Measured in cycles from the PMU counter, not CNTPCT: at 8 MHz CNTPCT    */
-/*  cannot resolve a handler body, let alone the variation in one.          */
+/*  Measured in cycles from the PMU counter, not CNTPCT: at 8 MHz CNTPCT  */
+/*  cannot resolve a handler body, let alone the variation in one.        */
 /*                                                                        */
-/*  The timing wrapper below stays in .text in both configurations, so its  */
-/*  own cost appears in every sample and cancels when the two are compared. */
-/*  Only the body moves.  What matters in the result is the spread: a warm  */
-/*  instruction cache can match ATCM on the mean and cannot match it on the */
-/*  worst case.                                                            */
+/*  The timing wrapper below stays in .text in both configurations, so    */
+/*  its own cost appears in every sample and cancels when the two are     */
+/*  compared. Only the body moves.  What matters in the result is the     */
+/*  spread: a warm instruction cache can match ATCM on the mean and       */
+/*  cannot match it on the worst case.                                    */
 /**************************************************************************/
 
 #define BOARD_LATENCY_SAMPLES   64U
@@ -356,11 +357,11 @@ void board_irq_service(unsigned long intid)
 
 
 /**************************************************************************/
-/*  board_irq_handler -- the non-nesting entry point.                      */
+/*  board_irq_handler -- the non-nesting entry point.                     */
 /*                                                                        */
-/*  Acknowledges, services and ends the interrupt in IRQ mode with          */
-/*  interrupts masked, which is what every image built without              */
-/*  TX_ENABLE_IRQ_NESTING did before this split.                           */
+/*  Acknowledges, services and ends the interrupt in IRQ mode with        */
+/*  interrupts masked, which is what every image built without            */
+/*  TX_ENABLE_IRQ_NESTING did before this split.                          */
 /**************************************************************************/
 
 void board_irq_handler(void)
@@ -378,11 +379,11 @@ void board_irq_handler(void)
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
 /**************************************************************************/
-/*  board_fiq_service -- service an already-acknowledged Group 0 INTID.     */
+/*  board_fiq_service -- service an already-acknowledged Group 0 INTID.   */
 /*                                                                        */
-/*  The FIQ counterpart of board_irq_service, and split for the same        */
-/*  reason: the acknowledge has to happen before nesting starts.  Does not  */
-/*  acknowledge and does not EOI.                                         */
+/*  The FIQ counterpart of board_irq_service, and split for the same      */
+/*  reason: the acknowledge has to happen before nesting starts.  Does    */
+/*  not acknowledge and does not EOI.                                     */
 /**************************************************************************/
 
 void board_fiq_service(unsigned long intid)
@@ -445,7 +446,7 @@ void board_fiq_service(unsigned long intid)
 
 
 /**************************************************************************/
-/*  board_fiq_handler -- the non-nesting FIQ entry point.                  */
+/*  board_fiq_handler -- the non-nesting FIQ entry point.                 */
 /**************************************************************************/
 
 void board_fiq_handler(void)

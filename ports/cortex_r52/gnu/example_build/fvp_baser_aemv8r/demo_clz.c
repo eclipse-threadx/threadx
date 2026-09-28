@@ -56,7 +56,7 @@
 /*         hide.                                                          */
 /*      5. The m == 0 divergence is PINNED, not fixed.  CLZ(0) is 32, so  */
 /*         this implementation yields 31 - 32 while the portable loop     */
-/*         yields 0.  Every one of the twelve call sites in common/src     */
+/*         yields 0.  Every one of the twelve call sites in common/src    */
 /*         reaches the macro only on a map already tested against zero,   */
 /*         so the difference is unreachable -- and a test that records    */
 /*         it is how it stays a decision instead of becoming a surprise.  */
@@ -153,8 +153,8 @@ static ULONG next_pattern(ULONG state)
 /*                                                                        */
 /*  Runs one map through the macro twice, once landing in a UINT and once */
 /*  in a ULONG, and compares both against the reference.  The macro       */
-/*  CONSUMES its first argument -- both implementations rewrite the map    */
-/*  in place -- so each call gets its own copy, which is also the trap a   */
+/*  CONSUMES its first argument -- both implementations rewrite the map   */
+/*  in place -- so each call gets its own copy, which is also the trap a  */
 /*  caller reusing the variable afterwards would fall into.               */
 /**************************************************************************/
 

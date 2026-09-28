@@ -25,19 +25,19 @@
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
 @/*                                                                        */
-@/*    The header the module manager reads before it will load a module.    */
+@/*    The header the module manager reads before it will load a module.   */
 @/*                                                                        */
-@/*    It must be the first thing in the module image, which is what the    */
-@/*    linker script arranges, and every entry point in it is an offset     */
-@/*    from the start of the preamble rather than an address.  A module is   */
-@/*    position independent: the manager decides where it lands, so the     */
-@/*    module cannot know its own addresses at link time.                   */
+@/*    It must be the first thing in the module image, which is what the   */
+@/*    linker script arranges, and every entry point in it is an offset    */
+@/*    from the start of the preamble rather than an address.  A module is */
+@/*    position independent: the manager decides where it lands, so the    */
+@/*    module cannot know its own addresses at link time.                  */
 @/*                                                                        */
-@/*    Code and data sizes come from the linker script rather than being    */
-@/*    written in by hand.  The Cortex-R4 preamble carries literal numbers   */
-@/*    for them, which is a standing invitation to grow a module past its   */
-@/*    declared size and have the manager map less memory than it uses --   */
-@/*    a fault in a module that did nothing wrong, whose cause is a         */
+@/*    Code and data sizes come from the linker script rather than being   */
+@/*    written in by hand.  The Cortex-R4 preamble carries literal numbers */
+@/*    for them, which is a standing invitation to grow a module past its  */
+@/*    declared size and have the manager map less memory than it uses --  */
+@/*    a fault in a module that did nothing wrong, whose cause is a        */
 @/*    constant in a file nobody thought to change.                        */
 @/*                                                                        */
 @/**************************************************************************/

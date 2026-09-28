@@ -27,13 +27,14 @@
 /*                                                                        */
 /*    AR1 milestone M5: PMSAv8-R protection and caches.                   */
 /*                                                                        */
-/*    The important check here is enforcement, not configuration.  Reading*/
-/*    SCTLR back only proves a bit was set; it says nothing about whether */
-/*    the region table actually describes memory correctly.  So the test  */
-/*    provokes a real permission fault by writing to the read-only code   */
-/*    region and requires the abort to arrive, then confirms a legal write*/
-/*    to the data region still succeeds.  A region set that permitted     */
-/*    everything would pass the first kind of check and fail this one.    */
+/*    The important check here is enforcement, not configuration.         */
+/*    Reading SCTLR back only proves a bit was set; it says nothing about */
+/*    whether the region table actually describes memory correctly.  So   */
+/*    the test provokes a real permission fault by writing to the         */
+/*    read-only code region and requires the abort to arrive, then        */
+/*    confirms a legal write to the data region still succeeds.  A region */
+/*    set that permitted everything would pass the first kind of check    */
+/*    and fail this one.                                                  */
 /*                                                                        */
 /**************************************************************************/
 

@@ -25,30 +25,30 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Compile-time verification of the structure offsets that this port's  */
+/*    Compile-time verification of the structure offsets that this port's */
 /*    assembly hard-codes.                                                */
 /*                                                                        */
-/*    tx_thread_schedule.S reaches into TX_THREAD and TXM_MODULE_INSTANCE  */
-/*    with numeric offsets, because assembly has no other way to do it.    */
-/*    Nothing in the toolchain connects those numbers to the structures     */
-/*    they describe, so adding a field, reordering an extension or         */
-/*    building with a different set of ThreadX options silently moves the   */
-/*    target and the scheduler reads the wrong word.  The failure is a      */
-/*    corrupted region table or a fault in a thread that did nothing wrong, */
-/*    a long way from the change that caused it.                           */
+/*    tx_thread_schedule.S reaches into TX_THREAD and TXM_MODULE_INSTANCE */
+/*    with numeric offsets, because assembly has no other way to do it.   */
+/*    Nothing in the toolchain connects those numbers to the structures   */
+/*    they describe, so adding a field, reordering an extension or        */
+/*    building with a different set of ThreadX options silently moves the */
+/*    target and the scheduler reads the wrong word.  The failure is a    */
+/*    corrupted region table or a fault in a thread that did nothing      */
+/*    wrong, a long way from the change that caused it.                   */
 /*                                                                        */
-/*    This file exists so that becomes a build error instead.  It emits no  */
-/*    code.                                                                */
+/*    This file exists so that becomes a build error instead.  It emits   */
+/*    no code.                                                            */
 /*                                                                        */
-/*    The offsets here are not the same as the Armv8-M module port's, and   */
-/*    that is the concrete case in point: there the module instance pointer */
-/*    sits at 0x90, and here it is 0x94, because the Cortex-R52 port keeps  */
-/*    tx_thread_vfp_enable ahead of the module fields in                    */
-/*    TX_THREAD_EXTENSION_2.  Copying the Armv8-M numbers would have built  */
-/*    cleanly and misbehaved on the board.                                  */
+/*    The offsets here are not the same as the Armv8-M module port's, and */
+/*    that is the concrete case in point: there the module instance       */
+/*    pointer sits at 0x90, and here it is 0x94, because the Cortex-R52   */
+/*    port keeps tx_thread_vfp_enable ahead of the module fields in       */
+/*    TX_THREAD_EXTENSION_2.  Copying the Armv8-M numbers would have      */
+/*    built cleanly and misbehaved on the board.                          */
 /*                                                                        */
-/*    See eclipse-threadx/threadx issue #577, which proposes this check for */
-/*    every port rather than only this one.                                */
+/*    See eclipse-threadx/threadx issue #577, which proposes this check   */
+/*    for every port rather than only this one.                           */
 /*                                                                        */
 /**************************************************************************/
 
