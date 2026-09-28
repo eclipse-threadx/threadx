@@ -135,6 +135,15 @@
     ((TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE(module_instance, string_ptr, 1)) || \
      ((void *) (string_ptr) == TX_NULL))
 
+/* Strings we walk are checked over the whole range the walk may reach: the declared
+   length plus the terminating character that follows it, since a length excludes the
+   terminator and the comparison reads it.  A length whose range cannot be expressed
+   is refused rather than truncated.  */
+#define TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING_RANGE(module_instance, string_ptr, string_length) \
+    (((((ALIGN_TYPE) (string_length)) < (~((ALIGN_TYPE) 0))) && \
+      (TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE(module_instance, string_ptr, ((ALIGN_TYPE) (string_length)) + ((ALIGN_TYPE) 1)))) || \
+     ((void *) (string_ptr) == TX_NULL))
+
 #define TXM_MODULE_MANAGER_UTIL_MAX_VALUE_OF_TYPE_UNSIGNED(type) ((1ULL << (sizeof(type) * 8)) - 1)
 
 #define TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(augend, addend, result) \
