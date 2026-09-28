@@ -103,8 +103,17 @@ fi
 
 # 4.  A near miss.  A line that is clearly meant to be the disclosure but is
 #     not spelled exactly right defeats every deduplication that follows it.
-hits="$(grep -nIF 'AI assistance' -- "${FILES[@]}" 2>/dev/null \
-        | grep -vF "${FIXED}" || true)"
+#
+#     Markdown is exempt from this one check.  The contribution guide has to
+#     quote the accepted text and explain when it applies, so matching the bare
+#     phrase there reports prose rather than drift.  A superseded form in a
+#     Markdown file is still caught by check 1.
+mapfile -d '' -t SOURCES < <(printf '%s\0' "${FILES[@]}" | grep -zZv '\.md$' || true)
+hits=''
+if [ "${#SOURCES[@]}" -gt 0 ]; then
+    hits="$(grep -nIF 'AI assistance' -- "${SOURCES[@]}" 2>/dev/null \
+            | grep -vF "${FIXED}" || true)"
+fi
 if [ -n "${hits}" ]; then
     report "AI disclosure check FAILED: the text is not spelled exactly.
 
