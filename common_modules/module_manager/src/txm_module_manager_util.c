@@ -281,7 +281,7 @@ UINT                        return_value;
 /*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txm_module_manager_object_name_compare(CHAR *search_name, UINT search_name_length, CHAR *object_name)
+UINT  _txm_module_manager_object_name_compare(CHAR *search_name, UINT search_name_length, TX_NAME_CONST CHAR *object_name)
 {
 
 CHAR    search_name_char;

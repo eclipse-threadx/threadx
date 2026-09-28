@@ -414,7 +414,7 @@ static UINT  test_service_record(ALIGN_TYPE object_ptr, ALIGN_TYPE name_ptr, ULO
 }
 
 
-UINT  _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG block_size,
+UINT  _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG block_size,
                              VOID *pool_start, ULONG pool_size, UINT pool_control_block_size)
 {
 
@@ -446,7 +446,7 @@ UINT    status;
 }
 
 
-UINT  _txe_byte_pool_create(TX_BYTE_POOL *pool_ptr, CHAR *name_ptr, VOID *pool_start,
+UINT  _txe_byte_pool_create(TX_BYTE_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, VOID *pool_start,
                             ULONG pool_size, UINT pool_control_block_size)
 {
 
@@ -478,7 +478,7 @@ UINT    status;
 }
 
 
-UINT  _txe_queue_create(TX_QUEUE *queue_ptr, CHAR *name_ptr, UINT message_size,
+UINT  _txe_queue_create(TX_QUEUE *queue_ptr, TX_NAME_CONST CHAR *name_ptr, UINT message_size,
                         VOID *queue_start, ULONG queue_size, UINT queue_control_block_size)
 {
 
