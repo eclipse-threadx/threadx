@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -69,7 +71,7 @@
 /*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, CHAR **name, ULONG *available_blocks,
+UINT  _tx_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR **name, ULONG *available_blocks,
                     ULONG *total_blocks, TX_THREAD **first_suspended,
                     ULONG *suspended_count, TX_BLOCK_POOL **next_pool)
 {

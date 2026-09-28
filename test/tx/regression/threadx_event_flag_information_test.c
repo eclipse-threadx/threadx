@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test the event flag group information gathering services.  */
 
 #include   <stdio.h>
@@ -134,7 +136,7 @@ static void    thread_0_entry(ULONG thread_input)
 
 UINT                    status;
 ULONG                   actual_events;
-CHAR                    *name;
+TX_NAME_CONST CHAR *name;
 ULONG                   current_flags;
 TX_THREAD               *first_suspended;
 ULONG                   suspended_count;
@@ -356,7 +358,7 @@ ULONG                   timeouts;
     status += tx_event_flags_info_get(&group_0, &name, &current_flags, &first_suspended, &suspended_count, &next_group);
 
     /* Check the status.  */
-    if ((status != TX_SUCCESS) || (current_flags != group_0.tx_event_flags_group_current) || (first_suspended != TX_NULL) || (suspended_count != 0) || (next_group != &group_1))
+    if ((status != TX_SUCCESS) || (name != group_0.tx_event_flags_group_name) || (current_flags != group_0.tx_event_flags_group_current) || (first_suspended != TX_NULL) || (suspended_count != 0) || (next_group != &group_1))
     {
 
         /* Event flag error.  */

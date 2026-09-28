@@ -73,7 +73,7 @@ extern TX_TIMER_INTERNAL   *_tx_timer_expired_timer_ptr;
 
 static void    thread_0_entry(ULONG task_input);
 
-UINT        _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+UINT        _txe_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*entry_function)(ULONG), ULONG entry_input,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,

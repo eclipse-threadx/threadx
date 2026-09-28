@@ -37,17 +37,17 @@ static int                 txfr_failures;
 /* The real entry points, supplied by the linker in response to --wrap.  */
 UINT __real__txe_byte_allocate(TX_BYTE_POOL *pool_ptr, VOID **memory_ptr, ULONG memory_size, ULONG wait_option);
 UINT __real__txe_byte_release(VOID *memory_ptr);
-UINT __real__txe_semaphore_create(TX_SEMAPHORE *semaphore_ptr, CHAR *name_ptr, ULONG initial_count, UINT semaphore_control_block_size);
+UINT __real__txe_semaphore_create(TX_SEMAPHORE *semaphore_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG initial_count, UINT semaphore_control_block_size);
 UINT __real__txe_semaphore_delete(TX_SEMAPHORE *semaphore_ptr);
-UINT __real__txe_mutex_create(TX_MUTEX *mutex_ptr, CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size);
+UINT __real__txe_mutex_create(TX_MUTEX *mutex_ptr, TX_NAME_CONST CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size);
 UINT __real__txe_mutex_delete(TX_MUTEX *mutex_ptr);
-UINT __real__txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR *name_ptr, UINT event_control_block_size);
+UINT __real__txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, TX_NAME_CONST CHAR *name_ptr, UINT event_control_block_size);
 UINT __real__txe_event_flags_delete(TX_EVENT_FLAGS_GROUP *group_ptr);
-UINT __real__txe_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr, VOID (*expiration_function)(ULONG input),
+UINT __real__txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr, VOID (*expiration_function)(ULONG input),
                               ULONG expiration_input, ULONG initial_ticks, ULONG reschedule_ticks,
                               UINT auto_activate, UINT timer_control_block_size);
 UINT __real__txe_timer_delete(TX_TIMER *timer_ptr);
-UINT __real__txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ULONG entry_input),
+UINT __real__txe_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr, VOID (*entry_function)(ULONG entry_input),
                                ULONG entry_input, VOID *stack_start, ULONG stack_size, UINT priority,
                                UINT preempt_threshold, ULONG time_slice, UINT auto_start,
                                UINT thread_control_block_size);
@@ -93,7 +93,7 @@ UINT __wrap__txe_byte_release(VOID *memory_ptr)
 }
 
 
-UINT __wrap__txe_semaphore_create(TX_SEMAPHORE *semaphore_ptr, CHAR *name_ptr, ULONG initial_count, UINT semaphore_control_block_size)
+UINT __wrap__txe_semaphore_create(TX_SEMAPHORE *semaphore_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG initial_count, UINT semaphore_control_block_size)
 {
     if(txfr_should_fail(TXFR_INJECT_SEMAPHORE_CREATE) != 0)
     {
@@ -121,7 +121,7 @@ UINT __wrap__txe_semaphore_delete(TX_SEMAPHORE *semaphore_ptr)
 }
 
 
-UINT __wrap__txe_mutex_create(TX_MUTEX *mutex_ptr, CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size)
+UINT __wrap__txe_mutex_create(TX_MUTEX *mutex_ptr, TX_NAME_CONST CHAR *name_ptr, UINT inherit, UINT mutex_control_block_size)
 {
     if(txfr_should_fail(TXFR_INJECT_MUTEX_CREATE) != 0)
     {
@@ -149,7 +149,7 @@ UINT __wrap__txe_mutex_delete(TX_MUTEX *mutex_ptr)
 }
 
 
-UINT __wrap__txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR *name_ptr, UINT event_control_block_size)
+UINT __wrap__txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, TX_NAME_CONST CHAR *name_ptr, UINT event_control_block_size)
 {
     if(txfr_should_fail(TXFR_INJECT_EVENT_FLAGS_CREATE) != 0)
     {
@@ -177,7 +177,7 @@ UINT __wrap__txe_event_flags_delete(TX_EVENT_FLAGS_GROUP *group_ptr)
 }
 
 
-UINT __wrap__txe_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr, VOID (*expiration_function)(ULONG input),
+UINT __wrap__txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr, VOID (*expiration_function)(ULONG input),
                               ULONG expiration_input, ULONG initial_ticks, ULONG reschedule_ticks,
                               UINT auto_activate, UINT timer_control_block_size)
 {
@@ -208,7 +208,7 @@ UINT __wrap__txe_timer_delete(TX_TIMER *timer_ptr)
 }
 
 
-UINT __wrap__txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ULONG entry_input),
+UINT __wrap__txe_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr, VOID (*entry_function)(ULONG entry_input),
                                ULONG entry_input, VOID *stack_start, ULONG stack_size, UINT priority,
                                UINT preempt_threshold, ULONG time_slice, UINT auto_start,
                                UINT thread_control_block_size)

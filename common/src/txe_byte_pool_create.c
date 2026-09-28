@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -73,7 +75,7 @@
 /*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txe_byte_pool_create(TX_BYTE_POOL *pool_ptr, CHAR *name_ptr, VOID *pool_start, ULONG pool_size, UINT pool_control_block_size)
+UINT  _txe_byte_pool_create(TX_BYTE_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, VOID *pool_start, ULONG pool_size, UINT pool_control_block_size)
 {
 
 TX_INTERRUPT_SAVE_AREA

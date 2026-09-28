@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -74,7 +76,7 @@
 /*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txe_thread_info_get(TX_THREAD *thread_ptr, CHAR **name, UINT *state, ULONG *run_count,
+UINT  _txe_thread_info_get(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR **name, UINT *state, ULONG *run_count,
                 UINT *priority, UINT *preemption_threshold, ULONG *time_slice,
                 TX_THREAD **next_thread, TX_THREAD **next_suspended_thread)
 {

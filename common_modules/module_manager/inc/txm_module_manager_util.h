@@ -186,7 +186,7 @@
 
 UINT    _txm_module_manager_object_memory_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG object_size);
 UINT    _txm_module_manager_object_size_check(ALIGN_TYPE object_ptr, ULONG object_size);
-UINT    _txm_module_manager_object_name_compare(CHAR *object_name1, UINT object_name1_length, CHAR *object_name2);
+UINT    _txm_module_manager_object_name_compare(CHAR *object_name1, UINT object_name1_length, TX_NAME_CONST CHAR *object_name2);
 UCHAR   _txm_module_manager_created_object_check(TXM_MODULE_INSTANCE *module_instance, void *object_ptr);
 UINT    _txm_module_manager_param_check_object_for_creation(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG object_size);
 UINT    _txm_module_manager_param_check_object_for_use(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE object_ptr, ULONG object_size);

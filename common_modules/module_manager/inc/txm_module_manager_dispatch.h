@@ -54,7 +54,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_BLOCK_POOL_CREATE_CALL_NOT_USED
 /* UINT _txe_block_pool_create(
     TX_BLOCK_POOL *pool_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     ULONG block_size, -> extra_parameters[0]
     VOID *pool_start, -> extra_parameters[1]
     ULONG pool_size, -> extra_parameters[2]
@@ -82,7 +82,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_block_pool_create(
         (TX_BLOCK_POOL *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (ULONG) extra_parameters[0],
         (VOID *) extra_parameters[1],
         (ULONG) extra_parameters[2],
@@ -126,7 +126,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_BLOCK_POOL_INFO_GET_CALL_NOT_USED
 /* UINT _txe_block_pool_info_get(
     TX_BLOCK_POOL *pool_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *available_blocks, -> extra_parameters[0]
     ULONG *total_blocks, -> extra_parameters[1]
     TX_THREAD **first_suspended, -> extra_parameters[2]
@@ -167,7 +167,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_block_pool_info_get(
         (TX_BLOCK_POOL *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (TX_THREAD **) extra_parameters[2],
@@ -363,7 +363,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_BYTE_POOL_CREATE_CALL_NOT_USED
 /* UINT _txe_byte_pool_create(
     TX_BYTE_POOL *pool_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     VOID *pool_start, -> extra_parameters[0]
     ULONG pool_size, -> extra_parameters[1]
     UINT pool_control_block_size -> extra_parameters[2]
@@ -390,7 +390,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_byte_pool_create(
         (TX_BYTE_POOL *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (VOID *) extra_parameters[0],
         (ULONG) extra_parameters[1],
         (UINT) extra_parameters[2]
@@ -433,7 +433,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_BYTE_POOL_INFO_GET_CALL_NOT_USED
 /* UINT _txe_byte_pool_info_get(
     TX_BYTE_POOL *pool_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *available_bytes, -> extra_parameters[0]
     ULONG *fragments, -> extra_parameters[1]
     TX_THREAD **first_suspended, -> extra_parameters[2]
@@ -474,7 +474,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_byte_pool_info_get(
         (TX_BYTE_POOL *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (TX_THREAD **) extra_parameters[2],
@@ -666,7 +666,7 @@ ALIGN_TYPE block_header_start;
 #ifndef TXM_EVENT_FLAGS_CREATE_CALL_NOT_USED
 /* UINT _txe_event_flags_create(
     TX_EVENT_FLAGS_GROUP *group_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     UINT event_control_block_size -> param_2
    ); */
 static ALIGN_TYPE _txm_module_manager_tx_event_flags_create_dispatch(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2)
@@ -685,7 +685,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_event_flags_create(
         (TX_EVENT_FLAGS_GROUP *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (UINT) param_2
     );
     return(return_value);
@@ -762,7 +762,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_EVENT_FLAGS_INFO_GET_CALL_NOT_USED
 /* UINT _txe_event_flags_info_get(
     TX_EVENT_FLAGS_GROUP *group_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *current_flags, -> extra_parameters[0]
     TX_THREAD **first_suspended, -> extra_parameters[1]
     ULONG *suspended_count, -> extra_parameters[2]
@@ -799,7 +799,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_event_flags_info_get(
         (TX_EVENT_FLAGS_GROUP *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (TX_THREAD **) extra_parameters[1],
         (ULONG *) extra_parameters[2],
@@ -969,7 +969,7 @@ VOID (*events_set_notify)(TX_EVENT_FLAGS_GROUP *);
 #ifndef TXM_MUTEX_CREATE_CALL_NOT_USED
 /* UINT _txe_mutex_create(
     TX_MUTEX *mutex_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     UINT inherit, -> extra_parameters[0]
     UINT mutex_control_block_size -> extra_parameters[1]
    ); */
@@ -992,7 +992,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_mutex_create(
         (TX_MUTEX *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (UINT) extra_parameters[0],
         (UINT) extra_parameters[1]
     );
@@ -1058,7 +1058,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_MUTEX_INFO_GET_CALL_NOT_USED
 /* UINT _txe_mutex_info_get(
     TX_MUTEX *mutex_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *count, -> extra_parameters[0]
     TX_THREAD **owner, -> extra_parameters[1]
     TX_THREAD **first_suspended, -> extra_parameters[2]
@@ -1099,7 +1099,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_mutex_info_get(
         (TX_MUTEX *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (TX_THREAD **) extra_parameters[1],
         (TX_THREAD **) extra_parameters[2],
@@ -1262,7 +1262,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_QUEUE_CREATE_CALL_NOT_USED
 /* UINT _txe_queue_create(
     TX_QUEUE *queue_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     UINT message_size, -> extra_parameters[0]
     VOID *queue_start, -> extra_parameters[1]
     ULONG queue_size, -> extra_parameters[2]
@@ -1290,7 +1290,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_queue_create(
         (TX_QUEUE *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (UINT) extra_parameters[0],
         (VOID *) extra_parameters[1],
         (ULONG) extra_parameters[2],
@@ -1388,7 +1388,7 @@ TX_QUEUE *queue_ptr;
 #ifndef TXM_QUEUE_INFO_GET_CALL_NOT_USED
 /* UINT _txe_queue_info_get(
     TX_QUEUE *queue_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *enqueued, -> extra_parameters[0]
     ULONG *available_storage, -> extra_parameters[1]
     TX_THREAD **first_suspended, -> extra_parameters[2]
@@ -1429,7 +1429,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_queue_info_get(
         (TX_QUEUE *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (TX_THREAD **) extra_parameters[2],
@@ -1704,7 +1704,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_SEMAPHORE_CREATE_CALL_NOT_USED
 /* UINT _txe_semaphore_create(
     TX_SEMAPHORE *semaphore_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     ULONG initial_count, -> extra_parameters[0]
     UINT semaphore_control_block_size -> extra_parameters[1]
    ); */
@@ -1727,7 +1727,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_semaphore_create(
         (TX_SEMAPHORE *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (ULONG) extra_parameters[0],
         (UINT) extra_parameters[1]
     );
@@ -1793,7 +1793,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_SEMAPHORE_INFO_GET_CALL_NOT_USED
 /* UINT _txe_semaphore_info_get(
     TX_SEMAPHORE *semaphore_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *current_value, -> extra_parameters[0]
     TX_THREAD **first_suspended, -> extra_parameters[1]
     ULONG *suspended_count, -> extra_parameters[2]
@@ -1830,7 +1830,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_semaphore_info_get(
         (TX_SEMAPHORE *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (TX_THREAD **) extra_parameters[1],
         (ULONG *) extra_parameters[2],
@@ -2018,7 +2018,7 @@ VOID (*semaphore_put_notify)(TX_SEMAPHORE *);
 #ifndef TXM_THREAD_CREATE_CALL_NOT_USED
 /* UINT _txe_thread_create(
     TX_THREAD *thread_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     VOID (*entry_function)(ULONG entry_input), -> extra_parameters[0]
     ULONG entry_input, -> extra_parameters[1]
     VOID *stack_start, -> extra_parameters[2]
@@ -2057,7 +2057,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txm_module_manager_thread_create(
         (TX_THREAD *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         module_instance -> txm_module_instance_shell_entry_function,
         (VOID (*)(ULONG entry_input)) extra_parameters[0],
         (ULONG) extra_parameters[1],
@@ -2194,7 +2194,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_THREAD_INFO_GET_CALL_NOT_USED
 /* UINT _txe_thread_info_get(
     TX_THREAD *thread_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     UINT *state, -> extra_parameters[0]
     ULONG *run_count, -> extra_parameters[1]
     UINT *priority, -> extra_parameters[2]
@@ -2243,7 +2243,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_thread_info_get(
         (TX_THREAD *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (UINT *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (UINT *) extra_parameters[2],
@@ -2811,7 +2811,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_TIMER_CREATE_CALL_NOT_USED
 /* UINT _txe_timer_create(
     TX_TIMER *timer_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     VOID (*expiration_function)(ULONG), -> extra_parameters[0]
     ULONG expiration_input, -> extra_parameters[1]
     ULONG initial_ticks, -> extra_parameters[2]
@@ -2854,7 +2854,7 @@ VOID (*expiration_function)(ULONG);
 
     return_value = (ALIGN_TYPE) _txe_timer_create(
         (TX_TIMER *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (VOID (*)(ULONG)) expiration_function,
         (ULONG) extra_parameters[1],
         (ULONG) extra_parameters[2],
@@ -2937,7 +2937,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_TIMER_INFO_GET_CALL_NOT_USED
 /* UINT _txe_timer_info_get(
     TX_TIMER *timer_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     UINT *active, -> extra_parameters[0]
     ULONG *remaining_ticks, -> extra_parameters[1]
     ULONG *reschedule_ticks, -> extra_parameters[2]
@@ -2974,7 +2974,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_timer_info_get(
         (TX_TIMER *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (UINT *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (ULONG *) extra_parameters[2],

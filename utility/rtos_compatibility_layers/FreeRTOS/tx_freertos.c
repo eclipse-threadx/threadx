@@ -652,7 +652,7 @@ void vTaskPrioritySet(TaskHandle_t xTask,
 char *pcTaskGetName(TaskHandle_t xTaskToQuery)
 {
     TX_THREAD *p_thread;
-    char *p_task_name;
+    const char *p_task_name;
     UINT ret;
 
     if(xTaskToQuery == NULL) {
@@ -667,7 +667,8 @@ char *pcTaskGetName(TaskHandle_t xTaskToQuery)
         return 0;
     }
 
-    return p_task_name;
+    /* FreeRTOS exposes task names through a writable pointer type. */
+    return (char *)p_task_name;
 }
 
 

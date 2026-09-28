@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -69,7 +71,7 @@
 /*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txe_timer_info_get(TX_TIMER *timer_ptr, CHAR **name, UINT *active, ULONG *remaining_ticks,
+UINT  _txe_timer_info_get(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR **name, UINT *active, ULONG *remaining_ticks,
                 ULONG *reschedule_ticks, TX_TIMER **next_timer)
 {
 

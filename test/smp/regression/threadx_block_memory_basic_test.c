@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test simple memory block pool creation, deletion, and
    allocates and releases.  */
 
@@ -72,7 +74,7 @@ void  test_control_return(UINT status);
 
 /* Prototype direct call to block pool core service.  */
 
-UINT  _tx_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG block_size,
+UINT  _tx_block_pool_create(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG block_size,
                     VOID *pool_start, ULONG pool_size);
 
 

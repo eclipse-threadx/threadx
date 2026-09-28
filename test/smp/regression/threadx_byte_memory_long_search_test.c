@@ -133,7 +133,7 @@ void    threadx_byte_memory_long_search_application_define(void *first_unused_me
 UINT    status;
 CHAR    *pointer;
 UINT    i;
-CHAR    *name;
+TX_NAME_CONST CHAR *name;
 ULONG   available;
 ULONG   fragments;
 void    *probe_ptr;
@@ -259,7 +259,7 @@ static void    thread_0_entry(ULONG thread_input)
 
 UINT    status;
 UINT    i;
-CHAR    *name;
+TX_NAME_CONST CHAR *name;
 ULONG   available;
 ULONG   fragments;
 
