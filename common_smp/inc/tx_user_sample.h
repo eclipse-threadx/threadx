@@ -102,10 +102,10 @@
 #define TX_TIMER_TICKS_PER_SECOND       (100UL)
 */
 
-/* Define this option to expose object names without the const qualifier.  */
+/* Define this option to qualify object names as pointers to const.  */
 
 /*
-#define TX_LEGACY_NON_CONST_NAMES
+#define TX_ENABLE_CONST_NAMES
 */
 
 /* Determine if there is a FileX pointer in the thread control block.

@@ -66,11 +66,15 @@ extern   "C" {
 
 #include "tx_port.h"
 
-/* Define the qualifier applied to object name strings.  */
-#ifdef TX_LEGACY_NON_CONST_NAMES
-#define TX_NAME_CONST
-#else
+/* Define the qualifier applied to object name strings.  Opting in makes every
+   object name a pointer to const, which the kernel and its tests are written
+   for.  It is off by default because it changes the type of a public struct
+   field, and application code that copies a name into a writable pointer stops
+   compiling.  */
+#ifdef TX_ENABLE_CONST_NAMES
 #define TX_NAME_CONST                   const
+#else
+#define TX_NAME_CONST
 #endif
 
 #if (defined(TX_EXECUTION_PROFILE_ENABLE) && !defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY))
