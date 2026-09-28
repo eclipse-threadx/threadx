@@ -71,8 +71,7 @@
 @/*    dead thread's stack pointer.  It looks like it works, because the    */
 @/*    thread is never resumed -- but nothing gives the Abort stack back,   */
 @/*    so each module fault costs it about 56 bytes for the life of the     */
-@/*    run.  The Cortex-M ports do not need step 1: there                   */
-@/*    _tx_thread_system_return only pends PendSV and returns.              */
+@/*    run.                                                                 */
 @/*                                                                        */
 @/**************************************************************************/
 
