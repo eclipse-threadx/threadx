@@ -162,6 +162,7 @@ TXM_MODULE_ALLOCATED_OBJECT
 UINT    _txm_module_manager_object_type_size_get(UINT object_type, ULONG *object_size);
 UINT    _txm_module_manager_created_object_type_check(ALIGN_TYPE object_ptr, UINT object_type);
 UINT    _txm_module_manager_object_id_check(ALIGN_TYPE object_ptr, UINT object_type);
+UINT    _txm_module_manager_live_object_check(ALIGN_TYPE object_ptr);
 UINT    _txm_module_manager_util_code_allocation_size_and_alignment_get(TXM_MODULE_PREAMBLE *module_preamble, ULONG *code_alignment_dest, ULONG *code_allocation_size_dest);
 
 #endif

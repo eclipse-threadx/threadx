@@ -127,3 +127,29 @@ target_compile_options(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_delete_ownership_test
          threadx_module_manager_delete_ownership_test)
+
+# This test drives the allocation and deallocation services directly rather than
+# through a dispatcher, so it needs none of the dispatch table and no guard list.
+add_executable(
+  threadx_module_manager_live_object_deallocation_test
+  ${SOURCE_DIR}/threadx_module_manager_live_object_deallocation_test.c
+  ${module_manager_dir}/src/txm_module_manager_util.c
+  ${module_manager_dir}/src/txm_module_manager_object_allocate.c
+  ${module_manager_dir}/src/txm_module_manager_object_deallocate.c)
+
+target_include_directories(
+  threadx_module_manager_live_object_deallocation_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_a7_module_dir}/inc)
+
+target_compile_options(
+  threadx_module_manager_live_object_deallocation_test
+  PRIVATE -Wall
+          -Wextra
+          -include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_live_object_deallocation_test
+         threadx_module_manager_live_object_deallocation_test)

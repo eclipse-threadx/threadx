@@ -854,26 +854,33 @@ char                    description[128];
     test_expect("a live queue is accepted before anything is given back",
                 test_authenticate(&module_a, object, TXM_QUEUE_OBJECT), (ULONG) TX_TRUE);
 
-    /* Give the memory back without deleting the object first. The manager stops
-       vouching for the control block at the moment it stops owning the memory, so
-       the address is refused even though the created list has not been told.  */
+    /* Memory holding a live object is not given back at all. The object stays
+       created, the allocation stays owned, and the address stays authentic, so
+       the state this once had to defend against -- an object on the created list
+       whose memory the manager no longer owns -- cannot be reached.  */
     _tx_thread_current_ptr =  (TX_THREAD *) test_allocate(&module_a, (ULONG) sizeof(TX_THREAD));
     _tx_thread_current_ptr -> tx_thread_module_instance_ptr =  &module_a;
 
+    status =  _txm_module_manager_object_deallocate(object);
+    test_expect("memory holding a live object is not given back", (ULONG) status, (ULONG) TX_DELETE_ERROR);
+
+    test_expect("and the live object is still accepted afterwards",
+                test_authenticate(&module_a, object, TXM_QUEUE_OBJECT), (ULONG) TX_TRUE);
+
+    /* Deleted first, the same memory is given back, and the address comes round
+       again as a fresh, raw allocation. It is once again an exact allocation start
+       of the right size, and the ID of the object that used to be there can be
+       written back into it by the module that now owns it, so the created list is
+       the only thing that refuses it.  */
+    test_object_delete(object, kind -> test_kind_type);
     test_release_size(kind -> test_kind_size);
     status =  _txm_module_manager_object_deallocate(object);
-    test_expect("the object memory is given back", (ULONG) status, (ULONG) TX_SUCCESS);
+    test_expect("a deleted object's memory is given back", (ULONG) status, (ULONG) TX_SUCCESS);
 
-    test_expect("an address whose memory was given back without a delete is refused",
-                test_authenticate(&module_a, object, TXM_QUEUE_OBJECT), (ULONG) TX_FALSE);
-
-    /* The same address now comes back as a fresh, raw allocation. It is once
-       again an exact allocation start of the right size, and it is still on the
-       created list, so nothing but the cleared ID stands between it and being
-       taken for the object that used to be there.  */
     raw_object =  test_allocate(&module_a, kind -> test_kind_size);
     test_expect("the freed address is handed out again",
                 (ULONG) (raw_object == object), (ULONG) TX_TRUE);
+    (VOID) test_plant(raw_object, ((ULONG) 0), kind -> test_kind_id);
     test_expect("and is not accepted as the object that used to be there",
                 test_authenticate(&module_a, raw_object, TXM_QUEUE_OBJECT), (ULONG) TX_FALSE);
 

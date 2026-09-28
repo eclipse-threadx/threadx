@@ -1021,13 +1021,18 @@ UINT    exact_object;
 /*    This function determines whether an address is the exact address    */
 /*    of an object on the kernel's created list for a module object type. */
 /*                                                                        */
-/*    This is how an object the application created and shared with a     */
-/*    module is authenticated. Such an object is not in the manager's     */
-/*    object pool and the manager has no allocation record of it, so the  */
-/*    kernel's own created list is the only record of it that a module    */
-/*    cannot influence. Being on that list establishes at once that the   */
-/*    address is an object start, that the object is of this type, and    */
-/*    that it is created.                                                 */
+/*    The created list is the record the create and delete services       */
+/*    maintain, so being on it establishes at once that the address is an */
+/*    object start rather than an address inside an object, that the      */
+/*    object is of this type, and that it has not been deleted. It is     */
+/*    also the only record of an object the application created and       */
+/*    shared with a module, since the manager allocated no such object.   */
+/*                                                                        */
+/*    Nothing the module can influence is consulted. In particular the    */
+/*    control block ID is not: a module can arrange for the value of an   */
+/*    ID to appear inside memory it owns, and distinct object types of    */
+/*    equal size exist, so an ID is not evidence that an object is there  */
+/*    nor of what type it is.                                             */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -1045,6 +1050,7 @@ UINT    exact_object;
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
+/*    _txm_module_manager_live_object_check Module object liveness check  */
 /*    _txm_module_manager_param_check_typed_object_for_use                */
 /*                                          Module object authentication  */
 /*                                                                        */
@@ -1396,6 +1402,96 @@ UINT    status;
     {
 
         status =  TX_FALSE;
+    }
+
+    return(status);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_live_object_check               PORTABLE C      */
+/*                                                           6.4.3        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Eclipse ThreadX contributors                                        */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function determines whether an address is the exact address    */
+/*    of a live kernel object of any type the Module Manager knows.       */
+/*                                                                        */
+/*    It answers the question object deallocation has to ask before it    */
+/*    gives memory back: is the kernel still going to use these bytes as  */
+/*    a control block. Deallocation is told an address and nothing else,  */
+/*    so unlike the checks a typed service makes it cannot be given the   */
+/*    type to look for, and every type has to be looked for in turn.      */
+/*                                                                        */
+/*    The eight created lists are searched whatever the size of the       */
+/*    allocation at the address. Skipping a type whose control block is   */
+/*    larger than the allocation would be sound only if every object had  */
+/*    been created through a size-checked path, and a module running      */
+/*    without memory protection creates objects without one.              */
+/*                                                                        */
+/*    Each list is searched in its own interrupts-disabled window rather  */
+/*    than all of them in one, so the longest window is bounded by the    */
+/*    number of objects of a single type. The whole search costs one pass */
+/*    over the objects the system has created, and is paid once per       */
+/*    object deallocation.                                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    object_ptr                        Address of object memory area     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_TRUE                           A live kernel object is there     */
+/*    TX_FALSE                          Anything else                     */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_created_object_type_check                       */
+/*                                          Check one kernel created list */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _txm_module_manager_object_deallocate Deallocate object memory      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-2026      Eclipse ThreadX         Initial Version 6.4.3         */
+/*                    contributors                                        */
+/*                                                                        */
+/**************************************************************************/
+UINT    _txm_module_manager_live_object_check(ALIGN_TYPE object_ptr)
+{
+
+UINT    object_type;
+UINT    status;
+
+
+    /* Assume no live object is there.  */
+    status =  TX_FALSE;
+
+    /* The eight module object types that have a kernel created list occupy a
+       contiguous range, so each is asked in turn by walking the range. A value in
+       the range that the per-type check does not recognise answers TX_FALSE, so a
+       type the manager stops knowing does not silently pass this search.  */
+    for (object_type = ((UINT) TXM_BLOCK_POOL_OBJECT); object_type <= ((UINT) TXM_TIMER_OBJECT); object_type++)
+    {
+
+        if (_txm_module_manager_created_object_type_check(object_ptr, object_type) == TX_TRUE)
+        {
+
+            /* An address is the start of at most one object, so there is nothing
+               further to look for.  */
+            status =  TX_TRUE;
+            break;
+        }
     }
 
     return(status);

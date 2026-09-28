@@ -44,9 +44,7 @@
 /*    DEPRECATED.  This function is called internally by the Module       */
 /*    Manager dispatch layer after a successful tx_*_delete() call from   */
 /*    a module.  It must not be called directly by module or application  */
-/*    code.  Calling it on a live kernel object (one whose tx_*_delete()  */
-/*    has not yet been called) frees the backing pool memory while the    */
-/*    object is still referenced by the kernel (use-after-free).          */
+/*    code.                                                               */
 /*                                                                        */
 /*    Module authors: remove any explicit call to                         */
 /*    txm_module_object_deallocate().  Calling the appropriate            */
@@ -59,6 +57,13 @@
 /*    header from in front of the address the caller supplied.  An        */
 /*    address that names none of this module's allocations returns        */
 /*    TX_PTR_ERROR and is not dereferenced.                               */
+/*    Memory holding a live kernel object is not given back.  Such a      */
+/*    request returns TX_DELETE_ERROR and changes nothing: the object     */
+/*    stays created, the allocation stays on the module's allocation      */
+/*    list, and the memory stays owned by the module.  Storage that was   */
+/*    allocated but never made into an object is still released, so a     */
+/*    module can still clean up after a create that failed or was         */
+/*    abandoned.                                                          */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -74,6 +79,7 @@
 /*    _txe_mutex_put                        Release module instance mutex */
 /*    _txm_module_manager_allocated_object_find                           */
 /*                                          Find the module's allocation  */
+/*    _txm_module_manager_live_object_check  Check for a live object      */
 /*    _txe_byte_release                     Release object back to pool   */
 /*                                                                        */
 /*                                                                        */
@@ -129,6 +135,35 @@ UINT                        return_value;
         {
             /* Set return value to invalid pointer.  */
             return_value =  TX_PTR_ERROR;
+        }
+
+        /* Determine if a live kernel object is in this memory.
+
+           Releasing the memory of a created object leaves the kernel holding the
+           only references to it.  The object stays on the created list for its
+           type, a thread stays on the ready or suspension list it was on and stays
+           schedulable, and an active timer stays on the timer list.  None of those
+           consult a control block ID, so nothing about the freed memory stops the
+           kernel using it: a created list walk reads a name pointer out of it, a
+           create or delete of another object of the same type writes through the
+           links in it, the scheduler restores a context from the stack pointer in
+           it, and timer expiration calls the function pointer in it.  The byte pool
+           is meanwhile free to hand those bytes to the next allocation, so what the
+           kernel goes on reading as a control block is whatever the next owner of
+           the memory puts there.
+
+           This is asked before the allocation is unlinked, so a refusal leaves the
+           allocation list, the object and the memory exactly as they were.  What is
+           refused is releasing the memory of an object that is still created; an
+           allocation that was never made into an object, or one whose object has
+           been deleted, is released as before, which is what keeps cleanup after a
+           failed or abandoned create working and what makes the release the delete
+           dispatchers perform after a successful delete go through.  */
+        else if (_txm_module_manager_live_object_check((ALIGN_TYPE) object_ptr) == TX_TRUE)
+        {
+
+            /* Set return value to indicate the object must be deleted first.  */
+            return_value =  TX_DELETE_ERROR;
         }
         else
         {
