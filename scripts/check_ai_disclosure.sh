@@ -35,7 +35,7 @@
 # Precise attribution lives on the commit instead, where the Assisted-by
 # trailer is dated and attached to the diff it describes:
 #
-#     git log --format='%h %(trailers:key=Assisted-by,valueonly)' -- <path>
+#     scripts/count_assisted_by.sh --list <rev> -- <path>
 #
 # A file-level flag answers WHETHER; the history answers WHO.  A header line
 # cannot hold the second honestly, because the code it names gets rewritten
