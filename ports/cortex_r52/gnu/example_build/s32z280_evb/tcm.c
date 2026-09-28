@@ -29,11 +29,12 @@
 /*    the register layouts and where they come from; nothing here is      */
 /*    inferred from a neighbouring register's shape.                      */
 /*                                                                        */
-/*    Reading only.  Programming a base address and setting the enables    */
-/*    comes after these values have been seen and agree with both the      */
-/*    Cortex-R52 TRM and the S32Z2 reference manual, because a disagreement*/
-/*    would mean one of the two documents does not describe this part and  */
-/*    guessing which would be the whole PRBAR mistake again.              */
+/*    Reading only.  Programming a base address and setting the enables   */
+/*    comes after these values have been seen and agree with both the     */
+/*    Cortex-R52 TRM and the S32Z2 reference manual, because a            */
+/*    disagreement would mean one of the two documents does not describe  */
+/*    this part and guessing which would be the whole PRBAR mistake       */
+/*    again.                                                              */
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */

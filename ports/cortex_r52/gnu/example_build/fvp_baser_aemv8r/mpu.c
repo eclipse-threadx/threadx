@@ -29,10 +29,11 @@
 /*                                                                        */
 /*    Register model (AArch32): a region is selected through PRSELR and   */
 /*    then described by PRBAR (base, shareability, access permission,     */
-/*    execute-never) and PRLAR (inclusive limit, attribute index, enable).*/
-/*    Both addresses have a 64-byte granule, so the low six bits of each  */
-/*    register hold attributes rather than address.  Memory types come    */
-/*    from MAIR through the attribute index, not from the region itself.  */
+/*    execute-never) and PRLAR (inclusive limit, attribute index,         */
+/*    enable). Both addresses have a 64-byte granule, so the low six bits */
+/*    of each register hold attributes rather than address.  Memory types */
+/*    come from MAIR through the attribute index, not from the region     */
+/*    itself.                                                             */
 /*                                                                        */
 /*    Caches are invalidated before being enabled.  On this model they    */
 /*    come out of reset invalid, but silicon does not guarantee that, and */
@@ -40,9 +41,9 @@
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 -- the MPU, MAIR, SCTLR and cache maintenance are only*/
-/*      reachable through CP15; every access is encapsulated in a one-line*/
-/*      accessor below.                                                   */
+/*    Directive 4.3 -- the MPU, MAIR, SCTLR and cache maintenance are     */
+/*      only reachable through CP15; every access is encapsulated in a    */
+/*      one-line accessor below.                                          */
 /*                                                                        */
 /**************************************************************************/
 
@@ -302,20 +303,21 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
 /*  A window over the module area, for the manager to load through.       */
 /*                                                                        */
 /*  No region in the table above covers the module area, which is what    */
-/*  stops every thread from reaching a module's memory -- but the manager  */
+/*  stops every thread from reaching a module's memory -- but the manager */
 /*  has to read the preamble and write the module's data to load it at    */
 /*  all.  Without this the load faults on its first read of the image.    */
 /*                                                                        */
 /*  Not opened and closed around the load.  It is left enabled here and   */
-/*  the SCHEDULER owns it from then on: it turns this region on for every  */
-/*  thread that owns no module and off for every thread that does, which   */
-/*  is what keeps it and a module's own regions -- which cover the same    */
-/*  memory -- from ever being enabled together.  PMSAv8-R has no region    */
-/*  priority, so an access hitting more than one enabled region takes a    */
-/*  translation fault (TRM 8.1), and mutual exclusion by ownership is the  */
-/*  only form of it that does not depend on remembering to bracket a call. */
+/*  the SCHEDULER owns it from then on: it turns this region on for every */
+/*  thread that owns no module and off for every thread that does, which  */
+/*  is what keeps it and a module's own regions -- which cover the same   */
+/*  memory -- from ever being enabled together.  PMSAv8-R has no region   */
+/*  priority, so an access hitting more than one enabled region takes a   */
+/*  translation fault (TRM 8.1), and mutual exclusion by ownership is the */
+/*  only form of it that does not depend on remembering to bracket a      */
+/*  call.                                                                 */
 /*                                                                        */
-/*  EL1 read/write with no EL0 access, and execute-never: the manager can  */
+/*  EL1 read/write with no EL0 access, and execute-never: the manager can */
 /*  load through it, and a module cannot use it to reach anything.        */
 /**************************************************************************/
 

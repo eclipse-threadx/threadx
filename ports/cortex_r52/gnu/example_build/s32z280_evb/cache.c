@@ -27,12 +27,12 @@
 /*                                                                        */
 /*    Cache maintenance and enable for the S32Z280-594EVB.                */
 /*                                                                        */
-/*    The FVP example enables SCTLR.C and SCTLR.I but only invalidates the*/
-/*    instruction cache, with a note that a data-cache set/way sweep      */
+/*    The FVP example enables SCTLR.C and SCTLR.I but only invalidates    */
+/*    the instruction cache, with a note that a data-cache set/way sweep  */
 /*    belongs with silicon bring-up "where it can be verified against the */
 /*    real cache geometry".  This is that: the sweep here reads CLIDR and */
-/*    CCSIDR and walks every set and way the hardware reports, rather than*/
-/*    assuming a size.                                                    */
+/*    CCSIDR and walks every set and way the hardware reports, rather     */
+/*    than assuming a size.                                               */
 /*                                                                        */
 /*    The sweep matters more here than on a model.  This image is written */
 /*    into SRAM by a debugger with the caches off, so nothing has been    */

@@ -31,11 +31,11 @@
 /*                                                                        */
 /*    Where M3 proved the tick and a single preemption, this exercises    */
 /*    the demo's full object set -- queue, semaphore, mutex, event flags, */
-/*    byte pool and block pool -- across eight threads at five priorities.*/
-/*    Each of the ten demo counters is required to have advanced: a       */
-/*    stalled thread (a lost wakeup, a mishandled priority inversion)     */
-/*    shows up as a counter still at zero rather than as a plausible-     */
-/*    looking run.                                                        */
+/*    byte pool and block pool -- across eight threads at five            */
+/*    priorities. Each of the ten demo counters is required to have       */
+/*    advanced: a stalled thread (a lost wakeup, a mishandled priority    */
+/*    inversion) shows up as a counter still at zero rather than as a     */
+/*    plausible- looking run.                                             */
 /*                                                                        */
 /*    The verification thread runs at priority 0 so it can always preempt */
 /*    the demo, and spends nearly all its life suspended.                 */

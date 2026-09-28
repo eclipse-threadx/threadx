@@ -25,17 +25,17 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Cache maintenance for a loader that copies code.  See cache.h for    */
+/*    Cache maintenance for a loader that copies code.  See cache.h for   */
 /*    why only these three functions exist.                               */
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 -- cache maintenance and CTR are reachable only        */
-/*      through CP15; every access is encapsulated in a one-line accessor  */
+/*    Directive 4.3 -- cache maintenance and CTR are reachable only       */
+/*      through CP15; every access is encapsulated in a one-line accessor */
 /*      below and nowhere else in this file.                              */
-/*    Rule 11.6 (conversion between a pointer and an integer) -- a cache   */
-/*      maintenance operation takes a virtual address as a register value, */
-/*      so the conversion is what the instruction requires.               */
+/*    Rule 11.6 (conversion between a pointer and an integer) -- a cache  */
+/*      maintenance operation takes a virtual address as a register       */
+/*      value, so the conversion is what the instruction requires.        */
 /*                                                                        */
 /**************************************************************************/
 
@@ -51,7 +51,8 @@
 
 
 /**************************************************************************/
-/*  CP15 accessors.  The only assembly in this file (MISRA C:2012 Dir 4.3).*/
+/*  CP15 accessors.  The only assembly in this file (MISRA C:2012 Dir     */
+/*  4.3).                                                                 */
 /**************************************************************************/
 
 static unsigned long read_ctr(void)
@@ -96,13 +97,13 @@ unsigned long cache_dcache_line_bytes(void)
 /**************************************************************************/
 /*  cache_clean_range                                                     */
 /*                                                                        */
-/*  Clean by virtual address over [start, start + length).                 */
+/*  Clean by virtual address over [start, start + length).                */
 /*                                                                        */
-/*  The start is rounded DOWN to a line boundary and the walk continues    */
-/*  past the end until the last line containing a requested byte has been  */
-/*  cleaned.  Rounding the start up instead would leave the first partial  */
-/*  line dirty, which is the whole failure this exists to prevent and is    */
-/*  invisible whenever the caller happens to be line aligned.              */
+/*  The start is rounded DOWN to a line boundary and the walk continues   */
+/*  past the end until the last line containing a requested byte has been */
+/*  cleaned.  Rounding the start up instead would leave the first partial */
+/*  line dirty, which is the whole failure this exists to prevent and is  */
+/*  invisible whenever the caller happens to be line aligned.             */
 /**************************************************************************/
 
 void cache_clean_range(const void *start_address, unsigned long length)

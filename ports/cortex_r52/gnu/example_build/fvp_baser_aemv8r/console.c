@@ -32,9 +32,9 @@
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 (assembly language shall be encapsulated and isolated)*/
-/*      -- observed rather than violated: the single asm statement lives  */
-/*      in semihost_call() and nowhere else in the port.                  */
+/*    Directive 4.3 (assembly language shall be encapsulated and          */
+/*      isolated) -- observed rather than violated: the single asm        */
+/*      statement lives in semihost_call() and nowhere else in the port.  */
 /*    Rule 1.1 / 1.2 (language extensions)                                */
 /*      -- register-asm bindings and inline assembly are unavoidable to   */
 /*      invoke a semihosting trap; no standard C construct expresses it.  */

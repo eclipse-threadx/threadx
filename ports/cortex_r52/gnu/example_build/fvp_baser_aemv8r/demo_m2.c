@@ -35,7 +35,8 @@
 /*    The threads record their execution order in a trace buffer, and the */
 /*    expected alternating sequence is asserted at the end.  Counting     */
 /*    iterations alone would not prove a context switch happened: if      */
-/*    switching were broken, one thread could run to completion by itself.*/
+/*    switching were broken, one thread could run to completion by        */
+/*    itself.                                                             */
 /*                                                                        */
 /*    Only tx_thread_relinquish is used.  tx_thread_sleep would hang      */
 /*    without a tick, which AR1/M3 adds.                                  */
