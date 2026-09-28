@@ -435,7 +435,7 @@ VOID    tx_thread_fp_disable(VOID);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Modules Cortex-A35-SMP/GNU Version 6.5.1.202602a *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Modules Cortex-A35-SMP/GNU Version 6.5.2.202603 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

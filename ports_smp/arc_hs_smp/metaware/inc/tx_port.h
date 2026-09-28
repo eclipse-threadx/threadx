@@ -395,7 +395,7 @@ typedef struct TX_THREAD_SMP_PROTECT_STRUCT
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX SMP/ARC_HS/MetaWare Version 6.5.1.202602a *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX SMP/ARC_HS/MetaWare Version 6.5.2.202603 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
