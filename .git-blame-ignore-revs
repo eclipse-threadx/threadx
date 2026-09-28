@@ -52,3 +52,11 @@ df30b8b96e4c0c6d72e0bb80d2a2ec31666e5afe
 # 2026-09-15  Normalized the AI disclosure comment to one fixed line per file (#740)
 # 455 files
 9e4c57138dfa004cd512b60259c1c5047a8b3dd1
+
+# 2026-09-28  Normalized the AI disclosure comment and added a check that keeps it so (#762)
+# 158 files
+83361990cb4d03da8851e30030688ed3abb4d840
+
+# 2026-09-28  Updated ThreadX version constants and port strings to 6.5.2.202603 (#781)
+# 212 files
+a7ded6a3b9e12985a6c52af4df419d2326cccc0a
