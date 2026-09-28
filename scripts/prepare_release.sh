@@ -15,6 +15,7 @@
 #
 # Copyright (C) 2026 Eclipse ThreadX contributors
 # SPDX-License-Identifier: MIT
+# Portions of this file were generated with AI assistance.
 
 set -eu
 
@@ -134,8 +135,6 @@ sed -i -E "s|(#define THREADX_HOTFIX_VERSION[[:space:]]+)'[^']*'|\1${HOTFIX_DEFI
 git -C "${REPO_ROOT}" add "${API_HEADER}"
 git -C "${REPO_ROOT}" commit -F - <<'COMMIT_EOF'
 Updated version number constants
-
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 COMMIT_EOF
 
 printf "Committed version constant updates.\n"
@@ -175,8 +174,6 @@ EOF
     else
         git -C "${REPO_ROOT}" commit -F - <<'COMMIT_EOF'
 Updated port version strings
-
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 COMMIT_EOF
         printf "Committed port version string updates.\n"
     fi
