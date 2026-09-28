@@ -206,5 +206,13 @@ SECTIONS
 
   __data_size__ =  __heap_end__ - __RAM_segment_start__;
 
+  /* The dynamic linking metadata is not used by the module manager.  Discarding
+     it keeps it out of the binary image produced from this ELF file.  */
+
+  /DISCARD/ :
+  {
+    *(.dynamic)
+  }
+
 }
 

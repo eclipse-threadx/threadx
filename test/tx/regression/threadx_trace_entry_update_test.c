@@ -12,6 +12,7 @@
  *
  * SPDX-License-Identifier: MIT and CC0-1.0
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 /* This test drives the trace entry update paths -- the blocks guarded by
    TX_ENABLE_EVENT_TRACE that go back and patch a trace entry after the call
@@ -73,7 +74,7 @@ static TX_SEMAPHORE    semaphore_0;
 
 static UCHAR           trace_buffer[16384];
 
-/* Four blocks of 20 bytes: 100 / (20 + sizeof(void *)) on a 32-bit build.  */
+/* Enough storage for several 20-byte blocks on both 32-bit and 64-bit builds.  */
 
 static UCHAR           block_pool_area[100];
 static UCHAR           byte_pool_area[512];
@@ -213,13 +214,21 @@ void    *byte_ptr;
 UINT    i;
 
 
-    /* Empty the block pool. The first of these takes the immediate-success path
-       through tx_block_allocate, which carries the first update block.  */
+    /* Empty the block pool. The first allocation takes the immediate-success
+       path through tx_block_allocate, which carries the first update block.
+       The exact capacity is port-dependent because each block has a pointer-
+       sized header, so allocate until the pool reports that it is empty.  */
     held_block =  TX_NULL;
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 6u; i++)
     {
 
         status =  tx_block_allocate(&block_pool_0, &block_ptr, TX_NO_WAIT);
+
+        if (status == TX_NO_MEMORY)
+        {
+
+            break;
+        }
 
         if (status != TX_SUCCESS)
         {
@@ -234,6 +243,12 @@ UINT    i;
 
             held_block =  block_ptr;
         }
+    }
+
+    if ((status != TX_NO_MEMORY) || (held_block == TX_NULL))
+    {
+
+        error++;
     }
 
     /* The pool is empty now, so this suspends. It completes in thread 1's
@@ -284,6 +299,43 @@ UINT    i;
         printf("Running Trace Entry Update Test..................................... ERROR #11\n");
         test_control_return(1);
     }
+
+#ifdef TX_ENABLE_EVENT_TRACE
+
+    /* Every update block above compares a saved time stamp against the one in
+       the entry, so a port whose time source never changes makes all of them
+       take their true branch for the wrong reason: not because the entry
+       survived, but because every entry reads the same. Check the buffer holds
+       at least one entry with a time stamp the port actually supplied. The
+       events written by this point number in the dozens, so a single zero
+       reading from a real clock cannot fail this.  */
+    {
+
+    TX_TRACE_BUFFER_ENTRY  *entry_ptr;
+    UINT                    stamped;
+
+
+        stamped =  TX_FALSE;
+
+        for (entry_ptr = _tx_trace_buffer_start_ptr; entry_ptr < _tx_trace_buffer_end_ptr; entry_ptr++)
+        {
+
+            if (entry_ptr -> tx_trace_buffer_entry_time_stamp != ((ULONG) 0))
+            {
+
+                stamped =  TX_TRUE;
+                break;
+            }
+        }
+
+        if (stamped != TX_TRUE)
+        {
+
+            printf("Running Trace Entry Update Test..................................... ERROR #13\n");
+            test_control_return(1);
+        }
+    }
+#endif
 
     if (error)
     {

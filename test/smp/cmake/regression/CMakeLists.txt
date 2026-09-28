@@ -86,6 +86,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_smp_random_resume_suspend_exclusion_test.c
     ${SOURCE_DIR}/threadx_smp_random_resume_suspend_test.c
     ${SOURCE_DIR}/threadx_smp_rebalance_exclusion_test.c
+    ${SOURCE_DIR}/threadx_smp_relinquish_rebalance_test.c
     ${SOURCE_DIR}/threadx_smp_relinquish_test.c
     ${SOURCE_DIR}/threadx_smp_resume_suspend_ascending_order_test.c
     ${SOURCE_DIR}/threadx_smp_resume_suspend_descending_order_test.c
@@ -114,6 +115,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_thread_sleep_for_100ticks_test.c
     ${SOURCE_DIR}/threadx_thread_sleep_terminate_test.c
     ${SOURCE_DIR}/threadx_thread_stack_checking_test.c
+    ${SOURCE_DIR}/threadx_thread_stack_fill_value_test.c
     ${SOURCE_DIR}/threadx_thread_terminate_delete_test.c
     ${SOURCE_DIR}/threadx_thread_exit_callback_transition_test.c
     ${SOURCE_DIR}/threadx_smp_thread_exit_callback_remote_test.c

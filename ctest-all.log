@@ -1,0 +1,220 @@
+Test project /tmp/claude-1000/-home-fdesbiens-652/bc81907a-b0a7-43d2-b3f5-83c3cfaa53e2/scratchpad/mm/test/tx/cmake/build/default_build_coverage
+        Start   1: default_build_coverage::threadx_block_memory_basic_test
+  1/107 Test   #1: default_build_coverage::threadx_block_memory_basic_test .............................   Passed    0.08 sec
+        Start   2: default_build_coverage::threadx_block_memory_error_detection_test
+  2/107 Test   #2: default_build_coverage::threadx_block_memory_error_detection_test ...................   Passed    0.01 sec
+        Start   3: default_build_coverage::threadx_block_memory_information_test
+  3/107 Test   #3: default_build_coverage::threadx_block_memory_information_test .......................   Passed    0.02 sec
+        Start   4: default_build_coverage::threadx_block_memory_prioritize_test
+  4/107 Test   #4: default_build_coverage::threadx_block_memory_prioritize_test ........................   Passed    0.03 sec
+        Start   5: default_build_coverage::threadx_block_memory_suspension_test
+  5/107 Test   #5: default_build_coverage::threadx_block_memory_suspension_test ........................   Passed    0.01 sec
+        Start   6: default_build_coverage::threadx_block_memory_suspension_timeout_test
+  6/107 Test   #6: default_build_coverage::threadx_block_memory_suspension_timeout_test ................   Passed    0.65 sec
+        Start   7: default_build_coverage::threadx_block_memory_thread_terminate_test
+  7/107 Test   #7: default_build_coverage::threadx_block_memory_thread_terminate_test ..................   Passed    0.01 sec
+        Start   8: default_build_coverage::threadx_byte_memory_basic_test
+  8/107 Test   #8: default_build_coverage::threadx_byte_memory_basic_test ..............................   Passed    0.03 sec
+        Start   9: default_build_coverage::threadx_byte_memory_information_test
+  9/107 Test   #9: default_build_coverage::threadx_byte_memory_information_test ........................   Passed    0.02 sec
+        Start  10: default_build_coverage::threadx_byte_memory_prioritize_test
+ 10/107 Test  #10: default_build_coverage::threadx_byte_memory_prioritize_test .........................   Passed    0.03 sec
+        Start  11: default_build_coverage::threadx_byte_memory_suspension_test
+ 11/107 Test  #11: default_build_coverage::threadx_byte_memory_suspension_test .........................   Passed    0.01 sec
+        Start  12: default_build_coverage::threadx_byte_memory_suspension_timeout_test
+ 12/107 Test  #12: default_build_coverage::threadx_byte_memory_suspension_timeout_test .................   Passed    0.65 sec
+        Start  13: default_build_coverage::threadx_byte_memory_thread_contention_test
+ 13/107 Test  #13: default_build_coverage::threadx_byte_memory_thread_contention_test ..................   Passed    1.36 sec
+        Start  14: default_build_coverage::threadx_byte_memory_thread_terminate_test
+ 14/107 Test  #14: default_build_coverage::threadx_byte_memory_thread_terminate_test ...................   Passed    0.01 sec
+        Start  15: default_build_coverage::threadx_event_flag_basic_test
+ 15/107 Test  #15: default_build_coverage::threadx_event_flag_basic_test ...............................   Passed    0.07 sec
+        Start  16: default_build_coverage::threadx_event_flag_information_test
+ 16/107 Test  #16: default_build_coverage::threadx_event_flag_information_test .........................   Passed    0.01 sec
+        Start  17: default_build_coverage::threadx_event_flag_isr_set_clear_test
+ 17/107 Test  #17: default_build_coverage::threadx_event_flag_isr_set_clear_test .......................   Passed    0.91 sec
+        Start  18: default_build_coverage::threadx_event_flag_isr_wait_abort_test
+ 18/107 Test  #18: default_build_coverage::threadx_event_flag_isr_wait_abort_test ......................   Passed    0.81 sec
+        Start  19: default_build_coverage::threadx_event_flag_single_thread_terminate_test
+ 19/107 Test  #19: default_build_coverage::threadx_event_flag_single_thread_terminate_test .............   Passed    0.31 sec
+        Start  20: default_build_coverage::threadx_event_flag_suspension_consume_test
+ 20/107 Test  #20: default_build_coverage::threadx_event_flag_suspension_consume_test ..................   Passed    0.01 sec
+        Start  21: default_build_coverage::threadx_event_flag_suspension_different_bits_consume_test
+ 21/107 Test  #21: default_build_coverage::threadx_event_flag_suspension_different_bits_consume_test ...   Passed    0.01 sec
+        Start  22: default_build_coverage::threadx_event_flag_suspension_different_bits_test
+ 22/107 Test  #22: default_build_coverage::threadx_event_flag_suspension_different_bits_test ...........   Passed    0.01 sec
+        Start  23: default_build_coverage::threadx_event_flag_suspension_test
+ 23/107 Test  #23: default_build_coverage::threadx_event_flag_suspension_test ..........................   Passed    0.01 sec
+        Start  24: default_build_coverage::threadx_event_flag_suspension_timeout_test
+ 24/107 Test  #24: default_build_coverage::threadx_event_flag_suspension_timeout_test ..................   Passed    0.68 sec
+        Start  25: default_build_coverage::threadx_event_flag_thread_terminate_test
+ 25/107 Test  #25: default_build_coverage::threadx_event_flag_thread_terminate_test ....................   Passed    0.01 sec
+        Start  26: default_build_coverage::threadx_interrupt_control_test
+ 26/107 Test  #26: default_build_coverage::threadx_interrupt_control_test ..............................   Passed    0.03 sec
+        Start  27: default_build_coverage::threadx_mutex_basic_test
+ 27/107 Test  #27: default_build_coverage::threadx_mutex_basic_test ....................................   Passed    0.09 sec
+        Start  28: default_build_coverage::threadx_mutex_delete_test
+ 28/107 Test  #28: default_build_coverage::threadx_mutex_delete_test ...................................   Passed    0.01 sec
+        Start  29: default_build_coverage::threadx_mutex_information_test
+ 29/107 Test  #29: default_build_coverage::threadx_mutex_information_test ..............................   Passed    0.01 sec
+        Start  30: default_build_coverage::threadx_mutex_nested_priority_inheritance_test
+ 30/107 Test  #30: default_build_coverage::threadx_mutex_nested_priority_inheritance_test ..............   Passed    0.10 sec
+        Start  31: default_build_coverage::threadx_mutex_no_preemption_test
+ 31/107 Test  #31: default_build_coverage::threadx_mutex_no_preemption_test ............................   Passed    0.01 sec
+        Start  32: default_build_coverage::threadx_mutex_preemption_test
+ 32/107 Test  #32: default_build_coverage::threadx_mutex_preemption_test ...............................   Passed    0.01 sec
+        Start  33: default_build_coverage::threadx_mutex_priority_inheritance_test
+ 33/107 Test  #33: default_build_coverage::threadx_mutex_priority_inheritance_test .....................   Passed    0.21 sec
+        Start  34: default_build_coverage::threadx_mutex_proritize_test
+ 34/107 Test  #34: default_build_coverage::threadx_mutex_proritize_test ................................   Passed    0.03 sec
+        Start  35: default_build_coverage::threadx_mutex_suspension_timeout_test
+ 35/107 Test  #35: default_build_coverage::threadx_mutex_suspension_timeout_test .......................   Passed    0.37 sec
+        Start  36: default_build_coverage::threadx_mutex_thread_terminate_test
+ 36/107 Test  #36: default_build_coverage::threadx_mutex_thread_terminate_test .........................   Passed    0.01 sec
+        Start  37: default_build_coverage::threadx_queue_basic_eight_word_test
+ 37/107 Test  #37: default_build_coverage::threadx_queue_basic_eight_word_test .........................   Passed    0.00 sec
+        Start  38: default_build_coverage::threadx_queue_basic_four_word_test
+ 38/107 Test  #38: default_build_coverage::threadx_queue_basic_four_word_test ..........................   Passed    0.00 sec
+        Start  39: default_build_coverage::threadx_queue_basic_one_word_test
+ 39/107 Test  #39: default_build_coverage::threadx_queue_basic_one_word_test ...........................   Passed    0.07 sec
+        Start  40: default_build_coverage::threadx_queue_basic_sixteen_word_test
+ 40/107 Test  #40: default_build_coverage::threadx_queue_basic_sixteen_word_test .......................   Passed    0.01 sec
+        Start  41: default_build_coverage::threadx_queue_basic_two_word_test
+ 41/107 Test  #41: default_build_coverage::threadx_queue_basic_two_word_test ...........................   Passed    0.00 sec
+        Start  42: default_build_coverage::threadx_queue_basic_max_message_size_test
+ 42/107 Test  #42: default_build_coverage::threadx_queue_basic_max_message_size_test ...................   Passed    0.00 sec
+        Start  43: default_build_coverage::threadx_queue_empty_suspension_test
+ 43/107 Test  #43: default_build_coverage::threadx_queue_empty_suspension_test .........................   Passed    0.01 sec
+        Start  44: default_build_coverage::threadx_queue_flush_no_suspension_test
+ 44/107 Test  #44: default_build_coverage::threadx_queue_flush_no_suspension_test ......................   Passed    0.00 sec
+        Start  45: default_build_coverage::threadx_queue_flush_test
+ 45/107 Test  #45: default_build_coverage::threadx_queue_flush_test ....................................   Passed    0.01 sec
+        Start  46: default_build_coverage::threadx_queue_front_send_test
+ 46/107 Test  #46: default_build_coverage::threadx_queue_front_send_test ...............................   Passed    0.01 sec
+        Start  47: default_build_coverage::threadx_queue_full_suspension_test
+ 47/107 Test  #47: default_build_coverage::threadx_queue_full_suspension_test ..........................   Passed    0.01 sec
+        Start  48: default_build_coverage::threadx_queue_information_test
+ 48/107 Test  #48: default_build_coverage::threadx_queue_information_test ..............................   Passed    0.00 sec
+        Start  49: default_build_coverage::threadx_queue_prioritize
+ 49/107 Test  #49: default_build_coverage::threadx_queue_prioritize ....................................   Passed    0.03 sec
+        Start  50: default_build_coverage::threadx_queue_suspension_timeout_test
+ 50/107 Test  #50: default_build_coverage::threadx_queue_suspension_timeout_test .......................   Passed    0.36 sec
+        Start  51: default_build_coverage::threadx_queue_thread_terminate_test
+ 51/107 Test  #51: default_build_coverage::threadx_queue_thread_terminate_test .........................   Passed    0.01 sec
+        Start  52: default_build_coverage::threadx_semaphore_basic_test
+ 52/107 Test  #52: default_build_coverage::threadx_semaphore_basic_test ................................   Passed    0.07 sec
+        Start  53: default_build_coverage::threadx_semaphore_ceiling_put_test
+ 53/107 Test  #53: default_build_coverage::threadx_semaphore_ceiling_put_test ..........................   Passed    0.01 sec
+        Start  54: default_build_coverage::threadx_semaphore_delete_test
+ 54/107 Test  #54: default_build_coverage::threadx_semaphore_delete_test ...............................   Passed    0.01 sec
+        Start  55: default_build_coverage::threadx_semaphore_information_test
+ 55/107 Test  #55: default_build_coverage::threadx_semaphore_information_test ..........................   Passed    0.00 sec
+        Start  56: default_build_coverage::threadx_semaphore_non_preemption_test
+ 56/107 Test  #56: default_build_coverage::threadx_semaphore_non_preemption_test .......................   Passed    0.01 sec
+        Start  57: default_build_coverage::threadx_semaphore_preemption_test
+ 57/107 Test  #57: default_build_coverage::threadx_semaphore_preemption_test ...........................   Passed    0.01 sec
+        Start  58: default_build_coverage::threadx_semaphore_prioritize
+ 58/107 Test  #58: default_build_coverage::threadx_semaphore_prioritize ................................   Passed    0.03 sec
+        Start  59: default_build_coverage::threadx_semaphore_thread_terminate_test
+ 59/107 Test  #59: default_build_coverage::threadx_semaphore_thread_terminate_test .....................   Passed    0.01 sec
+        Start  60: default_build_coverage::threadx_semaphore_timeout_test
+ 60/107 Test  #60: default_build_coverage::threadx_semaphore_timeout_test ..............................   Passed    0.36 sec
+        Start  61: default_build_coverage::threadx_thread_basic_execution_test
+ 61/107 Test  #61: default_build_coverage::threadx_thread_basic_execution_test .........................   Passed    0.05 sec
+        Start  62: default_build_coverage::threadx_thread_basic_time_slice_test
+ 62/107 Test  #62: default_build_coverage::threadx_thread_basic_time_slice_test ........................   Passed    0.20 sec
+        Start  63: default_build_coverage::threadx_thread_completed_test
+ 63/107 Test  #63: default_build_coverage::threadx_thread_completed_test ...............................   Passed    0.02 sec
+        Start  64: default_build_coverage::threadx_thread_create_preemption_threshold_test
+ 64/107 Test  #64: default_build_coverage::threadx_thread_create_preemption_threshold_test .............   Passed    0.03 sec
+        Start  65: default_build_coverage::threadx_thread_delayed_suspension_test
+ 65/107 Test  #65: default_build_coverage::threadx_thread_delayed_suspension_test ......................   Passed    7.26 sec
+        Start  66: default_build_coverage::threadx_thread_information_test
+ 66/107 Test  #66: default_build_coverage::threadx_thread_information_test .............................   Passed    0.01 sec
+        Start  67: default_build_coverage::threadx_thread_misaligned_stack_test
+ 67/107 Test  #67: default_build_coverage::threadx_thread_misaligned_stack_test ........................   Passed    0.06 sec
+        Start  68: default_build_coverage::threadx_thread_multi_level_preemption_threshold_test
+ 68/107 Test  #68: default_build_coverage::threadx_thread_multi_level_preemption_threshold_test ........   Passed    0.02 sec
+        Start  69: default_build_coverage::threadx_thread_multiple_non_current_test
+ 69/107 Test  #69: default_build_coverage::threadx_thread_multiple_non_current_test ....................   Passed    0.01 sec
+        Start  70: default_build_coverage::threadx_thread_multiple_sleep_test
+ 70/107 Test  #70: default_build_coverage::threadx_thread_multiple_sleep_test ..........................   Passed    1.02 sec
+        Start  71: default_build_coverage::threadx_thread_multiple_suspension_test
+ 71/107 Test  #71: default_build_coverage::threadx_thread_multiple_suspension_test .....................   Passed    0.01 sec
+        Start  72: default_build_coverage::threadx_thread_multiple_time_slice_test
+ 72/107 Test  #72: default_build_coverage::threadx_thread_multiple_time_slice_test .....................   Passed    0.54 sec
+        Start  73: default_build_coverage::threadx_thread_preemptable_suspension_test
+ 73/107 Test  #73: default_build_coverage::threadx_thread_preemptable_suspension_test ..................   Passed    0.01 sec
+        Start  74: default_build_coverage::threadx_thread_preemption_change_test
+ 74/107 Test  #74: default_build_coverage::threadx_thread_preemption_change_test .......................   Passed    0.01 sec
+        Start  75: default_build_coverage::threadx_thread_priority_change
+ 75/107 Test  #75: default_build_coverage::threadx_thread_priority_change ..............................   Passed    0.18 sec
+        Start  76: default_build_coverage::threadx_thread_relinquish_test
+ 76/107 Test  #76: default_build_coverage::threadx_thread_relinquish_test ..............................   Passed    0.01 sec
+        Start  77: default_build_coverage::threadx_thread_reset_test
+ 77/107 Test  #77: default_build_coverage::threadx_thread_reset_test ...................................   Passed    0.01 sec
+        Start  78: default_build_coverage::threadx_thread_simple_sleep_non_clear_test
+ 78/107 Test  #78: default_build_coverage::threadx_thread_simple_sleep_non_clear_test ..................   Passed    0.20 sec
+        Start  79: default_build_coverage::threadx_thread_simple_sleep_test
+ 79/107 Test  #79: default_build_coverage::threadx_thread_simple_sleep_test ............................   Passed    0.19 sec
+        Start  80: default_build_coverage::threadx_thread_simple_suspend_test
+ 80/107 Test  #80: default_build_coverage::threadx_thread_simple_suspend_test ..........................   Passed    0.00 sec
+        Start  81: default_build_coverage::threadx_thread_sleep_for_100ticks_test
+ 81/107 Test  #81: default_build_coverage::threadx_thread_sleep_for_100ticks_test ......................   Passed    1.01 sec
+        Start  82: default_build_coverage::threadx_thread_sleep_terminate_test
+ 82/107 Test  #82: default_build_coverage::threadx_thread_sleep_terminate_test .........................   Passed    0.05 sec
+        Start  83: default_build_coverage::threadx_thread_stack_checking_test
+ 83/107 Test  #83: default_build_coverage::threadx_thread_stack_checking_test ..........................   Passed    0.01 sec
+        Start  84: default_build_coverage::threadx_thread_stack_fill_value_test
+ 84/107 Test  #84: default_build_coverage::threadx_thread_stack_fill_value_test ........................   Passed    0.01 sec
+        Start  85: default_build_coverage::threadx_thread_terminate_delete_test
+ 85/107 Test  #85: default_build_coverage::threadx_thread_terminate_delete_test ........................   Passed    0.00 sec
+        Start  86: default_build_coverage::threadx_thread_exit_callback_transition_test
+ 86/107 Test  #86: default_build_coverage::threadx_thread_exit_callback_transition_test ................   Passed    0.25 sec
+        Start  87: default_build_coverage::threadx_thread_time_slice_change_test
+ 87/107 Test  #87: default_build_coverage::threadx_thread_time_slice_change_test .......................   Passed    0.10 sec
+        Start  88: default_build_coverage::threadx_thread_wait_abort_and_isr_test
+ 88/107 Test  #88: default_build_coverage::threadx_thread_wait_abort_and_isr_test ......................   Passed    0.22 sec
+        Start  89: default_build_coverage::threadx_thread_wait_abort_test
+ 89/107 Test  #89: default_build_coverage::threadx_thread_wait_abort_test ..............................   Passed    0.01 sec
+        Start  90: default_build_coverage::threadx_time_get_set_test
+ 90/107 Test  #90: default_build_coverage::threadx_time_get_set_test ...................................   Passed    0.37 sec
+        Start  91: default_build_coverage::threadx_timer_activate_deactivate_test
+ 91/107 Test  #91: default_build_coverage::threadx_timer_activate_deactivate_test ......................   Passed    0.86 sec
+        Start  92: default_build_coverage::threadx_timer_deactivate_accuracy_test
+ 92/107 Test  #92: default_build_coverage::threadx_timer_deactivate_accuracy_test ......................   Passed    0.40 sec
+        Start  93: default_build_coverage::threadx_timer_information_test
+ 93/107 Test  #93: default_build_coverage::threadx_timer_information_test ..............................   Passed    1.61 sec
+        Start  94: default_build_coverage::threadx_timer_large_timer_accuracy_test
+ 94/107 Test  #94: default_build_coverage::threadx_timer_large_timer_accuracy_test .....................   Passed    1.11 sec
+        Start  95: default_build_coverage::threadx_timer_multiple_accuracy_test
+ 95/107 Test  #95: default_build_coverage::threadx_timer_multiple_accuracy_test ........................   Passed    3.05 sec
+        Start  96: default_build_coverage::threadx_timer_multiple_test
+ 96/107 Test  #96: default_build_coverage::threadx_timer_multiple_test .................................   Passed    6.07 sec
+        Start  97: default_build_coverage::threadx_timer_simple_test
+ 97/107 Test  #97: default_build_coverage::threadx_timer_simple_test ...................................   Passed    1.65 sec
+        Start  98: default_build_coverage::threadx_trace_basic_test
+ 98/107 Test  #98: default_build_coverage::threadx_trace_basic_test ....................................   Passed    0.01 sec
+        Start  99: default_build_coverage::threadx_trace_entry_update_test
+ 99/107 Test  #99: default_build_coverage::threadx_trace_entry_update_test .............................   Passed    0.05 sec
+        Start 100: default_build_coverage::threadx_initialize_kernel_setup_test
+100/107 Test #100: default_build_coverage::threadx_initialize_kernel_setup_test ........................   Passed    0.00 sec
+        Start 101: default_build_coverage::threadx_thread_transition_ni_test
+101/107 Test #101: default_build_coverage::threadx_thread_transition_ni_test ...........................   Passed    0.00 sec
+        Start 102: default_build_coverage::threadx_thread_transition_ni_no_error_checking_test
+102/107 Test #102: default_build_coverage::threadx_thread_transition_ni_no_error_checking_test .........   Passed    0.00 sec
+        Start 103: default_build_coverage::threadx_thread_transition_ni_no_notify_test
+103/107 Test #103: default_build_coverage::threadx_thread_transition_ni_no_notify_test .................   Passed    0.00 sec
+        Start 104: default_build_coverage::threadx_thread_transition_no_error_checking_test
+104/107 Test #104: default_build_coverage::threadx_thread_transition_no_error_checking_test ............   Passed    0.00 sec
+        Start 105: default_build_coverage::threadx_module_manager_thread_kernel_stack_test
+105/107 Test #105: default_build_coverage::threadx_module_manager_thread_kernel_stack_test .............   Passed    0.00 sec
+        Start 106: default_build_coverage::threadx_module_manager_object_authentication_test
+106/107 Test #106: default_build_coverage::threadx_module_manager_object_authentication_test ...........   Passed    0.00 sec
+        Start 107: default_build_coverage::threadx_module_manager_delete_ownership_test
+107/107 Test #107: default_build_coverage::threadx_module_manager_delete_ownership_test ................   Passed    0.00 sec
+
+100% tests passed out of 107
+
+Total Test time (real) =  34.26 sec
+CTEST_RC=0

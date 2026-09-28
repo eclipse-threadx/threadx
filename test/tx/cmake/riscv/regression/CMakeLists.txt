@@ -110,9 +110,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_multiple_accuracy_test.c
     ${SOURCE_DIR}/threadx_timer_multiple_test.c
     ${SOURCE_DIR}/threadx_timer_simple_test.c
-    # threadx_trace_basic_test.c excluded: references tx_saved_posture
-    # (the Linux port's interrupt save variable) which is named
-    # interrupt_save on RISC-V.
+    ${SOURCE_DIR}/threadx_trace_basic_test.c
 )
 
 # Architecture specific tests living next to this file. The RV32 stack

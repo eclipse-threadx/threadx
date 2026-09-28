@@ -223,6 +223,7 @@ armcc -g -O0 --cpu=cortex-a7.no_neon --fpu=softvfp -c -I../inc -I../../../../com
 armcc -g -O0 --cpu=cortex-a7.no_neon --fpu=softvfp -c -I../inc -I../../../../common/inc -I../../../../common_modules/inc -I../../../../common_modules/module_manager/inc ../../../../common_modules/module_manager/src/txm_module_manager_properties_get.c
 armcc -g -O0 --cpu=cortex-a7.no_neon --fpu=softvfp -c -I../inc -I../../../../common/inc -I../../../../common_modules/inc -I../../../../common_modules/module_manager/inc ../../../../common_modules/module_manager/src/txm_module_manager_queue_notify_trampoline.c
 armcc -g -O0 --cpu=cortex-a7.no_neon --fpu=softvfp -c -I../inc -I../../../../common/inc -I../../../../common_modules/inc -I../../../../common_modules/module_manager/inc ../../../../common_modules/module_manager/src/txm_module_manager_semaphore_notify_trampoline.c
+armcc -g -O0 --cpu=cortex-a7.no_neon --fpu=softvfp -c -I../inc -I../../../../common/inc -I../../../../common_modules/inc -I../../../../common_modules/module_manager/inc ../module_manager/src/txm_module_manager_inside_data_check.c
 armcc -g -O0 --cpu=cortex-a7.no_neon --fpu=softvfp -c -I../inc -I../../../../common/inc -I../../../../common_modules/inc -I../../../../common_modules/module_manager/inc ../module_manager/src/txm_module_manager_mm_register_setup.c
 armcc -g -O0 --cpu=cortex-a7.no_neon --fpu=softvfp -c -I../inc -I../../../../common/inc -I../../../../common_modules/inc -I../../../../common_modules/module_manager/inc ../../../../common_modules/module_manager/src/txm_module_manager_start.c
 armcc -g -O0 --cpu=cortex-a7.no_neon --fpu=softvfp -c -I../inc -I../../../../common/inc -I../../../../common_modules/inc -I../../../../common_modules/module_manager/inc ../../../../common_modules/module_manager/src/txm_module_manager_stop.c
@@ -278,7 +279,7 @@ armar -r tx.a txm_module_manager_in_place_load.o txm_module_manager_initialize.o
 armar -r tx.a txm_module_manager_kernel_dispatch.o txm_module_manager_maximum_module_priority_set.o txm_module_manager_memory_fault_handler.o
 armar -r tx.a txm_module_manager_memory_fault_notify.o txm_module_manager_memory_load.o txm_module_manager_object_pointer_get.o
 armar -r tx.a txm_module_manager_object_pool_create.o txm_module_manager_queue_notify_trampoline.o txm_module_manager_semaphore_notify_trampoline.o
-armar -r tx.a txm_module_manager_mm_register_setup.o txm_module_manager_start.o txm_module_manager_stop.o
+armar -r tx.a txm_module_manager_inside_data_check.o txm_module_manager_mm_register_setup.o txm_module_manager_start.o txm_module_manager_stop.o
 armar -r tx.a txm_module_manager_thread_create.o txm_module_manager_thread_notify_trampoline.o txm_module_manager_thread_reset.o
 armar -r tx.a txm_module_manager_timer_notify_trampoline.o txm_module_manager_unload.o txm_module_manager_thread_stack_build.o
 armar -r tx.a txm_module_manager_user_mode_entry.o

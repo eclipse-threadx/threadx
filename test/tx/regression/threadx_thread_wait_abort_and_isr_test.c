@@ -32,6 +32,90 @@ extern UINT            _tx_timer_system_clock;
 static TX_SEMAPHORE    semaphore_0;
 
 
+#ifdef __linux__
+
+/* The window this test waits for is a few instructions wide, and the interrupt
+   that samples it is the same one that wakes the thread being sampled, so the
+   two run in lockstep: the tick wakes thread 0, thread 0 does a fixed amount of
+   work and suspends, and the next tick arrives a fixed interval later with
+   thread 0 in the same place every time. That is the resonance the handler below
+   describes, and perturbing the handler's duration only shifts the phase rather
+   than decorrelating it.
+
+   The simulator's timer thread waits on _tx_linux_timer_semaphore with a
+   one-tick deadline and delivers an interrupt early if the semaphore is posted,
+   which the port itself relies on elsewhere. A plain POSIX thread posting it
+   therefore injects interrupts at moments unrelated to the tick grid, which
+   samples thread 0 at arbitrary points in its cycle instead of the same one.
+
+   It posts only when nothing is outstanding, so interrupts can never be queued
+   faster than they are serviced and the injector cannot starve the system.  */
+
+#include   <pthread.h>
+#include   <semaphore.h>
+#include   <unistd.h>
+
+extern sem_t           _tx_linux_timer_semaphore;
+
+static volatile int    injector_stop =  0;
+static pthread_t       injector_thread;
+
+#define INJECTOR_INTERVAL_USEC  100
+
+
+static void  *interrupt_injector(void *p)
+{
+
+int     pending;
+
+
+    (void) p;
+
+    while (injector_stop == 0)
+    {
+
+        if ((sem_getvalue(&_tx_linux_timer_semaphore, &pending) == 0) && (pending == 0))
+        {
+            sem_post(&_tx_linux_timer_semaphore);
+        }
+
+        usleep(INJECTOR_INTERVAL_USEC);
+    }
+
+    return(NULL);
+}
+
+
+static void  interrupt_injector_start(void)
+{
+
+    injector_stop =  0;
+    if (pthread_create(&injector_thread, NULL, interrupt_injector, NULL) != 0)
+    {
+
+        /* Without the injector the loop still runs, on its own budget.  */
+        injector_stop =  1;
+    }
+}
+
+
+static void  interrupt_injector_stop(void)
+{
+
+    if (injector_stop == 0)
+    {
+
+        injector_stop =  1;
+        pthread_join(injector_thread, NULL);
+    }
+}
+
+#else
+#define interrupt_injector_start()
+#define interrupt_injector_stop()
+#endif
+
+
 /* Define thread prototypes.  */
 
 static void    thread_0_entry(ULONG thread_input);
@@ -192,17 +276,23 @@ UINT    status;
    ticks, nominally 200 seconds, failed to stop a run that took 726 seconds,
    because fewer than 20000 ticks had passed. time() does not drift that way.
 
-   How many windows to ask for is set by what a run can actually reach. Four CI
-   runs of the same tree measured this loop in two modes: one where a window
-   arrives in milliseconds and every window asked for costs under a second in
-   total, and one where a single window costs around forty seconds. Seven of
-   twenty configuration-runs landed in the slow mode and ran out of budget,
-   reaching 0, 3, 3, 3, 4, 7 and 7 of the ten then asked for, every one of them
-   still reporting a pass. Asking for three keeps the count reachable in both
-   modes. The later hits repeat what the first ones establish, so the coverage
-   given up is small, and what is recorded is honest. The SMP copy asks for
-   twenty and reaches them in under half a second in all five of its
-   configurations, so it keeps its count.
+   How many windows to ask for is set by what a run can actually reach. Before the
+   injector above, four CI runs of the same tree measured this loop in two modes:
+   one where a window arrives in milliseconds, and one where a single window
+   costs around forty seconds. Seven of twenty configuration-runs landed in the
+   slow mode and ran out of budget, reaching 0, 3, 3, 3, 4, 7 and 7 of the ten
+   then asked for, every one of them still reporting a pass, and the count had to
+   come down to three to stay reachable. With the interrupt source decorrelated
+   from the thread it samples the slow mode does not occur: all six
+   configurations of a run reach ten of ten in under a second. The count is
+   therefore back to ten, on the same reasoning that lowered it.
+
+   The SMP copy deliberately does not get the injector. It has never been in the
+   slow mode, reaching its twenty windows in about a second, and injecting
+   interrupts there measurably hurts: 8.9 seconds against 0 to 1 for the same
+   twenty, which is the extra interrupt traffic contending across the simulated
+   cores. Its budget and ceiling still match this one; only the injector differs,
+   because only this copy has the problem it solves.
 
    Reaching the window no times at all is different in kind, which is what the
    ceiling below is for. The check after the loop compares semaphore bookkeeping
@@ -212,14 +302,11 @@ UINT    status;
    reached the window once keeps trying up to the ceiling, and fails if it still
    has not.
 
-   The budget is 180 seconds rather than 120 because of what the slow mode costs
-   per window. The seven truncated runs reached their windows at between 17 and
-   40 seconds each, so three of them can need 120 seconds, which is exactly what
-   the old budget allowed and would have truncated at two. 180 leaves margin at
-   the worst rate measured, and bounds five configurations at 15 minutes against
-   a 60 minute step timeout. Locally, where a window costs 2 to 5 seconds, three
-   of them take 5 to 14 seconds and the budget is never approached.  */
-#define WAIT_ABORT_WINDOWS_WANTED   ((ULONG) 3)
+   The budget and the ceiling stay as they were, as a net rather than a working
+   limit. They were sized for the slow mode: 180 seconds covers three windows at
+   the worst rate measured, 17 to 40 seconds each. Nothing should approach them
+   now, and if something does, the behaviour is what it was before.  */
+#define WAIT_ABORT_WINDOWS_WANTED   ((ULONG) 10)
 #define WAIT_ABORT_SECOND_BUDGET    ((ULONG) 180)
 #define WAIT_ABORT_ZERO_WINDOW_CEILING  ((ULONG) 300)
 
@@ -234,6 +321,7 @@ time_t  start_wall;
 
     /* Loop to exploit the probability window inside tx_thread_wait_abort.  */
     start_wall =  time(TX_NULL);
+    interrupt_injector_start();
     while (condition_count < WAIT_ABORT_WINDOWS_WANTED)
     {
 
@@ -291,6 +379,8 @@ time_t  start_wall;
             break;
 #endif
     }
+
+    interrupt_injector_stop();
 
     /* Clear ISR dispatch.  */
     test_isr_dispatch =  TX_NULL;

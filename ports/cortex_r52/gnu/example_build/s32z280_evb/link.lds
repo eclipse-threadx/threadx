@@ -54,7 +54,10 @@ MEMORY
        Used for data that wants deterministic access without depending on a
        cache -- an enabled TCM is never cached.  */
     BTCM (rw)  : ORIGIN = 0x30100000, LENGTH = 0x00004000    /* 16 KB  */
-    DATA (rwx) : ORIGIN = 0x31780000, LENGTH = 0x00080000    /* 512 KB: DRAM0 + DRAM1, both full core speed */
+    DATA (rwx) : ORIGIN = 0x31780000, LENGTH = 0x00070000    /* 448 KB: DRAM0 + DRAM1 below the module area */
+    /* Module memory, uncovered by any kernel MPU region on purpose.  See
+       S32Z_MODULE_AREA_BASE in platform.h.  */
+    MODULE (rwx) : ORIGIN = 0x317F0000, LENGTH = 0x00010000    /* 64 KB   */
 }
 
 ENTRY(_start)

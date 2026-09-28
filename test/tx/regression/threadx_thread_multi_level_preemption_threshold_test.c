@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test multi-level preemption threshold. The protection placed
    by a thread must be preserved after higher-priority thread preemption that is above the threshold.  */
 
@@ -74,7 +76,7 @@ static TX_TIMER         timer_0;
 
 /* Define counters.  */
 
-static unsigned long   timer_0_counter =     0;
+static volatile unsigned long   timer_0_counter =     0;
 static unsigned long   thread_1_0_counter =  0;
 static unsigned long   thread_2_1_counter =  0;
 static unsigned long   thread_3_2_counter =  0;
