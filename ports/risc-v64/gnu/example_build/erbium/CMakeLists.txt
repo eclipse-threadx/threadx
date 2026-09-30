@@ -41,3 +41,28 @@ target_link_options(demo_threadx PRIVATE
     -Wl,--gc-sections
     -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/demo_threadx.map
 )
+
+function(add_erbium_test name source handler)
+    add_executable(${name}
+        ${ERBIUM_DIR}/entry.S
+        ${ERBIUM_DIR}/tx_initialize_low_level.S
+        ${ERBIUM_DIR}/board.c
+        ${ERBIUM_DIR}/hwtimer.c
+        ${ERBIUM_DIR}/plic.c
+        ${ERBIUM_DIR}/uart.c
+        ${source}
+        ${handler}
+    )
+    target_include_directories(${name} PRIVATE ${ERBIUM_DIR})
+    target_link_libraries(${name} PRIVATE threadx)
+    target_compile_options(${name} PRIVATE -ffreestanding)
+    target_link_options(${name} PRIVATE
+        -T${ERBIUM_DIR}/link.lds
+        -nostdlib
+        -Wl,--gc-sections
+    )
+    set_target_properties(${name} PROPERTIES LINK_DEPENDS ${ERBIUM_DIR}/link.lds)
+endfunction()
+
+add_erbium_test(test_uart_ticks ${ERBIUM_DIR}/test/test_uart_ticks.c ${ERBIUM_DIR}/trap.c)
+add_erbium_test(test_plic_race ${ERBIUM_DIR}/test/test_plic_race.c ${ERBIUM_DIR}/test/test_plic_trap.c)
