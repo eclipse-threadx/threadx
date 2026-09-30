@@ -78,29 +78,32 @@ int uart_init(void)
     return 0;
 }
 
-static inline void uart_putc_nolock(int ch)
-{
-    while ((UART_REG(UART_STATUS) & STATUS_TX_FULL) != 0u)
-        ;
-    UART_REG(UART_TX) = (uint32_t)(ch & 0xFF);
-}
-
 int uart_putc(int ch)
 {
-    int intr_enable = riscv_mintr_save();
-    uart_putc_nolock(ch);
-    riscv_mintr_restore(intr_enable);
-    return 1;
+    int intr_enable;
+
+    for (;;)
+    {
+        while ((UART_REG(UART_STATUS) & STATUS_TX_FULL) != 0u)
+            ;
+
+        intr_enable = riscv_mintr_save();
+        if ((UART_REG(UART_STATUS) & STATUS_TX_FULL) == 0u)
+        {
+            UART_REG(UART_TX) = (uint32_t)(ch & 0xFF);
+            riscv_mintr_restore(intr_enable);
+            return 1;
+        }
+        riscv_mintr_restore(intr_enable);
+    }
 }
 
 int uart_puts(const char *str)
 {
     int i;
-    int intr_enable = riscv_mintr_save();
     for (i = 0; str[i] != 0; i++)
-        uart_putc_nolock(str[i]);
-    uart_putc_nolock('\r');
-    uart_putc_nolock('\n');
-    riscv_mintr_restore(intr_enable);
+        uart_putc(str[i]);
+    uart_putc('\r');
+    uart_putc('\n');
     return i;
 }

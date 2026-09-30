@@ -99,6 +99,20 @@ simulated cycles, so the 100,000,000-cycle run shows `thread_0` five times.
 The simulator verifies register accesses, the trap flow and the console.
 It does not verify baud timing or the timer rate of real silicon.
 
+## Simulator regression tests
+
+With `erbium_emu` on `PATH`, run:
+
+```bash
+ERBIUM_EMU=erbium_emu ./test/run_simulator_tests.sh
+```
+
+The UART test checks that a long polling write does not lose ThreadX ticks.
+The PLIC test changes one source in timer context while a thread changes
+another, and checks that neither update is lost. The runner builds both
+images with CMake and Ninja and reports a failure if either check fails.
+These tests use the simulator's UART drain rate, not physical baud timing.
+
 ## Files
 
 | File | Purpose |
@@ -114,6 +128,7 @@ It does not verify baud timing or the timer rate of real silicon.
 | `link.lds` | MRAM layout |
 | `erbium_gnu.cmake` | Toolchain file: `rv64imc_zicsr_zifencei`, `lp64` |
 | `CMakeLists.txt`, `build.sh` | Build of the library and the demo |
+| `test/` | Simulator tests for UART timekeeping and PLIC updates |
 
 ## References
 
