@@ -29,21 +29,27 @@ static int plic_source_valid(int irqno)
 void plic_irq_enable(int irqno)
 {
     volatile uint32_t *reg = (volatile uint32_t *)PLIC_MENABLE(riscv_get_core());
+    int intr_enable;
 
     if (!plic_source_valid(irqno))
         return;
 
+    intr_enable = riscv_mintr_save();
     *reg = *reg | (1u << (unsigned int)irqno);
+    riscv_mintr_restore(intr_enable);
 }
 
 void plic_irq_disable(int irqno)
 {
     volatile uint32_t *reg = (volatile uint32_t *)PLIC_MENABLE(riscv_get_core());
+    int intr_enable;
 
     if (!plic_source_valid(irqno))
         return;
 
+    intr_enable = riscv_mintr_save();
     *reg = *reg & ~(1u << (unsigned int)irqno);
+    riscv_mintr_restore(intr_enable);
 }
 
 int plic_register_callback(int irqno, irq_callback callback)
