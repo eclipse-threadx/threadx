@@ -21,6 +21,17 @@ on:
         default: './test/cmake'
         required: false
         type: string
+      # Minutes for the install step. Ten suits a consumer that only installs
+      # packages, which is all of them bar GUIX: measured install steps run 0.2
+      # to 0.5 minutes, and NetX Duo's secure interoperability job, which builds
+      # OpenSSL and wolfSSL from source, takes 2.1 to 2.8. GUIX also builds a
+      # configuration here, because its regression suite is staged across the
+      # install, build and test steps to fit their limits, so it needs longer.
+      # The default keeps every other consumer exactly where it was.
+      install_timeout_minutes:
+        default: 10
+        required: false
+        type: number
       skip_test:
         default: false
         required: false
@@ -108,7 +119,7 @@ jobs:
     # stall ran until the six hour job limit and cost a whole run rather than
     # failing and being retried.
     - name: Install softwares
-      timeout-minutes: 10
+      timeout-minutes: ${{ inputs.install_timeout_minutes }}
       run: ${{ inputs.install_script }}
 
     # TX_COVERAGE instruments every build configuration rather than only the one
