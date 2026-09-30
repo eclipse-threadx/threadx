@@ -10,6 +10,8 @@
 # SPDX-License-Identifier: MIT
 ##############################################################################
 
+# Portions of this file were generated with AI assistance.
+
 # Install RISC-V bare-metal cross-compiler toolchain and QEMU for CI.
 set -e
 
@@ -48,7 +50,14 @@ if ! retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" update; then
     echo "install_riscv.sh: the real gate."
     echo ""
 fi
+# --no-install-recommends, because qemu-system-misc recommends a desktop media
+# stack it does not need here. With recommends the install fetches 67 packages
+# and 87 MB, 26 of them gstreamer, pulseaudio, v4l and codec libraries, for a
+# job that runs qemu-system-riscv64 headless. That download is what pushes the
+# install past its two-minute budget on a slow mirror, and a larger budget is
+# not available: TIMEOUT_LONG is already sized so three attempts fit the step cap.
 retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" install -y \
+    --no-install-recommends \
     qemu-system-misc \
     ninja-build \
     cmake || exit 1
