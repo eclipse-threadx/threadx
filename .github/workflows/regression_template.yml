@@ -32,6 +32,15 @@ on:
         default: 10
         required: false
         type: number
+      # Minutes for the build step, on the same reasoning as the install step
+      # above. Fifteen suits a consumer that builds once: measured build steps
+      # are 0.5 minutes for LevelX, 1.1 for FileX and 6.4 for USBX. GUIX builds
+      # five configurations here as part of its staging and reaches 11.8, which
+      # is 79 per cent of the cap and shrinking as tests are added.
+      build_timeout_minutes:
+        default: 15
+        required: false
+        type: number
       skip_test:
         default: false
         required: false
@@ -127,7 +136,7 @@ jobs:
     # test: the build is where -fprofile-arcs is decided, and the test run is
     # where the reports are collected and merged.
     - name: Build
-      timeout-minutes: 15
+      timeout-minutes: ${{ inputs.build_timeout_minutes }}
       env:
         TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.build_script }}
