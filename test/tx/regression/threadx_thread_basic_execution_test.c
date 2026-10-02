@@ -1,4 +1,6 @@
 /***************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 /* Copyright (c) 2024 Microsoft Corporation                                */
 /* Copyright (c) 2026 Eclipse ThreadX contributors                         */
 /*                                                                         */
@@ -71,7 +73,7 @@ extern TX_TIMER_INTERNAL   *_tx_timer_expired_timer_ptr;
 
 static void    thread_0_entry(ULONG task_input);
 
-UINT        _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+UINT        _txe_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*entry_function)(ULONG), ULONG entry_input,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
@@ -401,7 +403,7 @@ VOID            (*temp_mutex_release)(TX_THREAD *thread_ptr);
     test_thread.tx_thread_timer.tx_timer_internal_list_head =  TX_NULL;
     test_thread.tx_thread_suspending =                         TX_TRUE;
     test_thread.tx_thread_delayed_suspend =                    TX_TRUE;
-#if defined(_WIN64) || defined(TX_TIMER_EXTENSION_PTR_DEFINED)
+#if defined(_WIN32) || defined(TX_TIMER_EXTENSION_PTR_DEFINED)
     {
     TX_TIMER_INTERNAL   timeout_timer;
     TX_TIMER_INTERNAL   *saved_expired_timer_ptr;

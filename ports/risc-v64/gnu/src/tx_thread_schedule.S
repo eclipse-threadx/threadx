@@ -58,6 +58,9 @@
 /**************************************************************************/
 /* VOID   _tx_thread_schedule(VOID)
 {  */
+#include "tx_port.h"
+    .equ    TX_TRAP_FRAME_SIZE, TX_RISCV_TRAP_FRAME_SIZE
+    .equ    TX_SOL_FRAME_SIZE, TX_RISCV_SOL_FRAME_SIZE
     .global  _tx_thread_schedule
 _tx_thread_schedule:
 
@@ -140,9 +143,18 @@ _tx_thread_schedule_loop:
     ld      t2, 0(sp)                                   // Pickup stack type
     beqz    t2, _tx_thread_synch_return                 // If 0, solicited thread return
 
-    /* Determine if floating point registers need to be recovered.  */
+    /* Determine if floating point registers need to be recovered.  This is an
+       interrupt frame, so _tx_thread_context_save built it and may have
+       skipped the FP stores when mstatus.FS was Off.  Read back the same slot
+       it wrote rather than reloading whatever those slots happen to hold.  */
+#if (__riscv_flen == 32) || (__riscv_flen == 64)
+    ld      t1, 29*8(sp)                                // Pickup saved mstatus
+    srli    t1, t1, 13
+    andi    t1, t1, 0x3
+    beqz    t1, _tx_thread_schedule_skip_fp_restore // Skip if FS was Off
+#endif
 
-#if defined(__riscv_float_abi_single)
+#if (__riscv_flen == 32)
     flw     f0, 31*8(sp)                                // Recover ft0
     flw     f1, 32*8(sp)                                // Recover ft1
     flw     f2, 33*8(sp)                                // Recover ft2
@@ -177,7 +189,7 @@ _tx_thread_schedule_loop:
     flw     f31,62*8(sp)                                // Recover ft11
     ld      t0, 63*8(sp)                                // Recover fcsr
     csrw    fcsr, t0                                    // Restore fcsr
-#elif defined(__riscv_float_abi_double)
+#elif (__riscv_flen == 64)
     fld     f0, 31*8(sp)                                // Recover ft0
     fld     f1, 32*8(sp)                                // Recover ft1
     fld     f2, 33*8(sp)                                // Recover ft2
@@ -213,6 +225,7 @@ _tx_thread_schedule_loop:
     ld      t0, 63*8(sp)                                // Recover fcsr
     csrw    fcsr, t0                                    // Restore fcsr
 #endif
+_tx_thread_schedule_skip_fp_restore:
 
 #if defined(__riscv_vector)
     /* Recover vector registers v0-v31 */
@@ -259,6 +272,10 @@ _tx_thread_schedule_loop:
     li      t1, 0x6000                                  // Set FS=Dirty (bits 14:13)
     or      t0, t0, t1
 #endif
+#if defined(__riscv_vector)
+    li      t1, 0x0600
+    or      t0, t0, t1
+#endif
     csrw    sstatus, t0                                 // Update sstatus safely
 #else
     csrw    mepc, t0                                    // Store mepc
@@ -274,7 +291,7 @@ _tx_thread_schedule_loop:
     or      t0, t0, t1
 #endif
 #if defined(__riscv_vector)
-    li      t1, 0x0200                                  // Set VS bits (bits 10:9 to 01) for vector state
+    li      t1, 0x0600
     or      t0, t0, t1
 #endif
     csrw    mstatus, t0                                 // Set mstatus
@@ -309,17 +326,9 @@ _tx_thread_schedule_loop:
     ld      t5, 14*8(sp)                                // Recover t5
     ld      t6, 13*8(sp)                                // Recover t6
 
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    sp, sp, 65*8                                // Recover stack frame - with floating point registers
-#else
-    addi    sp, sp, 32*8                                // Recover stack frame - without floating point registers
-#endif
+    addi    sp, sp, TX_TRAP_FRAME_SIZE                  // Recover stack frame - with floating point registers (65*8 data + 8 pad)
 #if defined(__riscv_vector)
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    t0, sp, -65*8
-#else
-    addi    t0, sp, -32*8
-#endif
+    addi    t0, sp, -TX_TRAP_FRAME_SIZE
     csrr    t1, vlenb                                   // Get vector register byte length
     slli    t1, t1, 5                                   // Multiply by 32 (number of vector registers)
     addi    t1, t1, 4*8                                 // Add vector CSR space: vstart, vtype, vl, vcsr
@@ -336,7 +345,7 @@ _tx_thread_schedule_loop:
 
 _tx_thread_synch_return:
 
-#if defined(__riscv_float_abi_single)
+#if (__riscv_flen == 32)
     flw     f8, 15*8(sp)                                // Recover fs0
     flw     f9, 16*8(sp)                                // Recover fs1
     flw     f18,17*8(sp)                                // Recover fs2
@@ -351,7 +360,7 @@ _tx_thread_synch_return:
     flw     f27,26*8(sp)                                // Recover fs11
     ld      t0, 27*8(sp)                                // Recover fcsr
     csrw    fcsr, t0                                    //
-#elif defined(__riscv_float_abi_double)
+#elif (__riscv_flen == 64)
     fld     f8, 15*8(sp)                                // Recover fs0
     fld     f9, 16*8(sp)                                // Recover fs1
     fld     f18,17*8(sp)                                // Recover fs2
@@ -418,11 +427,7 @@ _tx_thread_synch_return:
 #else
     csrw    mstatus, t0                                 // Store mstatus, enables interrupt
 #endif
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    sp, sp, 29*8                                // Recover stack frame
-#else
-    addi    sp, sp, 16*8                                // Recover stack frame
-#endif
+    addi    sp, sp, TX_SOL_FRAME_SIZE                   // Recover stack frame (29*8 data + 8 pad)
 #if defined(__riscv_vector)
     csrr    t1, vlenb                                   // Get vector register byte length
     slli    t1, t1, 5                                   // Multiply by 32 (number of vector registers)

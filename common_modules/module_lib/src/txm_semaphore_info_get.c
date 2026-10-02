@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -64,7 +66,7 @@
 /*    Module application code                                             */
 /*                                                                        */
 /**************************************************************************/
-UINT _txe_semaphore_info_get(TX_SEMAPHORE *semaphore_ptr, CHAR **name, ULONG *current_value, TX_THREAD **first_suspended, ULONG *suspended_count, TX_SEMAPHORE **next_semaphore)
+UINT _txe_semaphore_info_get(TX_SEMAPHORE *semaphore_ptr, TX_NAME_CONST CHAR **name, ULONG *current_value, TX_THREAD **first_suspended, ULONG *suspended_count, TX_SEMAPHORE **next_semaphore)
 {
 
 UINT return_value;

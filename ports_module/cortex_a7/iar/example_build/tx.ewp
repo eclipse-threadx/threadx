@@ -1053,7 +1053,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>C:\tmp\threadx\ports_module\cortex_a7\iar\example_build\Debug\Exe\tx.a</state>
+                    <state>###Unitialized###</state>
                 </option>
             </data>
         </settings>
@@ -2831,6 +2831,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\module_manager\src\txm_module_manager_mm_initialize.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\module_manager\src\txm_module_manager_inside_data_check.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\module_manager\src\txm_module_manager_mm_register_setup.c</name>

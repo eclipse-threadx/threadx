@@ -9,6 +9,7 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -70,7 +71,7 @@
 /**************************************************************************/
     PUBLIC   _tx_thread_smp_time_get
 _tx_thread_smp_time_get:
-    MOV     x0, #0          // Add logic to get timer value here for diagnostics
+    MRS     x0, CNTPCT_EL0  // Read generic timer physical count
     RET
 
     END

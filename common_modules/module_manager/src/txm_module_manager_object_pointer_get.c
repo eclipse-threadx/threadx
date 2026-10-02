@@ -37,9 +37,10 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function is deprecated and calls the secure version of this    */
-/*    function (_txm_module_manager_object_pointer_get_extended) with the */
-/*    maximum possible name length since none was passed.                 */
+/*    DEPRECATED. Use _txm_module_manager_object_pointer_get_extended()   */
+/*    instead, passing the actual name-buffer length.  This wrapper       */
+/*    passes UINT_MAX as the length, which can cause the name-comparison  */
+/*    loop to read past the end of a short buffer (undefined behaviour).  */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */

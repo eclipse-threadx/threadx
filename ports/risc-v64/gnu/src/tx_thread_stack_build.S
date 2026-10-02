@@ -21,6 +21,8 @@
 /**************************************************************************/
 
     .section .text
+#include "tx_port.h"
+    .equ    TX_TRAP_FRAME_SIZE, TX_RISCV_TRAP_FRAME_SIZE
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -30,6 +32,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -92,7 +95,7 @@ _tx_thread_stack_build:
                     x11     26      Initial a1
                     x10     27      Initial a0
                     x1      28      Initial ra
-                    --      29      reserved
+                    mstatus 29      Initial mstatus
                     mepc    30      Initial mepc
 If floating point support:
                     f0      31      Inital ft0
@@ -138,6 +141,9 @@ If vector extension support:
                     ...
                     v31     99      Initial v31
 
+    With floating point enabled, 8 pad bytes sit at the top of the frame
+    (bytes 520-527) so the 528-byte total keeps sp 16-byte aligned.
+
     Stack Bottom: (higher memory address)  */
 
     ld      t0, 24(a0)                                  // Pickup end of stack area
@@ -146,11 +152,7 @@ If vector extension support:
 
     /* Actually build the stack frame.  */
 
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    t0, t0, -65*8
-#else
-    addi    t0, t0, -32*8                               // Allocate space for the stack frame
-#endif
+    addi    t0, t0, -TX_TRAP_FRAME_SIZE
 
 #if defined(__riscv_vector)
     /* Vector extension support: calculate space based on vlenb */
@@ -192,6 +194,8 @@ If vector extension support:
     sd      zero, 26*8(t0)                              // Initial a1
     sd      zero, 27*8(t0)                              // Initial a0
     sd      zero, 28*8(t0)                              // Initial ra
+    li      t1, 0x2000                                  // mstatus.FS = Initial
+    sd      t1, 29*8(t0)                                // Initial mstatus
     sd      a1, 30*8(t0)                                // Initial mepc/sepc (thread entry point)
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     sd      zero, 31*8(t0)                              // Initial ft0
@@ -226,8 +230,7 @@ If vector extension support:
     sd      zero, 60*8(t0)                              // Initial ft9
     sd      zero, 61*8(t0)                              // Initial ft10
     sd      zero, 62*8(t0)                              // Initial ft11
-    csrr    a1, fcsr                                    // Read fcsr for initial value
-    sd      a1, 63*8(t0)                                // Initial fcsr
+    sd      zero, 63*8(t0)                              // Initial fcsr (0: no sticky flags, round-to-nearest)
 #endif
 
 #if defined(__riscv_vector)

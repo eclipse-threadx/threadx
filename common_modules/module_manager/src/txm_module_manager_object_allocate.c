@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -23,6 +25,7 @@
 #define TX_SOURCE_CODE
 
 #include "txm_module.h"
+#include "txm_module_manager_util.h"
 
 /**************************************************************************/
 /*                                                                        */
@@ -51,6 +54,11 @@
 /*  OUTPUT                                                                */
 /*                                                                        */
 /*    status                            Completion status                 */
+/*                                        TXM_MODULE_MATH_OVERFLOW is     */
+/*                                        returned when object_size is so */
+/*                                        large that adding the manager's */
+/*                                        own object header to it would   */
+/*                                        not be representable            */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -67,6 +75,7 @@ UINT _txm_module_manager_object_allocate(VOID **object_ptr_ptr, ULONG object_siz
 {
 
 TXM_MODULE_ALLOCATED_OBJECT *object_ptr;
+ULONG                       allocation_size;
 UINT                        return_value;
 
 
@@ -81,6 +90,18 @@ UINT                        return_value;
     /* Initialize the return pointer to NULL.  */
     *((VOID **) object_ptr_ptr) =  TX_NULL;
 
+    /* Work out how much memory the pool must supply: the size the caller asked for plus
+       the private header this function writes in front of it.  The size is supplied by
+       the module, so the addition is checked.  An unchecked one wraps for sizes near the
+       top of a ULONG and asks the pool for fewer bytes than the header alone occupies,
+       after which the header stores below run past the end of the allocation and into
+       the neighbouring pool block.  Sizes that survive the addition but exceed the pool
+       are refused by _txe_byte_allocate, which bounds every request by the pool size.
+
+       This is done before the protection mutex is taken so that a refused request leaves
+       the object pool, the module's allocated object list and its count untouched.  */
+    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(object_size, (ULONG) sizeof(TXM_MODULE_ALLOCATED_OBJECT), allocation_size);
+
     /* Get module manager protection mutex.  */
     _txe_mutex_get(&_txm_module_manager_mutex, TX_WAIT_FOREVER);
 
@@ -90,10 +111,10 @@ UINT                        return_value;
 
     TXM_MODULE_ALLOCATED_OBJECT   *next_object, *previous_object;
 
-        /* Allocate the object requested by the module - adding an extra ULONG in order to
-           store the module instance pointer.  */
+        /* Allocate the object requested by the module, including the header checked above
+           that holds the owning module instance, the allocation list links and the size.  */
         return_value =  (ULONG)  _txe_byte_allocate(&_txm_module_manager_object_pool, (VOID **) &object_ptr,
-            (ULONG) (object_size + sizeof(TXM_MODULE_ALLOCATED_OBJECT)), TX_NO_WAIT);
+            allocation_size, TX_NO_WAIT);
 
         /* Determine if the request was successful.  */
         if (return_value == TX_SUCCESS)

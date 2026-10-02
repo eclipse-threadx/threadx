@@ -45,6 +45,7 @@ else()
 endif()
 configure_file(${TX_USER_FILE} ${CUSTOM_INC_DIR}/tx_user.h COPYONLY)
 target_include_directories(${PROJECT_NAME}
+    SYSTEM
     PUBLIC
     ${CUSTOM_INC_DIR}
 )

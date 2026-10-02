@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test a simple application timer services, including create,
    activate, deactivate, change, and delete.  */
 
@@ -63,7 +65,7 @@ static void    thread_1_entry(ULONG thread_input);
 static void    timer_0_expiration(ULONG timer_input);
 static void    timer_1_expiration(ULONG timer_input);
 
-UINT        _txe_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr,
+UINT        _txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*expiration_function)(ULONG), ULONG expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size);
 

@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -79,6 +81,7 @@ void *_tx_linux_thread_entry(void *ptr);
 /**************************************************************************/
 VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 {
+ALIGN_TYPE  fake_stack_ptr;
 struct sched_param sp;
 
     (VOID)function_ptr;
@@ -118,8 +121,13 @@ struct sched_param sp;
        tx_interrupt_control nesting.  */
     thread_ptr -> tx_thread_linux_int_disabled_flag =  0;
 
-    /* Setup a fake thread stack pointer.   */
-    thread_ptr -> tx_thread_stack_ptr =  (VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8);
+    /* Setup a fake thread stack pointer.  The stack end points at the last byte of the
+       thread's stack area and is therefore not necessarily aligned, so round the result
+       down to a ULONG boundary.  This pointer is dereferenced as a ULONG below and is
+       also the starting value of the stack checking logic's highest used pointer.  */
+    fake_stack_ptr =  (ALIGN_TYPE) ((VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8));
+    fake_stack_ptr =  fake_stack_ptr & (~((ALIGN_TYPE) (sizeof(ULONG) - 1)));
+    thread_ptr -> tx_thread_stack_ptr =  (VOID *) ((ALIGN_TYPE) fake_stack_ptr);
 
     /* Clear the first word of the stack.  */
     *(((ULONG *) thread_ptr -> tx_thread_stack_ptr) - 1) =  0;

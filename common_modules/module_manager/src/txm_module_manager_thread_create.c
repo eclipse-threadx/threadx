@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -82,7 +84,7 @@
 /*    _txm_module_manager_kernel_dispatch   Kernel dispatch function      */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                             VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
                             VOID (*entry_function)(ULONG id), ULONG entry_input,
                             VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
@@ -103,6 +105,9 @@ UCHAR                   *temp_ptr;
 #ifdef TX_ENABLE_STACK_CHECKING
 ALIGN_TYPE              new_stack_start;
 ALIGN_TYPE              updated_stack_start;
+#endif
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING) && !defined(TX_DISABLE_STACK_FILLING)
+ULONG                   stack_fill_value;
 #endif
 TXM_MODULE_THREAD_ENTRY_INFO *thread_entry_info;
 VOID                    *stack_end;
@@ -261,13 +266,18 @@ ULONG                   i;
 #if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
 
     /* Initialize the stack fill value to a 8-bit random value.  */
-    thread_ptr -> tx_thread_stack_fill_value = ((ULONG) TX_RAND()) & 0xFFUL;
+    stack_fill_value =  ((ULONG) TX_RAND()) & 0xFFUL;
 
     /* Duplicate the random value in each of the 4 bytes of the stack fill value.  */
-    thread_ptr -> tx_thread_stack_fill_value = thread_ptr -> tx_thread_stack_fill_value |
-                    (thread_ptr -> tx_thread_stack_fill_value << 8) |
-                    (thread_ptr -> tx_thread_stack_fill_value << 16) |
-                    (thread_ptr -> tx_thread_stack_fill_value << 24);
+    stack_fill_value =  stack_fill_value |
+                    (stack_fill_value << 8) |
+                    (stack_fill_value << 16) |
+                    (stack_fill_value << 24);
+
+    /* Store the fill value in the control block so that the stack fill below picks it up
+       through the TX_STACK_FILL macro.  The control block is cleared further down in this
+       function, so the value is stored again once that has been done.  */
+    thread_ptr -> tx_thread_stack_fill_value =  stack_fill_value;
 #endif
 
     /* Set the thread stack to a pattern prior to creating the initial
@@ -284,7 +294,7 @@ ULONG                   i;
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
 
     /* Ensure the starting stack address is evenly aligned.  */
-    new_stack_start =  TX_POINTER_TO_ALIGN_TYPE_CONVERT(stack_start);
+    new_stack_start =  (ALIGN_TYPE) ((VOID *) stack_start);
     updated_stack_start =  ((((ULONG) new_stack_start) + ((sizeof(ULONG)) - ((ULONG) 1)) ) & (~((sizeof(ULONG)) - ((ULONG) 1))));
 
     /* Determine if the starting stack address is different.  */
@@ -296,7 +306,7 @@ ULONG                   i;
     }
 
     /* Update the starting stack pointer.  */
-    stack_start =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(updated_stack_start);
+    stack_start =  (VOID *) ((ALIGN_TYPE) updated_stack_start);
 #endif
 
     /* Allocate the thread entry information at the top of thread's stack - Leaving one
@@ -308,6 +318,21 @@ ULONG                   i;
 
     /* Initialize thread control block to all zeros.  */
     TX_MEMSET(thread_ptr, 0, sizeof(TX_THREAD));
+
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING) && !defined(TX_DISABLE_STACK_FILLING)
+
+    /* Clearing the control block reset the stack fill value, so store the value that was
+       actually used to fill the stack again.  Otherwise the stack checking and stack analyze
+       routines would look for a pattern that is not the one present in the stack.  */
+    thread_ptr -> tx_thread_stack_fill_value =  stack_fill_value;
+#endif
+
+    /* Note that TX_ENABLE_STACK_CHECKING is not supported for module threads.  A user mode
+       module thread owns two stacks and the scheduler swaps tx_thread_stack_start,
+       tx_thread_stack_end and tx_thread_stack_size over to the kernel stack whenever the
+       thread enters the module manager.  Neither tx_thread_stack_highest_ptr nor the guard
+       pattern beyond the end of the stack is maintained across that switch, so
+       TX_THREAD_STACK_CHECK may report spurious stack errors for module threads.  */
 
     /* If the thread runs on user mode, allocate the kernel stack for syscall.  */
     if((module_instance -> txm_module_instance_property_flags) & TXM_MODULE_USER_MODE)
@@ -331,8 +356,10 @@ ULONG                   i;
         /* Align kernel stack pointer.  */
         thread_ptr -> tx_thread_module_kernel_stack_end = (VOID *) (((ALIGN_TYPE)(thread_ptr -> tx_thread_module_kernel_stack_start) + TXM_MODULE_KERNEL_STACK_SIZE) & ~0x07);
 
-        /* Set kernel stack size.  */
-        thread_ptr -> tx_thread_module_kernel_stack_size = TXM_MODULE_KERNEL_STACK_SIZE;
+        /* Set kernel stack size.  Aligning the end of the kernel stack downwards can consume
+           up to seven bytes of the block returned by the allocator, so the usable size must be
+           derived from the aligned range instead of from TXM_MODULE_KERNEL_STACK_SIZE.  */
+        thread_ptr -> tx_thread_module_kernel_stack_size = (ULONG) ((ALIGN_TYPE) (thread_ptr -> tx_thread_module_kernel_stack_end) - (ALIGN_TYPE) (thread_ptr -> tx_thread_module_kernel_stack_start));
     }
 
 #if TXM_MODULE_MEMORY_PROTECTION
@@ -741,4 +768,3 @@ ULONG                   i;
     /* Return success.  */
     return(TX_SUCCESS);
 }
-

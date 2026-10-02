@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -183,7 +184,16 @@ typedef unsigned short                          USHORT;
 
 #define TX_THREAD_EXTENSION_0
 #define TX_THREAD_EXTENSION_1
-#define TX_THREAD_EXTENSION_2
+
+/* TX_THREAD_EXTENSION_2 carries the per-thread VFP enable flag that the lazy
+   floating-point save and restore in tx_thread_schedule, tx_thread_system_return
+   and tx_thread_context_restore reads and writes as [thread, #144].  Without it
+   a TX_ENABLE_VFP_SUPPORT build has no such member and those accesses land on
+   tx_thread_filex_ptr instead.  Defined unconditionally, matching the Armv7-A
+   ports: the offset is hard-coded in assembly, so a conditional member would
+   move every following field and be correct in only one configuration.  */
+
+#define TX_THREAD_EXTENSION_2                   ULONG       tx_thread_vfp_enable;
 #define TX_THREAD_EXTENSION_3
 
 
@@ -236,6 +246,18 @@ typedef unsigned short                          USHORT;
 #define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
 #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
+
+
+/* Per-thread floating-point control, implemented in tx_thread_schedule and
+   available only in a TX_ENABLE_VFP_SUPPORT build.  Floating-point context is
+   saved lazily: only threads that ask for it pay the cost.  Note these set a
+   software flag for the context switch; enabling the FPU itself (CPACR, FPEXC)
+   remains the board support package's responsibility.  */
+
+#ifdef TX_ENABLE_VFP_SUPPORT
+void    tx_thread_vfp_enable(void);
+void    tx_thread_vfp_disable(void);
+#endif
 
 
 /* Determine if the ARM architecture has the CLZ instruction. This is available on
@@ -300,7 +322,7 @@ unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Cortex-R5/GNU Version 6.5.1.202602a *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Cortex-R5/GNU Version 6.5.2.202603 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

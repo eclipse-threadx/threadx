@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test the semaphore create/delete and immediate  return gets and puts.  */
 
 #include   <stdio.h>
@@ -62,7 +64,7 @@ static TX_SEMAPHORE    semaphore_3;
 static void    thread_0_entry(ULONG thread_input);
 static void    thread_1_entry(ULONG thread_input);
 
-UINT        _txe_semaphore_create(TX_SEMAPHORE *semaphore_ptr, CHAR *name_ptr, ULONG initial_count, UINT semaphore_control_block_size);
+UINT        _txe_semaphore_create(TX_SEMAPHORE *semaphore_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG initial_count, UINT semaphore_control_block_size);
 
 
 /* Prototype for test control return.  */

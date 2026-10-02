@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -251,6 +253,22 @@ The following extensions must also be defined in tx_port.h:
 
 #define TXM_ADDRESS_TRANSLATION_FAULT_BIT       1
 
+/* Mask selecting the ASID field of CONTEXTIDR in the short-descriptor format.  */
+#define TXM_CONTEXTIDR_ASID_MASK                0x000000FF
+
+/* Access intents understood by the module data range check.  */
+#define TXM_MODULE_MANAGER_ACCESS_READ          0
+#define TXM_MODULE_MANAGER_ACCESS_WRITE         1
+
+/* Define the largest number of MMU pages a single caller-supplied range may span before
+   the data range check rejects it. This bounds the worst-case, module-controlled cost of
+   validating one kernel request, which keeps the check deterministic. The default permits
+   a 4 MB range. Applications that hand larger shared-memory ranges to kernel services can
+   define a larger value.  */
+#ifndef TXM_MODULE_MANAGER_DATA_CHECK_MAX_PAGES
+#define TXM_MODULE_MANAGER_DATA_CHECK_MAX_PAGES 1024
+#endif
+
 #define TXM_ASID_RESERVED                       0xFFFFFFFF
 
 #define TXM_MODULE_ASID_ERROR                   0xF6
@@ -386,9 +404,26 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 
 /* Define the macros to perform port-specific checks when passing pointers to the kernel.  */
 
-/* Define macro to make sure object is inside the module's data or shared memory.  */
+/* Define macros to make sure a whole object is inside the module's data or shared memory.
+   The MMU is the authority for shared and external memory, so the check translates every
+   page the range touches with the requested unprivileged access. Passing the size and the
+   access intent through is what keeps the check honest: translating only the first address,
+   and only for reading, would accept a range that leaves the module's mapping partway
+   through, or a read-only range used as a kernel write destination.  */
+#define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_READ(module_instance, obj_ptr, obj_size) \
+    _txm_module_manager_inside_data_check(module_instance, (ALIGN_TYPE) (obj_ptr), (ULONG) (obj_size), TXM_MODULE_MANAGER_ACCESS_READ)
+
+#define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_WRITE(module_instance, obj_ptr, obj_size) \
+    _txm_module_manager_inside_data_check(module_instance, (ALIGN_TYPE) (obj_ptr), (ULONG) (obj_size), TXM_MODULE_MANAGER_ACCESS_WRITE)
+
+/* The unqualified check keeps its historical name and takes the stricter write intent.  */
 #define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size) \
-    _txm_module_manager_inside_data_check((ULONG) obj_ptr)
+    TXM_MODULE_MANAGER_CHECK_INSIDE_DATA_WRITE(module_instance, obj_ptr, obj_size)
+
+/* Negating the inside check would report a range that only partly reaches into the module
+   as being outside it, so the outside direction gets its own check.  */
+#define TXM_MODULE_MANAGER_CHECK_OUTSIDE_DATA(module_instance, obj_ptr, obj_size) \
+    _txm_module_manager_outside_data_check(module_instance, (ALIGN_TYPE) (obj_ptr), (ULONG) (obj_size))
 
 
 /* Define some internal prototypes to this module port.  */
@@ -408,7 +443,10 @@ UINT  _txm_module_manager_mm_initialize(VOID);                                  
 VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance);                                              \
 VOID  _txm_level2_page_clear(TXM_MODULE_INSTANCE *module_instance);                                                             \
 VOID  _txm_module_manager_remove_asid(TXM_MODULE_INSTANCE *module_instance);                                                    \
-UINT  _txm_module_manager_inside_data_check(ULONG pointer);
+UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, ULONG obj_size, UINT write_request);  \
+UINT  _txm_module_manager_outside_data_check(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE obj_ptr, ULONG obj_size);                       \
+UINT  _txm_module_manager_address_probe(ULONG address, UINT write_request);                                                     \
+ULONG _txm_module_manager_current_asid_get(VOID);
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \

@@ -16,6 +16,7 @@ target_sources(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME}
+    SYSTEM
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/inc
 )

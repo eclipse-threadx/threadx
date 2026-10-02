@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -317,13 +319,21 @@ void    _tx_linux_debug_entry_insert(char *action, char *file, unsigned long lin
 
 */
 
-#ifndef TX_MISRA_ENABLE
+/* The clock below is read for every trace event in both builds. The MISRA form
+   of the in-line insert takes the time stamp as an argument rather than reading
+   it itself, so the macro has to be an expression; that is why it carries no
+   trailing semicolon.  */
+
 #ifndef TX_TRACE_TIME_SOURCE
-#define TX_TRACE_TIME_SOURCE                    ((ULONG) (_tx_linux_time_stamp.tv_nsec));
+#define TX_TRACE_TIME_SOURCE                    ((ULONG) (_tx_linux_time_stamp.tv_nsec))
 #endif
-#else
+
+/* Declared here rather than used: this port supplies its own time stamp above,
+   but the generic definition in common/src/tx_misra.c is compiled for this port
+   and needs a declaration in scope.  */
+
+#ifdef TX_MISRA_ENABLE
 ULONG   _tx_misra_time_stamp_get(VOID);
-#define TX_TRACE_TIME_SOURCE                    _tx_misra_time_stamp_get()
 #endif
 
 #ifndef TX_TRACE_TIME_MASK
@@ -501,7 +511,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 #define TX_RESTORE                          _tx_linux_debug_entry_insert("RESTORE", __FILE__, __LINE__); \
                                             _tx_thread_interrupt_restore(tx_saved_posture);
 #endif /* TX_LINUX_DEBUG_ENABLE */
-#define tx_linux_mutex_lock(p)              pthread_mutex_lock(&p)
+#define tx_linux_mutex_lock(p)              _tx_linux_mutex_lock_retry(&p)
 #define tx_linux_mutex_unlock(p)            pthread_mutex_unlock(&p)
 #define tx_linux_mutex_recursive_unlock(p)  {\
                                                 int _recursive_count = (int)tx_linux_mutex_recursive_count;\
@@ -533,7 +543,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) Microsoft Corporation * ThreadX Linux/gcc Version 6.5.1.202602a *";
+                                    "Copyright (c) Microsoft Corporation * ThreadX Linux/gcc Version 6.5.2.202603 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
@@ -542,6 +552,17 @@ extern  CHAR                    _tx_version_id[];
 /* Define externals for the Linux port of ThreadX.  */
 
 extern pthread_mutex_t                          _tx_linux_mutex;
+
+/* Define how long a thread waits on the Linux mutex before retrying. A thread
+   parked on the mutex can be suspended by the port's signal handler and so never
+   act on the wake-up the next unlock sends it, which leaves the wake-up lost and
+   every other waiter parked on a mutex that is free.  */
+
+#ifndef TX_LINUX_MUTEX_RETRY_NSEC
+#define TX_LINUX_MUTEX_RETRY_NSEC       1000000
+#endif
+
+void    _tx_linux_mutex_lock_retry(pthread_mutex_t *mutex);
 extern sem_t                                    _tx_linux_semaphore;
 extern sem_t                                    _tx_linux_semaphore_no_idle;
 extern ULONG                                    _tx_linux_global_int_disabled_flag;

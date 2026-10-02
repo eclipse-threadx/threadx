@@ -1,0 +1,55 @@
+# Copyright (c) 2026 Eclipse ThreadX contributors
+# SPDX-License-Identifier: MIT
+# Portions of this file were generated with AI assistance.
+#
+# Toolchain file for Arm Cortex-R52 (Armv8-R, AArch32) using GNU tools.
+
+# Name of the target
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR cortex-r52)
+
+set(THREADX_ARCH "cortex_r52")
+set(THREADX_TOOLCHAIN "gnu")
+
+# Floating-point ABI.  Cortex-R52 always implements at least a single-precision
+# FPU -- GCC rejects "+nofp" for this core and offers only "+nofp.dp" (drop
+# double precision).  There is therefore no FPU-less R52, so the soft-float
+# baseline selects the soft *ABI* rather than removing the FPU.  The hard-float
+# variant with lazy VFP context save arrives with AR1 milestone M5.
+if(NOT DEFINED TX_R52_FLOAT_ABI)
+    set(TX_R52_FLOAT_ABI "soft" CACHE STRING "R52 float ABI: soft | hard")
+endif()
+
+set(MCPU_FLAGS "-marm -mcpu=cortex-r52")
+if(TX_R52_FLOAT_ABI STREQUAL "hard")
+    set(VFP_FLAGS "-mfpu=fpv5-d16 -mfloat-abi=hard")
+else()
+    set(VFP_FLAGS "-mfloat-abi=soft")
+endif()
+set(SPEC_FLAGS "--specs=nosys.specs")
+
+include(${CMAKE_CURRENT_LIST_DIR}/arm-none-eabi.cmake)
+
+# Pin the project's reference cross toolchain, GCC 14 for Arm.  An absolute
+# path is used deliberately, so that a build on a machine which has it does not
+# depend on PATH ordering.  Override with -DARM_TOOLCHAIN_PATH=<dir containing
+# arm-none-eabi-gcc> to build with a different compiler -- for example the
+# advisory newest-compiler lane.
+#
+# The default below serves local builds and nothing else.  It fires only on a
+# machine that already has that directory, and no CI job does: the workflows
+# unpack the toolchain into the workspace and put it on PATH, and
+# scripts/check_gcc.sh passes -DARM_TOOLCHAIN_PATH at every CMake call site.
+# On a runner the EXISTS check therefore falls through and the compiler comes
+# from PATH.  Do not read the default as something CI depends on -- and do not
+# remove it as dead code either, because it is what makes a no-flag build work
+# on a developer machine.
+if(NOT DEFINED ARM_TOOLCHAIN_PATH)
+    set(ARM_TOOLCHAIN_PATH
+        "$ENV{HOME}/toolchains/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin")
+endif()
+if(EXISTS "${ARM_TOOLCHAIN_PATH}/arm-none-eabi-gcc")
+    set(CMAKE_C_COMPILER   "${ARM_TOOLCHAIN_PATH}/arm-none-eabi-gcc")
+    set(CMAKE_CXX_COMPILER "${ARM_TOOLCHAIN_PATH}/arm-none-eabi-g++")
+    set(CMAKE_ASM_COMPILER "${ARM_TOOLCHAIN_PATH}/arm-none-eabi-gcc")
+endif()

@@ -9,6 +9,7 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -82,7 +83,7 @@
                 _tx_thread_stack_error_handler((thread_ptr));                                                                   \
                 TX_DISABLE                                                                                                      \
             }                                                                                                                   \
-            if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                                \
+            else if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                           \
             {                                                                                                                   \
                 TX_RESTORE                                                                                                      \
                 _tx_thread_stack_analyze((thread_ptr));                                                                         \
@@ -1171,6 +1172,11 @@ TX_THREAD       *last_thread;
 TX_THREAD       *thread_remap_list[TX_THREAD_SMP_MAX_CORES];
 
 
+    /* Limit the supplied core maps to the cores that are actually present.  */
+    available_cores =       available_cores & ((ULONG) TX_THREAD_SMP_CORE_MASK);
+    thread_possible_cores = thread_possible_cores & ((ULONG) TX_THREAD_SMP_CORE_MASK);
+    test_possible_cores =   test_possible_cores & ((ULONG) TX_THREAD_SMP_CORE_MASK);
+
     /* Clear the last thread cores in the search.  */
     last_thread_cores =  ((ULONG) 0);
 
@@ -1180,6 +1186,9 @@ TX_THREAD       *thread_remap_list[TX_THREAD_SMP_MAX_CORES];
     /* Setup the core queue indices.  */
     queue_first =  ((UINT) 0);
     queue_last =   ((UINT) 0);
+
+    /* Initialize the first core queue entry.  */
+    core_queue[0] =  ((UINT) 0);
 
     /* Build a list of possible cores for this thread to execute on, starting
        with the previously mapped core.  */

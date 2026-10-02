@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test byte memory information.  */
 
 #include   <stdio.h>
@@ -226,7 +228,7 @@ static void    thread_0_entry(ULONG thread_input)
 
 UINT            status;
 VOID            *pointer;
-CHAR            *name;
+TX_NAME_CONST CHAR *name;
 ULONG           available;
 ULONG           fragments;
 TX_THREAD       *first_suspended;
@@ -369,7 +371,7 @@ ULONG           timeouts;
     status += tx_byte_pool_info_get(&byte_pool_0, &name, &available, &fragments, &first_suspended, &suspended_count, &next_pool);
 
     /* Check the status.  */
-    if ((status != TX_SUCCESS) || (available != byte_pool_0.tx_byte_pool_available) || (fragments != byte_pool_0.tx_byte_pool_fragments) ||
+    if ((status != TX_SUCCESS) || (name != byte_pool_0.tx_byte_pool_name) || (available != byte_pool_0.tx_byte_pool_available) || (fragments != byte_pool_0.tx_byte_pool_fragments) ||
         (first_suspended != &thread_4) || (suspended_count != byte_pool_0.tx_byte_pool_suspended_count) || (next_pool != &byte_pool_0))
     {
 

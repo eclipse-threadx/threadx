@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -64,7 +66,7 @@
 /*    Module application code                                             */
 /*                                                                        */
 /**************************************************************************/
-UINT _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG block_size, VOID *pool_start, ULONG pool_size, UINT pool_control_block_size)
+UINT _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG block_size, VOID *pool_start, ULONG pool_size, UINT pool_control_block_size)
 {
 
 UINT return_value;

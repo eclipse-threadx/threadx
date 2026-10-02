@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test the semaphore information services.  */
 
 #include   <stdio.h>
@@ -100,7 +102,7 @@ static void    thread_0_entry(ULONG thread_input)
 {
 
 UINT            status;
-CHAR            *name;
+TX_NAME_CONST CHAR *name;
 ULONG           current_value;
 TX_THREAD       *first_suspended;
 ULONG           suspended_count;
@@ -211,7 +213,7 @@ ULONG           timeouts;
     status +=  tx_semaphore_info_get(&semaphore_0, &name, &current_value, &first_suspended, &suspended_count, &next_semaphore);
 
     /* Check status.  */
-    if ((status != TX_SUCCESS) || (current_value != semaphore_0.tx_semaphore_count) ||
+    if ((status != TX_SUCCESS) || (name != semaphore_0.tx_semaphore_name) || (current_value != semaphore_0.tx_semaphore_count) ||
         (first_suspended != semaphore_0.tx_semaphore_suspension_list) || (suspended_count != semaphore_0.tx_semaphore_suspended_count) ||
         (next_semaphore != semaphore_0.tx_semaphore_created_next))
     {

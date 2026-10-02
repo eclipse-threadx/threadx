@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -21,10 +22,8 @@
 /**************************************************************************/
 
 
-    EXTERN  _tx_thread_system_stack_ptr
     EXTERN  _tx_initialize_unused_memory
     EXTERN  _tx_timer_interrupt
-    EXTERN  __vector_table
     EXTERN  _tx_execution_isr_enter
     EXTERN  _tx_execution_isr_exit
 
@@ -87,12 +86,6 @@ _tx_initialize_low_level:
     LDR     r1, =__tx_free_memory_start             // Build first free address
     STR     r1, [r0]                                // Setup first unused memory pointer
 
-    /* Setup Vector Table Offset Register.  */
-
-    MOV     r0, #0xE000E000                         // Build address of NVIC registers
-    LDR     r1, =__vector_table                     // Pickup address of vector table
-    STR     r1, [r0, #0xD08]                        // Set vector table address
-
     /* Enable the cycle count register.  */
 
 //    LDR     r0, =0xE0001000                         // Build address of DWT register
@@ -100,16 +93,12 @@ _tx_initialize_low_level:
 //    ORR     r1, r1, #1                              // Set the CYCCNTENA bit
 //    STR     r1, [r0]                                // Enable the cycle count register
 
-    /* Set system stack pointer from vector value.  */
-
-    LDR     r0, =_tx_thread_system_stack_ptr        // Build address of system stack pointer
-    LDR     r1, =__vector_table                     // Pickup address of vector table
-    LDR     r1, [r1]                                // Pickup reset stack pointer
-    STR     r1, [r0]                                // Save system stack pointer
-
     /* Configure SysTick.  */
 
     MOV     r0, #0xE000E000                         // Build address of NVIC registers
+    MOV     r1, #0                                  // Build value for SysTick reset
+    STR     r1, [r0, #0x10]                         // Reset SysTick Control
+    STR     r1, [r0, #0x18]                         // Reset SysTick Counter Value
     LDR     r1, =SYSTICK_CYCLES
     STR     r1, [r0, #0x14]                         // Setup SysTick Reload Value
     MOV     r1, #0x7                                // Build SysTick Control Enable Value

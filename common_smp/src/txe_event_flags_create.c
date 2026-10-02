@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -70,7 +72,7 @@
 /*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, CHAR *name_ptr, UINT event_control_block_size)
+UINT  _txe_event_flags_create(TX_EVENT_FLAGS_GROUP *group_ptr, TX_NAME_CONST CHAR *name_ptr, UINT event_control_block_size)
 {
 
 TX_INTERRUPT_SAVE_AREA

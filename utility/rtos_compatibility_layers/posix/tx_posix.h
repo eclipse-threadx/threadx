@@ -278,9 +278,22 @@ typedef struct pthread_attr_obj
 } pthread_attr_t;
 
 
-typedef  INT    ssize_t ;     /* this should be pulled in from sys\types.h  */
+/* ssize_t and mode_t belong to <sys/types.h>. A C library that has already
+   declared them wins: it knows the target's real widths, and on an LP64 target
+   ssize_t is 64 bits while INT is not. newlib guards each type with its own
+   _*_DECLARED macro, so honour those and only define what is missing. A port
+   whose library uses different guards can predefine them to the same effect.  */
+#ifndef _SSIZE_T_DECLARED
+typedef  INT    ssize_t ;
+#define  _SSIZE_T_DECLARED
+#endif
+
 typedef  ALIGN_TYPE  pthread_t;
+
+#ifndef _MODE_T_DECLARED
 typedef  ULONG  mode_t;
+#define  _MODE_T_DECLARED
+#endif
 
 
 

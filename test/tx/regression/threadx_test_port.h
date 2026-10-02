@@ -32,6 +32,11 @@
 
 typedef ALIGN_TYPE TX_TEST_POINTER_WORD;
 
-#define TX_TEST_STORE_POINTER(a, b)            (a) = ((TX_TEST_POINTER_WORD) TX_POINTER_TO_ALIGN_TYPE_CONVERT(b))
+/* TX_POINTER_TO_ALIGN_TYPE_CONVERT is defined only when TX_MISRA_ENABLE is absent,
+   so the conversion is written out here rather than taken from the API. This is
+   test scaffolding storing a pointer in a word wide enough to hold one; it is not
+   kernel source and carries no MISRA obligation of its own.  */
+
+#define TX_TEST_STORE_POINTER(a, b)            (a) = ((TX_TEST_POINTER_WORD) (ALIGN_TYPE) (b))
 
 #endif

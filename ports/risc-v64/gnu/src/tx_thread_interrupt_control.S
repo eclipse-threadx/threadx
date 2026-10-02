@@ -27,7 +27,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_interrupt_control                       RISC-V64/GNU     */
-/*                                                           6.2.1        */
+/*                                                        6.5.1.202602a   */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
@@ -61,23 +61,25 @@ _tx_thread_interrupt_control:
     /* Pickup current interrupt lockout posture.  */
 
 #ifdef TX_RISCV_SMODE
-    csrr    t0, sstatus
-    mv      t1, t0                                      // Save original sstatus for return
-    li      t2, ~0x02                                   // Build mask to clear SIE (bit 1)
-    and     t0, t0, t2                                  // Clear SIE bit
+    li      t1, 0x02                                    // Build SIE bit mask (bit 1)
     andi    a0, a0, 0x02                                // Mask incoming to only SIE bit
-    or      t0, t0, a0                                  // Set requested SIE state
-    csrw    sstatus, t0
-    andi    a0, t1, 0x02                                // Return original SIE bit
+    bnez    a0, 1f                                      // If set, enable interrupts
+    csrrc   t0, sstatus, t1                             // Atomically clear SIE, read old sstatus
+    j       2f
+1:
+    csrrs   t0, sstatus, t1                             // Atomically set SIE, read old sstatus
+2:
+    andi    a0, t0, 0x02                                // Return original SIE bit
 #else
-    csrr    t0, mstatus
-    mv      t1, t0                                      // Save original mstatus for return
-    li      t2, ~0x08                                   // Build mask to clear MIE
-    and     t0, t0, t2                                  // Clear MIE bit
+    li      t1, 0x08                                    // Build MIE bit mask (bit 3)
     andi    a0, a0, 0x08                                // Mask incoming to only MIE bit
-    or      t0, t0, a0                                  // Set requested MIE state
-    csrw    mstatus, t0
-    andi    a0, t1, 0x08                                // Return original MIE bit
+    bnez    a0, 1f                                      // If set, enable interrupts
+    csrrc   t0, mstatus, t1                             // Atomically clear MIE, read old mstatus
+    j       2f
+1:
+    csrrs   t0, mstatus, t1                             // Atomically set MIE, read old mstatus
+2:
+    andi    a0, t0, 0x08                                // Return original MIE bit
 #endif
     ret
 /* }  */

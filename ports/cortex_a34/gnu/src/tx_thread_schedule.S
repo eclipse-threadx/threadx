@@ -23,7 +23,6 @@
 #include "tx_user.h"
 #endif
 
-
     .text
     .align 3
 /**************************************************************************/
@@ -31,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                                  ARMv8-A        */
-/*                                                           6.1.10       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -220,4 +219,3 @@ _skip_solicited_fp_restore:
     MSR     DAIF, x4                            // Recover DAIF
     RET                                         // Return to caller
 // }
-

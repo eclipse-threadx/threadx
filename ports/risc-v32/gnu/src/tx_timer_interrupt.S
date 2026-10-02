@@ -88,7 +88,7 @@ _tx_timer_interrupt:
        /* Check for expiration.  */
        /* if (_tx_timer_time_slice == 0)  */
 
-    bgtz    t3, _tx_timer_no_time_slice                 // If not 0, has not expired yet
+    bnez    t3, _tx_timer_no_time_slice                 // If not 0, has not expired yet
     li      t1, 1                                       // Build expired flag
 
        /* Set the time-slice expired flag.  */
@@ -181,7 +181,7 @@ _tx_timer_dont_activate:
     /* if (_tx_timer_expired_time_slice)
     {  */
 
-    andi    t2, t6, 1                                   // Is the timer expired bit set?
+    andi    t2, t6, 1                                   // Is the time-slice expired bit set?
     beqz    t2, _tx_timer_not_ts_expiration             // If not, skip time slice processing
 
         /* Time slice interrupted thread.  */

@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test block memory information services.  */
 
 #include   <stdio.h>
@@ -68,7 +70,7 @@ static void    thread_5_entry(ULONG thread_input);
 static void    thread_6_entry(ULONG thread_input);
 
 /* Direct core function to bypass the error checking shell.  */
-UINT  _tx_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, CHAR **name, ULONG *available_blocks,
+UINT  _tx_block_pool_info_get(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR **name, ULONG *available_blocks,
                     ULONG *total_blocks, TX_THREAD **first_suspended,
                     ULONG *suspended_count, TX_BLOCK_POOL **next_pool);
 
@@ -227,7 +229,7 @@ static void    thread_0_entry(ULONG thread_input)
 
 UINT            status;
 VOID            *pointer;
-CHAR            *name;
+TX_NAME_CONST CHAR *name;
 ULONG           available;
 ULONG           total_blocks;
 TX_THREAD       *first_suspended;
@@ -369,7 +371,7 @@ ULONG           timeouts;
     status +=  tx_block_pool_info_get(&block_pool_0, &name, &available, &total_blocks, &first_suspended, &suspended_count, &next_pool);
 
     /* Check for an error condition.  */
-    if ((status) || (available != block_pool_0.tx_block_pool_available) || (total_blocks != block_pool_0.tx_block_pool_total) ||
+    if ((status) || (name != block_pool_0.tx_block_pool_name) || (available != block_pool_0.tx_block_pool_available) || (total_blocks != block_pool_0.tx_block_pool_total) ||
         (first_suspended != &thread_4) || (suspended_count != block_pool_0.tx_block_pool_suspended_count) || (next_pool != &block_pool_0))
     {
 

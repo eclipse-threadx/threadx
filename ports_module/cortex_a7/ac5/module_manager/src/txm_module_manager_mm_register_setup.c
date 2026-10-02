@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -35,24 +37,34 @@ extern ULONG _txm_ttbr1_page_table[TXM_MAXIMUM_MODULES][TXM_MASTER_PAGE_TABLE_EN
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _txm_module_manager_inside_data_check           Cortex-A7/MMU/AC5   */
-/*                                                           6.1          */
+/*    _txm_module_manager_address_probe               Cortex-A7/MMU/AC5   */
+/*                                                           6.5.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
+/*    Eclipse ThreadX contributors                                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function determines if pointer is within the module's data or  */
-/*    shared memory.                                                      */
+/*    This function asks the MMU whether unprivileged code running in the */
+/*    currently loaded translation context may reach one address with the */
+/*    requested access. Reading and writing are asked separately, because */
+/*    a module's code and its read-only shared memory translate for       */
+/*    reading while a kernel service writing to them would fault or,      */
+/*    worse, succeed from privileged mode.                                */
+/*                                                                        */
+/*    This answers for one address only. Callers that hold a range must   */
+/*    ask about every page the range touches.                             */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    pointer                           Data pointer                      */
+/*    address                           Address to translate              */
+/*    write_request                     TXM_MODULE_MANAGER_ACCESS_READ or */
+/*                                        TXM_MODULE_MANAGER_ACCESS_WRITE */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */
+/*    TX_TRUE if the translation granted the requested access             */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -60,17 +72,40 @@ extern ULONG _txm_ttbr1_page_table[TXM_MAXIMUM_MODULES][TXM_MASTER_PAGE_TABLE_EN
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    TXM_MODULE_MANAGER_DATA_POINTER_CHECK                               */
+/*    _txm_module_manager_page_walk                                       */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  03-08-2023      Scott Larson            Initial Version 6.2.1         */
+/*  08-24-2026      Eclipse ThreadX         Added the write intent and    */
+/*                    contributors            moved range handling to     */
+/*                                            the caller, resulting in    */
+/*                                            version 6.5.0               */
 /*                                                                        */
 /**************************************************************************/
-UINT _txm_module_manager_inside_data_check(ULONG pointer)
+UINT  _txm_module_manager_address_probe(ULONG address, UINT write_request)
 {
 
-ULONG translation;
+ULONG   translation;
 
-    /* ATS1CUR operation on address supplied in pointer, Stage 1 unprivileged read.  */
-    __asm("MCR p15, 0, pointer, c7, c8, 2");
-    __asm("ISB");                                   /* Ensure completion of the MCR write to CP15.  */
+
+    /* Determine which unprivileged access the caller needs.  */
+    if (write_request == ((UINT) TXM_MODULE_MANAGER_ACCESS_WRITE))
+    {
+
+        /* ATS1CUW operation on address supplied in address, Stage 1 unprivileged write.  */
+        __asm("MCR p15, 0, address, c7, c8, 3");
+    }
+    else
+    {
+
+        /* ATS1CUR operation on address supplied in address, Stage 1 unprivileged read.  */
+        __asm("MCR p15, 0, address, c7, c8, 2");
+    }
+
+    __asm("ISB");                                       /* Ensure completion of the MCR write to CP15.  */
     __asm("MRC p15, 0, translation, c7, c4, 0");    /* Read result from 32-bit PAR into translation.  */
 
     if (translation & TXM_ADDRESS_TRANSLATION_FAULT_BIT)
@@ -79,6 +114,62 @@ ULONG translation;
     }
 
     return(TX_TRUE);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_current_asid_get            Cortex-A7/MMU/AC5   */
+/*                                                           6.5.0        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Eclipse ThreadX contributors                                        */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function returns the ASID of the translation context that is   */
+/*    currently loaded. Address translation always answers for that       */
+/*    context, so a caller validating a pointer on behalf of a module     */
+/*    must confirm that the loaded context is that module's before it     */
+/*    believes the answer.                                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    ASID of the currently loaded translation context                    */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _txm_module_manager_inside_data_check                               */
+/*    _txm_module_manager_outside_data_check                              */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  08-24-2026      Eclipse ThreadX         Initial Version 6.5.0         */
+/*                    contributors                                        */
+/*                                                                        */
+/**************************************************************************/
+ULONG  _txm_module_manager_current_asid_get(VOID)
+{
+
+ULONG   contextidr;
+
+
+    /* Read CONTEXTIDR, whose low byte holds the ASID in the short-descriptor format.  */
+    __asm("MRC p15, 0, contextidr, c13, c0, 1");
+
+    return(contextidr & TXM_CONTEXTIDR_ASID_MASK);
 }
 
 

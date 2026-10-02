@@ -110,10 +110,16 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_multiple_accuracy_test.c
     ${SOURCE_DIR}/threadx_timer_multiple_test.c
     ${SOURCE_DIR}/threadx_timer_simple_test.c
-    # threadx_trace_basic_test.c excluded: references tx_saved_posture
-    # (the Linux port's interrupt save variable) which is named
-    # interrupt_save on RISC-V.
+    ${SOURCE_DIR}/threadx_trace_basic_test.c
 )
+
+# Architecture specific tests living next to this file. The RV32 stack
+# builder still leaves the mstatus slot of the frame unwritten, so the new
+# thread FPU state test only applies to RV64 for now.
+if(THREADX_ARCH STREQUAL "risc-v64")
+    list(APPEND regression_test_cases
+        ${CMAKE_CURRENT_LIST_DIR}/threadx_riscv_new_thread_fpu_state_test.c)
+endif()
 
 # Tests that provide their own main() and must NOT link with testcontrol.
 set(standalone_test_cases

@@ -95,8 +95,8 @@ _tx_thread_schedule:
 @
 @    /* Enter the scheduler for the first time.  */
 @
-    LDR     r0, =#0x10000000                        @ Load PENDSVSET bit
-    LDR     r1, =#0xE000ED04                        @ Load NVIC base
+    LDR     r0, =0x10000000                        @ Load PENDSVSET bit
+    LDR     r1, =0xE000ED04                        @ Load NVIC base
     STR     r0, [r1]                                @ Set PENDSVBIT in ICSR
     DSB                                             @ Complete all memory accesses
     ISB                                             @ Flush pipeline

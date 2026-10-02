@@ -1,0 +1,295 @@
+#!/bin/sh
+##############################################################################
+# Copyright (c) 2026 Eclipse ThreadX contributors
+#
+# This program and the accompanying materials are made available under the
+# terms of the MIT License which is available at
+# https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: MIT
+##############################################################################
+
+set -e
+cd "$(dirname "$0")"
+
+# this script builds the ThreadX library for the Cortex-A7 SMP port using
+# GNU toolchain or llvm/clang toolchain (defaults to GNU).
+: "${TOOLCHAIN:=gnu}"
+
+case "${TOOLCHAIN}" in
+    gnu)
+        CC="arm-none-eabi-gcc"
+        AR="arm-none-eabi-ar"
+        TARGET_FLAGS=""
+        ;;
+    atfe)
+        CC="${ATFE_CLANG:-clang}"
+        case "${CC}" in
+            */*) AR="$(dirname "${CC}")/llvm-ar" ;;
+            *)   AR="llvm-ar" ;;
+        esac
+        TARGET_FLAGS="--target=arm-none-eabi"
+        ;;
+    *)
+        echo "Unknown TOOLCHAIN: ${TOOLCHAIN}" >&2
+        exit 1
+        ;;
+esac
+
+rm -f tx.a
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 tx_initialize_low_level.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_stack_build.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_schedule.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_system_return.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_context_save.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_context_restore.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_interrupt_control.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_timer_interrupt.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_interrupt_disable.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_interrupt_restore.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_irq_nesting_end.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_irq_nesting_start.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_vectored_context_save.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_core_get.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_core_preempt.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_current_state_get.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_current_thread_get.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_initialize_wait.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_low_level_initialize.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_protect.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_time_get.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 ../src/tx_thread_smp_unprotect.S
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_allocate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_pool_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_block_release.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_allocate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_pool_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_pool_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_pool_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_pool_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_pool_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_pool_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_pool_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_pool_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_pool_search.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_byte_release.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_set.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_event_flags_set_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_initialize_high_level.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_initialize_kernel_enter.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_initialize_kernel_setup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_priority_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_mutex_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_flush.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_front_send.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_receive.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_send.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_queue_send_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_ceiling_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_cleanup.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_semaphore_put_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_entry_exit_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_identify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_preemption_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_priority_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_relinquish.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_reset.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_resume.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_shell_entry.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_sleep.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_stack_analyze.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_stack_error_handler.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_stack_error_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_suspend.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_system_preempt_check.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_system_resume.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_system_suspend.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_terminate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_time_slice.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_time_slice_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_timeout.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_wait_abort.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_time_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_time_set.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_activate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_deactivate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_expiration_process.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_performance_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_performance_system_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_system_activate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_system_deactivate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_thread_entry.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_enable.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_disable.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_interrupt_control.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_isr_enter_insert.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_isr_exit_insert.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_object_register.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_object_unregister.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_user_event_insert.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_buffer_full_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_event_filter.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_trace_event_unfilter.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_block_allocate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_block_pool_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_block_pool_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_block_pool_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_block_pool_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_block_release.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_byte_allocate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_byte_pool_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_byte_pool_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_byte_pool_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_byte_pool_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_byte_release.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_event_flags_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_event_flags_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_event_flags_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_event_flags_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_event_flags_set.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_event_flags_set_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_mutex_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_mutex_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_mutex_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_mutex_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_mutex_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_mutex_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_queue_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_queue_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_queue_flush.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_queue_front_send.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_queue_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_queue_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_queue_receive.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_queue_send.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_queue_send_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_semaphore_ceiling_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_semaphore_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_semaphore_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_semaphore_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_semaphore_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_semaphore_prioritize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_semaphore_put.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_semaphore_put_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_entry_exit_notify.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_preemption_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_priority_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_relinquish.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_reset.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_resume.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_suspend.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_terminate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_time_slice_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_thread_wait_abort.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_timer_activate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_timer_change.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_timer_create.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_timer_deactivate.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_timer_delete.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/txe_timer_info_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_smp_current_state_set.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_smp_debug_entry_insert.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_smp_high_level_initialize.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_smp_rebalance_execute_list.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_smp_core_exclude.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_smp_core_exclude_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_smp_core_exclude.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_timer_smp_core_exclude_get.c
+"${CC}" ${TARGET_FLAGS} -c -g -mcpu=cortex-a7 -I../../../../common_smp/inc -I../inc ../../../../common_smp/src/tx_thread_smp_utilities.c
+"${AR}" -r tx.a tx_thread_stack_build.o tx_thread_schedule.o tx_thread_system_return.o tx_thread_context_save.o tx_thread_context_restore.o tx_timer_interrupt.o tx_thread_interrupt_control.o
+"${AR}" -r tx.a tx_initialize_low_level.o tx_thread_interrupt_disable.o
+"${AR}" -r tx.a tx_thread_interrupt_restore.o tx_thread_irq_nesting_end.o tx_thread_irq_nesting_start.o
+"${AR}" -r tx.a tx_block_allocate.o tx_block_pool_cleanup.o tx_block_pool_create.o tx_block_pool_delete.o tx_block_pool_info_get.o
+"${AR}" -r tx.a tx_block_pool_initialize.o tx_block_pool_performance_info_get.o tx_block_pool_performance_system_info_get.o tx_block_pool_prioritize.o
+"${AR}" -r tx.a tx_block_release.o tx_byte_allocate.o tx_byte_pool_cleanup.o tx_byte_pool_create.o tx_byte_pool_delete.o tx_byte_pool_info_get.o
+"${AR}" -r tx.a tx_byte_pool_initialize.o tx_byte_pool_performance_info_get.o tx_byte_pool_performance_system_info_get.o tx_byte_pool_prioritize.o
+"${AR}" -r tx.a tx_byte_pool_search.o tx_byte_release.o tx_event_flags_cleanup.o tx_event_flags_create.o tx_event_flags_delete.o tx_event_flags_get.o
+"${AR}" -r tx.a tx_event_flags_info_get.o tx_event_flags_initialize.o tx_event_flags_performance_info_get.o tx_event_flags_performance_system_info_get.o
+"${AR}" -r tx.a tx_event_flags_set.o tx_event_flags_set_notify.o tx_initialize_high_level.o tx_initialize_kernel_enter.o tx_initialize_kernel_setup.o
+"${AR}" -r tx.a tx_mutex_cleanup.o tx_mutex_create.o tx_mutex_delete.o tx_mutex_get.o tx_mutex_info_get.o tx_mutex_initialize.o tx_mutex_performance_info_get.o
+"${AR}" -r tx.a tx_mutex_performance_system_info_get.o tx_mutex_prioritize.o tx_mutex_priority_change.o tx_mutex_put.o tx_queue_cleanup.o tx_queue_create.o
+"${AR}" -r tx.a tx_queue_delete.o tx_queue_flush.o tx_queue_front_send.o tx_queue_info_get.o tx_queue_initialize.o tx_queue_performance_info_get.o
+"${AR}" -r tx.a tx_queue_performance_system_info_get.o tx_queue_prioritize.o tx_queue_receive.o tx_queue_send.o tx_queue_send_notify.o tx_semaphore_ceiling_put.o
+"${AR}" -r tx.a tx_semaphore_cleanup.o tx_semaphore_create.o tx_semaphore_delete.o tx_semaphore_get.o tx_semaphore_info_get.o tx_semaphore_initialize.o
+"${AR}" -r tx.a tx_semaphore_performance_info_get.o tx_semaphore_performance_system_info_get.o tx_semaphore_prioritize.o tx_semaphore_put.o tx_semaphore_put_notify.o
+"${AR}" -r tx.a tx_thread_create.o tx_thread_delete.o tx_thread_entry_exit_notify.o tx_thread_identify.o tx_thread_info_get.o tx_thread_initialize.o
+"${AR}" -r tx.a tx_thread_performance_info_get.o tx_thread_performance_system_info_get.o tx_thread_preemption_change.o tx_thread_priority_change.o tx_thread_relinquish.o
+"${AR}" -r tx.a tx_thread_reset.o tx_thread_resume.o tx_thread_shell_entry.o tx_thread_sleep.o tx_thread_stack_analyze.o tx_thread_stack_error_handler.o
+"${AR}" -r tx.a tx_thread_stack_error_notify.o tx_thread_suspend.o tx_thread_system_preempt_check.o tx_thread_system_resume.o tx_thread_system_suspend.o
+"${AR}" -r tx.a tx_thread_terminate.o tx_thread_time_slice.o tx_thread_time_slice_change.o tx_thread_timeout.o tx_thread_wait_abort.o tx_time_get.o
+"${AR}" -r tx.a tx_time_set.o tx_timer_activate.o tx_timer_change.o tx_timer_create.o tx_timer_deactivate.o tx_timer_delete.o tx_timer_expiration_process.o
+"${AR}" -r tx.a tx_timer_info_get.o tx_timer_initialize.o tx_timer_performance_info_get.o tx_timer_performance_system_info_get.o tx_timer_system_activate.o
+"${AR}" -r tx.a tx_timer_system_deactivate.o tx_timer_thread_entry.o tx_trace_enable.o tx_trace_disable.o tx_trace_initialize.o tx_trace_interrupt_control.o
+"${AR}" -r tx.a tx_trace_isr_enter_insert.o tx_trace_isr_exit_insert.o tx_trace_object_register.o tx_trace_object_unregister.o tx_trace_user_event_insert.o
+"${AR}" -r tx.a tx_trace_buffer_full_notify.o tx_trace_event_filter.o tx_trace_event_unfilter.o
+"${AR}" -r tx.a txe_block_allocate.o txe_block_pool_create.o txe_block_pool_delete.o txe_block_pool_info_get.o txe_block_pool_prioritize.o txe_block_release.o
+"${AR}" -r tx.a txe_byte_allocate.o txe_byte_pool_create.o txe_byte_pool_delete.o txe_byte_pool_info_get.o txe_byte_pool_prioritize.o txe_byte_release.o
+"${AR}" -r tx.a txe_event_flags_create.o txe_event_flags_delete.o txe_event_flags_get.o txe_event_flags_info_get.o txe_event_flags_set.o
+"${AR}" -r tx.a txe_event_flags_set_notify.o txe_mutex_create.o txe_mutex_delete.o txe_mutex_get.o txe_mutex_info_get.o txe_mutex_prioritize.o
+"${AR}" -r tx.a txe_mutex_put.o txe_queue_create.o txe_queue_delete.o txe_queue_flush.o txe_queue_front_send.o txe_queue_info_get.o txe_queue_prioritize.o
+"${AR}" -r tx.a txe_queue_receive.o txe_queue_send.o txe_queue_send_notify.o txe_semaphore_ceiling_put.o txe_semaphore_create.o txe_semaphore_delete.o
+"${AR}" -r tx.a txe_semaphore_get.o txe_semaphore_info_get.o txe_semaphore_prioritize.o txe_semaphore_put.o txe_semaphore_put_notify.o txe_thread_create.o
+"${AR}" -r tx.a txe_thread_delete.o txe_thread_entry_exit_notify.o txe_thread_info_get.o txe_thread_preemption_change.o txe_thread_priority_change.o
+"${AR}" -r tx.a txe_thread_relinquish.o txe_thread_reset.o txe_thread_resume.o txe_thread_suspend.o txe_thread_terminate.o txe_thread_time_slice_change.o
+"${AR}" -r tx.a txe_thread_wait_abort.o txe_timer_activate.o txe_timer_change.o txe_timer_create.o txe_timer_deactivate.o txe_timer_delete.o txe_timer_info_get.o
+"${AR}" -r tx.a tx_thread_smp_current_state_set.o tx_thread_smp_debug_entry_insert.o tx_thread_smp_high_level_initialize.o
+"${AR}" -r tx.a tx_thread_smp_rebalance_execute_list.o tx_thread_smp_core_exclude.o tx_thread_smp_core_exclude_get.o
+"${AR}" -r tx.a tx_timer_smp_core_exclude.o tx_timer_smp_core_exclude_get.o tx_thread_smp_utilities.o
+"${AR}" -r tx.a tx_thread_smp_core_get.o tx_thread_smp_core_preempt.o tx_thread_smp_current_state_get.o tx_thread_smp_current_thread_get.o tx_thread_smp_initialize_wait.o
+"${AR}" -r tx.a tx_thread_smp_low_level_initialize.o tx_thread_smp_protect.o tx_thread_smp_time_get.o tx_thread_smp_unprotect.o

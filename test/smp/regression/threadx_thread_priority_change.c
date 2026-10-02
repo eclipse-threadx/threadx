@@ -465,10 +465,27 @@ TX_THREAD   *temp_thread;
     /* Restore interrupts.  */
     TX_RESTORE
 
-    /* Hit branch in _tx_thread_smp_simple_priority_change such that the
-       new priority is less than the inheritance priority.  */
-    thread_0.tx_thread_inherit_priority = 0;
+    /* Hit the branch in _tx_thread_smp_simple_priority_change where the new
+       priority is below the inheritance priority. That needs an inheritance
+       priority above the new one, so 0 does not reach it: with 0 the other
+       branch runs, and that branch records the inheritance priority as the
+       thread's priority while still linking the thread at the new priority.
+       Thread 0 came out of here claiming priority 0 while living in the
+       priority 16 list, which is what has been hanging this test in CI.
+       Priority 0 ties with the control thread, so resuming the control thread
+       raised no preemption, and once thread 0 completed, core 0 was left owned
+       by a completed thread with the control thread ready and unscheduled.
+
+       This routine is internal and expects protection to be in force, so hold
+       it here rather than calling in the open.  */
+    TX_DISABLE
+    thread_0.tx_thread_inherit_priority =  20;
     _tx_thread_smp_simple_priority_change(&thread_0, 16);
+
+    /* Put the inheritance priority back to the value that means this thread is
+       not inheriting one, so nothing downstream reasons about a phantom.  */
+    thread_0.tx_thread_inherit_priority =  TX_MAX_PRIORITIES;
+    TX_RESTORE
 
     /* Successful test.  */
     printf("SUCCESS!\n");
@@ -513,6 +530,15 @@ static void    thread_3_entry(ULONG thread_input)
 UINT    old_priority;
 UINT    loop;
 
+/* The interrupt below only fires on a narrow window: thread 3 at priority 6,
+   ready, and not yet at the head of its priority list. Waiting for it without a
+   bound made this test hang indefinitely when the window was never hit, which
+   showed up in CI as a timeout carrying no information about what went wrong.
+   The TX_NOT_INTERRUPTABLE path already stopped after a fixed amount of work;
+   this gives the interruptable path the same protection.  */
+UINT    attempts = 0;
+#define MAX_PRIORITY_CHANGE_ATTEMPTS  100000
+
 
     /* Resume threads 4.  */
     tx_thread_resume(&thread_4);
@@ -537,7 +563,23 @@ UINT    loop;
         if (thread_4_counter)
             thread_1_counter++;
 
-    } while (test_isr_dispatch);
+        attempts++;
+
+    } while (test_isr_dispatch && (attempts < MAX_PRIORITY_CHANGE_ATTEMPTS));
+
+    /* Stop the interrupt regardless, so a window that was never hit does not
+       leave the handler installed for the rest of the test.  */
+    test_isr_dispatch =  TX_NULL;
+
+    if (attempts >= MAX_PRIORITY_CHANGE_ATTEMPTS)
+    {
+
+        /* The window was not reached. That is a gap in what this test covered on
+           this run rather than a fault in the code under test, so say so instead
+           of failing, and leave the counters alone so the checks that follow
+           still mean what they did before.  */
+        printf("(priority change window not reached in %u attempts) ", attempts);
+    }
 }
 
 

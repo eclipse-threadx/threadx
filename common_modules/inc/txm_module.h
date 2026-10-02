@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -569,6 +571,7 @@ VOID  _txm_module_usbx_duo_callback_request(TXM_MODULE_CALLBACK_MESSAGE *callbac
 
 #define txm_module_manager_initialize                   _txm_module_manager_initialize
 #define txm_module_manager_absolute_load                _txm_module_manager_absolute_load
+#define txm_module_manager_absolute_load_extended       _txm_module_manager_absolute_load_extended
 #define txm_module_manager_in_place_load                _txm_module_manager_in_place_load
 #define txm_module_manager_file_load                    _txm_module_manager_file_load
 #define txm_module_manager_memory_load                  _txm_module_manager_memory_load
@@ -606,6 +609,7 @@ UINT  _txm_module_manager_file_load(TXM_MODULE_INSTANCE *module_instance, CHAR *
 #endif
 UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_memory_size);
 UINT  _txm_module_manager_absolute_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location);
+UINT  _txm_module_manager_absolute_load_extended(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location, VOID *module_data_location);
 UINT  _txm_module_manager_in_place_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location);
 UINT  _txm_module_manager_internal_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location,
                                         ULONG code_size, VOID *code_allocation_ptr, ULONG code_allocation_size);
@@ -620,7 +624,7 @@ UINT  _txm_module_manager_memory_load(TXM_MODULE_INSTANCE *module_instance, CHAR
 UINT  _txm_module_manager_properties_get(TXM_MODULE_INSTANCE *module_instance, ULONG *module_properties_ptr);
 UINT  _txm_module_manager_start(TXM_MODULE_INSTANCE *module_instance);
 UINT  _txm_module_manager_stop(TXM_MODULE_INSTANCE *module_instance);
-UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, CHAR *name, VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
+UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name, VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
                                VOID (*entry_function)(ULONG), ULONG entry_input,
                                VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                                ULONG time_slice, UINT auto_start, UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance);

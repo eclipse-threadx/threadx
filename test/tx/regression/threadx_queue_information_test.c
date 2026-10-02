@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test the queue information services.  */
 
 #include   <stdio.h>
@@ -102,7 +104,7 @@ UINT        status;
 ULONG       source_message = 0x12345678UL;
 ULONG       dest_message;
 ULONG       expected_message;
-CHAR        *name;
+TX_NAME_CONST CHAR *name;
 ULONG       enqueued;
 ULONG       available_storage;
 TX_THREAD   *first_suspended;
@@ -409,7 +411,7 @@ ULONG       timeouts;
     status += tx_queue_info_get(&queue_0, &name, &enqueued, &available_storage, &first_suspended, &suspended_count, &next_queue);
 
     /* Check for errors.  */
-    if ((status != TX_SUCCESS) || (enqueued != queue_0.tx_queue_enqueued) || (available_storage != queue_0.tx_queue_available_storage) ||
+    if ((status != TX_SUCCESS) || (name != queue_0.tx_queue_name) || (enqueued != queue_0.tx_queue_enqueued) || (available_storage != queue_0.tx_queue_available_storage) ||
         (first_suspended != queue_0.tx_queue_suspension_list) || (suspended_count != queue_0.tx_queue_suspended_count) ||
         (next_queue != queue_0.tx_queue_created_next))
     {

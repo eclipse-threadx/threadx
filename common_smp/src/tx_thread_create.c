@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -77,7 +79,7 @@
 /*    _tx_timer_initialize                  Create system timer thread    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+UINT  _tx_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                             VOID (*entry_function)(ULONG id), ULONG entry_input,
                             VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                             ULONG time_slice, UINT auto_start)
@@ -93,19 +95,27 @@ UCHAR                   *temp_ptr;
 ALIGN_TYPE              new_stack_start;
 ALIGN_TYPE              updated_stack_start;
 #endif
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING) && !defined(TX_DISABLE_STACK_FILLING)
+ULONG                   stack_fill_value;
+#endif
 
 
 #ifndef TX_DISABLE_STACK_FILLING
 #if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
 
     /* Initialize the stack fill value to a 8-bit random value.  */
-    thread_ptr -> tx_thread_stack_fill_value = ((ULONG) TX_RAND()) & 0xFFUL;
+    stack_fill_value =  ((ULONG) TX_RAND()) & 0xFFUL;
 
     /* Duplicate the random value in each of the 4 bytes of the stack fill value.  */
-    thread_ptr -> tx_thread_stack_fill_value = thread_ptr -> tx_thread_stack_fill_value |
-                    (thread_ptr -> tx_thread_stack_fill_value << 8) |
-                    (thread_ptr -> tx_thread_stack_fill_value << 16) |
-                    (thread_ptr -> tx_thread_stack_fill_value << 24);
+    stack_fill_value =  stack_fill_value |
+                    (stack_fill_value << 8) |
+                    (stack_fill_value << 16) |
+                    (stack_fill_value << 24);
+
+    /* Store the fill value in the control block so that the stack fill below picks it up
+       through the TX_STACK_FILL macro.  The control block is cleared further down in this
+       function, so the value is stored again once that has been done.  */
+    thread_ptr -> tx_thread_stack_fill_value =  stack_fill_value;
 #endif
 
     /* Set the thread stack to a pattern prior to creating the initial
@@ -122,7 +132,7 @@ ALIGN_TYPE              updated_stack_start;
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
 
     /* Ensure the starting stack address is evenly aligned.  */
-    new_stack_start =  TX_POINTER_TO_ALIGN_TYPE_CONVERT(stack_start);
+    new_stack_start =  (ALIGN_TYPE) ((VOID *) stack_start);
     updated_stack_start =  (((new_stack_start) + ((sizeof(ULONG)) - ((ULONG) 1)) ) & (~((sizeof(ULONG)) - ((ULONG) 1))));
 
     /* Determine if the starting stack address is different.  */
@@ -134,7 +144,7 @@ ALIGN_TYPE              updated_stack_start;
     }
 
     /* Update the starting stack pointer.  */
-    stack_start =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(updated_stack_start);
+    stack_start =  (VOID *) ((ALIGN_TYPE) updated_stack_start);
 #endif
 
     /* Prepare the thread control block prior to placing it on the created
@@ -142,6 +152,14 @@ ALIGN_TYPE              updated_stack_start;
 
     /* Initialize thread control block to all zeros.  */
     TX_MEMSET(thread_ptr, 0, sizeof(TX_THREAD));
+
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING) && !defined(TX_DISABLE_STACK_FILLING)
+
+    /* Clearing the control block reset the stack fill value, so store the value that was
+       actually used to fill the stack again.  Otherwise the stack checking and stack analyze
+       routines would look for a pattern that is not the one present in the stack.  */
+    thread_ptr -> tx_thread_stack_fill_value =  stack_fill_value;
+#endif
 
     /* Place the supplied parameters into the thread's control block.  */
     thread_ptr -> tx_thread_name =                name_ptr;

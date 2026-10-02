@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -75,6 +77,7 @@ DWORD WINAPI _tx_win32_thread_entry(LPVOID p);
 /**************************************************************************/
 VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 {
+ALIGN_TYPE  fake_stack_ptr;
 
     /* Create a Win32 thread for the application thread.  */
     thread_ptr -> tx_thread_win32_thread_handle =
@@ -111,6 +114,20 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
         }
     }
 
+    /* Create the scheduler acknowledgement semaphore for this thread.  */
+    thread_ptr -> tx_thread_win32_thread_start_semaphore =  CreateSemaphore(NULL, 0, 1, NULL);
+
+    /* Determine if the start semaphore was created successfully.  */
+    if (!thread_ptr -> tx_thread_win32_thread_start_semaphore)
+    {
+
+        /* Display an error message.  */
+        printf("ThreadX Win32 error creating thread start semaphore!\n");
+        while(1)
+        {
+        }
+    }
+
     /* Setup the thread suspension type to solicited thread suspension.
        Pseudo interrupt handlers will suspend with this field set to 1.  */
     thread_ptr -> tx_thread_win32_suspension_type =  0;
@@ -119,8 +136,13 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
        tx_interrupt_control nesting.  */
     thread_ptr -> tx_thread_win32_int_disabled_flag =  0;
 
-    /* Setup a fake thread stack pointer.   */
-    thread_ptr -> tx_thread_stack_ptr =  (VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8);
+    /* Setup a fake thread stack pointer.  The stack end points at the last byte of the
+       thread's stack area and is therefore not necessarily aligned, so round the result
+       down to a ULONG boundary.  This pointer is dereferenced as a ULONG below and is
+       also the starting value of the stack checking logic's highest used pointer.  */
+    fake_stack_ptr =  (ALIGN_TYPE) ((VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8));
+    fake_stack_ptr =  fake_stack_ptr & (~((ALIGN_TYPE) (sizeof(ULONG) - 1)));
+    thread_ptr -> tx_thread_stack_ptr =  (VOID *) ((ALIGN_TYPE) fake_stack_ptr);
 
     /* Clear the first word of the stack.  */
     *(((ULONG *) thread_ptr -> tx_thread_stack_ptr) - 1) =  0;
@@ -128,24 +150,77 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
     /* Make the thread initially ready so it will run to the initial wait on
        its run semaphore.  */
     ResumeThread(thread_ptr -> tx_thread_win32_thread_handle);
+
+    /* Wait until the host thread is parked at the controlled handoff point
+       before ThreadX can schedule it.  */
+    if (WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_start_semaphore, INFINITE) != WAIT_OBJECT_0)
+    {
+
+        /* Display an error message.  */
+        printf("ThreadX Win32 error synchronizing thread startup!\n");
+        while(1)
+        {
+        }
+    }
 }
 
 
 DWORD WINAPI _tx_win32_thread_entry(LPVOID ptr)
 {
 
-TX_THREAD  *thread_ptr;
+TX_THREAD   *thread_ptr;
+TX_THREAD   *current_thread_ptr;
+HANDLE      threadhandle;
+int         threadpriority;
+DWORD       threadid;
+ULONG       handoff_spin_count;
 
     /* Pickup the current thread pointer.  */
     thread_ptr =  (TX_THREAD *) ptr;
 
-    /* Now suspend the thread initially.  If the thread has already
-       been scheduled, this will return immediately.  */
-    WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_run_semaphore, INFINITE);
+    /* Tell the creator that this host thread has reached the controlled
+       handoff point and is ready to be scheduled.  */
+    ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
+
+    /* Spin briefly for the scheduler to release this thread to run, then
+       block so dormant threads do not consume host CPU indefinitely.  */
+    handoff_spin_count =  TX_WIN32_HANDOFF_SPIN_COUNT;
+    while (WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_run_semaphore, 0) != WAIT_OBJECT_0)
+    {
+        if (handoff_spin_count != 0)
+        {
+            handoff_spin_count--;
+            SwitchToThread();
+        }
+        else
+        {
+            WaitForSingleObject(thread_ptr -> tx_thread_win32_thread_run_semaphore, INFINITE);
+            break;
+        }
+    }
+
+    /* Acknowledge that the host thread is now able to execute ThreadX code.  */
+    ReleaseSemaphore(thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
+
+    /* A deleted host thread can be released only to let it exit.  In notify-enabled
+       builds, the first TX_DISABLE in _tx_thread_shell_entry catches this path.
+       When callbacks are disabled, perform the same check before the shell calls
+       the stale ThreadX entry function.  */
+    _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
+    threadhandle =       GetCurrentThread();
+    threadpriority =     GetThreadPriority(threadhandle);
+    threadid =           GetCurrentThreadId();
+    current_thread_ptr = _tx_thread_current_ptr;
+    if ((threadpriority == THREAD_PRIORITY_LOWEST) &&
+        ((current_thread_ptr == TX_NULL) || (current_thread_ptr -> tx_thread_win32_thread_id != threadid)))
+    {
+        _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
+        ExitThread(0);
+    }
+    _tx_win32_critical_section_release(&_tx_win32_critical_section);
 
     /* Call ThreadX thread entry point.  */
     _tx_thread_shell_entry();
 
     return EXIT_SUCCESS;
 }
-

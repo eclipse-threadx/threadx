@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -313,12 +315,13 @@ __istate_t interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
     *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
-    __asm__ volatile ("dsb 0xF \n isb 0xF " : : : "memory");
+    __asm__ volatile ("dsb sy \n isb sy " : : : "memory");
     if (__get_IPSR() == 0)
     {
         interrupt_save = __get_interrupt_state();
         __enable_interrupt();
         __set_interrupt_state(interrupt_save);
+        __asm__ volatile ("isb sy " : : : "memory");
     }
 }
 
@@ -339,7 +342,7 @@ __istate_t interrupt_save;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Cortex-M0/IAR Version 6.5.1.202602a *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Cortex-M0/IAR Version 6.5.2.202603 *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

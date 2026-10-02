@@ -19,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .text
     .align 3
@@ -28,7 +30,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_schedule                                ARMv8-A-SMP      */
-/*                                                           6.1.10       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -156,7 +158,7 @@ _tx_thread_ready_for_execution:
 
     LDR     x2, =_tx_thread_current_ptr         // Pickup address of current thread
     STR     x0, [x2, x20, LSL #3]               // Setup current thread pointer
-
+    DMB     ISH
     LDR     x1, [x1, x20, LSL #3]               // Reload the execute pointer
     CMP     w0, w1                              // Did it change?
     BEQ     _execute_pointer_did_not_change     // If not, skip handling

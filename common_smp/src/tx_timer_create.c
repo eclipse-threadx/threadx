@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -68,7 +70,7 @@
 /*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _tx_timer_create(TX_TIMER *timer_ptr, CHAR *name_ptr,
+UINT  _tx_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
             VOID (*expiration_function)(ULONG id), ULONG expiration_input,
             ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
 {

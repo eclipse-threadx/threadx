@@ -52,32 +52,47 @@ int plic_unregister_callback(int irqno)
 
 int plic_init(void)
 {
+    uintptr_t hart = riscv_get_core();
+
     for (int i = 0; i < MAX_CALLBACK_NUM; i++)
     {
         callbacks[i] = NULL;
     }
+
+    /* Do not depend on the reset state or on a prior boot stage: accept
+       every priority (threshold 0) and start with all sources for this
+       hart disabled.  */
+    *(volatile uint32_t *)PLIC_MPRIORITY(hart) = 0;
+    for (int w = 0; w < MAX_CALLBACK_NUM / 32; w++)
+        *(volatile uint32_t *)(PLIC_MENABLE(hart) + w * 4) = 0;
+
     return 0;
 }
 
 int plic_claim(void)
 {
     uintptr_t hart = riscv_get_core();
-    return (int)(*(uint32_t *)PLIC_MCLAIM(hart));
+    return (int)(*(volatile uint32_t *)PLIC_MCLAIM(hart));
 }
 
 void plic_complete(int irqno)
 {
     uintptr_t hart = riscv_get_core();
-    *(uint32_t *)(PLIC_MCOMPLETE(hart)) = (uint32_t)irqno;
+    *(volatile uint32_t *)(PLIC_MCOMPLETE(hart)) = (uint32_t)irqno;
 }
 
 int plic_irq_intr(void)
 {
     int ret = -1;
     int irqno = plic_claim();
-    if (irqno <= 0 || irqno >= MAX_CALLBACK_NUM) {
-        plic_complete(irqno);
-        return 0;  // spurious or out-of-range, not an error
+
+    if (irqno == 0)
+        return 0;
+
+    if (irqno < 0 || irqno >= MAX_CALLBACK_NUM) {
+        if (irqno > 0)
+            plic_complete(irqno);
+        return -1;
     }
     if (callbacks[irqno] != NULL)
         ret = (callbacks[irqno])(irqno);

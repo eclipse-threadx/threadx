@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -63,6 +65,7 @@
 
 /* Define compiler library include files.  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -155,47 +158,12 @@ extern TEST_FLAG        test_forced_mutex_timeout;
 
 #endif
 
-
-/* Define performance metric symbols.  */
-
-#ifndef TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO
-#define TX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_BYTE_POOL_ENABLE_PERFORMANCE_INFO
-#define TX_BYTE_POOL_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO
-#define TX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_MUTEX_ENABLE_PERFORMANCE_INFO
-#define TX_MUTEX_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_QUEUE_ENABLE_PERFORMANCE_INFO
-#define TX_QUEUE_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_SEMAPHORE_ENABLE_PERFORMANCE_INFO
-#define TX_SEMAPHORE_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_THREAD_ENABLE_PERFORMANCE_INFO
-#define TX_THREAD_ENABLE_PERFORMANCE_INFO
-#endif
-
-#ifndef TX_TIMER_ENABLE_PERFORMANCE_INFO
-#define TX_TIMER_ENABLE_PERFORMANCE_INFO
-#endif
-
-/* Enable trace info.  */
-
-#ifndef TX_ENABLE_EVENT_TRACE
-#define TX_ENABLE_EVENT_TRACE
-#endif
-
+/* Performance metrics and event trace are left to the application. Set the
+   TX_*_ENABLE_PERFORMANCE_INFO symbols, or TX_ENABLE_EVENT_TRACE, in
+   tx_user.h or on the command line when they are wanted. They extend the
+   control blocks, so a port that turns them on behind the application's
+   back changes structures the application also sees. This port and the
+   win64 one were the only two that did.  */
 
 /* Define ThreadX basic types for this port.  */
 
@@ -338,9 +306,10 @@ void    _tx_initialize_start_interrupts(void);
 #define TX_THREAD_EXTENSION_0                                               HANDLE tx_thread_win32_thread_handle; \
                                                                             DWORD  tx_thread_win32_thread_id; \
                                                                             HANDLE tx_thread_win32_thread_run_semaphore; \
+                                                                            HANDLE tx_thread_win32_thread_start_semaphore; \
                                                                             UINT   tx_thread_win32_suspension_type; \
                                                                             UINT   tx_thread_win32_int_disabled_flag;
-#define TX_THREAD_EXTENSION_1
+#define TX_THREAD_EXTENSION_1                                               VOID       *tx_thread_extension_ptr;
 #define TX_THREAD_EXTENSION_2
 #define TX_THREAD_EXTENSION_3
 
@@ -396,13 +365,27 @@ void    _tx_initialize_start_interrupts(void);
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
 
 
+/* Store the owning object pointer in the internal timer so timeout handlers can
+   recover it via a pointer field rather than the ULONG timeout parameter.  This
+   matches the Win64 port and satisfies NetXDuo/USBX default extension macros
+   that reference tx_timer_internal_extension_ptr / tx_thread_extension_ptr.  */
+
+#define TX_TIMER_INTERNAL_EXTENSION             VOID    *tx_timer_internal_extension_ptr;
+
+#define TX_THREAD_CREATE_TIMEOUT_SETUP(t)       (t) -> tx_thread_timer.tx_timer_internal_timeout_function =  &(_tx_thread_timeout);            \
+                                                (t) -> tx_thread_timer.tx_timer_internal_timeout_param =     0;                                \
+                                                (t) -> tx_thread_timer.tx_timer_internal_extension_ptr =     (VOID *) (t);
+
+#define TX_THREAD_TIMEOUT_POINTER_SETUP(t)      (t) =  (TX_THREAD *) _tx_timer_expired_timer_ptr -> tx_timer_internal_extension_ptr;
+
+
 struct TX_THREAD_STRUCT;
 
 /* Define the Win32 critical section data structure.  */
 
 typedef struct TX_WIN32_CRITICAL_SECTION_STRUCT
 {
-    HANDLE                                      tx_win32_critical_section_mutex_handle;
+    CRITICAL_SECTION                            tx_win32_critical_section_lock;
     DWORD                                       tx_win32_critical_section_owner;
     ULONG                                       tx_win32_critical_section_nested_count;
 } TX_WIN32_CRITICAL_SECTION;
@@ -500,7 +483,7 @@ VOID   _tx_thread_interrupt_restore(UINT previous_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Win32/Visual Studio Version 6.5.1.202602a *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Win32/Visual Studio Version 6.5.2.202603 *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
@@ -510,24 +493,40 @@ extern  CHAR                    _tx_version_id[];
 
 extern TX_WIN32_CRITICAL_SECTION                _tx_win32_critical_section;
 extern HANDLE                                   _tx_win32_scheduler_semaphore;
+extern HANDLE                                   _tx_win32_scheduler_wake_event;
 extern DWORD                                    _tx_win32_scheduler_id;
 extern ULONG                                    _tx_win32_global_int_disabled_flag;
 extern LARGE_INTEGER                            _tx_win32_time_stamp;
 extern ULONG                                    _tx_win32_system_error;
 extern HANDLE                                   _tx_win32_timer_handle;
+extern HANDLE                                   _tx_win32_timer_thread_handle;
+extern HANDLE                                   _tx_win32_isr_semaphore;
 extern UINT                                     _tx_win32_timer_id;
-extern LARGE_INTEGER                            _tx_win32_time_stamp;
+extern UINT                                     _tx_win32_timer_waiting;
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+extern HANDLE                                   _tx_win32_timer_kick_event;
+#endif
 
+VOID                                            _tx_win32_scheduler_wake(VOID);
+
+
+#ifndef TX_WIN32_USE_HIGH_RESOLUTION_TIMER
+#define TX_WIN32_USE_HIGH_RESOLUTION_TIMER      1
+#endif
+
+#ifndef TX_WIN32_HANDOFF_SPIN_COUNT
+#define TX_WIN32_HANDOFF_SPIN_COUNT              64
+#endif
 
 #ifndef TX_WIN32_MEMORY_SIZE
-#define TX_WIN32_MEMORY_SIZE                    64000
+#define TX_WIN32_MEMORY_SIZE                    256000
 #endif
 
 #ifndef TX_TIMER_PERIODIC
 #ifdef TX_WIN32_SLOW_TIMER
 #define TX_TIMER_PERIODIC                       TX_WIN32_SLOW_TIMER
 #else
-#define TX_TIMER_PERIODIC                       10
+#define TX_TIMER_PERIODIC                       1
 #endif
 #endif
 

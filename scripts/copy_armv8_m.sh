@@ -18,7 +18,7 @@ set -e
 
 ports_folder="ports"
 source_folder="ports_arch/ARMv8-M/threadx"
-target_mcu="cortex_m33 cortex_m55 cortex_m85"
+target_mcu="cortex_m33 cortex_m52 cortex_m55 cortex_m85"
 source_inc_folder="$source_folder/inc"
 target_inc_mcu=$target_mcu
 target_inc_ide="ac6 gnu iar"

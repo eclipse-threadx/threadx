@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is for the thread information services.  */
 
 #include   <stdio.h>
@@ -63,7 +65,7 @@ static void    thread_0_entry(ULONG thread_input)
 {
 
 UINT        status;
-CHAR        *name;
+TX_NAME_CONST CHAR *name;
 UINT        state;
 ULONG       run_count;
 UINT        priority;
@@ -96,7 +98,7 @@ ULONG       idle_returns;
     status += tx_thread_info_get(&thread_0, &name, &state, &run_count, &priority, &preemption_threshold, &time_slice, &next_thread, &suspended_thread);
 
     /* Check for error status.  */
-    if ((status != TX_SUCCESS) || (state != TX_READY) || (run_count != thread_0.tx_thread_run_count) || (priority != 16) || (preemption_threshold != 16) ||
+    if ((status != TX_SUCCESS) || (name != thread_0.tx_thread_name) || (state != TX_READY) || (run_count != thread_0.tx_thread_run_count) || (priority != 16) || (preemption_threshold != 16) ||
         (time_slice != 0) || (next_thread != thread_0.tx_thread_created_next) || (suspended_thread != thread_0.tx_thread_suspended_next))
     {
 

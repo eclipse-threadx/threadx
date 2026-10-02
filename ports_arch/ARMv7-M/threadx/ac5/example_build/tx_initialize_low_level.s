@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -20,7 +21,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-    IMPORT  _tx_thread_system_stack_ptr
     IMPORT  _tx_initialize_unused_memory
     IMPORT  _tx_thread_context_save
     IMPORT  _tx_thread_context_restore
@@ -151,20 +151,12 @@ _tx_initialize_low_level
     ADD     r1, r1, #4                              // Add 4 to get to next free word
     STR     r1, [r0]                                // Setup first unused memory pointer
 
-    /* Setup Vector Table Offset Register.  */
-    MOV     r0, #0xE000E000                         // Build address of NVIC registers
-    LDR     r1, =__tx_vectors                       // Pickup address of vector table
-    STR     r1, [r0, #0xD08]                        // Set vector table address
-
-    /* Set system stack pointer from vector value.  */
-    LDR     r0, =_tx_thread_system_stack_ptr        // Build address of system stack pointer
-    LDR     r1, =__tx_vectors                       // Pickup address of vector table
-    LDR     r1, [r1]                                // Pickup reset stack pointer
-    STR     r1, [r0]                                // Save system stack pointer
-
 #ifndef TX_NO_TIMER
     /* Configure SysTick.  */
     MOV     r0, #0xE000E000                         // Build address of NVIC registers
+    MOV     r1, #0                                  // Build value for SysTick reset
+    STR     r1, [r0, #0x10]                         // Reset SysTick Control
+    STR     r1, [r0, #0x18]                         // Reset SysTick Counter Value
     LDR     r1, =SYSTICK_CYCLES
     STR     r1, [r0, #0x14]                         // Setup SysTick Reload Value
     MOV     r1, #0x7                                // Build SysTick Control Enable Value

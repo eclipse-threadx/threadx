@@ -1811,7 +1811,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>C:\Users\cindydeng\AzureRTOS\threadx\modules\cortex-a-port\threadx\ports_module\cortex_a7\iar\example_build\sample_threadx_module_manager.icf</state>
+                    <state>$PROJ_DIR$\sample_threadx_module_manager.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>

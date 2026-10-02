@@ -74,12 +74,21 @@ pthread_t    thread_ID;
 
     thread_ID = posix_thread2tid(thread_ptr);
 
-    /* Determine if this thread is actually the signal thread helper.  */
-    if (((POSIX_TCB *) thread_ptr) -> signals.signal_handler)
+    /* Only a pthread has the signal fields read below: they belong to the
+       POSIX_TCB that surrounds the thread, and reading them through anything
+       else runs off the end of a plain TX_THREAD.  A zero ID means the caller
+       is not a pthread, either because it is a ThreadX thread created directly
+       or because there is no current thread at all, so leave it alone.  */
+    if (thread_ID != (pthread_t) 0)
     {
 
-        /* Yes, override the thread_ID with the non-signal thread ID.  */
-        thread_ID =  (pthread_t) ((POSIX_TCB *) thread_ptr) -> signals.base_thread_ptr;
+        /* Determine if this thread is actually the signal thread helper.  */
+        if (((POSIX_TCB *) thread_ptr) -> signals.signal_handler)
+        {
+
+            /* Yes, override the thread_ID with the non-signal thread ID.  */
+            thread_ID =  (pthread_t) ((POSIX_TCB *) thread_ptr) -> signals.base_thread_ptr;
+        }
     }
 
 

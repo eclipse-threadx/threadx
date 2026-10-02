@@ -12,6 +12,7 @@
 /* This test is designed to test for simultaneous thread suspension lifting AND thread wait abort calls.  */
 
 #include   <stdio.h>
+#include   <time.h>
 #include   "tx_api.h"
 
 static unsigned long   thread_0_counter =  0;
@@ -29,6 +30,90 @@ static unsigned long   condition_count  =  0;
 extern UINT            _tx_timer_system_clock;
 
 static TX_SEMAPHORE    semaphore_0;
+
+
+#ifdef __linux__
+
+/* The window this test waits for is a few instructions wide, and the interrupt
+   that samples it is the same one that wakes the thread being sampled, so the
+   two run in lockstep: the tick wakes thread 0, thread 0 does a fixed amount of
+   work and suspends, and the next tick arrives a fixed interval later with
+   thread 0 in the same place every time. That is the resonance the handler below
+   describes, and perturbing the handler's duration only shifts the phase rather
+   than decorrelating it.
+
+   The simulator's timer thread waits on _tx_linux_timer_semaphore with a
+   one-tick deadline and delivers an interrupt early if the semaphore is posted,
+   which the port itself relies on elsewhere. A plain POSIX thread posting it
+   therefore injects interrupts at moments unrelated to the tick grid, which
+   samples thread 0 at arbitrary points in its cycle instead of the same one.
+
+   It posts only when nothing is outstanding, so interrupts can never be queued
+   faster than they are serviced and the injector cannot starve the system.  */
+
+#include   <pthread.h>
+#include   <semaphore.h>
+#include   <unistd.h>
+
+extern sem_t           _tx_linux_timer_semaphore;
+
+static volatile int    injector_stop =  0;
+static pthread_t       injector_thread;
+
+#define INJECTOR_INTERVAL_USEC  100
+
+
+static void  *interrupt_injector(void *p)
+{
+
+int     pending;
+
+
+    (void) p;
+
+    while (injector_stop == 0)
+    {
+
+        if ((sem_getvalue(&_tx_linux_timer_semaphore, &pending) == 0) && (pending == 0))
+        {
+            sem_post(&_tx_linux_timer_semaphore);
+        }
+
+        usleep(INJECTOR_INTERVAL_USEC);
+    }
+
+    return(NULL);
+}
+
+
+static void  interrupt_injector_start(void)
+{
+
+    injector_stop =  0;
+    if (pthread_create(&injector_thread, NULL, interrupt_injector, NULL) != 0)
+    {
+
+        /* Without the injector the loop still runs, on its own budget.  */
+        injector_stop =  1;
+    }
+}
+
+
+static void  interrupt_injector_stop(void)
+{
+
+    if (injector_stop == 0)
+    {
+
+        injector_stop =  1;
+        pthread_join(injector_thread, NULL);
+    }
+}
+
+#else
+#define interrupt_injector_start()
+#define interrupt_injector_stop()
+#endif
 
 
 /* Define thread prototypes.  */
@@ -177,6 +262,56 @@ static void    thread_0_entry(ULONG thread_input)
 
 UINT    status;
 
+/* The window this test waits for is probabilistic, and the handler above says
+   as much: it can settle into a resonance in which the condition is never met.
+   Waiting for it without a bound means such a run never ends, and this test has
+   been the most expensive thing in the suite: run one at a time in CI it took
+   between 148 and 726 seconds per configuration, 88 percent of the whole
+   ThreadX suite, against 273 seconds for the other ninety five tests together.
+
+   The budget is in wall clock seconds rather than ticks on purpose. The
+   simulated tick clock is not a proxy for elapsed time here: a tick arrives only
+   when the port's timer thread gets to run, so under load, or under coverage
+   instrumentation, ticks fall behind and never catch up. A budget of 20000
+   ticks, nominally 200 seconds, failed to stop a run that took 726 seconds,
+   because fewer than 20000 ticks had passed. time() does not drift that way.
+
+   How many windows to ask for is set by what a run can actually reach. Before the
+   injector above, four CI runs of the same tree measured this loop in two modes:
+   one where a window arrives in milliseconds, and one where a single window
+   costs around forty seconds. Seven of twenty configuration-runs landed in the
+   slow mode and ran out of budget, reaching 0, 3, 3, 3, 4, 7 and 7 of the ten
+   then asked for, every one of them still reporting a pass, and the count had to
+   come down to three to stay reachable. With the interrupt source decorrelated
+   from the thread it samples the slow mode does not occur: all six
+   configurations of a run reach ten of ten in under a second. The count is
+   therefore back to ten, on the same reasoning that lowered it.
+
+   The SMP copy deliberately does not get the injector. It has never been in the
+   slow mode, reaching its twenty windows in about a second, and injecting
+   interrupts there measurably hurts: 8.9 seconds against 0 to 1 for the same
+   twenty, which is the extra interrupt traffic contending across the simulated
+   cores. Its budget and ceiling still match this one; only the injector differs,
+   because only this copy has the problem it solves.
+
+   Reaching the window no times at all is different in kind, which is what the
+   ceiling below is for. The check after the loop compares semaphore bookkeeping
+   that a window has to have touched to mean anything, so a pass with a count of
+   zero claims coverage the run did not have. One of those twenty runs did
+   exactly that, and said so only in an artifact nobody reads. A run that has not
+   reached the window once keeps trying up to the ceiling, and fails if it still
+   has not.
+
+   The budget and the ceiling stay as they were, as a net rather than a working
+   limit. They were sized for the slow mode: 180 seconds covers three windows at
+   the worst rate measured, 17 to 40 seconds each. Nothing should approach them
+   now, and if something does, the behaviour is what it was before.  */
+#define WAIT_ABORT_WINDOWS_WANTED   ((ULONG) 10)
+#define WAIT_ABORT_SECOND_BUDGET    ((ULONG) 180)
+#define WAIT_ABORT_ZERO_WINDOW_CEILING  ((ULONG) 300)
+
+time_t  start_wall;
+
 
     /* Setup ISR for this test.  */
     test_isr_dispatch =  isr_entry;
@@ -185,7 +320,9 @@ UINT    status;
     printf("Running Thread Wait Abort and ISR Resume Test....................... ");
 
     /* Loop to exploit the probability window inside tx_thread_wait_abort.  */
-    while (condition_count < 10)
+    start_wall =  time(TX_NULL);
+    interrupt_injector_start();
+    while (condition_count < WAIT_ABORT_WINDOWS_WANTED)
     {
 
         /* Suspend on the semaphore that is going to be set via the ISR.  */
@@ -226,10 +363,49 @@ UINT    status;
 #endif
 
         }
+
+        /* Out of budget?  A run that has not reached the window even once has
+           verified nothing yet, so it gets the higher ceiling before giving up.  */
+#ifdef TX_NOT_INTERRUPTABLE
+        if (((ULONG) (time(TX_NULL) - start_wall)) > WAIT_ABORT_SECOND_BUDGET)
+            break;
+#else
+        if (condition_count == 0)
+        {
+            if (((ULONG) (time(TX_NULL) - start_wall)) > WAIT_ABORT_ZERO_WINDOW_CEILING)
+                break;
+        }
+        else if (((ULONG) (time(TX_NULL) - start_wall)) > WAIT_ABORT_SECOND_BUDGET)
+            break;
+#endif
     }
+
+    interrupt_injector_stop();
 
     /* Clear ISR dispatch.  */
     test_isr_dispatch =  TX_NULL;
+
+    /* Say what this run reached, on every run and not only a short one. A count
+       printed only on shortfall cannot be told apart from a count nobody
+       recorded, and this line is what the CI artifacts carry. Falling short is a
+       gap in what was exercised rather than a fault in the code under test, so
+       the check below still runs and still means what it did.  */
+    printf("(reached %lu of %lu windows in %lu seconds) ",
+           (ULONG) condition_count, WAIT_ABORT_WINDOWS_WANTED,
+           (ULONG) (time(TX_NULL) - start_wall));
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+    /* Reached it no times?  Then the check below compares bookkeeping no window
+       ever touched, and a pass would report coverage this run did not have.  */
+    if (condition_count == 0)
+    {
+
+        /* Test error!  */
+        printf("ERROR #8\n");
+        test_control_return(4);
+    }
+#endif
 
 #ifdef TX_NOT_INTERRUPTABLE
     /* At this point, check to see if we got all the semaphores!  */

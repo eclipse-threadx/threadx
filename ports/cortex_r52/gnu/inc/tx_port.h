@@ -1,0 +1,393 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026 Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+// Portions of this file were generated with AI assistance.
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Port Specific                                                       */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+/*                                                                        */
+/*    tx_port.h                                        Cortex-R52/GNU     */
+/*                                                           6.5.2        */
+/*                                                                        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Frédéric Desbiens, Eclipse Foundation                               */
+/*                                                                        */
+/*    Derived from the Cortex-R5/GNU port originally written by           */
+/*    William E. Lamie, Microsoft Corporation.                            */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This file contains data type definitions that make the ThreadX      */
+/*    real-time kernel function identically on a variety of different     */
+/*    processor architectures.  For example, the size or number of bits   */
+/*    in an "int" data type vary between microprocessor architectures and */
+/*    even C compilers for the same microprocessor.  ThreadX does not     */
+/*    directly use native C data types.  Instead, ThreadX creates its     */
+/*    own special types that can be mapped to actual data types by this   */
+/*    file to guarantee consistency in the interface and functionality.   */
+/*                                                                        */
+/**************************************************************************/
+
+#ifndef TX_PORT_H
+#define TX_PORT_H
+
+
+/* Determine if the optional ThreadX user define file should be used.     */
+
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+
+
+/* Yes, include the user defines in tx_user.h. The defines in this file may
+   alternately be defined on the command line.  */
+
+#include "tx_user.h"
+#endif
+
+
+/* Define compiler library include files.                                 */
+
+#include <stdlib.h>
+#include <string.h>
+
+
+/* Define ThreadX basic types for this port.                              */
+
+#define VOID                                    void
+typedef char                                    CHAR;
+typedef unsigned char                           UCHAR;
+typedef int                                     INT;
+typedef unsigned int                            UINT;
+typedef long                                    LONG;
+typedef unsigned long                           ULONG;
+typedef short                                   SHORT;
+typedef unsigned short                          USHORT;
+
+
+/* Define the priority levels for ThreadX.  Legal values range
+   from 32 to 1024 and MUST be evenly divisible by 32.  */
+
+#ifndef TX_MAX_PRIORITIES
+#define TX_MAX_PRIORITIES                       32
+#endif
+
+
+/* Define the minimum stack for a ThreadX thread on this processor. If the size supplied during
+   thread creation is less than this value, the thread create call will return an error.  */
+
+#ifndef TX_MINIMUM_STACK
+#define TX_MINIMUM_STACK                        200         /* Minimum stack size for this port  */
+#endif
+
+
+/* Define the system timer thread's default stack size and priority.  These are only applicable
+   if TX_TIMER_PROCESS_IN_ISR is not defined.  */
+
+#ifndef TX_TIMER_THREAD_STACK_SIZE
+#define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
+#endif
+
+#ifndef TX_TIMER_THREAD_PRIORITY
+#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
+#endif
+
+
+/* Define various constants for the ThreadX ARM port.                     */
+
+#ifdef TX_ENABLE_FIQ_SUPPORT
+#define TX_INT_DISABLE                          0xC0        /* Disable IRQ & FIQ interrupts     */
+#else
+#define TX_INT_DISABLE                          0x80        /* Disable IRQ interrupts           */
+#endif
+#define TX_INT_ENABLE                           0x00        /* Enable IRQ interrupts            */
+
+
+/* Define the clock source for trace event entry time stamp. The following two item are port specific.
+   For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
+   source constants would be:
+
+#define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
+#define TX_TRACE_TIME_MASK                      0x0000FFFFUL
+
+*/
+
+#ifndef TX_TRACE_TIME_SOURCE
+#define TX_TRACE_TIME_SOURCE                    ++_tx_trace_simulated_time
+#endif
+#ifndef TX_TRACE_TIME_MASK
+#define TX_TRACE_TIME_MASK                      0xFFFFFFFFUL
+#endif
+
+
+/* Define the port specific options for the _tx_build_options variable. This variable indicates
+   how the ThreadX library was built.  */
+
+#ifdef TX_ENABLE_FIQ_SUPPORT
+#define TX_FIQ_ENABLED                          1
+#else
+#define TX_FIQ_ENABLED                          0
+#endif
+
+#ifdef TX_ENABLE_IRQ_NESTING
+#define TX_IRQ_NESTING_ENABLED                  2
+#else
+#define TX_IRQ_NESTING_ENABLED                  0
+#endif
+
+#ifdef TX_ENABLE_FIQ_NESTING
+#define TX_FIQ_NESTING_ENABLED                  4
+#else
+#define TX_FIQ_NESTING_ENABLED                  0
+#endif
+
+#define TX_PORT_SPECIFIC_BUILD_OPTIONS          TX_FIQ_ENABLED | TX_IRQ_NESTING_ENABLED | TX_FIQ_NESTING_ENABLED
+
+
+/* Define the in-line initialization constant so that modules with in-line
+   initialization capabilities can prevent their initialization from being
+   a function call.  */
+
+#define TX_INLINE_INITIALIZATION
+
+
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
+   disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
+   checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
+   define is negated, thereby forcing the stack fill which is necessary for the stack checking
+   logic.  */
+
+#ifdef TX_ENABLE_STACK_CHECKING
+#undef TX_DISABLE_STACK_FILLING
+#endif
+
+
+/* Define the TX_THREAD control block extensions for this port. The main reason
+   for the multiple macros is so that backward compatibility can be maintained with
+   existing ThreadX kernel awareness modules.  */
+
+/* TX_THREAD_EXTENSION_2 carries the per-thread VFP enable flag used by the
+   lazy floating-point save and restore in tx_thread_schedule.S,
+   tx_thread_system_return.S and tx_thread_context_restore.S.
+
+   It is defined UNCONDITIONALLY, not under TX_ENABLE_VFP_SUPPORT, and that is
+   deliberate: the assembly reaches this field through a hard-coded structure
+   offset, so making the field conditional would move every following member
+   between build configurations and leave the offset correct in only one of
+   them.  Keeping it always present makes the layout independent of the
+   floating-point build options.  The offset is checked at compile time in
+   tx_port_offset_check.c, which turns a wrong offset into a build failure
+   instead of silent corruption of an unrelated thread field.  */
+
+#define TX_THREAD_EXTENSION_0
+#define TX_THREAD_EXTENSION_1
+#define TX_THREAD_EXTENSION_2                   ULONG       tx_thread_vfp_enable;
+#define TX_THREAD_EXTENSION_3
+
+
+/* Define the port extensions of the remaining ThreadX objects.           */
+
+#define TX_BLOCK_POOL_EXTENSION
+#define TX_BYTE_POOL_EXTENSION
+#define TX_EVENT_FLAGS_GROUP_EXTENSION
+#define TX_MUTEX_EXTENSION
+#define TX_QUEUE_EXTENSION
+#define TX_SEMAPHORE_EXTENSION
+#define TX_TIMER_EXTENSION
+
+
+/* Define the user extension field of the thread control block.  Nothing
+   additional is needed for this port so it is defined as white space.  */
+
+#ifndef TX_THREAD_USER_EXTENSION
+#define TX_THREAD_USER_EXTENSION
+#endif
+
+
+/* Define the macros for processing extensions in tx_thread_create, tx_thread_delete,
+   tx_thread_shell_entry, and tx_thread_terminate.  */
+
+
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+#define TX_THREAD_DELETE_EXTENSION(thread_ptr)
+#define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
+#define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
+
+
+/* Define the ThreadX object creation extensions for remaining objects.   */
+
+#define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
+#define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
+#define TX_EVENT_FLAGS_GROUP_CREATE_EXTENSION(group_ptr)
+#define TX_MUTEX_CREATE_EXTENSION(mutex_ptr)
+#define TX_QUEUE_CREATE_EXTENSION(queue_ptr)
+#define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
+#define TX_TIMER_CREATE_EXTENSION(timer_ptr)
+
+
+/* Define the ThreadX object deletion extensions for remaining objects.   */
+
+#define TX_BLOCK_POOL_DELETE_EXTENSION(pool_ptr)
+#define TX_BYTE_POOL_DELETE_EXTENSION(pool_ptr)
+#define TX_EVENT_FLAGS_GROUP_DELETE_EXTENSION(group_ptr)
+#define TX_MUTEX_DELETE_EXTENSION(mutex_ptr)
+#define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
+#define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
+#define TX_TIMER_DELETE_EXTENSION(timer_ptr)
+
+
+/* Determine whether this core has the CLZ instruction and this compiler will
+   admit to it, and if so replace the portable lowest-set-bit search with it.
+
+   The guard is not upstream's.  Upstream asks __TARGET_ARCH_ARM > 4, which is an
+   Arm Compiler 5 predefine.  GCC does not define it -- it predefines the ACLE
+   macros __ARM_ARCH and __ARM_FEATURE_CLZ instead -- so under GCC the test reads
+   0 > 4, this whole block is dropped and tx_thread.h's portable loop runs on a
+   core that has had the instruction since Armv5.  Measured with
+   arm-none-eabi-gcc 14.3 on 20 Aug 2026: zero CLZ instructions in the built
+   scheduler objects.
+
+   That was not a dormant path.  Half the TX_LOWEST_SET_BIT_CALCULATE call sites
+   in tx_thread_suspend.c and tx_thread_system_suspend.c sit OUTSIDE the
+   TX_MAX_PRIORITIES > 32 guards, so the portable loop was running in the
+   scheduler's priority search in the default 32-priority configuration, which is
+   the one every R52 build uses.
+
+   __ARM_FEATURE_CLZ is the ACLE answer to the question actually being asked, and
+   the compiler defines it exactly when the architecture has the instruction, so
+   a core without CLZ is excluded by construction rather than by an architecture
+   number.  Arm Compiler 5's spelling is kept beside it, now wrapped in defined()
+   so the test no longer leans on an undefined identifier evaluating to zero --
+   which is what -Wundef reports and how this was found.
+
+   The __thumb__ guard stays, and it is load-bearing rather than inherited
+   caution: __ARM_FEATURE_CLZ describes the ARCHITECTURE, not the instruction
+   set.  Checked on 20 Aug 2026 -- GCC defines it for -mthumb -march=armv5te,
+   where Thumb-1 has no CLZ at all and this asm would fail to assemble.  A Thumb
+   build therefore keeps the portable loop on purpose.  (On this core it is moot:
+   the R52 toolchain file builds -marm.)
+
+   Two deliberate deviations, per AGENTS.md:
+
+     - Rule 1.2, language extensions.  Inline assembly is the entire point of the
+       macro; there is no conforming way to reach CLZ.  Spelled __asm__ and not
+       asm, because the asm keyword is rejected under -std=c99 -- verified, it is
+       an "'asm' undeclared" error -- and AGENTS.md requires C99 compatibility.
+
+     - Rule 10.1 / 10.3 on the isolation step, which is why it is respelled.
+       Upstream isolates the lowest set bit with (ULONG) (-((LONG) m)): that
+       converts an unsigned map to signed and negates it, which is undefined for
+       the one input whose top bit is set.  (~(m)) + 1 is the same value in
+       well-defined unsigned arithmetic, and it is character-for-character what
+       tx_thread.h's portable version uses -- so the two implementations now
+       visibly compute the same thing instead of merely agreeing.
+
+   Rule 20.7 is a straight fix rather than a deviation: upstream leaves m and b
+   unparenthesised in the expansion.
+
+   PRECONDITION: m must be non-zero, and the two implementations DISAGREE when it
+   is not.  CLZ(0) is 32, so this yields 31 - 32; the portable loop yields 0.
+   All twelve call sites in common/src reach the macro only on a map already
+   tested against zero -- every one checked on 20 Aug 2026 -- so the divergence is
+   unreachable today.  It is written down because a new call site is exactly how
+   it would stop being unreachable, and demo_clz.c pins both answers so that
+   changing this has to be a decision.  */
+
+#if defined(__ARM_FEATURE_CLZ) || (defined(__TARGET_ARCH_ARM) && (__TARGET_ARCH_ARM > 4))
+
+#ifndef __thumb__
+
+#define TX_LOWEST_SET_BIT_CALCULATE(m, b)                                       \
+    (m) =  (m) & ((~(m)) + ((ULONG) 1));                                        \
+    __asm__ volatile (" CLZ  %0,%1 " : "=r" (b) : "r" (m));                     \
+    (b) =  31 - (b);
+
+#endif
+#endif
+
+
+/* Define ThreadX interrupt lockout and restore macros for protection on
+   access of critical kernel information.  The restore interrupt macro must
+   restore the interrupt posture of the running thread prior to the value
+   present prior to the disable macro.  In most cases, the save area macro
+   is used to define a local function save area for the disable and restore
+   macros.  */
+
+/* Per-thread floating-point control.  Implemented in tx_thread_schedule.S and
+   available only when the library is built with TX_ENABLE_VFP_SUPPORT.  A
+   thread's floating-point context is saved and restored lazily: only threads
+   that have called tx_thread_vfp_enable() pay for it.  */
+
+#ifdef TX_ENABLE_VFP_SUPPORT
+void    tx_thread_vfp_enable(void);
+void    tx_thread_vfp_disable(void);
+#endif
+
+
+#ifdef __thumb__
+
+unsigned int   _tx_thread_interrupt_disable(void);
+unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
+
+
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
+
+#define TX_DISABLE                              interrupt_save =  _tx_thread_interrupt_disable();
+#define TX_RESTORE                              _tx_thread_interrupt_restore(interrupt_save);
+
+#else
+
+#define TX_INTERRUPT_SAVE_AREA                  UINT interrupt_save;
+
+#ifdef TX_ENABLE_FIQ_SUPPORT
+#define TX_DISABLE                              asm volatile (" MRS %0,CPSR; CPSID if ": "=r" (interrupt_save) );
+#else
+#define TX_DISABLE                              asm volatile (" MRS %0,CPSR; CPSID i ": "=r" (interrupt_save) );
+#endif
+
+#define TX_RESTORE                              asm volatile (" MSR CPSR_c,%0 "::"r" (interrupt_save) );
+
+#endif
+
+
+/* Define the interrupt lockout macros for each ThreadX object.           */
+
+#define TX_BLOCK_POOL_DISABLE                   TX_DISABLE
+#define TX_BYTE_POOL_DISABLE                    TX_DISABLE
+#define TX_EVENT_FLAGS_GROUP_DISABLE            TX_DISABLE
+#define TX_MUTEX_DISABLE                        TX_DISABLE
+#define TX_QUEUE_DISABLE                        TX_DISABLE
+#define TX_SEMAPHORE_DISABLE                    TX_DISABLE
+
+
+/* Define the version ID of ThreadX.  This may be used by the application.*/
+
+#ifdef TX_THREAD_INIT
+CHAR                            _tx_version_id[] =
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadXCortex-R52/GNU Version 6.5.2.202603 *";
+#else
+extern  CHAR                    _tx_version_id[];
+#endif
+
+
+#endif
+

@@ -1,0 +1,727 @@
+# Copyright (c) 2026 Eclipse ThreadX contributors
+# SPDX-License-Identifier: MIT
+# Portions of this file were generated with AI assistance.
+#
+# Example builds for Cortex-R52 on the Armv8-R AEM FVP (FVP_BaseR_AEMv8R).
+
+set(FVP_DIR ${CMAKE_CURRENT_LIST_DIR})
+
+# A bare-metal image has one flat DRAM region and no OS page permissions; access
+# control belongs to the MPU, so an RWX segment is expected here rather than a
+# mistake. GNU ld has warned about them since binutils 2.39 and takes this flag
+# to stay quiet. ld.lld does not warn and rejects the flag outright, failing the
+# link with "unknown argument", so the suppression is chosen by toolchain
+# instead of being spelled into every target.
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    set(R52_LINK_QUIET_RWX -Wl,--no-warn-rwx-segments)
+else()
+    set(R52_LINK_QUIET_RWX)
+endif()
+
+# Console sources.  Both backends are always compiled; console.c selects one at
+# compile time and --gc-sections drops the unused one, which keeps every image
+# building in either configuration without per-target source juggling.
+set(R52_CONSOLE_SOURCES
+    ${FVP_DIR}/console.c
+    ${FVP_DIR}/uart_pl011.c
+    ${FVP_DIR}/mpu.c
+)
+
+# AR1/M1 -- boot check.  Verifies the EL2 configuration, the drop to EL1 and
+# the EL2 HVC seam.  Standalone by design: it does not link ThreadX, so a
+# failure here is unambiguously a boot problem rather than a kernel problem.
+add_executable(boot_check.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${R52_CONSOLE_SOURCES}
+    ${FVP_DIR}/bsp_boot.c
+)
+
+target_include_directories(boot_check.elf PRIVATE ${FVP_DIR})
+
+target_link_options(boot_check.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=boot_check.map
+    ${R52_LINK_QUIET_RWX}
+)
+
+# AR1/M2 -- cooperative two-thread demo.  Links ThreadX and exercises the
+# ported context-switch assembly with no interrupts and no timer tick.
+add_executable(demo_m2.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${R52_CONSOLE_SOURCES}
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_m2.c
+)
+
+target_link_libraries(demo_m2.elf PRIVATE threadx)
+
+target_include_directories(demo_m2.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_m2.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_m2.map
+    ${R52_LINK_QUIET_RWX}
+)
+
+# AR1/M3 -- periodic tick and preemptive scheduling.  Adds GICv3, the generic
+# timer and the ThreadX IRQ path.  TX_R52_USE_THREADX_IRQ routes the EL1 IRQ
+# vector into _tx_thread_context_save and has _tx_initialize_low_level bring up
+# the interrupt controller; images without it keep the fault reporter.
+add_executable(demo_m3.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${R52_CONSOLE_SOURCES}
+    ${FVP_DIR}/gicv3.c
+    ${FVP_DIR}/timer.c
+    ${FVP_DIR}/irq_dispatch.c
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_m3.c
+)
+
+target_compile_definitions(demo_m3.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+target_link_libraries(demo_m3.elf PRIVATE threadx)
+
+target_include_directories(demo_m3.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_m3.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_m3.map
+    ${R52_LINK_QUIET_RWX}
+)
+
+# AR1/M4 -- the standard eight-thread ThreadX demo.  demo_threadx.c is the
+# shipped sample kept byte-identical apart from its header note and one call
+# into the verification harness, which lives in demo_verify.c.
+add_executable(demo_threadx.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${R52_CONSOLE_SOURCES}
+    ${FVP_DIR}/gicv3.c
+    ${FVP_DIR}/timer.c
+    ${FVP_DIR}/irq_dispatch.c
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_threadx.c
+    ${FVP_DIR}/demo_verify.c
+)
+
+target_compile_definitions(demo_threadx.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+target_link_libraries(demo_threadx.elf PRIVATE threadx)
+
+target_include_directories(demo_threadx.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_threadx.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_threadx.map
+    ${R52_LINK_QUIET_RWX}
+)
+
+# CLZ lowest-set-bit regression.  tx_port.h replaces tx_thread.h's portable
+# priority search with a CLZ instruction, and that macro decides which thread
+# runs next on every suspend and resume -- so it gets an image of its own rather
+# than being covered incidentally by demos that would merely hang if it broke.
+# Needs the tick because the checks run in a thread; needs nothing else.
+add_executable(demo_clz.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${R52_CONSOLE_SOURCES}
+    ${FVP_DIR}/gicv3.c
+    ${FVP_DIR}/timer.c
+    ${FVP_DIR}/irq_dispatch.c
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_clz.c
+)
+
+target_compile_definitions(demo_clz.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+target_link_libraries(demo_clz.elf PRIVATE threadx)
+
+target_include_directories(demo_clz.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_clz.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_clz.map
+    ${R52_LINK_QUIET_RWX}
+)
+
+# AR1/M5 -- lazy VFP context save and restore.  Only meaningful when the
+# library was built with TX_R52_ENABLE_VFP and a floating-point ABI, so the
+# target exists only in that configuration.
+if(TX_R52_ENABLE_VFP)
+    add_executable(demo_m5.elf EXCLUDE_FROM_ALL
+        ${FVP_DIR}/entry.S
+        ${R52_CONSOLE_SOURCES}
+        ${FVP_DIR}/gicv3.c
+        ${FVP_DIR}/timer.c
+        ${FVP_DIR}/irq_dispatch.c
+        ${FVP_DIR}/tx_initialize_low_level.S
+        ${FVP_DIR}/demo_m5.c
+    )
+
+    target_compile_definitions(demo_m5.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+    target_link_libraries(demo_m5.elf PRIVATE threadx)
+
+    target_include_directories(demo_m5.elf PRIVATE
+        ${FVP_DIR}
+        ${CMAKE_SOURCE_DIR}/common/inc
+        ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+    )
+
+    target_link_options(demo_m5.elf PRIVATE
+        -T${FVP_DIR}/link.lds
+        -nostartfiles
+        -Wl,-Map=demo_m5.map
+        ${R52_LINK_QUIET_RWX}
+    )
+endif()
+
+# AR1/M5 -- PMSAv8-R protection and caches.  Verifies enforcement, so it needs
+# the recoverable data-abort path in entry.S (TX_R52_MPU_FAULT_TEST) and the
+# protection itself (TX_R52_ENABLE_MPU), independently of the global option.
+add_executable(demo_mpu.elf EXCLUDE_FROM_ALL
+    ${FVP_DIR}/entry.S
+    ${R52_CONSOLE_SOURCES}
+    ${FVP_DIR}/gicv3.c
+    ${FVP_DIR}/timer.c
+    ${FVP_DIR}/irq_dispatch.c
+    ${FVP_DIR}/tx_initialize_low_level.S
+    ${FVP_DIR}/demo_mpu.c
+)
+
+target_compile_definitions(demo_mpu.elf PRIVATE
+    TX_R52_USE_THREADX_IRQ
+    TX_R52_ENABLE_MPU
+    TX_R52_MPU_FAULT_TEST
+)
+
+target_link_libraries(demo_mpu.elf PRIVATE threadx)
+
+target_include_directories(demo_mpu.elf PRIVATE
+    ${FVP_DIR}
+    ${CMAKE_SOURCE_DIR}/common/inc
+    ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+)
+
+target_link_options(demo_mpu.elf PRIVATE
+    -T${FVP_DIR}/link.lds
+    -nostartfiles
+    -Wl,-Map=demo_mpu.map
+    ${R52_LINK_QUIET_RWX}
+)
+
+# Nested IRQ handling.  Needs the library built with TX_R52_ENABLE_IRQ_NESTING,
+# because _tx_thread_irq_nesting_start only re-enables IRQ usefully when
+# tx_port.h agrees the configuration supports it, and entry.S only emits the
+# start/end pairing under the same macro.  The image therefore exists in that
+# configuration only, as demo_m5.elf does for VFP.
+if(TX_R52_ENABLE_IRQ_NESTING)
+    add_executable(demo_nesting.elf EXCLUDE_FROM_ALL
+        ${FVP_DIR}/entry.S
+        ${R52_CONSOLE_SOURCES}
+        ${FVP_DIR}/gicv3.c
+        ${FVP_DIR}/timer.c
+        ${FVP_DIR}/irq_dispatch.c
+        ${FVP_DIR}/tx_initialize_low_level.S
+        ${FVP_DIR}/demo_nesting.c
+    )
+
+    target_compile_definitions(demo_nesting.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+    target_link_libraries(demo_nesting.elf PRIVATE threadx)
+
+    target_include_directories(demo_nesting.elf PRIVATE
+        ${FVP_DIR}
+        ${CMAKE_SOURCE_DIR}/common/inc
+        ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+    )
+
+    target_link_options(demo_nesting.elf PRIVATE
+        -T${FVP_DIR}/link.lds
+        -nostartfiles
+        -Wl,-Map=demo_nesting.map
+        ${R52_LINK_QUIET_RWX}
+    )
+endif()
+
+# Nested FIQ handling.  Needs TX_R52_ENABLE_FIQ_NESTING, which the port-level
+# CMakeLists already requires TX_R52_ENABLE_FIQ alongside, so the image exists
+# only where both the FIQ vector path and the nesting pairing are compiled in.
+if(TX_R52_ENABLE_FIQ_NESTING)
+    add_executable(demo_fiq.elf EXCLUDE_FROM_ALL
+        ${FVP_DIR}/entry.S
+        ${R52_CONSOLE_SOURCES}
+        ${FVP_DIR}/gicv3.c
+        ${FVP_DIR}/timer.c
+        ${FVP_DIR}/irq_dispatch.c
+        ${FVP_DIR}/tx_initialize_low_level.S
+        ${FVP_DIR}/demo_fiq.c
+    )
+
+    target_compile_definitions(demo_fiq.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+
+    target_link_libraries(demo_fiq.elf PRIVATE threadx)
+
+    target_include_directories(demo_fiq.elf PRIVATE
+        ${FVP_DIR}
+        ${CMAKE_SOURCE_DIR}/common/inc
+        ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
+    )
+
+    target_link_options(demo_fiq.elf PRIVATE
+        -T${FVP_DIR}/link.lds
+        -nostartfiles
+        -Wl,-Map=demo_fiq.map
+        ${R52_LINK_QUIET_RWX}
+    )
+endif()
+
+# Every image built here, in the order they should be exercised.
+set(R52_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf demo_mpu.elf
+               demo_clz.elf)
+
+# The linker script is passed with -T, which CMake does not treat as a
+# dependency, so editing it would not trigger a relink and stale images would
+# be tested against new region boundaries.  Declare it explicitly.
+foreach(image IN LISTS R52_IMAGES)
+    set_target_properties(${image} PROPERTIES LINK_DEPENDS ${FVP_DIR}/link.lds)
+endforeach()
+if(TX_R52_ENABLE_VFP)
+    list(APPEND R52_IMAGES demo_m5.elf)
+endif()
+if(TX_R52_ENABLE_IRQ_NESTING)
+    list(APPEND R52_IMAGES demo_nesting.elf)
+endif()
+if(TX_R52_ENABLE_FIQ_NESTING)
+    list(APPEND R52_IMAGES demo_fiq.elf)
+endif()
+
+# Console backend.  Semihosting is the default because it needs no peripheral
+# and so cannot be broken by a wrong memory map; the PL011 path is what real
+# silicon will use.
+# Protection and caches for every image.  Off by default so a bring-up failure
+# can always be reproduced with the simplest possible memory configuration.
+option(TX_R52_ENABLE_MPU
+       "Enable the PMSAv8-R MPU and caches in every image" OFF)
+if(TX_R52_ENABLE_MPU)
+    foreach(image IN LISTS R52_IMAGES)
+        target_compile_definitions(${image} PRIVATE TX_R52_ENABLE_MPU)
+    endforeach()
+endif()
+
+option(TX_R52_CONSOLE_PL011
+       "Use the PL011 UART for console output instead of semihosting" OFF)
+if(TX_R52_CONSOLE_PL011)
+    foreach(image IN LISTS R52_IMAGES)
+        target_compile_definitions(${image} PRIVATE TX_R52_CONSOLE_PL011)
+    endforeach()
+endif()
+
+# ---------------------------------------------------------------------------
+# ThreadX modules: the module manager, with a sample module linked into the
+# module area and loaded in place from there.
+#
+# This is the AR2 deliverable that the S32Z280 example cannot be: the silicon
+# module demonstration is judged by a person reading a console through a debug
+# probe, and this one is judged by ctest.  The image below is the same port
+# under the same three passes, reporting one result line the runner matches.
+#
+# This target deliberately does NOT link the threadx library's port assembly.
+# The module port carries its own copies of the scheduler, context restore and
+# stack build, because the region switch happens in the scheduler and a module
+# thread starts in a different processor mode.  Linking both would give two
+# definitions of every one of them.
+#
+# Guarded by an option, off by default, because it is the only target that needs
+# TXM_MODULE_MANAGER in entry.S and the only one that links common_modules.
+# ---------------------------------------------------------------------------
+
+option(TX_R52_BUILD_FVP_MODULE_EXAMPLE
+       "Build the Armv8-R AEM FVP ThreadX module manager example" OFF)
+
+if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
+
+    set(MOD_DIR ${CMAKE_SOURCE_DIR}/ports_module/cortex_r52/gnu)
+    set(MOD_FVP ${MOD_DIR}/example_build/fvp_baser_aemv8r)
+
+    # ---------------------------------------------------------------------
+    # A second ThreadX library, built with the module port's headers.
+    #
+    # This is not optional and not a convenience.  The module port's tx_port.h
+    # adds the owning module instance to TX_QUEUE, TX_SEMAPHORE,
+    # TX_EVENT_FLAGS_GROUP and TX_TIMER, and the module fields to TX_THREAD.
+    # Measured: TX_QUEUE is 68 bytes against the base port's 60, TX_SEMAPHORE 40
+    # against 32, TX_THREAD 236 against 184.  A kernel compiled against the base
+    # port and a manager compiled against this one disagree about every object,
+    # and they link without complaint, because C linking does not compare struct
+    # layouts.  The result would be memory corruption at run time with nothing in
+    # the build to hint at it.
+    #
+    # Guarded by if(NOT TARGET) because the S32Z280 module example defines the
+    # same library from its own directory, and the two example options can be on
+    # at once.  The definitions are identical -- both describe the module port,
+    # not a board -- so whichever directory CMake reaches first may create it.
+    # ---------------------------------------------------------------------
+
+    if(NOT TARGET threadx_module)
+
+        file(GLOB TX_COMMON_SRC ${CMAKE_SOURCE_DIR}/common/src/*.c)
+
+        set(TX_R52_PORT_SRC ${CMAKE_SOURCE_DIR}/ports/cortex_r52/gnu/src)
+
+        # The base port's assembly is reused except for the five files the module
+        # port replaces, and tx_port_offset_check.c is included deliberately: if
+        # the module headers moved any offset that assembly depends on, that check
+        # is what says so.
+        add_library(threadx_module STATIC EXCLUDE_FROM_ALL
+            ${TX_COMMON_SRC}
+            ${TX_R52_PORT_SRC}/tx_port_offset_check.c
+            ${TX_R52_PORT_SRC}/tx_thread_fiq_context_restore.S
+            ${TX_R52_PORT_SRC}/tx_thread_fiq_context_save.S
+            ${TX_R52_PORT_SRC}/tx_thread_fiq_nesting_end.S
+            ${TX_R52_PORT_SRC}/tx_thread_fiq_nesting_start.S
+            ${TX_R52_PORT_SRC}/tx_thread_interrupt_control.S
+            ${TX_R52_PORT_SRC}/tx_thread_interrupt_disable.S
+            ${TX_R52_PORT_SRC}/tx_thread_interrupt_restore.S
+            ${TX_R52_PORT_SRC}/tx_thread_irq_nesting_end.S
+            ${TX_R52_PORT_SRC}/tx_thread_irq_nesting_start.S
+            ${TX_R52_PORT_SRC}/tx_thread_vectored_context_save.S
+            ${TX_R52_PORT_SRC}/tx_timer_interrupt.S
+        )
+
+        target_include_directories(threadx_module PUBLIC
+            ${MOD_DIR}/inc
+            ${CMAKE_SOURCE_DIR}/common/inc
+            ${CMAKE_SOURCE_DIR}/common_modules/module_manager/inc
+            ${CMAKE_SOURCE_DIR}/common_modules/module_lib/inc
+            ${CMAKE_SOURCE_DIR}/common_modules/inc
+        )
+
+        target_compile_definitions(threadx_module PUBLIC TXM_MODULE_MANAGER)
+
+    endif()
+
+    # The portable half of the module manager.  Globbed rather than listed: it is
+    # a whole upstream component, not a selection from one, and a file added to it
+    # upstream should not need a change here to be compiled.
+
+    file(GLOB TXM_MANAGER_SRC ${CMAKE_SOURCE_DIR}/common_modules/module_manager/src/*.c)
+
+    # The module-side library: the API shims that run inside the module.  These
+    # belong to the module's image and must not reach the manager's link -- they
+    # define the same names as the kernel's own entry points, and as objects they
+    # beat the kernel's static library, so in one link every service call the
+    # manager makes is redirected into the module.
+
+    file(GLOB TXM_MODULE_LIB_SRC ${CMAKE_SOURCE_DIR}/common_modules/module_lib/src/*.c)
+
+    # ------------------------------------------------------------------------
+    # The module, built as its own image and reduced to a raw binary.
+    # ------------------------------------------------------------------------
+
+    add_executable(fvp_demo_module.elf EXCLUDE_FROM_ALL
+        ${MOD_FVP}/txm_module_preamble.S
+        ${MOD_FVP}/sample_threadx_module.c
+        ${MOD_DIR}/module_lib/src/txm_module_thread_shell_entry.c
+        ${MOD_DIR}/module_lib/src/txm_module_gcc_setup.S
+        ${TXM_MODULE_LIB_SRC}
+    )
+
+    # No TXM_MODULE_MANAGER here: that define selects the kernel side of the
+    # shared headers, and this is the other side.
+
+    target_include_directories(fvp_demo_module.elf PRIVATE
+        ${FVP_DIR}
+        ${MOD_DIR}/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/module_lib/inc
+        ${CMAKE_SOURCE_DIR}/common_modules/inc
+        ${CMAKE_SOURCE_DIR}/common/inc
+    )
+
+    # Position independent, and only here.  These five flags are what make the
+    # module relocatable, and putting any of them on the manager would be a bug:
+    # the manager is the resident image, linked absolutely at the address it
+    # boots from, and -msingle-pic-base in particular would have it treat r9 as
+    # a PIC base that nothing sets up.
+    #
+    #   -fpic                            data references go through the GOT
+    #   -msingle-pic-base                r9 is the GOT base, and the caller sets
+    #                                    it -- which is what the manager's
+    #                                    thread stack build does
+    #   -mno-pic-data-is-text-relative   the module's data is NOT at a fixed
+    #                                    offset from its code: code is loaded in
+    #                                    place in the module area and data is
+    #                                    allocated from the byte pool, so the gap
+    #                                    between them is decided at run time
+    #   -fno-plt                         no procedure linkage table, which a
+    #                                    module has no loader to populate
+    #   -mno-long-calls                  see below
+    #
+    # -mno-long-calls is the interesting one.  The project-wide C flags carry
+    # -mlong-calls, and under -fpic that makes GCC route EVERY call through the
+    # GOT -- R_ARM_GOT32 instead of R_ARM_CALL -- including the shell entry's
+    # call to _gcc_setup, which is the function that fills the GOT in.  The
+    # module would load, enter its shell entry, read a zero out of the
+    # not-yet-written GOT and branch to address 0.  A module never needs long
+    # calls: it is one contiguous blob and it never calls out of itself, because
+    # kernel services go through the dispatcher function pointer in its entry
+    # info.
+
+    target_compile_options(fvp_demo_module.elf PRIVATE
+        -g
+        -fpic
+        -fno-plt
+        -mno-pic-data-is-text-relative
+        -msingle-pic-base
+        -mno-long-calls
+    )
+
+    target_link_options(fvp_demo_module.elf PRIVATE
+        -T${MOD_FVP}/link_demo_module.lds
+        -nostartfiles
+        -nostdlib
+        -Wl,-Map=fvp_demo_module.map
+        ${R52_LINK_QUIET_RWX}
+    )
+
+    set_target_properties(fvp_demo_module.elf PROPERTIES
+        LINK_DEPENDS ${MOD_FVP}/link_demo_module.lds)
+
+    # The raw image the manager embeds.  Written into the binary directory
+    # because that is the include path module_blob.S searches.
+
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+        COMMAND ${CMAKE_OBJCOPY} -O binary
+                $<TARGET_FILE:fvp_demo_module.elf>
+                ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+        DEPENDS fvp_demo_module.elf
+        COMMENT "Converting the demonstration module to a raw image"
+        VERBATIM
+    )
+
+    add_custom_target(fvp_demo_module_bin
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+    )
+
+    # ------------------------------------------------------------------------
+    # The manager images.
+    #
+    # Two of them, and everything except the application file is the same, so
+    # the shared part is a list and a function rather than a second copy.  The
+    # duplicate that a copy would create is not a style question here: an image
+    # built with a different set of module manager sources, or without
+    # TX_R52_ENABLE_MPU, would still link and would test something other than
+    # what its name says.
+    # ------------------------------------------------------------------------
+
+    set(TX_R52_MODULE_IMAGE_SRC
+        # Board support, shared with the other FVP examples
+        ${FVP_DIR}/entry.S
+        ${FVP_DIR}/console.c
+        ${FVP_DIR}/uart_pl011.c
+        ${FVP_DIR}/mpu.c
+        ${FVP_DIR}/cache.c
+        ${FVP_DIR}/gicv3.c
+        ${FVP_DIR}/timer.c
+        ${FVP_DIR}/irq_dispatch.c
+        ${FVP_DIR}/tx_initialize_low_level.S
+
+        # Module manager port
+        ${MOD_DIR}/module_manager/src/tx_thread_schedule.S
+        ${MOD_DIR}/module_manager/src/tx_thread_context_save.S
+        ${MOD_DIR}/module_manager/src/tx_thread_context_restore.S
+        ${MOD_DIR}/module_manager/src/tx_thread_stack_build.S
+        ${MOD_DIR}/module_manager/src/tx_thread_system_return.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_svc_handler.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_fault_capture.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_user_mode_entry.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_thread_stack_build.S
+        ${MOD_DIR}/module_manager/src/txm_module_manager_mm_register_setup.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_memory_fault_handler.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_memory_fault_notify.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_alignment_adjust.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_external_memory_enable.c
+        ${MOD_DIR}/module_manager/src/txm_module_manager_offset_check.c
+
+        # The module, as bytes rather than as objects.  module_blob.S includes the
+        # raw image built by fvp_demo_module.elf, so none of the module's symbols
+        # enter this link.
+        ${MOD_FVP}/module_blob.S
+
+        # The portable module manager
+        ${TXM_MANAGER_SRC}
+    )
+
+    # .incbin searches the assembler's include paths, not the source tree, and
+    # demo_module.bin is generated -- so the build directory has to be on that
+    # path or module_blob.S cannot find the image.  Set on the file rather than
+    # per target, because both images include the same blob the same way.
+
+    set_source_files_properties(${MOD_FVP}/module_blob.S PROPERTIES
+        OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/demo_module.bin
+        COMPILE_OPTIONS "-Wa,-I${CMAKE_CURRENT_BINARY_DIR}"
+    )
+
+    function(threadx_r52_add_module_image target_name application)
+
+        add_executable(${target_name} EXCLUDE_FROM_ALL
+            ${TX_R52_MODULE_IMAGE_SRC}
+            ${application}
+        )
+
+        target_include_directories(${target_name} PRIVATE
+            ${FVP_DIR}
+            ${MOD_DIR}/inc
+            ${CMAKE_SOURCE_DIR}/common_modules/module_manager/inc
+            ${CMAKE_SOURCE_DIR}/common_modules/module_lib/inc
+            ${CMAKE_SOURCE_DIR}/common_modules/inc
+        )
+
+        # TX_R52_ENABLE_MPU is not optional for these images, unlike the AR1 demos
+        # where it is a switch: without protection there is no module boundary to
+        # test, and the manager's load window over the module area is programmed by
+        # mpu_init.  TX_R52_USE_THREADX_IRQ brings up the tick, which the module
+        # needs for the tx_thread_sleep that proves a kernel call returns.
+
+        target_compile_definitions(${target_name} PRIVATE
+            TXM_MODULE_MANAGER
+            TX_R52_USE_THREADX_IRQ
+            TX_R52_ENABLE_MPU
+        )
+
+        target_compile_options(${target_name} PRIVATE -g)
+
+        add_dependencies(${target_name} fvp_demo_module_bin)
+
+        target_link_options(${target_name} PRIVATE
+            -T${MOD_FVP}/link_module.lds
+            -nostartfiles
+            -Wl,-Map=${target_name}.map
+            ${R52_LINK_QUIET_RWX}
+        )
+
+        set_target_properties(${target_name} PROPERTIES
+            LINK_DEPENDS ${MOD_FVP}/link_module.lds)
+
+        target_link_libraries(${target_name} PRIVATE threadx_module)
+
+    endfunction()
+
+    # AR2.  What the hardware does about a module that misbehaves.
+
+    threadx_r52_add_module_image(fvp_module.elf
+        ${MOD_FVP}/sample_threadx_module_manager.c)
+
+    # And what the LOADER does about a module whose property word is not the
+    # 0x02000003 every example in the tree ships.  A separate image because four
+    # of its six cases never run a module at all, so it has a different subject
+    # and a different verdict; it shares the blob and nothing else.
+
+    threadx_r52_add_module_image(fvp_module_properties.elf
+        ${MOD_FVP}/sample_threadx_module_properties.c)
+
+endif()
+
+# Run a target on the FVP.  Each image exits by itself through the
+# semihosting SYS_EXIT call, so no host-side timeout is needed.  UART0 is
+# routed to stdout unconditionally so that PL011-console images are visible
+# too; it is harmless for semihosting images.
+find_program(FVP_BASER_AEMV8R FVP_BaseR_AEMv8R
+    HINTS $ENV{HOME}/FVP_Base_AEMv8R_11.32_19/bin
+)
+if(FVP_BASER_AEMV8R)
+    function(threadx_r52_add_fvp_run target_name run_target description)
+        add_custom_target(${run_target}
+            COMMAND ${FVP_BASER_AEMV8R}
+                    -C cluster0.NUM_CORES=1
+                    -C bp.vis.disable_visualisation=1
+                    -C bp.terminal_0.start_telnet=0
+                    -C bp.pl011_uart0.out_file=-
+                    -C bp.pl011_uart0.unbuffered_output=1
+                    -a $<TARGET_FILE:${target_name}>
+            DEPENDS ${target_name}
+            USES_TERMINAL
+            COMMENT "${description}"
+        )
+    endfunction()
+
+    threadx_r52_add_fvp_run(boot_check.elf run-boot-check-r52
+        "Running AR1/M1 boot check on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_m2.elf run-demo-m2-r52
+        "Running AR1/M2 cooperative switch demo on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_m3.elf run-demo-m3-r52
+        "Running AR1/M3 tick and preemption demo on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_threadx.elf run-demo-threadx-r52
+        "Running the standard ThreadX demo on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_clz.elf run-demo-clz-r52
+        "Running the CLZ lowest-set-bit regression on FVP_BaseR_AEMv8R...")
+    if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
+        threadx_r52_add_fvp_run(fvp_module.elf run-module-r52
+            "Running the AR2 module isolation example on FVP_BaseR_AEMv8R...")
+        threadx_r52_add_fvp_run(fvp_module_properties.elf run-module-properties-r52
+            "Running the AR2 module property contract regression on FVP_BaseR_AEMv8R...")
+    endif()
+
+    # Automated checks.  The runner judges each image by its self-reported
+    # result and treats a missing result line as failure, so a hang cannot
+    # pass.  Registered with CTest when Python is available, plus a plain
+    # target so the suite is runnable without CTest.
+    find_package(Python3 COMPONENTS Interpreter)
+    if(Python3_FOUND)
+        set(R52_RUNNER ${FVP_DIR}/test/run_fvp_test.py)
+        set(R52_TEST_IMAGES ${R52_IMAGES})
+
+        # AR2.  Kept out of R52_IMAGES above rather than added to it, because
+        # that list is what the TX_R52_ENABLE_MPU and TX_R52_CONSOLE_PL011
+        # options are applied to and neither is optional for this image: the
+        # module boundary IS the MPU, and the result line has to reach the
+        # runner whichever console the rest of the suite was built with.
+        if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
+            list(APPEND R52_TEST_IMAGES fvp_module.elf fvp_module_properties.elf)
+        endif()
+
+        enable_testing()
+        foreach(image IN LISTS R52_TEST_IMAGES)
+            add_test(NAME r52-fvp-${image}
+                     COMMAND ${Python3_EXECUTABLE} ${R52_RUNNER}
+                             --elf $<TARGET_FILE:${image}>
+                             --fvp ${FVP_BASER_AEMV8R})
+        endforeach()
+
+        add_custom_target(check-r52-fvp
+            COMMENT "Running every Cortex-R52 FVP image through the test runner..."
+        )
+        foreach(image IN LISTS R52_TEST_IMAGES)
+            add_custom_command(TARGET check-r52-fvp POST_BUILD
+                COMMAND ${Python3_EXECUTABLE} ${R52_RUNNER}
+                        --elf $<TARGET_FILE:${image}>
+                        --fvp ${FVP_BASER_AEMV8R}
+            )
+            add_dependencies(check-r52-fvp ${image})
+        endforeach()
+    else()
+        message(STATUS "Python3 not found; check-r52-fvp unavailable.")
+    endif()
+else()
+    message(STATUS "FVP_BaseR_AEMv8R not found; FVP run targets unavailable.")
+endif()
