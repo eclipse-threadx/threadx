@@ -105,8 +105,7 @@ __txm_module_preamble:
 @   dereference goes through a register the stack build had zeroed.  On silicon
 @   that read faulted at 0x1C, which is offset 0x1C from a null r3.
 @
-@   Every other GNU module port writes these the same way; cortex_m33's
-@   preamble, which this port was seeded from, spells it "symbol - . - 0".
+@   Every other GNU module port writes these the same way.
 
     .word   _txm_module_thread_shell_entry - .
     .word   demo_module_start - .
