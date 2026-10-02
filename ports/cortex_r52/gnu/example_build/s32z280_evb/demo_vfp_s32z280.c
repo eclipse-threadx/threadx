@@ -59,7 +59,7 @@
 /*    software flag and never touches the hardware.  Without that, the    */
 /*    first D-register access after a switch takes an Undefined           */
 /*    Instruction exception -- which on this board was invisible until    */
-/*    SCTLR.TE was cleared.                                              */
+/*    SCTLR.TE was cleared.                                               */
 /*                                                                        */
 /**************************************************************************/
 

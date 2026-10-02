@@ -28,12 +28,12 @@
 /*    First-boot verification for the NXP S32Z280-594EVB.  Records what   */
 /*    the core reports about itself into a structure a debugger reads.    */
 /*                                                                        */
-/*    There is no console on this board yet: LIN9 reaches the host through*/
-/*    the daughtercard USB-UART, but its baud rate depends on clock       */
-/*    configuration that is not yet established, and a console that prints*/
-/*    at the wrong rate produces garbage indistinguishable from a crash.  */
-/*    So this milestone reports through memory instead, which cannot be   */
-/*    mis-configured.  The console arrives in the next step.              */
+/*    There is no console on this board yet: LIN9 reaches the host        */
+/*    through the daughtercard USB-UART, but its baud rate depends on     */
+/*    clock configuration that is not yet established, and a console that */
+/*    prints at the wrong rate produces garbage indistinguishable from a  */
+/*    crash. So this milestone reports through memory instead, which      */
+/*    cannot be mis-configured.  The console arrives in the next step.    */
 /*                                                                        */
 /*    Only EL1-accessible registers are read here.  EL2-only ones         */
 /*    (HMPUIR, CNTFRQ) are captured by entry.S before the drop to EL1,    */
@@ -153,12 +153,13 @@ static void report(const char *name, unsigned int value)
 
 
 /**************************************************************************/
-/*  bsp_done -- breakpoint target, reached once the structure is complete.*/
+/*  bsp_done -- breakpoint target, reached once the structure is          */
+/*  complete.                                                             */
 /*                                                                        */
-/*  Deliberately not static and deliberately not inlined: it exists purely*/
-/*  so a debugger can break on a symbol.  An optimising build would remove*/
-/*  an empty static function, and then the script would have nothing to   */
-/*  attach to.                                                            */
+/*  Deliberately not static and deliberately not inlined: it exists       */
+/*  purely so a debugger can break on a symbol.  An optimising build      */
+/*  would remove an empty static function, and then the script would have */
+/*  nothing to attach to.                                                 */
 /**************************************************************************/
 
 /* Clear CPSR.I so the GIC can deliver to this core.  Interrupts stay masked

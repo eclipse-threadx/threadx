@@ -36,13 +36,13 @@
 /*      2. counter is enabled       -> the control frame was started      */
 /*      3. CNTPCT advances          -> the counter really runs            */
 /*      4. interrupts arrive        -> GICv3 + PPI + vector wiring work   */
-/*      5. tx_time_get advances     -> _tx_timer_interrupt drives the tick*/
-/*      6. tx_thread_sleep returns  -> timer-driven thread resumption     */
-/*      7. a lower-priority thread ran while we slept -> preemption and   */
-/*         context save/restore across an interrupt                       */
+/*      5. tx_time_get advances     -> _tx_timer_interrupt drives the     */
+/*      tick 6. tx_thread_sleep returns  -> timer-driven thread           */
+/*      resumption 7. a lower-priority thread ran while we slept ->       */
+/*         preemption and context save/restore across an interrupt        */
 /*                                                                        */
-/*    The timer PPI INTID is reported, not assumed: the whole PPI range is*/
-/*    enabled and whichever INTID the model drives is recorded.           */
+/*    The timer PPI INTID is reported, not assumed: the whole PPI range   */
+/*    is enabled and whichever INTID the model drives is recorded.        */
 /*                                                                        */
 /**************************************************************************/
 
@@ -81,7 +81,8 @@ static UINT report(const char *label_ptr, UINT passed)
 
 
 /**************************************************************************/
-/*  thread_busy_entry -- lowest priority; only runs when nothing else can.*/
+/*  thread_busy_entry -- lowest priority; only runs when nothing else     */
+/*  can.                                                                  */
 /**************************************************************************/
 
 static void thread_busy_entry(ULONG thread_input)

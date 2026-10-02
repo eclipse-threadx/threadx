@@ -114,10 +114,10 @@ void board_init(void)
 /**************************************************************************/
 
 /**************************************************************************/
-/*  board_irq_service -- service an already-acknowledged INTID.            */
+/*  board_irq_service -- service an already-acknowledged INTID.           */
 /*                                                                        */
-/*  Split out so the nesting path in entry.S can acknowledge in IRQ mode   */
-/*  before nesting starts.  Does not acknowledge and does not EOI.         */
+/*  Split out so the nesting path in entry.S can acknowledge in IRQ mode  */
+/*  before nesting starts.  Does not acknowledge and does not EOI.        */
 /**************************************************************************/
 
 void board_irq_service(unsigned long intid)
@@ -199,12 +199,12 @@ void board_irq_service(unsigned long intid)
 
 
 /**************************************************************************/
-/*  board_irq_handler -- the non-nesting entry point.                      */
+/*  board_irq_handler -- the non-nesting entry point.                     */
 /*                                                                        */
-/*  Acknowledges, services and ends the interrupt, all in IRQ mode with    */
-/*  interrupts masked.  entry.S calls this when the image was built without */
-/*  TX_ENABLE_IRQ_NESTING, so the behaviour of every existing image is      */
-/*  exactly what it was.                                                  */
+/*  Acknowledges, services and ends the interrupt, all in IRQ mode with   */
+/*  interrupts masked.  entry.S calls this when the image was built       */
+/*  without TX_ENABLE_IRQ_NESTING, so the behaviour of every existing     */
+/*  image is exactly what it was.                                         */
 /**************************************************************************/
 
 void board_irq_handler(void)
@@ -222,11 +222,11 @@ void board_irq_handler(void)
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
 /**************************************************************************/
-/*  board_fiq_service -- service an already-acknowledged Group 0 INTID.     */
+/*  board_fiq_service -- service an already-acknowledged Group 0 INTID.   */
 /*                                                                        */
-/*  The FIQ counterpart of board_irq_service, and split for the same        */
-/*  reason: the acknowledge has to happen before nesting starts.  Does not  */
-/*  acknowledge and does not EOI.                                         */
+/*  The FIQ counterpart of board_irq_service, and split for the same      */
+/*  reason: the acknowledge has to happen before nesting starts.  Does    */
+/*  not acknowledge and does not EOI.                                     */
 /**************************************************************************/
 
 void board_fiq_service(unsigned long intid)
@@ -289,7 +289,7 @@ void board_fiq_service(unsigned long intid)
 
 
 /**************************************************************************/
-/*  board_fiq_handler -- the non-nesting FIQ entry point.                  */
+/*  board_fiq_handler -- the non-nesting FIQ entry point.                 */
 /**************************************************************************/
 
 void board_fiq_handler(void)

@@ -29,10 +29,10 @@
 /*                                                                        */
 /*    Two paths must be covered, and they use different register sets:    */
 /*                                                                        */
-/*      solicited  tx_thread_system_return saves D8-D15 and FPSCR, because*/
-/*                 the callee-saved half is all a voluntary switch can    */
-/*                 lose.  Exercised by the checking thread, which keeps   */
-/*                 eight doubles live across tx_thread_sleep.             */
+/*      solicited  tx_thread_system_return saves D8-D15 and FPSCR,        */
+/*                 because the callee-saved half is all a voluntary       */
+/*                 switch can lose.  Exercised by the checking thread,    */
+/*                 which keeps eight doubles live across tx_thread_sleep. */
 /*      interrupt  tx_thread_context_restore restores D0-D15 and FPSCR,   */
 /*                 because an asynchronous interrupt can land anywhere.   */
 /*                 Exercised by a lower-priority thread doing continuous  */
