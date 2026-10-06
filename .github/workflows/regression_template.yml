@@ -271,9 +271,14 @@ jobs:
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}
 
+  # The gate is the dependency's own result, not failure() and cancelled().
+  # Those two report the status of the workflow rather than of run_tests, so a
+  # run_tests that is cancelled -- which is what a job that never gets a runner
+  # ends up as -- leaves both false and lets the deploy proceed to download an
+  # artifact the cancelled job never uploaded.
   deploy_code_coverage:
     runs-on: ubuntu-24.04
-    if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && !failure() && !cancelled()
+    if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && needs.run_tests.result == 'success'
     needs: run_tests
     environment:
       name: github-pages
