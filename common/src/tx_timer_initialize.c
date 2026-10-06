@@ -92,8 +92,15 @@ TX_TIMER_INTERNAL  *_tx_timer_expired_timer_ptr;
 
 /* Define the timer thread's control block.  */
 
+#ifdef TX_TIMER_TCB_SECTION_NAME
+
+TX_THREAD           _tx_timer_thread __attribute__((section(TX_TIMER_TCB_SECTION_NAME)));
+
+#else
+
 TX_THREAD           _tx_timer_thread;
 
+#endif
 
 /* Define the variable that holds the timer thread's starting stack address.  */
 
@@ -112,7 +119,16 @@ UINT                _tx_timer_priority;
 /* Define the system timer thread's stack.   The default size is defined
    in tx_port.h.  */
 
+#ifdef TX_TIMER_STACK_SECTION_NAME
+
+ULONG               _tx_timer_thread_stack_area[(((UINT) TX_TIMER_THREAD_STACK_SIZE)+((sizeof(ULONG))- ((UINT) 1)))/(sizeof(ULONG))] __attribute__((section(TX_TIMER_STACK_SECTION_NAME)));
+
+#else
+
 ULONG               _tx_timer_thread_stack_area[(((UINT) TX_TIMER_THREAD_STACK_SIZE)+((sizeof(ULONG))- ((UINT) 1)))/(sizeof(ULONG))];
+
+#endif
+
 
 #else
 
