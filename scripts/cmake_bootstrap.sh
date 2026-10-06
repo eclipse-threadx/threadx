@@ -89,6 +89,18 @@ function test() {
     else
         repeat_fail=${CTEST_REPEAT_FAIL}
     fi
+    # The per-test ceiling. It has to clear the slowest test in any suite this
+    # script serves by enough that runner load cannot push a passing test over
+    # it, and still leave a timing-out test inside the 60 minute job timeout
+    # after until-pass has run it twice. GUIX's guix_bidi_text_draw_32bpp is the
+    # slowest known: measured between 831 and 957 seconds across six passing
+    # runs in October 2026, against a ceiling that was then 1000.
+    if [ -z "${CTEST_TIMEOUT}" ];
+    then
+        ctest_timeout=1500
+    else
+        ctest_timeout=${CTEST_TIMEOUT}
+    fi
     # ctest's status is captured rather than allowed to abort the function, and
     # returned at the end. set -e would otherwise stop here on the first failing
     # test, and every configuration after it would go untested -- and, before
@@ -100,7 +112,7 @@ function test() {
     # itself now happens in collect_all_coverage, after every configuration has
     # been tested, and it does not stop at the first failure either.
     local status=0
-    ctest $parallel --timeout 1000 -O $1.txt -T test --no-compress-output --test-output-size-passed 4194304 --test-output-size-failed 4194304 --output-on-failure --repeat until-pass:${repeat_fail} --output-junit $1.xml || status=$?
+    ctest $parallel --timeout ${ctest_timeout} -O $1.txt -T test --no-compress-output --test-output-size-passed 4194304 --test-output-size-failed 4194304 --output-on-failure --repeat until-pass:${repeat_fail} --output-junit $1.xml || status=$?
     popd
     # Tolerated because this is a summary for humans, and a ctest that died early
     # enough to leave no matching line must not be what stops the coverage below.
