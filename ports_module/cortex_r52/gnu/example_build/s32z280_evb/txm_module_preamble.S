@@ -25,19 +25,19 @@
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
 @/*                                                                        */
-@/*    The header the module manager reads before it will load a module.    */
+@/*    The header the module manager reads before it will load a module.   */
 @/*                                                                        */
-@/*    It must be the first thing in the module image, which is what the    */
-@/*    linker script arranges, and every entry point in it is an offset     */
-@/*    from the start of the preamble rather than an address.  A module is   */
-@/*    position independent: the manager decides where it lands, so the     */
-@/*    module cannot know its own addresses at link time.                   */
+@/*    It must be the first thing in the module image, which is what the   */
+@/*    linker script arranges, and every entry point in it is an offset    */
+@/*    from the start of the preamble rather than an address.  A module is */
+@/*    position independent: the manager decides where it lands, so the    */
+@/*    module cannot know its own addresses at link time.                  */
 @/*                                                                        */
-@/*    Code and data sizes come from the linker script rather than being    */
-@/*    written in by hand.  The Cortex-R4 preamble carries literal numbers   */
-@/*    for them, which is a standing invitation to grow a module past its   */
-@/*    declared size and have the manager map less memory than it uses --   */
-@/*    a fault in a module that did nothing wrong, whose cause is a         */
+@/*    Code and data sizes come from the linker script rather than being   */
+@/*    written in by hand.  The Cortex-R4 preamble carries literal numbers */
+@/*    for them, which is a standing invitation to grow a module past its  */
+@/*    declared size and have the manager map less memory than it uses --  */
+@/*    a fault in a module that did nothing wrong, whose cause is a        */
 @/*    constant in a file nobody thought to change.                        */
 @/*                                                                        */
 @/**************************************************************************/
@@ -105,8 +105,7 @@ __txm_module_preamble:
 @   dereference goes through a register the stack build had zeroed.  On silicon
 @   that read faulted at 0x1C, which is offset 0x1C from a null r3.
 @
-@   Every other GNU module port writes these the same way; cortex_m33's
-@   preamble, which this port was seeded from, spells it "symbol - . - 0".
+@   Every other GNU module port writes these the same way.
 
     .word   _txm_module_thread_shell_entry - .
     .word   demo_module_start - .

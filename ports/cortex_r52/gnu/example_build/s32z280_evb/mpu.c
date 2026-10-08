@@ -29,10 +29,11 @@
 /*                                                                        */
 /*    Register model (AArch32): a region is selected through PRSELR and   */
 /*    then described by PRBAR (base, shareability, access permission,     */
-/*    execute-never) and PRLAR (inclusive limit, attribute index, enable).*/
-/*    Both addresses have a 64-byte granule, so the low six bits of each  */
-/*    register hold attributes rather than address.  Memory types come    */
-/*    from MAIR through the attribute index, not from the region itself.  */
+/*    execute-never) and PRLAR (inclusive limit, attribute index,         */
+/*    enable). Both addresses have a 64-byte granule, so the low six bits */
+/*    of each register hold attributes rather than address.  Memory types */
+/*    come from MAIR through the attribute index, not from the region     */
+/*    itself.                                                             */
 /*                                                                        */
 /*    Caches are invalidated before being enabled.  On this model they    */
 /*    come out of reset invalid, but silicon does not guarantee that, and */
@@ -40,9 +41,9 @@
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 -- the MPU, MAIR, SCTLR and cache maintenance are only*/
-/*      reachable through CP15; every access is encapsulated in a one-line*/
-/*      accessor below.                                                   */
+/*    Directive 4.3 -- the MPU, MAIR, SCTLR and cache maintenance are     */
+/*      only reachable through CP15; every access is encapsulated in a    */
+/*      one-line accessor below.                                          */
 /*                                                                        */
 /**************************************************************************/
 
@@ -467,7 +468,7 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
 /*  the preamble and write the module's data to load it at all.  Without  */
 /*  this the load faulted on its first read of the image, and because a   */
 /*  privileged data abort ends in a handler that only spins, that looked  */
-/*  exactly like the load hanging.                                       */
+/*  exactly like the load hanging.                                        */
 /*                                                                        */
 /*  Opened around the load and closed straight after, rather than left in */
 /*  place, because PMSAv8-R has no region priority: if this region were   */
@@ -475,7 +476,7 @@ static void program_region(unsigned int index, const MPU_REGION *region_ptr)
 /*  own regions, and an access hitting both takes a translation fault     */
 /*  (TRM 8.1).                                                            */
 /*  Closing it before any module thread starts is what keeps the two from */
-/*  ever being enabled together.                                         */
+/*  ever being enabled together.                                          */
 /*                                                                        */
 /*  Region 16, above both the kernel's 0-7 and the eight the manager      */
 /*  hands to a module, so neither the scheduler's per-thread region load  */

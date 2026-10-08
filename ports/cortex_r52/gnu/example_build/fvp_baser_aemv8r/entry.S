@@ -468,9 +468,9 @@ el2_hyp_trap_unhandled:
     FAULT_REPORT msg_el2_hyp
 
 /**************************************************************************/
-/*  Unhandled exceptions.  Each records a distinct code in r12 so a halted*/
-/*  model or a later fault dump (AR1/M5) can identify the cause.  Real    */
-/*  handlers arrive with the interrupt work in M3.                        */
+/*  Unhandled exceptions.  Each records a distinct code in r12 so a       */
+/*  halted model or a later fault dump (AR1/M5) can identify the cause.   */
+/*  Real handlers arrive with the interrupt work in M3.                   */
 /**************************************************************************/
 
 /* Unhandled exceptions.  Real handlers arrive with the interrupt work in

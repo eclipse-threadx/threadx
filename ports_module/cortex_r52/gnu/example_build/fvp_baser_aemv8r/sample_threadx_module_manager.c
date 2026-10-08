@@ -25,90 +25,93 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Loads the sample module four times, lets it misbehave every time,    */
-/*    and reports what the hardware did about it -- on the Armv8-R AEM     */
-/*    FVP, with no debugger and no person in the loop.                     */
+/*    Loads the sample module four times, lets it misbehave every time,   */
+/*    and reports what the hardware did about it -- on the Armv8-R AEM    */
+/*    FVP, with no debugger and no person in the loop.                    */
 /*                                                                        */
-/*    This is the S32Z280 module demonstration turned into a regression.   */
-/*    The silicon version is judged by a human reading a console and by a  */
-/*    GDB harness that reads the module's memory between passes; neither    */
-/*    exists here.  The model offers an Iris server and no GDB stub, so     */
-/*    the image has to judge itself and say so in one line the runner can   */
-/*    match.  Everything below that differs from the silicon sample         */
-/*    differs for that reason.                                             */
+/*    This is the S32Z280 module demonstration turned into a regression.  */
+/*    The silicon version is judged by a human reading a console and by a */
+/*    GDB harness that reads the module's memory between passes; neither  */
+/*    exists here.  The model offers an Iris server and no GDB stub, so   */
+/*    the image has to judge itself and say so in one line the runner can */
+/*    match.  Everything below that differs from the silicon sample       */
+/*    differs for that reason.                                            */
 /*                                                                        */
-/*    THE RESULT THIS EXAMPLE EXISTS TO PRODUCE IS THE FAULT.  A module    */
-/*    that starts and runs proves the loader works; a module that is       */
-/*    stopped by the memory protection unit when it reaches outside its    */
-/*    own memory proves the port works.  So the fault notification is not  */
-/*    an error path here, it is the expected outcome, and its absence is   */
+/*    THE RESULT THIS EXAMPLE EXISTS TO PRODUCE IS THE FAULT.  A module   */
+/*    that starts and runs proves the loader works; a module that is      */
+/*    stopped by the memory protection unit when it reaches outside its   */
+/*    own memory proves the port works.  So the fault notification is not */
+/*    an error path here, it is the expected outcome, and its absence is  */
 /*    the failure.                                                        */
 /*                                                                        */
-/*    TWO PASSES, because one proves nothing about relocation.  The module */
-/*    is position independent: it is linked against nominal addresses it   */
-/*    never runs at, and _gcc_setup rewrites its global offset table to    */
-/*    wherever the manager actually put it.  A single run at the linked    */
-/*    address would exercise a rebase whose input and output are the same  */
-/*    number, and would look identical if the rebase did nothing at all.   */
+/*    TWO PASSES, because one proves nothing about relocation.  The       */
+/*    module is position independent: it is linked against nominal        */
+/*    addresses it never runs at, and _gcc_setup rewrites its global      */
+/*    offset table to wherever the manager actually put it.  A single run */
+/*    at the linked address would exercise a rebase whose input and       */
+/*    output are the same number, and would look identical if the rebase  */
+/*    did nothing at all.                                                 */
 /*                                                                        */
-/*    So pass 1 loads the blob where the linker placed it and pass 2 loads */
-/*    a byte-for-byte copy of it from the staging area, with pass 1 still  */
-/*    holding its pool memory so that pass 2's data lands somewhere else    */
-/*    too.  Both bases therefore differ between the passes, which is what   */
-/*    makes the comparison at the end mean something.                      */
+/*    So pass 1 loads the blob where the linker placed it and pass 2      */
+/*    loads a byte-for-byte copy of it from the staging area, with pass 1 */
+/*    still holding its pool memory so that pass 2's data lands somewhere */
+/*    else too.  Both bases therefore differ between the passes, which is */
+/*    what makes the comparison at the end mean something.                */
 /*                                                                        */
-/*    THEN A THIRD PASS, which faults the other way.  The two passes above */
-/*    make the module read an address it does not own: a data abort,        */
-/*    reported through DFSR and DFAR.  A module can equally leave its code  */
-/*    region, which is a prefetch abort reported through IFSR and IFAR and  */
-/*    arrives at the handler by a different vector.  Both halves of the     */
-/*    port's fault path are therefore exercised, and neither is inferred    */
-/*    from the other.  The third pass also runs after the first two have    */
-/*    been unloaded, which is the other half of what this file shows: a     */
-/*    module fault must leave the manager able to load and run the next     */
-/*    module.                                                              */
+/*    THEN A THIRD PASS, which faults the other way.  The two passes      */
+/*    above make the module read an address it does not own: a data       */
+/*    abort, reported through DFSR and DFAR.  A module can equally leave  */
+/*    its code region, which is a prefetch abort reported through IFSR    */
+/*    and IFAR and arrives at the handler by a different vector.  Both    */
+/*    halves of the port's fault path are therefore exercised, and        */
+/*    neither is inferred from the other.  The third pass also runs after */
+/*    the first two have been unloaded, which is the other half of what   */
+/*    this file shows: a module fault must leave the manager able to load */
+/*    and run the next module.                                            */
 /*                                                                        */
-/*    AND WHAT THE MODULE ACHIEVED IS READ BACK, not inferred.  The manager */
-/*    grants each pass a shared MPU region over one granule at a fixed      */
-/*    address and the module records its progress there.  That is what      */
-/*    replaces the GDB harness, and it is what lets this file fail on the   */
-/*    two flags that matter -- SURVIVED_STEAL and SURVIVED_JUMP -- by name  */
-/*    rather than only on the absence of a fault.  The two are the same     */
-/*    event seen from both ends, and a regression that showed one without   */
-/*    the other would be worth knowing about.                              */
+/*    AND WHAT THE MODULE ACHIEVED IS READ BACK, not inferred.  The       */
+/*    manager grants each pass a shared MPU region over one granule at a  */
+/*    fixed address and the module records its progress there.  That is   */
+/*    what replaces the GDB harness, and it is what lets this file fail   */
+/*    on the two flags that matter -- SURVIVED_STEAL and SURVIVED_JUMP -- */
+/*    by name rather than only on the absence of a fault.  The two are    */
+/*    the same event seen from both ends, and a regression that showed    */
+/*    one without the other would be worth knowing about.                 */
 /*                                                                        */
-/*    AND A FOURTH PASS FOR THE SHARED REGIONS.  The three above are each   */
-/*    granted one shared region -- the status granule -- which exercises    */
-/*    the first of the five shared entries the port provides and says       */
-/*    nothing about the other four.  The fourth pass is granted all five,   */
-/*    one 64-byte granule each, and is NOT granted the granule that sits    */
-/*    between two of them.  It writes every granule it was given, reads     */
-/*    every one of them back, and then writes the gap, which must fault.    */
+/*    AND A FOURTH PASS FOR THE SHARED REGIONS.  The three above are each */
+/*    granted one shared region -- the status granule -- which exercises  */
+/*    the first of the five shared entries the port provides and says     */
+/*    nothing about the other four.  The fourth pass is granted all five, */
+/*    one 64-byte granule each, and is NOT granted the granule that sits  */
+/*    between two of them.  It writes every granule it was given, reads   */
+/*    every one of them back, and then writes the gap, which must fault.  */
 /*                                                                        */
-/*    That shape is chosen against a specific defect.  A limit register     */
-/*    masked the wrong way, or a base off by one granule, extends a region  */
-/*    past what was asked for -- and with the gap sandwiched between two    */
-/*    granted granules it is reachable from either side if that happens.    */
-/*    The readback matters as much as the write: a region programmed with   */
-/*    the wrong base accepts a store and puts it elsewhere, so five marks   */
-/*    read out of five granules is what says five distinct extents were     */
-/*    programmed rather than one of them five times.                       */
+/*    That shape is chosen against a specific defect.  A limit register   */
+/*    masked the wrong way, or a base off by one granule, extends a       */
+/*    region past what was asked for -- and with the gap sandwiched       */
+/*    between two granted granules it is reachable from either side if    */
+/*    that happens. The readback matters as much as the write: a region   */
+/*    programmed with the wrong base accepts a store and puts it          */
+/*    elsewhere, so five marks read out of five granules is what says     */
+/*    five distinct extents were programmed rather than one of them five  */
+/*    times.                                                              */
 /*                                                                        */
-/*    The same pass probes the two ways the manager refuses a grant, which  */
-/*    nothing had ever called: an unaligned address must come back          */
-/*    TXM_MODULE_ALIGNMENT_ERROR, and one grant past the entry count must   */
-/*    come back TX_NO_MEMORY.  Both are checked by name.  The order is not  */
-/*    free -- the entry-count check runs before the alignment check, so the  */
-/*    unaligned probe has to happen while entries remain.                   */
+/*    The same pass probes the two ways the manager refuses a grant,      */
+/*    which nothing had ever called: an unaligned address must come back  */
+/*    TXM_MODULE_ALIGNMENT_ERROR, and one grant past the entry count must */
+/*    come back TX_NO_MEMORY.  Both are checked by name.  The order is    */
+/*    not free -- the entry-count check runs before the alignment check,  */
+/*    so the unaligned probe has to happen while entries remain.          */
 /*                                                                        */
-/*    WHAT A GREEN RUN HERE DOES NOT PROVE.  The model reports 32 EL1 MPU   */
-/*    regions.  The Cortex-R52 TRM gives MPUIR.DREGION as 16, 20 or 24, so  */
-/*    32 is not an architecturally permitted value for this core and the    */
-/*    model is the generic AEMv8-R rather than an R52.  It is strictly more */
-/*    permissive than every real part: this port needs seventeen regions,   */
-/*    which the S32Z280's twenty supply and a legal 16-region R52 does not, */
-/*    and no result from this image can tell you that.  The count is        */
-/*    reported below so the log says what it was rather than implying it.   */
+/*    WHAT A GREEN RUN HERE DOES NOT PROVE.  The model reports 32 EL1 MPU */
+/*    regions.  The Cortex-R52 TRM gives MPUIR.DREGION as 16, 20 or 24,   */
+/*    so 32 is not an architecturally permitted value for this core and   */
+/*    the model is the generic AEMv8-R rather than an R52.  It is         */
+/*    strictly more permissive than every real part: this port needs      */
+/*    seventeen regions, which the S32Z280's twenty supply and a legal    */
+/*    16-region R52 does not, and no result from this image can tell you  */
+/*    that.  The count is reported below so the log says what it was      */
+/*    rather than implying it.                                            */
 /*                                                                        */
 /**************************************************************************/
 
@@ -393,16 +396,16 @@ static unsigned char    report_stack[2048] __attribute__((aligned(8)));
 /**************************************************************************/
 /*  Fault notification.                                                   */
 /*                                                                        */
-/*  Called by the module manager after it has terminated the offending     */
-/*  thread.  Records rather than prints: this runs in Abort mode on the     */
-/*  Abort stack, which is a kilobyte and already carries the terminate      */
-/*  underneath this frame.  A callback that printed would work here and     */
+/*  Called by the module manager after it has terminated the offending    */
+/*  thread.  Records rather than prints: this runs in Abort mode on the   */
+/*  Abort stack, which is a kilobyte and already carries the terminate    */
+/*  underneath this frame.  A callback that printed would work here and   */
 /*  would still be the wrong shape to copy.                               */
 /*                                                                        */
-/*  Its two arguments are the point of the hook, so they are recorded and  */
-/*  checked rather than discarded: an application is being told WHICH      */
-/*  thread and WHICH module faulted, and a callback that fires with the    */
-/*  wrong pair is no more use than one that never fires.                   */
+/*  Its two arguments are the point of the hook, so they are recorded and */
+/*  checked rather than discarded: an application is being told WHICH     */
+/*  thread and WHICH module faulted, and a callback that fires with the   */
+/*  wrong pair is no more use than one that never fires.                  */
 /**************************************************************************/
 
 static void module_fault_notify(TX_THREAD *thread_ptr, TXM_MODULE_INSTANCE *module_instance)
@@ -422,15 +425,15 @@ static void put_field(const char *label, unsigned long value)
 
 
 /**************************************************************************/
-/*  The shared status word, reached through the manager's load window.     */
+/*  The shared status word, reached through the manager's load window.    */
 /*                                                                        */
-/*  No kernel region covers the module area; region 16 does, and the       */
-/*  scheduler enables it for every thread that owns no module.  This       */
-/*  thread owns none, so the window is open on it and these two functions  */
-/*  need no bracketing of their own -- which is the whole reason the       */
-/*  window is owned by the scheduler rather than by whoever calls.         */
+/*  No kernel region covers the module area; region 16 does, and the      */
+/*  scheduler enables it for every thread that owns no module.  This      */
+/*  thread owns none, so the window is open on it and these two functions */
+/*  need no bracketing of their own -- which is the whole reason the      */
+/*  window is owned by the scheduler rather than by whoever calls.        */
 /*                                                                        */
-/*  MISRA C:2012 Rule 11.6 is deliberately violated: the address is an     */
+/*  MISRA C:2012 Rule 11.6 is deliberately violated: the address is an    */
 /*  agreement between two separately linked images.                       */
 /**************************************************************************/
 
@@ -460,9 +463,9 @@ static ULONG module_status_read(void)
 /**************************************************************************/
 /*  A byte copy, written out rather than called for.                      */
 /*                                                                        */
-/*  The manager links -nostartfiles and nothing else in this image reaches */
-/*  for a C library, so calling memcpy would pull one in for a single      */
-/*  copy.  The blob is under two kilobytes and this runs once.            */
+/*  The manager links -nostartfiles and nothing else in this image        */
+/*  reaches for a C library, so calling memcpy would pull one in for a    */
+/*  single copy.  The blob is under two kilobytes and this runs once.     */
 /**************************************************************************/
 
 static void copy_bytes(unsigned char *destination, const unsigned char *source,
@@ -478,21 +481,22 @@ static void copy_bytes(unsigned char *destination, const unsigned char *source,
 
 
 /**************************************************************************/
-/*  The shared grants a pass gets, and the two ways a grant is refused.    */
+/*  The shared grants a pass gets, and the two ways a grant is refused.   */
 /*                                                                        */
-/*  Every pass is granted the first granule, which is the progress word it  */
-/*  reports through.  The shared pass is granted one granule per shared     */
-/*  entry the port provides, skipping the gap, because a single grant only   */
-/*  ever exercises the first of the five and this port has never run the    */
-/*  other four.                                                           */
+/*  Every pass is granted the first granule, which is the progress word   */
+/*  it reports through.  The shared pass is granted one granule per       */
+/*  shared entry the port provides, skipping the gap, because a single    */
+/*  grant only ever exercises the first of the five and this port has     */
+/*  never run the other four.                                             */
 /*                                                                        */
-/*  It also probes the two ways a grant is refused, which can only be done  */
-/*  on a LOADED instance.  ORDER MATTERS: the manager checks the entry      */
-/*  count BEFORE it checks alignment, so the unaligned probe has to happen  */
-/*  while entries remain -- after five grants it would come back            */
-/*  TX_NO_MEMORY and say nothing about alignment at all.                    */
+/*  It also probes the two ways a grant is refused, which can only be     */
+/*  done on a LOADED instance.  ORDER MATTERS: the manager checks the     */
+/*  entry count BEFORE it checks alignment, so the unaligned probe has to */
+/*  happen while entries remain -- after five grants it would come back   */
+/*  TX_NO_MEMORY and say nothing about alignment at all.                  */
 /*                                                                        */
-/*  Returns the first grant status that was not TX_SUCCESS, or TX_SUCCESS.  */
+/*  Returns the first grant status that was not TX_SUCCESS, or            */
+/*  TX_SUCCESS.                                                           */
 /**************************************************************************/
 
 static UINT grant_shared_regions(TXM_MODULE_INSTANCE *instance, PASS_RESULT *result)
@@ -576,24 +580,24 @@ static UINT grant_shared_regions(TXM_MODULE_INSTANCE *instance, PASS_RESULT *res
 
 
 /**************************************************************************/
-/*  The size guards on a shared grant.                                     */
+/*  The size guards on a shared grant.                                    */
 /*                                                                        */
-/*  A grant of no bytes and a grant whose inclusive end wraps past the top */
-/*  of the address space both used to compute a limit BELOW the base,      */
-/*  program it, return TX_SUCCESS and spend one of the five entries on a    */
-/*  region the hardware cannot honour.  Both must now be refused as         */
-/*  TX_SIZE_ERROR, and -- the half that a status code alone does not say --  */
-/*  must leave the entry count exactly where they found it, because an      */
-/*  entry spent on a refused grant is one the caller can never get back.    */
+/*  A grant of no bytes and a grant whose inclusive end wraps past the    */
+/*  top of the address space both used to compute a limit BELOW the base, */
+/*  program it, return TX_SUCCESS and spend one of the five entries on a  */
+/*  region the hardware cannot honour.  Both must now be refused as       */
+/*  TX_SIZE_ERROR, and -- the half that a status code alone does not say  */
+/*  -- must leave the entry count exactly where they found it, because an */
+/*  entry spent on a refused grant is one the caller can never get back.  */
 /*                                                                        */
-/*  The third probe is the one that must SUCCEED: a grant ending exactly    */
-/*  at 0xFFFFFFFF is legal, and a guard that refused it would be a new bug   */
-/*  in place of the old one.  It is checked last so that the count it does   */
-/*  move is unambiguous.                                                   */
+/*  The third probe is the one that must SUCCEED: a grant ending exactly  */
+/*  at 0xFFFFFFFF is legal, and a guard that refused it would be a new    */
+/*  bug in place of the old one.  It is checked last so that the count it */
+/*  does move is unambiguous.                                             */
 /*                                                                        */
-/*  Loaded here and unloaded below without ever being started, so nothing   */
-/*  these probes accept is programmed into an MPU region.  See the comment  */
-/*  on MODULE_TOP_GRANULE_ADDRESS for why that matters.                     */
+/*  Loaded here and unloaded below without ever being started, so nothing */
+/*  these probes accept is programmed into an MPU region.  See the        */
+/*  comment on MODULE_TOP_GRANULE_ADDRESS for why that matters.           */
 /**************************************************************************/
 
 static void run_guard_probes(VOID *location)
@@ -657,12 +661,13 @@ static void run_guard_probes(VOID *location)
 
 
 /**************************************************************************/
-/*  One pass: load the blob from a given address, grant it the shared      */
-/*  granules it is entitled to, start it, wait for the fault it is written */
-/*  to provoke, and stop it.                                              */
+/*  One pass: load the blob from a given address, grant it the shared     */
+/*  granules it is entitled to, start it, wait for the fault it is        */
+/*  written to provoke, and stop it.                                      */
 /*                                                                        */
-/*  The module is left loaded.  Its data allocation is what moves the next */
-/*  pass's data base, and releasing it here would defeat half the test.    */
+/*  The module is left loaded.  Its data allocation is what moves the     */
+/*  next pass's data base, and releasing it here would defeat half the    */
+/*  test.                                                                 */
 /**************************************************************************/
 
 /* name is CHAR * and not const CHAR *, because txm_module_manager_in_place_load

@@ -25,58 +25,59 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    A module that exercises the protection boundary rather than          */
-/*    demonstrating features, for the NXP S32Z280-594EVB.                  */
+/*    A module that exercises the protection boundary rather than         */
+/*    demonstrating features, for the NXP S32Z280-594EVB.                 */
 /*                                                                        */
-/*    The FVP copy of this file is the same module for the same port; what  */
-/*    differs is the two addresses at the bottom and the board named here,  */
-/*    so `diff` is the tool for telling whether the two have drifted.       */
+/*    The FVP copy of this file is the same module for the same port;     */
+/*    what differs is the two addresses at the bottom and the board named */
+/*    here, so `diff` is the tool for telling whether the two have        */
+/*    drifted.                                                            */
 /*                                                                        */
-/*    Four steps:                                                          */
+/*    Four steps:                                                         */
 /*                                                                        */
 /*      1. Writes and reads its own data, which must succeed.             */
-/*      2. Makes a kernel call, which must succeed -- proving a module in  */
-/*         User mode can reach the kernel through the supervisor call      */
+/*      2. Makes a kernel call, which must succeed -- proving a module in */
+/*         User mode can reach the kernel through the supervisor call     */
 /*         boundary and come back.                                        */
-/*      3. Violates its protection in one of three ways the manager        */
+/*      3. Violates its protection in one of three ways the manager       */
 /*         selects, which must fault.                                     */
 /*      4. Never reaches step 4, because step 3 terminates it.            */
 /*                                                                        */
-/*    THE THREE VIOLATIONS.  Two of them are the two aborts the hardware   */
-/*    distinguishes: reading the kernel's data is a DATA abort reported     */
-/*    through DFSR and DFAR, branching out of the code region is a         */
-/*    PREFETCH abort reported through IFSR and IFAR.  The third writes a   */
-/*    granule of the SHARED area that the manager deliberately did not     */
-/*    grant, after writing and reading back every granule it did -- so it   */
-/*    is the shared-region machinery under test rather than the kernel's    */
-/*    own memory, and a grant that covered one granule too many is what it  */
-/*    is looking for.                                                      */
+/*    THE THREE VIOLATIONS.  Two of them are the two aborts the hardware  */
+/*    distinguishes: reading the kernel's data is a DATA abort reported   */
+/*    through DFSR and DFAR, branching out of the code region is a        */
+/*    PREFETCH abort reported through IFSR and IFAR.  The third writes a  */
+/*    granule of the SHARED area that the manager deliberately did not    */
+/*    grant, after writing and reading back every granule it did -- so it */
+/*    is the shared-region machinery under test rather than the kernel's  */
+/*    own memory, and a grant that covered one granule too many is what   */
+/*    it is looking for.                                                  */
 /*                                                                        */
-/*    Steps 1 and 2 passing without step 3 faulting would mean the module  */
-/*    is running unprotected, which is the failure this example exists to  */
-/*    detect.  A module that only ever touched its own memory would pass   */
+/*    Steps 1 and 2 passing without step 3 faulting would mean the module */
+/*    is running unprotected, which is the failure this example exists to */
+/*    detect.  A module that only ever touched its own memory would pass  */
 /*    identically with the MPU switched off.                              */
 /*                                                                        */
-/*    HOW PROGRESS GETS OUT.  A module cannot print: the console belongs    */
-/*    to the board support package, outside every region a module owns, so  */
-/*    reaching it would fault as surely as step 3 does.  So progress is     */
-/*    recorded twice -- in the module's own data, and in the first granule  */
-/*    of the shared area the manager granted it.                           */
+/*    HOW PROGRESS GETS OUT.  A module cannot print: the console belongs  */
+/*    to the board support package, outside every region a module owns,   */
+/*    so reaching it would fault as surely as step 3 does.  So progress   */
+/*    is recorded twice -- in the module's own data, and in the first     */
+/*    granule of the shared area the manager granted it.                  */
 /*                                                                        */
-/*    Which of the two can be read depends on the board.  On silicon a GDB  */
-/*    harness reads the module's own copy out of the data area the manager  */
-/*    allocated for it; the FVP has no such seam -- it exposes an Iris      */
-/*    server and no GDB stub -- so there only the shared copy is readable    */
-/*    and everything the run reports has to be reported by the image        */
-/*    itself.  Both writes are kept on both boards deliberately: if the     */
-/*    shared write were the only one, a module that could not reach its own */
-/*    data would still report progress.                                    */
+/*    Which of the two can be read depends on the board.  On silicon a    */
+/*    GDB harness reads the module's own copy out of the data area the    */
+/*    manager allocated for it; the FVP has no such seam -- it exposes an */
+/*    Iris server and no GDB stub -- so there only the shared copy is     */
+/*    readable and everything the run reports has to be reported by the   */
+/*    image itself.  Both writes are kept on both boards deliberately: if */
+/*    the shared write were the only one, a module that could not reach   */
+/*    its own data would still report progress.                           */
 /*                                                                        */
-/*    The shared address is a literal on this side.  The module has no      */
-/*    loader to tell it anything and the manager deliberately knows no      */
-/*    symbol of the module, so the two agree by convention -- and the       */
-/*    manager checks that they do, against the linker's own symbol, rather  */
-/*    than trusting them to.                                               */
+/*    The shared address is a literal on this side.  The module has no    */
+/*    loader to tell it anything and the manager deliberately knows no    */
+/*    symbol of the module, so the two agree by convention -- and the     */
+/*    manager checks that they do, against the linker's own symbol,       */
+/*    rather than trusting them to.                                       */
 /*                                                                        */
 /**************************************************************************/
 

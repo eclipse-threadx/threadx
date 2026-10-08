@@ -62,11 +62,11 @@
 /*                                                                        */
 /*    When built with TX_R52_USE_THREADX_IRQ, board_init() brings up the  */
 /*    MPU, GICv3 and the generic timer tick here.  The MPU comes first on */
-/*    this board: the GIC region has to be mapped Device nGnRnE before any*/
-/*    GIC register can be touched at all.                                 */
+/*    this board: the GIC region has to be mapped Device nGnRnE before    */
+/*    any GIC register can be touched at all.                             */
 /*    and the generic timer tick here.  That is safe this early because   */
-/*    interrupts stay masked until _tx_thread_schedule enables them, so no*/
-/*    tick can be delivered before the kernel is ready to take one.       */
+/*    interrupts stay masked until _tx_thread_schedule enables them, so   */
+/*    no tick can be delivered before the kernel is ready to take one.    */
 /*    Without that symbol (the M2 cooperative demo) no tick is created,   */
 /*    which keeps M2 free of any interrupt dependency.                    */
 /*                                                                        */
