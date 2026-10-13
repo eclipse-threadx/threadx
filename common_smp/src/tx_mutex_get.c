@@ -60,6 +60,7 @@
 /*    _tx_thread_system_suspend         Suspend thread service            */
 /*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
 /*    _tx_mutex_priority_change         Inherit thread priority           */
+/*    _tx_mutex_priority_chain          Inherit along mutex chain         */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -309,6 +310,12 @@ UINT            status;
                            of the current thread.  */
                         _tx_mutex_priority_change(mutex_owner, thread_ptr -> tx_thread_priority);
 
+#ifdef TX_MUTEX_INHERIT_CHAIN_MAX
+
+                        /* Pass the priority on to the owner of any mutex the owner is waiting on.  */
+                        _tx_mutex_priority_chain(mutex_owner, thread_ptr -> tx_thread_priority);
+#endif
+
 #ifdef TX_MUTEX_ENABLE_PERFORMANCE_INFO
 
                         /* Increment the total mutex priority inheritance counter.  */
@@ -367,6 +374,12 @@ UINT            status;
                         /* Yes, raise the suspended, owning thread's priority to that
                            of the current thread.  */
                         _tx_mutex_priority_change(mutex_owner, thread_ptr -> tx_thread_priority);
+
+#ifdef TX_MUTEX_INHERIT_CHAIN_MAX
+
+                        /* Pass the priority on to the owner of any mutex the owner is waiting on.  */
+                        _tx_mutex_priority_chain(mutex_owner, thread_ptr -> tx_thread_priority);
+#endif
 
 #ifdef TX_MUTEX_ENABLE_PERFORMANCE_INFO
 

@@ -31,7 +31,7 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}.")
-set(default_build_coverage TX_QUEUE_MESSAGE_MAX_SIZE=32)
+set(default_build_coverage TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_MUTEX_INHERIT_CHAIN_MAX=2)
 set(disable_notify_callbacks_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_DISABLE_NOTIFY_CALLBACKS)
 set(stack_checking_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING)
 set(stack_checking_rand_fill_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING TX_ENABLE_RANDOM_NUMBER_STACK_FILLING)

@@ -11,7 +11,6 @@
 
 /* Portions of this file were generated with AI assistance. */
 
-
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -253,6 +252,16 @@
 
 /*
 #define TX_MUTEX_ENABLE_PERFORMANCE_INFO
+*/
+
+/* Determine if priority inheritance follows chains of mutexes. When a thread that inherits
+   a priority is itself waiting on a priority inheritance mutex, the owner of that mutex does
+   not inherit the priority unless the following is defined. Its value is the maximum number
+   of mutexes followed along one chain, which bounds the time tx_mutex_get spends passing
+   the priority on.  */
+
+/*
+#define TX_MUTEX_INHERIT_CHAIN_MAX      8
 */
 
 /* Determine if queue performance gathering is required by the application. When the following is

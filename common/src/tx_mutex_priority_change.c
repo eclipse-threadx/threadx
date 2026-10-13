@@ -320,3 +320,124 @@ UINT            map_index;
     }
 }
 
+
+#ifdef TX_MUTEX_INHERIT_CHAIN_MAX
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_mutex_priority_chain                            PORTABLE C      */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function passes an inherited priority along a chain of         */
+/*    priority inheritance mutexes. While the thread is waiting on such a */
+/*    mutex, the mutex owner inherits the priority and the owner becomes  */
+/*    the next thread in the chain. At most TX_MUTEX_INHERIT_CHAIN_MAX    */
+/*    mutexes are followed. The walk ends at the first owner already at   */
+/*    the priority or higher, so it also ends on a lock cycle.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                        Thread that inherited priority    */
+/*    new_priority                      Inherited priority                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_mutex_priority_change         Inherit thread priority           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_mutex_get                     Inherit priority                  */
+/*                                                                        */
+/**************************************************************************/
+VOID  _tx_mutex_priority_chain(TX_THREAD *thread_ptr, UINT new_priority)
+{
+
+#ifndef TX_NOT_INTERRUPTABLE
+TX_INTERRUPT_SAVE_AREA
+#endif
+
+TX_MUTEX        *mutex_ptr;
+TX_THREAD       *owner_ptr;
+UINT            chain_length;
+
+
+    /* Follow the chain for at most TX_MUTEX_INHERIT_CHAIN_MAX mutexes.  */
+    chain_length =  ((UINT) 0);
+    while ((thread_ptr != TX_NULL) && (chain_length < ((UINT) TX_MUTEX_INHERIT_CHAIN_MAX)))
+    {
+
+        /* Default to the end of the chain.  */
+        owner_ptr =  TX_NULL;
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+        /* Disable interrupts.  */
+        TX_DISABLE
+#endif
+
+        /* Determine if this thread is waiting on a mutex.  */
+        if ((thread_ptr -> tx_thread_state == TX_MUTEX_SUSP) && (thread_ptr -> tx_thread_suspend_cleanup != TX_NULL))
+        {
+
+            /* Pickup the mutex the thread is waiting on.  */
+            mutex_ptr =  TX_VOID_TO_MUTEX_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
+
+            /* Determine if priority inheritance is in effect.  */
+            if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
+            {
+
+                /* Determine if this is the highest priority to raise for this mutex.  */
+                if (mutex_ptr -> tx_mutex_highest_priority_waiting > new_priority)
+                {
+
+                    /* Remember this priority.  */
+                    mutex_ptr -> tx_mutex_highest_priority_waiting =  new_priority;
+                }
+
+                /* Pickup the mutex owner.  */
+                owner_ptr =  mutex_ptr -> tx_mutex_owner;
+
+                /* Determine if we have to update inherit priority level of the mutex owner.  */
+                if (owner_ptr -> tx_thread_inherit_priority > new_priority)
+                {
+
+                    /* Remember the new priority inheritance priority.  */
+                    owner_ptr -> tx_thread_inherit_priority =  new_priority;
+                }
+
+                /* Determine if the owner already runs at the priority or higher.  */
+                if (owner_ptr -> tx_thread_priority <= new_priority)
+                {
+
+                    /* Yes, the chain ends here.  */
+                    owner_ptr =  TX_NULL;
+                }
+            }
+        }
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+#endif
+
+        /* Determine if there is an owner to raise.  */
+        if (owner_ptr != TX_NULL)
+        {
+
+            /* Raise the owner's priority to the inherited priority.  */
+            _tx_mutex_priority_change(owner_ptr, new_priority);
+        }
+
+        /* Move to the next thread in the chain.  */
+        thread_ptr =  owner_ptr;
+        chain_length++;
+    }
+}
+#endif
