@@ -34,7 +34,8 @@
 /*    header the definitions have external linkage and no visible         */
 /*    declaration, which MISRA C:2012 Rule 8.4 prohibits and which        */
 /*    -Wmissing-prototypes reports.  Declaring them in one place also     */
-/*    means a signature change cannot silently disagree with the assembly.*/
+/*    means a signature change cannot silently disagree with the          */
+/*    assembly.                                                           */
 /*                                                                        */
 /**************************************************************************/
 

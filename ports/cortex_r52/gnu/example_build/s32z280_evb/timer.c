@@ -36,10 +36,10 @@
 /*                                                                        */
 /*    The rate itself is measured rather than computed.  The RTU divides  */
 /*    a cluster clock by RTU.GPR CFG_CNTDV to generate the timer's        */
-/*    clock-enable, so deriving it needs the divider AND the cluster clock*/
-/*    AND the PLL configuration feeding it -- three places to be wrong.   */
-/*    Sampling CNTPCT against host wall-clock time needs none of them and */
-/*    is checkable against the clock tree afterwards.                     */
+/*    clock-enable, so deriving it needs the divider AND the cluster      */
+/*    clock AND the PLL configuration feeding it -- three places to be    */
+/*    wrong. Sampling CNTPCT against host wall-clock time needs none of   */
+/*    them and is checkable against the clock tree afterwards.            */
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
@@ -151,10 +151,11 @@ void timer_stop(void)
 /**************************************************************************/
 /*  PMU cycle counter.                                                    */
 /*                                                                        */
-/*  PMCR.E gates all counters including the dedicated cycle counter, and   */
-/*  PMCNTENSET bit 31 enables that counter specifically.  Both are needed. */
-/*  PMCR.D is left clear so the counter advances every cycle rather than   */
-/*  every 64th, which is the resolution these measurements want.          */
+/*  PMCR.E gates all counters including the dedicated cycle counter, and  */
+/*  PMCNTENSET bit 31 enables that counter specifically.  Both are        */
+/*  needed. PMCR.D is left clear so the counter advances every cycle      */
+/*  rather than every 64th, which is the resolution these measurements    */
+/*  want.                                                                 */
 /**************************************************************************/
 
 #define PMCR_E      (1UL << 0)      /* enable all counters                 */

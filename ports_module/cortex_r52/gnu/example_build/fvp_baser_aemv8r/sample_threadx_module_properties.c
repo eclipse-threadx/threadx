@@ -25,105 +25,107 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Walks the module property combinations this port accepts and         */
-/*    refuses, and checks each one against the documented contract, on     */
-/*    the Armv8-R AEM FVP with no debugger and no person in the loop.      */
+/*    Walks the module property combinations this port accepts and        */
+/*    refuses, and checks each one against the documented contract, on    */
+/*    the Armv8-R AEM FVP with no debugger and no person in the loop.     */
 /*                                                                        */
-/*    WHY THIS IS A SEPARATE IMAGE from fvp_module.elf.  That one loads    */
-/*    one property word -- 0x02000003, the only combination any example    */
-/*    in the tree ships -- and asks what the hardware does about a module   */
-/*    that misbehaves.  This one asks what the LOADER does about a module   */
-/*    whose property word is something else, which is a question about a    */
-/*    module that never runs at all in four of the six cases below.  The    */
-/*    two have different subjects and different verdicts, and the only     */
-/*    thing they share is the module blob.                                 */
+/*    WHY THIS IS A SEPARATE IMAGE from fvp_module.elf.  That one loads   */
+/*    one property word -- 0x02000003, the only combination any example   */
+/*    in the tree ships -- and asks what the hardware does about a module */
+/*    that misbehaves.  This one asks what the LOADER does about a module */
+/*    whose property word is something else, which is a question about a  */
+/*    module that never runs at all in four of the six cases below.  The  */
+/*    two have different subjects and different verdicts, and the only    */
+/*    thing they share is the module blob.                                */
 /*                                                                        */
-/*    WHAT THE CONTRACT IS.  TXM_MODULE_MANAGER_REQUIRED_OPTIONS in         */
-/*    txm_module_port.h requires TXM_MODULE_USER_MODE and                   */
-/*    TXM_MODULE_MEMORY_PROTECTION together, which every other module port  */
-/*    in the tree leaves at zero.  The reason is PMSAv8-R and not policy:   */
-/*    the port programs a module's region table only when both bits are     */
-/*    set, the scheduler closes the kernel's window over module memory      */
-/*    before it dispatches a module thread, and per the Cortex-R52 TRM      */
-/*    section 8.2.1 there is no background region to fall back on -- EL0    */
-/*    accesses are faulted whenever the MPU is enabled, and EL1 needs       */
-/*    SCTLR.BR, which neither board support package sets.  So a module      */
-/*    that asks for user mode without protection is not an unprotected      */
-/*    module.  It is a module with no mapping, and it aborts on the fetch    */
-/*    of its own first instruction.                                        */
+/*    WHAT THE CONTRACT IS.  TXM_MODULE_MANAGER_REQUIRED_OPTIONS in       */
+/*    txm_module_port.h requires TXM_MODULE_USER_MODE and                 */
+/*    TXM_MODULE_MEMORY_PROTECTION together, which every other module     */
+/*    port in the tree leaves at zero.  The reason is PMSAv8-R and not    */
+/*    policy: the port programs a module's region table only when both    */
+/*    bits are set, the scheduler closes the kernel's window over module  */
+/*    memory before it dispatches a module thread, and per the Cortex-R52 */
+/*    TRM section 8.2.1 there is no background region to fall back on --  */
+/*    EL0 accesses are faulted whenever the MPU is enabled, and EL1 needs */
+/*    SCTLR.BR, which neither board support package sets.  So a module    */
+/*    that asks for user mode without protection is not an unprotected    */
+/*    module.  It is a module with no mapping, and it aborts on the fetch */
+/*    of its own first instruction.                                       */
 /*                                                                        */
-/*    TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS is supported and optional,   */
-/*    and both halves of that are checked below rather than asserted.      */
+/*    TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS is supported and optional, */
+/*    and both halves of that are checked below rather than asserted.     */
 /*                                                                        */
-/*    ONE BLOB, SIX PROPERTY WORDS.  The property word is a field of the    */
-/*    preamble, and the preamble is the first thing in the module image, so */
-/*    a case is set up by copying the blob into the staging area and        */
-/*    writing one word of the copy.  Nothing else about the module changes  */
-/*    between cases, which is what makes the six verdicts comparable: the   */
-/*    only variable is the word under test.  Six separately built module    */
-/*    images would each also carry their own code, and a difference in      */
-/*    outcome could then be blamed on any of it.                           */
+/*    ONE BLOB, SIX PROPERTY WORDS.  The property word is a field of the  */
+/*    preamble, and the preamble is the first thing in the module image,  */
+/*    so a case is set up by copying the blob into the staging area and   */
+/*    writing one word of the copy.  Nothing else about the module        */
+/*    changes between cases, which is what makes the six verdicts         */
+/*    comparable: the only variable is the word under test.  Six          */
+/*    separately built module images would each also carry their own      */
+/*    code, and a difference in outcome could then be blamed on any of    */
+/*    it.                                                                 */
 /*                                                                        */
-/*    THE FOUR REFUSALS ARE CHECKED BY NAME, not by "it did not run".  A    */
-/*    load that failed with TX_NO_MEMORY, or one that succeeded and then    */
-/*    faulted in the module's first instruction, would both leave the       */
-/*    module not running.  The whole point of the contract is that the      */
-/*    refusal arrives from txm_module_manager_in_place_load as              */
-/*    TXM_MODULE_INVALID_PROPERTIES, at the moment the property word can    */
-/*    still be corrected, so that status is what is compared.              */
+/*    THE FOUR REFUSALS ARE CHECKED BY NAME, not by "it did not run".  A  */
+/*    load that failed with TX_NO_MEMORY, or one that succeeded and then  */
+/*    faulted in the module's first instruction, would both leave the     */
+/*    module not running.  The whole point of the contract is that the    */
+/*    refusal arrives from txm_module_manager_in_place_load as            */
+/*    TXM_MODULE_INVALID_PROPERTIES, at the moment the property word can  */
+/*    still be corrected, so that status is what is compared.             */
 /*                                                                        */
-/*    A REFUSAL MUST ALSO COST NOTHING.  Each case gets its own instance    */
-/*    out of .bss, and a refused case's instance is checked to be           */
-/*    untouched and the manager's loaded count to be unmoved.  The port     */
-/*    would still be wrong if it rejected the module and left half an       */
-/*    instance behind, and the four refusals run before the two loads for   */
-/*    the same reason: what follows them proves the manager is still able   */
-/*    to load.                                                             */
+/*    A REFUSAL MUST ALSO COST NOTHING.  Each case gets its own instance  */
+/*    out of .bss, and a refused case's instance is checked to be         */
+/*    untouched and the manager's loaded count to be unmoved.  The port   */
+/*    would still be wrong if it rejected the module and left half an     */
+/*    instance behind, and the four refusals run before the two loads for */
+/*    the same reason: what follows them proves the manager is still able */
+/*    to load.                                                            */
 /*                                                                        */
-/*    THE TWO ACCEPTED CASES ARE RUN, not merely loaded.  A load that       */
-/*    returns TX_SUCCESS says nothing about whether the region table it     */
-/*    programmed describes anything, which is exactly the defect this file  */
-/*    exists for.  So both accepted cases start the module and wait for the */
-/*    abort it is written to provoke, and the abort is attributed to the    */
-/*    case by thread pointer and checked for its address, its mode and its  */
-/*    offset into the module's own code.                                    */
+/*    THE TWO ACCEPTED CASES ARE RUN, not merely loaded.  A load that     */
+/*    returns TX_SUCCESS says nothing about whether the region table it   */
+/*    programmed describes anything, which is exactly the defect this     */
+/*    file exists for.  So both accepted cases start the module and wait  */
+/*    for the abort it is written to provoke, and the abort is attributed */
+/*    to the case by thread pointer and checked for its address, its mode */
+/*    and its offset into the module's own code.                          */
 /*                                                                        */
-/*    The two differ in what they are granted, which is the optional half   */
-/*    of the contract:                                                     */
+/*    The two differ in what they are granted, which is the optional half */
+/*    of the contract:                                                    */
 /*                                                                        */
-/*      0x03, user mode and protection.  Granted NOTHING.  It reports       */
-/*      through no shared granule, so what is read back is the abort: the   */
-/*      module wrote its own data, then reached the status word it was      */
-/*      never granted, and faulted there.  A module that did not ask for    */
-/*      shared access and was given none cannot reach the shared area, and  */
-/*      the fault address says so.                                         */
+/*      0x03, user mode and protection.  Granted NOTHING.  It reports     */
+/*      through no shared granule, so what is read back is the abort: the */
+/*      module wrote its own data, then reached the status word it was    */
+/*      never granted, and faulted there.  A module that did not ask for  */
+/*      shared access and was given none cannot reach the shared area,    */
+/*      and the fault address says so.                                    */
 /*                                                                        */
-/*      0x07, and the status granule granted.  The module reports its       */
-/*      progress through that granule, gets as far as a kernel call, and    */
-/*      faults where fvp_module.elf's first pass does -- on the kernel's    */
-/*      data.  So the shared grant is what is under test here, and the      */
-/*      progress word is the evidence that it worked.                      */
+/*      0x07, and the status granule granted.  The module reports its     */
+/*      progress through that granule, gets as far as a kernel call, and  */
+/*      faults where fvp_module.elf's first pass does -- on the kernel's  */
+/*      data.  So the shared grant is what is under test here, and the    */
+/*      progress word is the evidence that it worked.                     */
 /*                                                                        */
-/*    WHAT A GREEN RUN HERE DOES NOT PROVE.  Two things, and both are        */
-/*    limits of the contract rather than gaps in the checking.              */
-/*                                                                          */
-/*    The port does not gate txm_module_manager_external_memory_enable on    */
-/*    TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS, and neither does any other   */
-/*    module port; a manager that granted a region to the 0x03 module would  */
-/*    be obliged.  That is why the 0x03 case above is granted nothing rather */
-/*    than granted something and expected to be refused: this file checks    */
-/*    the contract the port states, and the port does not state that one.    */
-/*                                                                          */
-/*    And nothing here exercises the property-flag test in                   */
-/*    tx_thread_schedule.S, which decides the same question a second time    */
-/*    for a thread being dispatched.  It cannot: the loader refuses every    */
-/*    combination that would reach the scheduler with an unprogrammed region */
-/*    table, so the assembly's test is unreachable by construction while     */
-/*    TXM_MODULE_MANAGER_REQUIRED_OPTIONS stands.  That redundancy is the    */
-/*    point of it -- the scheduler stops depending on a loader invariant it  */
-/*    cannot see -- but it does mean the test is covered by the offset       */
-/*    assertion in txm_module_manager_offset_check.c and by reading it, and  */
-/*    not by any run of this image.                                         */
+/*    WHAT A GREEN RUN HERE DOES NOT PROVE.  Two things, and both are     */
+/*    limits of the contract rather than gaps in the checking.            */
+/*                                                                        */
+/*    The port does not gate txm_module_manager_external_memory_enable on */
+/*    TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS, and neither does any      */
+/*    other module port; a manager that granted a region to the 0x03      */
+/*    module would be obliged.  That is why the 0x03 case above is        */
+/*    granted nothing rather than granted something and expected to be    */
+/*    refused: this file checks the contract the port states, and the     */
+/*    port does not state that one.                                       */
+/*                                                                        */
+/*    And nothing here exercises the property-flag test in                */
+/*    tx_thread_schedule.S, which decides the same question a second time */
+/*    for a thread being dispatched.  It cannot: the loader refuses every */
+/*    combination that would reach the scheduler with an unprogrammed     */
+/*    region table, so the assembly's test is unreachable by construction */
+/*    while TXM_MODULE_MANAGER_REQUIRED_OPTIONS stands.  That redundancy  */
+/*    is the point of it -- the scheduler stops depending on a loader     */
+/*    invariant it cannot see -- but it does mean the test is covered by  */
+/*    the offset assertion in txm_module_manager_offset_check.c and by    */
+/*    reading it, and not by any run of this image.                       */
 /*                                                                        */
 /**************************************************************************/
 
@@ -249,8 +251,8 @@ static unsigned char    module_object_pool[MODULE_OBJECT_POOL_SIZE]
 /**************************************************************************/
 /*  The cases.                                                            */
 /*                                                                        */
-/*  Every low-byte combination the port has an opinion about, and the      */
-/*  opinion.  The compiler field is ORed in when the word is written, so   */
+/*  Every low-byte combination the port has an opinion about, and the     */
+/*  opinion.  The compiler field is ORed in when the word is written, so  */
 /*  the option bits stay legible here.                                    */
 /**************************************************************************/
 
@@ -384,8 +386,8 @@ static unsigned char    report_stack[2048] __attribute__((aligned(8)));
 /**************************************************************************/
 /*  Fault notification.                                                   */
 /*                                                                        */
-/*  Records rather than prints: this runs in Abort mode on the Abort       */
-/*  stack, which is a kilobyte and already carries the terminate           */
+/*  Records rather than prints: this runs in Abort mode on the Abort      */
+/*  stack, which is a kilobyte and already carries the terminate          */
 /*  underneath this frame.                                                */
 /**************************************************************************/
 
@@ -406,13 +408,13 @@ static void put_field(const char *label, unsigned long value)
 
 
 /**************************************************************************/
-/*  The shared status granule, reached through the manager's load window.  */
+/*  The shared status granule, reached through the manager's load window. */
 /*                                                                        */
-/*  No kernel region covers the module area; region 16 does, and the       */
-/*  scheduler enables it for every thread that owns no module.  This       */
+/*  No kernel region covers the module area; region 16 does, and the      */
+/*  scheduler enables it for every thread that owns no module.  This      */
 /*  thread owns none, so the window is open on it.                        */
 /*                                                                        */
-/*  MISRA C:2012 Rule 11.6 is deliberately violated: the address is an     */
+/*  MISRA C:2012 Rule 11.6 is deliberately violated: the address is an    */
 /*  agreement between two separately linked images.                       */
 /**************************************************************************/
 
@@ -438,10 +440,10 @@ static ULONG module_status_read(void)
 
 
 /**************************************************************************/
-/*  A byte copy, written out rather than called for.  The manager links    */
-/*  -nostartfiles and nothing else in this image reaches for a C library,  */
-/*  so calling memcpy would pull one in for a copy of under two kilobytes  */
-/*  that happens six times.                                              */
+/*  A byte copy, written out rather than called for.  The manager links   */
+/*  -nostartfiles and nothing else in this image reaches for a C library, */
+/*  so calling memcpy would pull one in for a copy of under two kilobytes */
+/*  that happens six times.                                               */
 /**************************************************************************/
 
 static void copy_bytes(unsigned char *destination, const unsigned char *source,
@@ -457,20 +459,21 @@ static void copy_bytes(unsigned char *destination, const unsigned char *source,
 
 
 /**************************************************************************/
-/*  Build one case in the staging area: the blob, with one word replaced.  */
+/*  Build one case in the staging area: the blob, with one word replaced. */
 /*                                                                        */
-/*  Copied afresh for every case rather than patched in place, so that a   */
-/*  case cannot inherit anything from the one before it -- including the   */
-/*  previous property word, which is the single variable under test.       */
+/*  Copied afresh for every case rather than patched in place, so that a  */
+/*  case cannot inherit anything from the one before it -- including the  */
+/*  previous property word, which is the single variable under test.      */
 /*                                                                        */
-/*  The cache maintenance is not a precaution the passing run justifies.   */
-/*  These are data writes to memory that is about to be fetched as          */
-/*  instructions, and the module area is mapped Normal write-back, so the  */
-/*  copied bytes may sit in dirty D-cache lines while the instruction side  */
-/*  -- which is not coherent with the D cache on this core -- fetches what  */
-/*  main memory still holds.  A cold I cache over a never-executed address  */
-/*  happens to work, and keeps happening to work until the staging area is  */
-/*  reused, which is exactly what this file does six times.                */
+/*  The cache maintenance is not a precaution the passing run justifies.  */
+/*  These are data writes to memory that is about to be fetched as        */
+/*  instructions, and the module area is mapped Normal write-back, so the */
+/*  copied bytes may sit in dirty D-cache lines while the instruction     */
+/*  side -- which is not coherent with the D cache on this core --        */
+/*  fetches what main memory still holds.  A cold I cache over a          */
+/*  never-executed address happens to work, and keeps happening to work   */
+/*  until the staging area is reused, which is exactly what this file     */
+/*  does six times.                                                       */
 /**************************************************************************/
 
 static ULONG stage_module(ULONG options)
@@ -508,8 +511,8 @@ static ULONG stage_module(ULONG options)
 
 
 /**************************************************************************/
-/*  One case: stage it, load it, and -- if the contract says it loads --   */
-/*  start it and wait for the abort it is written to provoke.              */
+/*  One case: stage it, load it, and -- if the contract says it loads --  */
+/*  start it and wait for the abort it is written to provoke.             */
 /**************************************************************************/
 
 static void run_one_case(UINT index)

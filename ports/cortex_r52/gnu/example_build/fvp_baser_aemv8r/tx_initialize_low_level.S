@@ -60,12 +60,12 @@
 /*    here and no run-time stack-overlap check to perform -- the linker   */
 /*    guarantees the regions do not overlap.                              */
 /*                                                                        */
-/*    When built with TX_R52_USE_THREADX_IRQ, board_init() brings up GICv3*/
-/*    and the generic timer tick here.  That is safe this early because   */
-/*    interrupts stay masked until _tx_thread_schedule enables them, so no*/
-/*    tick can be delivered before the kernel is ready to take one.       */
-/*    Without that symbol (the M2 cooperative demo) no tick is created,   */
-/*    which keeps M2 free of any interrupt dependency.                    */
+/*    When built with TX_R52_USE_THREADX_IRQ, board_init() brings up      */
+/*    GICv3 and the generic timer tick here.  That is safe this early     */
+/*    because interrupts stay masked until _tx_thread_schedule enables    */
+/*    them, so no tick can be delivered before the kernel is ready to     */
+/*    take one. Without that symbol (the M2 cooperative demo) no tick is  */
+/*    created, which keeps M2 free of any interrupt dependency.           */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
