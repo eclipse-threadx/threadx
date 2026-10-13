@@ -159,7 +159,7 @@ model and not an R52 at all.
         CPSR at EL2  0x000001DA  mode 0x1A, Hyp
         CPSR at EL1  0x600001D3  mode 0x13, Supervisor
 
-    The two CPSR values are the point of the milestone: they are the EL2 to EL1
+    The two CPSR values are the point of the check: they are the EL2 to EL1
     drop performed by this code on silicon rather than on a model.
 
 
@@ -170,7 +170,7 @@ model and not an R52 at all.
     0x40170000, the tempting wrong choice as the first instance in the
     Reference Manual's list.  What is missing is the clock configuration needed
     to compute a baud rate; a console at the wrong rate produces garbage
-    indistinguishable from a crash, which is why this milestone reports through
+    indistinguishable from a crash, which is why this check reports through
     memory instead.
 
     No timer, no GIC, no MPU programming and no ThreadX: this image does not

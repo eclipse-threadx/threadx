@@ -13,7 +13,7 @@
 /* Copied unmodified from samples/demo_threadx.c for the Armv8-R AEM FVP
    example build, then extended with a verification thread and a bsp_main
    entry point.  Keeping the demo body byte-identical to the shipped sample
-   is the point of AR1 milestone M4: it shows the standard ThreadX demo runs
+   is the point of this image: it shows the standard ThreadX demo runs
    on Cortex-R52 with no demo-side changes.  The additions are confined to
    the end of this file and one call in tx_application_define.  */
 
@@ -190,7 +190,7 @@ CHAR    *pointer = TX_NULL;
     /* Release the block back to the pool.  */
     tx_block_release(pointer);
 
-    /* AR1/M4 addition: create the verification thread.  */
+    /* Addition: create the verification thread.  */
     demo_verify_create();
 }
 

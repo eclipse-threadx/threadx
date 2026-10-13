@@ -32,7 +32,7 @@
 /*    through the daughtercard USB-UART, but its baud rate depends on     */
 /*    clock configuration that is not yet established, and a console that */
 /*    prints at the wrong rate produces garbage indistinguishable from a  */
-/*    crash. So this milestone reports through memory instead, which      */
+/*    crash. So this check reports through memory instead, which          */
 /*    cannot be mis-configured.  The console arrives in the next step.    */
 /*                                                                        */
 /*    Only EL1-accessible registers are read here.  EL2-only ones         */

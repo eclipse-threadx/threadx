@@ -25,13 +25,13 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M1 boot check.  Verifies that the reset path really   */
+/*    Boot check.  Verifies that the reset path really                    */
 /*    configured EL2 and then dropped to EL1, and that the EL2 HVC seam   */
-/*    used by ZoneX (AR3) is reachable from EL1 and returns correctly.    */
+/*    used by ZoneX is reachable from EL1 and returns correctly.          */
 /*                                                                        */
 /*    This deliberately asserts the resulting exception level rather than */
 /*    merely printing a message: "it printed something" does not prove a  */
-/*    correct EL2-to-EL1 transition, and AR3 depends on that transition.  */
+/*    correct EL2-to-EL1 transition, which ZoneX depends on.              */
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
@@ -101,7 +101,7 @@ void bsp_main(void)
     unsigned long hvc_after;
     unsigned int  failures = 0U;
 
-    console_puts("\n=== ThreadX AR1/M1 boot check "
+    console_puts("\n=== ThreadX boot check "
                  "(Cortex-R52, Armv8-R AArch32, Armv8-R AEM FVP) ===\n");
 
     /* Check 1: we are executing at EL1, not still at EL2.  */
@@ -133,7 +133,7 @@ void bsp_main(void)
     }
 
     /* Check 2: the EL2 HVC seam is reachable from EL1 and returns.  This is
-       what AR3 (ZoneX Phase-0) builds on, so it is verified from AR1.  */
+       what ZoneX builds on, so the boot check verifies it.  */
 
     hvc_before = _hvc_call_count;
     issue_hvc();
