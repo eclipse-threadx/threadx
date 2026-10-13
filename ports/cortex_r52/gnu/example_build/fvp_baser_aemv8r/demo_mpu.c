@@ -25,7 +25,7 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M5: PMSAv8-R protection and caches.                   */
+/*    PMSAv8-R protection and caches.                                     */
 /*                                                                        */
 /*    The important check here is enforcement, not configuration.         */
 /*    Reading SCTLR back only proves a bit was set; it says nothing about */
@@ -278,7 +278,7 @@ void tx_application_define(void *first_unused_memory)
 
 void bsp_main(void)
 {
-    console_puts("\n=== ThreadX AR1/M5 PMSAv8-R protection and caches "
+    console_puts("\n=== ThreadX PMSAv8-R protection and caches "
                  "(Cortex-R52, Armv8-R AEM FVP) ===\n");
 
     tx_kernel_enter();

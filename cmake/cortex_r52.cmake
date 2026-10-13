@@ -15,7 +15,7 @@ set(THREADX_TOOLCHAIN "gnu")
 # FPU -- GCC rejects "+nofp" for this core and offers only "+nofp.dp" (drop
 # double precision).  There is therefore no FPU-less R52, so the soft-float
 # baseline selects the soft *ABI* rather than removing the FPU.  The hard-float
-# variant with lazy VFP context save arrives with AR1 milestone M5.
+# variant adds lazy VFP context save (TX_R52_ENABLE_VFP).
 if(NOT DEFINED TX_R52_FLOAT_ABI)
     set(TX_R52_FLOAT_ABI "soft" CACHE STRING "R52 float ABI: soft | hard")
 endif()

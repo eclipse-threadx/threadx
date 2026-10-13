@@ -98,7 +98,7 @@ void console_puts(const char *string_ptr)
 #ifdef TX_R52_CONSOLE_PL011
 
     /* Initialise on first use rather than from board_init, so that images
-       with no ThreadX initialisation path (the M1 boot check) also get a
+       with no ThreadX initialisation path (the boot check) also get a
        working UART console.  */
 
     static unsigned int initialised = 0U;

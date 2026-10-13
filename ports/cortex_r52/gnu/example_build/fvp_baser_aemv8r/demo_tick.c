@@ -17,7 +17,7 @@
 /*                                                                        */
 /*  DEMONSTRATION                                          RELEASE        */
 /*                                                                        */
-/*    demo_m3.c                                        Cortex-R52/GNU     */
+/*    demo_tick.c                                      Cortex-R52/GNU     */
 /*                                                           6.5.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -25,8 +25,8 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M3: periodic tick and preemptive scheduling.  This    */
-/*    exercises the parts of the port that M2 could not reach --          */
+/*    Periodic tick and preemptive scheduling.  This                      */
+/*    exercises the parts of the port that demo_coop.c cannot reach --    */
 /*    _tx_thread_context_save, _tx_timer_interrupt and                    */
 /*    _tx_thread_context_restore -- by driving them from a real generic   */
 /*    timer interrupt routed through GICv3.                               */
@@ -243,7 +243,7 @@ void tx_application_define(void *first_unused_memory)
 
 void bsp_main(void)
 {
-    console_puts("\n=== ThreadX AR1/M3 tick and preemption "
+    console_puts("\n=== ThreadX tick and preemption "
                  "(Cortex-R52, Armv8-R AArch32, Armv8-R AEM FVP) ===\n");
 
     tx_kernel_enter();

@@ -30,7 +30,7 @@
 /*    file configures EL2 first, installs both the EL2 and EL1 vector     */
 /*    tables, and only then drops to EL1 (Supervisor mode) to run the     */
 /*    kernel.  The HVC entry in the EL2 table is the seam that ZoneX      */
-/*    (roadmap AR3) grows into -- it is deliberately present from AR1 so  */
+/*    grows into.  It is deliberately present in every image so           */
 /*    that partitioning does not require re-architecting the boot path.   */
 /*                                                                        */
 /*    Define TX_R52_BOOT_AT_EL1 to skip EL2 configuration, for targets    */
@@ -137,7 +137,7 @@ el2_vectors:
 /* Offsets 0x04-0x10 are exceptions taken *from* Hyp mode itself.  Offset
    0x14 is the Hyp Trap Entry: every exception routed to EL2 from EL1/EL0 --
    HVC, stage-2 faults, trapped register accesses -- funnels through it and
-   is decoded from HSR.  That single funnel is the ZoneX (AR3) seam.  */
+   is decoded from HSR.  That single funnel is the ZoneX seam.  */
 
     b       el2_trap_reset                  /* 0x00  reset (unused at EL2)  */
     b       el2_trap_undef                  /* 0x04  undef, from Hyp        */
@@ -192,9 +192,9 @@ _start:
     isb
 
     /* Configure EL2: keep exceptions and interrupts routed to EL1, and
-       leave the stage-2 MPU disabled for AR1 (the FVP background memory
+       leave the stage-2 MPU disabled (the FVP background memory
        map already permits execution and data access in low DRAM).  ZoneX
-       enables HCR_VM and programs stage 2 in AR3.
+       enables HCR_VM and programs stage 2.
 
        HCR_HCD is cleared explicitly so HVC is enabled from EL1 rather than
        relying on its reset value -- the ZoneX seam depends on it.  */
@@ -375,7 +375,7 @@ _start_hang:
 /*  plain B: context save adjusts lr itself to find the point of          */
 /*  interrupt.  Interrupts are still disabled on return from it.          */
 /*                                                                        */
-/*  Images that do not link ThreadX (the M1 boot check) keep the          */
+/*  Images that do not link ThreadX (the boot check) keep the             */
 /*  self-identifying fault reporter instead.                              */
 /**************************************************************************/
 
@@ -434,12 +434,12 @@ __tx_irq_processing_return:
 #endif
 
 /**************************************************************************/
-/*  el2_hyp_trap_entry -- the ZoneX (AR3) seam.                           */
+/*  el2_hyp_trap_entry -- the ZoneX seam.                                 */
 /*                                                                        */
 /*  Reached for every exception routed to EL2 from EL1/EL0, so the cause  */
-/*  is decoded from HSR.EC before dispatch.  AR1 handles only HVC, which  */
+/*  is decoded from HSR.EC before dispatch.  It handles only HVC, which   */
 /*  it counts before returning to EL1; that proves EL2 is live and        */
-/*  reachable without the boot path changing later.  AR3 grows the        */
+/*  reachable without the boot path changing later.  ZoneX grows the      */
 /*  dispatch table here (stage-2 faults, trapped accesses, IRQ paravirt). */
 /*                                                                        */
 /*  EL1's registers must be preserved -- this runs on the Hyp stack.      */
@@ -454,7 +454,7 @@ el2_hyp_trap_entry:
     cmp     r1, #HSR_EC_HVC
     bne     el2_hyp_trap_unhandled
 
-    /* HVC from EL1: AR1 placeholder for the ZoneX hypercall dispatch.  */
+    /* HVC from EL1: placeholder for the ZoneX hypercall dispatch.  */
 
     ldr     r0, =_hvc_call_count
     ldr     r1, [r0]
@@ -469,12 +469,10 @@ el2_hyp_trap_unhandled:
 
 /**************************************************************************/
 /*  Unhandled exceptions.  Each records a distinct code in r12 so a       */
-/*  halted model or a later fault dump (AR1/M5) can identify the cause.   */
-/*  Real handlers arrive with the interrupt work in M3.                   */
+/*  halted model or a fault dump can identify the cause.                  */
 /**************************************************************************/
 
-/* Unhandled exceptions.  Real handlers arrive with the interrupt work in
-   AR1/M3; until then each vector identifies itself and halts.  */
+/* Unhandled exceptions.  Each vector identifies itself and halts.  */
 
 el2_trap_reset:     FAULT_REPORT msg_el2_reset
 el2_trap_undef:     FAULT_REPORT msg_el2_undef
@@ -609,7 +607,7 @@ el1_trap_fiq:
     /* Both guards are needed, and the second is not obvious.
      * TX_ENABLE_FIQ_SUPPORT is PUBLIC on the threadx target, so it reaches every
      * image the moment the library is built with FIQ, including images that link
-     * no interrupt controller at all.  demo_m2 is one: it has no gicv3.c and no
+     * no interrupt controller at all.  demo_coop is one: it has no gicv3.c and no
      * irq_dispatch.c, so referencing gicv3_acknowledge_group0 and
      * board_fiq_service from here broke its link outright.  Images without the
      * interrupt infrastructure keep the fault reporter on this vector, which is

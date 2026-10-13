@@ -90,8 +90,8 @@ extern char __data_end__;
 /*  Deliberately minimal and readable: code is read-only and executable,  */
 /*  everything writable is non-executable, and the peripheral half of the */
 /*  address map is Device.  A write-protected code region is the point -- */
-/*  it is what makes the MPU do something observable, and AR2 extends the */
-/*  same table with per-module regions.                                   */
+/*  it is what makes the MPU do something observable, and the module      */
+/*  port extends the same table with per-module regions.                  */
 /**************************************************************************/
 
 /* Table capacity.  The FVP example this file came from declared this as [3],

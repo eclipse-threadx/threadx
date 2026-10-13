@@ -64,8 +64,8 @@
 /*    GICv3 and the generic timer tick here.  That is safe this early     */
 /*    because interrupts stay masked until _tx_thread_schedule enables    */
 /*    them, so no tick can be delivered before the kernel is ready to     */
-/*    take one. Without that symbol (the M2 cooperative demo) no tick is  */
-/*    created, which keeps M2 free of any interrupt dependency.           */
+/*    take one. Without that symbol (the cooperative demo) no tick is     */
+/*    created, which keeps that demo free of any interrupt dependency.    */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */

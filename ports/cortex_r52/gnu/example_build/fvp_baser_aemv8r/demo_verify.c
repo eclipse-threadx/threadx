@@ -25,11 +25,11 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M4: verifies that the standard eight-thread ThreadX   */
+/*    Verifies that the standard eight-thread ThreadX                     */
 /*    demo makes progress on Cortex-R52, then terminates the simulation   */
 /*    so the run can be automated.                                        */
 /*                                                                        */
-/*    Where M3 proved the tick and a single preemption, this exercises    */
+/*    Where demo_tick.c tests the tick and one preemption, this exercises */
 /*    the demo's full object set -- queue, semaphore, mutex, event flags, */
 /*    byte pool and block pool -- across eight threads at five            */
 /*    priorities. Each of the ten demo counters is required to have       */
@@ -179,7 +179,7 @@ void demo_verify_create(void)
 
 void bsp_main(void)
 {
-    console_puts("\n=== ThreadX AR1/M4 standard eight-thread demo "
+    console_puts("\n=== ThreadX standard eight-thread demo "
                  "(Cortex-R52, Armv8-R AArch32, Armv8-R AEM FVP) ===\n");
 
     tx_kernel_enter();

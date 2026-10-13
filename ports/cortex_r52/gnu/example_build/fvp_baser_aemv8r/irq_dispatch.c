@@ -43,7 +43,7 @@
 
 extern void _tx_timer_interrupt(void);
 
-/* Observability for the M3 checks.  board_timer_intid records the INTID that
+/* Observability for the tick checks.  board_timer_intid records the INTID that
    actually arrived -- this is how the timer PPI was identified during bring-up
    (see TIMER_PPI_INTID) and it keeps reporting it, so a platform that assigns
    the timer elsewhere shows up as an unexpected INTID rather than a silent

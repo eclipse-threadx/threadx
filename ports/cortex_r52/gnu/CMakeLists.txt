@@ -72,7 +72,7 @@ if(TX_R52_ENABLE_VFP)
     target_compile_definitions(${PROJECT_NAME} PUBLIC TX_ENABLE_VFP_SUPPORT)
 endif()
 
-# Armv8-R AEM FVP example builds (boot check now, kernel demo from AR1/M2).
+# Armv8-R AEM FVP example builds (boot check and kernel demos).
 # Off by default so the default build stays a pure static-library build.
 option(TX_R52_BUILD_FVP_EXAMPLE "Build the Armv8-R AEM FVP example targets" OFF)
 if(TX_R52_BUILD_FVP_EXAMPLE)
