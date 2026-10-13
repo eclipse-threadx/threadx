@@ -157,7 +157,7 @@ jobs:
 
     - name: Upload Test Results
       if: success() || failure()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: test_reports ${{ inputs.result_affix }}
         path: |
@@ -244,7 +244,7 @@ jobs:
     # The top level therefore holds only the suite directory and the merged XML,
     # which is the shape the deploy already expects.
     - name: Upload Code Coverage Artifacts
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: ${{ !cancelled() && (inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
           name: ${{ steps.artifact.outputs.coverage_report }}
@@ -258,7 +258,7 @@ jobs:
     # it. The name deliberately does not match coverage_report-*, so the deploy
     # job's pattern does not pick it up and it never reaches the published site.
     - name: Upload Per-Configuration Coverage
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       with:
           name: coverage_detail ${{ inputs.result_affix }}
@@ -311,7 +311,7 @@ jobs:
     # Verified on the runner: both hold merged.xml. That file is consumed by
     # CodeCoverageSummary back in run_tests and is not read here, so this is
     # untidy rather than wrong.
-    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+    - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
       if: ${{ inputs.skip_test }}
       with:
         pattern: coverage_report-*
@@ -337,7 +337,7 @@ jobs:
 
     - name: Deploy GitHub Pages site
       id: deployment
-      uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+      uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
     - name: Write Code Coverage Report URL
       run: >-
