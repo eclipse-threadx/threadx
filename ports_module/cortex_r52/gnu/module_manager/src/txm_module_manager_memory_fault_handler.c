@@ -52,15 +52,13 @@
    architecture _tx_thread_system_return switches context immediately and never
    comes back, so the callback would be unreachable.
 
-   The body below is therefore left exactly as the cortex_m33, cortex_a7 and
-   cortex_m7 ports have it, and the requirement is met where it belongs -- in
+   The body below is therefore left exactly as the other module ports have it,
+   and the requirement is met where it belongs -- in
    txm_module_manager_fault_capture.S, which increments _tx_thread_system_state
    around this call, clears _tx_thread_current_ptr afterwards and returns into
-   the scheduler.  The Cortex-M ports need no such bracket because their
-   _tx_thread_system_return only pends PendSV and returns.  Anyone tempted to
-   reorder the two statements below to "fix" a notify callback that does not fire
-   should look at the abort vector first: the ordering here is upstream's and it
-   is not the defect.  */
+   the scheduler.  Anyone tempted to reorder the two statements below to "fix" a
+   notify callback that does not fire should look at the abort vector first: the
+   ordering here is upstream's and it is not the defect.  */
 
 /* Define the user's fault notification callback function pointer.  This is
    setup via the txm_module_manager_memory_fault_notify API.  */
