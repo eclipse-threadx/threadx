@@ -390,6 +390,13 @@ THREAD_DECLARE  volatile UINT   _tx_thread_preempt_disable;
 THREAD_DECLARE  VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
 
 
+/* Define the global function pointer that updates the priority inheritance of a mutex
+   after the priority of a thread waiting on it changes. This pointer is setup during
+   mutex initialization.  */
+
+THREAD_DECLARE  VOID            (*_tx_thread_mutex_priority_update)(TX_MUTEX *mutex_ptr);
+
+
 /* Define the global build options variable.  This contains a bit map representing
    how the ThreadX library was built. The following are the bit field definitions:
 
