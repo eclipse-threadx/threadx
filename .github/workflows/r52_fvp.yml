@@ -78,26 +78,18 @@ jobs:
       # 14.3.rel1 is the project's GCC 14 default.
       GCC_VERSION: 14.3.rel1
 
-      # Where the Armv8-R AEM FVP comes from.
+      # The Armv8-R AEM FVP, from Arm's unauthenticated download permalink.
+      # Only the _Linux_x86.tar.gz name resolves; the _Linux64.tgz name of
+      # older releases returns 404. The archive holds Arm's installer, which
+      # refuses to run until its EULA is accepted, so the install step accepts
+      # it. The model is fetched from Arm on every cache miss and never
+      # re-hosted.
       #
-      # Arm distributes it free of charge but behind a click-through licence,
-      # with no stable unauthenticated download URL we can hard-code -- the
-      # permalink forms under developer.arm.com/-/cdn-downloads all 404 for
-      # this model. So the URL is a repository variable rather than a literal
-      # here, and the maintainer sets it once to a location the runner can
-      # reach (an Eclipse-hosted mirror, a release asset, or Arm's own URL if
-      # a durable one appears).
-      #
-      # Set FVP_AEMV8R_URL to a .tgz/.tar.gz of the model, and optionally
-      # FVP_AEMV8R_SHA256 to its checksum. With the checksum set the download
-      # is verified; without it the run says so rather than pretending.
-      #
-      # When the variable is unset the build lanes still run and still gate the
-      # pull request -- only execution is skipped, loudly, in the log and in
-      # the job summary. A silent green here would recreate the exact hole this
-      # workflow exists to close.
-      FVP_URL: ${{ vars.FVP_AEMV8R_URL }}
-      FVP_SHA256: ${{ vars.FVP_AEMV8R_SHA256 }}
+      # Pinned with its checksum so that a change of model is a reviewed diff.
+      # Keep the version in step with the find_program hint in
+      # ports/cortex_r52/gnu/example_build/fvp_baser_aemv8r/CMakeLists.txt.
+      FVP_URL: https://developer.arm.com/-/cdn-downloads/permalink/FVPs-Architecture/FM-11.32/FVP_Base_AEMv8R_11.32_19_Linux_x86.tar.gz
+      FVP_SHA256: e6d046946529db86129ee6d8e7a2d5c3667d6c4c98365ad815586db8bca06613
 
     steps:
     # Actions are pinned to a commit SHA with the version in the trailing
@@ -150,48 +142,34 @@ jobs:
           sudo apt-get install -y --no-install-recommends ninja-build
         fi
 
-    # The cache key has to move when the model does, and stay put when it does
-    # not. hashFiles() reads files, so it cannot hash a variable: pointing it
-    # at this workflow keyed the cache on the file's own contents, which is
-    # wrong twice over -- repointing FVP_AEMV8R_URL kept serving the old model,
-    # and editing anything here forced a needless refetch of a large archive.
-    # The URL is hashed here instead, so the key tracks exactly what it names.
-    - name: Key the FVP cache on the download URL
-      id: fvp-key
-      if: env.FVP_URL != ''
-      run: |
-        set -eu
-        printf 'hash=%s\n' "$(printf '%s' "$FVP_URL" | sha256sum | cut -d' ' -f1)" >>"$GITHUB_OUTPUT"
-
+    # Keyed on the archive's checksum, which changes exactly when the model
+    # does.
     - name: Cache the Armv8-R AEM FVP
       id: cache-fvp
-      if: env.FVP_URL != ''
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: fvp
-        key: fvp-aemv8r-${{ steps.fvp-key.outputs.hash }}-${{ env.FVP_SHA256 || 'nosum' }}
+        key: fvp-aemv8r-${{ env.FVP_SHA256 }}
 
     - name: Install the Armv8-R AEM FVP
-      if: env.FVP_URL != '' && steps.cache-fvp.outputs.cache-hit != 'true'
+      if: steps.cache-fvp.outputs.cache-hit != 'true'
       run: |
         set -eu
-        mkdir -p fvp && cd fvp
-        curl -fsSL -o fvp.tgz "$FVP_URL"
-        if [ -n "${FVP_SHA256:-}" ]; then
-          echo "$FVP_SHA256  fvp.tgz" | sha256sum -c -
-        else
-          echo "::warning::FVP_AEMV8R_SHA256 is not set; the download was not verified."
-        fi
-        tar xf fvp.tgz
-        rm -f fvp.tgz
+        mkdir -p fvp-download
+        curl -fsSL --retry 3 -o fvp-download/fvp.tar.gz "$FVP_URL"
+        echo "$FVP_SHA256  fvp-download/fvp.tar.gz" | sha256sum -c -
+        tar xzf fvp-download/fvp.tar.gz -C fvp-download
+        sh fvp-download/FVP_Base_AEMv8R_*_Linux_x86.sh \
+            --i-agree-to-the-contained-eula --no-interactive \
+            -d "$GITHUB_WORKSPACE/fvp"
+        rm -rf fvp-download
 
     # The model links against libatomic. Everything else it needs
     # (libstdc++, libgcc_s, librt, libpthread) is already on the runner image,
-    # and its own libscxframework/libsystemc ship inside the tarball. The
+    # and its own libscxframework/libsystemc ship with the model. The
     # runner usually has libatomic1 by way of gcc, so this is guarded for the
     # same reason the ninja step is.
     - name: Ensure the FVP's runtime dependencies are present
-      if: env.FVP_URL != ''
       run: |
         set -eu
         if ldconfig -p | grep -q 'libatomic\.so\.1'; then
@@ -210,38 +188,23 @@ jobs:
     # which means -DFVP_BASER_AEMV8R=<path> overrides it with no change to the
     # CMake files.
     #
-    # FVP_PRESENT, not a bare "did the variable exist", so that a URL which
-    # downloads something that is not the model fails here rather than
-    # silently skipping every test later.
+    # A missing binary fails here, rather than leaving CMake without a model
+    # and CTest with no tests to run.
     - name: Locate the FVP
       id: fvp
       run: |
         set -eu
-        if [ -z "${FVP_URL:-}" ]; then
-          echo "present=false" >>"$GITHUB_OUTPUT"
-          echo "::warning::FVP_AEMV8R_URL is not set for this repository, so the Cortex-R52 images were built but NOT executed. Set the repository variable to enable the execution lanes."
-          {
-            echo "### Cortex-R52 FVP execution: SKIPPED"
-            echo ""
-            echo "\`FVP_AEMV8R_URL\` is not set, so this run built the images but executed none of them."
-            echo "Set the repository variable (Settings -> Secrets and variables -> Actions -> Variables)"
-            echo "to a download URL for the Armv8-R AEM FVP to turn the execution lanes on."
-          } >>"$GITHUB_STEP_SUMMARY"
-          exit 0
-        fi
         binary="$(find fvp -type f -name FVP_BaseR_AEMv8R -perm -u+x | head -1)"
         if [ -z "$binary" ]; then
-          echo "FVP_AEMV8R_URL was set, but no FVP_BaseR_AEMv8R binary was found in the archive." >&2
+          echo "::error::The FVP install produced no FVP_BaseR_AEMv8R binary."
           find fvp -maxdepth 3 -type d | sed 's/^/  /' >&2
           exit 1
         fi
         binary="$(cd "$(dirname "$binary")" && pwd)/$(basename "$binary")"
-        echo "present=true" >>"$GITHUB_OUTPUT"
         echo "binary=$binary" >>"$GITHUB_OUTPUT"
         "$binary" --version
 
-    # Both configurations are configured, built and (when the model is here)
-    # run by one script, so that adding a configuration is one line rather
+    # Both configurations are configured, built and run by one script, so that adding a configuration is one line rather
     # than three near-identical blocks of YAML.
     #
     # Every image is named explicitly from the generated ninja graph rather
@@ -261,13 +224,7 @@ jobs:
         export PATH="$GITHUB_WORKSPACE/toolchain/arm-gnu-toolchain-${GCC_VERSION}-x86_64-arm-none-eabi/bin:$PATH"
         arm-none-eabi-gcc --version | head -1
 
-        fvp_present='${{ steps.fvp.outputs.present }}'
         fvp_binary='${{ steps.fvp.outputs.binary }}'
-
-        fvp_arg=""
-        if [ "$fvp_present" = "true" ]; then
-          fvp_arg="-DFVP_BASER_AEMV8R=$fvp_binary"
-        fi
 
         status=0
 
@@ -282,7 +239,7 @@ jobs:
 
           if ! cmake -S . -B "$build" -G Ninja \
                   -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_r52.cmake \
-                  $fvp_arg "$@"; then
+                  -DFVP_BASER_AEMV8R="$fvp_binary" "$@"; then
             echo "::error::$name: CMake configure failed"
             status=1
             return
@@ -302,11 +259,6 @@ jobs:
           if ! cmake --build "$build" --target $images; then
             echo "::error::$name: one or more images did not build"
             status=1
-            return
-          fi
-
-          if [ "$fvp_present" != "true" ]; then
-            echo "$name: built, not executed (no FVP configured)"
             return
           fi
 
