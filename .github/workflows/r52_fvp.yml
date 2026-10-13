@@ -21,19 +21,17 @@ name: r52_fvp
 # What it covers:
 #
 #   - the default configuration -- the images gcc_check's CMake stage builds,
-#     but run rather than merely linked;
-#   - the feature configuration -- VFP with the hard float ABI, FIQ, IRQ
-#     nesting and FIQ nesting. Those four options gate whole assembly blocks
-#     (the VMRS/VSTMDB/VLDMIA sequences, the FIQ context paths, the nesting
-#     start/end pairs) that the default configuration never assembles, let
-#     alone runs.
+#     but run rather than merely linked, plus the FVP module manager example,
+#     whose two images are the module isolation tests;
+#   - the feature configuration -- the same images with VFP and the hard float
+#     ABI, FIQ, IRQ nesting and FIQ nesting. Those four options gate whole
+#     assembly blocks (the VMRS/VSTMDB/VLDMIA sequences, the FIQ context paths,
+#     the nesting start/end pairs) that the default configuration never
+#     assembles, let alone runs.
 #
-# What it does not cover: the module manager port and the S32Z280 targets are
-# not on dev yet -- they are PR #639. When that merges, add their lanes here
-# rather than starting a second workflow; the matrix already has the shape.
-#
-# The S32Z280 targets will be build-only in CI regardless. They need silicon,
-# and a hosted runner has none.
+# Both configurations also build the S32Z280 kernel and module examples. Those
+# need silicon, which a hosted runner does not have, so they are built and
+# never run: CTest registers only the FVP images.
 
 on:
   # push as well as pull_request, for the reason gcc_check.yml states at
@@ -321,11 +319,19 @@ jobs:
           fi
         }
 
+        # Every example option defaults to OFF, so each one a configuration
+        # leaves out is an example that no check builds.
         run_configuration default \
-            -DTX_R52_BUILD_FVP_EXAMPLE=ON
+            -DTX_R52_BUILD_FVP_EXAMPLE=ON \
+            -DTX_R52_BUILD_FVP_MODULE_EXAMPLE=ON \
+            -DTX_R52_BUILD_S32Z280_EXAMPLE=ON \
+            -DTX_R52_BUILD_S32Z280_MODULE_EXAMPLE=ON
 
         run_configuration feature \
             -DTX_R52_BUILD_FVP_EXAMPLE=ON \
+            -DTX_R52_BUILD_FVP_MODULE_EXAMPLE=ON \
+            -DTX_R52_BUILD_S32Z280_EXAMPLE=ON \
+            -DTX_R52_BUILD_S32Z280_MODULE_EXAMPLE=ON \
             -DTX_R52_ENABLE_VFP=ON \
             -DTX_R52_FLOAT_ABI=hard \
             -DTX_R52_ENABLE_FIQ=ON \
