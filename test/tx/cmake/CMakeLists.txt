@@ -1,3 +1,15 @@
+##############################################################################
+# Copyright (c) 2026 Eclipse ThreadX contributors
+#
+# This program and the accompanying materials are made available under the
+# terms of the MIT License which is available at
+# https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: MIT
+##############################################################################
+
+# Portions of this file were generated with AI assistance.
+
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 cmake_policy(SET CMP0054 NEW)
 cmake_policy(SET CMP0057 NEW)
@@ -146,4 +158,12 @@ else()
             -Wlogical-op
             -Waggregate-return
             -Wfloat-equal)
+endif()
+
+# Preserve native32 host coverage and also exercise the Linux pointer-width
+# mismatch with a native64 kernel, including MISRA plus stack checking.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND THREADX_ARCH STREQUAL "linux" AND
+   THREADX_TOOLCHAIN STREQUAL "gnu" AND
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+  add_subdirectory(thread_stack_alignment)
 endif()
