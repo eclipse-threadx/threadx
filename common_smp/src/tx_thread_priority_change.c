@@ -178,13 +178,22 @@ UINT            status;
             }
 
             /* Determine if the thread is waiting on a mutex.  */
+            mutex_ptr =  TX_NULL;
             if ((thread_ptr -> tx_thread_state == TX_MUTEX_SUSP) && (thread_ptr -> tx_thread_suspend_cleanup != TX_NULL))
             {
 
-                /* Yes, the mutex owner may have inherited the old priority of this thread, or
-                   may now have to inherit the new one.  The update function pointer is set,
-                   since a mutex has been created.  */
+                /* Yes, pickup the mutex.  */
                 mutex_ptr =  TX_VOID_TO_MUTEX_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
+            }
+
+            /* Determine if the mutex supports priority inheritance.  Only then can its owner
+               have inherited the old priority of this thread, or have to inherit the new one.
+               The suspension list of any other mutex is left alone, so it stays in FIFO
+               order.  */
+            if ((mutex_ptr != TX_NULL) && (mutex_ptr -> tx_mutex_inherit == TX_TRUE))
+            {
+
+                /* Yes, the update function pointer is set, since a mutex has been created.  */
 
 #ifndef TX_NOT_INTERRUPTABLE
 

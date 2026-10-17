@@ -330,6 +330,10 @@ UINT        status;
 /*    preemption disabled and interrupts enabled, as for                  */
 /*    _tx_mutex_priority_change. Otherwise interrupts must be disabled.   */
 /*                                                                        */
+/*    The mutex must support priority inheritance. Its suspension list    */
+/*    is reordered by priority here, which would break the FIFO order     */
+/*    the waiters of any other mutex are served in.                       */
+/*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
 /*    mutex_ptr                         Pointer to mutex control block    */
