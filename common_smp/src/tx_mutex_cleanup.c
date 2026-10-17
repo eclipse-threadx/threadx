@@ -80,6 +80,11 @@ TX_THREAD           *next_thread;
 TX_THREAD           *previous_thread;
 
 
+#ifdef TX_NOT_INTERRUPTABLE
+    /* Suspension sequences are not used in the non-interruptable kernel. */
+    (VOID) suspension_sequence;
+#endif
+
 #ifndef TX_NOT_INTERRUPTABLE
 
     /* Disable interrupts to remove the suspended thread from the mutex.  */
@@ -153,6 +158,14 @@ TX_THREAD           *previous_thread;
                                 /* Update the list head pointer.  */
                                 mutex_ptr -> tx_mutex_suspension_list =         next_thread;
                             }
+                        }
+
+                        /* Remove this waiter's inheritance before it can resume. */
+                        if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
+                        {
+                            _tx_thread_preempt_disable++;
+                            _tx_mutex_inherit_priority_update(mutex_ptr);
+                            _tx_thread_preempt_disable--;
                         }
 
                         /* Now we need to determine if this cleanup is from a terminate, timeout,
