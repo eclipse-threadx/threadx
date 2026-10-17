@@ -29,6 +29,7 @@
 #include "tx_api.h"
 #include "tx_trace.h"
 #include "tx_thread.h"
+#include "tx_mutex.h"
 
 
 /**************************************************************************/
@@ -82,6 +83,7 @@ UINT  _tx_thread_priority_change(TX_THREAD *thread_ptr, UINT new_priority, UINT 
 TX_INTERRUPT_SAVE_AREA
 
 TX_THREAD       *execute_ptr;
+TX_MUTEX        *mutex_ptr;
 UINT            core_index;
 UINT            original_priority;
 UINT            lowest_priority;
@@ -112,6 +114,33 @@ UINT            status;
     /* Save the previous priority.  */
     *old_priority =  thread_ptr -> tx_thread_user_priority;
 
+    /* A base-priority change on an active mutex wait changes a dependency.
+       Require an active suspension before interpreting its control block. */
+    if ((thread_ptr -> tx_thread_state == TX_MUTEX_SUSP) &&
+        (thread_ptr -> tx_thread_suspend_cleanup != TX_NULL) &&
+        (_tx_thread_mutex_priority_update != TX_NULL))
+    {
+        mutex_ptr =  TX_VOID_TO_MUTEX_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
+        if ((mutex_ptr != TX_NULL) && (mutex_ptr -> tx_mutex_id == TX_MUTEX_ID) &&
+            (mutex_ptr -> tx_mutex_inherit == TX_TRUE))
+        {
+            thread_ptr -> tx_thread_user_priority =  new_priority;
+            thread_ptr -> tx_thread_user_preempt_threshold =  new_priority;
+            if (thread_ptr -> tx_thread_inherit_priority < new_priority)
+            {
+                new_priority =  thread_ptr -> tx_thread_inherit_priority;
+            }
+            thread_ptr -> tx_thread_priority =  new_priority;
+            thread_ptr -> tx_thread_preempt_threshold =  new_priority;
+            _tx_thread_preempt_disable++;
+            (_tx_thread_mutex_priority_update)(mutex_ptr);
+            _tx_thread_preempt_disable--;
+            TX_RESTORE
+            _tx_thread_system_preempt_check();
+            return(TX_SUCCESS);
+        }
+    }
+
     /* Determine if the new priority is the same as the last requested priority.  */
     if ((thread_ptr -> tx_thread_user_priority == new_priority) &&
         (thread_ptr -> tx_thread_user_preempt_threshold == new_priority))
@@ -128,10 +157,12 @@ UINT            status;
 
     /* Determine if the inherit priority is in effect and there is no preemption-threshold in force.  */
     else if ((thread_ptr -> tx_thread_inherit_priority < new_priority) &&
+             (thread_ptr -> tx_thread_priority == thread_ptr -> tx_thread_inherit_priority) &&
              (thread_ptr -> tx_thread_user_preempt_threshold == thread_ptr -> tx_thread_user_priority))
     {
 
-        /* In this case, simply setup the user priority and preemption-threshold and return.  */
+        /* The effective priority is already the inherited priority. If it were
+           still the old user priority, it would need to change as well. */
 
         /* Setup the new priority for this thread.  */
         thread_ptr -> tx_thread_user_priority =           new_priority;
