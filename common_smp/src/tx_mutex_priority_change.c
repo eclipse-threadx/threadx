@@ -484,3 +484,268 @@ UINT            finished;
 #endif
 }
 
+
+
+/**************************************************************************/
+/*                                                                        */
+/*    _tx_mutex_inherit_priority_update                                   */
+/*                                                                        */
+/*    Recompute an inheriting mutex after a waiter changes or leaves.     */
+/*    Caller holds interrupt/SMP protection and disables preemption.      */
+/*    No list reordering is needed: put prioritizes before transfer.      */
+/*                                                                        */
+/**************************************************************************/
+VOID  _tx_mutex_inherit_priority_update(TX_MUTEX *mutex_ptr)
+{
+
+#ifndef TX_MUTEX_INHERIT_CHAIN_MAX
+TX_THREAD       *waiter;
+UINT            remaining;
+UINT            priority;
+
+
+    priority =  ((UINT) TX_MAX_PRIORITIES);
+    waiter =  mutex_ptr -> tx_mutex_suspension_list;
+    remaining =  mutex_ptr -> tx_mutex_suspended_count;
+    while (remaining != ((UINT) 0))
+    {
+        if (waiter -> tx_thread_priority < priority)
+        {
+            priority =  waiter -> tx_thread_priority;
+        }
+        waiter =  waiter -> tx_thread_suspended_next;
+        remaining--;
+    }
+    mutex_ptr -> tx_mutex_highest_priority_waiting =  priority;
+
+#endif
+
+    if (mutex_ptr -> tx_mutex_owner != TX_NULL)
+    {
+        _tx_mutex_priority_chain(mutex_ptr -> tx_mutex_owner);
+    }
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*    _tx_mutex_priority_chain                                            */
+/*                                                                        */
+/*    Rebuild inheritance, including decreases, before publishing it.     */
+/*    With chaining disabled this is the ordinary owned-mutex cache scan. */
+/*    Otherwise collect the first owner and at most CHAIN_MAX further     */
+/*    edges, stopping on a repeated owner or an invalid wait context.      */
+/*                                                                        */
+/*    Within the collected path, effective priorities are results, never  */
+/*    seeds. Seeds are user priorities and waiters outside the path.      */
+/*    Relaxing its internal edges from these seeds removes stale boosts  */
+/*    even in a cycle wholly contained in the path. Cycles extending      */
+/*    beyond the configured bound can still contain stale outside seeds; */
+/*    the bound does not promise restoration outside this window.         */
+/*                                                                        */
+/*    Caller holds interrupt/SMP protection and disables preemption.      */
+/*    Scheduler priority changes retain that protection, including in NI. */
+/*    Work also depends on owned-mutex and waiter counts (see tx_user.h). */
+/*                                                                        */
+/**************************************************************************/
+VOID  _tx_mutex_priority_chain(TX_THREAD *thread_ptr)
+{
+
+TX_MUTEX        *mutex_ptr;
+UINT            priority;
+UINT            inheritance;
+#ifdef TX_MUTEX_INHERIT_CHAIN_MAX
+TX_THREAD       *chain[TX_MUTEX_INHERIT_CHAIN_MAX + 1];
+UINT            effective[TX_MUTEX_INHERIT_CHAIN_MAX + 1];
+UINT            inherited[TX_MUTEX_INHERIT_CHAIN_MAX + 1];
+TX_THREAD       *owner;
+TX_THREAD       *waiter;
+UINT            count;
+UINT            cycle;
+UINT            i;
+UINT            j;
+UINT            pass;
+UINT            target;
+UINT            remaining;
+
+
+    count =  ((UINT) 1);
+    chain[0] =  thread_ptr;
+    cycle =  ((UINT) TX_MUTEX_INHERIT_CHAIN_MAX) + ((UINT) 1);
+    for (;;)
+    {
+        thread_ptr =  chain[count - ((UINT) 1)];
+        if ((thread_ptr -> tx_thread_state != TX_MUTEX_SUSP) ||
+            (thread_ptr -> tx_thread_suspend_cleanup != &(_tx_mutex_cleanup)))
+        {
+            break;
+        }
+        mutex_ptr =  TX_VOID_TO_MUTEX_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
+        if ((mutex_ptr == TX_NULL) || (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID) ||
+            (mutex_ptr -> tx_mutex_inherit != TX_TRUE) ||
+            (mutex_ptr -> tx_mutex_ownership_count == ((UINT) 0)) ||
+            (mutex_ptr -> tx_mutex_owner == TX_NULL))
+        {
+            break;
+        }
+        owner =  mutex_ptr -> tx_mutex_owner;
+        for (j = 0; j < count; j++)
+        {
+            if (chain[j] == owner)
+            {
+                break;
+            }
+        }
+        if (j < count)
+        {
+            cycle =  j;
+            break;
+        }
+        if (count == (((UINT) TX_MUTEX_INHERIT_CHAIN_MAX) + ((UINT) 1)))
+        {
+            break;
+        }
+        chain[count] =  owner;
+        count++;
+    }
+
+    /* Seed only from contributions that do not depend on this path. */
+    for (i = 0; i < count; i++)
+    {
+        inherited[i] =  ((UINT) TX_MAX_PRIORITIES);
+        mutex_ptr =  chain[i] -> tx_thread_owned_mutex_list;
+        if (mutex_ptr != TX_NULL)
+        {
+            do
+            {
+                if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
+                {
+                    waiter =  mutex_ptr -> tx_mutex_suspension_list;
+                    remaining =  mutex_ptr -> tx_mutex_suspended_count;
+                    while (remaining != ((UINT) 0))
+                    {
+                        for (j = 0; j < count; j++)
+                        {
+                            if (chain[j] == waiter)
+                            {
+                                break;
+                            }
+                        }
+                        if ((j == count) && (waiter -> tx_thread_priority < inherited[i]))
+                        {
+                            inherited[i] =  waiter -> tx_thread_priority;
+                        }
+                        waiter =  waiter -> tx_thread_suspended_next;
+                        remaining--;
+                    }
+                }
+                mutex_ptr =  mutex_ptr -> tx_mutex_owned_next;
+            } while (mutex_ptr != chain[i] -> tx_thread_owned_mutex_list);
+        }
+        effective[i] =  chain[i] -> tx_thread_user_priority;
+        if (inherited[i] < effective[i])
+        {
+            effective[i] =  inherited[i];
+        }
+    }
+
+    /* Forward order propagates every seed along the tail on the first pass.
+       A back edge can then move the minimum to an earlier cycle member;
+       the second pass carries it around the entire cycle. */
+    for (pass = 0; pass < ((UINT) 2); pass++)
+    {
+        for (i = 0; i < count; i++)
+        {
+            target =  i + ((UINT) 1);
+            if (target == count)
+            {
+                target =  cycle;
+            }
+            if (target < count)
+            {
+                if (effective[i] < inherited[target])
+                {
+                    inherited[target] =  effective[i];
+                }
+                if (effective[i] < effective[target])
+                {
+                    effective[target] =  effective[i];
+                }
+            }
+        }
+    }
+
+    /* Refresh every affected mutex cache from the solved priorities. */
+    for (i = 0; i < count; i++)
+    {
+        mutex_ptr =  chain[i] -> tx_thread_owned_mutex_list;
+        if (mutex_ptr != TX_NULL)
+        {
+            do
+            {
+                if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
+                {
+                    priority =  ((UINT) TX_MAX_PRIORITIES);
+                    waiter =  mutex_ptr -> tx_mutex_suspension_list;
+                    remaining =  mutex_ptr -> tx_mutex_suspended_count;
+                    while (remaining != ((UINT) 0))
+                    {
+                        inheritance =  waiter -> tx_thread_priority;
+                        for (j = 0; j < count; j++)
+                        {
+                            if (chain[j] == waiter)
+                            {
+                                inheritance =  effective[j];
+                                break;
+                            }
+                        }
+                        if (inheritance < priority)
+                        {
+                            priority =  inheritance;
+                        }
+                        waiter =  waiter -> tx_thread_suspended_next;
+                        remaining--;
+                    }
+                    mutex_ptr -> tx_mutex_highest_priority_waiting =  priority;
+                }
+                mutex_ptr =  mutex_ptr -> tx_mutex_owned_next;
+            } while (mutex_ptr != chain[i] -> tx_thread_owned_mutex_list);
+        }
+        chain[i] -> tx_thread_inherit_priority =  inherited[i];
+    }
+    for (i = 0; i < count; i++)
+    {
+        if (chain[i] -> tx_thread_priority != effective[i])
+        {
+            _tx_mutex_priority_change(chain[i], effective[i]);
+        }
+    }
+#else
+
+    /* Preserve the single-level owned-cache scan when chaining is off. */
+    inheritance =  ((UINT) TX_MAX_PRIORITIES);
+    mutex_ptr =  thread_ptr -> tx_thread_owned_mutex_list;
+    if (mutex_ptr != TX_NULL)
+    {
+        do
+        {
+            if ((mutex_ptr -> tx_mutex_inherit == TX_TRUE) &&
+                (mutex_ptr -> tx_mutex_highest_priority_waiting < inheritance))
+            {
+                inheritance =  mutex_ptr -> tx_mutex_highest_priority_waiting;
+            }
+            mutex_ptr =  mutex_ptr -> tx_mutex_owned_next;
+        } while (mutex_ptr != thread_ptr -> tx_thread_owned_mutex_list);
+    }
+    thread_ptr -> tx_thread_inherit_priority =  inheritance;
+    priority =  thread_ptr -> tx_thread_user_priority;
+    if (inheritance < priority)
+    {
+        priority =  inheritance;
+    }
+    if (thread_ptr -> tx_thread_priority != priority)
+    {
+        _tx_mutex_priority_change(thread_ptr, priority);
+    }
+#endif
+}
