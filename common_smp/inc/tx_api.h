@@ -9,8 +9,6 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
-/* Portions of this file were generated with AI assistance. */
-
 
 /**************************************************************************/
 /**************************************************************************/
@@ -1971,7 +1969,11 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 #define TX_TIMER_POINTER_DIF(a,b)                       _tx_misra_timer_pointer_dif((TX_TIMER_INTERNAL **) (a), (TX_TIMER_INTERNAL **) (b))
 #define TX_TIMER_POINTER_ADD(a,b)                       _tx_misra_timer_pointer_add((TX_TIMER_INTERNAL **) (a), (ULONG) (b))
 #define TX_USER_TIMER_POINTER_GET(a,b)                  _tx_misra_user_timer_pointer_get((TX_TIMER_INTERNAL *) (a), (TX_TIMER **) &(b));
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+#define TX_THREAD_STACK_CHECK(a)                        _tx_misra_thread_stack_check((a), (((a) && ((a)->tx_thread_module_instance_ptr != TX_NULL) && ((a)->tx_thread_module_kernel_stack_start != TX_NULL) && (((a)->tx_thread_module_current_user_mode == 0) || ((a)->tx_thread_stack_start == (a)->tx_thread_module_kernel_stack_start))) ? &((a)->tx_thread_module_kernel_stack_highest_ptr) : &((a)->tx_thread_stack_highest_ptr)));
+#else
 #define TX_THREAD_STACK_CHECK(a)                        _tx_misra_thread_stack_check((a), &((a)->tx_thread_stack_highest_ptr));
+#endif
 #ifdef TX_ENABLE_EVENT_TRACE
 #define TX_TRACE_IN_LINE_INSERT(i,a,b,c,d,e)            _tx_misra_trace_event_insert((ULONG) (i), (VOID *) (a), (ULONG) (b), (ULONG) (c), (ULONG) (d), (ULONG) (e), ((ULONG) TX_TRACE_TIME_SOURCE));
 #endif

@@ -274,10 +274,51 @@ VOID  _tx_misra_thread_stack_check(TX_THREAD *thread_ptr, VOID **highest_stack)
 {
 
 TX_INTERRUPT_SAVE_AREA
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+VOID   *_tx_guard_ptr;
+VOID   *_tx_stack_start;
+VOID  **_tx_highest_ptr_ref;
+#endif
 
     TX_DISABLE
     if (((thread_ptr)) && ((thread_ptr) -> tx_thread_id == TX_THREAD_ID))
     {
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+        if (((thread_ptr) -> tx_thread_module_instance_ptr != TX_NULL) &&
+            ((thread_ptr) -> tx_thread_module_kernel_stack_start != TX_NULL) &&
+            (((thread_ptr) -> tx_thread_module_current_user_mode == 0) ||
+             ((thread_ptr) -> tx_thread_stack_start == (thread_ptr) -> tx_thread_module_kernel_stack_start)))
+        {
+            _tx_stack_start = (thread_ptr) -> tx_thread_module_kernel_stack_start;
+            _tx_highest_ptr_ref = &((thread_ptr) -> tx_thread_module_kernel_stack_highest_ptr);
+            _tx_guard_ptr = (VOID *) (((ALIGN_TYPE) (thread_ptr) -> tx_thread_module_kernel_stack_end) + sizeof(ULONG));
+        }
+        else
+        {
+            _tx_stack_start = (thread_ptr) -> tx_thread_stack_start;
+            _tx_highest_ptr_ref = highest_stack;
+            _tx_guard_ptr = (VOID *) (((UCHAR *) (thread_ptr) -> tx_thread_stack_end) + 1);
+        }
+        if (((ULONG *) (thread_ptr) -> tx_thread_stack_ptr) < ((ULONG *) *_tx_highest_ptr_ref))
+        {
+            *_tx_highest_ptr_ref = (thread_ptr) -> tx_thread_stack_ptr;
+        }
+        if ((*((ULONG *) _tx_stack_start) != TX_STACK_FILL) ||
+            (*((ULONG *) _tx_guard_ptr) != TX_STACK_FILL) ||
+            (((ULONG *) *_tx_highest_ptr_ref) < ((ULONG *) _tx_stack_start)))
+        {
+            TX_RESTORE
+            _tx_thread_stack_error_handler((thread_ptr));
+            TX_DISABLE
+        }
+        else if ((((ULONG *) *_tx_highest_ptr_ref) > ((ULONG *) _tx_stack_start)) &&
+                 (*(((ULONG *) *_tx_highest_ptr_ref) - 1) != TX_STACK_FILL))
+        {
+            TX_RESTORE
+            _tx_thread_stack_analyze((thread_ptr));
+            TX_DISABLE
+        }
+#else
         if (((ULONG *) (thread_ptr) -> tx_thread_stack_ptr) < ((ULONG *) *highest_stack))
         {
             *highest_stack =  (thread_ptr) -> tx_thread_stack_ptr;
@@ -290,12 +331,14 @@ TX_INTERRUPT_SAVE_AREA
             _tx_thread_stack_error_handler((thread_ptr));
             TX_DISABLE
         }
-        if (*(((ULONG *) *highest_stack) - 1) != TX_STACK_FILL)
+        else if ((((ULONG *) *highest_stack) > ((ULONG *) (thread_ptr) -> tx_thread_stack_start)) &&
+                 (*(((ULONG *) *highest_stack) - 1) != TX_STACK_FILL))
         {
             TX_RESTORE
             _tx_thread_stack_analyze((thread_ptr));
             TX_DISABLE
         }
+#endif
     }
     TX_RESTORE
 }
