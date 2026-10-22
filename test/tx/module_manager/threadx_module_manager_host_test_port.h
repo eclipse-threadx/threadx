@@ -77,4 +77,9 @@ extern unsigned int test_interrupt_restore_underflows;
         }                                                                   \
     }
 
+#if defined(__SIZEOF_POINTER__) && (__SIZEOF_POINTER__ == 8)
+#undef TX_STACK_FILL
+#define TX_STACK_FILL                                                       ((ULONG) 0xEFEFEFEFEFEFEFEFULL)
+#endif
+
 #endif

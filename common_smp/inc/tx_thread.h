@@ -65,6 +65,49 @@
    grow from high address to low address.  */
 
 #ifndef TX_THREAD_STACK_CHECK
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+#define TX_THREAD_STACK_CHECK(thread_ptr)                                                                                       \
+    {                                                                                                                           \
+    TX_INTERRUPT_SAVE_AREA                                                                                                      \
+        TX_DISABLE                                                                                                              \
+        if (((thread_ptr)) && ((thread_ptr) -> tx_thread_id == TX_THREAD_ID))                                                   \
+        {                                                                                                                       \
+            VOID **_tx_highest_ptr_ref;                                                                                         \
+            VOID  *_tx_guard_ptr;                                                                                               \
+            if (((thread_ptr) -> tx_thread_module_instance_ptr != TX_NULL) &&                                                   \
+                ((thread_ptr) -> tx_thread_module_kernel_stack_start != TX_NULL) &&                                             \
+                ((thread_ptr) -> tx_thread_stack_start == (thread_ptr) -> tx_thread_module_kernel_stack_start))                  \
+            {                                                                                                                   \
+                _tx_highest_ptr_ref = &((thread_ptr) -> tx_thread_module_reserved);                                             \
+                _tx_guard_ptr = (thread_ptr) -> tx_thread_stack_end;                                                            \
+            }                                                                                                                   \
+            else                                                                                                                \
+            {                                                                                                                   \
+                _tx_highest_ptr_ref = &((thread_ptr) -> tx_thread_stack_highest_ptr);                                           \
+                _tx_guard_ptr = (VOID *) (((UCHAR *) (thread_ptr) -> tx_thread_stack_end) + 1);                                \
+            }                                                                                                                   \
+            if (((ULONG *) (thread_ptr) -> tx_thread_stack_ptr) < ((ULONG *) *_tx_highest_ptr_ref))                             \
+            {                                                                                                                   \
+                *_tx_highest_ptr_ref = (thread_ptr) -> tx_thread_stack_ptr;                                                     \
+            }                                                                                                                   \
+            if ((*((ULONG *) (thread_ptr) -> tx_thread_stack_start) != TX_STACK_FILL) ||                                        \
+                (*((ULONG *) _tx_guard_ptr) != TX_STACK_FILL) ||                                                                \
+                (((ULONG *) *_tx_highest_ptr_ref) < ((ULONG *) (thread_ptr) -> tx_thread_stack_start)))                         \
+            {                                                                                                                   \
+                TX_RESTORE                                                                                                      \
+                _tx_thread_stack_error_handler((thread_ptr));                                                                   \
+                TX_DISABLE                                                                                                      \
+            }                                                                                                                   \
+            else if (*(((ULONG *) *_tx_highest_ptr_ref) - 1) != TX_STACK_FILL)                                                  \
+            {                                                                                                                   \
+                TX_RESTORE                                                                                                      \
+                _tx_thread_stack_analyze((thread_ptr));                                                                         \
+                TX_DISABLE                                                                                                      \
+            }                                                                                                                   \
+        }                                                                                                                       \
+        TX_RESTORE                                                                                                              \
+    }
+#else
 #define TX_THREAD_STACK_CHECK(thread_ptr)                                                                                       \
     {                                                                                                                           \
     TX_INTERRUPT_SAVE_AREA                                                                                                      \
@@ -92,6 +135,7 @@
         }                                                                                                                       \
         TX_RESTORE                                                                                                              \
     }
+#endif
 #endif
 
 
