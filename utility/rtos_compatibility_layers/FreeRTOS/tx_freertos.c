@@ -652,7 +652,7 @@ void vTaskPrioritySet(TaskHandle_t xTask,
 char *pcTaskGetName(TaskHandle_t xTaskToQuery)
 {
     TX_THREAD *p_thread;
-    const char *p_task_name;
+    TX_NAME_CONST CHAR *p_task_name;
     UINT ret;
 
     if(xTaskToQuery == NULL) {
