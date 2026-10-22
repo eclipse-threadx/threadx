@@ -23,6 +23,7 @@ if(NOT ((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64")))
 endif()
 
 option(THREADX_SMP "Build ThreadX SMP version" OFF)
+option(THREADX_MODULE_MANAGER "Build ThreadX kernel with module manager support" OFF)
 
 # Enable testing at the top level so that tests registered by ports and
 # example builds further down the tree are discoverable with ctest from the
@@ -31,7 +32,33 @@ option(THREADX_SMP "Build ThreadX SMP version" OFF)
 # "ctest --test-dir <build>" reports no tests at all.
 enable_testing()
 
-if(THREADX_SMP)
+if(THREADX_MODULE_MANAGER)
+    set(TX_PORT_DIR "ports_module")
+    if(THREADX_SMP)
+        set(TX_COMMON_DIR "common_smp")
+        if(THREADX_ARCH MATCHES "_smp$")
+            set(TX_ARCH_DIR "${THREADX_ARCH}")
+        else()
+            set(TX_ARCH_DIR "${THREADX_ARCH}_smp")
+        endif()
+        message(STATUS "Building ThreadX module manager SMP version")
+    else()
+        set(TX_COMMON_DIR "common")
+        set(TX_ARCH_DIR "${THREADX_ARCH}")
+        if(THREADX_ARCH STREQUAL "cortex_m0" AND NOT IS_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/${TX_PORT_DIR}/${TX_ARCH_DIR}")
+            set(TX_ARCH_DIR "cortex_m0+")
+        endif()
+        if(THREADX_ARCH MATCHES "_smp$")
+            message(FATAL_ERROR "ThreadX module manager SMP port '${THREADX_ARCH}' requires THREADX_SMP=ON")
+        endif()
+        message(STATUS "Building ThreadX module manager version")
+    endif()
+
+    set(TX_PORT_PATH "${CMAKE_CURRENT_LIST_DIR}/${TX_PORT_DIR}/${TX_ARCH_DIR}/${THREADX_TOOLCHAIN}")
+    if(NOT IS_DIRECTORY "${TX_PORT_PATH}/module_manager/src")
+        message(FATAL_ERROR "ThreadX module manager is not supported for architecture '${THREADX_ARCH}' with toolchain '${THREADX_TOOLCHAIN}' (SMP=${THREADX_SMP})")
+    endif()
+elseif(THREADX_SMP)
     set(TX_PORT_DIR "ports_smp")
     set(TX_COMMON_DIR "common_smp")
     set(TX_ARCH_DIR "${THREADX_ARCH}_smp")
@@ -43,11 +70,13 @@ if(THREADX_SMP)
         set(TX_ARCH_DIR "${THREADX_ARCH}")
     endif()
     message(STATUS "Building ThreadX SMP version")
+    set(TX_PORT_PATH "${CMAKE_CURRENT_LIST_DIR}/${TX_PORT_DIR}/${TX_ARCH_DIR}/${THREADX_TOOLCHAIN}")
 else()
     set(TX_PORT_DIR "ports")
     set(TX_COMMON_DIR "common")
     set(TX_ARCH_DIR "${THREADX_ARCH}")
     message(STATUS "Building standard ThreadX version")
+    set(TX_PORT_PATH "${CMAKE_CURRENT_LIST_DIR}/${TX_PORT_DIR}/${TX_ARCH_DIR}/${THREADX_TOOLCHAIN}")
 endif()
 
 message(STATUS "THREADX_ARCH: ${THREADX_ARCH}")
@@ -63,12 +92,39 @@ set(CUSTOM_INC_DIR ${CMAKE_CURRENT_BINARY_DIR}/custom_inc)
 # Pick up the port specific variables and apply them
 if(DEFINED THREADX_CUSTOM_PORT)
     add_subdirectory(${THREADX_CUSTOM_PORT} threadx_port)
+elseif(EXISTS "${TX_PORT_PATH}/CMakeLists.txt")
+    add_subdirectory(${TX_PORT_PATH})
+elseif(THREADX_MODULE_MANAGER)
+    file(GLOB TX_PORT_SOURCES
+        "${TX_PORT_PATH}/module_manager/src/*.c"
+        "${TX_PORT_PATH}/module_manager/src/*.S"
+        "${TX_PORT_PATH}/module_manager/src/*.s"
+    )
+    if(THREADX_ARCH STREQUAL "cortex_r52")
+        file(GLOB TX_R52_BASE_SOURCES
+            "${CMAKE_CURRENT_LIST_DIR}/ports/cortex_r52/gnu/src/tx_thread_fiq_*.S"
+            "${CMAKE_CURRENT_LIST_DIR}/ports/cortex_r52/gnu/src/tx_thread_irq_*.S"
+            "${CMAKE_CURRENT_LIST_DIR}/ports/cortex_r52/gnu/src/tx_thread_interrupt_*.S"
+            "${CMAKE_CURRENT_LIST_DIR}/ports/cortex_r52/gnu/src/tx_thread_vectored_context_save.S"
+            "${CMAKE_CURRENT_LIST_DIR}/ports/cortex_r52/gnu/src/tx_timer_interrupt.S"
+        )
+        list(APPEND TX_PORT_SOURCES ${TX_R52_BASE_SOURCES})
+    endif()
+    target_sources(${PROJECT_NAME} PRIVATE ${TX_PORT_SOURCES})
+    target_include_directories(${PROJECT_NAME}
+        SYSTEM
+        PUBLIC
+        ${TX_PORT_PATH}/inc
+    )
 else()
-    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${TX_PORT_DIR}/${TX_ARCH_DIR}/${THREADX_TOOLCHAIN})
+    add_subdirectory(${TX_PORT_PATH})
 endif()
 
 # Pick up the common stuff
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${TX_COMMON_DIR})
+if(THREADX_MODULE_MANAGER)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common_modules/module_manager)
+endif()
 
 # Define the FreeRTOS adaptation layer
 add_library(freertos-threadx EXCLUDE_FROM_ALL)
@@ -117,6 +173,9 @@ target_include_directories(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME} PUBLIC "TX_INCLUDE_USER_DEFINE_FILE" )
 if(THREADX_SMP)
     target_compile_definitions(${PROJECT_NAME} PUBLIC "TX_MPCORE" )
+endif()
+if(THREADX_MODULE_MANAGER)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC "TXM_MODULE_MANAGER" )
 endif()
 
 # Optional: build for S-mode (Supervisor mode) instead of M-mode (Machine mode).
