@@ -41,6 +41,13 @@ on:
         default: 15
         required: false
         type: number
+      # Keep the .deb files apt downloads in the install step in the Actions
+      # cache, so a later run installs them without fetching them again. See the
+      # apt cache steps below.
+      apt_cache:
+        default: true
+        required: false
+        type: boolean
       skip_test:
         default: false
         required: false
@@ -123,6 +130,59 @@ jobs:
       with:
         submodules: true
 
+    # The apt cache. The install scripts retry and bound every fetch, but a
+    # mirror can be slow without being down: on 23 Oct 2026 it served packages
+    # at 50 to 250 KB/s while indexes still came at 12 MB/s, and the ThreadX and
+    # RISC-V installs timed out on all three attempts inside an 11 MB and a 58 MB
+    # file. With the .deb files restored from the Actions cache, apt fetches
+    # only the indexes and whatever changed since the cache was saved.
+    #
+    # It is done here rather than in the install scripts so that every caller's
+    # script gets it unchanged: an apt.conf.d entry points apt-get's archive
+    # directory at the restored one. A restored file cannot alter what is
+    # installed, because apt checks every .deb against the hash in the signed
+    # index before using it, and fetches it again if the two differ.
+    #
+    # The key carries the runner image, whose package versions the cache
+    # matches, and the install script, whose package list it holds. A miss on
+    # either still restores the closest older cache, so a new image or one
+    # added package costs only the packages that changed.
+    - name: Prepare the apt cache key
+      id: apt_key
+      if: ${{ inputs.apt_cache }}
+      env:
+        INSTALL_SCRIPT: ${{ inputs.install_script }}
+      run: |
+        echo "dir=${RUNNER_TEMP}/apt-archives" >> "$GITHUB_OUTPUT"
+        echo "image=${ImageOS}-${ImageVersion}" >> "$GITHUB_OUTPUT"
+        echo "script=$( (sha256sum "$INSTALL_SCRIPT" 2> /dev/null || echo none) | cut -c1-16)" >> "$GITHUB_OUTPUT"
+
+    - name: Restore the apt cache
+      id: apt_restore
+      if: ${{ inputs.apt_cache }}
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.apt_key.outputs.dir }}
+        key: apt-${{ steps.apt_key.outputs.image }}-${{ steps.apt_key.outputs.script }}
+        restore-keys: |
+          apt-${{ steps.apt_key.outputs.image }}-
+          apt-
+
+    # apt downloads as the unprivileged _apt user, which must own partial/.
+    # Keep-Downloaded-Packages is set because the apt front end deletes what it
+    # installed by default; apt-get keeps it, but a caller's script may use
+    # either.
+    - name: Point apt at the cache
+      if: ${{ inputs.apt_cache }}
+      env:
+        APT_DIR: ${{ steps.apt_key.outputs.dir }}
+      run: |
+        sudo mkdir -p "$APT_DIR/partial"
+        sudo chown _apt:root "$APT_DIR/partial"
+        printf 'Dir::Cache::Archives "%s/";\nAPT::Keep-Downloaded-Packages "true";\nBinary::apt::APT::Keep-Downloaded-Packages "true";\n' "$APT_DIR" \
+          | sudo tee /etc/apt/apt.conf.d/99-ci-archive-cache > /dev/null
+        echo "apt cache: $(find "$APT_DIR" -maxdepth 1 -name '*.deb' | wc -l) packages restored"
+
     # apt and PyPI have stalled this step twice, for 55 minutes and for over two
     # hours, against a normal 27 to 152 seconds. Nothing here had a timeout, so a
     # stall ran until the six hour job limit and cost a whole run rather than
@@ -130,6 +190,29 @@ jobs:
     - name: Install softwares
       timeout-minutes: ${{ inputs.install_timeout_minutes }}
       run: ${{ inputs.install_script }}
+
+    # Saved straight after the install rather than at the end of the job, so a
+    # run whose tests fail still leaves the packages for the next one. autoclean
+    # drops .deb files the indexes no longer list, so the cache does not grow
+    # with every superseded version. apt's lock file and partial/ are root-only
+    # and are removed so the cache action, which runs unprivileged, can read the
+    # rest.
+    - name: Save the apt cache
+      if: ${{ inputs.apt_cache && steps.apt_restore.outputs.cache-hit != 'true' }}
+      env:
+        APT_DIR: ${{ steps.apt_key.outputs.dir }}
+      run: |
+        sudo apt-get autoclean -qq
+        sudo rm -rf "$APT_DIR/partial" "$APT_DIR/lock"
+        sudo chmod -R a+rX "$APT_DIR"
+        echo "apt cache: $(find "$APT_DIR" -maxdepth 1 -name '*.deb' | wc -l) packages, $(du -sh "$APT_DIR" | cut -f1)"
+
+    - name: Upload the apt cache
+      if: ${{ inputs.apt_cache && steps.apt_restore.outputs.cache-hit != 'true' }}
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.apt_key.outputs.dir }}
+        key: apt-${{ steps.apt_key.outputs.image }}-${{ steps.apt_key.outputs.script }}
 
     # TX_COVERAGE instruments every build configuration rather than only the one
     # whose name ends in _coverage. It has to be set for the build as well as the
