@@ -39,7 +39,7 @@ extern VOID _tx_execution_initialize(VOID);
 TX_PORT_SPECIFIC_DATA
 
 
-#ifdef TX_SAFETY_CRITICAL
+#if defined(TX_SAFETY_CRITICAL) || defined(TX_SAFETY_CRITICAL_EXCEPTION_ENABLE)
 TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 #endif
 
@@ -147,7 +147,7 @@ VOID  _tx_initialize_kernel_enter(VOID)
     /* Enter the scheduling loop to start executing threads!  */
     _tx_thread_schedule();
 
-#ifdef TX_SAFETY_CRITICAL
+#if defined(TX_SAFETY_CRITICAL) || defined(TX_SAFETY_CRITICAL_EXCEPTION_ENABLE)
 
     /* If we ever get here, raise safety critical exception.  */
     TX_SAFETY_CRITICAL_EXCEPTION(__FILE__, __LINE__, 0);

@@ -2101,6 +2101,15 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 /* Define safety critical configuration and exception handling.  */
 
 #ifdef TX_SAFETY_CRITICAL
+#ifndef TX_SAFETY_CRITICAL_BUILD_CHECK
+#define TX_SAFETY_CRITICAL_BUILD_CHECK
+#endif
+#ifndef TX_SAFETY_CRITICAL_EXCEPTION_ENABLE
+#define TX_SAFETY_CRITICAL_EXCEPTION_ENABLE
+#endif
+#endif
+
+#ifdef TX_SAFETY_CRITICAL_BUILD_CHECK
 
 /* Ensure the maximum number of priorities is defined in safety critical mode.  */
 #ifndef TX_MAX_PRIORITIES
@@ -2132,11 +2141,6 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 #error "TX_DISABLE_STACK_FILLING must not be defined."
 #endif
 
-/* Ensure enable stack checking is not defined.  */
-#ifdef TX_ENABLE_STACK_CHECKING
-#error "TX_ENABLE_STACK_CHECKING must not be defined."
-#endif
-
 /* Ensure disable preemption-threshold is not defined.  */
 #ifdef TX_DISABLE_PREEMPTION_THRESHOLD
 #error "TX_DISABLE_PREEMPTION_THRESHOLD must not be defined."
@@ -2152,11 +2156,6 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 #error "TX_NO_TIMER must not be defined."
 #endif
 
-/* Ensure disable notify callbacks is not defined.  */
-#ifdef TX_DISABLE_NOTIFY_CALLBACKS
-#error "TX_DISABLE_NOTIFY_CALLBACKS must not be defined."
-#endif
-
 /* Ensure in-line thread suspend/resume is not defined.  */
 #ifdef TX_INLINE_THREAD_RESUME_SUSPEND
 #error "TX_INLINE_THREAD_RESUME_SUSPEND must not be defined."
@@ -2165,11 +2164,6 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 /* Ensure not interruptable is not defined.  */
 #ifdef TX_NOT_INTERRUPTABLE
 #error "TX_NOT_INTERRUPTABLE must not be defined."
-#endif
-
-/* Ensure event trace enable is not defined.  */
-#ifdef TX_ENABLE_EVENT_TRACE
-#error "TX_ENABLE_EVENT_TRACE must not be defined."
 #endif
 
 /* Ensure block pool performance info enable is not defined.  */
@@ -2212,6 +2206,10 @@ VOID                    _tx_misra_thread_entry_exit_notify_not_used(VOID (*threa
 #error "TX_TIMER_ENABLE_PERFORMANCE_INFO must not be defined."
 #endif
 
+#endif
+
+
+#if defined(TX_SAFETY_CRITICAL) || defined(TX_SAFETY_CRITICAL_EXCEPTION_ENABLE)
 
 /* Now define the safety critical exception handler.  */
 
@@ -2225,6 +2223,9 @@ VOID    _tx_safety_critical_exception_handler(CHAR *file_name, INT line_number, 
 #ifndef TX_SAFETY_CRITICAL_EXCEPTION_HANDLER
 #define TX_SAFETY_CRITICAL_EXCEPTION_HANDLER    VOID  _tx_safety_critical_exception_handler(CHAR *file_name, INT line_number, UINT status) \
                                                 { \
+                                                    TX_PARAMETER_NOT_USED(file_name); \
+                                                    TX_PARAMETER_NOT_USED(line_number); \
+                                                    TX_PARAMETER_NOT_USED(status); \
                                                     while(1) \
                                                     { \
                                                     } \
