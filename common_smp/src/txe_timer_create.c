@@ -75,9 +75,15 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/**************************************************************************/
-UINT  _txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+static UINT  _txe_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
             VOID (*expiration_function)(ULONG id), ULONG expiration_input,
+            VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
+            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size);
+
+/**************************************************************************/
+static UINT  _txe_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+            VOID (*expiration_function)(ULONG id), ULONG expiration_input,
+            VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
             ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size)
 {
 
@@ -223,11 +229,113 @@ TX_THREAD       *thread_ptr;
     {
 
         /* Call actual application timer create function.  */
-        status =  _tx_timer_create(timer_ptr, name_ptr, expiration_function, expiration_input,
-                                                    initial_ticks, reschedule_ticks, auto_activate);
+        if (expiration_function_ptr != TX_NULL)
+        {
+            status =  _tx_timer_create_ptr(timer_ptr, name_ptr,
+                                           expiration_function_ptr, expiration_input_ptr,
+                                           initial_ticks, reschedule_ticks, auto_activate);
+        }
+        else
+        {
+            status =  _tx_timer_create(timer_ptr, name_ptr,
+                                       expiration_function, expiration_input,
+                                       initial_ticks, reschedule_ticks, auto_activate);
+        }
     }
 
     /* Return completion status.  */
     return(status);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_timer_create                                   PORTABLE SMP     */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in the timer create function call.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                             Pointer to timer control blk  */
+/*    name_ptr                              Pointer to timer name         */
+/*    expiration_function                   Function to call on expiration*/
+/*    expiration_input                      32-bit input value for timer  */
+/*    initial_ticks                         Initial expiration ticks      */
+/*    reschedule_ticks                      Reschedule ticks              */
+/*    auto_activate                         Automatic activation flag     */
+/*    timer_control_block_size              Size of timer control block   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_TIMER_ERROR                        Invalid timer pointer         */
+/*    TX_TICK_ERROR                         Invalid initial ticks         */
+/*    TX_ACTIVATE_ERROR                     Invalid auto-activate option  */
+/*    TX_CALLER_ERROR                       Invalid caller of function    */
+/*    status                                Actual completion status      */
+/*                                                                        */
+/**************************************************************************/
+UINT  _txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+            VOID (*expiration_function)(ULONG id), ULONG expiration_input,
+            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size)
+{
+    return(_txe_timer_create_initial(timer_ptr, name_ptr,
+                                     expiration_function, expiration_input,
+                                     TX_NULL, TX_NULL,
+                                     initial_ticks, reschedule_ticks, auto_activate,
+                                     timer_control_block_size));
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_timer_create_ptr                               PORTABLE SMP     */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in timer create with pointer input. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                             Pointer to timer control blk  */
+/*    name_ptr                              Pointer to timer name         */
+/*    expiration_function                   Function to call on expiration*/
+/*    expiration_input                      Pointer input value for timer */
+/*    initial_ticks                         Initial expiration ticks      */
+/*    reschedule_ticks                      Reschedule ticks              */
+/*    auto_activate                         Automatic activation flag     */
+/*    timer_control_block_size              Size of timer control block   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_TIMER_ERROR                        Invalid timer pointer         */
+/*    TX_TICK_ERROR                         Invalid initial ticks         */
+/*    TX_ACTIVATE_ERROR                     Invalid auto-activate option  */
+/*    TX_CALLER_ERROR                       Invalid caller of function    */
+/*    status                                Actual completion status      */
+/*                                                                        */
+/**************************************************************************/
+UINT  _txe_timer_create_ptr(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+            VOID (*expiration_function)(VOID *id), VOID *expiration_input,
+            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size)
+{
+    return(_txe_timer_create_initial(timer_ptr, name_ptr,
+                                     TX_NULL, 0,
+                                     expiration_function, expiration_input,
+                                     initial_ticks, reschedule_ticks, auto_activate,
+                                     timer_control_block_size));
 }
 
