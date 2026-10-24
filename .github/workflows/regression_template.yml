@@ -359,9 +359,20 @@ jobs:
   # run_tests that is cancelled -- which is what a job that never gets a runner
   # ends up as -- leaves both false and lets the deploy proceed to download an
   # artifact the cancelled job never uploaded.
+  #
+  # The one exception is a caller passing skip_test, such as the deploy jobs
+  # of ThreadX and NetX Duo: run_tests is skipped by design, and the steps below
+  # download the coverage the caller's other jobs uploaded. The caller's needs
+  # gates those jobs. !cancelled() is required because an if without a status
+  # function implies success(), which is false when run_tests is skipped.
   deploy_code_coverage:
     runs-on: ubuntu-24.04
-    if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && needs.run_tests.result == 'success'
+    if: >-
+      !cancelled() &&
+      ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) &&
+      !inputs.skip_coverage && !inputs.skip_deploy &&
+      (needs.run_tests.result == 'success' ||
+      (inputs.skip_test && needs.run_tests.result == 'skipped'))
     needs: run_tests
     environment:
       name: github-pages
