@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 cmake_policy(SET CMP0057 NEW)
 
 project(module_manager_test LANGUAGES C)
+enable_testing()
 
 set(REPO_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../..)
 set(SOURCE_DIR ${REPO_ROOT}/test/tx/module_manager)
@@ -252,3 +253,35 @@ target_include_directories(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_cortex_a7_range_check_test
          threadx_module_manager_cortex_a7_range_check_test)
+
+add_executable(
+  threadx_module_manager_thread_stack_checking_test
+  ${SOURCE_DIR}/threadx_module_manager_thread_stack_checking_test.c
+  ${module_manager_dir}/src/txm_module_manager_thread_create.c
+  ${module_manager_dir}/src/txm_module_manager_object_allocate.c
+  ${module_manager_dir}/src/txm_module_manager_object_deallocate.c
+  ${module_manager_dir}/src/txm_module_manager_util.c
+  ${REPO_ROOT}/common/src/tx_thread_stack_analyze.c)
+
+target_include_directories(
+  threadx_module_manager_thread_stack_checking_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_a7_module_dir}/inc)
+
+target_compile_definitions(
+  threadx_module_manager_thread_stack_checking_test
+  PRIVATE TXM_MODULE_MANAGER
+          TX_ENABLE_STACK_CHECKING)
+
+target_compile_options(
+  threadx_module_manager_thread_stack_checking_test
+  PRIVATE -Wall
+          -Wextra
+          -include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_thread_stack_checking_test
+         threadx_module_manager_thread_stack_checking_test)
+

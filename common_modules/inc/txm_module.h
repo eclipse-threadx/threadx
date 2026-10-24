@@ -182,6 +182,11 @@ extern   "C" {
 #endif
 
 
+/* Define alias for kernel stack highest pointer used when stack checking is enabled.  */
+
+#define tx_thread_module_kernel_stack_highest_ptr           tx_thread_module_reserved
+
+
 /* Define object types for object search requests.  */
 
 #define TXM_BLOCK_POOL_OBJECT                               1
