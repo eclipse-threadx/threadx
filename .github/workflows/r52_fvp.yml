@@ -22,7 +22,8 @@ name: r52_fvp
 #
 #   - the default configuration -- the images gcc_check's CMake stage builds,
 #     but run rather than merely linked, plus the FVP module manager example,
-#     whose two images are the module isolation tests;
+#     whose two images are the module isolation tests. They link every portable
+#     module manager source, so common_modules/ is among the trigger paths;
 #   - the feature configuration -- the same images with VFP and the hard float
 #     ABI, FIQ, IRQ nesting and FIQ nesting. Those four options gate whole
 #     assembly blocks (the VMRS/VSTMDB/VLDMIA sequences, the FIQ context paths,
@@ -44,6 +45,7 @@ on:
       - "CMakeLists.txt"
       - "cmake/cortex_r52*.cmake"
       - "common/**"
+      - "common_modules/**"
       - "ports/cortex_r52/**"
       - "ports_module/cortex_r52/**"
   pull_request:
@@ -58,6 +60,7 @@ on:
       - "CMakeLists.txt"
       - "cmake/cortex_r52*.cmake"
       - "common/**"
+      - "common_modules/**"
       - "ports/cortex_r52/**"
       - "ports_module/cortex_r52/**"
 
