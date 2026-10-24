@@ -10,6 +10,8 @@
 # SPDX-License-Identifier: MIT
 ##############################################################################
 
+# Portions of this file were generated with AI assistance.
+
 #
 # Install necessary softwares for Ubuntu.
 
@@ -48,6 +50,11 @@ if ! retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" update; then
     echo "install.sh: gate and fails if any package needed is unavailable."
     echo ""
 fi
+# CMake is not installed from apt: the pip install at the end of this script
+# provides it, and on a runner the image's own CMake comes first on PATH anyway.
+# The apt package was never used, and with its data package it was 13 of the
+# 34 MB this install fetched. On 23 Oct 2026 the mirror served it at about
+# 90 KB/s, and all three attempts timed out inside that one file.
 retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" install -y \
     gcc-multilib \
     git \
@@ -58,7 +65,6 @@ retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" install -y \
     p7zip-full \
     tofrodos \
     gawk \
-    cmake \
     software-properties-common || exit 1
 
 retry "${TIMEOUT[@]}" python3 -m pip install --retries 3 --timeout 30 --upgrade pip || exit 1
