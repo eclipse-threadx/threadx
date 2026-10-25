@@ -41,6 +41,14 @@ on:
         default: 15
         required: false
         type: number
+      # Minutes for the test step. Sixty covers every ThreadX suite, whose
+      # longest observed run is 37 minutes. NetX Duo runs all 43 configurations
+      # of its full suite in this one step, which took 201 minutes on 25 Oct
+      # 2026, so it passes a larger value.
+      test_timeout_minutes:
+        default: 60
+        required: false
+        type: number
       # Keep the .deb files apt downloads in the install step in the Actions
       # cache, so a later run installs them without fetching them again. See the
       # apt cache steps below.
@@ -225,7 +233,7 @@ jobs:
       run: ${{ inputs.build_script }}
 
     - name: Test
-      timeout-minutes: 60
+      timeout-minutes: ${{ inputs.test_timeout_minutes }}
       env:
         TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.test_script }}
