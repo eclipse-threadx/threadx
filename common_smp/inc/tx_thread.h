@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
-// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -64,7 +63,59 @@
    low address to high address (the default logic is for stacks that
    grow from high address to low address.  */
 
+#ifndef tx_thread_module_kernel_stack_highest_ptr
+#define tx_thread_module_kernel_stack_highest_ptr           tx_thread_module_reserved
+#endif
+
 #ifndef TX_THREAD_STACK_CHECK
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+#define TX_THREAD_STACK_CHECK(thread_ptr)                                                                                       \
+    {                                                                                                                           \
+    TX_INTERRUPT_SAVE_AREA                                                                                                      \
+        TX_DISABLE                                                                                                              \
+        if (((thread_ptr)) && ((thread_ptr) -> tx_thread_id == TX_THREAD_ID))                                                   \
+        {                                                                                                                       \
+            VOID  **_tx_highest_ptr_ref;                                                                                        \
+            VOID   *_tx_guard_ptr;                                                                                              \
+            VOID   *_tx_stack_start;                                                                                            \
+            if (((thread_ptr) -> tx_thread_module_instance_ptr != TX_NULL) &&                                                   \
+                ((thread_ptr) -> tx_thread_module_kernel_stack_start != TX_NULL) &&                                             \
+                (((thread_ptr) -> tx_thread_module_current_user_mode == 0) ||                                                   \
+                 ((thread_ptr) -> tx_thread_stack_start == (thread_ptr) -> tx_thread_module_kernel_stack_start)))               \
+            {                                                                                                                   \
+                _tx_stack_start = (thread_ptr) -> tx_thread_module_kernel_stack_start;                                           \
+                _tx_highest_ptr_ref = &((thread_ptr) -> tx_thread_module_kernel_stack_highest_ptr);                             \
+                _tx_guard_ptr = (VOID *) (((ALIGN_TYPE) (thread_ptr) -> tx_thread_module_kernel_stack_end) + sizeof(ULONG));   \
+            }                                                                                                                   \
+            else                                                                                                                \
+            {                                                                                                                   \
+                _tx_stack_start = (thread_ptr) -> tx_thread_stack_start;                                                        \
+                _tx_highest_ptr_ref = &((thread_ptr) -> tx_thread_stack_highest_ptr);                                           \
+                _tx_guard_ptr = (VOID *) (((UCHAR *) (thread_ptr) -> tx_thread_stack_end) + 1);                                \
+            }                                                                                                                   \
+            if (((ULONG *) (thread_ptr) -> tx_thread_stack_ptr) < ((ULONG *) *_tx_highest_ptr_ref))                             \
+            {                                                                                                                   \
+                *_tx_highest_ptr_ref = (thread_ptr) -> tx_thread_stack_ptr;                                                     \
+            }                                                                                                                   \
+            if ((*((ULONG *) _tx_stack_start) != TX_STACK_FILL) ||                                                              \
+                (*((ULONG *) _tx_guard_ptr) != TX_STACK_FILL) ||                                                                \
+                (((ULONG *) *_tx_highest_ptr_ref) < ((ULONG *) _tx_stack_start)))                                               \
+            {                                                                                                                   \
+                TX_RESTORE                                                                                                      \
+                _tx_thread_stack_error_handler((thread_ptr));                                                                   \
+                TX_DISABLE                                                                                                      \
+            }                                                                                                                   \
+            else if ((((ULONG *) *_tx_highest_ptr_ref) > ((ULONG *) _tx_stack_start)) &&                                        \
+                     (*(((ULONG *) *_tx_highest_ptr_ref) - 1) != TX_STACK_FILL))                                               \
+            {                                                                                                                   \
+                TX_RESTORE                                                                                                      \
+                _tx_thread_stack_analyze((thread_ptr));                                                                         \
+                TX_DISABLE                                                                                                      \
+            }                                                                                                                   \
+        }                                                                                                                       \
+        TX_RESTORE                                                                                                              \
+    }
+#else
 #define TX_THREAD_STACK_CHECK(thread_ptr)                                                                                       \
     {                                                                                                                           \
     TX_INTERRUPT_SAVE_AREA                                                                                                      \
@@ -83,7 +134,8 @@
                 _tx_thread_stack_error_handler((thread_ptr));                                                                   \
                 TX_DISABLE                                                                                                      \
             }                                                                                                                   \
-            else if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                           \
+            else if ((((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) > ((ULONG *) (thread_ptr) -> tx_thread_stack_start)) && \
+                     (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL))                         \
             {                                                                                                                   \
                 TX_RESTORE                                                                                                      \
                 _tx_thread_stack_analyze((thread_ptr));                                                                         \
@@ -92,6 +144,7 @@
         }                                                                                                                       \
         TX_RESTORE                                                                                                              \
     }
+#endif
 #endif
 
 

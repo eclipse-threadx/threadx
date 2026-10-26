@@ -9,8 +9,6 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
-// Portions of this file were generated with AI assistance.
-
 
 /**************************************************************************/
 /**************************************************************************/
@@ -327,13 +325,6 @@ ULONG                   i;
     thread_ptr -> tx_thread_stack_fill_value =  stack_fill_value;
 #endif
 
-    /* Note that TX_ENABLE_STACK_CHECKING is not supported for module threads.  A user mode
-       module thread owns two stacks and the scheduler swaps tx_thread_stack_start,
-       tx_thread_stack_end and tx_thread_stack_size over to the kernel stack whenever the
-       thread enters the module manager.  Neither tx_thread_stack_highest_ptr nor the guard
-       pattern beyond the end of the stack is maintained across that switch, so
-       TX_THREAD_STACK_CHECK may report spurious stack errors for module threads.  */
-
     /* If the thread runs on user mode, allocate the kernel stack for syscall.  */
     if((module_instance -> txm_module_instance_property_flags) & TXM_MODULE_USER_MODE)
     {
@@ -354,12 +345,21 @@ ULONG                   i;
 #endif
 
         /* Align kernel stack pointer.  */
+#ifdef TX_ENABLE_STACK_CHECKING
+        thread_ptr -> tx_thread_module_kernel_stack_end = (VOID *) (((ALIGN_TYPE)(thread_ptr -> tx_thread_module_kernel_stack_start) + TXM_MODULE_KERNEL_STACK_SIZE - (sizeof(ULONG) * 2)) & ~0x07);
+#else
         thread_ptr -> tx_thread_module_kernel_stack_end = (VOID *) (((ALIGN_TYPE)(thread_ptr -> tx_thread_module_kernel_stack_start) + TXM_MODULE_KERNEL_STACK_SIZE) & ~0x07);
+#endif
 
         /* Set kernel stack size.  Aligning the end of the kernel stack downwards can consume
            up to seven bytes of the block returned by the allocator, so the usable size must be
            derived from the aligned range instead of from TXM_MODULE_KERNEL_STACK_SIZE.  */
         thread_ptr -> tx_thread_module_kernel_stack_size = (ULONG) ((ALIGN_TYPE) (thread_ptr -> tx_thread_module_kernel_stack_end) - (ALIGN_TYPE) (thread_ptr -> tx_thread_module_kernel_stack_start));
+
+#ifdef TX_ENABLE_STACK_CHECKING
+        /* Setup the highest usage pointer for the kernel stack.  */
+        thread_ptr -> tx_thread_module_kernel_stack_highest_ptr =  thread_ptr -> tx_thread_module_kernel_stack_end;
+#endif
     }
 
 #if TXM_MODULE_MEMORY_PROTECTION

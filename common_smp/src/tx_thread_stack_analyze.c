@@ -9,8 +9,6 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
-// Portions of this file were generated with AI assistance.
-
 
 /**************************************************************************/
 /**************************************************************************/
@@ -77,6 +75,9 @@ ULONG       *stack_limit;
 ULONG       probe_count;
 UINT        fill_present;
 ULONG       size;
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+UINT        analyzing_kernel_stack;
+#endif
 
 
     /* Disable interrupts.  */
@@ -97,8 +98,25 @@ ULONG       size;
             if (stack_lowest != TX_NULL)
             {
 
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+                /* Determine if this thread is currently on the module kernel stack.  */
+                if (((thread_ptr -> tx_thread_module_kernel_stack_start) != TX_NULL) &&
+                    (((thread_ptr -> tx_thread_module_current_user_mode) == 0) ||
+                     ((thread_ptr -> tx_thread_stack_start) == (thread_ptr -> tx_thread_module_kernel_stack_start))))
+                {
+                    analyzing_kernel_stack =  TX_TRUE;
+                    stack_lowest =   TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_module_kernel_stack_start);
+                    stack_highest =  TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_module_kernel_stack_highest_ptr);
+                }
+                else
+                {
+                    analyzing_kernel_stack =  TX_FALSE;
+                    stack_highest =  TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_highest_ptr);
+                }
+#else
                 /* Pickup the highest stack pointer.  */
                 stack_highest =  TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_highest_ptr);
+#endif
 
                 /* Determine if the pointer is null or if the highest stack pointer is not above the
                    start of the stack. The latter indicates a stack overflow or a corrupted thread
@@ -199,10 +217,37 @@ ULONG       size;
 
                         /* Yes, thread is still created.  */
 
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+                        if (analyzing_kernel_stack == TX_TRUE)
+                        {
+                            if (stack_ptr > (TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_module_kernel_stack_start)))
+                            {
+                                if (stack_ptr < (TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_module_kernel_stack_highest_ptr)))
+                                {
+                                    if (*stack_ptr != TX_STACK_FILL)
+                                    {
+                                        thread_ptr -> tx_thread_module_kernel_stack_highest_ptr =  (VOID *) stack_ptr;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (stack_ptr > (TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_start)))
+                            {
+                                if (stack_ptr < (TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_highest_ptr)))
+                                {
+                                    if (*stack_ptr != TX_STACK_FILL)
+                                    {
+                                        thread_ptr -> tx_thread_stack_highest_ptr =  stack_ptr;
+                                    }
+                                }
+                            }
+                        }
+#else
                         /* Now check the new highest stack pointer is past the stack start.  */
                         if (stack_ptr > (TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_start)))
                         {
-
                             /* Yes, now check that the new highest stack pointer is less than the previous highest stack pointer.  */
                             if (stack_ptr < (TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_highest_ptr)))
                             {
@@ -216,6 +261,7 @@ ULONG       size;
                                 }
                             }
                         }
+#endif
                     }
                 }
             }
