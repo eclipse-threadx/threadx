@@ -244,6 +244,7 @@ void    threadx_timer_multiple_accuracy_application_define(void *);
 void    threadx_timer_information_application_define(void *);
 
 void    threadx_trace_basic_application_define(void *);
+void    threadx_safety_critical_application_define(void *);
 void    test_application_define(void *first_unused_memory);
 
 
@@ -365,6 +366,7 @@ TEST_ENTRY  test_control_tests[] =
     threadx_timer_information_application_define,
 
     threadx_trace_basic_application_define,
+    threadx_safety_critical_application_define,
 #endif
 
     TX_NULL,

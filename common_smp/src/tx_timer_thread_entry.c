@@ -530,7 +530,7 @@ UINT                         status;
         }
     }
 
-#ifdef TX_SAFETY_CRITICAL
+#if defined(TX_SAFETY_CRITICAL) || defined(TX_SAFETY_CRITICAL_EXCEPTION_ENABLE)
 
     /* If we ever get here, raise safety critical exception.  */
     TX_SAFETY_CRITICAL_EXCEPTION(__FILE__, __LINE__, 0);
