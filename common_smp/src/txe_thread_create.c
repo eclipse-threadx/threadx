@@ -80,9 +80,17 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/**************************************************************************/
-UINT    _txe_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+static UINT    _txe_thread_create_initial(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*entry_function)(ULONG id), ULONG entry_input,
+                VOID (*entry_function_ptr)(VOID *id), VOID *entry_input_ptr,
+                VOID *stack_start, ULONG stack_size,
+                UINT priority, UINT preempt_threshold,
+                ULONG time_slice, UINT auto_start, UINT thread_control_block_size);
+
+/**************************************************************************/
+static UINT    _txe_thread_create_initial(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                VOID (*entry_function)(ULONG id), ULONG entry_input,
+                VOID (*entry_function_ptr)(VOID *id), VOID *entry_input_ptr,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start, UINT thread_control_block_size)
@@ -221,7 +229,7 @@ TX_THREAD       *current_thread;
         }
 
         /* Check for invalid thread entry point.  */
-        else if (entry_function == TX_NULL)
+        else if ((entry_function == TX_NULL) && (entry_function_ptr == TX_NULL))
         {
 
             /* Invalid stack or entry point, return appropriate error code.  */
@@ -296,12 +304,135 @@ TX_THREAD       *current_thread;
     {
 
         /* Call actual thread create function.  */
-        status =  _tx_thread_create(thread_ptr, name_ptr, entry_function, entry_input,
-                        stack_start, stack_size, priority, preempt_threshold,
-                        time_slice, auto_start);
+        if (entry_function_ptr != TX_NULL)
+        {
+            status =  _tx_thread_create_ptr(thread_ptr, name_ptr,
+                            entry_function_ptr, entry_input_ptr,
+                            stack_start, stack_size, priority, preempt_threshold,
+                            time_slice, auto_start);
+        }
+        else
+        {
+            status =  _tx_thread_create(thread_ptr, name_ptr,
+                            entry_function, entry_input,
+                            stack_start, stack_size, priority, preempt_threshold,
+                            time_slice, auto_start);
+        }
     }
 
     /* Return completion status.  */
     return(status);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_thread_create                                  PORTABLE SMP     */
+/*                                                           6.3.0        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in the thread create function call. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Thread control block pointer  */
+/*    name_ptr                              Pointer to thread name string */
+/*    entry_function                        Entry function of the thread  */
+/*    entry_input                           32-bit input value to thread  */
+/*    stack_start                           Pointer to start of stack     */
+/*    stack_size                            Stack size in bytes           */
+/*    priority                              Priority of thread (0-31)     */
+/*    preempt_threshold                     Preemption threshold          */
+/*    time_slice                            Thread time-slice value       */
+/*    auto_start                            Automatic start selection     */
+/*    thread_control_block_size             Size of thread control block  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_THREAD_ERROR                       Invalid thread pointer        */
+/*    TX_PTR_ERROR                          Invalid stack or function ptr */
+/*    TX_SIZE_ERROR                         Invalid stack size            */
+/*    TX_PRIORITY_ERROR                     Invalid thread priority       */
+/*    TX_THRESH_ERROR                       Invalid preemption threshold  */
+/*    TX_START_ERROR                        Invalid start selection       */
+/*    TX_CALLER_ERROR                       Invalid caller of function    */
+/*    status                                Actual completion status      */
+/*                                                                        */
+/**************************************************************************/
+UINT    _txe_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                VOID (*entry_function)(ULONG id), ULONG entry_input,
+                VOID *stack_start, ULONG stack_size,
+                UINT priority, UINT preempt_threshold,
+                ULONG time_slice, UINT auto_start, UINT thread_control_block_size)
+{
+    return(_txe_thread_create_initial(thread_ptr, name_ptr,
+                                      entry_function, entry_input,
+                                      TX_NULL, TX_NULL,
+                                      stack_start, stack_size,
+                                      priority, preempt_threshold,
+                                      time_slice, auto_start,
+                                      thread_control_block_size));
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_thread_create_ptr                              PORTABLE SMP     */
+/*                                                           6.3.0        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in pointer context thread create.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Thread control block pointer  */
+/*    name_ptr                              Pointer to thread name string */
+/*    entry_function                        Entry function of the thread  */
+/*    entry_input                           Pointer input value to thread */
+/*    stack_start                           Pointer to start of stack     */
+/*    stack_size                            Stack size in bytes           */
+/*    priority                              Priority of thread            */
+/*    preempt_threshold                     Preemption threshold          */
+/*    time_slice                            Thread time-slice value       */
+/*    auto_start                            Automatic start selection     */
+/*    thread_control_block_size             Size of thread control block  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_THREAD_ERROR                       Invalid thread pointer        */
+/*    TX_PTR_ERROR                          Invalid stack or function ptr */
+/*    TX_SIZE_ERROR                         Invalid stack size            */
+/*    TX_PRIORITY_ERROR                     Invalid thread priority       */
+/*    TX_THRESH_ERROR                       Invalid preemption threshold  */
+/*    TX_START_ERROR                        Invalid start selection       */
+/*    TX_CALLER_ERROR                       Invalid caller of function    */
+/*    status                                Actual completion status      */
+/*                                                                        */
+/**************************************************************************/
+UINT    _txe_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                VOID (*entry_function)(VOID *id), VOID *entry_input,
+                VOID *stack_start, ULONG stack_size,
+                UINT priority, UINT preempt_threshold,
+                ULONG time_slice, UINT auto_start, UINT thread_control_block_size)
+{
+    return(_txe_thread_create_initial(thread_ptr, name_ptr,
+                                      TX_NULL, 0,
+                                      entry_function, entry_input,
+                                      stack_start, stack_size,
+                                      priority, preempt_threshold,
+                                      time_slice, auto_start,
+                                      thread_control_block_size));
 }
 
