@@ -61,6 +61,17 @@
 #define MODULE_OUT_CONTROL          ((ULONG) 19UL)  /* CONTROL as seen by the start thread  */
 #define MODULE_DONE                 ((ULONG) 31UL)
 
+/* The context switch test points a thread's stack at the bottom of this area,
+   so the exception frame overwrites words 0 to 25; it uses the words above.  */
+
+#define MODULE_IN_FRAME_DATA        ((ULONG) 2UL)   /* Stack pointer in the module's data   */
+#define MODULE_IN_FRAME_SHARED      ((ULONG) 3UL)   /* Stack pointer in this area           */
+#define MODULE_OUT_FRAME_STATUS     ((ULONG) 26UL)  /* Worst allocation or creation status  */
+#define MODULE_OUT_FRAME_THREAD_0   ((ULONG) 27UL)  /* Thread moving its stack to the area  */
+#define MODULE_OUT_FRAME_THREAD_1   ((ULONG) 28UL)  /* Thread moving its stack to the data  */
+#define MODULE_OUT_FRAME_RUNNING_0  ((ULONG) 29UL)  /* Thread 0 is about to move its stack  */
+#define MODULE_OUT_FRAME_RUNNING_1  ((ULONG) 30UL)  /* Thread 1 is about to move its stack  */
+
 #define MODULE_DONE_MAGIC           ((ULONG) 0x0D0E0D0EUL)
 #define MODULE_STARTED_MAGIC        ((ULONG) 0x57A27EDUL)
 #define MODULE_QUEUE_MESSAGE        ((ULONG) 0x12345678UL)
