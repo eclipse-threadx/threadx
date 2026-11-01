@@ -167,6 +167,7 @@ endfunction()
 # bit 2 shared memory access.
 module_qemu_add_module(module_services_protected  ${HARNESS_TESTS}/module_services.c 0x02000007)
 module_qemu_add_module(module_services_privileged ${HARNESS_TESTS}/module_services.c 0x02000000)
+module_qemu_add_module(module_stack_frame         ${HARNESS_TESTS}/module_stack_frame.c 0x02000007)
 
 # ---------------------------------------------------------------------------
 # The manager images, one per test, and the CTest entries that run them.
@@ -218,6 +219,7 @@ endfunction()
 module_qemu_add_test(test_module_lifecycle  ${HARNESS_TESTS}/test_module_lifecycle.c  module_services_protected)
 module_qemu_add_test(test_module_fault      ${HARNESS_TESTS}/test_module_fault.c      module_services_protected)
 module_qemu_add_test(test_module_privileged ${HARNESS_TESTS}/test_module_privileged.c module_services_privileged)
+module_qemu_add_test(test_module_stack_frame ${HARNESS_TESTS}/test_module_stack_frame.c module_stack_frame)
 
 if(NOT (Python3_FOUND AND QEMU_SYSTEM_ARM))
     message(STATUS "qemu-system-arm or Python 3 not found; the images build but no tests are registered.")
