@@ -211,6 +211,12 @@ TX_BYTE_POOL    _txm_module_manager_object_pool;
 UINT            _txm_module_manager_object_pool_created;
 
 
+/* The name the manager gives each module's callback request queue, which the queue
+   dispatchers compare against. No queue here carries it.  */
+
+TX_NAME_CONST CHAR  _txm_module_manager_callback_request_queue_name[] = "Module Callback Request Queue";
+
+
 /* The kernel's created lists. A created object lives on the list for its type, and
    the manager reads those lists, so a test that stands in for the kernel has to
    provide them. All stay empty here, because this test creates no kernel object; it

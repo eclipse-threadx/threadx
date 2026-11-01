@@ -156,6 +156,12 @@
 #define TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, obj_ptr, obj_size) \
     (_txm_module_manager_allocated_object_check(module_instance, obj_ptr, obj_size))
 
+/* A module's callback request queue is posted to only by the module manager and received
+   from only by that module's callback thread, so a module may not send to, flush or
+   reprioritise any callback request queue, nor receive from another module's.  */
+#define TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(queue_ptr) \
+    (((TX_QUEUE *) (queue_ptr)) -> tx_queue_name == _txm_module_manager_callback_request_queue_name)
+
 /* Strings we dereference can be in RW/RO/Shared areas.  */
 #define TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, string_ptr) \
     ((TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE(module_instance, string_ptr, 1)) || \
