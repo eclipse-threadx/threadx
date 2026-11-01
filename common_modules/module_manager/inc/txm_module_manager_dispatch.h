@@ -1344,6 +1344,13 @@ ALIGN_TYPE return_value;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* Only the module manager and the owning module's callback thread use a callback
+           request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_queue_flush(
@@ -1369,6 +1376,12 @@ TX_QUEUE *queue_ptr;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* Only the module manager posts to a callback request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
 
         /* We need to get the size of the message from the queue.  */
         queue_ptr =  (TX_QUEUE *) param_0;
@@ -1558,6 +1571,13 @@ ALIGN_TYPE return_value;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* Only the module manager and the owning module's callback thread use a callback
+           request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_queue_prioritize(
@@ -1583,6 +1603,13 @@ TX_QUEUE *queue_ptr;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module receives only from its own callback request queue.  */
+        if ((TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0)) &&
+            (((TX_QUEUE *) param_0) != &(module_instance -> txm_module_instance_callback_request_queue)))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
 
         /* We need to get the max size of the buffer from the queue.  */
         queue_ptr =  (TX_QUEUE *) param_0;
@@ -1616,6 +1643,12 @@ TX_QUEUE *queue_ptr;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        /* Only the module manager posts to a callback request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
+
         /* We need to get the size of the message from the queue.  */
         queue_ptr =  (TX_QUEUE *) param_0;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_READ(module_instance, param_1, sizeof(ULONG)*queue_ptr -> tx_queue_message_size))
@@ -1647,6 +1680,13 @@ VOID (*queue_send_notify)(TX_QUEUE *);
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* Only the module manager and the owning module's callback thread use a callback
+           request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
 
         /* Since we need to write to the object, ensure it's valid.  */
         if ((queue_ptr == TX_NULL) || (queue_ptr -> tx_queue_id != TX_QUEUE_ID))

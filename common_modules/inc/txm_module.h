@@ -599,6 +599,7 @@ extern UINT                                         _txm_module_manager_ready;
 extern TX_MUTEX                                     _txm_module_manager_mutex;
 extern ULONG                                        _txm_module_manager_callback_total_count;
 extern ULONG                                        _txm_module_manager_callback_error_count;
+extern TX_NAME_CONST CHAR                           _txm_module_manager_callback_request_queue_name[];
 #endif
 
 /* Define internal module manager function prototypes.  */
