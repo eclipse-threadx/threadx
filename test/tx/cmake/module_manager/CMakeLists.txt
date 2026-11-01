@@ -317,3 +317,43 @@ target_compile_options(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_callback_request_queue_test
          threadx_module_manager_callback_request_queue_test)
+
+# This test drives the eight thread-control dispatchers, so every other guard in the
+# dispatch table is defined.
+add_executable(
+  threadx_module_manager_thread_control_ownership_test
+  ${SOURCE_DIR}/threadx_module_manager_thread_control_ownership_test.c
+  ${module_manager_dir}/src/txm_module_manager_util.c)
+
+target_include_directories(
+  threadx_module_manager_thread_control_ownership_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_a7_module_dir}/inc)
+
+set(thread_control_dispatchers
+    TXM_THREAD_SUSPEND_CALL_NOT_USED
+    TXM_THREAD_RESUME_CALL_NOT_USED
+    TXM_THREAD_TERMINATE_CALL_NOT_USED
+    TXM_THREAD_RESET_CALL_NOT_USED
+    TXM_THREAD_PRIORITY_CHANGE_CALL_NOT_USED
+    TXM_THREAD_PREEMPTION_CHANGE_CALL_NOT_USED
+    TXM_THREAD_TIME_SLICE_CHANGE_CALL_NOT_USED
+    TXM_THREAD_WAIT_ABORT_CALL_NOT_USED)
+
+set(thread_control_guards ${dispatch_guards})
+list(REMOVE_ITEM thread_control_guards ${thread_control_dispatchers})
+
+target_compile_definitions(threadx_module_manager_thread_control_ownership_test
+                           PRIVATE ${thread_control_guards})
+
+target_compile_options(
+  threadx_module_manager_thread_control_ownership_test
+  PRIVATE -Wall
+          -Wextra
+          -include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_thread_control_ownership_test
+         threadx_module_manager_thread_control_ownership_test)

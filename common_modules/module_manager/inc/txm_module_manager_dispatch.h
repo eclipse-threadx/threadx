@@ -2486,6 +2486,12 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
+
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_2, sizeof(UINT)))
             return(TXM_MODULE_INVALID_MEMORY);
     }
@@ -2519,6 +2525,12 @@ ALIGN_TYPE return_value;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_2, sizeof(UINT)))
             return(TXM_MODULE_INVALID_MEMORY);
@@ -2556,6 +2568,12 @@ ALIGN_TYPE return_value;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txm_module_manager_thread_reset(
@@ -2578,6 +2596,12 @@ ALIGN_TYPE return_value;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_thread_resume(
@@ -2635,6 +2659,12 @@ ALIGN_TYPE return_value;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_thread_suspend(
@@ -2714,6 +2744,12 @@ ALIGN_TYPE return_value;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_thread_terminate(
@@ -2738,6 +2774,12 @@ ALIGN_TYPE return_value;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_2, sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
@@ -2765,6 +2807,12 @@ ALIGN_TYPE return_value;
     {
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_thread_wait_abort(
