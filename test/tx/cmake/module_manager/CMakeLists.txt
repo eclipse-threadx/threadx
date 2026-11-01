@@ -252,3 +252,32 @@ target_include_directories(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_cortex_a7_range_check_test
          threadx_module_manager_cortex_a7_range_check_test)
+
+# This test calls one dispatcher, so every other guard in the dispatch table is
+# defined and the translation unit holds only the service under test.
+add_executable(
+  threadx_module_manager_trace_buffer_full_notify_test
+  ${SOURCE_DIR}/threadx_module_manager_trace_buffer_full_notify_test.c)
+
+target_include_directories(
+  threadx_module_manager_trace_buffer_full_notify_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_m4_module_dir}/inc)
+
+set(trace_buffer_full_notify_guards ${dispatch_guards})
+list(REMOVE_ITEM trace_buffer_full_notify_guards TXM_TRACE_BUFFER_FULL_NOTIFY_CALL_NOT_USED)
+
+target_compile_definitions(threadx_module_manager_trace_buffer_full_notify_test
+                           PRIVATE ${trace_buffer_full_notify_guards})
+
+target_compile_options(
+  threadx_module_manager_trace_buffer_full_notify_test
+  PRIVATE -Wall
+          -Wextra
+          -include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_trace_buffer_full_notify_test
+         threadx_module_manager_trace_buffer_full_notify_test)

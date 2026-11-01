@@ -3088,9 +3088,18 @@ static ALIGN_TYPE _txm_module_manager_tx_trace_buffer_full_notify_dispatch(TXM_M
 
 ALIGN_TYPE return_value;
 
-    return_value = (ALIGN_TYPE) _tx_trace_buffer_full_notify(
-        (VOID (*)(VOID *buffer)) param_0
-    );
+    /* The kernel calls this notification directly from privileged code, with no
+       trampoline, so a user-mode module may not register one.  */
+    if ((module_instance -> txm_module_instance_property_flags & TXM_MODULE_USER_MODE) != ((ULONG) 0))
+    {
+        return_value = (ALIGN_TYPE) TXM_MODULE_INVALID_PROPERTIES;
+    }
+    else
+    {
+        return_value = (ALIGN_TYPE) _tx_trace_buffer_full_notify(
+            (VOID (*)(VOID *buffer)) param_0
+        );
+    }
     return(return_value);
 }
 #endif
