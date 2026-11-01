@@ -205,5 +205,8 @@ UINT    _txm_module_manager_created_object_type_check(ALIGN_TYPE object_ptr, UIN
 UINT    _txm_module_manager_object_id_check(ALIGN_TYPE object_ptr, UINT object_type);
 UINT    _txm_module_manager_live_object_check(ALIGN_TYPE object_ptr);
 UINT    _txm_module_manager_util_code_allocation_size_and_alignment_get(TXM_MODULE_PREAMBLE *module_preamble, ULONG *code_alignment_dest, ULONG *code_allocation_size_dest);
+UINT    _txm_module_manager_util_math_add_ulong(ULONG augend, ULONG addend, ULONG *result);
+UINT    _txm_module_manager_util_code_address_check(ALIGN_TYPE code_start, ULONG code_size, ALIGN_TYPE address);
+UINT    _txm_module_manager_util_image_size_check(VOID *module_location, ULONG module_size);
 
 #endif

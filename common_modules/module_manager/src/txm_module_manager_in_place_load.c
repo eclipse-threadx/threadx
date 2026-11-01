@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -46,6 +48,10 @@
 /*    This function ensures the code-related parts of the module preamble */
 /*    are valid and calls _txm_module_manager_internal_load to load the   */
 /*    data and prepare the module for execution.                          */
+/*                                                                        */
+/*    Deprecated: this function cannot bound the module image, because    */
+/*    it is not given its length. Use _txm_module_manager_in_place_load_ext*/
+/*    instead.                                                            */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -102,13 +108,68 @@ UINT                    status;
         return(status);
     }
 
-    /* Since this is an in-place load, check the alignment of the module's instruction area (code).  */
-    TXM_MODULE_MANAGER_CHECK_CODE_ALIGNMENT(module_location, code_alignment)
-
-    /* Now load the module in-place.  */
+    /* Now load the module in-place. The internal load checks the alignment of the module's
+       instruction area while it holds the protection mutex.  */
     status =  _txm_module_manager_internal_load(module_instance, module_name, module_location,
-                                                code_size, TX_NULL, 0);
+                                                code_size, TX_NULL, ((ULONG) 0), code_alignment);
 
     /* Return status.  */
+    return(status);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_in_place_load_ext               PORTABLE C      */
+/*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Eclipse ThreadX contributors                                        */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function loads a module in place, as                           */
+/*    _txm_module_manager_in_place_load does, after checking the module   */
+/*    image against its length: the image must hold a complete preamble, */
+/*    and the instruction area the preamble declares must not extend      */
+/*    past the image.                                                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_instance                   Module instance pointer           */
+/*    module_name                       Module name pointer               */
+/*    module_location                   Module code location              */
+/*    module_size                       Length of the module image        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_util_image_size_check                           */
+/*                                      Check the image against its length*/
+/*    _txm_module_manager_in_place_load Load the module in place          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _txm_module_manager_in_place_load_ext(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location, ULONG module_size)
+{
+
+UINT    status;
+
+
+    /* Nothing in the image is read until it is known to hold its preamble and its code.  */
+    status =  _txm_module_manager_util_image_size_check(module_location, module_size);
+    if (status == TX_SUCCESS)
+    {
+        status =  _txm_module_manager_in_place_load(module_instance, module_name, module_location);
+    }
+
     return(status);
 }

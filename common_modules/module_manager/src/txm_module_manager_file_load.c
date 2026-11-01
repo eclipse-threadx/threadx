@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -118,12 +120,11 @@ UINT                    status;
                 /* Pickup the module code size.  */
                 code_size =  module_preamble -> txm_module_preamble_code_size;
 
-                /* Check for valid sizes.  */
-                if (code_size != 0)
+                /* Check for valid sizes. The instruction area holds the preamble, so it is never
+                   smaller. The module control block is left alone here: the internal load refuses
+                   one that is already loaded, and clears it only after that check.  */
+                if (code_size >= ((ULONG) sizeof(TXM_MODULE_PREAMBLE)))
                 {
-
-                    /* Initialize module control block to all zeros.  */
-                    TX_MEMSET(module_instance, 0, sizeof(TXM_MODULE_INSTANCE));
 
                     /* Get the amount of the bytes we need to allocate for the module's code as well as the required alignment.  */
                     status =  _txm_module_manager_util_code_allocation_size_and_alignment_get(module_preamble, &code_alignment, &code_allocation_size);
@@ -160,7 +161,7 @@ UINT                    status;
 
                                         /* Now load it in-place.  */
                                         status =  _txm_module_manager_internal_load(module_instance, module_name, (VOID *) code_start,
-                                                                                    code_size, code_memory_ptr, code_allocation_size);
+                                                                                    code_size, code_memory_ptr, code_allocation_size, ((ULONG) 0));
                                         if (status == TX_SUCCESS)
                                         {
 

@@ -39,9 +39,12 @@
  * to determine where the module's data area is, and cannot describe it in the
  * module instance. The affected fields are left empty by this wrapper.
  *
- * WHAT TO DO: replace calls with txm_module_manager_absolute_load_extended(),
- * passing the module's data area address as the fourth argument. That address
- * is the RAM segment start defined in the module's linker script.
+ * It is also not given the length of the module image, so it cannot check that
+ * the instruction area the preamble declares lies within the image.
+ *
+ * WHAT TO DO: replace calls with txm_module_manager_absolute_load_ext(),
+ * passing the length of the module image and the module's data area address.
+ * That address is the RAM segment start defined in the module's linker script.
  *
  * RISK: with the data area unknown, the module manager cannot tell whether an
  * object, a thread control block, or the trace buffer resides in the module's
@@ -53,8 +56,8 @@
  * and this message from the build.
  */
 #pragma message("txm_module_manager_absolute_load() is deprecated. " \
-                "Use txm_module_manager_absolute_load_extended() and pass " \
-                "the module's data area address.")
+                "Use txm_module_manager_absolute_load_ext() and pass " \
+                "the module image length and data area address.")
 
 /**************************************************************************/
 /*                                                                        */

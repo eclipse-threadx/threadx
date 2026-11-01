@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -54,6 +56,8 @@
 /*    code_size                         Module code size                  */
 /*    code_allocation_ptr               Allocated code location           */
 /*    code_allocation_size              Allocated code size               */
+/*    code_alignment                    Required alignment of an in-place */
+/*                                        module, or 0 for none           */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
@@ -62,6 +66,10 @@
 /*  CALLS                                                                 */
 /*                                                                        */
 /*    _tx_byte_allocate                 Allocate data area                */
+/*    _txm_module_manager_util_code_address_check                         */
+/*                                      Check an entry address            */
+/*    _txm_module_manager_util_math_add_ulong                             */
+/*                                      Add sizes without overflow        */
 /*    _tx_mutex_get                     Get protection mutex              */
 /*    _tx_mutex_put                     Release protection mutex          */
 /*                                                                        */
@@ -71,7 +79,8 @@
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_internal_load(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location,
-                                        ULONG code_size, VOID *code_allocation_ptr, ULONG code_allocation_size)
+                                        ULONG code_size, VOID *code_allocation_ptr, ULONG code_allocation_size,
+                                        ULONG code_alignment)
 {
 
 TX_INTERRUPT_SAVE_AREA
@@ -82,6 +91,11 @@ ULONG                   shell_function_adjust;
 ULONG                   start_function_adjust;
 ULONG                   stop_function_adjust;
 ULONG                   callback_function_adjust;
+ALIGN_TYPE              code_start;
+ALIGN_TYPE              shell_function_address;
+ALIGN_TYPE              start_function_address;
+ALIGN_TYPE              stop_function_address;
+ALIGN_TYPE              callback_function_address;
 ULONG                   start_stop_stack_size;
 ULONG                   callback_stack_size;
 ULONG                   code_size_ignored;
@@ -170,9 +184,11 @@ UINT                    status;
         return(TXM_MODULE_INVALID_PROPERTIES);
     }
 
-    /* Check for valid module entry offsets.  */
+    /* Check for valid module entry offsets. The callback thread is always created, so its entry
+       offset must be set as well.  */
     if ((module_preamble -> txm_module_preamble_shell_entry_function == 0) ||
-        (module_preamble -> txm_module_preamble_start_function == 0))
+        (module_preamble -> txm_module_preamble_start_function == 0) ||
+        (module_preamble -> txm_module_preamble_callback_function == 0))
     {
 
         /* Release the protection mutex.  */
@@ -182,11 +198,14 @@ UINT                    status;
         return(TXM_MODULE_INVALID);
     }
 
-    /* Check for valid sizes.  */
+    /* Check for valid sizes. The instruction area holds the preamble, so it must be at least as
+       large as the preamble and as the preamble size it declares.  */
     if ((module_preamble -> txm_module_preamble_code_size == 0) ||
         (module_preamble -> txm_module_preamble_data_size == 0) ||
         (module_preamble -> txm_module_preamble_start_stop_stack_size == 0) ||
-        (module_preamble -> txm_module_preamble_callback_stack_size == 0))
+        (module_preamble -> txm_module_preamble_callback_stack_size == 0) ||
+        (code_size < ((ULONG) sizeof(TXM_MODULE_PREAMBLE))) ||
+        (module_preamble -> txm_module_preamble_preamble_size > (code_size / ((ULONG) sizeof(ULONG)))))
     {
 
         /* Release the protection mutex.  */
@@ -194,10 +213,46 @@ UINT                    status;
 
         /* Invalid module preamble.  */
         return(TXM_MODULE_INVALID);
+    }
+
+    /* A module executed in place must sit at the alignment its port requires. The port's check
+       releases the protection mutex itself when it fails.  */
+    if (code_alignment != ((ULONG) 0))
+    {
+        TXM_MODULE_MANAGER_CHECK_CODE_ALIGNMENT(module_location, code_alignment)
     }
 
     /* Initialize module control block to all zeros.  */
     TX_MEMSET(module_instance, 0, sizeof(TXM_MODULE_INSTANCE));
+
+    /* Record where the code is, which the port's adjustments may depend on.  */
+    module_instance -> txm_module_instance_code_start =  (VOID *) module_location;
+
+    /* Calculate the function adjustments based on the specific implementation of the module manager/module.  */
+    TXM_MODULE_MANAGER_CALCULATE_ADJUSTMENTS(module_preamble -> txm_module_preamble_property_flags, shell_function_adjust, start_function_adjust, stop_function_adjust, callback_function_adjust)
+
+    /* Build the entry addresses from the offsets in the preamble. Unsigned arithmetic wraps
+       rather than overflowing, and the bound check below refuses any address that wrapped.  */
+    code_start =                 (ALIGN_TYPE) module_location;
+    shell_function_address =     code_start + (ALIGN_TYPE) module_preamble -> txm_module_preamble_shell_entry_function + (ALIGN_TYPE) shell_function_adjust;
+    start_function_address =     code_start + (ALIGN_TYPE) module_preamble -> txm_module_preamble_start_function + (ALIGN_TYPE) start_function_adjust;
+    callback_function_address =  code_start + (ALIGN_TYPE) module_preamble -> txm_module_preamble_callback_function + (ALIGN_TYPE) callback_function_adjust;
+    stop_function_address =      code_start + (ALIGN_TYPE) module_preamble -> txm_module_preamble_stop_function + (ALIGN_TYPE) stop_function_adjust;
+
+    /* Every entry the module's threads will start at must lie inside the module's own code.  */
+    if ((_txm_module_manager_util_code_address_check(code_start, code_size, shell_function_address) == TX_FALSE) ||
+        (_txm_module_manager_util_code_address_check(code_start, code_size, start_function_address) == TX_FALSE) ||
+        (_txm_module_manager_util_code_address_check(code_start, code_size, callback_function_address) == TX_FALSE) ||
+        ((module_preamble -> txm_module_preamble_stop_function != 0) &&
+         (_txm_module_manager_util_code_address_check(code_start, code_size, stop_function_address) == TX_FALSE)))
+    {
+
+        /* Release the protection mutex.  */
+        _tx_mutex_put(&_txm_module_manager_mutex);
+
+        /* Invalid module preamble.  */
+        return(TXM_MODULE_INVALID);
+    }
 
     /* Pickup the basic module sizes.  */
     data_size =              module_preamble -> txm_module_preamble_data_size;
@@ -207,20 +262,38 @@ UINT                    status;
     /* Adjust the size of the module elements to be aligned to the default alignment. We do this
        so that when we partition the allocated memory, we can simply place these regions right beside
        each other without having to align their pointers. Note this only works when they all have
-       the same alignment.  */
+       the same alignment. A size that overflows is refused, with the protection mutex released.  */
+    status =  _txm_module_manager_util_math_add_ulong(data_size, (ULONG) TXM_MODULE_DATA_ALIGNMENT, &data_size);
+    if (status == TX_SUCCESS)
+    {
+        data_size =  ((data_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+        status =  _txm_module_manager_util_math_add_ulong(start_stop_stack_size, (ULONG) TXM_MODULE_DATA_ALIGNMENT, &start_stop_stack_size);
+    }
+    if (status == TX_SUCCESS)
+    {
+        start_stop_stack_size =  ((start_stop_stack_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+        status =  _txm_module_manager_util_math_add_ulong(callback_stack_size, (ULONG) TXM_MODULE_DATA_ALIGNMENT, &callback_stack_size);
+    }
+    if (status == TX_SUCCESS)
+    {
+        callback_stack_size =  ((callback_stack_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
 
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(data_size, TXM_MODULE_DATA_ALIGNMENT, data_size);
-    data_size =              ((data_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+        /* Update the data size to account for the default thread stacks.  */
+        status =  _txm_module_manager_util_math_add_ulong(data_size, start_stop_stack_size, &data_size);
+    }
+    if (status == TX_SUCCESS)
+    {
+        status =  _txm_module_manager_util_math_add_ulong(data_size, callback_stack_size, &data_size);
+    }
+    if (status != TX_SUCCESS)
+    {
 
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(start_stop_stack_size, TXM_MODULE_DATA_ALIGNMENT, start_stop_stack_size);
-    start_stop_stack_size =  ((start_stop_stack_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+        /* Release the protection mutex.  */
+        _tx_mutex_put(&_txm_module_manager_mutex);
 
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(callback_stack_size, TXM_MODULE_DATA_ALIGNMENT, callback_stack_size);
-    callback_stack_size =    ((callback_stack_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
-
-    /* Update the data size to account for the default thread stacks.  */
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(data_size, start_stop_stack_size, data_size);
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(data_size, callback_stack_size, data_size);
+        /* Math overflow error occurred.  */
+        return(status);
+    }
 
     /* Setup the default code and data alignments.  */
     data_alignment =  (ULONG) TXM_MODULE_DATA_ALIGNMENT;
@@ -248,7 +321,16 @@ UINT                    status;
     Highest Address:    */
 
     /* Add an extra alignment increment so we can align the pointer after allocation.  */
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(data_size, data_alignment, data_allocation_size);
+    status =  _txm_module_manager_util_math_add_ulong(data_size, data_alignment, &data_allocation_size);
+    if (status != TX_SUCCESS)
+    {
+
+        /* Release the protection mutex.  */
+        _tx_mutex_put(&_txm_module_manager_mutex);
+
+        /* Math overflow error occurred.  */
+        return(status);
+    }
 
     /* Allocate memory for the module.  */
     status =  _tx_byte_allocate(&_txm_module_manager_byte_pool, (VOID **) &memory_ptr, data_allocation_size, TX_NO_WAIT);
@@ -349,28 +431,17 @@ UINT                    status;
     /* Setup the start of the module data section.  */
     module_instance -> txm_module_instance_module_data_base_address =  (VOID *) (memory_ptr);
 
-    /* Calculate the function adjustments based on the specific implementation of the module manager/module.  */
-    TXM_MODULE_MANAGER_CALCULATE_ADJUSTMENTS(module_preamble -> txm_module_preamble_property_flags, shell_function_adjust, start_function_adjust, stop_function_adjust, callback_function_adjust)
+    /* Setup all the function pointers from the entry addresses checked above.  */
+    module_instance -> txm_module_instance_shell_entry_function  =          (VOID (*)(TX_THREAD *, TXM_MODULE_INSTANCE *)) ((VOID *) shell_function_address);
+    module_instance -> txm_module_instance_start_thread_entry =             (VOID (*)(ULONG)) ((VOID *) start_function_address);
+    module_instance -> txm_module_instance_callback_request_thread_entry =  (VOID (*)(ULONG)) ((VOID *) callback_function_address);
 
-    /* Build actual addresses based on load...  Setup all the function pointers. Any adjustments needed to shell entry, start function, and callback function are defined in the
-       module preamble. */
-    module_instance -> txm_module_instance_shell_entry_function  =          (VOID (*)(TX_THREAD *, TXM_MODULE_INSTANCE *)) (((CHAR *) module_instance -> txm_module_instance_code_start) +
-                                                                                                                                      (module_preamble -> txm_module_preamble_shell_entry_function) +
-                                                                                                                                      (shell_function_adjust));
-    module_instance -> txm_module_instance_start_thread_entry =             (VOID (*)(ULONG)) (((CHAR *) module_instance -> txm_module_instance_code_start) +
-                                                                                                                                      (module_preamble -> txm_module_preamble_start_function) +
-                                                                                                                                      (start_function_adjust));
-    module_instance -> txm_module_instance_callback_request_thread_entry =  (VOID (*)(ULONG)) (((CHAR *) module_instance -> txm_module_instance_code_start) +
-                                                                                                                                      (module_preamble -> txm_module_preamble_callback_function) +
-                                                                                                                                      (callback_function_adjust));
     /* Determine if there is a stop function for this module.  */
     if (module_preamble -> txm_module_preamble_stop_function)
     {
 
-        /* Yes, there is a stop function, build the address.  */
-        module_instance -> txm_module_instance_stop_thread_entry =  (VOID (*)(ULONG)) (((CHAR *) module_instance -> txm_module_instance_code_start) +
-                                                                                                                                      (module_preamble -> txm_module_preamble_stop_function) +
-                                                                                                                                      (stop_function_adjust));
+        /* Yes, there is a stop function, set its address.  */
+        module_instance -> txm_module_instance_stop_thread_entry =  (VOID (*)(ULONG)) ((VOID *) stop_function_address);
     }
     else
     {
