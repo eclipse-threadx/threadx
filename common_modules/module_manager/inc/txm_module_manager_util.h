@@ -156,6 +156,12 @@
 #define TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, obj_ptr, obj_size) \
     (_txm_module_manager_allocated_object_check(module_instance, obj_ptr, obj_size))
 
+/* A module's callback request queue is posted to only by the module manager and received
+   from only by that module's callback thread, so a module may not send to, flush or
+   reprioritise any callback request queue, nor receive from another module's.  */
+#define TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(queue_ptr) \
+    (((TX_QUEUE *) (queue_ptr)) -> tx_queue_name == _txm_module_manager_callback_request_queue_name)
+
 /* Strings we dereference can be in RW/RO/Shared areas.  */
 #define TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, string_ptr) \
     ((TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE(module_instance, string_ptr, 1)) || \
@@ -199,5 +205,8 @@ UINT    _txm_module_manager_created_object_type_check(ALIGN_TYPE object_ptr, UIN
 UINT    _txm_module_manager_object_id_check(ALIGN_TYPE object_ptr, UINT object_type);
 UINT    _txm_module_manager_live_object_check(ALIGN_TYPE object_ptr);
 UINT    _txm_module_manager_util_code_allocation_size_and_alignment_get(TXM_MODULE_PREAMBLE *module_preamble, ULONG *code_alignment_dest, ULONG *code_allocation_size_dest);
+UINT    _txm_module_manager_util_math_add_ulong(ULONG augend, ULONG addend, ULONG *result);
+UINT    _txm_module_manager_util_code_address_check(ALIGN_TYPE code_start, ULONG code_size, ALIGN_TYPE address);
+UINT    _txm_module_manager_util_image_size_check(VOID *module_location, ULONG module_size);
 
 #endif

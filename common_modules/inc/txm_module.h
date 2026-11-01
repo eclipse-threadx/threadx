@@ -575,6 +575,9 @@ VOID  _txm_module_usbx_duo_callback_request(TXM_MODULE_CALLBACK_MESSAGE *callbac
 #define txm_module_manager_in_place_load                _txm_module_manager_in_place_load
 #define txm_module_manager_file_load                    _txm_module_manager_file_load
 #define txm_module_manager_memory_load                  _txm_module_manager_memory_load
+#define txm_module_manager_absolute_load_ext            _txm_module_manager_absolute_load_ext
+#define txm_module_manager_in_place_load_ext            _txm_module_manager_in_place_load_ext
+#define txm_module_manager_memory_load_ext              _txm_module_manager_memory_load_ext
 #define txm_module_manager_object_pointer_get           _txm_module_manager_object_pointer_get
 #define txm_module_manager_object_pointer_get_extended  _txm_module_manager_object_pointer_get_extended
 #define txm_module_manager_object_pool_create           _txm_module_manager_object_pool_create
@@ -599,6 +602,7 @@ extern UINT                                         _txm_module_manager_ready;
 extern TX_MUTEX                                     _txm_module_manager_mutex;
 extern ULONG                                        _txm_module_manager_callback_total_count;
 extern ULONG                                        _txm_module_manager_callback_error_count;
+extern TX_NAME_CONST CHAR                           _txm_module_manager_callback_request_queue_name[];
 #endif
 
 /* Define internal module manager function prototypes.  */
@@ -608,11 +612,16 @@ UINT  _txm_module_manager_application_request(ULONG request, ALIGN_TYPE param_1,
 UINT  _txm_module_manager_file_load(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, FX_MEDIA *media_ptr, CHAR *file_name);
 #endif
 UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_memory_size);
+/* The absolute, in-place and memory loaders that take no image length are deprecated: they cannot
+   check the module image against its length. Use the _ext loaders, which take it.  */
 UINT  _txm_module_manager_absolute_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location);
 UINT  _txm_module_manager_absolute_load_extended(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location, VOID *module_data_location);
+UINT  _txm_module_manager_absolute_load_ext(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location, ULONG module_size, VOID *module_data_location);
 UINT  _txm_module_manager_in_place_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location);
+UINT  _txm_module_manager_in_place_load_ext(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location, ULONG module_size);
 UINT  _txm_module_manager_internal_load(TXM_MODULE_INSTANCE *module_instance, CHAR *name, VOID *module_location,
-                                        ULONG code_size, VOID *code_allocation_ptr, ULONG code_allocation_size);
+                                        ULONG code_size, VOID *code_allocation_ptr, ULONG code_allocation_size,
+                                        ULONG code_alignment);
 ALIGN_TYPE _txm_module_manager_kernel_dispatch(ULONG kernel_request, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2);
 UINT  _txm_module_manager_object_allocate(VOID **object_ptr_ptr, ULONG object_size, TXM_MODULE_INSTANCE *module_instance);
 UINT  _txm_module_manager_object_deallocate(VOID *object_ptr);
@@ -621,6 +630,7 @@ UINT  _txm_module_manager_object_pointer_get_extended(UINT object_type, CHAR *na
 UINT  _txm_module_manager_object_pool_create(VOID *object_memory, ULONG object_memory_size);
 VOID  _txm_module_manager_object_type_set(ULONG object_ptr, ULONG object_size, ULONG object_type);
 UINT  _txm_module_manager_memory_load(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location);
+UINT  _txm_module_manager_memory_load_ext(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location, ULONG module_size);
 UINT  _txm_module_manager_properties_get(TXM_MODULE_INSTANCE *module_instance, ULONG *module_properties_ptr);
 UINT  _txm_module_manager_start(TXM_MODULE_INSTANCE *module_instance);
 UINT  _txm_module_manager_stop(TXM_MODULE_INSTANCE *module_instance);

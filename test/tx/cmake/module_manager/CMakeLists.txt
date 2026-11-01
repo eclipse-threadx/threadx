@@ -252,3 +252,144 @@ target_include_directories(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_cortex_a7_range_check_test
          threadx_module_manager_cortex_a7_range_check_test)
+
+# This test calls one dispatcher, so every other guard in the dispatch table is
+# defined and the translation unit holds only the service under test.
+add_executable(
+  threadx_module_manager_trace_buffer_full_notify_test
+  ${SOURCE_DIR}/threadx_module_manager_trace_buffer_full_notify_test.c)
+
+target_include_directories(
+  threadx_module_manager_trace_buffer_full_notify_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_m4_module_dir}/inc)
+
+set(trace_buffer_full_notify_guards ${dispatch_guards})
+list(REMOVE_ITEM trace_buffer_full_notify_guards TXM_TRACE_BUFFER_FULL_NOTIFY_CALL_NOT_USED)
+
+target_compile_definitions(threadx_module_manager_trace_buffer_full_notify_test
+                           PRIVATE ${trace_buffer_full_notify_guards})
+
+target_compile_options(
+  threadx_module_manager_trace_buffer_full_notify_test
+  PRIVATE -Wall
+          -Wextra
+          -include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_trace_buffer_full_notify_test
+         threadx_module_manager_trace_buffer_full_notify_test)
+
+# This test calls the six queue dispatchers that act on an existing queue, so every
+# other guard in the dispatch table is defined.
+add_executable(
+  threadx_module_manager_callback_request_queue_test
+  ${SOURCE_DIR}/threadx_module_manager_callback_request_queue_test.c
+  ${module_manager_dir}/src/txm_module_manager_util.c)
+
+target_include_directories(
+  threadx_module_manager_callback_request_queue_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_m4_module_dir}/inc)
+
+set(callback_request_queue_guards ${dispatch_guards})
+list(REMOVE_ITEM callback_request_queue_guards
+     TXM_QUEUE_SEND_CALL_NOT_USED
+     TXM_QUEUE_FRONT_SEND_CALL_NOT_USED
+     TXM_QUEUE_RECEIVE_CALL_NOT_USED
+     TXM_QUEUE_FLUSH_CALL_NOT_USED
+     TXM_QUEUE_PRIORITIZE_CALL_NOT_USED
+     TXM_QUEUE_SEND_NOTIFY_CALL_NOT_USED)
+
+target_compile_definitions(threadx_module_manager_callback_request_queue_test
+                           PRIVATE ${callback_request_queue_guards})
+
+target_compile_options(
+  threadx_module_manager_callback_request_queue_test
+  PRIVATE -Wall
+          -Wextra
+          -include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_callback_request_queue_test
+         threadx_module_manager_callback_request_queue_test)
+
+# This test drives the eight thread-control dispatchers, so every other guard in the
+# dispatch table is defined.
+add_executable(
+  threadx_module_manager_thread_control_ownership_test
+  ${SOURCE_DIR}/threadx_module_manager_thread_control_ownership_test.c
+  ${module_manager_dir}/src/txm_module_manager_util.c)
+
+target_include_directories(
+  threadx_module_manager_thread_control_ownership_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_a7_module_dir}/inc)
+
+set(thread_control_dispatchers
+    TXM_THREAD_SUSPEND_CALL_NOT_USED
+    TXM_THREAD_RESUME_CALL_NOT_USED
+    TXM_THREAD_TERMINATE_CALL_NOT_USED
+    TXM_THREAD_RESET_CALL_NOT_USED
+    TXM_THREAD_PRIORITY_CHANGE_CALL_NOT_USED
+    TXM_THREAD_PREEMPTION_CHANGE_CALL_NOT_USED
+    TXM_THREAD_TIME_SLICE_CHANGE_CALL_NOT_USED
+    TXM_THREAD_WAIT_ABORT_CALL_NOT_USED)
+
+set(thread_control_guards ${dispatch_guards})
+list(REMOVE_ITEM thread_control_guards ${thread_control_dispatchers})
+
+target_compile_definitions(threadx_module_manager_thread_control_ownership_test
+                           PRIVATE ${thread_control_guards})
+
+target_compile_options(
+  threadx_module_manager_thread_control_ownership_test
+  PRIVATE -Wall
+          -Wextra
+          -include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h)
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_thread_control_ownership_test
+         threadx_module_manager_thread_control_ownership_test)
+
+# This test drives the loaders directly. It compiles the file loader against a
+# stand-in FileX interface, and force-includes a shim that replaces the port's
+# system-state read, which is an Arm instruction, with the kernel's system state.
+add_executable(
+  threadx_module_manager_load_bounds_test
+  ${SOURCE_DIR}/threadx_module_manager_load_bounds_test.c
+  ${module_manager_dir}/src/txm_module_manager_internal_load.c
+  ${module_manager_dir}/src/txm_module_manager_in_place_load.c
+  ${module_manager_dir}/src/txm_module_manager_memory_load.c
+  ${module_manager_dir}/src/txm_module_manager_file_load.c
+  ${module_manager_dir}/src/txm_module_manager_absolute_load.c
+  ${module_manager_dir}/src/txm_module_manager_absolute_load_extended.c
+  ${module_manager_dir}/src/txm_module_manager_util.c)
+
+target_include_directories(
+  threadx_module_manager_load_bounds_test
+  PRIVATE ${SOURCE_DIR}/load_bounds_filex
+          ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_m4_module_dir}/inc)
+
+target_compile_definitions(threadx_module_manager_load_bounds_test
+                           PRIVATE FX_FILEX_PRESENT)
+
+target_compile_options(
+  threadx_module_manager_load_bounds_test
+  PRIVATE -Wall
+          -Wextra
+          "SHELL:-include ${SOURCE_DIR}/threadx_module_manager_load_bounds_state.h"
+          "SHELL:-include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h")
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_load_bounds_test
+         threadx_module_manager_load_bounds_test)

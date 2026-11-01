@@ -237,6 +237,34 @@ __tx_ts_handler:
 
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r3, PSP                                 // Pickup PSP pointer (thread's stack pointer)
+
+    /* A user-mode thread of a memory-protected module sets its own PSP, and the stores that
+       preserve its context are privileged, so they are made only if they stay within the
+       thread's stack. Otherwise the context goes on the thread's kernel stack, which the
+       module cannot reach, and the thread faults when it resumes.  */
+    MOVS    r0, #0x98                               // Index of current user mode
+    LDR     r0, [r1, r0]                            // Pickup current user mode flag
+    CMP     r0, #0                                  // Kernel mode?
+    BEQ     __tx_ts_psp_checked                     // Yes, PSP is the kernel's
+    MOVS    r0, #0x90                               // Index of module instance ptr
+    LDR     r0, [r1, r0]                            // Pickup the module instance pointer
+    LDR     r0, [r0, #0x0C]                         // Pickup the module property flags
+    MOVS    r2, #2                                  // Build memory protection mask
+    TST     r0, r2                                  // Is the module memory protected?
+    BEQ     __tx_ts_psp_checked                     // No, nothing to protect
+    LDR     r0, [r1, #16]                           // Pickup thread stack end
+    CMP     r3, r0                                  // Is PSP above the stack?
+    BHI     __tx_ts_psp_bad                         // Yes, do not store through it
+    LDR     r0, [r1, #12]                           // Pickup thread stack start
+    ADDS    r0, r0, #36                             // Room for r4-r11 and LR
+    CMP     r3, r0                                  // Do the stores fit above the stack start?
+    BHS     __tx_ts_psp_checked                     // Yes, save the context where it belongs
+__tx_ts_psp_bad:
+    MOVS    r0, #0xA8                               // Index of module kernel stack end
+    LDR     r3, [r1, r0]                            // No, save it on the kernel stack instead
+__tx_ts_psp_checked:
+    LDR     r0, =_tx_thread_current_ptr             // Rebuild current thread pointer address
+    LDR     r2, =_tx_thread_execute_ptr             // Rebuild execute thread pointer address
     SUBS    r3, r3, #16                             // Allocate stack space
     STM     r3!, {r4-r7}                            // Save r4-r7 (M4 Instruction: STMDB r12!, {r4-r11})
     MOV     r4, r8                                  // Copy r8-r11 to multisave registers

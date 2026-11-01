@@ -273,6 +273,34 @@ __tx_ts_handler:
 
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r12, PSP                                // Pickup PSP pointer (thread's stack pointer)
+
+    /* A user-mode thread of a memory-protected module sets its own PSP, and the stores that
+       preserve its context are privileged, so they are made only if they stay within the
+       thread's stack. Otherwise the context goes on the thread's kernel stack, which the
+       module cannot reach, and the thread faults when it resumes.  */
+    LDR     r3, [r1, #0x98]                         // Pickup current user mode flag
+    CBZ     r3, __tx_ts_psp_checked                 // Kernel mode, PSP is the kernel's
+    LDR     r3, [r1, #0x90]                         // Pickup the module instance pointer
+    LDR     r3, [r3, #0x0C]                         // Pickup the module property flags
+    TST     r3, #2                                  // Is the module memory protected?
+    BEQ     __tx_ts_psp_checked                     // No, nothing to protect
+    LDR     r3, [r1, #16]                           // Pickup thread stack end
+    CMP     r12, r3                                 // Is PSP above the stack?
+    BHI     __tx_ts_psp_bad                         // Yes, do not store through it
+    LDR     r3, [r1, #12]                           // Pickup thread stack start
+    ADD     r3, r3, #36                             // Room for r4-r11 and LR
+#ifdef __ARM_FP
+    TST     LR, #0x10                               // Is the VFP extended frame present?
+    BNE     __tx_ts_psp_room                        // No, no VFP registers to save
+    ADD     r3, r3, #64                             // Yes, also room for s16-s31
+__tx_ts_psp_room:
+#endif
+    CMP     r12, r3                                 // Do the stores fit above the stack start?
+    BHS     __tx_ts_psp_checked                     // Yes, save the context where it belongs
+__tx_ts_psp_bad:
+    LDR     r12, [r1, #0xA8]                        // No, save it on the kernel stack instead
+__tx_ts_psp_checked:
+    MOV     r3, #0                                  // Rebuild NULL value
     STMDB   r12!, {r4-r11}                          // Save its remaining registers
 #ifdef __ARM_FP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
