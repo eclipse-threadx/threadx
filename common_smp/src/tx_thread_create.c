@@ -78,11 +78,18 @@
 /*    Application Code                                                    */
 /*    _tx_timer_initialize                  Create system timer thread    */
 /*                                                                        */
+static UINT  _tx_thread_create_initial(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                                       VOID (*entry_function)(ULONG id), ULONG entry_input,
+                                       VOID (*entry_function_ptr)(VOID *id), VOID *entry_input_ptr,
+                                       VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                                       ULONG time_slice, UINT auto_start);
+
 /**************************************************************************/
-UINT  _tx_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
-                            VOID (*entry_function)(ULONG id), ULONG entry_input,
-                            VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
-                            ULONG time_slice, UINT auto_start)
+static UINT  _tx_thread_create_initial(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                                       VOID (*entry_function)(ULONG id), ULONG entry_input,
+                                       VOID (*entry_function_ptr)(VOID *id), VOID *entry_input_ptr,
+                                       VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                                       ULONG time_slice, UINT auto_start)
 {
 
 TX_INTERRUPT_SAVE_AREA
@@ -165,6 +172,8 @@ ULONG                   stack_fill_value;
     thread_ptr -> tx_thread_name =                name_ptr;
     thread_ptr -> tx_thread_entry =               entry_function;
     thread_ptr -> tx_thread_entry_parameter =     entry_input;
+    thread_ptr -> tx_thread_entry_ptr =           entry_function_ptr;
+    thread_ptr -> tx_thread_entry_parameter_ptr = entry_input_ptr;
     thread_ptr -> tx_thread_stack_start =         stack_start;
     thread_ptr -> tx_thread_stack_size =          stack_size;
     thread_ptr -> tx_thread_priority =            priority;
@@ -400,5 +409,95 @@ ULONG                   stack_fill_value;
 
     /* Return success.  */
     return(TX_SUCCESS);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_create                                  PORTABLE SMP     */
+/*                                                           6.3.0        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function creates a thread with ULONG input parameter.          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Thread control block pointer  */
+/*    name                                  Pointer to thread name string */
+/*    entry_function                        Entry function of the thread  */
+/*    entry_input                           32-bit input value to thread  */
+/*    stack_start                           Pointer to start of stack     */
+/*    stack_size                            Stack size in bytes           */
+/*    priority                              Priority of thread            */
+/*    preempt_threshold                     Preemption threshold          */
+/*    time_slice                            Thread time-slice value       */
+/*    auto_start                            Automatic start selection     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    return status                         Thread create return status   */
+/*                                                                        */
+/**************************************************************************/
+UINT  _tx_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                        VOID (*entry_function)(ULONG id), ULONG entry_input,
+                        VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                        ULONG time_slice, UINT auto_start)
+{
+    return(_tx_thread_create_initial(thread_ptr, name_ptr,
+                                     entry_function, entry_input,
+                                     TX_NULL, TX_NULL,
+                                     stack_start, stack_size, priority, preempt_threshold,
+                                     time_slice, auto_start));
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_create_ptr                               PORTABLE SMP     */
+/*                                                           6.3.0        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function creates a thread with pointer context input.          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Thread control block pointer  */
+/*    name                                  Pointer to thread name string */
+/*    entry_function                        Entry function of the thread  */
+/*    entry_input                           Pointer input value to thread */
+/*    stack_start                           Pointer to start of stack     */
+/*    stack_size                            Stack size in bytes           */
+/*    priority                              Priority of thread            */
+/*    preempt_threshold                     Preemption threshold          */
+/*    time_slice                            Thread time-slice value       */
+/*    auto_start                            Automatic start selection     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    return status                         Thread create return status   */
+/*                                                                        */
+/**************************************************************************/
+UINT  _tx_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                            VOID (*entry_function)(VOID *id), VOID *entry_input,
+                            VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                            ULONG time_slice, UINT auto_start)
+{
+    return(_tx_thread_create_initial(thread_ptr, name_ptr,
+                                     TX_NULL, 0,
+                                     entry_function, entry_input,
+                                     stack_start, stack_size, priority, preempt_threshold,
+                                     time_slice, auto_start));
 }
 

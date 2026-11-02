@@ -105,7 +105,16 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
 #endif
 
     /* Call current thread's entry function.  */
-    (thread_ptr -> tx_thread_entry) (thread_ptr -> tx_thread_entry_parameter);
+    if (thread_ptr -> tx_thread_entry_ptr != TX_NULL)
+    {
+
+        (thread_ptr -> tx_thread_entry_ptr)(thread_ptr -> tx_thread_entry_parameter_ptr);
+    }
+    else
+    {
+
+        (thread_ptr -> tx_thread_entry)(thread_ptr -> tx_thread_entry_parameter);
+    }
 
     /* Suspend thread with a "completed" state.  */
 
