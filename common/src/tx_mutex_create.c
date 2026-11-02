@@ -11,7 +11,6 @@
 
 /* Portions of this file were generated with AI assistance. */
 
-
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -91,6 +90,9 @@ TX_MUTEX        *previous_mutex;
 
     /* Setup the thread mutex release function pointer.  */
     _tx_thread_mutex_release =  &(_tx_mutex_thread_release);
+
+    /* Setup the thread mutex priority update function pointer.  */
+    _tx_thread_mutex_priority_update =  &(_tx_mutex_inherit_priority_update);
 
     /* Place the mutex on the list of created mutexes.  First,
        check for an empty list.  */

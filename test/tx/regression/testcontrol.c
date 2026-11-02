@@ -173,6 +173,7 @@ void    threadx_mutex_preemption_application_define(void *);
 void    threadx_mutext_no_preemption_application_define(void *);
 void    threadx_mutex_suspension_timeout_application_define(void *);
 void    threadx_mutex_thread_terminate_application_define(void *);
+void    threadx_mutex_inherit_waiter_priority_change_application_define(void *);
 void    threadx_mutex_priority_inheritance_application_define(void *);
 void    threadx_mutex_nested_priority_inheritance_application_define(void *);
 void    threadx_mutex_prioritize_application_define(void *);
@@ -292,6 +293,7 @@ TEST_ENTRY  test_control_tests[] =
     threadx_mutext_no_preemption_application_define,
     threadx_mutex_suspension_timeout_application_define,
     threadx_mutex_thread_terminate_application_define,
+    threadx_mutex_inherit_waiter_priority_change_application_define,
     threadx_mutex_priority_inheritance_application_define,
     threadx_mutex_prioritize_application_define,
     threadx_mutex_nested_priority_inheritance_application_define,

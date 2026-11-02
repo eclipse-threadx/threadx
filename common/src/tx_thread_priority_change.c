@@ -66,6 +66,7 @@
 /*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
 /*    _tx_thread_system_suspend         Suspend thread                    */
 /*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*    _tx_thread_mutex_priority_update  Update mutex inheritance          */
 /*    _tx_thread_system_preempt_check   Check for preemption              */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -79,6 +80,7 @@ UINT  _tx_thread_priority_change(TX_THREAD *thread_ptr, UINT new_priority, UINT 
 TX_INTERRUPT_SAVE_AREA
 
 TX_THREAD       *execute_ptr;
+TX_MUTEX        *mutex_ptr;
 TX_THREAD       *next_execute_ptr;
 UINT            original_priority;
 
@@ -121,8 +123,57 @@ UINT            original_priority;
             thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_inherit_priority;
         }
 
-        /* Restore interrupts.  */
-        TX_RESTORE
+        /* Determine if the thread is waiting on a mutex.  */
+        mutex_ptr =  TX_NULL;
+        if ((thread_ptr -> tx_thread_state == TX_MUTEX_SUSP) && (thread_ptr -> tx_thread_suspend_cleanup != TX_NULL))
+        {
+
+            /* Yes, pickup the mutex.  */
+            mutex_ptr =  TX_VOID_TO_MUTEX_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
+        }
+
+        /* Determine if the mutex supports priority inheritance.  Only then can its owner
+           have inherited the old priority of this thread, or have to inherit the new one.
+           The suspension list of any other mutex is left alone, so it stays in FIFO
+           order.  */
+        if ((mutex_ptr != TX_NULL) && (mutex_ptr -> tx_mutex_inherit == TX_TRUE))
+        {
+
+            /* Yes, the update function pointer is set, since a mutex has been created.  */
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+            /* Temporarily disable preemption.  */
+            _tx_thread_preempt_disable++;
+
+            /* Restore interrupts.  */
+            TX_RESTORE
+#endif
+
+            /* Update the priority inheritance of the mutex owner.  */
+            (_tx_thread_mutex_priority_update)(mutex_ptr);
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+            /* Disable interrupts.  */
+            TX_DISABLE
+
+            /* Back off the preemption disable.  */
+            _tx_thread_preempt_disable--;
+#endif
+
+            /* Restore interrupts.  */
+            TX_RESTORE
+
+            /* Check for preemption.  */
+            _tx_thread_system_preempt_check();
+        }
+        else
+        {
+
+            /* Restore interrupts.  */
+            TX_RESTORE
+        }
     }
     else
     {
