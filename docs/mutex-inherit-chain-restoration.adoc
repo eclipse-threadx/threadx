@@ -1,0 +1,369 @@
+= Mutex inheritance chain restoration: implementation and validation
+
+== Checkout and scope
+
+Investigated `fix/mutex-inherit-chain`, HEAD `2820d6d61ce16d7073c0232163b3b8875694b573`.
+The original worktree contained only untracked `ISSUES.md`; that file is preserved.
+No commits, staging, fetches, remote changes, pushes, merges, or GitHub changes were made.
+The supplied review scenario was used without accessing the network.
+
+The checkout contains #808's boost-only chain implementation, but not #807.
+Local history also contains #807 (`d2db0b3f`) and the waiter-priority branch
+(`09c8547a`, `44fcf703`), which were inspected, not merged or cherry-picked.
+Only necessary compatible restoration behavior, the direct-restoration tests,
+and the native optional mutex callback pattern were reused.
+
+== Root cause and invariants
+
+`_tx_mutex_get` recorded a waiter's effective priority in the mutex and owner,
+then `_tx_mutex_priority_chain` copied that number downstream. Its comparison
+against an already equal/higher-priority owner both stopped boosts and broke cycles.
+It had no withdrawal operation. `_tx_mutex_cleanup` only unlinked waiters.
+With #807 alone, cleanup restores the first owner but does not refresh that owner's
+outgoing mutex contribution or the next owner's effective priority.
+
+The relevant state has distinct responsibilities:
+
+[cols="1,3",options="header"]
+|===
+|Field |Meaning and update responsibility
+|`tx_thread_user_priority` |Configured priority; thread-priority API owns changes. This is an independent recomputation seed.
+|`tx_thread_priority` |Effective scheduling priority; the existing scheduler-specific priority functions maintain ready lists, execution selection, and thresholds. Within a visited cycle it is a result, not an independent seed.
+|`tx_thread_inherit_priority` |Cached minimum donation across owned inheriting mutexes; `TX_MAX_PRIORITIES` means none. It must not seed its own cycle.
+|`tx_mutex_highest_priority_waiting` |Cached minimum effective priority of waiters; it must be refreshed when membership or a waiter's priority changes.
+|`tx_thread_owned_mutex_list` |Circular ownership list, including non-inheriting mutexes. Get/put own its links. Only inheriting mutexes contribute.
+|Suspension list and count |Actual incoming dependency edges. Get, cleanup, put, and delete own membership. Recalculation never reorders or unlinks them.
+|`tx_thread_state`, `tx_thread_suspend_cleanup`, `tx_thread_suspend_control_block` |Outgoing wait is usable only in an active mutex suspension. Chain discovery checks `TX_MUTEX_SUSP`, the exact `_tx_mutex_cleanup` function, non-null/valid mutex, inheritance, ownership count, and owner. Cleanup clears its marker before recalculation; transfer clears it before resuming the recipient.
+|`tx_mutex_original_priority` |Acquisition-time bookkeeping, not a current priority contribution or restoration seed.
+|===
+
+The transfer regression exposed another SMP defect: `_tx_thread_priority_change`'s
+inheritance fast path updated only user fields even when the effective priority
+was still the old user priority. A recipient at base 5 with a remaining priority-10
+waiter stayed at 5 after its base became 18. The fast path now additionally requires
+that effective priority already equals inherited priority. Both suspended and
+remotely executing ready owners exercise this correction.
+
+== Recalculation and synchronization
+
+`_tx_mutex_inherit_priority_update` is the common mutex entry point.
+`_tx_mutex_priority_chain` owns recomputation for an owner, including release.
+When chaining is disabled, the former scans the changed wait list and the latter
+performs the original owned-mutex cache scan. The get path remains single-level.
+No waiter-list prioritization is needed during recalculation; put retains its
+existing prioritization before selecting a recipient.
+
+With chaining enabled, the updater:
+
+. Collects the first owner and at most K further waiting-mutex edges, stopping at an inactive/non-inheriting wait or repeated owner.
+. Seeds scratch priorities from user priorities and waiters outside the collected path, ignoring effective-priority caches of all path members.
+. Relaxes internal path edges in forward order twice. The first pass propagates tail seeds and can carry a minimum across a back edge; the second carries that minimum through the cycle. There is no recursive propagation or convergence retry loop.
+. Refreshes all inheriting mutex caches and inherited-priority fields in the path from the solved values, then publishes effective changes once per owner through `_tx_mutex_priority_change`.
+
+All observations and publication hold `TX_DISABLE` protection and preemption
+disable. In SMP, this is the port's shared kernel protection, not just local
+interrupt masking. Nested scheduler operations retain the outer protection;
+no graph pointer is retained across an unlocked graph transaction. The original
+single-core ready-list/threshold code and SMP ready-list, core mapping, rebalance,
+and remote preemption code are retained. NI callers supply the same preemption
+contract, and cleanup marks its unused NI suspension sequence explicitly.
+
+Wait abort changes the departing thread's state before cleanup; termination also
+sets a terminal state and prevents deletion during cleanup. Neither path is used
+as an outgoing wait after detachment. Timeout restoration occurs before resume.
+New ownership is linked and the recipient's cleanup marker cleared before either
+owner is recomputed. Delete and termination release owned mutexes through put.
+
+The optional `_tx_thread_mutex_priority_update` callback follows the existing
+`_tx_thread_mutex_release` pattern: thread-only applications do not acquire a direct
+link dependency on mutex services. Creation installs it and thread initialization
+clears it. Thread-priority changes on active inheriting waits call it while protected,
+including base changes inside a cycle whose initially cached effective priority
+appears unchanged. Non-inheriting waits retain their FIFO behavior.
+
+== Event and regression mapping
+
+Both regression trees contain the same chain and wait-exit tests. The wait-exit
+suite is adopted from local #807; no effective priorities are assigned manually.
+The RISC-V manifest now registers both suites as well.
+
+[cols="1,3",options="header"]
+|===
+|Requirement/event |Test or execution path
+|T1/T2/T3: timeout, abort, terminate |`restore_chain(2, how)` and direct `single_waiter_leaves`; assert restored priorities, status, empty A list, intact B ring, and ownership count.
+|T4: three owners |`restore_chain(3, how)` for limits at least 2, through all three wait-exit routes.
+|T5/T6: remaining donations |`remaining_contributions` keeps a priority-10 waiter on A or on a second mutex owned by L1, withdraws priority 5/4, then removes the remaining contribution.
+|T7: stronger/weaker configured priority |Actively waiting H changes 5 to 12 to 4; retained priority-10 contribution wins where appropriate. A contained cycle member changes base 15 to 25. Transferred H changes base 5 to 18 with remaining donations 10 and 15.
+|T8: release/transfer |`ownership_transfer` hands A to H with two remaining waiters, verifies H's inherited cache, and terminates those waiters in turn. `delete_while_waiting` releases A through kernel deletion while L1 remains blocked on B, checking restoration downstream.
+|T9: ready owner/scheduling |`chain_to_ready_owner` keeps L2 ready, checks 5 to 20 to 30 restoration and that a runnable priority-10 thread executes. It also changes L2's user priority across its inherited priority. SMP explicitly excludes L2 from core 0, exercising a remotely executing owner.
+|T10: cycles |`chain_with_cycle` forms an actual two-owner deadlock, adds/removes H, checks both priorities and wait-list rings, then weakens a cycle member's base. Both owners remain mutex-suspended.
+|T11: bounds |Four-owner decreasing-base chain checks both boost and restoration boundaries. With K=2, two-owner, three-owner, and four-owner cases are shorter than, equal to, and longer than the two further-edge bound. K=0 and K=1 are also executed.
+|T12: disabled |Same regressions expect only direct inheritance; independent direct-restoration and waiter-priority fixes remain enabled.
+|T13/T14 |Single-core QEMU and adapted SMP simulator; chain on/off, NI, disabled preemption thresholds, MISRA, and performance information as detailed below.
+|Non-inheriting edge |`non_inheriting_edge` stops propagation at B. The priority API only invokes inheritance updates for inheriting waits.
+|Other suspended/ready thread priority API |Native scheduler paths suffice if no outgoing mutex dependency exists; no unrelated hooks were added.
+|Ownership/wait changes |Get, cleanup, priority API, and put are the required hooks. Delete and thread termination already funnel ownership release through put; wait abort and timeout already funnel removal through cleanup.
+|===
+
+== Source changes
+
+Every production file modified is listed below; corresponding common and SMP
+files share semantic logic but retain their existing scheduler implementation.
+
+[cols="2,2,3",options="header"]
+|===
+|Single-core file |SMP file |Change
+|`common/src/tx_mutex_cleanup.c` |`common_smp/src/tx_mutex_cleanup.c` |Recompute after unlink, before resume; NI parameter annotation.
+|`common/src/tx_mutex_create.c` |`common_smp/src/tx_mutex_create.c` |Install optional inheritance-update callback.
+|`common/src/tx_mutex_get.c` |`common_smp/src/tx_mutex_get.c` |Use protected recomputation for enabled chains, including unchanged first-owner priorities; preserve performance counters and disabled get path.
+|`common/src/tx_mutex_priority_change.c` |`common_smp/src/tx_mutex_priority_change.c` |Replace boost-only walk with shared recomputation and bounded scratch path solver. Existing scheduler-specific priority changer is retained.
+|`common/src/tx_mutex_put.c` |`common_smp/src/tx_mutex_put.c` |Reuse updater instead of a duplicate owned-mutex scan; recompute former and transferred owners after relationship changes.
+|`common/src/tx_thread_priority_change.c` |`common_smp/src/tx_thread_priority_change.c` |Propagate active inheriting-wait base changes. SMP also guards its unchanged-effective-priority optimization correctly.
+|`common/src/tx_thread_initialize.c` |`common_smp/src/tx_thread_initialize.c` |Define/initialize optional callback.
+|`common/inc/tx_mutex.h` |`common_smp/inc/tx_mutex.h` |Internal updater declarations.
+|`common/inc/tx_thread.h` |`common_smp/inc/tx_thread.h` |Optional callback declaration; no control-block fields added.
+|`common/inc/tx_user_sample.h` |`common_smp/inc/tx_user_sample.h` |Document edge count, bidirectional behavior, cycles, list-dependent cost, and scratch stack.
+|===
+
+The test manifests and batch testcontrol registries register the new direct-restoration
+suite; existing chain tests cover the additional events.
+== Reproduction and validation evidence
+
+The baseline scenario uses real mutex calls: H has priority 5; L1 owns A at base
+20 and waits on B; L2 owns B at base 30 and remains ready.
+
+[source,text]
+----
+Original HEAD, K=2:
+After H abort: L1=5 L2=5 (expected 20,20)
+ERROR #25
+
+Only #807 cleanup/helper temporarily applied:
+After H abort: L1=20 L2=5 (expected 20,20)
+ERROR #26
+
+Repair:
+After H abort: L1=20 L2=20 (expected 20,20)
+SUCCESS!
+----
+
+The #807 overlay was removed before implementing the repair. Logs:
+`/tmp/threadx-808/baseline-test.log`, `807-test.log`, and final regression logs.
+The expanded transfer test also failed with `ERROR #281` on SMP before the
+fast-path correction (`smp-transfer-before.log`), while passing on single-core.
+
+Supported single-core runner used RISC-V64 GCC 13.2 and QEMU virt. The final full
+suite passes 99/99 tests with K=2. All 12 mutex tests pass with K=2 and with
+chaining undefined. Both new regressions additionally pass with K=0, K=1,
+K=2+NI, undefined+NI, K=2+disabled preemption thresholds, and K=2+mutex/thread
+performance information.
+
+This macOS ARM host cannot execute the repository's 32-bit Linux runner directly;
+Docker is unavailable. Supplemental native runs use an isolated source copy under
+`/tmp/threadx-808/host-tree`, the repository's CMake/CTest suites and Linux simulation
+scheduler, with temporary adapters for named POSIX semaphores, missing timed waits,
+and single-core simulator recursive-mutex counts. Host builds remove `-m32` and
+`-Wconversion` from the broad suite's flags, and link gcov into executables.
+No host adapter or replacement of the native scheduler algorithms is included in the patch.
+These are adapted simulator results, not validation on a supported Linux host or
+SMP hardware. The SMP simulator uses four virtual cores; its default tests pin
+threads to core 0 unless explicitly excluded, as the remote-owner case does.
+
+In both adapted kernels, all 12 mutex tests pass with chaining on/off, and both
+new regressions pass with K=2+NI, K=2+MISRA, and K=2+disabled preemption thresholds.
+For NI builds, existing unused-parameter diagnostics outside the edited cleanup
+are suppressed. RV64 MISRA cannot link from a user-header-only definition because
+the shim tests its macro before including that header; defining it on the compiler
+command line then exposes existing 32-bit ULONG/64-bit pointer errors in the shim.
+RV32 attempts could not link with the installed multilib selection. MISRA runtime
+evidence therefore comes from the adapted simulators, not QEMU RV64/RV32.
+
+A broad adapted SMP run passed 115/120: three random scheduling tests exceeded the
+exploratory 15-second limit, the stack-fill test failed, and the trace test did not
+build because its platform check selected Windows-only code. The same three
+timeouts and stack-fill failure reproduced against unchanged HEAD production code
+in a separate adapted tree. These baseline limitations were not hidden or patched.
+One adapted single-core disabled-chain nested-inheritance test also timed out once;
+it passed the next five consecutive executions. Its transient cause is unverified.
+The supported QEMU suite has no corresponding failure.
+
+Strict standalone compilation checks all seven edited C files per kernel in six
+configurations: undefined, K=2, K=2+NI, K=2+MISRA, K=2+disabled thresholds, and
+K=2+NI+MISRA+disabled thresholds+mutex performance. All 84 compilations pass with
+C99, `-O2 -Wall -Wextra -Werror -Wconversion -Wmissing-declarations
+-Wpointer-arith -Wlogical-op -Waggregate-return -Wfloat-equal`.
+Single-core additionally uses `-pedantic`; SMP omits it because of an existing
+Linux-port duplicate TX_THREAD typedef under C99. Temporary host builds emit
+existing toolchain deployment-version warnings/debug-linker notes; strict source
+compilations introduce no warnings.
+
+Reproducible local commands and complete command logs are retained under
+`/tmp/threadx-808`:
+
+[source,sh]
+----
+cmake -S test/tx/cmake/riscv -B /tmp/threadx-808/baseline -G Ninja \
+  -DCMAKE_TOOLCHAIN_FILE="$PWD/cmake/riscv64_gnu.cmake" \
+  -DTX_USER_FILE=/tmp/threadx-808/tx_user.h
+cmake --build /tmp/threadx-808/baseline
+ctest --test-dir /tmp/threadx-808/baseline --output-on-failure -j 4
+python3 /tmp/threadx-808/final-verify.py
+python3 /tmp/threadx-808/strict.py
+python3 /tmp/threadx-808/collect-coverage.py
+----
+
+`tx_user.h` is the sample user header followed by `#define TX_MUTEX_INHERIT_CHAIN_MAX 2`.
+The matrix scripts record exact commands/configuration files, including NI diagnostic
+suppression and compiler-command-line MISRA definitions. `host-setup.py`,
+`host-compat.h`, and subsequent host port adaptations are temporary environment aids.
+Coverage and simulator artifacts are local evidence, not shipped port changes.
+
+== Coverage
+
+Coverage was collected from actual native simulator execution using GCC/gcov 12.5,
+`-fprofile-arcs -ftest-coverage`, and `gcov-12 -b -c -f -j` on each production
+`.gcno`. Branch coverage means outcomes taken at least once, not merely decisions
+reached. Reports union executable source lines and source-line branch indices across
+five configurations per kernel: K=2 default, undefined+disabled notify callbacks,
+K=2+NI, K=2+MISRA, and K=2+disabled thresholds. Default/disabled builds run all mutex
+regressions and the existing thread-priority-change regression; alternative builds
+run the two inheritance regressions.
+
+[cols="3,1,1,1",options="header"]
+|===
+|Production source |Lines |Branches |Changed executable lines
+|`common/src/tx_mutex_cleanup.c` |100.00% (47/47) |95.83% (23/24) |100.00% (4/4)
+|`common/src/tx_mutex_create.c` |100.00% (20/20) |100.00% (4/4) |100.00% (1/1)
+|`common/src/tx_mutex_get.c` |100.00% (70/70) |100.00% (26/26) |100.00% (5/5)
+|`common/src/tx_mutex_priority_change.c` |99.35% (152/153) |94.92% (112/118) |100.00% (102/102)
+|`common/src/tx_mutex_put.c` |98.35% (119/121) |88.33% (53/60) |90.91% (10/11)
+|`common/src/tx_thread_initialize.c` |100.00% (17/17) |100.00% (6/6) |100.00% (1/1)
+|`common/src/tx_thread_priority_change.c` |100.00% (68/68) |84.38% (27/32) |100.00% (18/18)
+|`common_smp/src/tx_mutex_cleanup.c` |100.00% (47/47) |95.83% (23/24) |100.00% (4/4)
+|`common_smp/src/tx_mutex_create.c` |100.00% (20/20) |100.00% (4/4) |100.00% (1/1)
+|`common_smp/src/tx_mutex_get.c` |100.00% (70/70) |100.00% (26/26) |100.00% (5/5)
+|`common_smp/src/tx_mutex_priority_change.c` |98.91% (182/184) |95.51% (149/156) |100.00% (102/102)
+|`common_smp/src/tx_mutex_put.c` |98.35% (119/121) |88.33% (53/60) |90.91% (10/11)
+|`common_smp/src/tx_thread_initialize.c` |100.00% (18/18) |100.00% (12/12) |100.00% (1/1)
+|`common_smp/src/tx_thread_priority_change.c` |100.00% (121/121) |93.42% (71/76) |100.00% (19/19)
+|===
+
+[cols="1,2,1,1",options="header"]
+|===
+|Kernel |Function |Lines |Branches
+|`common` |`_tx_mutex_inherit_priority_update` |100.00% (12/12) |83.33% (5/6)
+|`common` |`_tx_mutex_priority_chain` |100.00% (91/91) |95.35% (82/86)
+|`common_smp` |`_tx_mutex_inherit_priority_update` |100.00% (12/12) |83.33% (5/6)
+|`common_smp` |`_tx_mutex_priority_chain` |100.00% (91/91) |95.35% (82/86)
+|===
+
+The path solver and mutex updater execute their restoration paths, rather than
+merely compiling them. Remaining uncovered branches include defensive invalid/null
+wait-context checks and the null-owner guard, unreachable MISRA status retry arms,
+and some existing scheduler/threshold paths. The legacy non-inheriting release
+fallback in put is not reached after its earlier empty-list return. No overall
+repository coverage floor or supported-host CI coverage percentage is claimed.
+Per-configuration gcov output, compressed JSON, uncovered source line/branch lists,
+and the union calculation are in `/tmp/threadx-808/coverage-final`.
+The existing thread-priority-change regression passes in both adapted kernels
+with chaining enabled and disabled (`priority-api-results.json`).
+
+[source,sh]
+----
+# Actual collection command shape, one file in each configuration:
+/opt/homebrew/bin/gcov-12 -b -c -f -j \
+  /tmp/threadx-808/host-smp/threadx_smp/CMakeFiles/threadx_smp.dir/tmp/threadx-808/host-tree/common_smp/src/tx_mutex_priority_change.c.gcno
+# The collection script repeats this for all 14 edited production C files.
+python3 /tmp/threadx-808/collect-coverage.py
+----
+
+== Execution cost and limits
+
+K counts mutex edges beyond the first owner, so at most N=K+1 distinct owners
+are visited. Path collection/membership checks cost O(N*N); the two edge passes
+cost at most 2N relaxations. Let M and W be total owned mutexes and waiters
+across visited owners. Seeding and cache publication cost O(M + N*W).
+At most N actual scheduler priority changes occur per owner update. A transfer
+updates two roots (its recipient is no longer waiting). Existing put prioritization
+and scheduler work are additional; K does not bound their work or dynamic list sizes.
+There are no allocations, recursive calls, global graph scans, or new retry loops.
+
+Graph processing holds interrupts/SMP protection and preemption disable for that
+whole cost, including priority publication. Therefore K alone is not a constant
+interrupt-latency bound: applications must bound mutex/waiter populations as well.
+SMP incurs the corresponding shared protection hold time and existing scheduler
+rebalance/IPI costs. No cycle-count or interrupt-latency measurement on hardware
+was performed.
+
+Scratch arrays use `(K+1)*(sizeof(TX_THREAD *) + 2*sizeof(UINT))`, plus fixed locals
+and callee frames. GCC `-O2 -fstack-usage` measured the solver's own frame at K=2
+as 128 bytes on RV64 GCC 13.2 and 112 bytes on the adapted SMP GCC 12 build
+(144/128 bytes respectively with MISRA). These are function frames, not whole-call
+stack bounds. The only new persistent storage is one optional function pointer
+per kernel, 4 or 8 bytes according to the port. No public control-block layout changes.
+
+Undefined chaining adds no graph arrays, discovery, or edge relaxation. Get keeps
+its prior single-level work. Cleanup and waiter-priority changes add the necessary
+direct restoration/update scan; put reuses its owned-cache calculation. Those scans
+now hold protection to avoid inconsistent cache snapshots. Transfer also records
+valid remaining contributions in the recipient's inherited cache.
+
+A cycle fully inside the window loses obsolete external boosts. A cycle crossing
+the configured boundary can feed a stale outside effective priority back into the
+window; no claim of full restoration is made for that case. Likewise, owners beyond
+the bound are not updated by an event. Applications needing full restoration must
+configure K to cover their possible affected chains and cycles. Removing a donation
+does not resolve a deadlock or make cycle members runnable.
+
+== PR readiness and remaining work
+
+The feature-plus-fix code/test patch applies cleanly to the locally available
+`upstream/dev` snapshot (`a5b4739d`) in a temporary directory. Its RV64 build
+and all 12 mutex tests pass there as well (`/tmp/threadx-808/dev-verify.log`).
+The working branch, HEAD, and remotes remain unchanged. The GitHub-side action is
+to ensure PR #808 targets `dev` (retarget if needed) and run the normal supported
+Linux single-core/SMP CI;
+no remote PR state was queried or changed.
+
+Remaining verification limits are the adapted host environment, its recorded
+baseline/transient failures, untested physical SMP timing and custom port extension
+hooks, and cycles/chains outside the configured propagation window. NI/MISRA/
+preemption-threshold combinations compile together; runtime tests cover the listed
+individual combinations, not every possible macro combination.
+
+== Suggested reviewer response
+
+The issue was reproducible: with #807 alone, aborting H restored L1 to 20 but left
+L2 at 5. The repair uses one inheritance updater for get, wait exit, configured
+priority changes, and release/transfer. It recomputes a bounded owner path from
+base priorities and valid outside donations before publishing priorities through
+the existing single-core/SMP scheduler routines. Internal cached priorities are
+excluded as seeds, which also removes self-sustaining boosts in contained cycles.
+K continues to count edges beyond the first owner; cycles crossing that bound are
+explicitly documented as a limitation. Regression tests cover timeout, abort,
+termination, remaining donations, ownership transfer, priority changes, scheduling,
+and a remotely executing SMP owner. The transfer tests also exposed and fixed the
+SMP priority-change fast-path condition. Supported RV64 QEMU passes 99 tests;
+adapted single-core/SMP mutex and configuration results, measured production
+coverage, and all environment limitations are recorded above. Please retarget to
+dev and run the supported Linux CI before merging.
+
+== Suggested commit
+
+[source,text]
+----
+fix(mutex): restore inherited priorities through bounded mutex chains
+
+Waiter withdrawal restored only the first owner, leaving obsolete priorities
+in downstream owners and mutually reinforcing cycle caches.
+
+Recompute the bounded owner path from user priorities and valid donations,
+share the updater across mutex events, and retain native scheduler handling.
+Correct the SMP user-priority fast path when inheritance becomes effective.
+
+Add wait-exit, chain restoration, transfer, bound, cycle, and remote-owner
+regressions. Validate with RV64 QEMU, adapted host simulators, strict builds,
+and measured production coverage; document host and cycle-bound limitations.
+
+Assisted-by: Codex (GPT-6)
+----

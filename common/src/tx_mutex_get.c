@@ -60,6 +60,7 @@
 /*    _tx_thread_system_suspend         Suspend thread service            */
 /*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
 /*    _tx_mutex_priority_change         Inherit thread priority           */
+/*    _tx_mutex_inherit_priority_update Recompute mutex inheritance      */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -74,7 +75,9 @@ TX_INTERRUPT_SAVE_AREA
 TX_THREAD       *thread_ptr;
 TX_MUTEX        *next_mutex;
 TX_MUTEX        *previous_mutex;
+#if !defined(TX_MUTEX_INHERIT_CHAIN_MAX) || defined(TX_MUTEX_ENABLE_PERFORMANCE_INFO)
 TX_THREAD       *mutex_owner;
+#endif
 TX_THREAD       *next_thread;
 TX_THREAD       *previous_thread;
 UINT            status;
@@ -203,7 +206,9 @@ UINT            status;
                 /* Prepare for suspension of this thread.  */
 
                 /* Pickup the mutex owner.  */
+#if !defined(TX_MUTEX_INHERIT_CHAIN_MAX) || defined(TX_MUTEX_ENABLE_PERFORMANCE_INFO)
                 mutex_owner =  mutex_ptr -> tx_mutex_owner;
+#endif
 
 #ifdef TX_MUTEX_ENABLE_PERFORMANCE_INFO
 
@@ -284,6 +289,18 @@ UINT            status;
                    owning the mutex.  */
                 if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
                 {
+#ifdef TX_MUTEX_INHERIT_CHAIN_MAX
+#ifdef TX_MUTEX_ENABLE_PERFORMANCE_INFO
+                    if (mutex_owner -> tx_thread_priority > thread_ptr -> tx_thread_priority)
+                    {
+                        _tx_mutex_performance__priority_inheritance_count++;
+                        mutex_ptr -> tx_mutex_performance__priority_inheritance_count++;
+                    }
+#endif
+                    _tx_thread_preempt_disable++;
+                    _tx_mutex_inherit_priority_update(mutex_ptr);
+                    _tx_thread_preempt_disable--;
+#else
 
                     /* Determine if this is the highest priority to raise for this mutex.  */
                     if (mutex_ptr -> tx_mutex_highest_priority_waiting > thread_ptr -> tx_thread_priority)
@@ -318,6 +335,7 @@ UINT            status;
                         mutex_ptr -> tx_mutex_performance__priority_inheritance_count++;
 #endif
                     }
+#endif
                 }
 
                 /* Call actual non-interruptable thread suspension routine.  */
@@ -336,13 +354,25 @@ UINT            status;
                 /* Temporarily disable preemption.  */
                 _tx_thread_preempt_disable++;
 
+#ifndef TX_MUTEX_INHERIT_CHAIN_MAX
                 /* Restore interrupts.  */
                 TX_RESTORE
+#endif
 
                 /* Determine if we need to raise the priority of the thread
                    owning the mutex.  */
                 if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
                 {
+#ifdef TX_MUTEX_INHERIT_CHAIN_MAX
+#ifdef TX_MUTEX_ENABLE_PERFORMANCE_INFO
+                    if (mutex_owner -> tx_thread_priority > thread_ptr -> tx_thread_priority)
+                    {
+                        _tx_mutex_performance__priority_inheritance_count++;
+                        mutex_ptr -> tx_mutex_performance__priority_inheritance_count++;
+                    }
+#endif
+                    _tx_mutex_inherit_priority_update(mutex_ptr);
+#else
 
                     /* Determine if this is the highest priority to raise for this mutex.  */
                     if (mutex_ptr -> tx_mutex_highest_priority_waiting > thread_ptr -> tx_thread_priority)
@@ -377,7 +407,12 @@ UINT            status;
                         mutex_ptr -> tx_mutex_performance__priority_inheritance_count++;
 #endif
                     }
+#endif
                 }
+
+#ifdef TX_MUTEX_INHERIT_CHAIN_MAX
+                TX_RESTORE
+#endif
 
                 /* Call actual thread suspension routine.  */
                 _tx_thread_system_suspend(thread_ptr);
