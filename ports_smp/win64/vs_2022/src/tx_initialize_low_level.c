@@ -46,6 +46,9 @@ __declspec(thread) int          _tx_win32_threadx_thread =  0;
 __declspec(thread) UINT         _tx_win32_current_virtual_core =  0U;
 
 static VOID                     _tx_win32_timer_start(VOID);
+static VOID                     _tx_win32_timer_due_set(LONGLONG period_ms, LARGE_INTEGER *due_time);
+static LONGLONG                 _tx_win32_timer_deadline;
+static LONGLONG                 _tx_win32_timer_frequency;
 static DWORD WINAPI             _tx_win32_timer_thread_entry(LPVOID thread_input);
 static UINT                     _tx_win32_smp_current_core_get_internal(DWORD thread_id);
 static UINT                     _tx_win32_smp_thread_core_get(DWORD thread_id);
@@ -1134,7 +1137,7 @@ LONGLONG        timer_period;
         timer_period =  (LONGLONG) TX_TIMER_PERIODIC;
     }
 
-    due_time.QuadPart =  -(timer_period * 10000LL);
+    _tx_win32_timer_due_set(timer_period, &due_time);
 #if (TX_WIN32_USE_HIGH_RESOLUTION_TIMER != 0)
     if (SetWaitableTimerEx(_tx_win32_timer_handle, &due_time, 0, NULL, NULL, NULL, 0) == 0)
 #else
@@ -1146,4 +1149,43 @@ LONGLONG        timer_period;
         {
         }
     }
+}
+
+
+/* Advances the timer deadline by one period and returns the relative due time to
+   it, so that interrupt latency does not accumulate into the period.  */
+static VOID  _tx_win32_timer_due_set(LONGLONG period_ms, LARGE_INTEGER *due_time)
+{
+
+LARGE_INTEGER   now;
+LONGLONG        period;
+LONGLONG        remaining;
+
+
+    if (_tx_win32_timer_frequency == 0LL)
+    {
+        QueryPerformanceFrequency(&now);
+        _tx_win32_timer_frequency =  now.QuadPart;
+    }
+
+    QueryPerformanceCounter(&now);
+    period =  (period_ms * _tx_win32_timer_frequency) / 1000LL;
+    _tx_win32_timer_deadline +=  period;
+
+    /* Resynchronize instead of bursting when more than a period late, and when an
+       early interrupt has left the deadline more than a period ahead.  */
+    if ((_tx_win32_timer_deadline <= (now.QuadPart - period)) ||
+        (_tx_win32_timer_deadline > (now.QuadPart + period)))
+    {
+        _tx_win32_timer_deadline =  now.QuadPart + period;
+    }
+
+    /* Convert to a negative, relative due time in 100 ns units; a deadline
+       already reached fires at once.  */
+    remaining =  ((_tx_win32_timer_deadline - now.QuadPart) * 10000000LL) / _tx_win32_timer_frequency;
+    if (remaining < 1LL)
+    {
+        remaining =  1LL;
+    }
+    due_time -> QuadPart =  -remaining;
 }
