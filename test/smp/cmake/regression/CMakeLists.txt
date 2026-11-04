@@ -132,7 +132,8 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_simple_test.c
     ${SOURCE_DIR}/threadx_trace_basic_test.c
     ${SOURCE_DIR}/threadx_trace_entry_update_test.c
-    ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
+    ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c
+    ${SOURCE_DIR}/threadx_safety_critical_test.c)
 
 add_custom_command(
   OUTPUT ${GENERATED_LOW_LEVEL_SOURCE}
