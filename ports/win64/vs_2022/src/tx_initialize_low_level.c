@@ -47,8 +47,8 @@ LARGE_INTEGER                   _tx_win32_time_stamp;
 ULONG                           _tx_win32_system_error;
 HANDLE                          _tx_win32_timer_handle;
 HANDLE                          _tx_win32_timer_thread_handle;
-HANDLE                          _tx_win32_isr_semaphore;
-UINT                            _tx_win32_timer_waiting;
+UINT                            _tx_win32_isr_waiting_count;
+volatile LONG                   _tx_win32_dispatch_count;
 extern TX_THREAD                *_tx_thread_current_ptr;
 
 #ifdef TX_WIN32_NO_IDLE_ENABLE
@@ -254,8 +254,7 @@ VOID   _tx_initialize_low_level(VOID)
 
     /* Create the semaphore that regulates when the scheduler executes.  */
     _tx_win32_scheduler_semaphore =  CreateSemaphore(NULL, 0, 1, NULL);
-    _tx_win32_isr_semaphore =        CreateSemaphore(NULL, 0, 1, NULL);
-    if ((_tx_win32_scheduler_semaphore == NULL) || (_tx_win32_isr_semaphore == NULL))
+    if (_tx_win32_scheduler_semaphore == NULL)
     {
         printf("ThreadX Win64 error creating semaphores!\n");
         while(1)
@@ -289,7 +288,7 @@ VOID   _tx_initialize_low_level(VOID)
 
     /* Initialize the global interrupt disabled flag.  */
     _tx_win32_global_int_disabled_flag =  TX_FALSE;
-    _tx_win32_timer_waiting =             TX_FALSE;
+    _tx_win32_isr_waiting_count =         0;
 
     /* Done, return to caller.  */
 }
@@ -380,9 +379,6 @@ VOID CALLBACK _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD_PTR dwUse
        relative ordering of thread wakeups is preserved because each call to
        _tx_timer_interrupt() advances the tick counter by exactly one step and
        processes the timers that expire at that step.  */
-#ifndef TX_WIN32_TICKS_PER_INTERRUPT
-#define TX_WIN32_TICKS_PER_INTERRUPT    5
-#endif
     {
         UINT _tick_i;
         for (_tick_i = 0; _tick_i < TX_WIN32_TICKS_PER_INTERRUPT; _tick_i++)

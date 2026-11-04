@@ -79,7 +79,6 @@ static VOID  _tx_win32_semaphore_reset(HANDLE semaphore_handle);
 /**************************************************************************/
 VOID   _tx_thread_schedule(VOID)
 {
-DWORD   wait_status;
 
 
     /* Loop forever.  */
@@ -176,26 +175,25 @@ DWORD   wait_status;
                 _tx_win32_system_error++;
             }
 
-            /* Let the solicited wakeup reach ThreadX before the timer ISR advances again.  */
-            if (_tx_win32_timer_waiting)
+            /* Let the solicited wakeup reach ThreadX before a waiting interrupt returns.  */
+            if (_tx_win32_isr_waiting_count != 0U)
             {
 
-                /* Wait for the thread to acknowledge the wakeup and then release the ISR.  */
-                wait_status =  WaitForSingleObject(_tx_thread_current_ptr -> tx_thread_win32_thread_start_semaphore, INFINITE);
-                if (ReleaseSemaphore(_tx_win32_isr_semaphore, 1, NULL) == 0)
-                {
-
-                    /* Increment the system error counter.  */
-                    _tx_win32_system_error++;
-                }
-
-                if (wait_status != WAIT_OBJECT_0)
+                /* Wait for the thread to acknowledge the wakeup.  */
+                if (WaitForSingleObject(_tx_thread_current_ptr -> tx_thread_win32_thread_start_semaphore, INFINITE) != WAIT_OBJECT_0)
                 {
 
                     /* Increment the system error counter.  */
                     _tx_win32_system_error++;
                 }
             }
+        }
+
+        /* Record the dispatch and release any interrupt waiting for it.  */
+        _tx_win32_dispatch_count++;
+        if (_tx_win32_isr_waiting_count != 0U)
+        {
+            WakeByAddressAll((PVOID) &_tx_win32_dispatch_count);
         }
 
         /* Debug entry.  */
