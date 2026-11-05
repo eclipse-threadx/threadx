@@ -109,8 +109,10 @@ endif()
 
 # Host tests for the Module Manager. Listed after thread_transition for the reason
 # given above it: additions here are appended rather than inserted, so that branches
-# adding a directory of their own merge cleanly.
-if(NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
+# adding a directory of their own merge cleanly. They compile the module ports'
+# headers, which accept only IAR, AC5 and GNU-compatible compilers, so MSVC builds
+# skip them.
+if(NOT MSVC AND NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
   add_subdirectory(module_manager)
 endif()
 
