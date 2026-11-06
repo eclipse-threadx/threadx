@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 /* This test is designed to test for simultaneous thread suspension lifting AND thread wait abort calls.  */
 
 #include   <stdio.h>
@@ -110,9 +112,38 @@ static void  interrupt_injector_stop(void)
     }
 }
 
+#define interrupt_jitter()
+
+#elif defined(_WIN32)
+
+/* The Windows simulators resonate the same way. Rather than move the interrupt,
+   thread 0 does a pseudo-random amount of work before each wait, so that the tick
+   finds it at a different point in its cycle each time.  */
+
+#define WAIT_ABORT_JITTER_SPAN  4096UL
+
+static ULONG            jitter_seed =  1;
+
+
+static void  interrupt_jitter(void)
+{
+
+volatile ULONG  count;
+
+
+    jitter_seed =  (jitter_seed * 1103515245UL) + 12345UL;
+    for (count = (jitter_seed >> 8) % WAIT_ABORT_JITTER_SPAN; count != 0; count--)
+    {
+    }
+}
+
+#define interrupt_injector_start()
+#define interrupt_injector_stop()
+
 #else
 #define interrupt_injector_start()
 #define interrupt_injector_stop()
+#define interrupt_jitter()
 #endif
 
 
@@ -324,6 +355,9 @@ time_t  start_wall;
     interrupt_injector_start();
     while (condition_count < WAIT_ABORT_WINDOWS_WANTED)
     {
+
+        /* Vary where the next interrupt finds this thread.  */
+        interrupt_jitter();
 
         /* Suspend on the semaphore that is going to be set via the ISR.  */
         status =  tx_semaphore_get(&semaphore_0, (thread_0_counter % 5) + 1);
