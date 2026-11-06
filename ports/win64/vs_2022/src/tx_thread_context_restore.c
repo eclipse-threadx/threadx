@@ -34,6 +34,10 @@
 #include "tx_api.h"
 #include "tx_thread.h"
 #include "tx_timer.h"
+#pragma comment (lib, "Synchronization.lib")
+
+
+static VOID  _tx_win32_dispatch_wait(TX_THREAD *execute_thread);
 
 
 /**************************************************************************/
@@ -118,32 +122,18 @@ TX_THREAD   *execute_thread;
             /* Clear the current thread pointer.  */
             _tx_thread_current_ptr =  TX_NULL;
 
-            /* Block the timer ISR until the resumed thread has observed the wakeup.  */
-            _tx_win32_timer_waiting =  TX_TRUE;
-
             /* Wakeup the system thread by setting the system semaphore.  */
             ReleaseSemaphore(_tx_win32_scheduler_semaphore, 1, NULL);
             _tx_win32_scheduler_wake();
 
-            /* If the timer made a solicited wakeup ready, let that thread run before
-               the host timer ISR continues.  */
+            /* If this interrupt made a solicited wakeup ready, let that thread run
+               before the interrupt returns.  */
             if ((execute_thread != TX_NULL) &&
                 (execute_thread -> tx_thread_win32_suspension_type == 0))
             {
 
-                /* Spin-poll for the scheduler to complete the solicited wakeup
-                   before the timer ISR proceeds.  */
-                _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
-                while (WaitForSingleObject(_tx_win32_isr_semaphore, 0) != WAIT_OBJECT_0)
-                    SwitchToThread();
-                _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
-                while (WaitForSingleObject(_tx_win32_isr_semaphore, 0) == WAIT_OBJECT_0)
-                {
-                }
+                _tx_win32_dispatch_wait(execute_thread);
             }
-
-            /* The timer ISR no longer needs to hold off future ticks.  */
-            _tx_win32_timer_waiting =  TX_FALSE;
         }
         else
         {
@@ -155,29 +145,50 @@ TX_THREAD   *execute_thread;
     else if ((!_tx_thread_system_state) && (execute_thread != TX_NULL))
     {
 
-        /* The timer made a thread ready while the scheduler was idle.  Keep the
-           timer ISR blocked until the solicited wakeup has started running.  */
-        _tx_win32_timer_waiting =  TX_TRUE;
+        /* This interrupt made a thread ready while the scheduler was idle.  Hold
+           the interrupt until a solicited wakeup has started running.  */
         _tx_win32_scheduler_wake();
 
         if (execute_thread -> tx_thread_win32_suspension_type == 0)
         {
 
-            /* Spin-poll for the scheduler to hand off to the next thread and
-               acknowledge via the ISR semaphore.  Keeps timer-path latency low.  */
-            _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
-            while (WaitForSingleObject(_tx_win32_isr_semaphore, 0) != WAIT_OBJECT_0)
-                SwitchToThread();
-            _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
-            while (WaitForSingleObject(_tx_win32_isr_semaphore, 0) == WAIT_OBJECT_0)
-            {
-            }
+            _tx_win32_dispatch_wait(execute_thread);
         }
-
-        _tx_win32_timer_waiting =  TX_FALSE;
     }
 
     /* Leave Win32 critical section.  */
     _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
 }
 
+
+/* Waits, with the ThreadX lock released, until the scheduler dispatches a thread
+   or the thread this interrupt made ready is no longer the next to run.  */
+static VOID  _tx_win32_dispatch_wait(TX_THREAD *execute_thread)
+{
+LONG    dispatch_count;
+ULONG   spin_count;
+
+
+    _tx_win32_isr_waiting_count++;
+    dispatch_count =  _tx_win32_dispatch_count;
+    _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
+
+    /* Spin briefly, then block, so that several waiting interrupt threads cannot
+       keep the lower-priority host thread being started off the processor.  */
+    spin_count =  TX_WIN32_HANDOFF_SPIN_COUNT;
+    while ((_tx_win32_dispatch_count == dispatch_count) && (_tx_thread_execute_ptr == execute_thread))
+    {
+        if (spin_count != 0U)
+        {
+            spin_count--;
+            (VOID) SwitchToThread();
+        }
+        else
+        {
+            (VOID) WaitOnAddress(&_tx_win32_dispatch_count, &dispatch_count, sizeof(LONG), 1U);
+        }
+    }
+
+    _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
+    _tx_win32_isr_waiting_count--;
+}

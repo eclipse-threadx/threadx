@@ -69,6 +69,12 @@ add_compile_definitions(
   TEST_STACK_SIZE_PRINTF=4096
   ${${CMAKE_BUILD_TYPE}})
 
+# The Windows simulators keep simulated time on the host clock by default. The
+# suite runs them at five ticks per millisecond so long timeouts finish quickly.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+  add_compile_definitions(TX_TIMER_PERIODIC=1 TX_WIN32_TICKS_PER_INTERRUPT=5)
+endif()
+
 if(MSVC)
   add_compile_options(/W3 /Zi)
   add_link_options(/DEBUG /INCREMENTAL:NO)
@@ -168,4 +174,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND THREADX_ARCH STREQUAL "linux" AND
    THREADX_TOOLCHAIN STREQUAL "gnu" AND
    CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
   add_subdirectory(thread_stack_alignment)
+endif()
+
+# Port-level tests for the Windows simulators.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+  add_subdirectory(windows_port)
 endif()
