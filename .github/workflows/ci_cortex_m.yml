@@ -34,6 +34,12 @@ on:
       - 'ports/cortex_m3/gnu/**'
       - 'ports/cortex_m4/gnu/**'
       - 'ports/cortex_m7/gnu/**'
+      - 'ports_module/cortex_m0+/gnu/**'
+      - 'ports_module/cortex_m3/gnu/**'
+      - 'ports_module/cortex_m4/gnu/**'
+      - 'ports_module/cortex_m7/gnu/**'
+      - 'common_modules/**'
+      - 'CMakeLists.txt'
 
 jobs:
   build:
@@ -111,3 +117,12 @@ jobs:
 
     - name: Compile and link
       run: cmake --build ./build
+
+    - name: Prepare build system (module manager)
+      run: cmake -Bbuild-mm -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m${{ matrix.port }}.cmake -DTHREADX_MODULE_MANAGER=ON -GNinja .
+
+    - name: Compile and link (module manager)
+      run: |
+        cmake --build ./build-mm
+        cmake --build ./build-mm --target threadx-module-manager-consumer-check
+
