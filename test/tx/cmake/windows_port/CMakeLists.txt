@@ -14,3 +14,9 @@ add_executable(tx_win_isr_handoff
                ${CMAKE_CURRENT_LIST_DIR}/../samples/fake.c)
 target_link_libraries(tx_win_isr_handoff PRIVATE azrtos::threadx)
 add_test(${CMAKE_BUILD_TYPE}::threadx_windows_isr_handoff_test tx_win_isr_handoff)
+
+add_executable(tx_win_tick_rate
+               ${SOURCE_DIR}/threadx_windows_tick_rate_test.c
+               ${CMAKE_CURRENT_LIST_DIR}/../samples/fake.c)
+target_link_libraries(tx_win_tick_rate PRIVATE azrtos::threadx)
+add_test(${CMAKE_BUILD_TYPE}::threadx_windows_tick_rate_test tx_win_tick_rate)
