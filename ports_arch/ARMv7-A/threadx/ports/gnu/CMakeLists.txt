@@ -24,6 +24,7 @@ target_sources(${PROJECT_NAME}
     ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_system_return.S
     ${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_vectored_context_save.S
     ${CMAKE_CURRENT_LIST_DIR}/src/tx_timer_interrupt.S
+    ${CMAKE_CURRENT_LIST_DIR}/src/tx_port_offset_check.c
     # {{END_TARGET_SOURCES}}
 )
 
