@@ -257,6 +257,12 @@ The converters now read and validate the input header before opening the output 
 
 ### Valid 32-bit ELF conversion on two host builds
 
+this link contains the output screenshots of initial (failure) and fixed code (success)
+https://drive.google.com/drive/folders/1-717-yVBiul7tpWoPQbeeNmXZexUx02P?usp=sharing
+
+this file contains the instructions to reproduce the test cases obtained above
+https://docs.google.com/document/d/19U9uNcRZ8nxyY5OsScYqIZUblecu7yh-KiVe43n9f9Y/edit?usp=sharing
+
 `test32.o` was the input where the old 64-bit converter failed while reading program headers. The updated converter succeeds, and its output matches the known-good output from the 32-bit build byte for byte.
 
 ```text
@@ -298,6 +304,7 @@ $ ./new64 empty.elf c.bin
 -> exit=6  output: not created bytes
 ```
 The four files fail for different reasons but print the same message. test64.o fails because it’s ELF64. The other three (24, 30 and 0 bytes) are shorter than the 52-byte header and fail the size check before the decoder runs.
+
 
 
 ENVIRONMENT SPECIFICATIONS: Linux MacBookPro 6.17.0-42-generic #42-Ubuntu SMP PREEMPT_DYNAMIC x86_64 x86_64 x86_64 GNU/Linux
