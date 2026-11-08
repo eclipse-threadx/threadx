@@ -253,30 +253,50 @@ Each record is decoded from its ELF-defined 40-byte representation. The converte
 
 The converters now read and validate the input header before opening the output file. This prevents an invalid header from leaving a newly created empty output file. A shared cleanup routine closes any file that was opened and frees any allocated buffers; it safely handles pointers that are still `NULL`. The same parsing and cleanup approach is present in both `module_to_binary.c` and `module_to_c_array.c`.
 
-## SCREENSHOTS — VALIDATION RUNS
-
-These screenshots are evidence from the team's host run. The commands and results shown are described below; the screenshots do not show the compiler version or the full automated test-suite output.
+## VALIDATION RUNS
 
 ### Valid 32-bit ELF conversion on two host builds
 
-![Comparison of 64-bit-host and 32-bit-host converter outputs](README-MACHZERO-compatibility.png)
+`test32.o` was the input where the old 64-bit converter failed while reading program headers. The updated converter succeeds, and its output matches the known-good output from the 32-bit build byte for byte.
 
-test32.o is the exact file where the old conv64 (old module_to_binary.c) failed with read failed on the program header(s). 
-The old 64-bit tool failed on this file with no output. The new one succeeds.
-The 64-bit and 32-bit builds now agree, so the word size no longer changes the result. That is the whole bug.
-The new 64-bit output also matches the old 32-bit output byte for byte. The old 32-bit build was the correct one, so the 64-bit build now does what it should.
+```text
+$ ./new64 test32.o a64.bin
+-> exit=0  output: 103 bytes
+$ ./new32 test32.o a32.bin
+-> exit=0  output: 103 bytes
+$ cmp a64.bin a32.bin && echo SAME
+SAME
+$ cmp a64.bin out32.bin && echo "SAME as the old known-good 32-bit output"
+SAME as the old known-good 32-bit output
+```
 
-### Building the 32-bit ELF fixture and comparing converter outputs
+### Building the 32-bit ELF fixture
 
-![Compiling a small test.c source into a 32-bit object and comparing outputs](README-MACHZERO-test-compile-compare.png)
+The fixture source contains a small `add` function. It is compiled as a 32-bit object file without linking, then used as the converter input.
 
-This screenshot shows how the valid input fixture was prepared: `test.c` contains a small `add` function, and `gcc -m32 -c test.c -o test32.o` compiles it into a 32-bit ELF object without linking it. The converters then process that same object. The 64-bit-host and 32-bit-host converter runs both succeed and produce 103-byte outputs; `cmp` reports identical bytes, and the 64-bit-host output also matches the saved known-good 32-bit output. This demonstrates compatibility for this particular fixture. It does not establish that every ELF32 file or toolchain configuration produces identical output.
+```text
+$ printf 'int add(int a,int b){return a+b;}\n' > test.c
+$ gcc -m32 -c test.c -o test32.o
+```
 
 ### Unsupported and malformed input rejection
 
-![Unsupported and malformed ELF inputs are rejected](README-MACHZERO-rejections.png)
+The ELF64 object, text file, truncated ELF header, and empty file are each rejected. The converter exits with status 6 and does not create the output file. The text, truncated, and empty inputs are shorter than the 52-byte ELF32 header; the ELF64 input is rejected as an unsupported class.
 
-There are four kinds of bad input. The old code accepted all of them without checking and misparsed them.
+```text
+$ ./new64 test64.o c.bin
+**** Error: invalid or unsupported ELF32 little-endian header ****
+-> exit=6  output: not created bytes
+$ ./new64 notelf.txt c.bin
+**** Error: invalid or unsupported ELF32 little-endian header ****
+-> exit=6  output: not created bytes
+$ ./new64 trunc_hdr.elf c.bin
+**** Error: invalid or unsupported ELF32 little-endian header ****
+-> exit=6  output: not created bytes
+$ ./new64 empty.elf c.bin
+**** Error: invalid or unsupported ELF32 little-endian header ****
+-> exit=6  output: not created bytes
+```
 The four files fail for different reasons but print the same message. test64.o fails because it’s ELF64. The other three (24, 30 and 0 bytes) are shorter than the 52-byte header and fail the size check before the decoder runs.
 
 
