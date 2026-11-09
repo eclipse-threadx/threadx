@@ -80,6 +80,8 @@ TX_TIMER_INTERNAL           *previous_timer;
 TX_TIMER_INTERNAL           *current_timer;
 VOID                        (*timeout_function)(ULONG id);
 ULONG                       timeout_param =  ((ULONG) 0);
+VOID                        (*timeout_function_ptr)(VOID *id);
+VOID                        *timeout_param_ptr =  TX_NULL;
 TX_THREAD                   *thread_ptr;
 #ifdef TX_REACTIVATE_INLINE
 TX_TIMER_INTERNAL           **timer_list;               /* Timer list pointer           */
@@ -257,7 +259,8 @@ UINT                         status;
 
                     /* Set the timeout function to NULL in order to bypass the
                        expiration.  */
-                    timeout_function =  TX_NULL;
+                    timeout_function =      TX_NULL;
+                    timeout_function_ptr =  TX_NULL;
 
                     /* Make the timer appear that it is still active while interrupts
                        are enabled.  This will permit proper processing of a timer
@@ -298,8 +301,10 @@ UINT                         status;
 
                     /* Copy the calling function and ID into local variables before interrupts
                        are re-enabled.  */
-                    timeout_function =  current_timer -> tx_timer_internal_timeout_function;
-                    timeout_param =     current_timer -> tx_timer_internal_timeout_param;
+                    timeout_function =      current_timer -> tx_timer_internal_timeout_function;
+                    timeout_param =         current_timer -> tx_timer_internal_timeout_param;
+                    timeout_function_ptr =  current_timer -> tx_timer_internal_timeout_function_ptr;
+                    timeout_param_ptr =     current_timer -> tx_timer_internal_timeout_param_ptr;
 
                     /* Copy the reinitialize ticks into the remaining ticks.  */
                     current_timer -> tx_timer_internal_remaining_ticks =  current_timer -> tx_timer_internal_re_initialize_ticks;
@@ -337,7 +342,12 @@ UINT                         status;
 #endif
 
                 /* Call the timer-expiration function, if non-NULL.  */
-                if (timeout_function != TX_NULL)
+                if (timeout_function_ptr != TX_NULL)
+                {
+
+                    (timeout_function_ptr) (timeout_param_ptr);
+                }
+                else if (timeout_function != TX_NULL)
                 {
 
                     (timeout_function) (timeout_param);
