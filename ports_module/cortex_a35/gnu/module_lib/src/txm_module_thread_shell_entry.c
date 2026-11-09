@@ -165,7 +165,7 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
     /* Call actual thread suspension routine.  */
     _txm_module_thread_system_suspend(thread_ptr);
 
-#ifdef TX_SAFETY_CRITICAL
+#if defined(TX_SAFETY_CRITICAL) || defined(TX_SAFETY_CRITICAL_EXCEPTION_ENABLE)
 
     /* If we ever get here, raise safety critical exception.  */
     TX_SAFETY_CRITICAL_EXCEPTION(__FILE__, __LINE__, 0);

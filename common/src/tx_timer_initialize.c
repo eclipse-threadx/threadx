@@ -255,7 +255,7 @@ UINT    status;
                                     _tx_timer_priority, _tx_timer_priority, TX_NO_TIME_SLICE, TX_DONT_START);
 
 
-#ifdef TX_SAFETY_CRITICAL
+#if defined(TX_SAFETY_CRITICAL) || defined(TX_SAFETY_CRITICAL_EXCEPTION_ENABLE)
 
         /* Check return from thread create - if an error is detected throw an exception.  */
         if (status != TX_SUCCESS)
