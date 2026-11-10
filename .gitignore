@@ -18,6 +18,7 @@ CTestTestfile.cmake
 *.dep
 *.o
 *.axf
+*.elf
 *.map
 *.a
 *.htm
