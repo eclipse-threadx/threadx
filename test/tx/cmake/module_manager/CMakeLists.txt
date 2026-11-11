@@ -393,3 +393,50 @@ target_compile_options(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_load_bounds_test
          threadx_module_manager_load_bounds_test)
+
+# This test checks the module options the Cortex-A35 module ports accept, so it is
+# compiled once against each of their four headers rather than against a stand-in
+# port. The SMP ports take the SMP kernel's headers. These ports are AArch64, whose
+# ALIGN_TYPE is as wide as a pointer only at 64 bits, so these targets build at
+# native 64-bit width rather than the suite's -m32. The port's alignment macro
+# assigns the code and data alignments in place, including into the loaders' and
+# utility's discarded copies, which -Wall reports as set but not used.
+foreach(a35_port cortex_a35/gnu cortex_a35/ac6 cortex_a35_smp/gnu cortex_a35_smp/ac6)
+  string(REPLACE "/" "_" a35_name ${a35_port})
+  set(a35_target threadx_module_manager_${a35_name}_properties_test)
+
+  if(a35_port MATCHES "_smp/")
+    set(a35_common_inc ${REPO_ROOT}/common_smp/inc)
+  else()
+    set(a35_common_inc ${REPO_ROOT}/common/inc)
+  endif()
+
+  add_executable(
+    ${a35_target}
+    ${SOURCE_DIR}/threadx_module_manager_cortex_a35_properties_test.c
+    ${module_manager_dir}/src/txm_module_manager_initialize.c
+    ${module_manager_dir}/src/txm_module_manager_internal_load.c
+    ${module_manager_dir}/src/txm_module_manager_in_place_load.c
+    ${module_manager_dir}/src/txm_module_manager_absolute_load_extended.c
+    ${module_manager_dir}/src/txm_module_manager_util.c)
+
+  target_include_directories(
+    ${a35_target}
+    PRIVATE ${SOURCE_DIR}
+            ${a35_common_inc}
+            ${REPO_ROOT}/common_modules/inc
+            ${module_manager_dir}/inc
+            ${REPO_ROOT}/ports_module/${a35_port}/inc)
+
+  target_compile_options(
+    ${a35_target}
+    PRIVATE -m64
+            -Wall
+            -Wextra
+            -Wno-unused-but-set-variable
+            -include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h)
+
+  target_link_options(${a35_target} PRIVATE -m64)
+
+  add_test(${CMAKE_BUILD_TYPE}::${a35_target} ${a35_target})
+endforeach()
