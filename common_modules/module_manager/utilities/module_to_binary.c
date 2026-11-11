@@ -71,7 +71,7 @@ int             alpha;
 unsigned char   *buffer;
 unsigned long   remaining_bytes;
 
-    /* ISSUE #585: accept empty tables and reject reads outside the input file.  */
+    /* Accept empty tables and reject reads outside the input file.  */
     if (object_size == 0)
     {
 
@@ -155,7 +155,7 @@ static void converter_cleanup(void)
        is supplied a NULL pointer, so no test is required here.  */
     free(program_header);
     program_header =  NULL;
-    /* ISSUE #585: release the temporary on-disk section-header bytes.  */
+    /* Release the temporary on-disk section-header bytes.  */
     free(raw_section_header_table);
     raw_section_header_table =  NULL;
     free(section_header);
@@ -211,7 +211,7 @@ unsigned char           zero_value;
         return(2);
     }
 
-    /* ISSUE #585: Record file length, then validate/decode raw ELF header bytes
+    /* Record file length, then validate/decode raw ELF header bytes
        before creating the output file.  */
     /* Record the input size so every later read can reject out-of-range data.  */
     if (fseek(source_file, 0L, SEEK_END) != 0)
@@ -291,7 +291,7 @@ unsigned char           zero_value;
         return(6);
     }
 
-    /* ISSUE #585: Read section headers as raw ELF bytes, then decode each
+    /* Read section headers as raw ELF bytes, then decode each
        fixed-width field into host-side values.  */
     /* Allocate memory for the section header(s).  */
     allocation_size =  MODULE_ELF32_SECTION_HEADER_SIZE*header.elf_header_section_header_entries;

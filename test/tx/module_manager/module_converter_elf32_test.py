@@ -125,7 +125,7 @@ def c_array_bytes(path):
                  re.findall(r"0x([0-9A-Fa-f]{1,2})\b", match.group(1)))
 
 
-# ISSUE #585 TESTS: exercise both converter programs against valid and hostile
+# Exercise both converter programs against valid and hostile
 # ELF fixtures, including deterministic allocation-failure injection.
 class ModuleConverterELF32Tests(unittest.TestCase):
     @classmethod

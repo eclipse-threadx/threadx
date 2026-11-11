@@ -394,7 +394,7 @@ target_compile_options(
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_load_bounds_test
          threadx_module_manager_load_bounds_test)
 
-# ISSUE #585 TESTS: The ELF-to-binary and ELF-to-C-array utilities are host
+# The ELF-to-binary and ELF-to-C-array utilities are host
 # programs, so run them as command-line tools against synthetic ELF inputs.
 # Python is optional for the normal ThreadX test build; when present, this driver
 # checks valid and malformed ELF32 files through both real executables.

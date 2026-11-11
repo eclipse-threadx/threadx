@@ -19,7 +19,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* ISSUE #585: ELF32 field layouts and little-endian byte decoding.  */
+/* ELF32 field layouts and little-endian byte decoding.  */
 #define MODULE_ELF32_IDENT_SIZE                  16UL
 #define MODULE_ELF32_HEADER_SIZE                 52UL
 #define MODULE_ELF32_PROGRAM_HEADER_SIZE         32UL
@@ -85,7 +85,7 @@ typedef struct ELF_SYMBOL_TABLE_ENTRY_STRUCT
     uint16_t    elf_symbol_table_entry_shndx;
 } ELF_SYMBOL_TABLE_ENTRY;
 
-/* ISSUE #585: C99-compatible layout checks keep host-side values predictable.
+/* C99-compatible layout checks keep host-side values predictable.
    A failure means a future edit changed a value structure away from the ELF32
    field sizes.  */
 typedef char module_elf32_header_size_check[
@@ -97,7 +97,7 @@ typedef char module_elf32_section_header_size_check[
 typedef char module_elf32_symbol_table_entry_size_check[
     (sizeof(ELF_SYMBOL_TABLE_ENTRY) == MODULE_ELF32_SYMBOL_TABLE_ENTRY_SIZE) ? 1 : -1];
 
-/* ISSUE #585: decode raw file bytes explicitly; do not cast file data to a
+/* Decode raw file bytes explicitly; do not cast file data to a
    host structure, because host endianness and alignment may differ.  */
 static uint16_t module_elf32_read_u16_le(const uint8_t *bytes)
 {
