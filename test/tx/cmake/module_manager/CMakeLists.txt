@@ -408,11 +408,11 @@ if(Python3_Interpreter_FOUND)
                  ${module_converter_utility_dir}/module_to_c_array.c)
 
   add_test(
-    ${CMAKE_BUILD_TYPE}::threadx_module_converter_elf32_test
-    ${Python3_EXECUTABLE}
-    ${SOURCE_DIR}/module_converter_elf32_test.py
-    $<TARGET_FILE:threadx_module_to_binary_elf32_test>
-    $<TARGET_FILE:threadx_module_to_c_array_elf32_test>
-    ${module_converter_utility_dir}/module_to_binary.c
-    ${module_converter_utility_dir}/module_to_c_array.c)
+    NAME ${CMAKE_BUILD_TYPE}::threadx_module_converter_elf32_test
+    COMMAND ${Python3_EXECUTABLE}
+            ${SOURCE_DIR}/module_converter_elf32_test.py
+            $<TARGET_FILE:threadx_module_to_binary_elf32_test>
+            $<TARGET_FILE:threadx_module_to_c_array_elf32_test>
+            ${module_converter_utility_dir}/module_to_binary.c
+            ${module_converter_utility_dir}/module_to_c_array.c)
 endif()
