@@ -98,7 +98,7 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 
     TX_DISABLE
 
-    __dsync();
+    _dsync();
 
     /* The CSA that LCX points to and the CSAs after it are the reserve of
        the free context list depletion trap (FCD). The thread shall not
@@ -121,7 +121,7 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
         /* Remove the two CSAs from the free CSA list by setting FCX to the
            link word of the second CSA.  */
         __mtcr(TX_PORT_TRICORE_CSFR_FCX, second_csa_ptr[ TX_PORT_TRICORE_CSA_PCXI_LINK_WORD ] & TX_PORT_TRICORE_CSA_LINK_MASK);
-        __isync();
+        _isync();
     }
     else
     {
@@ -129,8 +129,8 @@ VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
         /* The first SVLCX takes the first CSA. The second SVLCX takes the
            CSA that LCX points to and raises FCD, or raises FCU if the list
            ends at the first CSA.  */
-        __svlcx();
-        __svlcx();
+        _svlcx();
+        _svlcx();
         while (TX_TRUE)
         {
 
@@ -182,10 +182,10 @@ VOID   _tx_thread_csa_release(TX_THREAD *thread_ptr)
         }
 
         TX_DISABLE
-        __dsync();
+        _dsync();
         csa_ptr[TX_PORT_TRICORE_CSA_PCXI_LINK_WORD] = __mfcr(TX_PORT_TRICORE_CSFR_FCX);
         __mtcr(TX_PORT_TRICORE_CSFR_FCX, head_csa_link_word);
-        __isync();
+        _isync();
         TX_RESTORE
 
         thread_ptr -> tx_thread_csa = 0;

@@ -120,11 +120,8 @@
 #include <string.h>
 #include <stdint.h>
 
-/* iLLD core intrinsics, the service request of the dispatch interrupt and
-   the trace time source.  */
-#include "IfxCpu_Intrinsics.h"
-#include "IfxSrc.h"
-#include "IfxStm_reg.h"
+/* TriCore intrinsics of the AURIX GCC. */
+#include <machine/intrinsics.h>
 
 
 
@@ -255,7 +252,41 @@ extern TEST_FLAG        test_forced_mutex_timeout;
 #define TX_PORT_TRICORE_ICR_IE_MSK                       0x00008000UL  /* Global interrupt enable */
 
 /* System call that enters the scheduler.  */
-#define TX_PORT_TRICORE_SYSCALL_ID                       0
+#define TX_PORT_TRICORE_SYSCALL_ID_SCHEDULE              0
+
+/* Receives every other system call number. The weak default stops the CPU.  */
+VOID    tx_port_tricore_syscall_hook(UINT id);
+
+
+/* Interrupt handlers of CPU0.
+
+   TX_PORT_TRICORE_INTERRUPT(isr, priority) starts the definition of the
+   interrupt handler isr, for example:
+
+       TX_PORT_TRICORE_INTERRUPT(timer_isr, 2)
+       {
+           ...
+       }
+
+   It places the vector table entry in the section .intvec_tc0_<priority>.
+   The linker script shall locate this section at BIV + 32 * priority. The
+   entry saves the lower context and jumps to isr, which returns through
+   RSLCX and RFE. priority shall expand to a decimal integer literal without
+   parentheses or suffix, because it becomes part of the section name.  */
+
+#define TX_PORT_TRICORE_STRINGIFY(x)                     #x
+#define TX_PORT_TRICORE_EXPAND_STRINGIFY(x)              TX_PORT_TRICORE_STRINGIFY(x)
+
+#define TX_PORT_TRICORE_INTERRUPT(isr, priority)                                                    \
+    __asm__ (".pushsection .intvec_tc0_" TX_PORT_TRICORE_EXPAND_STRINGIFY(priority)                 \
+             ", \"ax\", @progbits\n"                                                                \
+             "    svlcx\n"                                                                          \
+             "    movh.a  %a14, hi:" #isr "\n"                                                      \
+             "    lea     %a14, [%a14]lo:" #isr "\n"                                                \
+             "    ji      %a14\n"                                                                   \
+             ".popsection\n");                                                                      \
+    void isr(void) __attribute__ ((interrupt_handler));                                             \
+    void isr(void)
 
 
 /* The dispatch interrupt switches threads on behalf of interrupt handlers.
@@ -265,13 +296,30 @@ extern TEST_FLAG        test_forced_mutex_timeout;
 #define TX_PORT_TRICORE_DISPATCH_PRIORITY                1
 #endif
 
-#ifndef TX_PORT_TRICORE_DISPATCH_SRC
-#define TX_PORT_TRICORE_DISPATCH_SRC                     SRC_GPSR_GPSR0_SR0
+/* Address of the service request control register (SRC) of the dispatch
+   interrupt. The default is SRC_GPSR00, general purpose service request 0
+   of group 0, of the TC3xx. The board shall configure this SRC for CPU0
+   with TX_PORT_TRICORE_DISPATCH_PRIORITY and enable it.  */
+#ifndef TX_PORT_TRICORE_DISPATCH_SRC_ADDRESS
+#define TX_PORT_TRICORE_DISPATCH_SRC_ADDRESS             0xF0038990UL
 #endif
+
+#define TX_PORT_TRICORE_DISPATCH_SRC                     (*(volatile unsigned int *) TX_PORT_TRICORE_DISPATCH_SRC_ADDRESS)
+
+/* Fields of an SRC.  */
+#define TX_PORT_TRICORE_SRC_SRPN_MSK                     0x000000FFUL  /* Service request priority number */
+#define TX_PORT_TRICORE_SRC_SRE_MSK                      0x00000400UL  /* Service request enable */
+#define TX_PORT_TRICORE_SRC_TOS_OFF                      11            /* Type of service, 0: CPU0 */
+#define TX_PORT_TRICORE_SRC_CLRR_MSK                     0x02000000UL  /* Request clear */
+#define TX_PORT_TRICORE_SRC_SETR_MSK                     0x04000000UL  /* Request set */
 
 #ifndef TX_PORT_TRICORE_TIMER_INTERRUPT_PRIORITY
 #define TX_PORT_TRICORE_TIMER_INTERRUPT_PRIORITY         2
 #endif
+
+/* Lower 32 bits of the system timer STM0 of the TC3xx: the default time
+   source of the trace and of the execution profile.  */
+#define TX_PORT_TRICORE_STM0_TIM0                        (*(volatile unsigned int *) 0xF0001010UL)
 
 
 /* Define the TX_MEMSET macro to remove library reference. The local names
@@ -359,7 +407,7 @@ extern TEST_FLAG        test_forced_mutex_timeout;
 
 #ifndef TX_MISRA_ENABLE
 #ifndef TX_TRACE_TIME_SOURCE
-#define TX_TRACE_TIME_SOURCE                    STM0_TIM0.U
+#define TX_TRACE_TIME_SOURCE                    TX_PORT_TRICORE_STM0_TIM0
 #endif
 #else
 #ifndef TX_TRACE_TIME_SOURCE
@@ -370,7 +418,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
 
 /* Time source of the execution profile kit.  */
 #ifndef TX_EXECUTION_TIME_SOURCE
-#define TX_EXECUTION_TIME_SOURCE                (EXECUTION_TIME_SOURCE_TYPE) STM0_TIM0.U
+#define TX_EXECUTION_TIME_SOURCE                (EXECUTION_TIME_SOURCE_TYPE) TX_PORT_TRICORE_STM0_TIM0
 #endif
 
 #ifndef TX_TRACE_TIME_MASK
@@ -479,7 +527,7 @@ __attribute__( ( always_inline ) ) static inline unsigned int __get_interrupt_st
 {
     UINT psw;
     psw = __mfcr(TX_PORT_TRICORE_CSFR_PSW);
-    __isync();
+    _isync();
     return (psw >> TX_PORT_TRICORE_PSW_IS_OFF) & 1U;
 }
 
@@ -509,9 +557,17 @@ ULONG   _tx_misra_interrupt_state_get(VOID);
 
 __attribute__( ( always_inline ) ) static inline void _tx_thread_dispatch_request(void)
 {
-    IfxSrc_setRequest(&TX_PORT_TRICORE_DISPATCH_SRC);
-    __dsync();
+    TX_PORT_TRICORE_DISPATCH_SRC |= (unsigned int) TX_PORT_TRICORE_SRC_SETR_MSK;
+    _dsync();
 }
+
+/* PSW.IS is 1 after reset, and start-up code may keep it. The initialisation runs on the user stack, so
+   _tx_initialize_kernel_enter clears PSW.IS: traps and interrupts then switch to the interrupt stack, and
+   TX_THREAD_GET_SYSTEM_STATE does not take the initialisation for an interrupt handler. The clear shall be
+   inline code of _tx_initialize_kernel_enter, which does not return: the return from a called function
+   would restore the PSW of its caller.  */
+#define TX_PORT_SPECIFIC_PRE_INITIALIZATION     __mtcr(TX_PORT_TRICORE_CSFR_PSW, __mfcr(TX_PORT_TRICORE_CSFR_PSW) & ~(1UL << TX_PORT_TRICORE_PSW_IS_OFF)); \
+                                                _isync();
 
 /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
    prevent early scheduling. _tx_thread_schedule clears it before the first thread runs.  */
@@ -525,8 +581,8 @@ __attribute__( ( always_inline ) ) static inline void _tx_thread_dispatch_reques
 __attribute__( ( always_inline ) ) static inline unsigned int __get_interrupt_posture(void)
 {
     UINT posture;
-    posture =__mfcr(TX_PORT_TRICORE_CSFR_ICR);
-    __isync();
+    posture = __mfcr(TX_PORT_TRICORE_CSFR_ICR);
+    _isync();
     return posture;
 }
 
@@ -537,18 +593,18 @@ __attribute__( ( always_inline ) ) static inline void __set_ccpn_value(unsigned 
     icr = __mfcr(TX_PORT_TRICORE_CSFR_ICR);
     icr = (icr & ~((UINT) TX_PORT_TRICORE_ICR_CCPN_MSK)) | (ccpn_value & ((UINT) TX_PORT_TRICORE_ICR_CCPN_MSK));
     __mtcr(TX_PORT_TRICORE_CSFR_ICR, icr);
-    __isync();
+    _isync();
 }
 
 __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
 {
-    __enable();
+    _enable();
 }
 
 __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsigned int posture)
 {
     __mtcr(TX_PORT_TRICORE_CSFR_ICR, posture);
-    __isync();
+    _isync();
 }
 
 __attribute__( ( always_inline ) ) static inline unsigned int __disable_interrupts(void)
@@ -564,7 +620,7 @@ __attribute__( ( always_inline ) ) static inline unsigned int __disable_interrup
         __set_ccpn_value(TX_PORT_CCPN);
     }
 #else
-    __disable();
+    _disable();
 #endif
 
     return posture;
@@ -587,7 +643,7 @@ __attribute__( ( always_inline ) ) static inline void _tx_thread_system_return_i
 #else
         __enable_interrupts();
 #endif
-        __syscall(TX_PORT_TRICORE_SYSCALL_ID);
+        __syscall(TX_PORT_TRICORE_SYSCALL_ID_SCHEDULE);
         __restore_interrupt(interrupt_save);
     }
     else

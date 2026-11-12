@@ -74,6 +74,16 @@ void    thread_5_entry(ULONG thread_input);
 void    thread_6_and_7_entry(ULONG thread_input);
 
 
+/* Define main entry point.  */
+
+int main()
+{
+
+    /* Enter the ThreadX kernel.  */
+    tx_kernel_enter();
+}
+
+
 /* Define what the initial system looks like.  */
 
 void    tx_application_define(void *first_unused_memory)

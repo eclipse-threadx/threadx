@@ -102,9 +102,9 @@ VOID   _tx_thread_schedule(VOID)
        interrupts are enabled; a thread it makes ready starts through the
        dispatch interrupt, and the system call below is not reached.  */
     _tx_thread_preempt_disable = 0;
-    __enable();
+    _enable();
 
-    __syscall(TX_PORT_TRICORE_SYSCALL_ID);
+    __syscall(TX_PORT_TRICORE_SYSCALL_ID_SCHEDULE);
     while(TX_TRUE)
     {
 
@@ -135,7 +135,7 @@ static VOID __attribute__( ( noinline ) ) _tx_thread_csa_save(UINT call_depth)
     UINT * upper_csa_ptr;
     UINT lower_csa;
 
-    __dsync();
+    _dsync();
     csa_ptr = _tx_thread_decode_link_word(__mfcr(TX_PORT_TRICORE_CSFR_PCXI));
 
     for (UINT i = 0U; i < (call_depth - 1U); i++)
@@ -156,7 +156,7 @@ static VOID __attribute__( ( noinline ) ) _tx_thread_csa_restore(UINT call_depth
 {
     UINT * csa_ptr;
 
-    __dsync();
+    _dsync();
     csa_ptr = _tx_thread_decode_link_word(__mfcr(TX_PORT_TRICORE_CSFR_PCXI));
 
     for (UINT i = 0U; i < (call_depth - 1U); i++)
@@ -183,9 +183,9 @@ static VOID __attribute__( ( noinline ) ) _tx_ts_handler(UINT call_depth)
         }
 
 #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
-        __disable();
+        _disable();
         _tx_execution_thread_exit();
-        __enable();
+        _enable();
 #endif
 
         _tx_thread_csa_save(call_depth);
@@ -200,8 +200,8 @@ static VOID __attribute__( ( noinline ) ) _tx_ts_handler(UINT call_depth)
        masks interrupts through ICR.IE.  */
     while (TX_TRUE)
     {
-        __disable();
-        __nop();
+        _disable();
+        _nop();
         next_thread = _tx_thread_execute_ptr;
         if (next_thread != TX_NULL)
         {
@@ -212,8 +212,8 @@ static VOID __attribute__( ( noinline ) ) _tx_ts_handler(UINT call_depth)
         tx_low_power_enter();
         tx_low_power_exit();
 #endif
-        __enable();
-        __nop();
+        _enable();
+        _nop();
     }
 
 #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
@@ -222,7 +222,7 @@ static VOID __attribute__( ( noinline ) ) _tx_ts_handler(UINT call_depth)
 
     /* Interrupts stay disabled until the return to next_thread, so the switch
        to next_thread satisfies every pending dispatch request.  */
-    IfxSrc_clearRequest(&TX_PORT_TRICORE_DISPATCH_SRC);
+    TX_PORT_TRICORE_DISPATCH_SRC |= (unsigned int) TX_PORT_TRICORE_SRC_CLRR_MSK;
 
     next_thread->tx_thread_run_count++;
     _tx_timer_time_slice = next_thread->tx_thread_time_slice;
@@ -240,11 +240,24 @@ static VOID __attribute__( ( noinline ) ) _tx_ts_handler(UINT call_depth)
 
 
 
+/* An unsupported system call number is an error.  */
+VOID __attribute__( ( weak ) ) tx_port_tricore_syscall_hook(UINT id)
+{
+    (VOID) id;
+
+    _disable();
+    _debug();
+    while (TX_TRUE)
+    {
+    }
+}
+
+
 VOID _tx_thread_syscall_handler(UCHAR id )
 {
     switch(id)
     {
-        case TX_PORT_TRICORE_SYSCALL_ID:
+        case TX_PORT_TRICORE_SYSCALL_ID_SCHEDULE:
             /* The dispatch interrupt shall not interrupt the scheduler. RFE
                restores the CCPN of the thread that the trap returns to.  */
             __set_ccpn_value(TX_PORT_TRICORE_DISPATCH_PRIORITY);
@@ -253,13 +266,14 @@ VOID _tx_thread_syscall_handler(UCHAR id )
             break;
 
         default:
+            tx_port_tricore_syscall_hook((UINT) id);
             break;
     }
 }
 
 
 
-IFX_INTERRUPT(_tx_thread_dispatch_isr, 0, TX_PORT_TRICORE_DISPATCH_PRIORITY)
+TX_PORT_TRICORE_INTERRUPT(_tx_thread_dispatch_isr, TX_PORT_TRICORE_DISPATCH_PRIORITY)
 {
     /* A thread that has disabled preemption keeps the CPU. It enters the
        scheduler through the system call once it enables preemption again.  */

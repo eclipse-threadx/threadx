@@ -7,144 +7,106 @@
 
 The port runs on CPU0 of an AURIX TC3 device and was developed on the AURIX
 TC375 Lite Kit (KIT_A2G_TC375_LITE). It requires the AURIX GCC
-(tricore-elf-gcc) on PATH and the Infineon iLLD, which is not part of this
-repository. AURIX_ILLD_DIR shall name the directory that holds the iLLD,
-Infra and Service folders. The example build was built and tested with
-iLLD 1.22.0.
-
-The iLLD headers include the board configuration Ifx_Cfg.h. The one for the
-TC375 Lite Kit (DEVICE_TC37X, IFX_PIN_PACKAGE_LQFP176) is in
-example_build/aurix_lite_kit_v2.
+(tricore-elf-gcc) on PATH and uses no driver library.
 
 
 2.  Building the ThreadX Run-time Library
 
-In example_build/aurix_lite_kit_v2, run:
+With CMake from the repository root, run:
 
-   AURIX_ILLD_DIR=/path/to/Libraries ./build_threadx.sh
-
-or, with CMake from the repository root:
-
-   cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=cmake/tricore_tc1_6_2.cmake \
-         -DAURIX_ILLD_DIR=/path/to/Libraries
+   cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=cmake/tricore_tc1_6_2.cmake
    cmake --build build
 
-The CMake variable AURIX_CFG_DIR selects a different directory for
-Ifx_Cfg.h. Both builds produce the library tx.a, which the application links.
-tx.a does not contain _tx_initialize_low_level and the timer interrupt,
-because both depend on the board; the application provides them (section 4).
+The build produces the library tx.a, which the application links. tx.a does
+not contain _tx_initialize_low_level and the timer interrupt, because both
+depend on the board; the application provides them (section 4).
 
 inc/tx_port.h holds the definitions for the ThreadX common sources and the
 application, including the settings that tx_user.h or the command line may
-override. src/tx_port_tricore.h holds the definitions that only the port
-sources use: the CSA layout, the initial thread context and the core
-registers.
+override. src/tx_port_tricore.h holds the internal definitions of the port.
 
 
 3.  Demonstration System
 
-After tx.a is built, run in example_build/aurix_lite_kit_v2:
+In example_build, run:
 
-   AURIX_ILLD_DIR=/path/to/Libraries ./build_threadx_sample.sh
+   ./build_threadx_sample.sh
 
-This builds sample_threadx.elf for the TC375 Lite Kit from:
+This builds tx.a and sample_threadx.elf for the TC375 Lite Kit from:
 
-  sample_threadx.c           samples/demo_threadx.c without main() and with
-                             the event trace start (section 8)
-  tx_initialize_low_level.c  low-level initialisation and timer interrupt
-  Cpu0_Main.c                CPU0 entry, calls tx_kernel_enter (Infineon)
-  Cpu1_Main.c, Cpu2_Main.c   CPU1 and CPU2 entry, idle (Infineon)
-  Ifx_Cfg_Trap.h             iLLD trap hook for the ThreadX system call
-  Ifx_Cfg.h                  clock configuration (Infineon)
-  Ifx_Cfg_Ssw.c/.h           iLLD start-up configuration (Infineon)
-  Ifx_Cfg_SswBmhd.c          boot mode headers (Infineon)
-  Lcf_Gnuc_Tricore_Tc.lsl    linker script (Infineon, with __TX_FREE_MEM)
+  sample_threadx.c           samples/demo_threadx.c with the event trace
+                             start (section 8)
+  tx_initialize_low_level.c  low-level initialisation, trap vector table
+                             with the ThreadX system call and timer
+                             interrupt
+  sample_threadx.ld          memory description of CPU0 of the TC375
 
-and the iLLD start-up code and drivers listed in build_threadx_sample.sh.
+The start-up code is crt0-tc38xx.o of the AURIX GCC. The AURIX GCC has no
+TC37x device; -mcpu=tc38xx selects the same TC1.6.2 core and start-up code
+that applies to the TC375 unchanged. sample_threadx.ld, given with -T,
+replaces the TC38x memory description of the compiler. The start-up code is
+located at 0x80000000, the cached address of 0xA0000000, at which the boot
+mode header of the board starts CPU0. The build produces no boot mode header.
 
-The files marked (Infineon) are Copyright (C) Infineon Technologies AG and
-are licensed under the Boost Software License 1.0, as stated in their
-headers, not under the MIT License of ThreadX. They are adapted for the
-ThreadX demonstration. The iLLD itself is not part of this repository and
-is subject to its own Infineon license.
+The clock system keeps its reset state: the system runs from the back-up
+clock of 100 MHz, and the caches stay disabled. CPU1 and CPU2 stay halted.
 
 
 4.  System Initialization
 
-The iLLD start-up code initialises each CPU and calls core0_main to
-core2_main. The linker script places the code and data of Cpu<n>_Main.c in
-the memories of CPU<n>. core0_main disables the CPU0 and safety watchdogs,
-waits until all CPUs have started and calls tx_kernel_enter. Interrupts stay
-disabled from reset until _tx_thread_schedule starts the first thread.
+main calls tx_kernel_enter. Interrupts stay disabled from reset until
+_tx_thread_schedule starts the first thread. The port clears PSW.IS at the
+start of _tx_initialize_kernel_enter (TX_PORT_SPECIFIC_PRE_INITIALIZATION),
+so traps and interrupts switch to the interrupt stack.
 
 _tx_initialize_low_level:
 
-  - sets the first unused memory to __TX_FREE_MEM, which the linker script
-    defines after the heap in the data RAM of CPU0; the memory up to
-    __USTACK0_END is free for tx_application_define,
+  - sets the first unused memory to __TX_FREE_MEM, which sample_threadx.ld
+    defines after the CSAs; the remaining data RAM of CPU0 is free for
+    tx_application_define,
+  - loads BTV with _tx_trap_table and BIV with __INTTAB_CPU0, the vector
+    table of sample_threadx.ld; it clears the CPU0 ENDINIT bit for both,
   - sets up the ThreadX timer (section 7),
-  - sets up the dispatch interrupt (section 5).
+  - sets up the dispatch interrupt: TX_PORT_TRICORE_DISPATCH_SRC for CPU0
+    with TX_PORT_TRICORE_DISPATCH_PRIORITY, enabled (section 5).
 
 
 5.  Thread Scheduling
 
-ThreadX enters the scheduler through syscall 0. The iLLD system call trap
-calls the hook IFX_CFG_CPU_TRAP_SYSCALL_CPU0_HOOK in Ifx_Cfg_Trap.h, which
-shall call _tx_thread_syscall_handler directly.
+ThreadX enters the scheduler through system call
+TX_PORT_TRICORE_SYSCALL_ID_SCHEDULE. The class 6 trap entry shall save the
+lower context with SVLCX and call _tx_thread_syscall_handler with the trap
+identification number. Any other number goes to tx_port_tricore_syscall_hook,
+which runs like an interrupt handler; its weak default stops the CPU.
 
 An interrupt or trap handler that makes another thread ready requests the
-dispatch interrupt _tx_thread_dispatch_isr, a software request on
-TX_PORT_TRICORE_DISPATCH_SRC (SRC_GPSR_GPSR0_SR0 by default) at
-TX_PORT_TRICORE_DISPATCH_PRIORITY (1 by default). It switches threads once no
-interrupt of a higher priority is active.
+dispatch interrupt _tx_thread_dispatch_isr, a software request on the SRC at
+TX_PORT_TRICORE_DISPATCH_SRC_ADDRESS (SRC_GPSR00 of the TC3xx, 0xF0038990, by
+default) at TX_PORT_TRICORE_DISPATCH_PRIORITY (1 by default).
 
 
 6.  Thread Context
 
-A thread's context is its CSA chain. tx_thread_csa (TX_THREAD_EXTENSION_0)
-holds the link to the chain of a suspended thread:
-
-  lower context      saved by SVLCX in the iLLD interrupt or trap entry;
-                     A11 holds the resume address
-  upper context      saved on entry to the system call or the dispatch
-                     interrupt; A10 and PSW of the thread
-  call contexts      one upper context for each call level of the thread
-
-The context save walks TX_PORT_TRICORE_SYSCALL_CALL_DEPTH or
-TX_PORT_TRICORE_DISPATCH_CALL_DEPTH links back from the handler
-(src/tx_port_tricore.h). It copies A10 of the upper context to
-tx_thread_stack_ptr for ThreadX stack checking. The thread stack holds only
-local data.
-
-_tx_thread_stack_build gives a new thread two CSAs, all other words 0:
-
-  lower context      A11 = entry function, PCXI.PIE = 1, PCXI.UL = 1 and
-                     the link to the upper context
-  upper context      A10 = stack end, aligned to 8 bytes; PSW.IO = 2,
-                     PRS 0, call depth counting disabled; no link
-
-The scheduler restores both like a suspended thread, so the thread starts at
-its entry function with interrupts enabled.
-
-The FPU state is part of the CSAs, so threads use the FPU without setup.
+A thread's context is its CSA chain; the port keeps the link to it in
+tx_thread_csa (TX_THREAD_EXTENSION_0). The thread stack holds only local
+data. A new thread starts at its entry function in supervisor mode with
+interrupts enabled. The FPU state is part of the CSAs, so threads use the
+FPU without setup.
 
 CSA budget: a suspended thread holds one CSA per call level plus two; each
 active interrupt or trap holds two plus one per call level. ThreadX stack
-checking does not cover the CSAs. The CSA area of CPU0 (LCF_CSA0_SIZE) shall
-hold the chains of all threads plus the deepest interrupt nesting, up to LCX
-as set by Ifx_Ssw_initCSA. If the CSAs for a new thread would reach LCX,
-tx_thread_create or tx_thread_reset raises FCD.
+checking does not cover the CSAs. The CSA area of CPU0 (__CSA_SIZE, 16 KiB,
+in sample_threadx.ld) shall hold the chains of all threads plus the deepest
+interrupt nesting, up to LCX as set by the start-up code. If the CSAs for a
+new thread would reach LCX, tx_thread_create or tx_thread_reset raises FCD.
 
 
 7.  Timer and Interrupt Handling
 
-The ThreadX timer uses STM0 compare 0. _tx_initialize_low_level derives the
-period from IfxStm_getFrequency and TX_TIMER_TICKS_PER_SECOND (1000 by
-default). TimerInterruptHandler (IFX_INTERRUPT, priority
-TX_PORT_TRICORE_TIMER_INTERRUPT_PRIORITY, 2 by default) clears the compare
-flag, sets the next compare one period after the previous one and calls
-_tx_timer_interrupt. If STM has already passed that value, for example after
-a debugger halt, the next compare is one period from now and the ticks in
+The ThreadX timer uses STM0 compare 0 with TX_TIMER_TICKS_PER_SECOND (1000
+by default) ticks per second. The timer interrupt has the priority
+TX_PORT_TRICORE_TIMER_INTERRUPT_PRIORITY (2 by default). If STM has passed
+the next compare value, for example after a debugger halt, the ticks in
 between are lost.
 
 TX_DISABLE clears ICR.IE by default. With TX_PORT_USE_CCPN defined, it
@@ -152,38 +114,35 @@ raises ICR.CCPN to TX_PORT_CCPN (31 by default) instead and never lowers it;
 interrupts above TX_PORT_CCPN stay enabled in ThreadX critical sections and
 shall not call ThreadX services. TX_RESTORE restores the previous ICR.
 
-An ISR that calls ThreadX services is a plain IFX_INTERRUPT function on CPU0
-with a priority above TX_PORT_TRICORE_DISPATCH_PRIORITY and, with
+An ISR that calls ThreadX services is a plain interrupt handler on CPU0 with
+a priority above TX_PORT_TRICORE_DISPATCH_PRIORITY and, with
 TX_PORT_USE_CCPN, not above TX_PORT_CCPN. _tx_thread_context_save and
 _tx_thread_context_restore have no effect on this port.
+TX_PORT_TRICORE_INTERRUPT(isr, priority) in tx_port.h defines such a handler
+and places its vector table entry in the section .intvec_tc0_<priority>.
+The linker script shall locate this section at BIV + 32 * priority;
+sample_threadx.ld does so for the priorities 1 to 15.
 
 Interrupts and traps taken from a thread switch to the CPU0 interrupt stack
-(LCF_ISTACK0_SIZE, 1 KiB). It holds the local data of all nested handlers,
-including the scheduler's idle wait, so thread stacks need no interrupt
-reserve.
-
-IFX_USE_SW_MANAGED_INT shall not be defined: IFX_INTERRUPT then creates no
-vector table entry, and the iLLD dispatcher adds a call level that
-TX_PORT_TRICORE_DISPATCH_CALL_DEPTH does not count.
+(__ISTACK_SIZE, 4 KiB, in sample_threadx.ld). It holds the local data of all
+nested handlers, including the scheduler's idle wait, so thread stacks need
+no interrupt reserve.
 
 
 8.  Event Trace
 
 With TX_ENABLE_EVENT_TRACE, the application calls tx_trace_enable with its
 trace buffer, at the earliest at the start of tx_application_define, because
-kernel initialisation resets the trace. The demonstration does so with a
-4000-byte buffer and 30 registry entries. The time stamp is STM0_TIM0
-(TX_TRACE_TIME_SOURCE in tx_port.h).
+kernel initialisation resets the trace. The time stamp is the lower word of
+STM0 (TX_TRACE_TIME_SOURCE in tx_port.h).
 
 
 9.  Execution Profile and Low Power
 
 For TX_EXECUTION_PROFILE_ENABLE and TX_LOW_POWER the port implements only the
-callouts. The regression configurations execution_profile_build and
-low_power_build (test/tx/cmake/tricore_tc1_6_2) show only that the callouts
-do not disturb the kernel: no test reads the measured times, and none of
-TX_LOW_POWER_TIMER_SETUP, TX_LOW_POWER_TICKLESS and TX_LOW_POWER_USER_* is
-defined.
+callouts. The regression tests show only that the callouts do not disturb
+the kernel. TX_LOW_POWER_TIMER_SETUP, TX_LOW_POWER_TICKLESS and
+TX_LOW_POWER_USER_* are not defined.
 
 
 10. Improving Performance

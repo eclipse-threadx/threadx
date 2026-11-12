@@ -18,14 +18,18 @@
 #ifndef TX_PORT_TRICORE_H
 #define TX_PORT_TRICORE_H
 
-#include "IfxCpu_bf.h"
-
 
 /* TriCore core registers.  */
 
 #define TX_PORT_TRICORE_CSFR_PCXI                        0xFE00
 #define TX_PORT_TRICORE_CSFR_FCX                         0xFE38
 #define TX_PORT_TRICORE_CSFR_LCX                         0xFE3C
+
+#define TX_PORT_TRICORE_PSW_CDC_MSK                      0x7FUL        /* Call depth counter, bits 6:0 */
+#define TX_PORT_TRICORE_PSW_CDE_OFF                      7             /* Call depth count enable */
+#define TX_PORT_TRICORE_PSW_IO_OFF                       10            /* I/O privilege level */
+#define TX_PORT_TRICORE_PCXI_UL_OFF                      20            /* 1: link to an upper context */
+#define TX_PORT_TRICORE_PCXI_PIE_OFF                     21            /* Previous interrupt enable */
 
 
 /* Context save areas (CSAs). A link word holds the segment of a CSA in bits
@@ -56,12 +60,12 @@
 
 /* Supervisor mode, protection register set 0. PSW.CDC = 0x7F disables call
    depth counting.  */
-#define TX_PORT_TRICORE_CSA_INITIAL_SYSTEM_PSW           ((TX_PORT_TRICORE_PSW_IO_SUPERVISOR << IFX_CPU_PSW_IO_OFF) | \
-                                                          (1UL << IFX_CPU_PSW_CDE_OFF) | \
-                                                          ((UINT) IFX_CPU_PSW_CDC_MSK << IFX_CPU_PSW_CDC_OFF))
+#define TX_PORT_TRICORE_CSA_INITIAL_SYSTEM_PSW           ((TX_PORT_TRICORE_PSW_IO_SUPERVISOR << TX_PORT_TRICORE_PSW_IO_OFF) | \
+                                                          (1UL << TX_PORT_TRICORE_PSW_CDE_OFF) | \
+                                                          TX_PORT_TRICORE_PSW_CDC_MSK)
 /* PCXI.UL = 1: links to an upper context.  */
-#define TX_PORT_TRICORE_CSA_INITIAL_LOWER_PCXI           ((1UL << IFX_CPU_PCXI_UL_OFF) | (1UL << IFX_CPU_PCXI_PIE_OFF))
-#define TX_PORT_TRICORE_CSA_INITIAL_UPPER_PCXI           (1UL << IFX_CPU_PCXI_PIE_OFF)
+#define TX_PORT_TRICORE_CSA_INITIAL_LOWER_PCXI           ((1UL << TX_PORT_TRICORE_PCXI_UL_OFF) | (1UL << TX_PORT_TRICORE_PCXI_PIE_OFF))
+#define TX_PORT_TRICORE_CSA_INITIAL_UPPER_PCXI           (1UL << TX_PORT_TRICORE_PCXI_PIE_OFF)
 
 #define TX_PORT_TRICORE_STACK_ALIGNMENT                  8U
 
