@@ -99,12 +99,14 @@ typedef char module_elf32_symbol_table_entry_size_check[
 
 /* Decode raw file bytes explicitly; do not cast file data to a
    host structure, because host endianness and alignment may differ.  */
+/* Decode a 16-bit little-endian ELF field. Version: 6.5.2.  */
 static uint16_t module_elf32_read_u16_le(const uint8_t *bytes)
 {
 
     return((uint16_t)((uint16_t)bytes[0] | ((uint16_t)bytes[1] << 8)));
 }
 
+/* Decode a 32-bit little-endian ELF field. Version: 6.5.2.  */
 static uint32_t module_elf32_read_u32_le(const uint8_t *bytes)
 {
 
@@ -114,6 +116,7 @@ static uint32_t module_elf32_read_u32_le(const uint8_t *bytes)
            ((uint32_t)bytes[3] << 24));
 }
 
+/* Validate and decode an ELF32 little-endian file header. Version: 6.5.2.  */
 static int module_elf32_decode_header(const uint8_t *bytes,
                                       size_t bytes_size,
                                       ELF_HEADER *header)
@@ -171,6 +174,7 @@ static int module_elf32_decode_header(const uint8_t *bytes,
     return(0);
 }
 
+/* Decode one ELF32 section-header record from raw bytes. Version: 6.5.2.  */
 static int module_elf32_decode_section_header(const uint8_t *bytes,
                                              size_t bytes_size,
                                              ELF_SECTION_HEADER *header)

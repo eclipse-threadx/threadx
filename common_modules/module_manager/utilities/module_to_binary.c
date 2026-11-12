@@ -63,6 +63,8 @@ CODE_SECTION_ENTRY		*code_section_array;
 
 /* Define helper functions.  */
 
+/* Read a byte range from the input ELF file after checking its bounds.
+   Version: 6.5.2.  */
 int elf_object_read(unsigned long offset, void *object_address, size_t object_size)
 {
 
@@ -130,6 +132,7 @@ unsigned long   remaining_bytes;
    tolerate being called with resources that were never acquired. The areas it
    releases are the file scope pointers declared above.  */
 
+/* Close converter files and release allocated ELF buffers. Version: 6.5.2.  */
 static void converter_cleanup(void)
 {
 
@@ -167,6 +170,7 @@ static void converter_cleanup(void)
 }
 
 
+/* Convert an ELF32 module into a binary file. Version: 6.5.2.  */
 int main(int argc, char* argv[])
 {
 
