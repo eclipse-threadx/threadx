@@ -1,0 +1,62 @@
+Test interrupt dispatch and timer jitter for the TC375 Lite Kit.
+
+The regression tests run their interrupt code from test_interrupt_dispatch(),
+which the timer interrupt of the example calls before _tx_timer_interrupt(),
+as test/tx/cmake does for the Linux port.
+
+Several tests loop until the timer interrupt arrives in a short window of the
+loop. Without caches, the loop and the timer can stay in phase, and the
+interrupt never arrives in that window. Each compare is therefore offset by a
+pseudo-random 0 to 255 STM ticks; the mean tick period stays unchanged.
+
+--- a/ports/tricore_tc1_6_2/gnu/example_build/tx_initialize_low_level.c
++++ b/ports/tricore_tc1_6_2/gnu/example_build/tx_initialize_low_level.c
+@@ -66,6 +66,7 @@
+ 
+ 
+ VOID    _tx_timer_interrupt(VOID);
++VOID    test_interrupt_dispatch(VOID);
+ 
+ #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+ VOID    _tx_execution_isr_enter(VOID);
+@@ -82,6 +83,11 @@
+ /* STM ticks per ThreadX timer tick.  */
+ static ULONG    timer_period;
+ 
++/* Pseudo-random offset of 0 to 255 STM ticks of the current compare. It
++   keeps the timer interrupt from staying in phase with a test loop.  */
++static ULONG    timer_jitter;
++static ULONG    timer_jitter_seed = 1U;
++
+ 
+ /* Sets (endinit = WDT_CON0_ENDINIT) or clears (endinit = 0) the ENDINIT bit
+    of the CPU0 watchdog. A password access unlocks CON0, the modify access
+@@ -148,6 +154,7 @@
+ 
+     ULONG   now;
+     ULONG   next;
++    ULONG   jitter;
+ 
+ #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
+     _tx_execution_isr_enter();
+@@ -160,14 +167,19 @@
+        next compare is one period from now and the ticks in between are lost.
+        Without this check, the next interrupt would occur only after the
+        32-bit timer wraps.  */
+-    next = STM0_CMP0 + timer_period;
++    timer_jitter_seed = (timer_jitter_seed * 1664525UL) + 1013904223UL;
++    jitter = timer_jitter_seed >> 24;
++    next = STM0_CMP0 - timer_jitter + timer_period + jitter;
+     now  = STM0_TIM0;
+     if ((LONG) (next - now) <= 0)
+     {
+         next = now + timer_period;
++        jitter = 0U;
+     }
++    timer_jitter = jitter;
+     STM0_CMP0 = next;
+ 
++    test_interrupt_dispatch();
+     _tx_timer_interrupt();
+ 
+ #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
