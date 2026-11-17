@@ -38,6 +38,18 @@
 #endif /* Check THREADX_MINOR_VERSION */
 
 
+#ifndef TEST_CONTROL_MEMORY_SIZE
+#define TEST_CONTROL_MEMORY_SIZE    0x60000
+#endif
+
+#ifndef TESTS_MEMORY_SIZE
+#define TESTS_MEMORY_SIZE           0x60000
+#endif
+
+#ifndef TEST_MEMORY_PLACEMENT
+#define TEST_MEMORY_PLACEMENT
+#endif
+
 #define TEST_STACK_SIZE         6144
 
 
@@ -118,8 +130,8 @@ UCHAR           *test_free_memory_ptr;
 VOID            (*test_isr_dispatch)(void);
 
 
-UCHAR           test_control_memory[0x60000];
-UCHAR           tests_memory[0x60000];
+UCHAR           test_control_memory[TEST_CONTROL_MEMORY_SIZE] TEST_MEMORY_PLACEMENT;
+UCHAR           tests_memory[TESTS_MEMORY_SIZE] TEST_MEMORY_PLACEMENT;
 
 /* Define the external reference for the preempt disable flag.  */
 

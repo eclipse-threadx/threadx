@@ -26,19 +26,11 @@ file(GLOB regression_test_cases ${SOURCE_DIR}/threadx_*.c)
 list(REMOVE_ITEM regression_test_cases
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
 
-# testcontrol.patch reduces the test memory to fit the RAM of the TC375.
-set(TESTCONTROL_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/testcontrol.c)
-add_custom_command(
-    OUTPUT ${TESTCONTROL_SOURCE}
-    COMMAND patch --quiet --output=${TESTCONTROL_SOURCE}
-            ${SOURCE_DIR}/testcontrol.c
-            ${CMAKE_CURRENT_LIST_DIR}/testcontrol.patch
-    DEPENDS ${SOURCE_DIR}/testcontrol.c
-            ${CMAKE_CURRENT_LIST_DIR}/testcontrol.patch
-    VERBATIM)
-# Cpu0_Main.c of the BSP starts the test control.
+# The default test memories do not fit the RAM of the TC375.
+set(TESTCONTROL_SOURCE ${SOURCE_DIR}/testcontrol.c)
 set_source_files_properties(${TESTCONTROL_SOURCE} PROPERTIES
-    COMPILE_DEFINITIONS main=tx_regression_main)
+    COMPILE_DEFINITIONS
+        "main=tx_regression_main;TEST_CONTROL_MEMORY_SIZE=0x6000;TESTS_MEMORY_SIZE=0x1C000;TEST_MEMORY_PLACEMENT=__attribute__((section(\".bss_cpu1\")))")
 
 set(WEAK_DEFAULTS_SOURCE ${CMAKE_CURRENT_LIST_DIR}/../../../../shared/regression/testcontrol_weak_defaults.c)
 

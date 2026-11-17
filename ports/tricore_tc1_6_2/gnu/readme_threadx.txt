@@ -32,6 +32,10 @@ In example_build, run:
 
    ./build_threadx_sample.sh
 
+or, on Windows:
+
+   build_threadx_sample.bat
+
 This builds tx.a and sample_threadx.elf for the TC375 Lite Kit from:
 
   sample_threadx.c           samples/demo_threadx.c with the event trace

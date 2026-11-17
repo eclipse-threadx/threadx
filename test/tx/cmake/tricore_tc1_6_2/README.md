@@ -8,9 +8,27 @@ one after the other. The test output goes to the UART of the Lite Kit.
 ## Requirements
 
 - AURIX TC375 Lite Kit (TC375TP)
-- AURIX GCC with `tricore-elf-gcc` on `PATH`
+- AURIX GCC with `tricore-elf-gcc` on `PATH` (see [Compiler](#compiler))
 - CMake 3.13 or later and Ninja
 - A terminal on the virtual COM port of the Lite Kit: 115200 baud
+
+## Compiler
+
+The tests ran with the following AURIX GCC for Linux x86-64:
+
+| Item         | Version                                                    |
+|--------------|------------------------------------------------------------|
+| Package      | AURIX GCC 03_2026 (`aurixgcc_03-2026_Linux_x86-x64`)       |
+| GCC          | 11.3.1 20221230 (AURIX(tm) GCC - Built 2026-03-19 10:12:22) |
+| Binutils     | 2.40.50.20230607                                           |
+| C library    | newlib 4.2.0                                               |
+| Start-up code| `lib/gcc/tricore-elf/11.3.1/crt0-tc38xx.o`                 |
+
+Infineon provides the AURIX GCC for download at
+<https://softwaretools.infineon.com/assets/com.ifx.tb.tool.aurixgcc>.
+`tricore-elf-gcc --version` prints the GCC version and the build date of the
+installed package. The download also offers a Windows package; `run.bat`
+builds with it, but the tests ran only with the Linux package.
 
 ## Build
 
@@ -18,6 +36,14 @@ one after the other. The test output goes to the UART of the Lite Kit.
 ./run.sh build                      # default_build
 ./run.sh build trace_build          # one or more configurations
 ./run.sh build all                  # every configuration
+```
+
+On Windows, `run.bat` takes the same arguments:
+
+```bat
+run.bat build
+run.bat build trace_build
+run.bat build all
 ```
 
 The configurations are those of `test/tx/cmake/CMakeLists.txt`:
@@ -52,8 +78,8 @@ The test runs on the example of the port in
 start-up code is `crt0-tc38xx.o` of the compiler, and the system runs from
 the back-up clock of 100 MHz. `bsp/` adds:
 
-- `tx_initialize_low_level.patch`, applied to a copy of the example's
-  `tx_initialize_low_level.c`, calls `test_interrupt_dispatch()` before
+- `tx_initialize_low_level.c`, a copy of the example's file whose timer
+  interrupt calls `test_interrupt_dispatch()` before
   `_tx_timer_interrupt()`, as `test/tx/cmake` does for the Linux port. It
   also offsets each timer compare by a pseudo-random 0 to 255 STM ticks.
   Without the offset, the timer can stay in phase with a test loop that
@@ -68,12 +94,12 @@ the back-up clock of 100 MHz. `bsp/` adds:
 
 The build further changes the regression suite:
 
-- `regression/testcontrol.patch`, applied to a copy of `testcontrol.c`, reduces
-  `test_control_memory` to 0x6000 bytes and `tests_memory` to 0x1C000 bytes
-  and places both in DSPR1 (`.bss_cpu1` of `bsp/regression.ld`). The original 0x60000 bytes each do
-  not fit the RAM of the TC375. The largest test uses about 94 KiB.
 - `testcontrol.c` is compiled with `EXTERNAL_EXIT` and with `main` renamed to
-  `tx_regression_main`.
+  `tx_regression_main`. `regression/CMakeLists.txt` sets
+  `TEST_CONTROL_MEMORY_SIZE` to 0x6000 bytes and `TESTS_MEMORY_SIZE` to
+  0x1C000 bytes, and `TEST_MEMORY_PLACEMENT` places both arrays in DSPR1
+  (`.bss_cpu1` of `bsp/regression.ld`). The default of 0x60000 bytes each
+  does not fit the RAM of the TC375. The largest test uses about 94 KiB.
 - `threadx_initialize_kernel_setup_test.c` is not built. It has its own `main`
   and is not part of `test_control_tests[]`.
 

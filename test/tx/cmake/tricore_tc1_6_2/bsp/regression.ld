@@ -13,9 +13,9 @@
 
 /* Test memory of the regression test in DSPR1 of the TC375. The file is given
    with -T after sample_threadx.ld of the example and augments the default
-   linker script of the AURIX GCC through INSERT. testcontrol.patch places
-   test_control_memory and tests_memory in the section .bss_cpu1; main()
-   clears it.  */
+   linker script of the AURIX GCC through INSERT. regression/CMakeLists.txt
+   places test_control_memory and tests_memory in the section .bss_cpu1;
+   main() clears it.  */
 
 MEMORY
 {
