@@ -1,0 +1,104 @@
+name: rh850_qemu
+
+on:
+  push:
+    branches: [ master, dev ]
+    paths:
+      - ".github/workflows/rh850_qemu.yml"
+      - "cmake/rh850_gnu.cmake"
+      - "cmake/v850-elf.cmake"
+      - "ports/rh850/**"
+      - "test/tx/cmake/rh850/**"
+      - "common/**"
+      - "test/tx/regression/**"
+      - "scripts/tx_ci_common.sh"
+  pull_request:
+    branches: [ master, dev ]
+    paths:
+      - ".github/workflows/rh850_qemu.yml"
+      - "cmake/rh850_gnu.cmake"
+      - "cmake/v850-elf.cmake"
+      - "ports/rh850/**"
+      - "test/tx/cmake/rh850/**"
+      - "common/**"
+      - "test/tx/regression/**"
+      - "scripts/tx_ci_common.sh"
+
+permissions:
+  contents: read
+
+jobs:
+  rh850_qemu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    env:
+      TOOLCHAIN_URL: https://github.com/linumiz/rh850-gcc-toolchain/releases/download/v1.2.0/v850-elf-toolchain-linux-x86_64.tar.gz
+      TOOLCHAIN_SHA256: a2194a060295008a2bd67db0e24c1cda8a795eba832b49b3f1d4cbb64cb242bd
+      QEMU_URL: https://github.com/linumiz/qemu-rh850/releases/download/rh850-v1.2.0/qemu-rh850-linux-x86_64.tar.gz
+      QEMU_SHA256: 1e1d3d5d3a365ec24047e9128b11df09fdfddb2b385aa4c77dc45253aa448f6b
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Install the RH850 toolchain and QEMU
+      run: |
+        set -eu
+        . scripts/tx_ci_common.sh
+        packages=""
+        command -v ninja >/dev/null 2>&1 || packages="$packages ninja-build"
+        dpkg -s libglib2.0-0t64 >/dev/null 2>&1 || packages="$packages libglib2.0-0t64"
+        if [ -n "$packages" ]; then
+          retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" update || true
+          # shellcheck disable=SC2086
+          retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" install -y --no-install-recommends $packages
+        fi
+        mkdir -p tools/v850-elf tools/qemu-rh850
+        cd tools
+        curl -fsSL -o v850-elf.tar.gz "$TOOLCHAIN_URL"
+        echo "$TOOLCHAIN_SHA256  v850-elf.tar.gz" | sha256sum -c -
+        tar -xzf v850-elf.tar.gz -C v850-elf
+        rm -f v850-elf.tar.gz
+        curl -fsSL -o qemu-rh850.tar.gz "$QEMU_URL"
+        echo "$QEMU_SHA256  qemu-rh850.tar.gz" | sha256sum -c -
+        tar -xzf qemu-rh850.tar.gz -C qemu-rh850
+        rm -f qemu-rh850.tar.gz
+        echo "$PWD/v850-elf/bin" >> "$GITHUB_PATH"
+        echo "$PWD/qemu-rh850/bin" >> "$GITHUB_PATH"
+        v850-elf/bin/v850-elf-gcc --version | head -1
+        qemu-rh850/bin/qemu-system-rh850 --version | head -1
+
+    - name: Build the library
+      run: |
+        set -eu
+        for float in hard soft; do
+          cmake -S . -B "build/lib-$float" -G Ninja \
+              -DCMAKE_TOOLCHAIN_FILE=cmake/rh850_gnu.cmake -DRH850_FLOAT="$float" \
+              -DCMAKE_C_FLAGS=-Werror -DCMAKE_ASM_FLAGS=-Werror
+          cmake --build "build/lib-$float"
+        done
+
+    - name: Run the example under QEMU
+      run: |
+        set -eu
+        for float in hard soft; do
+          cmake -S . -B "build/example-$float" -G Ninja \
+              -DCMAKE_TOOLCHAIN_FILE=cmake/rh850_gnu.cmake -DRH850_FLOAT="$float" \
+              -DCMAKE_BUILD_TYPE=Release -DTX_RH850_BUILD_QEMU_EXAMPLE=ON \
+              -DCMAKE_C_FLAGS=-Werror
+          cmake --build "build/example-$float"
+          ctest --test-dir "build/example-$float" --output-on-failure --no-tests=error
+        done
+
+    - name: Build the regression tests
+      run: |
+        set -eu
+        test/tx/cmake/rh850/run.sh hard build all
+        test/tx/cmake/rh850/run.sh soft build all
+
+    - name: Run the regression tests under QEMU
+      run: |
+        set -eu
+        test/tx/cmake/rh850/run.sh hard test all
+        test/tx/cmake/rh850/run.sh soft test all
