@@ -1,0 +1,176 @@
+name: erbium_simulator
+
+# Builds the RISC-V64 Erbium board example and regression tests, and EXECUTES
+# them on the et-platform functional simulator (erbium_emu).
+#
+# Why this exists: until this workflow was added, nothing in CI compiled the
+# Erbium port example or executed its tests. The example was added in #787
+# with two simulator regression tests covering bring-up interrupt races, but
+# without a workflow referencing it, any changes to the shared RISC-V64 port
+# files or the example itself could break silently.
+#
+# What it covers:
+#   - demo_threadx: the standard eight-thread ThreadX demo built for the
+#     Erbium board (RV64IMC, soft-float lp64 ABI, no C library) and run on
+#     erbium_emu, verifying UART initialization and thread execution;
+#   - test_uart_ticks: verifies that polling console writes do not lose
+#     ThreadX hardware timer ticks;
+#   - test_plic_race: verifies that concurrent PLIC enable-word updates
+#     between thread and timer ISR context do not lose updates.
+
+on:
+  push:
+    branches: [ master, dev ]
+    paths:
+      - ".github/workflows/erbium_simulator.yml"
+      - "CMakeLists.txt"
+      - "cmake/riscv64-unknown-elf.cmake"
+      - "common/**"
+      - "ports/risc-v64/**"
+      - "scripts/install_riscv.sh"
+      - "scripts/tx_ci_common.sh"
+  pull_request:
+    branches: [ master, dev ]
+    paths:
+      - ".github/workflows/erbium_simulator.yml"
+      - "CMakeLists.txt"
+      - "cmake/riscv64-unknown-elf.cmake"
+      - "common/**"
+      - "ports/risc-v64/**"
+      - "scripts/install_riscv.sh"
+      - "scripts/tx_ci_common.sh"
+
+permissions:
+  contents: read
+
+jobs:
+  erbium_simulator:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    env:
+      # Pinned toolchain release matching scripts/install_riscv.sh.
+      RISCV_GCC_VERSION: 2026.04.26
+      RV64_SHA256: 4a66a329653c9cfb869b826cae6d70c603bedcc1e13d419d3e3e92b99e0816b1
+
+      # Pinned et-platform simulator revision tested with the Erbium port.
+      ET_PLATFORM_REV: 836a4ab600e93c3059bb58c898edbc37744cd8d0
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Cache the RISC-V64 GNU toolchain
+      id: cache-riscv64
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: toolchain
+        key: riscv64-elf-${{ env.RISCV_GCC_VERSION }}-${{ env.RV64_SHA256 }}
+
+    - name: Install the RISC-V64 GNU toolchain
+      if: steps.cache-riscv64.outputs.cache-hit != 'true'
+      run: |
+        set -eu
+        base="https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/${RISCV_GCC_VERSION}"
+        archive="riscv64-elf-ubuntu-24.04-gcc.tar.xz"
+        mkdir -p toolchain
+        curl -fsSL --retry 3 -o "toolchain/$archive" "$base/$archive"
+        echo "${RV64_SHA256}  toolchain/$archive" | sha256sum -c -
+        tar xf "toolchain/$archive" -C toolchain
+        rm -f "toolchain/$archive"
+
+    - name: Ensure build dependencies are available
+      run: |
+        set -eu
+        . scripts/tx_ci_common.sh
+        packages="libgoogle-glog-dev liblz4-dev lz4"
+        command -v ninja >/dev/null 2>&1 || packages="$packages ninja-build"
+        retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" update || true
+        # shellcheck disable=SC2086
+        retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" install -y --no-install-recommends $packages
+
+    - name: Cache the Erbium simulator
+      id: cache-simulator
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: simulator
+        key: erbium-emu-${{ env.ET_PLATFORM_REV }}
+
+    - name: Build and install the Erbium simulator
+      if: steps.cache-simulator.outputs.cache-hit != 'true'
+      run: |
+        set -eu
+        mkdir -p et-platform-src
+        curl -fsSL --retry 3 "https://github.com/aifoundry-org/et-platform/archive/${ET_PLATFORM_REV}.tar.gz" | tar xz -C et-platform-src --strip-components=1
+        cd et-platform-src
+        cmake -S erbium-hal -B build-hal -DCMAKE_INSTALL_PREFIX="$PWD/install"
+        cmake --build build-hal --target install
+        cmake -S sw-sysemu -B build-emu -GNinja -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_CXX_FLAGS="-Wno-error=unused-result" \
+              -DCMAKE_PREFIX_PATH="$PWD/install"
+        cmake --build build-emu --target erbium_emu
+        mkdir -p "$GITHUB_WORKSPACE/simulator/bin"
+        if [ -f build-emu/bin/erbium_emu ]; then
+          cp build-emu/bin/erbium_emu "$GITHUB_WORKSPACE/simulator/bin/erbium_emu"
+        elif [ -f build-emu/erbium_emu ]; then
+          cp build-emu/erbium_emu "$GITHUB_WORKSPACE/simulator/bin/erbium_emu"
+        fi
+        chmod +x "$GITHUB_WORKSPACE/simulator/bin/erbium_emu"
+        cd "$GITHUB_WORKSPACE"
+        rm -rf et-platform-src
+
+    - name: Locate the Erbium simulator
+      id: simulator
+      run: |
+        set -eu
+        binary="$(find simulator -type f -name erbium_emu -perm -u+x | head -1)"
+        if [ -z "$binary" ]; then
+          echo "::error::The Erbium simulator build produced no erbium_emu binary."
+          exit 1
+        fi
+        binary="$(cd "$(dirname "$binary")" && pwd)/$(basename "$binary")"
+        echo "binary=$binary" >>"$GITHUB_OUTPUT"
+        "$binary" -help 2>&1 | head -5 || true
+
+    - name: Build and run the Erbium example
+      run: |
+        set -eu
+        export PATH="$GITHUB_WORKSPACE/toolchain/riscv/bin:$GITHUB_WORKSPACE/simulator/bin:$PATH"
+        riscv64-unknown-elf-gcc --version | head -1
+
+        emu='${{ steps.simulator.outputs.binary }}'
+        example_dir="ports/risc-v64/gnu/example_build/erbium"
+
+        echo "Building demo_threadx.elf..."
+        "$example_dir/build.sh"
+
+        echo "Executing demo_threadx.elf on erbium_emu..."
+        run_dir="$(mktemp -d)"
+        trap 'rm -rf "$run_dir"' EXIT
+
+        "$emu" -elf_load "$example_dir/build/demo_threadx.elf" \
+            -reset_pc 0x40000200 -minions 1 -single_thread -max_cycles 20000000 \
+            -uart_rx_file /dev/null -uart_tx_file "$run_dir/uart.log" > "$run_dir/run.log" 2>&1 || true
+
+        if ! grep -q -F "[UART0] : Erbium UART initialized" "$run_dir/uart.log"; then
+          echo "::error::demo_threadx did not initialize UART"
+          cat "$run_dir/uart.log"
+          exit 1
+        fi
+
+        if ! grep -q -F "thread_0_entry is here!" "$run_dir/uart.log"; then
+          echo "::error::demo_threadx did not schedule threads"
+          cat "$run_dir/uart.log"
+          exit 1
+        fi
+
+        echo "demo_threadx: PASS"
+
+    - name: Run simulator regression tests
+      run: |
+        set -eu
+        export PATH="$GITHUB_WORKSPACE/toolchain/riscv/bin:$GITHUB_WORKSPACE/simulator/bin:$PATH"
+        emu='${{ steps.simulator.outputs.binary }}'
+        example_dir="ports/risc-v64/gnu/example_build/erbium"
+
+        ERBIUM_EMU="$emu" "$example_dir/test/run_simulator_tests.sh"
