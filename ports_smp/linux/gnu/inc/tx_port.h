@@ -194,10 +194,6 @@ extern UINT             priority_change_extension_selection;
 /* Define extension macros for automated coverage tests.  */
 
 
-#define TX_PORT_SPECIFIC_MEMORY_SYNCHRONIZATION other_core_status =  other_core_status + _tx_thread_system_state[0]; \
-                                                _tx_thread_system_state[0] =  0;
-
-
 #define TX_BYTE_ALLOCATE_EXTENSION              if (threadx_byte_allocate_loop_test == ((TEST_FLAG) 1))         \
                                                 {                                                               \
                                                     pool_ptr -> tx_byte_pool_owner =  TX_NULL;                  \
