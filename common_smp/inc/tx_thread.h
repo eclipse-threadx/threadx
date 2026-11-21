@@ -643,20 +643,12 @@ UINT            first_bit_set;
 ULONG           local_priority_map;
 UINT            next_priority;
 
-    local_priority_map =  _tx_thread_priority_maps[0];
-    local_priority_map =  local_priority_map >> priority;
-    next_priority =  priority;
-    if (local_priority_map == ((ULONG) 0))
+    next_priority =  ((UINT) TX_MAX_PRIORITIES);
+    if (priority < ((UINT) TX_MAX_PRIORITIES))
     {
-        next_priority =  ((UINT) TX_MAX_PRIORITIES);
-    }
-    else
-    {
-        if (next_priority >= ((UINT) TX_MAX_PRIORITIES))
-        {
-            next_priority =  ((UINT) TX_MAX_PRIORITIES);
-        }
-        else
+        local_priority_map =  _tx_thread_priority_maps[0];
+        local_priority_map =  local_priority_map >> priority;
+        if (local_priority_map != ((ULONG) 0))
         {
             TX_LOWEST_SET_BIT_CALCULATE(local_priority_map, first_bit_set)
             next_priority =  priority + first_bit_set;
