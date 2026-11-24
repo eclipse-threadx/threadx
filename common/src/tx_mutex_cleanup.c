@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -393,9 +394,6 @@ TX_THREAD       *suspended_thread;
 TX_MUTEX        *next_mutex;
 UINT            inheritance_priority;
 UINT            new_priority;
-#ifdef TX_MISRA_ENABLE
-UINT            status;
-#endif
 
 
     /* Determine if there is more than one thread suspended on the mutex.  */
@@ -403,15 +401,8 @@ UINT            status;
     {
 
         /* Yes, prioritize the list so the highest priority thread is placed at the
-           front of the suspension list.  */
-#ifdef TX_MISRA_ENABLE
-        do
-        {
-            status =  _tx_mutex_prioritize(mutex_ptr);
-        } while (status != TX_SUCCESS);
-#else
-        _tx_mutex_prioritize(mutex_ptr);
-#endif
+           front of the suspension list. The call always returns TX_SUCCESS.  */
+        (VOID) _tx_mutex_prioritize(mutex_ptr);
     }
 
 #ifndef TX_NOT_INTERRUPTABLE
