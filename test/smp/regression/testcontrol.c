@@ -204,6 +204,7 @@ void    threadx_mutex_thread_terminate_application_define(void *);
 void    threadx_mutex_priority_inheritance_application_define(void *);
 void    threadx_mutex_nested_priority_inheritance_application_define(void *);
 void    threadx_mutex_prioritize_application_define(void *);
+void    threadx_mutex_inherit_wait_exit_application_define(void *);
 void    threadx_mutex_information_application_define(void *);
 
 void    threadx_queue_basic_application_define(void *);
@@ -351,6 +352,7 @@ TEST_ENTRY  test_control_tests[] =
     threadx_mutex_priority_inheritance_application_define,
     threadx_mutex_prioritize_application_define,
     threadx_mutex_nested_priority_inheritance_application_define,
+    threadx_mutex_inherit_wait_exit_application_define,
     threadx_mutex_information_application_define,
 
     threadx_queue_basic_application_define,
