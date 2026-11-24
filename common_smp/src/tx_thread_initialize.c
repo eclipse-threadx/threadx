@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -177,7 +178,7 @@ volatile UINT               _tx_thread_preempt_disable;
 
 VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
 /* Optional mutex inheritance update, installed by mutex creation. */
-VOID            (*_tx_thread_mutex_priority_update)(TX_MUTEX *mutex_ptr);
+UINT            (*_tx_thread_mutex_priority_update)(TX_THREAD *thread_ptr, UINT new_priority);
 
 
 /* Define the global build options variable.  This contains a bit map representing

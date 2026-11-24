@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -29,7 +30,6 @@
 #include "tx_api.h"
 #include "tx_trace.h"
 #include "tx_thread.h"
-#include "tx_mutex.h"
 
 
 /**************************************************************************/
@@ -83,9 +83,9 @@ UINT  _tx_thread_priority_change(TX_THREAD *thread_ptr, UINT new_priority, UINT 
 TX_INTERRUPT_SAVE_AREA
 
 TX_THREAD       *execute_ptr;
-TX_MUTEX        *mutex_ptr;
 UINT            core_index;
 UINT            original_priority;
+UINT            mutex_priority_updated;
 UINT            lowest_priority;
 TX_THREAD       *original_pt_thread;
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
@@ -114,35 +114,22 @@ UINT            status;
     /* Save the previous priority.  */
     *old_priority =  thread_ptr -> tx_thread_user_priority;
 
-    /* A base-priority change on an active mutex wait changes a dependency.
-       Require an active suspension before interpreting its control block. */
-    if ((thread_ptr -> tx_thread_state == TX_MUTEX_SUSP) &&
-        (thread_ptr -> tx_thread_suspend_cleanup != TX_NULL) &&
-        (_tx_thread_mutex_priority_update != TX_NULL))
+    /* Mutex creation installs the hook before a thread can wait on a mutex.  */
+    mutex_priority_updated =  TX_FALSE;
+    if (thread_ptr -> tx_thread_state == TX_MUTEX_SUSP)
     {
-        mutex_ptr =  TX_VOID_TO_MUTEX_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
-        if ((mutex_ptr != TX_NULL) && (mutex_ptr -> tx_mutex_id == TX_MUTEX_ID) &&
-            (mutex_ptr -> tx_mutex_inherit == TX_TRUE))
-        {
-            thread_ptr -> tx_thread_user_priority =  new_priority;
-            thread_ptr -> tx_thread_user_preempt_threshold =  new_priority;
-            if (thread_ptr -> tx_thread_inherit_priority < new_priority)
-            {
-                new_priority =  thread_ptr -> tx_thread_inherit_priority;
-            }
-            thread_ptr -> tx_thread_priority =  new_priority;
-            thread_ptr -> tx_thread_preempt_threshold =  new_priority;
-            _tx_thread_preempt_disable++;
-            (_tx_thread_mutex_priority_update)(mutex_ptr);
-            _tx_thread_preempt_disable--;
-            TX_RESTORE
-            _tx_thread_system_preempt_check();
-            return(TX_SUCCESS);
-        }
+        mutex_priority_updated =  (_tx_thread_mutex_priority_update)(thread_ptr, new_priority);
+    }
+
+    if (mutex_priority_updated == TX_TRUE)
+    {
+        TX_RESTORE
+        _tx_thread_system_preempt_check();
+        status =  TX_SUCCESS;
     }
 
     /* Determine if the new priority is the same as the last requested priority.  */
-    if ((thread_ptr -> tx_thread_user_priority == new_priority) &&
+    else if ((thread_ptr -> tx_thread_user_priority == new_priority) &&
         (thread_ptr -> tx_thread_user_preempt_threshold == new_priority))
     {
 

@@ -7,6 +7,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 /* This test checks priority inheritance through a chain of mutexes: owner 0 holds
    mutex 0 and waits on mutex 1, held by owner 1, and so on.  When a thread at 5 then
@@ -25,6 +26,11 @@
 
 #define OWNERS                  4
 
+#if defined(CTEST) && defined(TX_REGRESSION_TEST) && defined(TX_MUTEX_INHERIT_CHAIN_MAX) && \
+    (TX_MUTEX_INHERIT_CHAIN_MAX >= 1) && !defined(TX_NOT_INTERRUPTABLE)
+#define TEST_MUTEX_RELEASE_WINDOW
+#endif
+
 
 static TX_THREAD       control_thread;
 static TX_THREAD       waiter_thread;
@@ -42,6 +48,9 @@ static UINT            take_extra;
 static UINT            release_first;
 static volatile UINT   medium_ran;
 
+#ifdef TEST_MUTEX_RELEASE_WINDOW
+static volatile UINT   release_hook_ran;
+#endif
 
 
 /* Define thread prototypes.  */
@@ -358,8 +367,19 @@ static void    chain_with_cycle(UINT error)
         check(owner[0].tx_thread_priority == 20, error + 11);
         check(owner[1].tx_thread_priority == 20, error + 12);
     }
+    /* Delete one side of the cycle while the other side still owns its mutex.  */
+    check(tx_mutex_delete(&mutex[0]) == TX_SUCCESS, error + 15);
+    WAIT_UNTIL(owner[1].tx_thread_state == TX_SUSPENDED)
+    check(owner[1].tx_thread_state == TX_SUSPENDED, error + 16);
+    check(owner[1].tx_thread_suspend_status == TX_DELETED, error + 17);
+    check(owner[0].tx_thread_state == TX_MUTEX_SUSP, error + 18);
+    check(owner[0].tx_thread_priority == 25, error + 19);
+    check(owner[1].tx_thread_priority == 20, error + 21);
 #endif
     stop_threads(2);
+#if defined(TX_MUTEX_INHERIT_CHAIN_MAX) && TX_MUTEX_INHERIT_CHAIN_MAX >= 1
+    check(tx_mutex_create(&mutex[0], "inherit", TX_INHERIT) == TX_SUCCESS, error + 20);
+#endif
 }
 
 
@@ -527,17 +547,93 @@ static void delete_while_waiting(UINT error)
     owner_count = OWNERS;
 }
 
+#ifdef TEST_MUTEX_RELEASE_WINDOW
+
+/* Abort the upstream wait while the downstream owner is releasing its mutex.  */
+void  abort_all_threads_suspended_on_mutex(void)
+{
+
+    check(mutex[1].tx_mutex_ownership_count == 0, 350);
+    check(owner[0].tx_thread_state == TX_MUTEX_SUSP, 351);
+    check(owner[0].tx_thread_priority == 5, 352);
+    check(owner[1].tx_thread_priority == 5, 365);
+    check(tx_thread_wait_abort(&waiter_thread) == TX_SUCCESS, 353);
+    check(owner[0].tx_thread_priority == 20, 354);
+    check(owner[1].tx_thread_priority == 5, 366);
+    release_hook_ran =  TX_TRUE;
+}
+
+
+/* Release the downstream mutex once both waiters have joined its list.  */
+static void    release_owner_entry(ULONG input)
+{
+
+    (VOID) input;
+    check(tx_mutex_get(&mutex[1], TX_WAIT_FOREVER) == TX_SUCCESS, 355);
+    (VOID) tx_thread_suspend(&owner[1]);
+    threadx_mutex_suspension_put_test =  1;
+    check(tx_mutex_put(&mutex[1]) == TX_SUCCESS, 356);
+    (VOID) tx_thread_suspend(&owner[1]);
+}
+
+
+/* Add the second waiter needed to reach the release hook.  */
+static void    release_waiter_entry(ULONG input)
+{
+
+    (VOID) input;
+    (VOID) tx_mutex_get(&mutex[1], TX_WAIT_FOREVER);
+    (VOID) tx_thread_suspend(tx_thread_identify());
+}
+
+
+/* Stop propagation at a mutex being released and let the next owner take it.  */
+static void    abort_during_release(void)
+{
+
+    release_hook_ran =  TX_FALSE;
+    start_thread(&owner[1], release_owner_entry, 0, 1, 23);
+    WAIT_UNTIL(owner[1].tx_thread_state == TX_SUSPENDED)
+    check(owner[1].tx_thread_state == TX_SUSPENDED, 357);
+    start_thread(&owner[0], chain_owner_entry, 0, 0, 20);
+    WAIT_UNTIL(owner[0].tx_thread_state == TX_MUTEX_SUSP)
+    check(owner[0].tx_thread_state == TX_MUTEX_SUSP, 358);
+    start_thread(&owner[2], release_waiter_entry, 0, 2, 24);
+    WAIT_UNTIL(mutex[1].tx_mutex_suspended_count == 2)
+    check(mutex[1].tx_mutex_suspended_count == 2, 359);
+    start_waiter();
+
+    check(tx_thread_resume(&owner[1]) == TX_SUCCESS, 360);
+    WAIT_UNTIL((mutex[1].tx_mutex_owner == &owner[0]) && (waiter_status == TX_WAIT_ABORTED))
+    check(release_hook_ran == TX_TRUE, 361);
+    check(mutex[1].tx_mutex_owner == &owner[0], 362);
+    check(waiter_status == TX_WAIT_ABORTED, 363);
+    check(owner[1].tx_thread_priority == 23, 364);
+    check(owner[2].tx_thread_state == TX_MUTEX_SUSP, 367);
+
+    (VOID) tx_thread_terminate(&owner[2]);
+    (VOID) tx_thread_delete(&owner[2]);
+    stop_threads(2);
+}
+#endif
+
 /* A non-inheriting edge ends the path and preserves its FIFO list. */
 static void non_inheriting_edge(UINT error)
 {
+UINT    old;
+
     check(tx_mutex_delete(&mutex[1]) == TX_SUCCESS, error);
     check(tx_mutex_create(&mutex[1], "no inherit", TX_NO_INHERIT) == TX_SUCCESS, error + 1);
     start_owners(2);
     start_waiter();
     check(owner[0].tx_thread_priority == 5, error + 2);
     check(owner[1].tx_thread_priority == 23, error + 3);
+    check(tx_thread_priority_change(&owner[0], 19, &old) == TX_SUCCESS, error + 9);
+    check(old == 20, error + 10);
+    check(owner[0].tx_thread_priority == 5, error + 11);
+    check(owner[1].tx_thread_priority == 23, error + 12);
     check(tx_thread_wait_abort(&waiter_thread) == TX_SUCCESS, error + 4);
-    check(owner[0].tx_thread_priority == 20, error + 5);
+    check(owner[0].tx_thread_priority == 19, error + 5);
     check(owner[1].tx_thread_priority == 23, error + 6);
     stop_threads(2);
     check(tx_mutex_delete(&mutex[1]) == TX_SUCCESS, error + 7);
@@ -567,6 +663,9 @@ static void    control_thread_entry(ULONG thread_input)
     ownership_transfer(270);
     non_inheriting_edge(310);
     delete_while_waiting(330);
+#ifdef TEST_MUTEX_RELEASE_WINDOW
+    abort_during_release();
+#endif
 
     /* Successful test.  */
     printf("SUCCESS!\n");

@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -76,7 +77,9 @@ TX_INTERRUPT_SAVE_AREA
 
 TX_THREAD       *thread_ptr;
 TX_THREAD       *old_owner;
+#ifdef TX_ENABLE_EVENT_TRACE
 UINT            old_priority;
+#endif
 UINT            status;
 TX_MUTEX        *next_mutex;
 TX_MUTEX        *previous_mutex;
@@ -229,9 +232,8 @@ TX_THREAD       *suspended_thread;
                     if (status == TX_NOT_DONE)
                     {
 
-                        /* Initialize original owner and thread priority.  */
-                        old_owner =      TX_NULL;
-                        old_priority =   thread_ptr -> tx_thread_user_priority;
+                        /* Initialize original owner.  */
+                        old_owner =  TX_NULL;
 
                         /* Determine if priority inheritance is in effect and there are one or more
                            threads suspended on the mutex.  */
@@ -299,14 +301,8 @@ TX_THREAD       *suspended_thread;
                             /* Setup the highest priority waiting thread.  */
                             mutex_ptr -> tx_mutex_highest_priority_waiting =  (UINT) TX_MAX_PRIORITIES;
 
-                            if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
-                            {
-                                _tx_mutex_priority_chain(mutex_ptr -> tx_mutex_owner);
-                            }
-                            else if ((mutex_ptr -> tx_mutex_owner) -> tx_thread_priority != old_priority)
-                            {
-                                _tx_mutex_priority_change(mutex_ptr -> tx_mutex_owner, old_priority);
-                            }
+                            /* Only an inheriting mutex can reach this release path.  */
+                            _tx_mutex_priority_chain(mutex_ptr -> tx_mutex_owner);
 
                             /* Back off the preemption disable.  */
                             _tx_thread_preempt_disable--;

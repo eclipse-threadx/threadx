@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -322,6 +323,60 @@ UINT            map_index;
 
 
 
+/* Return the inheriting mutex of an active mutex suspension. A mutex being
+   deleted can still be referenced until its waiters are resumed.  */
+static TX_MUTEX  *_tx_mutex_inheriting_wait_mutex(TX_THREAD *thread_ptr)
+{
+
+TX_MUTEX        *mutex_ptr;
+
+
+    mutex_ptr =  TX_NULL;
+    if (thread_ptr -> tx_thread_suspend_cleanup == &(_tx_mutex_cleanup))
+    {
+        /* Mutex get installs the control block before publishing the suspension.  */
+        mutex_ptr =  TX_VOID_TO_MUTEX_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
+        if ((mutex_ptr -> tx_mutex_id != TX_MUTEX_ID) || (mutex_ptr -> tx_mutex_inherit != TX_TRUE))
+        {
+            mutex_ptr =  TX_NULL;
+        }
+    }
+
+    return(mutex_ptr);
+}
+
+
+/* Update the base priority and inheritance for a thread waiting on an
+   inheriting mutex. The caller holds interrupt or SMP protection.  */
+UINT  _tx_mutex_waiter_priority_change(TX_THREAD *thread_ptr, UINT new_priority)
+{
+
+TX_MUTEX        *mutex_ptr;
+UINT            handled;
+
+
+    handled =  TX_FALSE;
+    mutex_ptr =  _tx_mutex_inheriting_wait_mutex(thread_ptr);
+    if (mutex_ptr != TX_NULL)
+    {
+        thread_ptr -> tx_thread_user_priority =  new_priority;
+        thread_ptr -> tx_thread_user_preempt_threshold =  new_priority;
+        if (thread_ptr -> tx_thread_inherit_priority < new_priority)
+        {
+            new_priority =  thread_ptr -> tx_thread_inherit_priority;
+        }
+        thread_ptr -> tx_thread_priority =  new_priority;
+        thread_ptr -> tx_thread_preempt_threshold =  new_priority;
+        _tx_thread_preempt_disable++;
+        _tx_mutex_inherit_priority_update(mutex_ptr);
+        _tx_thread_preempt_disable--;
+        handled =  TX_TRUE;
+    }
+
+    return(handled);
+}
+
+
 /**************************************************************************/
 /*                                                                        */
 /*    _tx_mutex_inherit_priority_update                                   */
@@ -356,10 +411,8 @@ UINT            priority;
 
 #endif
 
-    if (mutex_ptr -> tx_mutex_owner != TX_NULL)
-    {
-        _tx_mutex_priority_chain(mutex_ptr -> tx_mutex_owner);
-    }
+    /* Waiters are linked only while the mutex has an owner.  */
+    _tx_mutex_priority_chain(mutex_ptr -> tx_mutex_owner);
 }
 
 
@@ -411,16 +464,12 @@ UINT            remaining;
     for (;;)
     {
         thread_ptr =  chain[count - ((UINT) 1)];
-        if ((thread_ptr -> tx_thread_state != TX_MUTEX_SUSP) ||
-            (thread_ptr -> tx_thread_suspend_cleanup != &(_tx_mutex_cleanup)))
+        if (thread_ptr -> tx_thread_state != TX_MUTEX_SUSP)
         {
             break;
         }
-        mutex_ptr =  TX_VOID_TO_MUTEX_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);
-        if ((mutex_ptr == TX_NULL) || (mutex_ptr -> tx_mutex_id != TX_MUTEX_ID) ||
-            (mutex_ptr -> tx_mutex_inherit != TX_TRUE) ||
-            (mutex_ptr -> tx_mutex_ownership_count == ((UINT) 0)) ||
-            (mutex_ptr -> tx_mutex_owner == TX_NULL))
+        mutex_ptr =  _tx_mutex_inheriting_wait_mutex(thread_ptr);
+        if ((mutex_ptr == TX_NULL) || (mutex_ptr -> tx_mutex_ownership_count == ((UINT) 0)))
         {
             break;
         }
