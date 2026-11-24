@@ -36,20 +36,20 @@
 /*    at MRC/MCR p15, 0, <Rt>, c9, c1, {0,1,2} and are laid out:          */
 /*                                                                        */
 /*      [31:13] BASEADDRESS   bits [31:13] of the TCM base address        */
-/*      [12:9]  RES0                                                     */
-/*      [8]     WAITSTATES    wait states for TCM accesses               */
-/*      [7]     RES0                                                     */
-/*      [6:2]   SIZE          size indicator, read-only in effect        */
-/*      [1]     ENABLEEL2     enable at EL2                              */
-/*      [0]     ENABLEEL10    enable at EL1 and EL0                      */
+/*      [12:9]  RES0                                                      */
+/*      [8]     WAITSTATES    wait states for TCM accesses                */
+/*      [7]     RES0                                                      */
+/*      [6:2]   SIZE          size indicator, read-only in effect         */
+/*      [1]     ENABLEEL2     enable at EL2                               */
+/*      [0]     ENABLEEL10    enable at EL1 and EL0                       */
 /*                                                                        */
-/*    ⚠ BASEADDRESS is [31:13], not [31:12].  IMP_PERIPHPREGIONR uses    */
-/*    [31:12] and inferring the same here would be wrong by one bit --   */
+/*    ⚠ BASEADDRESS is [31:13], not [31:12].  IMP_PERIPHPREGIONR uses     */
+/*    [31:12] and inferring the same here would be wrong by one bit --    */
 /*    the same class of mistake that made PRBAR silently drop XN.  The    */
-/*    base is therefore 8KB-aligned, not 4KB.                            */
+/*    base is therefore 8KB-aligned, not 4KB.                             */
 /*                                                                        */
-/*    SIZE encodings: 0 none, 4 8KB, 5 16KB, 6 32KB, 7 64KB, 8 128KB,    */
-/*    9 256KB, 10 512KB, 11 1MB.                                         */
+/*    SIZE encodings: 0 none, 4 8KB, 5 16KB, 6 32KB, 7 64KB, 8 128KB,     */
+/*    9 256KB, 10 512KB, 11 1MB.                                          */
 /*                                                                        */
 /*    "At reset all bits are 0 apart from SIZE and WAITSTATES", unless    */
 /*    CFGTCMBOOTx is high, which resets the ATCM enables to 1.  So a      */
@@ -60,7 +60,7 @@
 /*    IMP_MEMPROTCTLR is at p15, 1, <Rt>, c9, c1, 2 (TRM 3.3.76, table    */
 /*    3-114): RAMPROTIMP [4] says whether RAM protection exists at all,   */
 /*    RAMPROTEN [0] whether it is on, and RAMPROTEN is ignored when       */
-/*    RAMPROTIMP is 0.                                                   */
+/*    RAMPROTIMP is 0.                                                    */
 /*                                                                        */
 /*    S32Z2 reference manual: TCMA 64KB with 1 wait state, TCMB 16KB with */
 /*    0, TCMC 16KB with 1, per core.  Those give expected SIZE values of  */
@@ -78,7 +78,7 @@
 /*    The preload widths are not uniform: BTCM and CTCM take STR, STRD    */
 /*    or STM at 32-bit alignment, but ATCM needs STRD or STM at 64-bit    */
 /*    alignment.  A C loop storing 32-bit words would leave ATCM's check  */
-/*    bits invalid.                                                      */
+/*    bits invalid.                                                       */
 /*                                                                        */
 /**************************************************************************/
 
@@ -117,21 +117,21 @@ unsigned int tcm_ecc_enabled(void);
 /**************************************************************************/
 /*  ENABLING                                                              */
 /*                                                                        */
-/*    Constraints, all from Cortex-R52 TRM r1p3 section 6.2 and 3.3.94:    */
+/*    Constraints, all from Cortex-R52 TRM r1p3 section 6.2 and 3.3.94:   */
 /*                                                                        */
-/*    - The base address must be SIZE-ALIGNED, not merely 8KB-aligned as   */
+/*    - The base address must be SIZE-ALIGNED, not merely 8KB-aligned as  */
 /*      the BASEADDRESS field's width alone would suggest.                */
-/*    - A disabled TCM's base address is UNKNOWN, not zero, so every bank  */
-/*      must be programmed explicitly rather than adjusted from what it    */
+/*    - A disabled TCM's base address is UNKNOWN, not zero, so every bank */
+/*      must be programmed explicitly rather than adjusted from what it   */
 /*      appears to hold.                                                  */
-/*    - "Before using the TCM you must program MPU regions to cover the    */
-/*      TCM regions to give access."  An enabled TCM with no MPU region    */
+/*    - "Before using the TCM you must program MPU regions to cover the   */
+/*      TCM regions to give access."  An enabled TCM with no MPU region   */
 /*      still faults once the MPU is on.                                  */
-/*    - An enabled TCM always behaves as Non-cacheable Non-shareable       */
-/*      Normal memory whatever the MPU says; the MPU supplies only the     */
-/*      permissions.  So the MPU region's attribute index is irrelevant    */
+/*    - An enabled TCM always behaves as Non-cacheable Non-shareable      */
+/*      Normal memory whatever the MPU says; the MPU supplies only the    */
+/*      permissions.  So the MPU region's attribute index is irrelevant   */
 /*      here and its AP and XN bits are not.                              */
-/*    - With ECC on, every location must be written before it is read.     */
+/*    - With ECC on, every location must be written before it is read.    */
 /*                                                                        */
 /**************************************************************************/
 

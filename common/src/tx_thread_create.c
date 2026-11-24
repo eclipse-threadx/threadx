@@ -46,7 +46,7 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    This function creates a thread and places it on the list of created */
-/*    threads.                                                            */
+/*    threads. Stack alignment preserves the full port-defined address.   */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -130,12 +130,11 @@ ULONG                   stack_fill_value;
        overflow conditions during run-time.  */
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
 
-    /* Ensure the starting stack address is evenly aligned.  */
-#ifdef TX_MISRA_ENABLE
-    new_stack_start = TX_POINTER_TO_ULONG_CONVERT(stack_start);
-#else
-    new_stack_start =  TX_POINTER_TO_ALIGN_TYPE_CONVERT(stack_start);
-#endif /* TX_MISRA_ENABLE */
+    /* Ensure the starting stack address is evenly aligned. The port-defined
+       ALIGN_TYPE preserves all pointer bits, even when ULONG is narrower.
+       MISRA C:2012/2023 Rule 11.6 (C:2004 Rule 11.3) deviation: these
+       pointer/integer conversions are required for address alignment.  */
+    new_stack_start =  (ALIGN_TYPE) ((VOID *) stack_start);
     updated_stack_start =  (((new_stack_start) + ((sizeof(ULONG)) - ((ULONG) 1)) ) & (~((sizeof(ULONG)) - ((ULONG) 1))));
 
     /* Determine if the starting stack address is different.  */
@@ -147,11 +146,7 @@ ULONG                   stack_fill_value;
     }
 
     /* Update the starting stack pointer.  */
-#ifdef TX_MISRA_ENABLE
-    stack_start = TX_ULONG_TO_POINTER_CONVERT(updated_stack_start);
-#else
-    stack_start =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(updated_stack_start);
-#endif /* TX_MISRA_ENABLE */
+    stack_start =  (VOID *) ((ALIGN_TYPE) updated_stack_start);
 #endif
 
     /* Prepare the thread control block prior to placing it on the created

@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -94,6 +96,13 @@ ULONG                   _txm_module_manager_callback_total_count;
    structures have been exhausted.  */
 
 ULONG                   _txm_module_manager_callback_error_count;
+
+
+/* Define the name given to every module's callback request queue. A memory-protected
+   module can only name a queue it creates with a string inside the module, so a queue
+   carrying this pointer is one the module manager created.  */
+
+TX_NAME_CONST CHAR      _txm_module_manager_callback_request_queue_name[] = "Module Callback Request Queue";
 
 
 

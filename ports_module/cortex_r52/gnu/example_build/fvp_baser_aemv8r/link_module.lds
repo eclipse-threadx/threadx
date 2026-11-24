@@ -21,8 +21,8 @@
  * to be linked into low DRAM -- linking at 0x80000000 produces a silent fault
  * loop with no output.
  *
- * This is the AR1 link.lds with three differences, and each of them is a
- * requirement of the module port rather than a preference.
+ * This is the kernel example's link.lds with three differences, each of
+ * them a requirement of the module port rather than a preference.
  *
  *   1.  DRAM stops below a MODULE region.  A module's code and data are handed
  *       to it as MPU regions, and PMSAv8-R has no region priority: an access
@@ -30,8 +30,8 @@
  *       (TRM 8.1).  So module memory has to be memory no kernel region covers,
  *       and the only way to guarantee that is to end the kernel's data region
  *       where the module area begins.  __data_end__ below is ORIGIN(MODULE) for
- *       exactly that reason, not the "1 MB of heap past the image" the AR1
- *       script uses.
+ *       exactly that reason, not the "1 MB of heap past the image" the
+ *       kernel example's script uses.
  *
  *   2.  .txm_user_entry sits between the code region and the data region, in a
  *       gap belonging to neither.  It holds the module's gateway into the

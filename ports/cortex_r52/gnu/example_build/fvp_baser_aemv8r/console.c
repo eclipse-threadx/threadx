@@ -32,9 +32,9 @@
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
-/*    Directive 4.3 (assembly language shall be encapsulated and isolated)*/
-/*      -- observed rather than violated: the single asm statement lives  */
-/*      in semihost_call() and nowhere else in the port.                  */
+/*    Directive 4.3 (assembly language shall be encapsulated and          */
+/*      isolated) -- observed rather than violated: the single asm        */
+/*      statement lives in semihost_call() and nowhere else in the port.  */
 /*    Rule 1.1 / 1.2 (language extensions)                                */
 /*      -- register-asm bindings and inline assembly are unavoidable to   */
 /*      invoke a semihosting trap; no standard C construct expresses it.  */
@@ -98,7 +98,7 @@ void console_puts(const char *string_ptr)
 #ifdef TX_R52_CONSOLE_PL011
 
     /* Initialise on first use rather than from board_init, so that images
-       with no ThreadX initialisation path (the M1 boot check) also get a
+       with no ThreadX initialisation path (the boot check) also get a
        working UART console.  */
 
     static unsigned int initialised = 0U;

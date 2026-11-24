@@ -31,10 +31,11 @@
 /*    parameters rather than assumed:                                     */
 /*                                                                        */
 /*      has-two-security-states=0  single security state, so GICD_CTLR.DS */
-/*                                 reads 1 and the Group 1 enable is bit 1*/
-/*      ARE-fixed-to-one=1         affinity routing cannot be turned off  */
-/*      priority-bits=5            only the top 5 priority bits exist, so */
-/*                                 priorities must be multiples of 8      */
+/*                                 reads 1 and the Group 1 enable is bit  */
+/*      1 ARE-fixed-to-one=1         affinity routing cannot be turned    */
+/*      off priority-bits=5            only the top 5 priority bits       */
+/*                                 exist, so priorities must be multiples */
+/*                                 of 8                                   */
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
@@ -225,9 +226,9 @@ void gicv3_enable_ppi(unsigned int intid, unsigned int priority)
 /**************************************************************************/
 /*  gicv3_enable_sgi                                                      */
 /*                                                                        */
-/*  An SGI lives in the same redistributor frame as a PPI, so this is      */
-/*  gicv3_enable_ppi without the ICFGR step: INTIDs 0-15 have no           */
-/*  configurable edge/level, they are always edge-triggered.               */
+/*  An SGI lives in the same redistributor frame as a PPI, so this is     */
+/*  gicv3_enable_ppi without the ICFGR step: INTIDs 0-15 have no          */
+/*  configurable edge/level, they are always edge-triggered.              */
 /**************************************************************************/
 
 void gicv3_enable_sgi(unsigned int intid, unsigned int priority)
@@ -251,15 +252,15 @@ void gicv3_enable_sgi(unsigned int intid, unsigned int priority)
 /**************************************************************************/
 /*  gicv3_send_sgi                                                        */
 /*                                                                        */
-/*  ICC_SGI1R is 64-bit, so in AArch32 it is an MCRR rather than an MCR.   */
-/*  Fields: INTID in [27:24], TargetList in [15:0], Aff1/2/3 and IRM zero  */
-/*  for this single-core configuration, so TargetList = 1 selects core 0.  */
+/*  ICC_SGI1R is 64-bit, so in AArch32 it is an MCRR rather than an MCR.  */
+/*  Fields: INTID in [27:24], TargetList in [15:0], Aff1/2/3 and IRM zero */
+/*  for this single-core configuration, so TargetList = 1 selects core 0. */
 /*                                                                        */
-/*  The AArch64 name for this register is S3_0_C12_C11_5, which the        */
-/*  Cortex-A72 example uses, but that encoding does not transcribe to the  */
-/*  AArch32 64-bit CP15 space.  The CRm here was confirmed by observing    */
-/*  that the SGI is actually delivered and acknowledged with the expected  */
-/*  INTID rather than by reading it off the A-profile alias.               */
+/*  The AArch64 name for this register is S3_0_C12_C11_5, which the       */
+/*  Cortex-A72 example uses, but that encoding does not transcribe to the */
+/*  AArch32 64-bit CP15 space.  The CRm here was confirmed by observing   */
+/*  that the SGI is actually delivered and acknowledged with the expected */
+/*  INTID rather than by reading it off the A-profile alias.              */
 /**************************************************************************/
 
 void gicv3_send_sgi(unsigned int intid)
@@ -273,11 +274,11 @@ void gicv3_send_sgi(unsigned int intid)
 
 
 /**************************************************************************/
-/*  gicv3_enable_sgi_group0                                                */
+/*  gicv3_enable_sgi_group0                                               */
 /*                                                                        */
-/*  As gicv3_enable_sgi, but leaves the interrupt in Group 0 so it arrives  */
-/*  as an FIQ.  The group is chosen by clearing the GICR_IGROUPR0 bit; the  */
-/*  Group 1 version sets it.                                              */
+/*  As gicv3_enable_sgi, but leaves the interrupt in Group 0 so it        */
+/*  arrives as an FIQ.  The group is chosen by clearing the GICR_IGROUPR0 */
+/*  bit; the Group 1 version sets it.                                     */
 /**************************************************************************/
 
 void gicv3_enable_sgi_group0(unsigned int intid, unsigned int priority)
@@ -299,11 +300,12 @@ void gicv3_enable_sgi_group0(unsigned int intid, unsigned int priority)
 
 
 /**************************************************************************/
-/*  gicv3_send_sgi_group0                                                  */
+/*  gicv3_send_sgi_group0                                                 */
 /*                                                                        */
-/*  ICC_SGI0R rather than ICC_SGI1R: the two differ only in opc1, 2 against */
-/*  0, and each raises the SGI into its own group.  Raising a Group 0       */
-/*  interrupt through the Group 1 register does not deliver it as an FIQ.   */
+/*  ICC_SGI0R rather than ICC_SGI1R: the two differ only in opc1, 2       */
+/*  against 0, and each raises the SGI into its own group.  Raising a     */
+/*  Group 0 interrupt through the Group 1 register does not deliver it as */
+/*  an FIQ.                                                               */
 /**************************************************************************/
 
 void gicv3_send_sgi_group0(unsigned int intid)
@@ -317,11 +319,12 @@ void gicv3_send_sgi_group0(unsigned int intid)
 
 
 /**************************************************************************/
-/*  gicv3_acknowledge_group0 / gicv3_end_of_interrupt_group0               */
+/*  gicv3_acknowledge_group0 / gicv3_end_of_interrupt_group0              */
 /*                                                                        */
-/*  Group 0 has its own pair at c12, c8, where Group 1 uses c12, c12.       */
-/*  Acknowledging a Group 0 interrupt through IAR1 returns the spurious     */
-/*  INTID and leaves the interrupt pending, which presents as an FIQ storm. */
+/*  Group 0 has its own pair at c12, c8, where Group 1 uses c12, c12.     */
+/*  Acknowledging a Group 0 interrupt through IAR1 returns the spurious   */
+/*  INTID and leaves the interrupt pending, which presents as an FIQ      */
+/*  storm.                                                                */
 /**************************************************************************/
 
 unsigned long gicv3_acknowledge_group0(void)

@@ -26,7 +26,7 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    Per-thread memory protection.  See thread_mpu.h for what this is    */
-/*    and is not.                                                        */
+/*    and is not.                                                         */
 /*                                                                        */
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
@@ -159,22 +159,22 @@ unsigned long thread_mpu_grant(TX_THREAD *thread_ptr, unsigned int window)
 /**************************************************************************/
 /*  Activation.                                                           */
 /*                                                                        */
-/*  Called explicitly by a thread rather than from the scheduler, and that */
-/*  is a deliberate limitation of this step rather than the intended       */
-/*  design.                                                              */
+/*  Called explicitly by a thread rather than from the scheduler, and     */
+/*  that is a deliberate limitation of this step rather than the intended */
+/*  design.                                                               */
 /*                                                                        */
-/*  The port's scheduler does call _tx_execution_thread_enter under        */
-/*  TX_ENABLE_EXECUTION_CHANGE_NOTIFY, which would make this automatic on  */
-/*  every switch.  That macro is read by the port assembly compiled into   */
-/*  the shared threadx library, so enabling it would oblige all nine       */
-/*  example targets in this port -- including the FVP ones -- to supply    */
-/*  the four execution hooks.  A ThreadX module port carries its own       */
-/*  copies of the port assembly for exactly this reason, and that is where */
-/*  the switch belongs.                                                   */
+/*  The port's scheduler does call _tx_execution_thread_enter under       */
+/*  TX_ENABLE_EXECUTION_CHANGE_NOTIFY, which would make this automatic on */
+/*  every switch.  That macro is read by the port assembly compiled into  */
+/*  the shared threadx library, so enabling it would oblige all nine      */
+/*  example targets in this port -- including the FVP ones -- to supply   */
+/*  the four execution hooks.  A ThreadX module port carries its own      */
+/*  copies of the port assembly for exactly this reason, and that is      */
+/*  where the switch belongs.                                             */
 /*                                                                        */
-/*  What this step establishes without that machinery: that a PMSAv8-R     */
-/*  region can be reprogrammed per thread on this part, what it costs, and */
-/*  that a violation faults.  Those are the questions worth answering      */
+/*  What this step establishes without that machinery: that a PMSAv8-R    */
+/*  region can be reprogrammed per thread on this part, what it costs,    */
+/*  and that a violation faults.  Those are the questions worth answering */
 /*  before writing a module manager on top of them.                       */
 /**************************************************************************/
 

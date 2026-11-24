@@ -71,8 +71,8 @@ $_txm_module_manager_thread_stack_build:
 @/*                                                                        */
 @/*  FUNCTION                                               RELEASE        */
 @/*                                                                        */
-@/*    _txm_module_manager_thread_stack_build                           Cortex-R52/GNU     */
-@/*                                                           6.5.2        */
+@/*    _txm_module_manager_thread_stack_build                              */
+@/*                                                           Cortex-R52/GNU 6.5.2*/
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    Frédéric Desbiens, Eclipse Foundation                               */

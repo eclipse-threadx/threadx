@@ -25,26 +25,26 @@
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
 @/*                                                                        */
-@/*    The privilege boundary.  A board's supervisor call vector branches    */
+@/*    The privilege boundary.  A board's supervisor call vector branches  */
 @/*    here.                                                               */
 @/*                                                                        */
-@/*    SVC 1 raises a module thread out of User mode and onto its kernel     */
-@/*    stack; SVC 2 puts it back.  Both are only reachable from the two      */
-@/*    exact instructions inside _txm_module_manager_user_mode_entry, and    */
-@/*    that check is what makes the boundary a boundary.  Without it a       */
-@/*    module could execute SVC 1 from anywhere in its own code and come     */
-@/*    back privileged, which is every protection in this port gone at       */
+@/*    SVC 1 raises a module thread out of User mode and onto its kernel   */
+@/*    stack; SVC 2 puts it back.  Both are only reachable from the two    */
+@/*    exact instructions inside _txm_module_manager_user_mode_entry, and  */
+@/*    that check is what makes the boundary a boundary.  Without it a     */
+@/*    module could execute SVC 1 from anywhere in its own code and come   */
+@/*    back privileged, which is every protection in this port gone at     */
 @/*    once.                                                               */
 @/*                                                                        */
-@/*    The two stacks are the other half of it.  A module's own stack is in  */
-@/*    memory the module can write, so the kernel must not run on it: a      */
-@/*    module could otherwise corrupt kernel state by scribbling on what it  */
-@/*    believes is its own stack.  SVC 1 therefore switches to a kernel      */
-@/*    stack the module cannot reach, and SVC 2 switches back.               */
+@/*    The two stacks are the other half of it.  A module's own stack is   */
+@/*    in memory the module can write, so the kernel must not run on it: a */
+@/*    module could otherwise corrupt kernel state by scribbling on what   */
+@/*    it believes is its own stack.  SVC 1 therefore switches to a kernel */
+@/*    stack the module cannot reach, and SVC 2 switches back.             */
 @/*                                                                        */
-@/*    Any other SVC number stops.  This core's base port does not use SVC   */
-@/*    at all -- its vector treats one as a fault -- so there is no third    */
-@/*    caller to accommodate and nothing legitimate to fall through to.      */
+@/*    Any other SVC number stops.  This core's base port does not use SVC */
+@/*    at all -- its vector treats one as a fault -- so there is no third  */
+@/*    caller to accommodate and nothing legitimate to fall through to.    */
 @/*                                                                        */
 @/**************************************************************************/
 

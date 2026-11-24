@@ -27,26 +27,26 @@
 /*                                                                        */
 /*    Nested IRQ handling on S32Z280 silicon.                             */
 /*                                                                        */
-/*    The FVP established that the nesting routines work and, more         */
-/*    usefully, what breaks them: the interrupt has to be acknowledged     */
-/*    before nesting starts, or the still-pending level-asserted timer is  */
-/*    retaken the moment IRQ is enabled and recurses until the stacks are  */
-/*    gone.  entry.S here has the same ordering for the same reason.       */
+/*    The FVP established that the nesting routines work and, more        */
+/*    usefully, what breaks them: the interrupt has to be acknowledged    */
+/*    before nesting starts, or the still-pending level-asserted timer is */
+/*    retaken the moment IRQ is enabled and recurses until the stacks are */
+/*    gone.  entry.S here has the same ordering for the same reason.      */
 /*                                                                        */
-/*    What the model could not answer is whether a real GIC-600 agrees.    */
-/*    Two things differ from a model and both are visible here:            */
+/*    What the model could not answer is whether a real GIC-600 agrees.   */
+/*    Two things differ from a model and both are visible here:           */
 /*                                                                        */
-/*      P1  how many priority bits the GIC implements.  Equal priorities   */
-/*          do not preempt, and it is the low bits that vanish, so if the  */
-/*          timer and the SGI collapse to the same value after truncation  */
-/*          nesting cannot happen at all.  board_init discovers the count  */
-/*          by write and readback rather than assuming the model's five,   */
-/*          and this demo reports it.                                      */
+/*      P1  how many priority bits the GIC implements.  Equal priorities  */
+/*          do not preempt, and it is the low bits that vanish, so if the */
+/*          timer and the SGI collapse to the same value after truncation */
+/*          nesting cannot happen at all.  board_init discovers the count */
+/*          by write and readback rather than assuming the model's five,  */
+/*          and this demo reports it.                                     */
 /*                                                                        */
-/*      P2  whether an SGI raised on real silicon is delivered at all.     */
-/*          ICC_SGI1R is a 64-bit AArch32 CP15 register and its encoding   */
-/*          does not transcribe from the AArch64 alias, so N1 tests SGI    */
-/*          delivery on its own before nesting is involved.                */
+/*      P2  whether an SGI raised on real silicon is delivered at all.    */
+/*          ICC_SGI1R is a 64-bit AArch32 CP15 register and its encoding  */
+/*          does not transcribe from the AArch64 alias, so N1 tests SGI   */
+/*          delivery on its own before nesting is involved.               */
 /*                                                                        */
 /**************************************************************************/
 

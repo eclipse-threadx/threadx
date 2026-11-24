@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -319,4 +320,3 @@ UINT        status;
     /* Restore interrupts.  */
     TX_RESTORE
 }
-

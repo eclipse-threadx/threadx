@@ -27,7 +27,7 @@
 /*                                                                        */
 /*    Lazy floating-point context save and restore on S32Z280 silicon.    */
 /*                                                                        */
-/*    This is the FVP's demo_m5.c test design, reporting over the         */
+/*    This is the FVP's demo_vfp.c test design, reporting over the        */
 /*    LINFlexD console instead of semihosting.  The design is kept        */
 /*    deliberately: the model established that the two halves of the VFP  */
 /*    context path need separate provocation, and silicon does not change */
@@ -59,7 +59,7 @@
 /*    software flag and never touches the hardware.  Without that, the    */
 /*    first D-register access after a switch takes an Undefined           */
 /*    Instruction exception -- which on this board was invisible until    */
-/*    SCTLR.TE was cleared.                                              */
+/*    SCTLR.TE was cleared.                                               */
 /*                                                                        */
 /**************************************************************************/
 

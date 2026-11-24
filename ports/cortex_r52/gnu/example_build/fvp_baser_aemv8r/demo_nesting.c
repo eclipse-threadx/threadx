@@ -28,39 +28,39 @@
 /*    Nested IRQ handling: _tx_thread_irq_nesting_start and               */
 /*    _tx_thread_irq_nesting_end.                                         */
 /*                                                                        */
-/*    Those two routines have shipped in this port since it was written    */
-/*    and nothing had ever called them.  They were compiled into every     */
-/*    build, never entered by any image, on the model or on silicon.       */
+/*    Those two routines have shipped in this port since it was written   */
+/*    and nothing had ever called them.  They were compiled into every    */
+/*    build, never entered by any image, on the model or on silicon.      */
 /*    This is the image that enters them.                                 */
 /*                                                                        */
 /*  HOW NESTING IS PROVOKED                                               */
 /*                                                                        */
-/*    Two interrupt sources are needed and one must outrank the other.     */
-/*    The generic timer PPI is already there; the second is an SGI, which  */
-/*    a core can raise on itself, given a numerically lower priority so    */
+/*    Two interrupt sources are needed and one must outrank the other.    */
+/*    The generic timer PPI is already there; the second is an SGI, which */
+/*    a core can raise on itself, given a numerically lower priority so   */
 /*    the GIC lets it preempt.                                            */
 /*                                                                        */
-/*    Inside the timer handler, after nesting_start has left IRQ mode for  */
-/*    System mode and re-enabled IRQ, board_irq_handler raises the SGI and */
-/*    spins briefly.  The SGI outranks the timer, so it is delivered       */
-/*    immediately and re-enters el1_irq_entry while the timer handler is    */
-/*    still on the stack.  That is nesting, and the depth counter sees 2.  */
+/*    Inside the timer handler, after nesting_start has left IRQ mode for */
+/*    System mode and re-enabled IRQ, board_irq_handler raises the SGI    */
+/*    and spins briefly.  The SGI outranks the timer, so it is delivered  */
+/*    immediately and re-enters el1_irq_entry while the timer handler is  */
+/*    still on the stack.  That is nesting, and the depth counter sees 2. */
 /*                                                                        */
-/*    The spin is bounded.  Without TX_ENABLE_IRQ_NESTING the SGI can      */
-/*    never arrive, and a test that hangs in that configuration would be   */
+/*    The spin is bounded.  Without TX_ENABLE_IRQ_NESTING the SGI can     */
+/*    never arrive, and a test that hangs in that configuration would be  */
 /*    worse than one that fails.                                          */
 /*                                                                        */
 /*  WHAT EACH CHECK IS FOR                                                */
 /*                                                                        */
-/*    N1  the SGI arrives at all.  This is separate on purpose: it tests   */
-/*        the ICC_SGI1R encoding, which does not transcribe from the       */
-/*        AArch64 alias, so if N1 fails the fault is in gicv3_send_sgi and */
-/*        not in the nesting routines.                                    */
-/*    N2  the SGI arrived while another handler was active, depth 2.       */
-/*    N3  depth returned to zero, so the pairing unwound.                  */
-/*    N4  the tick still advances afterwards, so nesting did not damage    */
+/*    N1  the SGI arrives at all.  This is separate on purpose: it tests  */
+/*        the ICC_SGI1R encoding, which does not transcribe from the      */
+/*        AArch64 alias, so if N1 fails the fault is in gicv3_send_sgi    */
+/*        and not in the nesting routines.                                */
+/*    N2  the SGI arrived while another handler was active, depth 2.      */
+/*    N3  depth returned to zero, so the pairing unwound.                 */
+/*    N4  the tick still advances afterwards, so nesting did not damage   */
 /*        the timer path.                                                 */
-/*    N5  threads still run and preempt, so the context save and restore   */
+/*    N5  threads still run and preempt, so the context save and restore  */
 /*        survived being re-entered.                                      */
 /*                                                                        */
 /**************************************************************************/

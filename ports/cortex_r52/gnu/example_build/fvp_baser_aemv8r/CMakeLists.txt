@@ -27,7 +27,7 @@ set(R52_CONSOLE_SOURCES
     ${FVP_DIR}/mpu.c
 )
 
-# AR1/M1 -- boot check.  Verifies the EL2 configuration, the drop to EL1 and
+# Boot check.  Verifies the EL2 configuration, the drop to EL1 and
 # the EL2 HVC seam.  Standalone by design: it does not link ThreadX, so a
 # failure here is unambiguously a boot problem rather than a kernel problem.
 add_executable(boot_check.elf EXCLUDE_FROM_ALL
@@ -45,62 +45,62 @@ target_link_options(boot_check.elf PRIVATE
     ${R52_LINK_QUIET_RWX}
 )
 
-# AR1/M2 -- cooperative two-thread demo.  Links ThreadX and exercises the
+# Cooperative two-thread demo.  Links ThreadX and exercises the
 # ported context-switch assembly with no interrupts and no timer tick.
-add_executable(demo_m2.elf EXCLUDE_FROM_ALL
+add_executable(demo_coop.elf EXCLUDE_FROM_ALL
     ${FVP_DIR}/entry.S
     ${R52_CONSOLE_SOURCES}
     ${FVP_DIR}/tx_initialize_low_level.S
-    ${FVP_DIR}/demo_m2.c
+    ${FVP_DIR}/demo_coop.c
 )
 
-target_link_libraries(demo_m2.elf PRIVATE threadx)
+target_link_libraries(demo_coop.elf PRIVATE threadx)
 
-target_include_directories(demo_m2.elf PRIVATE
+target_include_directories(demo_coop.elf PRIVATE
     ${FVP_DIR}
     ${CMAKE_SOURCE_DIR}/common/inc
     ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
 )
 
-target_link_options(demo_m2.elf PRIVATE
+target_link_options(demo_coop.elf PRIVATE
     -T${FVP_DIR}/link.lds
     -nostartfiles
-    -Wl,-Map=demo_m2.map
+    -Wl,-Map=demo_coop.map
     ${R52_LINK_QUIET_RWX}
 )
 
-# AR1/M3 -- periodic tick and preemptive scheduling.  Adds GICv3, the generic
+# Periodic tick and preemptive scheduling.  Adds GICv3, the generic
 # timer and the ThreadX IRQ path.  TX_R52_USE_THREADX_IRQ routes the EL1 IRQ
 # vector into _tx_thread_context_save and has _tx_initialize_low_level bring up
 # the interrupt controller; images without it keep the fault reporter.
-add_executable(demo_m3.elf EXCLUDE_FROM_ALL
+add_executable(demo_tick.elf EXCLUDE_FROM_ALL
     ${FVP_DIR}/entry.S
     ${R52_CONSOLE_SOURCES}
     ${FVP_DIR}/gicv3.c
     ${FVP_DIR}/timer.c
     ${FVP_DIR}/irq_dispatch.c
     ${FVP_DIR}/tx_initialize_low_level.S
-    ${FVP_DIR}/demo_m3.c
+    ${FVP_DIR}/demo_tick.c
 )
 
-target_compile_definitions(demo_m3.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+target_compile_definitions(demo_tick.elf PRIVATE TX_R52_USE_THREADX_IRQ)
 
-target_link_libraries(demo_m3.elf PRIVATE threadx)
+target_link_libraries(demo_tick.elf PRIVATE threadx)
 
-target_include_directories(demo_m3.elf PRIVATE
+target_include_directories(demo_tick.elf PRIVATE
     ${FVP_DIR}
     ${CMAKE_SOURCE_DIR}/common/inc
     ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
 )
 
-target_link_options(demo_m3.elf PRIVATE
+target_link_options(demo_tick.elf PRIVATE
     -T${FVP_DIR}/link.lds
     -nostartfiles
-    -Wl,-Map=demo_m3.map
+    -Wl,-Map=demo_tick.map
     ${R52_LINK_QUIET_RWX}
 )
 
-# AR1/M4 -- the standard eight-thread ThreadX demo.  demo_threadx.c is the
+# The standard eight-thread ThreadX demo.  demo_threadx.c is the
 # shipped sample kept byte-identical apart from its header note and one call
 # into the verification harness, which lives in demo_verify.c.
 add_executable(demo_threadx.elf EXCLUDE_FROM_ALL
@@ -163,39 +163,39 @@ target_link_options(demo_clz.elf PRIVATE
     ${R52_LINK_QUIET_RWX}
 )
 
-# AR1/M5 -- lazy VFP context save and restore.  Only meaningful when the
+# Lazy VFP context save and restore.  Only meaningful when the
 # library was built with TX_R52_ENABLE_VFP and a floating-point ABI, so the
 # target exists only in that configuration.
 if(TX_R52_ENABLE_VFP)
-    add_executable(demo_m5.elf EXCLUDE_FROM_ALL
+    add_executable(demo_vfp.elf EXCLUDE_FROM_ALL
         ${FVP_DIR}/entry.S
         ${R52_CONSOLE_SOURCES}
         ${FVP_DIR}/gicv3.c
         ${FVP_DIR}/timer.c
         ${FVP_DIR}/irq_dispatch.c
         ${FVP_DIR}/tx_initialize_low_level.S
-        ${FVP_DIR}/demo_m5.c
+        ${FVP_DIR}/demo_vfp.c
     )
 
-    target_compile_definitions(demo_m5.elf PRIVATE TX_R52_USE_THREADX_IRQ)
+    target_compile_definitions(demo_vfp.elf PRIVATE TX_R52_USE_THREADX_IRQ)
 
-    target_link_libraries(demo_m5.elf PRIVATE threadx)
+    target_link_libraries(demo_vfp.elf PRIVATE threadx)
 
-    target_include_directories(demo_m5.elf PRIVATE
+    target_include_directories(demo_vfp.elf PRIVATE
         ${FVP_DIR}
         ${CMAKE_SOURCE_DIR}/common/inc
         ${CMAKE_SOURCE_DIR}/ports/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/inc
     )
 
-    target_link_options(demo_m5.elf PRIVATE
+    target_link_options(demo_vfp.elf PRIVATE
         -T${FVP_DIR}/link.lds
         -nostartfiles
-        -Wl,-Map=demo_m5.map
+        -Wl,-Map=demo_vfp.map
         ${R52_LINK_QUIET_RWX}
     )
 endif()
 
-# AR1/M5 -- PMSAv8-R protection and caches.  Verifies enforcement, so it needs
+# PMSAv8-R protection and caches.  Verifies enforcement, so it needs
 # the recoverable data-abort path in entry.S (TX_R52_MPU_FAULT_TEST) and the
 # protection itself (TX_R52_ENABLE_MPU), independently of the global option.
 add_executable(demo_mpu.elf EXCLUDE_FROM_ALL
@@ -233,7 +233,7 @@ target_link_options(demo_mpu.elf PRIVATE
 # because _tx_thread_irq_nesting_start only re-enables IRQ usefully when
 # tx_port.h agrees the configuration supports it, and entry.S only emits the
 # start/end pairing under the same macro.  The image therefore exists in that
-# configuration only, as demo_m5.elf does for VFP.
+# configuration only, as demo_vfp.elf does for VFP.
 if(TX_R52_ENABLE_IRQ_NESTING)
     add_executable(demo_nesting.elf EXCLUDE_FROM_ALL
         ${FVP_DIR}/entry.S
@@ -296,7 +296,7 @@ if(TX_R52_ENABLE_FIQ_NESTING)
 endif()
 
 # Every image built here, in the order they should be exercised.
-set(R52_IMAGES boot_check.elf demo_m2.elf demo_m3.elf demo_threadx.elf demo_mpu.elf
+set(R52_IMAGES boot_check.elf demo_coop.elf demo_tick.elf demo_threadx.elf demo_mpu.elf
                demo_clz.elf)
 
 # The linker script is passed with -T, which CMake does not treat as a
@@ -306,7 +306,7 @@ foreach(image IN LISTS R52_IMAGES)
     set_target_properties(${image} PROPERTIES LINK_DEPENDS ${FVP_DIR}/link.lds)
 endforeach()
 if(TX_R52_ENABLE_VFP)
-    list(APPEND R52_IMAGES demo_m5.elf)
+    list(APPEND R52_IMAGES demo_vfp.elf)
 endif()
 if(TX_R52_ENABLE_IRQ_NESTING)
     list(APPEND R52_IMAGES demo_nesting.elf)
@@ -340,7 +340,7 @@ endif()
 # ThreadX modules: the module manager, with a sample module linked into the
 # module area and loaded in place from there.
 #
-# This is the AR2 deliverable that the S32Z280 example cannot be: the silicon
+# This is what the S32Z280 example cannot be: the silicon
 # module demonstration is judged by a person reading a console through a debug
 # probe, and this one is judged by ctest.  The image below is the same port
 # under the same three passes, reporting one result line the runner matches.
@@ -597,7 +597,7 @@ if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
             ${CMAKE_SOURCE_DIR}/common_modules/inc
         )
 
-        # TX_R52_ENABLE_MPU is not optional for these images, unlike the AR1 demos
+        # TX_R52_ENABLE_MPU is not optional for these images, unlike the kernel demos
         # where it is a switch: without protection there is no module boundary to
         # test, and the manager's load window over the module area is programmed by
         # mpu_init.  TX_R52_USE_THREADX_IRQ brings up the tick, which the module
@@ -627,7 +627,7 @@ if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
 
     endfunction()
 
-    # AR2.  What the hardware does about a module that misbehaves.
+    # What the hardware does about a module that misbehaves.
 
     threadx_r52_add_module_image(fvp_module.elf
         ${MOD_FVP}/sample_threadx_module_manager.c)
@@ -666,20 +666,20 @@ if(FVP_BASER_AEMV8R)
     endfunction()
 
     threadx_r52_add_fvp_run(boot_check.elf run-boot-check-r52
-        "Running AR1/M1 boot check on FVP_BaseR_AEMv8R...")
-    threadx_r52_add_fvp_run(demo_m2.elf run-demo-m2-r52
-        "Running AR1/M2 cooperative switch demo on FVP_BaseR_AEMv8R...")
-    threadx_r52_add_fvp_run(demo_m3.elf run-demo-m3-r52
-        "Running AR1/M3 tick and preemption demo on FVP_BaseR_AEMv8R...")
+        "Running the boot check on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_coop.elf run-demo-coop-r52
+        "Running the cooperative switch demo on FVP_BaseR_AEMv8R...")
+    threadx_r52_add_fvp_run(demo_tick.elf run-demo-tick-r52
+        "Running the tick and preemption demo on FVP_BaseR_AEMv8R...")
     threadx_r52_add_fvp_run(demo_threadx.elf run-demo-threadx-r52
         "Running the standard ThreadX demo on FVP_BaseR_AEMv8R...")
     threadx_r52_add_fvp_run(demo_clz.elf run-demo-clz-r52
         "Running the CLZ lowest-set-bit regression on FVP_BaseR_AEMv8R...")
     if(TX_R52_BUILD_FVP_MODULE_EXAMPLE)
         threadx_r52_add_fvp_run(fvp_module.elf run-module-r52
-            "Running the AR2 module isolation example on FVP_BaseR_AEMv8R...")
+            "Running the module isolation example on FVP_BaseR_AEMv8R...")
         threadx_r52_add_fvp_run(fvp_module_properties.elf run-module-properties-r52
-            "Running the AR2 module property contract regression on FVP_BaseR_AEMv8R...")
+            "Running the module property contract regression on FVP_BaseR_AEMv8R...")
     endif()
 
     # Automated checks.  The runner judges each image by its self-reported
@@ -691,7 +691,7 @@ if(FVP_BASER_AEMV8R)
         set(R52_RUNNER ${FVP_DIR}/test/run_fvp_test.py)
         set(R52_TEST_IMAGES ${R52_IMAGES})
 
-        # AR2.  Kept out of R52_IMAGES above rather than added to it, because
+        # Module images.  Kept out of R52_IMAGES above rather than added to it, because
         # that list is what the TX_R52_ENABLE_MPU and TX_R52_CONSOLE_PL011
         # options are applied to and neither is optional for this image: the
         # module boundary IS the MPU, and the result line has to reach the

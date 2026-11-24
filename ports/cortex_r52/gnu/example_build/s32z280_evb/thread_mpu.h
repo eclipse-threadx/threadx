@@ -27,21 +27,21 @@
 /*                                                                        */
 /*    Per-thread memory protection for the NXP S32Z280-594EVB.            */
 /*                                                                        */
-/*    One MPU region is reprogrammed on every thread entry to grant the    */
-/*    incoming thread access to its own window and nothing else.  A thread */
-/*    with no window registered runs with that region disabled, so it      */
-/*    reaches none of them.                                               */
+/*    One MPU region is reprogrammed on every thread entry to grant the   */
+/*    incoming thread access to its own window and nothing else.  A       */
+/*    thread with no window registered runs with that region disabled, so */
+/*    it reaches none of them.                                            */
 /*                                                                        */
-/*    This is a step towards a ThreadX module port for this core, not a    */
-/*    substitute for one.  It demonstrates that PMSAv8-R regions can be    */
-/*    switched per thread on this part, at a measured cost, and that a     */
-/*    violation faults -- which are the questions worth answering before   */
-/*    building a module manager on top of them.  There is no user mode, no */
-/*    syscall boundary and no loader here.                                */
+/*    This is a step towards a ThreadX module port for this core, not a   */
+/*    substitute for one.  It demonstrates that PMSAv8-R regions can be   */
+/*    switched per thread on this part, at a measured cost, and that a    */
+/*    violation faults -- which are the questions worth answering before  */
+/*    building a module manager on top of them.  There is no user mode,   */
+/*    no syscall boundary and no loader here.                             */
 /*                                                                        */
-/*    The hook is _tx_execution_thread_enter, which the port's scheduler   */
-/*    already calls under TX_ENABLE_EXECUTION_CHANGE_NOTIFY, after the     */
-/*    stack pointer has been switched.  No port assembly is modified.      */
+/*    The hook is _tx_execution_thread_enter, which the port's scheduler  */
+/*    already calls under TX_ENABLE_EXECUTION_CHANGE_NOTIFY, after the    */
+/*    stack pointer has been switched.  No port assembly is modified.     */
 /*                                                                        */
 /**************************************************************************/
 

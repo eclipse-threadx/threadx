@@ -1,3 +1,15 @@
+##############################################################################
+# Copyright (c) 2026 Eclipse ThreadX contributors
+#
+# This program and the accompanying materials are made available under the
+# terms of the MIT License which is available at
+# https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: MIT
+##############################################################################
+
+# Portions of this file were generated with AI assistance.
+
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 cmake_policy(SET CMP0054 NEW)
 cmake_policy(SET CMP0057 NEW)
@@ -57,6 +69,12 @@ add_compile_definitions(
   TEST_STACK_SIZE_PRINTF=4096
   ${${CMAKE_BUILD_TYPE}})
 
+# The Windows simulators keep simulated time on the host clock by default. The
+# suite runs them at five ticks per millisecond so long timeouts finish quickly.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+  add_compile_definitions(TX_TIMER_PERIODIC=1 TX_WIN32_TICKS_PER_INTERRUPT=5)
+endif()
+
 if(MSVC)
   add_compile_options(/W3 /Zi)
   add_link_options(/DEBUG /INCREMENTAL:NO)
@@ -97,8 +115,10 @@ endif()
 
 # Host tests for the Module Manager. Listed after thread_transition for the reason
 # given above it: additions here are appended rather than inserted, so that branches
-# adding a directory of their own merge cleanly.
-if(NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
+# adding a directory of their own merge cleanly. They compile the module ports'
+# headers, which accept only IAR, AC5 and GNU-compatible compilers, so MSVC builds
+# skip them.
+if(NOT MSVC AND NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
   add_subdirectory(module_manager)
 endif()
 
@@ -146,4 +166,17 @@ else()
             -Wlogical-op
             -Waggregate-return
             -Wfloat-equal)
+endif()
+
+# Preserve native32 host coverage and also exercise the Linux pointer-width
+# mismatch with a native64 kernel, including MISRA plus stack checking.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND THREADX_ARCH STREQUAL "linux" AND
+   THREADX_TOOLCHAIN STREQUAL "gnu" AND
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+  add_subdirectory(thread_stack_alignment)
+endif()
+
+# Port-level tests for the Windows simulators.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+  add_subdirectory(windows_port)
 endif()

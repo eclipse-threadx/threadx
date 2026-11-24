@@ -42,12 +42,12 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_interrupt_control_test.c
     ${SOURCE_DIR}/threadx_mutex_basic_test.c
     ${SOURCE_DIR}/threadx_mutex_delete_test.c
+    ${SOURCE_DIR}/threadx_mutex_inherit_wait_exit_test.c
     ${SOURCE_DIR}/threadx_mutex_information_test.c
     ${SOURCE_DIR}/threadx_mutex_nested_priority_inheritance_test.c
     ${SOURCE_DIR}/threadx_mutex_no_preemption_test.c
     ${SOURCE_DIR}/threadx_mutex_preemption_test.c
     ${SOURCE_DIR}/threadx_mutex_inherit_chain_test.c
-    ${SOURCE_DIR}/threadx_mutex_inherit_wait_exit_test.c
     ${SOURCE_DIR}/threadx_mutex_priority_inheritance_test.c
     ${SOURCE_DIR}/threadx_mutex_proritize_test.c
     ${SOURCE_DIR}/threadx_mutex_suspension_timeout_test.c

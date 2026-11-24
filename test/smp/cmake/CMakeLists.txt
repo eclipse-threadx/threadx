@@ -107,3 +107,8 @@ else()
             -Waggregate-return
             -Wfloat-equal)
 endif()
+
+# Port-level tests for the Windows simulator.
+if(THREADX_ARCH STREQUAL "win64")
+  add_subdirectory(windows_port)
+endif()

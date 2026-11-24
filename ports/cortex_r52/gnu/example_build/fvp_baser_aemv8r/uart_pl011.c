@@ -30,9 +30,9 @@
 /*                                                                        */
 /*    Semihosting remains the default because it needs no peripheral at   */
 /*    all, which keeps early bring-up independent of the memory map.  The */
-/*    UART matters because it is what real silicon will use: exercising it*/
-/*    here means the S32Z280 console differs only in its base address and */
-/*    clocking, not in structure.                                         */
+/*    UART matters because it is what real silicon will use: exercising   */
+/*    it here means the S32Z280 console differs only in its base address  */
+/*    and clocking, not in structure.                                     */
 /*                                                                        */
 /*    The model leaves UART0 disabled at reset                            */
 /*    (bp.pl011_uart0.uart_enable=0), so the control register must be     */

@@ -7,6 +7,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 /* This test checks that a priority-inheritance mutex owner gives up an inherited
    priority when the thread it inherited it from stops waiting without obtaining the
@@ -32,8 +33,10 @@ static TX_THREAD       waiter[WAITERS];
 static CHAR            *thread_stack[WAITERS + 1];
 static TX_MUTEX        mutex_0;
 static TX_MUTEX        mutex_1;
+static TX_MUTEX        plain_mutex;
 static ULONG           waiter_wait_option;
 static volatile UINT   waiter_status;
+static volatile UINT   run_sequence;
 
 
 /* Define thread prototypes.  */
@@ -77,6 +80,7 @@ UINT    i;
 
     status +=  tx_mutex_create(&mutex_0, "mutex 0", TX_INHERIT);
     status +=  tx_mutex_create(&mutex_1, "mutex 1", TX_INHERIT);
+    status +=  tx_mutex_create(&plain_mutex, "plain mutex", TX_NO_INHERIT);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -215,6 +219,95 @@ UINT                i;
 }
 
 
+/* These threads share core 0 in the SMP regression configuration.  The waiter
+   must run first after its wait is aborted, followed by the medium-priority
+   thread, while the owner remains ready and still holds the mutex.  */
+
+static void    ready_waiter_entry(ULONG thread_input)
+{
+
+    check(tx_mutex_get(&mutex_0, TX_WAIT_FOREVER) == TX_WAIT_ABORTED, 55);
+    check(owner_thread.tx_thread_priority == 15, 56);
+    check(owner_thread.tx_thread_state == TX_READY, 57);
+    check(run_sequence == 0, 58);
+    run_sequence =  1;
+    tx_thread_suspend(tx_thread_identify());
+}
+
+
+static void    medium_thread_entry(ULONG thread_input)
+{
+
+    check(owner_thread.tx_thread_priority == 15, 59);
+    check(owner_thread.tx_thread_state == TX_READY, 60);
+    check(mutex_0.tx_mutex_owner == &owner_thread, 61);
+    check(run_sequence == 1, 62);
+    run_sequence =  2;
+    tx_thread_suspend(tx_thread_identify());
+}
+
+
+/* Wait on the mutex that does not contribute to the owner's priority.  */
+static void    plain_waiter_entry(ULONG thread_input)
+{
+
+    (VOID) thread_input;
+    (VOID) tx_mutex_get(&plain_mutex, TX_WAIT_FOREVER);
+}
+
+
+static void    ready_owner_entry(ULONG thread_input)
+{
+
+    check(tx_mutex_get(&mutex_0, TX_WAIT_FOREVER) == TX_SUCCESS, 50);
+    check(tx_mutex_get(&plain_mutex, TX_WAIT_FOREVER) == TX_SUCCESS, 68);
+
+    /* A higher priority waiter on the plain mutex must not raise the owner.  */
+    start_thread(&waiter[2], plain_waiter_entry, 0, 2, 3);
+    check(waiter[2].tx_thread_state == TX_MUTEX_SUSP, 69);
+    check(owner_thread.tx_thread_priority == 15, 70);
+
+    /* The waiter preempts the owner, blocks, and raises the owner from 15 to 5.
+       A thread at 10 then becomes ready but cannot preempt the owner yet.  */
+    start_thread(&waiter[0], ready_waiter_entry, 0, 0, 5);
+    check(waiter[0].tx_thread_state == TX_MUTEX_SUSP, 51);
+    check(owner_thread.tx_thread_priority == 5, 52);
+    start_thread(&waiter[1], medium_thread_entry, 0, 1, 10);
+    check(waiter[1].tx_thread_state == TX_READY, 53);
+    check(run_sequence == 0, 54);
+
+    /* Restoring the owner's priority must let both threads run before this
+       call returns, without releasing the mutex or suspending the owner.  */
+    check(tx_thread_wait_abort(&waiter[0]) == TX_SUCCESS, 63);
+    check(run_sequence == 2, 64);
+    check(owner_thread.tx_thread_priority == 15, 65);
+    check(mutex_0.tx_mutex_highest_priority_waiting == TX_MAX_PRIORITIES, 66);
+    check(plain_mutex.tx_mutex_owner == &owner_thread, 71);
+    check(waiter[2].tx_thread_state == TX_MUTEX_SUSP, 72);
+    run_sequence =  3;
+    tx_thread_resume(&control_thread);
+}
+
+
+static void    ready_owner_waiter_aborted(void)
+{
+
+    run_sequence =  0;
+    start_thread(&owner_thread, ready_owner_entry, 0, WAITERS, 15);
+    tx_thread_suspend(&control_thread);
+    check(run_sequence == 3, 67);
+
+    tx_thread_terminate(&waiter[0]);
+    tx_thread_delete(&waiter[0]);
+    tx_thread_terminate(&waiter[1]);
+    tx_thread_delete(&waiter[1]);
+    tx_thread_terminate(&waiter[2]);
+    tx_thread_delete(&waiter[2]);
+    tx_thread_terminate(&owner_thread);
+    tx_thread_delete(&owner_thread);
+}
+
+
 static void    control_thread_entry(ULONG thread_input)
 {
 
@@ -225,6 +318,7 @@ static void    control_thread_entry(ULONG thread_input)
     single_waiter_leaves(1, 20);
     single_waiter_leaves(2, 30);
     waiters_leave_in_turn(40);
+    ready_owner_waiter_aborted();
 
     /* Successful test.  */
     printf("SUCCESS!\n");
