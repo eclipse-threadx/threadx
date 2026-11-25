@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -41,20 +42,6 @@
 /*    directly use native C data types.  Instead, ThreadX creates its     */
 /*    own special types that can be mapped to actual data types by this   */
 /*    file to guarantee consistency in the interface and functionality.   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  04-02-2021      Bhupendra Naphade       Modified comment(s),updated   */
-/*                                            macro definition,           */
-/*                                            resulting in version 6.1.6  */
-/*  04-25-2022      Zhen Kong               Updated comments,             */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Updated comments, removed     */
-/*                                            unneeded temp variable,     */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -320,7 +307,7 @@ void    tx_thread_vfp_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX ARMv7-A Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX ARMv7-A Version 6.5.2.202603b *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

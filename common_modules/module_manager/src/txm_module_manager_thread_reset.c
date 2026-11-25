@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -60,12 +63,6 @@
 /*                                                                        */
 /*    _txm_module_manager_kernel_dispatch   Kernel dispatch function      */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_thread_reset(TX_THREAD *thread_ptr)
 {
@@ -110,6 +107,20 @@ TXM_MODULE_THREAD_ENTRY_INFO    *thread_entry_info;
                 /* Thread not completed or terminated - return an error!  */
                 status =  TX_NOT_DONE;
             }
+        }
+
+        /* Resetting a thread means rebuilding its stack around a module's shell entry
+           function, so the thread has to be one a module manager created.  A thread the
+           application created carries no module instance, and the fields this function
+           goes on to read from it -- the shell entry function it builds the new stack
+           frame around -- would be read through a null pointer in privileged mode.  A
+           module can name such a thread: any thread the system created can be found by
+           name, and one that has run to completion satisfies the state test above.  */
+        if (thread_ptr -> tx_thread_module_instance_ptr == TX_NULL)
+        {
+
+            /* Not a module thread, so there is nothing here to reset.  */
+            status =  TX_NOT_DONE;
         }
     }
 

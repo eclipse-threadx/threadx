@@ -1,4 +1,4 @@
-                     Microsoft's Azure RTOS ThreadX for Cortex-R4 
+                     Microsoft's Azure RTOS ThreadX for Cortex-R4
 
                                Thumb & 32-bit Mode
 
@@ -6,12 +6,12 @@
 
 1. Import the ThreadX Projects
 
-In order to build the ThreadX library and the ThreadX demonstration, first move 
-the project folders into your DS workspace directory. The project folders are 
-named 'tx' and 'sample_threadx' and are located in the installation directory. 
+In order to build the ThreadX library and the ThreadX demonstration, first move
+the project folders into your DS workspace directory. The project folders are
+named 'tx' and 'sample_threadx' and are located in the installation directory.
 
 Now that the projects are in the workspace directory, import them into DS by
-doing the following for each project: 
+doing the following for each project:
 
     1. Click 'File -> Import -> Existing Projects into Workspace'
     2. Set the root directory the project i.e. the 'tx' or 'sample_threadx' directory
@@ -23,8 +23,8 @@ This is expected, so please do so.
 
 2.  Building the ThreadX run-time Library
 
-Building the ThreadX library is easy; simply right-click the Eclipse project 
-"tx" and then select the "Build Project" button. You should now observe the compilation 
+Building the ThreadX library is easy; simply right-click the Eclipse project
+"tx" and then select the "Build Project" button. You should now observe the compilation
 and assembly of the ThreadX library. This project build produces the ThreadX
 library file tx.a.
 
@@ -34,41 +34,41 @@ library file tx.a.
 The ThreadX demonstration is designed to execute under the DS-5 debugger on the
 VE_Cortex-R4 Bare Metal simulator.
 
-Building the demonstration is easy; simply right-click the Eclipse project 
-"sample_threadx" and then select the "Build Project" button. You should now observe 
-the compilation and assembly of the ThreadX demonstration. This project build produces 
-the ThreadX library file sample_threadx.axf. Next, expand the demo ThreadX project folder 
+Building the demonstration is easy; simply right-click the Eclipse project
+"sample_threadx" and then select the "Build Project" button. You should now observe
+the compilation and assembly of the ThreadX demonstration. This project build produces
+the ThreadX library file sample_threadx.axf. Next, expand the demo ThreadX project folder
 in the Project Explorer window, right-click on the 'cortex-r4_tx.launch' file, click
 'Debug As', and then click 'cortex-r4_tx' from the submenu. This will cause the
-debugger to load the sample_threadx.axf ELF file and run to main. You are now ready 
+debugger to load the sample_threadx.axf ELF file and run to main. You are now ready
 to execute the ThreadX demonstration.
 
 
 4.  System Initialization
 
-The entry point in ThreadX for the Cortex-R4 using ARM tools is at label 
-"Vectors". This is defined within startup.S in the sample_threadx project. In addition, 
-this is where all static and global pre-set C variable initialization processing 
+The entry point in ThreadX for the Cortex-R4 using ARM tools is at label
+"Vectors". This is defined within startup.S in the sample_threadx project. In addition,
+this is where all static and global pre-set C variable initialization processing
 takes place.
 
-The ThreadX tx_initialize_low_level.s file is responsible for determining the 
-first available RAM address for use by the application, which is supplied as the 
+The ThreadX tx_initialize_low_level.s file is responsible for determining the
+first available RAM address for use by the application, which is supplied as the
 sole input parameter to your application definition function, tx_application_define.
 
 
 5.  Register Usage and Stack Frames
 
-The ARM compiler assumes that registers r0-r3 (a1-a4) and r12 (ip) are scratch 
-registers for each function. All other registers used by a C function must 
-be preserved by the function. ThreadX takes advantage of this in situations 
-where a context switch happens as a result of making a ThreadX service call 
-(which is itself a C function). In such cases, the saved context of a thread 
+The ARM compiler assumes that registers r0-r3 (a1-a4) and r12 (ip) are scratch
+registers for each function. All other registers used by a C function must
+be preserved by the function. ThreadX takes advantage of this in situations
+where a context switch happens as a result of making a ThreadX service call
+(which is itself a C function). In such cases, the saved context of a thread
 is only the non-scratch registers.
 
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
 All suspended threads have one of these two types of stack frames. The top
-of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the 
+of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the
 associated thread control block TX_THREAD.
 
 
@@ -86,39 +86,39 @@ associated thread control block TX_THREAD.
      0x20                   r6  (v3)                    r10 (v7)
      0x24                   r7  (v4)                    r11 (fp)
      0x28                   r8  (v5)                    r14 (lr)
-     0x2C                   r9  (v6)                        
-     0x30                   r10 (v7)                        
-     0x34                   r11 (fp)                        
-     0x38                   r12 (ip)                         
+     0x2C                   r9  (v6)
+     0x30                   r10 (v7)
+     0x34                   r11 (fp)
+     0x38                   r12 (ip)
      0x3C                   r14 (lr)
-     0x40                   PC 
+     0x40                   PC
 
 
 6.  Improving Performance
 
-The distribution version of ThreadX is built without any compiler 
-optimizations. This makes it easy to debug because you can trace or set 
-breakpoints inside of ThreadX itself. Of course, this costs some 
-performance. To make it run faster, you can change the build_threadx.bat file to 
-remove the -g option and enable all compiler optimizations. 
+The distribution version of ThreadX is built without any compiler
+optimizations. This makes it easy to debug because you can trace or set
+breakpoints inside of ThreadX itself. Of course, this costs some
+performance. To make it run faster, you can change the build_threadx.bat file to
+remove the -g option and enable all compiler optimizations.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined.
 
 
 7.  Interrupt Handling
 
 ThreadX provides complete and high-performance interrupt handling for Cortex-R4
-targets. There are a certain set of requirements that are defined in the 
+targets. There are a certain set of requirements that are defined in the
 following sub-sections:
 
 
 7.1  Vector Area
 
 The Cortex-R4 vectors start at address zero. The demonstration system startup.S
-file contains the vectors and is loaded at address zero. On actual hardware platforms, 
-this area might have to be copied to address 0. 
+file contains the vectors and is loaded at address zero. On actual hardware platforms,
+this area might have to be copied to address 0.
 
 
 7.2  IRQ ISRs
@@ -129,8 +129,8 @@ IRQ interrupts. The following sub-sections define the IRQ capabilities.
 
 7.2.1 Standard IRQ ISRs
 
-The standard ARM IRQ mechanism has a single interrupt vector at address 0x18. This IRQ 
-interrupt is managed by the __tx_irq_handler code in tx_initialize_low_level. The following 
+The standard ARM IRQ mechanism has a single interrupt vector at address 0x18. This IRQ
+interrupt is managed by the __tx_irq_handler code in tx_initialize_low_level. The following
 is the default IRQ handler defined in tx_initialize_low_level.s:
 
     .global __tx_irq_handler
@@ -159,7 +159,7 @@ __tx_irq_handler:
 7.2.2 Vectored IRQ ISRs
 
 The vectored ARM ISR mechanism has multiple interrupt vectors at addresses specified
-by the particular implementation. The following is an example ISR handler defined in 
+by the particular implementation. The following is an example ISR handler defined in
 tx_initialize_low_level.s:
 
     .global __tx_example_vectored_irq_handler
@@ -200,18 +200,18 @@ IRQ support, the entire library should be built with TX_ENABLE_IRQ_NESTING
 defined. With this defined, two new IRQ interrupt management services are
 available, namely _tx_thread_irq_nesting_start and _tx_thread_irq_nesting_end.
 These function should be called between the IRQ context save and restore
-calls. 
+calls.
 
-Execution between the calls to _tx_thread_irq_nesting_start and 
-_tx_thread_irq_nesting_end is enabled for IRQ nesting. This is achieved 
+Execution between the calls to _tx_thread_irq_nesting_start and
+_tx_thread_irq_nesting_end is enabled for IRQ nesting. This is achieved
 by switching from IRQ mode to SYS mode and enabling IRQ interrupts.
-The SYS mode stack is used during the SYS mode operation, which was 
+The SYS mode stack is used during the SYS mode operation, which was
 setup in tx_initialize_low_level.s. When nested IRQ interrupts are no longer required,
 calling the _tx_thread_irq_nesting_end service disables nesting by disabling
-IRQ interrupts and switching back to IRQ mode in preparation for the IRQ 
+IRQ interrupts and switching back to IRQ mode in preparation for the IRQ
 context restore service.
 
-The following is an example of enabling IRQ nested interrupts in a standard 
+The following is an example of enabling IRQ nested interrupts in a standard
 IRQ handler:
 
     .global __tx_irq_handler
@@ -249,12 +249,12 @@ __tx_irq_processing_return:
 
 7.3  FIQ Interrupts
 
-By default, Cortex-R4 FIQ interrupts are left alone by ThreadX. Of course, this 
-means that the application is fully responsible for enabling the FIQ interrupt 
-and saving/restoring any registers used in the FIQ ISR processing. To globally 
-enable FIQ interrupts, the application should enable FIQ interrupts at the 
-beginning of each thread or before any threads are created in tx_application_define. 
-In addition, the application must ensure that no ThreadX service calls are made 
+By default, Cortex-R4 FIQ interrupts are left alone by ThreadX. Of course, this
+means that the application is fully responsible for enabling the FIQ interrupt
+and saving/restoring any registers used in the FIQ ISR processing. To globally
+enable FIQ interrupts, the application should enable FIQ interrupts at the
+beginning of each thread or before any threads are created in tx_application_define.
+In addition, the application must ensure that no ThreadX service calls are made
 from default FIQ ISRs, which is located in tx_initialize_low_level.s.
 
 
@@ -263,7 +263,7 @@ from default FIQ ISRs, which is located in tx_initialize_low_level.s.
 Full ThreadX management of FIQ interrupts is provided if the ThreadX sources
 are built with the TX_ENABLE_FIQ_SUPPORT defined. If the library is built
 this way, the FIQ interrupt handlers are very similar to the IRQ interrupt
-handlers defined previously. The following is default FIQ handler 
+handlers defined previously. The following is default FIQ handler
 defined in tx_initialize_low_level.s:
 
 
@@ -293,18 +293,18 @@ FIQ support, the entire library should be built with TX_ENABLE_FIQ_NESTING
 defined. With this defined, two new FIQ interrupt management services are
 available, namely _tx_thread_fiq_nesting_start and _tx_thread_fiq_nesting_end.
 These function should be called between the FIQ context save and restore
-calls. 
+calls.
 
-Execution between the calls to _tx_thread_fiq_nesting_start and 
-_tx_thread_fiq_nesting_end is enabled for FIQ nesting. This is achieved 
+Execution between the calls to _tx_thread_fiq_nesting_start and
+_tx_thread_fiq_nesting_end is enabled for FIQ nesting. This is achieved
 by switching from FIQ mode to SYS mode and enabling FIQ interrupts.
-The SYS mode stack is used during the SYS mode operation, which was 
+The SYS mode stack is used during the SYS mode operation, which was
 setup in tx_initialize_low_level.s. When nested FIQ interrupts are no longer required,
 calling the _tx_thread_fiq_nesting_end service disables nesting by disabling
-FIQ interrupts and switching back to FIQ mode in preparation for the FIQ 
+FIQ interrupts and switching back to FIQ mode in preparation for the FIQ
 context restore service.
 
-The following is an example of enabling FIQ nested interrupts in the 
+The following is an example of enabling FIQ nested interrupts in the
 typical FIQ handler:
 
 
@@ -322,7 +322,7 @@ __tx_fiq_processing_return:
        interrupt, and all C scratch registers are available for use.  */
 
     /* Enable nested FIQ interrupts. NOTE:  Since this service returns
-       with FIQ interrupts enabled, all FIQ interrupt sources must be 
+       with FIQ interrupts enabled, all FIQ interrupt sources must be
        cleared prior to calling this service.  */
     BL      _tx_thread_fiq_nesting_start
 
@@ -338,28 +338,28 @@ __tx_fiq_processing_return:
 
 8.  ThreadX Timer Interrupt
 
-ThreadX requires a periodic interrupt source to manage all time-slicing, 
-thread sleeps, timeouts, and application timers. Without such a timer 
+ThreadX requires a periodic interrupt source to manage all time-slicing,
+thread sleeps, timeouts, and application timers. Without such a timer
 interrupt source, these services are not functional. However, all other
 ThreadX services are operational without a periodic timer source.
 
-To add the timer interrupt processing, simply make a call to 
+To add the timer interrupt processing, simply make a call to
 _tx_timer_interrupt in the IRQ processing. An example of this can be
 found in the file tx_initialize_low_level.s in the Integrator sub-directories.
 
 
 9.  Thumb/Cortex-R4 Mixed Mode
 
-By default, ThreadX is setup for running in Cortex-R4 32-bit mode. This is 
-also true for the demonstration system. It is possible to build any 
-ThreadX file and/or the application in Thumb mode. To build ThreadX 
-assembly files in Thumb mode, define TX_THUMB_MODE. 
+By default, ThreadX is setup for running in Cortex-R4 32-bit mode. This is
+also true for the demonstration system. It is possible to build any
+ThreadX file and/or the application in Thumb mode. To build ThreadX
+assembly files in Thumb mode, define TX_THUMB_MODE.
 
 
 10. VFP Support
 
 By default, VFP support is disabled for each thread. If saving the context of the VFP registers
-is needed, the following API call must be made from the context of the application thread - before 
+is needed, the following API call must be made from the context of the application thread - before
 the VFP usage:
 
 void    tx_thread_vfp_enable(void);

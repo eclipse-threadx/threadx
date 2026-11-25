@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
 /**   User Specific                                                       */
@@ -20,11 +21,11 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
-/*                                                                        */ 
-/*    tx_user.h                                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+/*                                                                        */
+/*    tx_user.h                                           PORTABLE C      */
 /*                                                           6.0.1        */
 /*                                                                        */
 /*  AUTHOR                                                                */
@@ -32,18 +33,12 @@
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file contains user defines for configuring ThreadX in specific */ 
-/*    ways. This file will have an effect only if the application and     */ 
-/*    ThreadX library are built with TX_INCLUDE_USER_DEFINE_FILE defined. */ 
-/*    Note that all the defines in this file may also be made on the      */ 
-/*    command line when building ThreadX library and application objects. */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-30-2020     William E. Lamie         Initial Version 6.0.1         */
+/*    This file contains user defines for configuring ThreadX in specific */
+/*    ways. This file will have an effect only if the application and     */
+/*    ThreadX library are built with TX_INCLUDE_USER_DEFINE_FILE defined. */
+/*    Note that all the defines in this file may also be made on the      */
+/*    command line when building ThreadX library and application objects. */
 /*                                                                        */
 /**************************************************************************/
 
@@ -52,12 +47,12 @@
 
 
 /* Define various build options for the ThreadX port.  The application should either make changes
-   here by commenting or un-commenting the conditional compilation defined OR supply the defines 
-   though the compiler's equivalent of the -D option.  
-   
+   here by commenting or un-commenting the conditional compilation defined OR supply the defines
+   though the compiler's equivalent of the -D option.
+
    For maximum speed, the following should be defined:
 
-        TX_MAX_PRIORITIES                       32  
+        TX_MAX_PRIORITIES                       32
         TX_DISABLE_PREEMPTION_THRESHOLD
         TX_DISABLE_REDUNDANT_CLEARING
         TX_DISABLE_NOTIFY_CALLBACKS
@@ -66,21 +61,21 @@
         TX_REACTIVATE_INLINE
         TX_DISABLE_STACK_FILLING
         TX_INLINE_THREAD_RESUME_SUSPEND
-   
+
    For minimum size, the following should be defined:
-   
-        TX_MAX_PRIORITIES                       32  
+
+        TX_MAX_PRIORITIES                       32
         TX_DISABLE_PREEMPTION_THRESHOLD
         TX_DISABLE_REDUNDANT_CLEARING
         TX_DISABLE_NOTIFY_CALLBACKS
         TX_NOT_INTERRUPTABLE
         TX_TIMER_PROCESS_IN_ISR
-   
+
    Of course, many of these defines reduce functionality and/or change the behavior of the
    system in ways that may not be worth the trade-off. For example, the TX_TIMER_PROCESS_IN_ISR
    results in faster and smaller code, however, it increases the amount of processing in the ISR.
    In addition, some services that are available in timers are not available from ISRs and will
-   therefore return an error if this option is used. This may or may not be desirable for a 
+   therefore return an error if this option is used. This may or may not be desirable for a
    given application.  */
 
 
@@ -88,16 +83,16 @@
    to tx_port.h for descriptions on each of these options.  */
 
 /*
-#define TX_MAX_PRIORITIES                       32  
-#define TX_MINIMUM_STACK                        ????         
+#define TX_MAX_PRIORITIES                       32
+#define TX_MINIMUM_STACK                        ????
 #define TX_THREAD_USER_EXTENSION                ????
 #define TX_TIMER_THREAD_STACK_SIZE              ????
 #define TX_TIMER_THREAD_PRIORITY                ????
 */
 
-/* Determine if timer expirations (application timers, timeouts, and tx_thread_sleep calls 
-   should be processed within the a system timer thread or directly in the timer ISR. 
-   By default, the timer thread is used. When the following is defined, the timer expiration 
+/* Determine if timer expirations (application timers, timeouts, and tx_thread_sleep calls
+   should be processed within the a system timer thread or directly in the timer ISR.
+   By default, the timer thread is used. When the following is defined, the timer expiration
    processing is done directly from the timer ISR, thereby eliminating the timer thread control
    block, stack, and context switching to activate it.  */
 
@@ -108,10 +103,10 @@
 /* Determine if in-line timer reactivation should be used within the timer expiration processing.
    By default, this is disabled and a function call is used. When the following is defined,
    reactivating is performed in-line resulting in faster timer processing but slightly larger
-   code size.  */ 
+   code size.  */
 
 /*
-#define TX_REACTIVATE_INLINE 
+#define TX_REACTIVATE_INLINE
 */
 
 /* Determine is stack filling is enabled. By default, ThreadX stack filling is enabled,
@@ -119,10 +114,10 @@
    debuggers with ThreadX-awareness and by the ThreadX run-time stack checking feature.  */
 
 /*
-#define TX_DISABLE_STACK_FILLING 
+#define TX_DISABLE_STACK_FILLING
 */
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -132,7 +127,7 @@
 #define TX_ENABLE_STACK_CHECKING
 */
 
-/* Determine if preemption-threshold should be disabled. By default, preemption-threshold is 
+/* Determine if preemption-threshold should be disabled. By default, preemption-threshold is
    enabled. If the application does not use preemption-threshold, it may be disabled to reduce
    code size and improve performance.  */
 
@@ -140,7 +135,7 @@
 #define TX_DISABLE_PREEMPTION_THRESHOLD
 */
 
-/* Determine if global ThreadX variables should be cleared. If the compiler startup code clears 
+/* Determine if global ThreadX variables should be cleared. If the compiler startup code clears
    the .bss section prior to ThreadX running, the define can be used to eliminate unnecessary
    clearing of ThreadX global variables.  */
 
@@ -148,13 +143,13 @@
 #define TX_DISABLE_REDUNDANT_CLEARING
 */
 
-/* Determine if no timer processing is required. This option will help eliminate the timer 
-   processing when not needed. The user will also have to comment out the call to 
-   tx_timer_interrupt, which is typically made from assembly language in 
+/* Determine if no timer processing is required. This option will help eliminate the timer
+   processing when not needed. The user will also have to comment out the call to
+   tx_timer_interrupt, which is typically made from assembly language in
    tx_initialize_low_level. Note: if TX_NO_TIMER is used, the define TX_TIMER_PROCESS_IN_ISR
    must also be used.  */
 
-/* 
+/*
 #define TX_NO_TIMER
 #ifndef TX_TIMER_PROCESS_IN_ISR
 #define TX_TIMER_PROCESS_IN_ISR
@@ -170,8 +165,8 @@
 */
 
 
-/* Determine if the tx_thread_resume and tx_thread_suspend services should have their internal 
-   code in-line. This results in a larger image, but improves the performance of the thread 
+/* Determine if the tx_thread_resume and tx_thread_suspend services should have their internal
+   code in-line. This results in a larger image, but improves the performance of the thread
    resume and suspend services.  */
 
 /*
@@ -179,7 +174,7 @@
 */
 
 
-/* Determine if the internal ThreadX code is non-interruptable. This results in smaller code 
+/* Determine if the internal ThreadX code is non-interruptable. This results in smaller code
    size and less processing overhead, but increases the interrupt lockout time.  */
 
 /*
@@ -187,8 +182,8 @@
 */
 
 
-/* Determine if the trace event logging code should be enabled. This causes slight increases in 
-   code size and overhead, but provides the ability to generate system trace information which 
+/* Determine if the trace event logging code should be enabled. This causes slight increases in
+   code size and overhead, but provides the ability to generate system trace information which
    is available for viewing in TraceX.  */
 
 /*

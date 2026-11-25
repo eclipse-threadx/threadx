@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -95,6 +98,13 @@ ULONG                   _txm_module_manager_callback_total_count;
 ULONG                   _txm_module_manager_callback_error_count;
 
 
+/* Define the name given to every module's callback request queue. A memory-protected
+   module can only name a queue it creates with a string inside the module, so a queue
+   carrying this pointer is one the module manager created.  */
+
+TX_NAME_CONST CHAR      _txm_module_manager_callback_request_queue_name[] = "Module Callback Request Queue";
+
+
 
 /**************************************************************************/
 /*                                                                        */
@@ -128,12 +138,6 @@ ULONG                   _txm_module_manager_callback_error_count;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_initialize(VOID *module_memory_start, ULONG module_memory_size)

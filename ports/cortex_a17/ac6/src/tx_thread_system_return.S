@@ -1,13 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -68,23 +70,6 @@
 /*                                                                        */
 /*    ThreadX components                                                  */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
-/*                                            execution profile support,  */
-/*                                            resulting in version 6.1.9  */
-/*  04-25-2022     Zhen Kong                Updated comments,             */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.3.0  */
-/*  12-31-2023     Yajun Xia                Modified comment(s),          */
-/*                                            Added thumb mode support,   */
-/*                                            resulting in version 6.4.0  */
-/*                                                                        */
 /**************************************************************************/
 #if defined(THUMB_MODE)
     .thumb_func
@@ -137,7 +122,9 @@ _tx_skip_solicited_vfp_save:
     LDR     r2, =_tx_timer_time_slice   // Pickup address of time slice
     LDR     r1, [r2]                    // Pickup current time slice
 
-    /* Save current stack and switch to system stack.  */
+    /* Save the current stack pointer in the thread control block. The
+           scheduler runs on the banked SVC mode stack that the startup code
+           set up, so there is no stack switch to perform.  */
 
     STR     sp, [r0, #8]                // Save thread stack pointer
 

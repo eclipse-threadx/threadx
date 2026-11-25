@@ -49,7 +49,7 @@ lock_mutex PROC
 
   WFENE                           ; If mutex is locked, go into standby
   BNE     lock_mutex              ; On waking re-check the mutex
-  
+
   ; Attempt to lock mutex
   ; -----------------------
   MRC     p15, 0, r1, c0, c0, 5   ; Read CPU ID register
@@ -87,7 +87,7 @@ unlock_mutex PROC
 
   MOV     r1, #UNLOCKED           ; Write "unlocked" into lock field
   STR     r1, [r0]
-  
+
   DMB                             ; To ensure update of the mutex occurs before other CPUs awake
 
   SEV                             ; Send event to other CPUs, wakes anyone waiting on a mutex (using WFE)
@@ -104,7 +104,7 @@ unlock_mutex PROC
   ; Returns 0x0 if mutex unlocked, 0x1 is locked
   ; r0 = address of mutex_t
 is_mutex_locked PROC
-  LDR     r0, [r0]                
+  LDR     r0, [r0]
   CMP     r0, #UNLOCKED
   MOVEQ   r0, #0x0
   MOVNE   r0, #0x1

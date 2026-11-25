@@ -46,8 +46,8 @@ init_global_timer PROC
   STR     r0, [r2, #0x208]        ; Store to control register
 
   ; Store increment value
-  STREQ   r1, [r2, #0x218]                                   
-  
+  STREQ   r1, [r2, #0x218]
+
   ; Clear timer value
   MOV     r0, #0x0
   STR     r0, [r2, #0x0]
@@ -71,12 +71,12 @@ set_global_timer_comparator PROC
   LDR     r1, [r2, #0x208]        ; Read control reg
   BIC     r3, r3, #0x02           ; Clear comparator enable bit
   STR     r3, [r2, #0x208]        ; Write modified value back
-  
+
   ; Write the comparator registers
   STR     r1, [r2, #0x210]        ; Write lower 32 bits
   STR     r0, [r2, #0x214]        ; Write upper 32 bits
   DMB
-  
+
   ; Re-enable the comparator
   ORR     r3, r3, #0x02           ; Set comparator enable bit
   STR     r3, [r2, #0x208]        ; Write modified value back
@@ -141,7 +141,7 @@ get_global_timer_count_loop
 
   BX      lr
   ENDP
-  
+
 ; ------------------------------------------------------------
 
   EXPORT clear_global_timer_irq

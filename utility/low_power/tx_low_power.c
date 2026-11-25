@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -71,15 +72,6 @@ UINT    tx_low_power_entered;
 /*                                                                        */
 /*    _tx_thread_schedule                   Thread scheduling loop        */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-02-2021      William E. Lamie        Initial Version 6.1.5         */
-/*  04-02-2021      Scott Larson            Modified comments and fixed   */
-/*                                            compiler warning,           */
-/*                                            resulting in version 6.1.6  */
-/*                                                                        */
 /**************************************************************************/
 VOID  tx_low_power_enter(VOID)
 {
@@ -111,10 +103,10 @@ ULONG   timers_active;
             Program the hardware timer source such that the next timer
             interrupt is equal to: tx_low_power_next_expiration*tick_frequency.
             In most applications, the tick_frequency is 10ms, but this is
-            completely application specific in ThreadX, typically set up 
+            completely application specific in ThreadX, typically set up
             in tx_low_level_initialize. Note that in this situation, a low
             power clock must be used in order to wake up the CPU for the next timeout
-            event. Therefore an alternative clock must be programmed. 
+            event. Therefore an alternative clock must be programmed.
         2:  There are no ThreadX timers active. tx_timer_get_next returns TX_FALSE.
             2.a: application may choose not to keep the ThreadX internal
             tick count updated (define TX_LOW_POWER_TICKLESS), therefore no need
@@ -142,7 +134,7 @@ ULONG   timers_active;
 #endif /* TX_LOW_POWER_TIMER_SETUP */
 
 
-    /* Set the flag indicating that low power has been entered. This 
+    /* Set the flag indicating that low power has been entered. This
        flag is checked in tx_low_power_exit to determine if the logic
        used to adjust the ThreadX time is required.  */
     tx_low_power_entered =  TX_TRUE;
@@ -505,7 +497,7 @@ TX_TIMER_INTERNAL           *temp_list_head;
             /* Now clear the current timer head pointer.  */
             *timer_list_head =  TX_NULL;
         }
-        
+
         /* Move to next timer entry.  */
         timer_list_head++;
 

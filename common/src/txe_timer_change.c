@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -25,8 +28,6 @@
 /* Include necessary system files.  */
 
 #include "tx_api.h"
-#include "tx_initialize.h"
-#include "tx_thread.h"
 #include "tx_timer.h"
 
 
@@ -55,7 +56,6 @@
 /*                                                                        */
 /*    TX_TIMER_ERROR                    Invalid application timer pointer */
 /*    TX_TICK_ERROR                     Invalid initial tick value of 0   */
-/*    TX_CALLER_ERROR                   Invalid caller of this function   */
 /*    status                            Actual completion status          */
 /*                                                                        */
 /*  CALLS                                                                 */
@@ -65,14 +65,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txe_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG reschedule_ticks)
@@ -105,13 +97,6 @@ UINT    status;
         status =  TX_TICK_ERROR;
     }
 
-    /* Check for invalid caller of this function.  */
-    else if (TX_THREAD_GET_SYSTEM_STATE() >= TX_INITIALIZE_IN_PROGRESS)
-    {
-
-        /* Invalid caller of this function, return appropriate error code.  */
-        status =  TX_CALLER_ERROR;
-    }
     else
     {
 

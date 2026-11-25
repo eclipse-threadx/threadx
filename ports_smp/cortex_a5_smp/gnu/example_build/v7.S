@@ -3,7 +3,7 @@
 //
 // Copyright (c) 2011-2018 Arm Limited (or its affiliates). All rights reserved.
 // Use, modification and redistribution of this file is subject to your possession of a
-// valid End User License Agreement for the Arm Product of which these examples are part of 
+// valid End User License Agreement for the Arm Product of which these examples are part of
 // and your compliance with all applicable terms and conditions of such licence agreement.
 // ------------------------------------------------------------
 
@@ -20,7 +20,7 @@
   .global enableInterrupts
   // void enableInterrupts(void)
   .type enableInterrupts, "function"
-  .cfi_startproc  
+  .cfi_startproc
 enableInterrupts:
   CPSIE   i
   BX      lr
@@ -30,7 +30,7 @@ enableInterrupts:
   .global disableInterrupts
   // void disableInterrupts(void)
   .type disableInterrupts, "function"
-  .cfi_startproc  
+  .cfi_startproc
 disableInterrupts:
   CPSID   i
   BX      lr
@@ -122,7 +122,7 @@ clean_dcache_skip:
   CMP     r3, r10
   BGT     clean_dcache_loop1
 
-clean_dcache_finished:	
+clean_dcache_finished:
   POP     {r4-r12}
 
   BX      lr
@@ -180,7 +180,7 @@ clean_invalidate_dcache_skip:
   CMP     r3, r10
   BGT     clean_invalidate_dcache_loop1
 
-clean_invalidate_dcache_finished:	
+clean_invalidate_dcache_finished:
   POP     {r4-r12}
 
   BX      lr

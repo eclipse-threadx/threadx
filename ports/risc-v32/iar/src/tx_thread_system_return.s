@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -39,47 +40,40 @@
 
     SECTION `.text`:CODE:REORDER:NOROOT(2)
     CODE
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _tx_thread_system_return                           RISC-V32/IAR     */
 /*                                                           6.1          */
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*    Tom van Leeuwen, Technolution B.V.                                  */
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function is target processor specific.  It is used to transfer */ 
-/*    control from a thread back to the system.  Only a minimal context   */ 
-/*    is saved since the compiler assumes temp registers are going to get */ 
-/*    slicked by a function call anyway.                                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_schedule                   Thread scheduling loop        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX components                                                  */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */ 
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function is target processor specific.  It is used to transfer */
+/*    control from a thread back to the system.  Only a minimal context   */
+/*    is saved since the compiler assumes temp registers are going to get */
+/*    slicked by a function call anyway.                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_schedule                   Thread scheduling loop        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX components                                                  */
+/**************************************************************************/
 /* VOID   _tx_thread_system_return(VOID)
 {  */
     PUBLIC  _tx_thread_system_return
@@ -87,16 +81,16 @@ _tx_thread_system_return:
 
     /* Save minimal context on the stack.  */
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
     addi    sp, sp, -116                                ; Allocate space on the stack - with floating point enabled
 #else
     addi    sp, sp, -64                                 ; Allocate space on the stack - without floating point enabled
 #endif
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
 
     /* Store floating point preserved registers.  */
- 
+
     fsw     f8,  0x3C(sp)                               ; Store fs0
     fsw     f9,  0x40(sp)                               ; Store fs1
     fsw     f18, 0x44(sp)                               ; Store fs2
@@ -133,14 +127,14 @@ _tx_thread_system_return:
 
 
    /* Lockout interrupts. - will be enabled in _tx_thread_schedule  */
-   
-    csrci   mstatus, 0xF 
-    
+
+    csrci   mstatus, 0xF
+
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 
     call    _tx_execution_thread_exit                   ; Call the thread execution exit function
 #endif
-    
+
     la      t0, _tx_thread_current_ptr                  ; Pickup address of pointer
     lw      t1, 0(t0)                                   ; Pickup current thread pointer
     la      t2,_tx_thread_system_stack_ptr              ; Pickup stack pointer address
@@ -180,4 +174,3 @@ _tx_thread_dont_save_ts:
 /* }  */
 
     END
-    

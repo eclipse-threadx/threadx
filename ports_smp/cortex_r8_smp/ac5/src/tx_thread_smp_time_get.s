@@ -1,13 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -51,19 +53,12 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Source                                                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2022      Scott Larson            Initial Version 6.2.0         */
-/*                                                                        */
 /**************************************************************************/
     EXPORT  _tx_thread_smp_time_get
 _tx_thread_smp_time_get
 
     MRC     p15, 4, r0, c15, c0, 0              // Read periph base address
-    LDR     r0, [r0, #0x604]                    // Read count register
+    LDR     r0, [r0, #0x200]                    // Read global timer count low register
 
     IF  {INTER} = {TRUE}
     BX      lr                                  // Return to caller

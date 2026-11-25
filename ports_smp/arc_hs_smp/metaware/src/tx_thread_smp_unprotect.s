@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread - Low Level SMP Support                                      */
 ;/**                                                                       */
@@ -30,44 +30,38 @@
 ;#include "tx_timer.h"  */
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_smp_unprotect                        SMP/ARC_HS/MetaWare */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_smp_unprotect                        SMP/ARC_HS/MetaWare */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function releases previously obtained protection. The supplied */ 
-;/*    previous SR is restored. If the value of _tx_thread_system_state    */ 
-;/*    and _tx_thread_preempt_disable are both zero, then multithreading   */ 
-;/*    is enabled as well.                                                 */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    Previous Status Register                                            */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ThreadX Source                                                      */
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function releases previously obtained protection. The supplied */
+;/*    previous SR is restored. If the value of _tx_thread_system_state    */
+;/*    and _tx_thread_preempt_disable are both zero, then multithreading   */
+;/*    is enabled as well.                                                 */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    Previous Status Register                                            */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ThreadX Source                                                      */
 ;/*                                                                        */
 ;/**************************************************************************/
     .global _tx_thread_smp_unprotect
@@ -85,7 +79,7 @@ _tx_thread_smp_unprotect:
     ld      r6, [r4, 12]                                ; Pickup ownership count
     breq    r6, 0, _still_protected                     ; If zero, protection is still active
     sub     r6, r6, 1                                   ; Decrement the ownership count
-    st      r6, [r4, 12]                                ; Store the ownership count      
+    st      r6, [r4, 12]                                ; Store the ownership count
     brne    r6, 0, _still_protected                     ; If non-zero, protection is still active
     ld      r6, [gp, _tx_thread_preempt_disable@sda]    ; Pickup preempt disable flag
     brne    r6, 0, _still_protected                     ; If non-zero, don't release the protection
@@ -93,14 +87,14 @@ _tx_thread_smp_unprotect:
     st      r2, [r4, 8]                                 ; Set the owning core to an invalid value
     .ifdef TX_SMP_DEBUG_ENABLE
     st      blink, [r4, 24]                             ; Save caller of unprotect
-    .endif    
+    .endif
     mov     r2, 0                                       ; Build clear value
     dmb     3                                           ; Data memory barrier
     st      r2, [r4]                                    ; Release the protection
     dmb     3                                           ; Data memory barrier
 _still_protected:
     j_s.d   [blink]                                     ; Return to caller with delay slot
-    seti    r0                                          ; Set desired interrupt state       
+    seti    r0                                          ; Set desired interrupt state
 
     .end
-    
+

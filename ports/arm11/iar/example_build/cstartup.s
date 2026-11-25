@@ -1,7 +1,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Part one of the system initialization code, 
+;; Part one of the system initialization code,
 ;; contains low-level
 ;; initialization.
 ;;
@@ -71,13 +71,13 @@ FIQ_Addr:       DCD   __tx_fiq_handler
 
         SECTION .text:CODE:NOROOT(2)
 
-;        PUBLIC  ?cstartup        
+;        PUBLIC  ?cstartup
         EXTERN  ?main
         REQUIRE __vector
 
-        ARM        
-        
-__iar_program_start:        
+        ARM
+
+__iar_program_start:
 ?cstartup:
 
 ;

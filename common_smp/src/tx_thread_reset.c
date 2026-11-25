@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -62,14 +65,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_reset(TX_THREAD *thread_ptr)
 {
@@ -108,6 +103,28 @@ UINT            status;
             {
 
                 /* Thread not completed or terminated - return an error!  */
+                status =  TX_NOT_DONE;
+            }
+        }
+
+        /* The state is terminal, but a terminal state on its own is not authorization
+           to rebuild the stack and move the thread back to TX_SUSPENDED.  Both paths
+           that produce one -- thread completion in _tx_thread_shell_entry and thread
+           termination in _tx_thread_terminate -- publish TX_COMPLETED or
+           TX_TERMINATED, and then run this thread's exit notification callback, before
+           the thread has been detached from the ready list.  The suspending flag is
+           set for exactly that interval.  Resetting inside it would also defeat the
+           protection _tx_thread_system_resume relies on, which refuses to cancel a
+           suspension only while the state is still terminal.  */
+        if (status == TX_SUCCESS)
+        {
+
+            /* Is the completion or termination transition still in progress?  */
+            if (thread_ptr -> tx_thread_suspending == TX_TRUE)
+            {
+
+                /* Yes, refuse the reset.  The condition is transient: the caller may
+                   retry once the transition has finished.  */
                 status =  TX_NOT_DONE;
             }
         }

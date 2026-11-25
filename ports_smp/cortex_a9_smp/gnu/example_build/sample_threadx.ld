@@ -1,7 +1,7 @@
 /* Linker script to place sections and symbol values.
  * It references following symbols, which must be defined in code:
  *   Vectors : Entry point
- * 
+ *
  * It defines following symbols, which code can use without definition:
  *   __code_start
  *   __exidx_start
@@ -170,7 +170,7 @@ SECTIONS
         __irq_stack = .;
         _stack_init_irq = .;
     }
-    
+
     _end = .;
 
     .pagetable 0x80100000 (NOLOAD):

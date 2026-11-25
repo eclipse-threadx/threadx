@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread                                                              */
 @/**                                                                       */
@@ -38,10 +38,10 @@ INT_MASK        =           0x80                @ Interrupt bit mask
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
 @/*    _tx_thread_interrupt_control                    SMP/Cortex-A5/GNU   */
 @/*                                                           6.1          */
 @/*  AUTHOR                                                                */
@@ -49,38 +49,32 @@ INT_MASK        =           0x80                @ Interrupt bit mask
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function is responsible for changing the interrupt lockout     */ 
-@/*    posture of the system.                                              */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    new_posture                           New interrupt lockout posture */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    old_posture                           Old interrupt lockout posture */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    Application Code                                                    */ 
-@/*                                                                        */ 
-@/*  RELEASE HISTORY                                                       */ 
-@/*                                                                        */ 
-@/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*    This function is responsible for changing the interrupt lockout     */
+@/*    posture of the system.                                              */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    new_posture                           New interrupt lockout posture */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    old_posture                           Old interrupt lockout posture */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    Application Code                                                    */
 @/*                                                                        */
 @/**************************************************************************/
 @UINT   _tx_thread_interrupt_control(UINT new_posture)
 @{
     .global _tx_thread_interrupt_control
     .type _tx_thread_interrupt_control,function
-_tx_thread_interrupt_control: 
+_tx_thread_interrupt_control:
 @
 @    /* Pickup current interrupt lockout posture.  */
 @

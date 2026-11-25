@@ -1,16 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** Thread-Metric Component                                               */
 /**                                                                       */
 /**   Message Processing Test                                             */
@@ -19,27 +20,21 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUCTION                                                RELEASE        */ 
-/*                                                                        */ 
-/*    tm_message_processing_test                          PORTABLE C      */ 
-/*                                                           6.1.7        */ 
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUCTION                                                RELEASE        */
+/*                                                                        */
+/*    tm_message_processing_test                          PORTABLE C      */
+/*                                                           6.1.7        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    Basic test for message exchange processing.                         */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  10-15-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/**************************************************************************/
 #include "tm_api.h"
 
 
@@ -89,7 +84,7 @@ void  tm_message_processing_initialize(void)
     /* Create a queue for the message passing.  */
     tm_queue_create(0);
 
-    /* Create the reporting thread. It will preempt the other 
+    /* Create the reporting thread. It will preempt the other
        threads and print out the test results.  */
     tm_thread_create(5, 2, tm_message_processing_thread_report);
     tm_thread_resume(5);
@@ -107,7 +102,7 @@ void  tm_message_processing_thread_0_entry(void)
     tm_message_sent[3] =  0x77778888;
 
     while(1)
-    {   	
+    {
         /* Send a message to the queue.  */
         tm_queue_send(0, tm_message_sent);
 

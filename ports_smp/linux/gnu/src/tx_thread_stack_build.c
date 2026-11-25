@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -76,15 +79,10 @@ void *_tx_linux_thread_entry(void *ptr);
 /*    _tx_thread_create                     Create thread service         */
 /*    _tx_thread_reset                      Reset thread service          */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 {
+ALIGN_TYPE  fake_stack_ptr;
 struct sched_param sp;
 pthread_attr_t attrs;
 
@@ -125,8 +123,13 @@ pthread_attr_t attrs;
        tx_interrupt_control nesting.  */
     thread_ptr -> tx_thread_linux_mutex_access = TX_FALSE;
 
-    /* Setup a fake thread stack pointer.   */
-    thread_ptr -> tx_thread_stack_ptr =  (VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8);
+    /* Setup a fake thread stack pointer.  The stack end points at the last byte of the
+       thread's stack area and is therefore not necessarily aligned, so round the result
+       down to a ULONG boundary.  This pointer is dereferenced as a ULONG below and is
+       also the starting value of the stack checking logic's highest used pointer.  */
+    fake_stack_ptr =  (ALIGN_TYPE) ((VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8));
+    fake_stack_ptr =  fake_stack_ptr & (~((ALIGN_TYPE) (sizeof(ULONG) - 1)));
+    thread_ptr -> tx_thread_stack_ptr =  (VOID *) ((ALIGN_TYPE) fake_stack_ptr);
 
     /* Clear the first word of the stack.  */
     *(((ULONG *) thread_ptr -> tx_thread_stack_ptr) - 1) =  0;

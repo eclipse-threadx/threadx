@@ -1,3 +1,16 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test trace functionality in ThreadX.  */
 
 
@@ -12,7 +25,7 @@
 extern VOID    (*test_isr_dispatch)(void);
 
 extern UINT    _tx_trace_interrupt_control(UINT new_posture);
-extern VOID    _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, CHAR *object_name, ULONG parameter_1, ULONG parameter_2);
+extern VOID    _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, TX_NAME_CONST CHAR *object_name, ULONG parameter_1, ULONG parameter_2);
 extern VOID    _tx_trace_object_unregister(VOID *object_ptr);
 
 static unsigned long   thread_0_counter =  0;
@@ -55,6 +68,16 @@ static unsigned long error =  0;
 static unsigned long full_buffer =  0;
 static void          *save_pointer;
 
+#define TRACE_BLOCK_POOL_SIZE  ((ULONG) (((100U + sizeof(ALIGN_TYPE) - 1U) / sizeof(ALIGN_TYPE)) * sizeof(ALIGN_TYPE)))
+#define TRACE_BYTE_POOL_SIZE   ((ULONG) (((1000U + sizeof(ALIGN_TYPE) - 1U) / sizeof(ALIGN_TYPE)) * sizeof(ALIGN_TYPE)))
+
+/* Keep pool storage aligned for ports with pointer-wide metadata.  */
+static struct
+{
+    ALIGN_TYPE alignment;
+    CHAR       bytes[TRACE_BLOCK_POOL_SIZE + TRACE_BYTE_POOL_SIZE + 400U];
+} object_memory;
+
 #if defined(TX_WIN32_MEMORY_SIZE) || defined(TX_LINUX_MEMORY_SIZE)
 
 static FILE         *trace_dump_file;
@@ -95,9 +118,9 @@ UINT    old_interrupt;
 
     /* If win32, we can actually dump the file!  */
     trace_dump_file =  fopen(trace_dump_file_name, "wb+");
-    
+
     fwrite(trace_buffer, 1, sizeof(trace_buffer), trace_dump_file);
-    
+
     fclose(trace_dump_file);
 
     /* Restore interrupts.  */
@@ -109,7 +132,7 @@ UINT    old_interrupt;
     {
         trace_dump_file_name[11] =  '0';
         trace_dump_file_name[10]++;
-        
+
         if (trace_dump_file_name[10] > '9')
         {
             trace_dump_file_name[10] =  '0';
@@ -141,7 +164,7 @@ static void    test_isr(void)
 
     /* Make ISR entry event.  */
     tx_trace_isr_enter_insert(1);
-    
+
     /* Resume thread 2.  */
     tx_thread_resume(&thread_2);
 
@@ -174,25 +197,21 @@ INT     status;
 CHAR    *pointer;
 
 
-    /* Setup a pointer.  */
-    pointer =  (CHAR *) first_unused_memory;
-    
-    /* Adjust it forward just to make sure there is some space for the test below.  */
-    pointer =  pointer + 200;
+    /* Setup aligned object storage.  */
+    pointer =  object_memory.bytes;
 
     /* Create a bunch of objects before being enabled.   */
 
     /* Create a timer for the test.  */
     save_pointer =  (void *) pointer;
     tx_timer_create(&timer_0, "timer 0", timer_entry, 0, 2, 2, TX_AUTO_ACTIVATE);
-    tx_block_pool_create(&block_pool_0, "block pool 0", 20, pointer, 100);
-    pointer = pointer + 100;
-    tx_byte_pool_create(&byte_pool_0, "byte pool 0", pointer, 1000);
-    pointer =  pointer + 1000;
+    tx_block_pool_create(&block_pool_0, "block pool 0", 20, pointer, TRACE_BLOCK_POOL_SIZE);
+    pointer = pointer + TRACE_BLOCK_POOL_SIZE;
+    tx_byte_pool_create(&byte_pool_0, "byte pool 0", pointer, TRACE_BYTE_POOL_SIZE);
+    pointer =  pointer + TRACE_BYTE_POOL_SIZE;
     tx_event_flags_create(&group_0, "event flags group 0");
     tx_mutex_create(&mutex_0, "mutex 0", TX_NO_INHERIT);
     tx_queue_create(&queue_0, "queue 0", 16, pointer, 400);
-    pointer =  pointer + 400;
     tx_semaphore_create(&semaphore_0, "semaphore 0", 1);
 
     /* Enable event tracing.   */
@@ -204,7 +223,7 @@ CHAR    *pointer;
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
-    
+
         printf("Running Trace Basic Test............................................ ERROR #1\n");
         test_control_return(1);
     }
@@ -213,17 +232,20 @@ CHAR    *pointer;
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         printf("Running Trace Basic Test............................................ ERROR #2\n");
         test_control_return(1);
     }
 #endif
 
+    pointer =  (CHAR *) first_unused_memory;
+    pointer =  pointer + 200;
+
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
-    
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -235,8 +257,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -248,8 +270,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             14, 14, TX_NO_TIME_SLICE, TX_DONT_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -270,12 +292,11 @@ static void    thread_0_entry(ULONG thread_input)
 UINT    status;
 UINT    old_interrupt;
 CHAR    *pointer;
-TX_INTERRUPT_SAVE_AREA
 ULONG   object;
 
     /* Coverage for build without TraceX enabled.  */
-    tx_saved_posture =  _tx_trace_interrupt_control(TX_INT_DISABLE);
-    _tx_trace_interrupt_control(tx_saved_posture);
+    old_interrupt =  _tx_trace_interrupt_control(TX_INT_DISABLE);
+    _tx_trace_interrupt_control(old_interrupt);
 #ifndef TX_ENABLE_EVENT_TRACE
     _tx_trace_object_register(0, TX_NULL, TX_NULL, 0, 0);
     _tx_trace_object_register(1, TX_NULL, TX_NULL, 0, 0);
@@ -343,14 +364,13 @@ ULONG   object;
 
     /* Now, create them all again.  */
     pointer =  (CHAR *) save_pointer;
-    tx_block_pool_create(&block_pool_0, "block pool 0", 20, pointer, 100);
-    pointer = pointer + 100;
-    tx_byte_pool_create(&byte_pool_0, "byte pool 0", pointer, 1000);
-    pointer =  pointer + 1000;
+    tx_block_pool_create(&block_pool_0, "block pool 0", 20, pointer, TRACE_BLOCK_POOL_SIZE);
+    pointer = pointer + TRACE_BLOCK_POOL_SIZE;
+    tx_byte_pool_create(&byte_pool_0, "byte pool 0", pointer, TRACE_BYTE_POOL_SIZE);
+    pointer =  pointer + TRACE_BYTE_POOL_SIZE;
     tx_event_flags_create(&group_0, "event flags group 0");
     tx_mutex_create(&mutex_0, "mutex 0", TX_NO_INHERIT);
     tx_queue_create(&queue_0, "queue 0", 16, pointer, 400);
-    pointer =  pointer + 400;
     tx_semaphore_create(&semaphore_0, "semaphore 0", 1);
 
     /* Attempt to enable event tracing again.   */
@@ -361,7 +381,7 @@ ULONG   object;
     /* Check status.  */
     if (status != TX_NOT_DONE)
     {
-    
+
         printf("ERROR #6\n");
         test_control_return(1);
     }
@@ -370,7 +390,7 @@ ULONG   object;
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         printf("ERROR #7\n");
         test_control_return(1);
     }
@@ -381,7 +401,7 @@ ULONG   object;
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         printf("ERROR #8\n");
         test_control_return(1);
     }
@@ -392,7 +412,7 @@ ULONG   object;
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         printf("ERROR #9\n");
         test_control_return(1);
     }
@@ -403,7 +423,7 @@ ULONG   object;
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         printf("ERROR #10\n");
         test_control_return(1);
     }
@@ -433,7 +453,7 @@ ULONG   object;
         printf("ERROR #12\n");
         test_control_return(1);
     }
-    
+
     /* Filter all events.  */
     status =  tx_trace_event_filter(0);
 
@@ -445,7 +465,7 @@ ULONG   object;
         printf("ERROR #13\n");
         test_control_return(1);
     }
-    
+
 #endif
 
     /* Unfilter all events.  */
@@ -485,7 +505,7 @@ ULONG   object;
     }
 
 #endif
-    
+
     /* Register the trace buffer full notification routine.  */
     status =  tx_trace_buffer_full_notify(trace_buffer_full);
 
@@ -509,7 +529,7 @@ ULONG   object;
         printf("ERROR #18\n");
         test_control_return(1);
     }
-    
+
     /* Check the NULL path with trace disabled.  */
     status =  tx_trace_buffer_full_notify(TX_NULL);
 
@@ -521,7 +541,7 @@ ULONG   object;
         printf("ERROR #19\n");
         test_control_return(1);
     }
-    
+
 #endif
 
     /* Create a timer for the test.  */
@@ -542,7 +562,7 @@ ULONG   object;
             /* Restore interrupts.  */
             tx_interrupt_control(old_interrupt);
         }
-        
+
         /* Insert user event.  */
         status =  tx_trace_user_event_insert(1027, 1, 2, 3, 4);
 
@@ -629,7 +649,7 @@ ULONG   object;
 
         break;
 #endif
-    }        
+    }
 
     /* Clear the ISR.  */
     test_isr_dispatch =  TX_NULL;
@@ -661,7 +681,7 @@ ULONG   object;
 
     /* Attempt to disable again, just to get the TX_NOT_DONE error code.  */
     status =  tx_trace_disable();
-    
+
 #ifdef TX_ENABLE_EVENT_TRACE
 
     /* Check status.  */
@@ -683,7 +703,7 @@ ULONG   object;
         test_control_return(1);
     }
 #endif
-    
+
     /* Attempt to enable event tracing with a bogus size.   */
     status =  tx_trace_enable(trace_buffer, 1, 8);
 
@@ -692,7 +712,7 @@ ULONG   object;
     /* Check status.  */
     if (status != TX_SIZE_ERROR)
     {
-    
+
         /* Trace error.  */
         printf("ERROR #31\n");
         test_control_return(1);
@@ -702,7 +722,7 @@ ULONG   object;
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Trace error.  */
         printf("ERROR #32\n");
         test_control_return(1);
@@ -718,7 +738,7 @@ ULONG   object;
     /* Check status.  */
     if (status != TX_NOT_DONE)
     {
-    
+
         /* Trace error.  */
         printf("ERROR #33\n");
         test_control_return(1);
@@ -728,7 +748,7 @@ ULONG   object;
     /* Check status.  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
-    
+
         /* Trace error.  */
         printf("ERROR #34\n");
         test_control_return(1);
@@ -746,7 +766,7 @@ ULONG   object;
     }
     else
     {
-    
+
         /* Successful test.  */
         printf("SUCCESS!\n");
         test_control_return(0);
@@ -759,9 +779,9 @@ static void    thread_1_entry(ULONG task_input)
 
     while(1)
     {
-    
+
         thread_1_counter++;
-        tx_thread_suspend(&thread_1);    
+        tx_thread_suspend(&thread_1);
     }
 }
 
@@ -772,8 +792,8 @@ static void    thread_2_entry(ULONG task_input)
 
     while(1)
     {
-    
+
         thread_2_counter++;
-        tx_thread_suspend(&thread_2);    
+        tx_thread_suspend(&thread_2);
     }
 }

@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -29,14 +29,14 @@
 ;#include "tx_thread.h"
 ;
 ;
-    .equ    LONG_ALIGN_MASK, 0xFFFFFFFC     
+    .equ    LONG_ALIGN_MASK, 0xFFFFFFFC
     .equ    INT_ENABLE_BITS, 0x8000001E
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_stack_build                          SMP/ARC_HS/MetaWare */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
@@ -44,33 +44,27 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
+;/*                                                                        */
 ;/*    This function builds a stack frame on the supplied thread's stack.  */
 ;/*    The stack frame results in a fake interrupt return to the supplied  */
-;/*    function pointer.                                                   */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
+;/*    function pointer.                                                   */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    thread_ptr                            Pointer to thread control blk */
 ;/*    function_ptr                          Pointer to return function    */
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_thread_create                     Create thread service         */
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_thread_create                     Create thread service         */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -79,11 +73,11 @@
     .type   _tx_thread_stack_build, @function
 _tx_thread_stack_build:
 ;
-;       
+;
 ;    /* Build a fake interrupt frame.  The form of the fake interrupt stack
 ;       on the ARC HS should look like the following after it is built.
 ;       Note that the extension registers are always assigned space here.
-;       
+;
 ;       Stack Top:      1           Interrupt stack frame type
 ;                       LP_START    Initial loop start
 ;                       LP_END      Initial loop end
@@ -118,7 +112,7 @@ _tx_thread_stack_build:
 ;                       r2          Initial r2
 ;                       r1          Initial r1
 ;                       r0          Initial r0
-;                       r30         Initial r30 
+;                       r30         Initial r30
 ;                       r58         Initial r58
 ;                       r59         Initial r59
 ;                       0           Reserved
@@ -126,10 +120,10 @@ _tx_thread_stack_build:
 ;                       0           Initial BTA
 ;                       0           Point of Interrupt (thread entry point)
 ;                       0           Initial STATUS32
-;                       0           Backtrace 
-;                       0           Backtrace 
-;                       0           Backtrace 
-;                       0           Backtrace 
+;                       0           Backtrace
+;                       0           Backtrace
+;                       0           Backtrace
+;                       0           Backtrace
 ;
 ; *: these registers will only be saved and restored if flag -Xxmac_d16 is passed to hcac
 ;
@@ -183,14 +177,14 @@ _tx_thread_stack_build:
     st      r5, [r3, 148]                               ; Reserved
     st      r5, [r3, 152]                               ; Reserved
     st      r5, [r3, 156]                               ; Store initial BTA
-    st      r1, [r3, 160]                               ; Store initial point of entry 
+    st      r1, [r3, 160]                               ; Store initial point of entry
     lr      r6, [status32]                              ; Pickup STATUS32
     or      r6, r6, INT_ENABLE_BITS                     ; Make sure interrupts are enabled
     st      r6, [r3, 164]                               ; Store initial STATUS32
-    st      r5, [r3, 168]                               ; Backtrace 0 
-    st      r5, [r3, 172]                               ; Backtrace 0 
-    st      r5, [r3, 176]                               ; Backtrace 0 
-    st      r5, [r3, 180]                               ; Backtrace 0 
+    st      r5, [r3, 168]                               ; Backtrace 0
+    st      r5, [r3, 172]                               ; Backtrace 0
+    st      r5, [r3, 176]                               ; Backtrace 0
+    st      r5, [r3, 180]                               ; Backtrace 0
 ;
 ;    /* Set ready bit in thread control block.  */
 ;

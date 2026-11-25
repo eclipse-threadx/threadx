@@ -1,18 +1,20 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+; Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -39,46 +41,39 @@
 
     SECTION `.text`:CODE:REORDER:NOROOT(2)
     CODE
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _tx_thread_context_save                            RISC-V32/IAR     */
 /*                                                           6.1          */
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*    Tom van Leeuwen, Technolution B.V.                                  */
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function saves the context of an executing thread in the       */ 
-/*    beginning of interrupt processing.  The function also ensures that  */ 
-/*    the system stack is used upon return to the calling ISR.            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISRs                                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function saves the context of an executing thread in the       */
+/*    beginning of interrupt processing.  The function also ensures that  */
+/*    the system stack is used upon return to the calling ISR.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISRs                                                                */
+/**************************************************************************/
 /* VOID   _tx_thread_context_save(VOID)
 {  */
     PUBLIC      _tx_thread_context_save
@@ -122,10 +117,10 @@ _tx_thread_context_save:
     csrr    t0, mepc                                    ; Load exception program counter
     sw      t0, 0x78(sp)                                ; Save it on the stack
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
 
     /* Save floating point scratch registers.  */
-    
+
     fsw     f0, 0x7C(sp)                                ; Store ft0
     fsw     f1, 0x80(sp)                                ; Store ft1
     fsw     f2, 0x84(sp)                                ; Store ft2
@@ -151,10 +146,14 @@ _tx_thread_context_save:
 #endif
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    addi    sp, sp, -16                                 ; Reserve space to save the return address
+    sw      ra, 0(sp)                                   ; Save the return address
     call    _tx_execution_isr_enter                     ; Call the ISR execution enter function
+    lw      ra, 0(sp)                                   ; Recover the return address
+    addi    sp, sp, 16                                  ; Recover the reserved stack space
 #endif
 
-    ret                                                 ; Return to calling ISR 
+    ret                                                 ; Return to calling ISR
 
 _tx_thread_not_nested_save:
     /* }  */
@@ -190,7 +189,7 @@ _tx_thread_not_nested_save:
     csrr    t0, mepc                                    ; Load exception program counter
     sw      t0, 0x78(sp)                                ; Save it on the stack
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
 
     /* Save floating point scratch registers.  */
 
@@ -229,7 +228,11 @@ _tx_thread_not_nested_save:
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     /* _tx_execution_isr_enter is called with thread stack pointer */
+    addi    sp, sp, -16                                 ; Reserve space to save the return address
+    sw      ra, 0(sp)                                   ; Save the return address
     call    _tx_execution_isr_enter                     ; Call the ISR execution enter function
+    lw      ra, 0(sp)                                   ; Recover the return address
+    addi    sp, sp, 16                                  ; Recover the reserved stack space
 #endif
 
 
@@ -244,14 +247,18 @@ _tx_thread_idle_system_save:
 
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    addi    sp, sp, -16                                 ; Reserve space to save the return address
+    sw      ra, 0(sp)                                   ; Save the return address
     call    _tx_execution_isr_enter                     ; Call the ISR execution enter function
+    lw      ra, 0(sp)                                   ; Recover the return address
+    addi    sp, sp, 16                                  ; Recover the reserved stack space
 #endif
 
     /* Interrupt occurred in the scheduling loop.  */
 
     /* }
 }  */
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
     addi    sp, sp, 260                                 ; Recover stack frame - with floating point enabled
 #else
     addi    sp, sp, 128                                 ; Recover the reserved stack space
@@ -259,4 +266,3 @@ _tx_thread_idle_system_save:
     ret                                                 ; Return to calling ISR
 
     END
-    

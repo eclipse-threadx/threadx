@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -54,15 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
-/*  10-31-2023      Tiejun Zhou             Included tx_user.h,           */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_interrupt_restore(UINT previous_posture)
 // {

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -30,56 +31,49 @@
 
     SECTION `.text`:CODE:REORDER:NOROOT(2)
     CODE
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _tx_thread_stack_build                             RISC-V32/IAR     */
 /*                                                           6.1          */
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*    Tom van Leeuwen, Technolution B.V.                                  */
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This function builds a stack frame on the supplied thread's stack.  */
 /*    The stack frame results in a fake interrupt return to the supplied  */
-/*    function pointer.                                                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*    function pointer.                                                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    thread_ptr                            Pointer to thread control blk */
 /*    function_ptr                          Pointer to return function    */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    _tx_thread_create                     Create thread service         */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */ 
-/*                                                                        */ 
-/**************************************************************************/ 
+/**************************************************************************/
 /* VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 {  */
     PUBLIC  _tx_thread_stack_build
 _tx_thread_stack_build:
 
-       
+
     /* Build a fake interrupt frame.  The form of the fake interrupt stack
        on the RISC-V RV32 should look like the following after it is built:
-       
+
        Stack Top:      1       (00)    Interrupt stack frame type
                        x27     (04)    Initial s11
                        x26     (08)    Initial s10
@@ -153,7 +147,7 @@ If floating point support:
 
     /* Actually build the stack frame.  */
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
     addi    t0, t0, -260
 #else
     addi    t0, t0, -128                                ; Allocate space for the stack frame
@@ -189,7 +183,7 @@ If floating point support:
     sw      x0, 108(t0)                                 ; Initial a0
     sw      x0, 112(t0)                                 ; Initial ra
     sw      a1, 120(t0)                                 ; Initial mepc
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
     sw      x0, 124(t0)                                 ; Inital ft0
     sw      x0, 128(t0)                                 ; Inital ft1
     sw      x0, 132(t0)                                 ; Inital ft2
@@ -236,4 +230,4 @@ If floating point support:
     ret                                                 ;   control block and return
 /* }  */
     END
-    
+

@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -66,14 +69,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_terminate(TX_THREAD *thread_ptr)
@@ -139,6 +134,16 @@ ULONG       suspension_sequence;
             TX_THREAD_STATE_CHANGE(thread_ptr, TX_TERMINATED)
 
 #ifdef TX_NOT_INTERRUPTABLE
+
+            /* Set the suspending flag, so that the termination transition is marked
+               as in progress for the same interval it is marked in the interruptable
+               configuration below.  Nothing in this configuration needs the flag to
+               cancel an interrupted suspension -- interrupts stay disabled through
+               the whole transition -- but the notification callback below is
+               application code, reached by a direct call, and interrupt lockout does
+               not stop it from calling a thread lifecycle service on this same
+               control block.  The flag is cleared in the common tail below.  */
+            thread_ptr -> tx_thread_suspending =  TX_TRUE;
 
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 
@@ -232,20 +237,13 @@ ULONG       suspension_sequence;
                 (suspend_cleanup)(thread_ptr, suspension_sequence);
             }
 
-#ifndef TX_NOT_INTERRUPTABLE
-
-            /* Disable interrupts.  */
-            TX_DISABLE
-#endif
-
-            /* Clear the suspending flag.  */
-            thread_ptr -> tx_thread_suspending =  TX_FALSE;
-
-#ifndef TX_NOT_INTERRUPTABLE
-
-            /* Restore interrupts.  */
-            TX_RESTORE
-#endif
+            /* The suspending flag deliberately stays set here.  It used to be
+               cleared at this point, which left the terminated extension and the
+               notification callback below -- both application code -- free to delete
+               or reset this control block while this service still held a pointer to
+               it and still had mutex-release processing to do.  It is now cleared
+               once, in the common tail below, after the last dereference of the
+               target.  */
 
             /* Perform any additional activities for tool or user purpose.  */
             TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
@@ -288,6 +286,20 @@ ULONG       suspension_sequence;
         /* Disable interrupts.  */
         TX_DISABLE
 #endif
+
+        /* Clear the suspending flag.  This is the one place the end of the
+           termination transition is published, and it is reached from both branches
+           above, after the notification callback and after the mutex-release
+           processing, which is the last thing in this service to dereference the
+           target.  Until this store, _tx_thread_delete and _tx_thread_reset refuse
+           the target.  In the interruptable ready branch the flag is already false,
+           because _tx_thread_system_suspend cleared it when it detached the thread,
+           so this is a second store of a value the flag already holds; that is
+           cheaper than testing for it and it keeps the transition to a single clear
+           site.  No suspension-initiating service can have set it again in between:
+           every one of them acts on a thread that is ready or suspended, and this
+           thread is terminated.  */
+        thread_ptr -> tx_thread_suspending =  TX_FALSE;
 
         /* Enable preemption.  */
         _tx_thread_preempt_disable--;

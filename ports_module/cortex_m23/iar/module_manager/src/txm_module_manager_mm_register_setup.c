@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -55,12 +56,6 @@
 /*                                                                        */
 /*    _txm_module_manager_thread_create                                   */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_mm_register_setup(TXM_MODULE_INSTANCE *module_instance)
 {
@@ -91,27 +86,27 @@ ULONG   callback_stack_size;
     /* Set base address register to module data address, which should be at least 32-byte aligned.
        Mask address to proper range, inner shareable, read write, execute never. */
     module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MPU_DATA_INDEX].txm_module_mpu_region_base_address = ((ULONG) module_instance -> txm_module_instance_data_start & 0xFFFFFFE0) | TXM_MODULE_ATTRIBUTE_INNER_SHAREABLE | TXM_MODULE_ATTRIBUTE_READ_WRITE | TXM_MODULE_ATTRIBUTE_EXECUTE_NEVER;
-    
+
     /* Adjust the size of the module elements to be aligned to the default alignment. We do this
        so that when we partition the allocated memory, we can simply place these regions right beside
        each other without having to align their pointers. Note this only works when they all have
        the same alignment.  */
-    
+
     data_size =             module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_data_size;
     start_stop_stack_size = module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_start_stop_stack_size;
     callback_stack_size =   module_instance -> txm_module_instance_preamble_ptr -> txm_module_preamble_callback_stack_size;
-    
+
     data_size =              ((data_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
     start_stop_stack_size =  ((start_stop_stack_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
     callback_stack_size =    ((callback_stack_size + TXM_MODULE_DATA_ALIGNMENT - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
 
     /* Update the data size to include thread stacks.  */
     data_size = data_size + start_stop_stack_size + callback_stack_size;
-    
+
     /* Set the limit address (data start + data size-1), attribute index, and enable bit.  */
     module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MPU_DATA_INDEX].txm_module_mpu_region_limit_address = (((ULONG) module_instance -> txm_module_instance_data_start + data_size - 1) & 0xFFFFFFE0) | TXM_MODULE_ATTRIBUTE_INDEX | TXM_MODULE_ATTRIBUTE_REGION_ENABLE;
     /* End of module data protection.  */
-    
+
     /* Remaining MPU entries are disabled for now and can be used for shared memory. */
 }
 
@@ -168,7 +163,7 @@ ALIGN_TYPE shared_memory_address_end;
     {
         return(TX_FALSE);
     }
-    
+
     /* Check if the object is inside the module data.  */
     if ((obj_ptr >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) &&
         ((obj_ptr + obj_size) <= ((ALIGN_TYPE) module_instance -> txm_module_instance_data_end + 1)))

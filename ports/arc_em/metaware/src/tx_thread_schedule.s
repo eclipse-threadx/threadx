@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 
@@ -59,23 +59,6 @@
 ;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
 ;/*    _tx_thread_system_return             Return to system from thread   */
 ;/*    _tx_thread_context_restore           Restore thread's context       */
-;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  04-02-2021     Andres Mlinar              Modified comment(s), and    */
-;/*                                            fixed interrupt priority    */
-;/*                                            overwritting bug, and       */
-;/*                                            fixed hardware stack checker*/
-;/*                                            disable and reenable logic, */
-;/*                                            resulting in version 6.1.6  */
-;/*  10-15-2021     Andres Mlinar            Modified comment(s), added    */
-;/*                                            support for disabling the   */
-;/*                                            loop control feature,       */
-;/*                                            improved internal logic,    */
-;/*                                            resulting in version 6.1.9  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)

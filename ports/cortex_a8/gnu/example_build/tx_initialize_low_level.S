@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -99,17 +100,6 @@ $_tx_initialize_low_level:
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  04-25-2022     Zhen Kong                Updated comments,             */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
     .global _tx_initialize_low_level
@@ -242,7 +232,7 @@ __tx_irq_processing_return:
        if nested IRQ interrupts are desired.  Interrupts may be re-enabled over
        small code sequences where lr is saved before enabling interrupts and
        restored after interrupts are again disabled.  */
-    
+
     PUSH    {r4, r5}            // Save some preserved registers (r5 is saved just for 8-byte alignment)
     BL      readIntAck
     MOV     r4, r0

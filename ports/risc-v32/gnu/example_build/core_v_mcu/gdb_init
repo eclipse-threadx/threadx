@@ -1,0 +1,6 @@
+set arch riscv:rv32
+target extended-remote localhost:3333
+file build/demo_threadx.elf
+load
+break main
+continue

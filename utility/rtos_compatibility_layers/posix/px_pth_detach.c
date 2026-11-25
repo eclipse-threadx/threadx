@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -48,11 +49,11 @@
 /*    Eventually, you should call pthread_join() or pthread_detach() for  */
 /*    every thread that is created joinable (with a detachstate of        */
 /*    PTHREAD_CREATE_JOINABLE)so that the system can reclaim all resources*/
-/*    associated with the thread. Failure to join to or detach joinable   */ 
+/*    associated with the thread. Failure to join to or detach joinable   */
 /*    threads will result in memory and other resource leaks until the    */
 /*    process ends. If thread doesn't represent a valid undetached thread,*/
-/*    pthread_detach() will return ESRCH.                                 */ 
-/*                                                                        */   
+/*    pthread_detach() will return ESRCH.                                 */
+/*                                                                        */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -70,12 +71,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
 /*                                                                        */
 /**************************************************************************/
 INT pthread_detach(pthread_t thread)
@@ -100,7 +95,7 @@ POSIX_TCB    *pthread_ptr;
         return (EINVAL);
     }
     pthread_ptr->is_detached = TX_TRUE;
-    
+
     TX_RESTORE
     return(OK);
 }

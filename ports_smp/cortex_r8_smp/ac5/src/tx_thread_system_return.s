@@ -1,13 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -62,13 +64,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX components                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2022      Scott Larson            Initial Version 6.2.0         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_system_return(VOID)
 // {
@@ -126,9 +121,10 @@ _tx_skip_solicited_vfp_save
     ADD     r2, r2, r12                         // Build index into time-slice array
     LDR     r1, [r2, #0]                        // Pickup current time slice
 
-    /* Save current stack and switch to system stack.  */
+    /* Save the current stack pointer in the thread's control block. The
+       scheduler runs on this core's banked SVC mode stack, which the startup
+       code set up, so there is no stack switch to perform.  */
     // _tx_thread_current_ptr[core] -> tx_thread_stack_ptr =  sp;
-    // sp = _tx_thread_system_stack_ptr[core];
 
     STR     sp, [r0, #8]                        // Save thread stack pointer
 

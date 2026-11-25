@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -63,12 +64,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 int   sigwait(const sigset_t *set, int *sig)
 {
@@ -99,7 +94,7 @@ POSIX_TCB   *base_thread;
     /* Determine if the current thread is a signal handler thread.  */
     if (base_thread -> signals.signal_handler)
     {
-    
+
         /* Pickup target thread.  */
         base_thread =  base_thread -> signals.base_thread_ptr;
     }
@@ -114,9 +109,9 @@ POSIX_TCB   *base_thread;
     /* Are there any.  */
     if (pending_signals)
     {
-    
+
         /* Yes, there are signals being masked currently that would satisfy this request. */
-   
+
         /* Save the current mask.  */
         saved_mask =  base_thread -> signals.signal_mask.signal_set;
 
@@ -125,31 +120,31 @@ POSIX_TCB   *base_thread;
 
         /* Call pthread_sigmask to temporarily unblock these signals which will release them as well.  */
         pthread_sigmask(SIG_UNBLOCK, set, &original_set);
-        
+
         /* Now determine if the changed mask is still in effect, i.e., there wasn't a pthread_sigmask call from any subsequent signal handlers.  */
         if (base_thread -> signals.signal_mask.signal_set == changed_mask)
         {
-        
+
             /* Yes, restore the previous signal mask.  */
             base_thread -> signals.signal_mask.signal_set =  saved_mask;
         }
-    
+
         /* Derived the signal number from the bit map.  */
         TX_LOWEST_SET_BIT_CALCULATE(pending_signals, signal_number);
-        
+
         /* Return the signal number.  */
         *sig =  (int) signal_number;
-        
+
         /* Return success!  */
         return(OK);
     }
-    
+
     /* Determine if there are any signals that have to be temporarily cleared.  */
     if (base_thread -> signals.signal_mask.signal_set & set -> signal_set)
     {
-    
+
         /* Yes, there are signals being masked needed to satisfy this request. */
-   
+
         /* Save the current mask.  */
         saved_mask =  base_thread -> signals.signal_mask.signal_set;
 
@@ -159,14 +154,14 @@ POSIX_TCB   *base_thread;
         /* Apply the changed signal mask.  */
         base_thread -> signals.signal_mask.signal_set =  changed_mask;
     }
-    
+
     /* Suspend on the signal specified by the input.  */
     status =  tx_event_flags_get(&(base_thread -> signals.signal_event_flags), (ULONG) set -> signal_set, TX_OR_CLEAR, &signal_bit_map, TX_WAIT_FOREVER);
 
     /* Determine if we need to restore the signal mask.  */
     if ((saved_mask) && (changed_mask == base_thread -> signals.signal_mask.signal_set))
     {
-    
+
         /* Yes, the signal mask should be restored.  */
         base_thread -> signals.signal_mask.signal_set =  saved_mask;
     }
@@ -174,19 +169,19 @@ POSIX_TCB   *base_thread;
     /* Check for successful status.  */
     if (status == TX_SUCCESS)
     {
-    
+
         /* Derived the signal number from the bit map.  */
         TX_LOWEST_SET_BIT_CALCULATE(signal_bit_map, signal_number);
-        
+
         /* Return the signal number.  */
         *sig =  (int) signal_number;
-        
+
         /* Return success!  */
         return(OK);
     }
     else
     {
-    
+
         /* Return error!  */
         return(EINVAL);
     }

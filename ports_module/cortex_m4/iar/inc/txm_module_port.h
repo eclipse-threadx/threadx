@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -34,24 +35,6 @@
 /*                                                                        */
 /*    This file defines the basic module constants, interface structures, */
 /*    and function prototypes.                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*  01-31-2022      Scott Larson            Modified comments and made    */
-/*                                            heap user-configurable,     */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022      Scott Larson            Enabled user-defined and      */
-/*                                            default MPU settings,       */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022      Scott Larson            Configure heap size,          */
-/*                                            resulting in version 6.2.0  */
-/*  03-08-2023      Scott Larson            Set default values for RBAR,  */
-/*                                            unify this file for all     */
-/*                                            compilers,                  */
-/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -463,6 +446,6 @@ UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module Cortex-M4 Version 6.4.2 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module Cortex-M4 Version 6.5.0.202601 *";
 
 #endif

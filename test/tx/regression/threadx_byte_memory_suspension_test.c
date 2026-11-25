@@ -1,7 +1,19 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test suspension on a memory byte pool.  */
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 
 static unsigned long   thread_0_counter =  0;
 static TX_THREAD       thread_0;
@@ -43,12 +55,12 @@ UCHAR   *search_ptr;
     /* Adjust the search pointer to avoid the search pointer change for this test.  */
     search_ptr =  pool_0.tx_byte_pool_search;
     while (search_ptr >= pool_0.tx_byte_pool_search)
-    
+
     {
         search_ptr =  *((UCHAR **) ((VOID *) search_ptr));
     }
     pool_0.tx_byte_pool_search =  search_ptr;
-   
+
     tx_thread_wait_abort(&thread_3);
     tx_thread_resume(&thread_3);
 }
@@ -77,8 +89,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -90,8 +102,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -103,12 +115,12 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -121,8 +133,8 @@ CHAR    *pointer;
     }
 
     /* Create byte pool 0.  */
-    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, 108);
-    pointer = pointer + 108;
+    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, TX_TEST_BYTE_POOL_BYTES(108));
+    pointer = pointer + TX_TEST_BYTE_POOL_BYTES(108);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -146,7 +158,7 @@ CHAR    *pointer;
 
     /* Inform user.  */
     printf("Running Byte Memory Suspension Test................................. ");
-        
+
     /* Increment the thread counter.  */
     thread_0_counter++;
 
@@ -188,7 +200,7 @@ CHAR    *pointer;
         printf("ERROR #7\n");
         test_control_return(1);
     }
-    
+
     /* Now allocate the memory again. Only one block of this size will fit.  */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer, 60, TX_NO_WAIT);
 
@@ -200,15 +212,15 @@ CHAR    *pointer;
         printf("ERROR #8\n");
         test_control_return(1);
     }
-    
+
     /* Resume the second thread.  */
     tx_thread_resume(&thread_2);
-    
+
     /* Now relinquish to let both thread 1 and 2 suspend.  */
     tx_thread_relinquish();
-    
+
     /* At this point both threads should be suspended on the byte pool.  */
-    
+
     /* Release the memory again.  */
     status =  tx_byte_release(pointer);
 
@@ -220,11 +232,11 @@ CHAR    *pointer;
         printf("ERROR #9\n");
         test_control_return(1);
     }
-    
+
     /* Now relinquish to get the other threads to run once.  */
     tx_thread_relinquish();
     tx_thread_relinquish();
-    
+
     /* At this point both threads 1 and 2 are suspended on the byte pool again.  */
     if ((thread_1_counter != 3) && (thread_2_counter != 1))
     {
@@ -233,7 +245,7 @@ CHAR    *pointer;
         printf("ERROR #10\n");
         test_control_return(1);
     }
-    
+
     /* Now allocate the memory again. Only one block of this size will fit.  */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer, 60, TX_NO_WAIT);
 
@@ -245,25 +257,25 @@ CHAR    *pointer;
         printf("ERROR #10a\n");
         test_control_return(1);
     }
-    
+
     /* Resume thread 3 to get it suspended on the the pool.  */
     tx_thread_resume(&thread_3);
 
 #ifdef TX_MANUAL_TEST
 
     /* Set BP hear. Now release the memory and step into the code. After byte search issue IRQ2 mannually, which will
-       make thread 3 abort the first request and make another request of a different size. This is the path we are trying 
+       make thread 3 abort the first request and make another request of a different size. This is the path we are trying
        to generate in the test.  */
     status =  tx_byte_release(pointer);
 #else
 
-    /* Set the flag that will make thread 3 abort the first request and make another request of a different size. This tests the memory size change path 
+    /* Set the flag that will make thread 3 abort the first request and make another request of a different size. This tests the memory size change path
        in the byte release loop logic.  */
     threadx_byte_release_loop_test =  1;
     status =  tx_byte_release(pointer);
 
 #endif
- 
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -273,7 +285,7 @@ CHAR    *pointer;
         test_control_return(1);
     }
     else
-    {    
+    {
 
         /* Successful test.  */
         printf("SUCCESS!\n");
@@ -307,7 +319,7 @@ CHAR    *pointer;
         /* Check for status.  */
         if (status != TX_SUCCESS)
             return;
-        
+
         /* Let thread 0 run again.  */
         tx_thread_relinquish();
     }
@@ -339,7 +351,7 @@ CHAR    *pointer;
         /* Check for status.  */
         if (status != TX_SUCCESS)
             return;
-        
+
         /* Let thread 0 run again.  */
         tx_thread_relinquish();
     }
@@ -370,7 +382,7 @@ CHAR    *pointer;
         threadx_byte_allocate_loop_test =  1;
         status =  tx_byte_allocate(&pool_0, (VOID **) &pointer, 90, TX_WAIT_FOREVER);
 #endif
-     
+
         /* Check for status.  */
         if (status != TX_SUCCESS)
             return;
@@ -384,7 +396,7 @@ CHAR    *pointer;
         /* Check for status.  */
         if (status != TX_SUCCESS)
             return;
-        
+
         /* suspend this thread.  */
         tx_thread_suspend(&thread_3);
     }

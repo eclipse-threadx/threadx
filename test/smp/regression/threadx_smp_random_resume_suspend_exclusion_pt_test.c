@@ -1,7 +1,20 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* Define the ThreadX SMP random resume/suspend/exclude/pt test.  */
+// Portions of this file were generated with AI assistance.
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "tx_thread.h"
 
 //#define MAX_PASSES      50000000
 //#define MAX_PASSES      50000
@@ -2119,9 +2132,9 @@ UINT        status;
     pointer =  (CHAR *) first_unused_memory;
 
     /* Create a control thread to run the test.  */
-    status =  tx_thread_create(&control_thread, "control thread", control_thread_entry, 0,  
-            pointer, 1024, 
-            0, 0, TX_NO_TIME_SLICE, TX_AUTO_START);     
+    status =  tx_thread_create(&control_thread, "control thread", control_thread_entry, 0,
+            pointer, 1024,
+            0, 0, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -2153,7 +2166,7 @@ UINT        status;
 
     /* Clear mapping error flag.  */
     mapping_error =  TX_FALSE;
-    
+
     /* Clear the preemption-threshold error flag.  */
     preemption_threshold_error =  TX_FALSE;
 
@@ -2168,10 +2181,10 @@ UINT        status;
     {
 
         /* Create each thread.  */
-        status +=  tx_thread_create(_smp_randomized_source_array[i], "test thread", thread_entry, i,  
-//            (void *) pointer, 512, 
+        status +=  tx_thread_create(_smp_randomized_source_array[i], "test thread", thread_entry, i,
+//            (void *) pointer, 512,
             malloc(1024), 1024,
-            priority, priority, TX_NO_TIME_SLICE, TX_DONT_START);     
+            priority, priority, TX_NO_TIME_SLICE, TX_DONT_START);
 //        pointer =  pointer + 512;
 
         /* Check status.  */
@@ -2186,7 +2199,7 @@ UINT        status;
         /* Move to next entry/priority.  */
         i++;
         priority++;
-        
+
         /* Should priority be reset?  */
 		if (priority >= TX_MAX_PRIORITIES)
 		{
@@ -2209,21 +2222,21 @@ UINT        status;
     status += tx_thread_resume(&thread_4);
     status += tx_thread_resume(&thread_22);
     status += tx_thread_resume(&thread_2);
-    
+
     /* Call rebalance directly.  */
     TX_DISABLE
     _tx_thread_smp_rebalance_execute_list(0);
     TX_RESTORE
-    
+
     status += tx_thread_sleep(4);
-    
+
     /* Check status and make sure all the threads ran and suspended.  */
-    if ((status != TX_SUCCESS) || (thread_2.tx_thread_run_count == 0) || 
+    if ((status != TX_SUCCESS) || (thread_2.tx_thread_run_count == 0) ||
                                   (thread_4.tx_thread_run_count == 0) ||
                                   (thread_16.tx_thread_run_count == 0) ||
                                   (thread_22.tx_thread_run_count == 0))
     {
-    
+
         printf("ERROR #3\n");
         test_control_return(1);
     }
@@ -2234,18 +2247,18 @@ UINT        status;
     status += tx_thread_smp_core_exclude(&thread_16, 0);
     status += tx_thread_smp_core_exclude(&thread_22, 0);
     status += tx_thread_preemption_change(&thread_4, 4, &original_threshold);
-    status += tx_thread_preemption_change(&thread_16, 16, &original_threshold);   
-    
+    status += tx_thread_preemption_change(&thread_16, 16, &original_threshold);
+
     /* Clear the run counters.  */
     thread_2.tx_thread_run_count =  0;
     thread_4.tx_thread_run_count =  0;
     thread_16.tx_thread_run_count =  0;
     thread_22.tx_thread_run_count =  0;
-    
+
     /* Check status.  */
-    if (status != TX_SUCCESS) 
+    if (status != TX_SUCCESS)
     {
-    
+
         printf("ERROR #4\n");
         test_control_return(1);
     }
@@ -2256,20 +2269,20 @@ UINT        status;
     end_pass =     start_pass + MAX_PASSES;
     do
     {
- 
+
         /* Clear the randomized test array.  */
         for (i = 0; i < (TX_THREAD_SMP_MAX_CORES*2); i++)
         {
             _smp_randomized_test_array[i] = TX_NULL;
-        }        
- 
+        }
+
         /* Build the randomized test array.  */
         for (i = 0; i < (TX_THREAD_SMP_MAX_CORES*2); i++)
         {
             do
             {
                 source_index =  (rand())%1024;
-                
+
                 /* Determine if this index has repeated.  */
                 thread_ptr = _smp_randomized_source_array[source_index];
 
@@ -2282,72 +2295,74 @@ UINT        status;
                     {
                         j =  (TX_THREAD_SMP_MAX_CORES*2);
                     }
-                    
+
                     /* Determine if we have a duplicate.  */
                     if (_smp_randomized_test_array[j] == thread_ptr)
 						thread_ptr =  TX_NULL;
-                
+
                     j++;
                 }
-              
+
              } while (thread_ptr == TX_NULL);
-            
+
             /* Clear run counter.  */
             thread_ptr -> tx_thread_run_count =  0;
-            
+
             /* Setup the exclusion for this thread.  */
             exclusions =  (ULONG) (rand()%15);
             tx_thread_smp_core_exclude(thread_ptr, exclusions);
 
-            /* See if we should setup a preemption-threshold.  */
-            if ((thread_ptr -> tx_thread_priority > 40) &&
+            /* See if we should setup a preemption-threshold. The thresholds are
+               derived from TX_MAX_PRIORITIES so that the randomised phase sets one
+               whatever the port's priority count is.  */
+            if ((thread_ptr -> tx_thread_priority > (TX_MAX_PRIORITIES/2)) &&
                 (exclusions & 1))
             {
                 /* Change preemption-threshold to enable it.  */
-                tx_thread_preemption_change(thread_ptr, thread_ptr -> tx_thread_priority - 20, &original_threshold);
+                tx_thread_preemption_change(thread_ptr, thread_ptr -> tx_thread_priority - (TX_MAX_PRIORITIES/4), &original_threshold);
             }
 
             /* Save the thread pointer.  */
             _smp_randomized_test_array[i] =  thread_ptr;
         }
-    
+
         /* Now make all the random threads ready.  */
         for (i = 0; i < (TX_THREAD_SMP_MAX_CORES*2); i++)
         {
             status =  tx_thread_resume(_smp_randomized_test_array[i]);
 
-            /* Check for an error.  */  
+            /* Check for an error.  */
             if (status != TX_SUCCESS)
             {
-                          
+
                 printf("ERROR #5\n");
                 test_control_return(1);
 				break;
-            } 
+            }
         }
-        
+
         /* Check the status.  */
         if (status)
             break;
-        
+
         /* Move to the lowest priority.  */
         status    +=  tx_thread_priority_change(current_thread, TX_MAX_PRIORITIES-1, &original_priority);
 		tx_thread_relinquish();
-            
+
         /* At this point all the threads have run, or should have.  */
-        
+
         /* Restore priority.  */
         status   +=  tx_thread_priority_change(current_thread, original_priority, &original_priority);
-             
+
         /* Was there an error?  */
         if (status != TX_SUCCESS)
         {
-                          
+
              printf("ERROR #6\n");
              test_control_return(1);
              break;
-        } 
-                   
+        }
+
         /* Determine if all the threads in the the random sample ran.  */
         for (i = 0; i < (TX_THREAD_SMP_MAX_CORES*2); i++)
         {
@@ -2379,10 +2394,10 @@ UINT        status;
 				/* Wait for the thread to complete!  */
 				tx_thread_relinquish();
 			}
-            
+
             /* Reset the exclusion for this thread.  */
             tx_thread_smp_core_exclude(thread_ptr, 0);
-            
+
             /* Reset preemption-threshold if needed.  */
             if (thread_ptr -> tx_thread_priority != thread_ptr -> tx_thread_preempt_threshold)
             {
@@ -2390,11 +2405,11 @@ UINT        status;
                 /* Change preemption-threshold to enable it.  */
                 tx_thread_preemption_change(thread_ptr, thread_ptr -> tx_thread_priority, &original_threshold);
             }
-            
+
             /* Check for mapping error.  */
             if (mapping_error)
             {
-            
+
 				 /* No, a thread ran on inccorect core!  */
                  printf("ERROR #8\n");
                  test_control_return(1);
@@ -2404,15 +2419,15 @@ UINT        status;
             /* Check for preemption-threshold error.  */
             if (preemption_threshold_error)
             {
-            
+
 				 /* No, a thread's preemption-threshold was violated!  */
                  printf("ERROR #9\n");
                  test_control_return(1);
                  break;
             }
 
-        }         
-                  
+        }
+
         /* Increment the pass counter.  */
         pass++;
 
@@ -2444,17 +2459,17 @@ TX_THREAD   *other_thread;
 
         /* Get thread.  */
         thread_ptr =  _smp_randomized_source_array[id];
-        
+
         /* Determine if this thread is running on a valid core.  */
         core =  tx_thread_smp_core_get();
-        
+
         /* Build a bit map for this core.  */
         core_bit_map =  (((ULONG) 1) << core);
-        
+
         /* Is this a valid core?  */
         if (core_bit_map & thread_ptr -> tx_thread_smp_cores_excluded)
         {
-        
+
             /* Invalid core, set error flag.  */
             mapping_error =  TX_TRUE;
         }
@@ -2462,26 +2477,26 @@ TX_THREAD   *other_thread;
         /* Now check for a preemption-threshold error.  */
         if (thread_ptr -> tx_thread_priority != thread_ptr -> tx_thread_preempt_threshold)
         {
-        
+
             /* Loop through the execute list to determine if any other threads have a priority or preemption-threshold less than this thread.  */
             for (i = 0; i < TX_THREAD_SMP_MAX_CORES; i++)
             {
-            
+
                 /* Pickup thread for the core.  */
                 other_thread =  _tx_thread_execute_ptr[i];
-                
+
                 /* Is it this thread?  */
                 if ((other_thread == TX_NULL) || (other_thread == thread_ptr))
                     continue;
-                    
+
                 /* Does this thread violate the preemption-thread of the current thread?  */
                 if (other_thread -> tx_thread_preempt_threshold >= thread_ptr -> tx_thread_preempt_threshold)
                 {
-                
+
                     /* This violated preemption-threshold. Set the flag.  */
                     preemption_threshold_error =  TX_TRUE;
                 }
-            }             
+            }
         }
 
         /* Suspend thread!  */

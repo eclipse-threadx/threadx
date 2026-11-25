@@ -1,13 +1,13 @@
 ;----------------------------------------------------------------
 ; Copyright (c) 2005-2018 Arm Limited (or its affiliates). All rights reserved.
 ; Use, modification and redistribution of this file is subject to your possession of a
-; valid End User License Agreement for the Arm Product of which these examples are part of 
+; valid End User License Agreement for the Arm Product of which these examples are part of
 ; and your compliance with all applicable terms and conditions of such licence agreement.
 ;
 ; Cortex-A5MP SMP example - Startup Code
 ;----------------------------------------------------------------
 
-        
+
 
         AREA  MP_GIC, CODE, READONLY
 
@@ -40,7 +40,7 @@ enableGIC PROC
 
         BX      lr
         ENDP
-  
+
 ; ------------------------------------------------------------
 
         EXPORT disableGIC
@@ -88,7 +88,7 @@ enableIntID PROC
         ENDP
 
 ; ------------------------------------------------------------
-  
+
         EXPORT  disableIntID
         ; void disableIntID(unsigned int ID)
         ; Disables the interrupt source number ID
@@ -129,7 +129,7 @@ setIntPriority PROC
         ; r0 = base addr
         ; r1 = priority
         ; r2 = ID
-  
+
         ; Make sure that priority value is only 5 bits, and convert to expected format
         AND     r1, r1, #0x1F
         MOV     r1, r1, LSL #3
@@ -208,7 +208,7 @@ setPriorityMask PROC
 
         BX      lr
         ENDP
-  
+
 ; ------------------------------------------------------------
 
        EXPORT setBinaryPoint
@@ -249,7 +249,7 @@ writeEOI PROC
 
        BX      lr
        ENDP
-  
+
 ;----------------------------------------------------------------
 ; SGI
 ;----------------------------------------------------------------

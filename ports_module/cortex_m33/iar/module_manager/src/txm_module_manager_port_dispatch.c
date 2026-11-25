@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -60,12 +61,6 @@
 /*                                                                        */
 /*    _txm_module_manager_kernel_dispatch                                 */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
-/*                                                                        */
 /**************************************************************************/
 ALIGN_TYPE _txm_module_manager_port_dispatch(TXM_MODULE_INSTANCE *module_instance, ULONG kernel_request, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2)
 {
@@ -88,7 +83,7 @@ ALIGN_TYPE return_value = TX_NOT_AVAILABLE;
             );
             break;
         }
-        
+
         case TXM_THREAD_SECURE_STACK_FREE_CALL:
         {
             if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
@@ -102,13 +97,13 @@ ALIGN_TYPE return_value = TX_NOT_AVAILABLE;
             );
             break;
         }
-        
+
         default:
         {
             /* Unhandled kernel request, return an error!  */
             break;
         }
     }
-    
+
     return(return_value);
 }

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -57,12 +58,6 @@
 /*                                                                        */
 /*    posix internal code                                                 */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 ULONG  posix_in_thread_context(VOID)
 {
@@ -72,7 +67,7 @@ ULONG  posix_in_thread_context(VOID)
 #ifndef TX_TIMER_PROCESS_IN_ISR
     extern    TX_THREAD       _tx_timer_thread;
 #endif
-    
+
     /*     Return TX_FALSE if any of the following are true:
          - we are in the scheduling loop (not in a thread);
          - we are in an ISR
@@ -90,10 +85,10 @@ ULONG  posix_in_thread_context(VOID)
              || (_tx_thread_system_state)               /* In an ISR       */
 #ifndef TX_TIMER_PROCESS_IN_ISR
                                                         /* Timer routine   */
-             || (_tx_thread_current_ptr == &_tx_timer_thread) 
+             || (_tx_thread_current_ptr == &_tx_timer_thread)
 #endif
             )
-       
+
     {
         /* We are NOT in thread (thread) context.  */
         return (TX_FALSE);

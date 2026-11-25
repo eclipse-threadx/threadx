@@ -1,23 +1,23 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
-;/**************************************************************************/ 
-;/**************************************************************************/ 
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
-;/**                                                                       */ 
-;/**   Initialize                                                          */ 
-;/**                                                                       */ 
-;/**************************************************************************/ 
-;/**************************************************************************/ 
+;/**************************************************************************/
+;/**************************************************************************/
+;/**                                                                       */
+;/** ThreadX Component                                                     */
+;/**                                                                       */
+;/**   Initialize                                                          */
+;/**                                                                       */
+;/**************************************************************************/
+;/**************************************************************************/
 ;
 ;
 ;#define TX_SOURCE_CODE
@@ -109,45 +109,39 @@ Reset_Vector
 ;
 ;
         AREA ||.text||, CODE, READONLY
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_low_level                        Cortex-A7/MMU/AC5   */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_initialize_low_level                        Cortex-A7/MMU/AC5   */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function is responsible for any low-level processor            */ 
-;/*    initialization, including setting up interrupt vectors, setting     */ 
-;/*    up a periodic timer interrupt source, saving the system stack       */ 
-;/*    pointer for use in ISR processing later, and finding the first      */ 
-;/*    available RAM memory address for tx_application_define.             */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
+;/*  DESCRIPTION                                                           */
 ;/*                                                                        */
-;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+;/*    This function is responsible for any low-level processor            */
+;/*    initialization, including setting up interrupt vectors, setting     */
+;/*    up a periodic timer interrupt source, saving the system stack       */
+;/*    pointer for use in ISR processing later, and finding the first      */
+;/*    available RAM memory address for tx_application_define.             */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter           ThreadX entry function        */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
@@ -335,7 +329,7 @@ GIC1_DIST_INTERFACE_BASE    EQU 0x2C001000
 ;
 ;
 ;/* Define initial heap/stack routine for the ARM RealView (and ADS) startup code.  This
-;   routine will set the initial stack to use the ThreadX IRQ & FIQ & 
+;   routine will set the initial stack to use the ThreadX IRQ & FIQ &
 ;   (optionally SYS) stack areas.  */
 ;
     EXPORT  __user_initial_stackheap
@@ -375,7 +369,7 @@ __tx_reserved_handler
 ;
 ;
     EXPORT  __tx_irq_handler
-    EXPORT  __tx_irq_processing_return      
+    EXPORT  __tx_irq_processing_return
 __tx_irq_handler
 ;
 ;    /* Jump to context save to save system context.  */
@@ -383,15 +377,15 @@ __tx_irq_handler
 __tx_irq_processing_return
 ;
 ;    /* At this point execution is still in the IRQ mode.  The CPSR, point of
-;       interrupt, and all C scratch registers are available for use.  In 
+;       interrupt, and all C scratch registers are available for use.  In
 ;       addition, IRQ interrupts may be re-enabled - with certain restrictions -
 ;       if nested IRQ interrupts are desired.  Interrupts may be re-enabled over
-;       small code sequences where lr is saved before enabling interrupts and 
+;       small code sequences where lr is saved before enabling interrupts and
 ;       restored after interrupts are again disabled.  */
 ;
 ;
     BL      _tx_timer_interrupt                 ; Timer interrupt handler
-    
+
     ; clear timer interrupt
     ldr     r0, =0x1C110000
     eor     r1, r1, r1
@@ -399,11 +393,11 @@ __tx_irq_processing_return
 
 _tx_not_timer_interrupt
 ;
-;    /* Interrupt nesting is allowed after calling _tx_thread_irq_nesting_start 
+;    /* Interrupt nesting is allowed after calling _tx_thread_irq_nesting_start
 ;       from IRQ mode with interrupts disabled.  This routine switches to the
-;       system mode and returns with IRQ interrupts enabled.  
-;       
-;       NOTE:  It is very important to ensure all IRQ interrupts are cleared 
+;       system mode and returns with IRQ interrupts enabled.
+;
+;       NOTE:  It is very important to ensure all IRQ interrupts are cleared
 ;       prior to enabling nested IRQ interrupts.  */
     IF :DEF:TX_ENABLE_IRQ_NESTING
     BL      _tx_thread_irq_nesting_start
@@ -413,7 +407,7 @@ _tx_not_timer_interrupt
 ;    /* Application IRQ handlers can be called here!  */
 ;
 ;    /* If interrupt nesting was started earlier, the end of interrupt nesting
-;       service must be called before returning to _tx_thread_context_restore.  
+;       service must be called before returning to _tx_thread_context_restore.
 ;       This routine returns in processing in IRQ mode with interrupts disabled.  */
     IF :DEF:TX_ENABLE_IRQ_NESTING
     BL      _tx_thread_irq_nesting_end
@@ -429,28 +423,28 @@ _tx_not_timer_interrupt
 __tx_example_vectored_irq_handler
 ;
 ;
-;    /* Save initial context and call context save to prepare for 
+;    /* Save initial context and call context save to prepare for
 ;       vectored ISR execution.  */
 ;
 ;    STMDB   sp!, {r0-r3}                        ; Save some scratch registers
 ;    MRS     r0, SPSR                            ; Pickup saved SPSR
-;    SUB     lr, lr, #4                          ; Adjust point of interrupt 
+;    SUB     lr, lr, #4                          ; Adjust point of interrupt
 ;    STMDB   sp!, {r0, r10, r12, lr}             ; Store other scratch registers
 ;    BL      _tx_thread_vectored_context_save    ; Vectored context save
 ;
 ;    /* At this point execution is still in the IRQ mode.  The CPSR, point of
-;       interrupt, and all C scratch registers are available for use.  In 
+;       interrupt, and all C scratch registers are available for use.  In
 ;       addition, IRQ interrupts may be re-enabled - with certain restrictions -
 ;       if nested IRQ interrupts are desired.  Interrupts may be re-enabled over
-;       small code sequences where lr is saved before enabling interrupts and 
+;       small code sequences where lr is saved before enabling interrupts and
 ;       restored after interrupts are again disabled.  */
 ;
 ;
-;    /* Interrupt nesting is allowed after calling _tx_thread_irq_nesting_start 
+;    /* Interrupt nesting is allowed after calling _tx_thread_irq_nesting_start
 ;       from IRQ mode with interrupts disabled.  This routine switches to the
-;       system mode and returns with IRQ interrupts enabled.  
-;       
-;       NOTE:  It is very important to ensure all IRQ interrupts are cleared 
+;       system mode and returns with IRQ interrupts enabled.
+;
+;       NOTE:  It is very important to ensure all IRQ interrupts are cleared
 ;       prior to enabling nested IRQ interrupts.  */
 ;    IF :DEF:TX_ENABLE_IRQ_NESTING
 ;    BL      _tx_thread_irq_nesting_start
@@ -459,7 +453,7 @@ __tx_example_vectored_irq_handler
 ;    /* Application IRQ handlers can be called here!  */
 ;
 ;    /* If interrupt nesting was started earlier, the end of interrupt nesting
-;       service must be called before returning to _tx_thread_context_restore.  
+;       service must be called before returning to _tx_thread_context_restore.
 ;       This routine returns in processing in IRQ mode with interrupts disabled.  */
 ;    IF :DEF:TX_ENABLE_IRQ_NESTING
 ;    BL      _tx_thread_irq_nesting_end
@@ -481,11 +475,11 @@ __tx_fiq_processing_return
 ;    /* At this point execution is still in the FIQ mode.  The CPSR, point of
 ;       interrupt, and all C scratch registers are available for use.  */
 ;
-;    /* Interrupt nesting is allowed after calling _tx_thread_fiq_nesting_start 
+;    /* Interrupt nesting is allowed after calling _tx_thread_fiq_nesting_start
 ;       from FIQ mode with interrupts disabled.  This routine switches to the
-;       system mode and returns with FIQ interrupts enabled. 
+;       system mode and returns with FIQ interrupts enabled.
 ;
-;       NOTE:  It is very important to ensure all FIQ interrupts are cleared 
+;       NOTE:  It is very important to ensure all FIQ interrupts are cleared
 ;       prior to enabling nested FIQ interrupts.  */
     IF  :DEF:TX_ENABLE_FIQ_NESTING
     BL      _tx_thread_fiq_nesting_start
@@ -509,43 +503,43 @@ __tx_fiq_handler
     B       __tx_fiq_handler                    ; FIQ interrupt handler
     ENDIF
 
-    
-    
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    __tx_prefetch_handler & __tx_abort_handler      Cortex-A7/MMU/AC5   */ 
+
+
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    __tx_prefetch_handler & __tx_abort_handler      Cortex-A7/MMU/AC5   */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function handles MMU exceptions and fills the                  */ 
-;/*    _txm_module_manager_memory_fault_info struct.                       */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _txm_module_manager_memory_fault_handler                            */ 
-;/*    _tx_execution_thread_exit                                           */ 
-;/*    _tx_thread_schedule                                                 */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    MMU exceptions                                                      */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function handles MMU exceptions and fills the                  */
+;/*    _txm_module_manager_memory_fault_info struct.                       */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _txm_module_manager_memory_fault_handler                            */
+;/*    _tx_execution_thread_exit                                           */
+;/*    _tx_thread_schedule                                                 */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    MMU exceptions                                                      */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
@@ -561,7 +555,7 @@ __tx_fiq_handler
     EXTERN  _txm_module_manager_memory_fault_handler
     EXTERN  _tx_execution_thread_exit
     EXTERN  _tx_thread_schedule
-    
+
     EXPORT  __tx_prefetch_handler
     EXPORT  __tx_abort_handler
 __tx_prefetch_handler
@@ -589,7 +583,7 @@ __tx_abort_handler
     STR     r0, [r3, #16]                   ; Save IFAR
     MRC     p15, 0, r0, c5, c0, 1           ; Read IFSR
     STR     r0, [r3, #20]                   ; Save IFSR
-    
+
     ; Save registers r0-r12
     POP     {r0-r2}
     STR     r0, [r3, #28]                   ; Save r0
@@ -606,7 +600,7 @@ __tx_abort_handler
     STR     r10,[r3, #68]                   ; Save r10
     STR     r11,[r3, #72]                   ; Save r11
     STR     r12,[r3, #76]                   ; Save r12
-    
+
     CPS     #SYS_MODE                       ; Enter SYS mode
     MOV     r0, lr                          ; Pickup lr
     MOV     r1, sp                          ; Pickup sp
@@ -618,7 +612,7 @@ __tx_abort_handler
     ORR     r0, r0, #SYS_MODE               ; Return into SYS mode
     BIC     r0, r0, #THUMB_MASK             ; Clear THUMB mode
     MSR     SPSR_c, r0                      ; Save SPSR
-    
+
     ; Call memory manager fault handler
     BL      _txm_module_manager_memory_fault_handler
 
@@ -633,11 +627,11 @@ __tx_abort_handler
     LDR     r1, [r0]                        ; Pickup system state
     SUB     r1, r1, #1                      ; Decrement
     STR     r1, [r0]                        ; Store new system state
-    
+
     MOV     r1, #0                          ; Build NULL value
     LDR     r0, =_tx_thread_current_ptr     ; Pickup address of current thread pointer
     STR     r1, [r0]                        ; Clear current thread pointer
-    
+
     ; Return from exception
     LDR     lr, =_tx_thread_schedule        ; Load scheduler address
     MOVS    pc, lr                          ; Return to scheduler

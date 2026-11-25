@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -61,14 +64,6 @@
 /*                                                                        */
 /*    Application code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_delete(TX_THREAD *thread_ptr)
 {
@@ -98,6 +93,31 @@ UINT            status;
             TX_RESTORE
 
             /* Thread not completed or terminated - return an error!  */
+            status =  TX_DELETE_ERROR;
+        }
+    }
+
+    /* The state is terminal, but a terminal state on its own is not authorization to
+       release the control block.  Both paths that produce one -- thread completion in
+       _tx_thread_shell_entry and thread termination in _tx_thread_terminate -- publish
+       TX_COMPLETED or TX_TERMINATED, and then run this thread's exit notification
+       callback, before the thread has been detached from the ready list and before
+       those services have finished with the pointer they hold to it.  The suspending
+       flag is set for exactly that interval, so a thread whose flag is still set is
+       part-way through the transition.  */
+    if (status == TX_SUCCESS)
+    {
+
+        /* Is the completion or termination transition still in progress?  */
+        if (thread_ptr -> tx_thread_suspending == TX_TRUE)
+        {
+
+            /* Restore interrupts.  */
+            TX_RESTORE
+
+            /* Yes, refuse the delete rather than unlink a thread the scheduler is
+               still holding.  The condition is transient: the caller may retry once
+               the transition has finished.  */
             status =  TX_DELETE_ERROR;
         }
     }

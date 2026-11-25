@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -68,15 +69,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Remove double parenthesis,    */
-/*                                            update argument type,       */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 int   pthread_kill(ALIGN_TYPE thread_id, int sig)
 {
@@ -101,7 +93,7 @@ UINT        retval;
     /* Determine if the desired signal is valid.  */
     if ((sig < 0) || (sig > SIGRTMAX))
     {
-    
+
         /* Return an error.  */
         posix_set_pthread_errno(EINVAL);
         return(ERROR);
@@ -126,9 +118,9 @@ UINT        retval;
     /* See if there is a signal handler setup for this signal.  */
     if (!handler)
     {
-    
+
         /* No handler, just set/clear the event flags to handle the sigwait condition.  */
-        
+
         /* Set the event flag corresponding the signal.  */
         tx_event_flags_set(&(target_thread -> signals.signal_event_flags), (((ULONG) 1) << sig), TX_OR);
 
@@ -142,7 +134,7 @@ UINT        retval;
     /* Now, let's look to see if the same signal is already pending.  */
     if (target_thread -> signals.signal_pending.signal_set & (((unsigned long) 1) << sig))
     {
-    
+
         /* Yes, the same signal is already pending, just return.  */
         return(OK);
     }
@@ -150,17 +142,17 @@ UINT        retval;
     /* Now determine if the thread's signals are masked by pthread_sigmask.  */
     if (target_thread -> signals.signal_mask.signal_set & (((unsigned long) 1) << sig))
     {
-    
-        /* Yes, simply set the pending bit so we know that the signal must be activated later when the 
+
+        /* Yes, simply set the pending bit so we know that the signal must be activated later when the
            signal mask for this signal is cleared.  */
         target_thread -> signals.signal_pending.signal_set =  target_thread -> signals.signal_pending.signal_set | (((unsigned long) 1) << sig);
         return(OK);
     }
 
     /* At this point we know that we need to create a new signal handler thread for processing this signal.  */
- 
-    /* Get a pthread control block for this new signal pthread */ 
-    
+
+    /* Get a pthread control block for this new signal pthread */
+
     /* Disable interrupts for protection.  */
     TX_DISABLE
 
@@ -168,12 +160,12 @@ UINT        retval;
     _tx_thread_preempt_disable++;
 
     /* Allocate a POSIX thread control block. */
-    status = posix_allocate_pthread_t(&new_signal_thread); 
+    status = posix_allocate_pthread_t(&new_signal_thread);
 
     /* Restore interrupts.  */
     TX_RESTORE
-    
-    /* Make sure we got a new thread control block */ 
+
+    /* Make sure we got a new thread control block */
     if ((status == ERROR) || (!new_signal_thread))
     {
 
@@ -186,10 +178,10 @@ UINT        retval;
         /* Restore interrupts.  */
         TX_RESTORE
 
-        /* Configuration/resource error.  */ 
+        /* Configuration/resource error.  */
         posix_set_pthread_errno(EAGAIN);
-        return(ERROR); 
-    }   
+        return(ERROR);
+    }
 
     /* Inherit the stack size for the new signal thread.  */
     new_signal_thread -> stack_size =  target_thread -> stack_size ;
@@ -200,10 +192,10 @@ UINT        retval;
     /* problem allocating stack space */
     if (status == ERROR)
     {
-        
+
         /* Mark the previously allocated control block as available.  */
         new_signal_thread -> in_use = FALSE;
-    
+
         /* Disable interrupts.  */
         TX_DISABLE
 
@@ -213,11 +205,11 @@ UINT        retval;
         /* Restore interrupts.  */
         TX_RESTORE
 
-        /* Configuration/resource error.  */ 
+        /* Configuration/resource error.  */
         posix_set_pthread_errno(EAGAIN);
-        return(ERROR); 
-    }   
-    
+        return(ERROR);
+    }
+
     /* Inherit scheduling attributes from base thread.  */
     new_signal_thread -> current_priority =         target_thread -> current_priority ;
     new_signal_thread -> detach_state =             target_thread -> detach_state ;
@@ -228,7 +220,7 @@ UINT        retval;
     new_signal_thread -> sched_policy =             target_thread -> sched_policy;
     new_signal_thread -> is_joined_by =             TX_FALSE;
     new_signal_thread -> joined_by_pthreadID =      TX_FALSE;
-    new_signal_thread -> is_joined_to =             TX_FALSE; 
+    new_signal_thread -> is_joined_to =             TX_FALSE;
     new_signal_thread -> joined_to_pthreadID =      TX_FALSE;
     new_signal_thread -> cancel_state =             PTHREAD_CANCEL_ENABLE;
     new_signal_thread -> cancel_type =              PTHREAD_CANCEL_DEFERRED;
@@ -244,7 +236,7 @@ UINT        retval;
     /* Mark the new thread as a signal thread, clear signal info, and setup links.  */
     new_signal_thread -> signals.signal_handler =             TRUE;
     new_signal_thread -> signals.signal_nesting_depth =       target_thread -> signals.signal_nesting_depth;
-    new_signal_thread -> signals.signal_pending.signal_set =  target_thread -> signals.signal_pending.signal_set;    
+    new_signal_thread -> signals.signal_pending.signal_set =  target_thread -> signals.signal_pending.signal_set;
     new_signal_thread -> signals.saved_thread_state =         ((TX_THREAD *) target_thread) -> tx_thread_state;
     new_signal_thread -> signals.base_thread_ptr =            target_thread;
     new_signal_thread -> signals.next_signal_thread =         target_thread -> signals.top_signal_thread;
@@ -262,9 +254,9 @@ UINT        retval;
                                (TX_LOWEST_PRIORITY - new_signal_thread -> current_priority + 1),
                                (TX_LOWEST_PRIORITY - new_signal_thread -> current_priority + 1),
                                new_signal_thread -> time_slice,
-                               TX_AUTO_START); 
+                               TX_AUTO_START);
 
-    /* See if ThreadX encountered an error */ 
+    /* See if ThreadX encountered an error */
     if (retval)
     {
 
@@ -273,10 +265,10 @@ UINT        retval;
 
         /* Release the stack memory.  */
         posix_memory_release(new_signal_thread -> stack_address);
-        
+
         /* Mark the previously allocated control block as available.  */
         new_signal_thread -> in_use = FALSE;
-    
+
         /* Disable interrupts.  */
         TX_DISABLE
 
@@ -286,10 +278,10 @@ UINT        retval;
         /* Restore interrupts.  */
         TX_RESTORE
 
-        /* Internal error */ 
-        posix_error_handler(3333); 
+        /* Internal error */
+        posix_error_handler(3333);
         posix_set_pthread_errno(EACCES);
-        return(ERROR); 
+        return(ERROR);
     }
 
     /* Disable interrupts.  */
@@ -304,13 +296,13 @@ UINT        retval;
 
         /* Restore interrupts.  */
         TX_RESTORE
-    
+
         /* Suspend the base thread so that it doesn't run again until all the signals have been processed.  */
         tx_thread_suspend((TX_THREAD *) target_thread);
     }
     else if (new_signal_thread -> signals.next_signal_thread)
     {
-    
+
         /* Restore interrupts.  */
         TX_RESTORE
 
@@ -322,7 +314,7 @@ UINT        retval;
 
     /* Check for a preemption condition.  */
     _tx_thread_system_preempt_check();
-     
+
     /* Return success!  */
     return(OK);
 }

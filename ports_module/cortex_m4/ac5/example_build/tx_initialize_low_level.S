@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -19,7 +21,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-    IMPORT  _tx_thread_system_stack_ptr
     IMPORT  _tx_initialize_unused_memory
     IMPORT  _tx_thread_context_save
     IMPORT  _tx_thread_context_restore
@@ -130,14 +131,6 @@ Reset_Handler
 /*                                                                        */
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  11-09-2020      Scott Larson            Modified comment(s),          */
-/*                                            resulting in version 6.1.2  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_initialize_low_level(VOID)
 // {
@@ -145,39 +138,29 @@ Reset_Handler
 _tx_initialize_low_level
 
     /* Disable interrupts during ThreadX initialization.  */
-    
+
     CPSID   i
 
     /* Set base of available memory to end of non-initialised RAM area.  */
 
     LDR     r0, =_tx_initialize_unused_memory       // Build address of unused memory pointer
     LDR     r1, =|Image$$ZI$$Limit|                 // Build first free address
-    ADD     r1, r1, #4                              // 
+    ADD     r1, r1, #4                              //
     STR     r1, [r0]                                // Setup first unused memory pointer
-
-    /* Setup Vector Table Offset Register.  */
-
-    MOV     r0, #0xE000E000                         // Build address of NVIC registers
-    LDR     r1, =__tx_vectors                       // Pickup address of vector table
-    STR     r1, [r0, #0xD08]                        // Set vector table address
 
     /* Enable the cycle count register.  */
 
 //    LDR     r0, =0xE0001000                         // Build address of DWT register
 //    LDR     r1, [r0]                                // Pickup the current value
 //    ORR     r1, r1, #1                              // Set the CYCCNTENA bit
-//    STR     r1, [r0]                                // Enable the cycle count register 
-
-    /* Set system stack pointer from vector value.  */
-
-    LDR     r0, =_tx_thread_system_stack_ptr        // Build address of system stack pointer
-    LDR     r1, =__tx_vectors                       // Pickup address of vector table
-    LDR     r1, [r1]                                // Pickup reset stack pointer
-    STR     r1, [r0]                                // Save system stack pointer
+//    STR     r1, [r0]                                // Enable the cycle count register
 
     /* Configure SysTick.  */
 
     MOV     r0, #0xE000E000                         // Build address of NVIC registers
+    MOV     r1, #0                                  // Build value for SysTick reset
+    STR     r1, [r0, #0x10]                         // Reset SysTick Control
+    STR     r1, [r0, #0x18]                         // Reset SysTick Counter Value
     LDR     r1, =SYSTICK_CYCLES
     STR     r1, [r0, #0x14]                         // Setup SysTick Reload Value
     MOV     r1, #0x7                                // Build SysTick Control Enable Value
@@ -198,7 +181,7 @@ _tx_initialize_low_level
 
     /* Return to caller.  */
 
-    BX      lr 
+    BX      lr
 // }
 
 
@@ -216,12 +199,12 @@ __user_initial_stackheap
 /* Define shells for each of the unused vectors.  */
 
     EXPORT  __tx_BadHandler
-__tx_BadHandler 
+__tx_BadHandler
     B       __tx_BadHandler
 
 //    EXPORT  __tx_SVCallHandler
 //__tx_SVCallHandler
-//    B       __tx_SVCallHandler 
+//    B       __tx_SVCallHandler
 
     EXPORT  __tx_IntHandler
 __tx_IntHandler
@@ -247,7 +230,7 @@ __tx_SysTickHandler
     BX      LR
 // }
 
-    EXPORT  __tx_NMIHandler 
+    EXPORT  __tx_NMIHandler
 __tx_NMIHandler
     B       __tx_NMIHandler
 

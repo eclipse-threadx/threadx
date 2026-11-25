@@ -1,18 +1,20 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026-present Eclipse ThreadX contributors
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
+; Portions of this file were generated with AI assistance.
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread - Low Level SMP Support                                      */
 ;/**                                                                       */
@@ -33,10 +35,10 @@
 
         AREA ||.text||, CODE, READONLY
         PRESERVE8
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_smp_time_get                         SMP/Cortex-A7/AC5   */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
@@ -44,38 +46,31 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function gets the global time value that is used for debug     */ 
-;/*    information and event tracing.                                      */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    32-bit time stamp                                                   */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ThreadX Source                                                      */
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function gets the global time value that is used for debug     */
+;/*    information and event tracing.                                      */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    32-bit time stamp                                                   */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ThreadX Source                                                      */
 ;/*                                                                        */
 ;/**************************************************************************/
     EXPORT  _tx_thread_smp_time_get
 _tx_thread_smp_time_get
 
-    MRC     p15, 4, r0, c15, c0, 0              ; Read periph base address
-    LDR     r0, [r0, #0x604]                    ; Read count register
+    MRRC    p15, 0, r0, r1, c14                 ; Read generic timer physical count
 
     IF  {INTER} = {TRUE}
     BX      lr                                  ; Return to caller
@@ -84,4 +79,3 @@ _tx_thread_smp_time_get
     ENDIF
 
     END
-    

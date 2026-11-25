@@ -1,7 +1,21 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test error detection for simple memory block operations.  */
-   
+
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 
 static unsigned long   thread_0_counter =  0;
 static TX_THREAD       thread_0;
@@ -17,7 +31,7 @@ static CHAR            *pointer;
 
 static void    thread_0_entry(ULONG thread_input);
 
-UINT        _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, CHAR *name_ptr, ULONG block_size,
+UINT        _txe_block_pool_create(TX_BLOCK_POOL *pool_ptr, TX_NAME_CONST CHAR *name_ptr, ULONG block_size,
                     VOID *pool_start, ULONG pool_size, UINT pool_control_block_size);
 
 
@@ -43,24 +57,24 @@ INT     status;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
     /* Create block pool 0.  */
-    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, 320);
-    pointer = pointer + 320;
+    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
+    pointer = pointer + TX_TEST_BLOCK_POOL_BYTES(100, 3);
 
 #ifndef TX_DISABLE_ERROR_CHECKING   /* skip this test and pretend it passed */
 
     /* Create block pool again to get pool_ptr error.  */
-    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, 320);
+    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
     if (status != TX_POOL_ERROR)
         return;
 
     /* Create block pool with NULL pointer.  */
-    status =  tx_block_pool_create(TX_NULL, "pool 0", 100, pointer, 320);
+    status =  tx_block_pool_create(TX_NULL, "pool 0", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
     if (status != TX_POOL_ERROR)
     {
 
@@ -69,7 +83,7 @@ INT     status;
     }
 
     /* Create block pool pointer if NULL start.  */
-    status =  tx_block_pool_create(&pool_1, "pool 0", 100, NULL, 320);
+    status =  tx_block_pool_create(&pool_1, "pool 0", 100, NULL, TX_TEST_BLOCK_POOL_BYTES(100, 3));
     if (status != TX_PTR_ERROR)
     {
 
@@ -128,11 +142,11 @@ INT     i;
 
 #ifndef TX_DISABLE_ERROR_CHECKING   /* skip this test and pretend it passed */
 
-    status =  tx_block_pool_create(&pool_1, "pool 1", 100, pointer, 320);
-    pointer = pointer + 320;
+    status =  tx_block_pool_create(&pool_1, "pool 1", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
+    pointer = pointer + TX_TEST_BLOCK_POOL_BYTES(100, 3);
 
     /* Attempt to create a pool with an invalid size.  */
-    status =  _txe_block_pool_create(&pool_2, "pool 2", 100, pointer, 320, 777777);
+    status =  _txe_block_pool_create(&pool_2, "pool 2", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3), 777777);
     if (status != TX_POOL_ERROR)
     {
 
@@ -160,7 +174,7 @@ INT     i;
         printf("ERROR #8\n");
         test_control_return(1);
     }
-    
+
     /* Allocate with bad pool pointer.  */
     pool_2.tx_block_pool_id =  0;
     status =  tx_block_allocate(&pool_2, (VOID **) TX_NULL, TX_NO_WAIT);
@@ -379,9 +393,8 @@ INT     i;
     thread_0_counter++;
 
 #endif  /* TX_DISABLE_ERROR_CHECKING */
-    
+
     /* All is good!  */
     printf("SUCCESS!\n");
     test_control_return(0);
 }
-

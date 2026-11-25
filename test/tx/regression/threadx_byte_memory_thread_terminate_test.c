@@ -1,7 +1,19 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test termination on thread suspended on memory byte pool.  */
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 
 static unsigned long   thread_0_counter =  0;
 static TX_THREAD       thread_0;
@@ -41,8 +53,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -54,8 +66,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -68,8 +80,8 @@ CHAR    *pointer;
     }
 
     /* Create byte pools 0 and 1.  */
-    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, 108);
-    pointer = pointer + 108;
+    status =  tx_byte_pool_create(&pool_0, "pool 0", pointer, TX_TEST_BYTE_POOL_BYTES(108));
+    pointer = pointer + TX_TEST_BYTE_POOL_BYTES(108);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -96,7 +108,7 @@ CHAR    *pointer;
 
     /* Increment the thread counter.  */
     thread_0_counter++;
-        
+
     /* Allocate memory from the pool.  Only one block of this size will fit.   */
     status = tx_byte_allocate(&pool_0, (VOID **) &pointer, 60, TX_NO_WAIT);
 
@@ -114,7 +126,7 @@ CHAR    *pointer;
 
     /* Terminate the other thread.  */
     status =  tx_thread_terminate(&thread_1);
- 
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -147,7 +159,7 @@ CHAR    *pointer;
         printf("ERROR #7\n");
         test_control_return(1);
     }
-    
+
     /* Successful test.  */
     printf("SUCCESS!\n");
     test_control_return(0);
@@ -174,4 +186,3 @@ CHAR    *pointer;
         thread_1_counter++;
     }
 }
-

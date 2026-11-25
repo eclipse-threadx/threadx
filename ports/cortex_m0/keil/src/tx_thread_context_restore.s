@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -20,10 +20,10 @@
 ;/**************************************************************************/
 ;
 ;
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))  
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     IMPORT  _tx_execution_isr_exit
 #endif
-        
+
 ;
     AREA    ||.text||, CODE, READONLY
     PRESERVE8
@@ -62,19 +62,13 @@
 ;/*                                                                        */
 ;/*    ISRs                                  Interrupt Service Routines    */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)
 ;{
     EXPORT  _tx_thread_context_restore
 _tx_thread_context_restore
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE)) 
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 ;
 ;    /* Call the ISR exit function to indicate an ISR is complete.  */
 ;

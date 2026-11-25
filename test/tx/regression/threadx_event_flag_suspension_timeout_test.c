@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test event flag suspension timeout processing.  */
 
 #include   <stdio.h>
@@ -54,8 +65,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -67,12 +78,12 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status += tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status += tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -84,8 +95,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -110,7 +121,7 @@ CHAR    *pointer;
 
     /* Register the event set notify function.  */
     status =  tx_event_flags_set_notify(&group_0, event_set_notify);
-    
+
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 
     /* Check status.  */
@@ -140,7 +151,7 @@ CHAR    *pointer;
 
 static void    thread_0_entry(ULONG thread_input)
 {
-  
+
 ULONG   actual_events;
 UINT    status;
 
@@ -178,17 +189,12 @@ UINT    status;
     /* Sleep for 63 ticks.  */
     tx_thread_sleep(63);
 
-    /* Check the run counters.  */
-    if (((thread_1_counter != 32)
-#ifdef __linux__
-          && (thread_1_counter != 33) /* Depending on the starting time, thread 1 can run either 32 or 33 rounds. */
-#endif
-        ) ||
-        ((thread_2_counter != 13)
-#ifdef __linux__
-         && (thread_2_counter != 14) /* When CPU starves, the thread 2 can run 14 ronuds. */
-#endif
-        ))
+    /* Check the run counters.  Depending on the starting time relative to
+       the tick boundary, thread 1 can run either 32 or 33 rounds and
+       thread 2 can run 13 or 14 rounds.  This variance applies to any
+       platform with non-deterministic tick alignment (Linux, QEMU, Windows, etc.). */
+    if (((thread_1_counter < 32UL) || (thread_1_counter > 33UL)) ||
+        ((thread_2_counter < 13UL) || (thread_2_counter > 14UL)))
     {
 
         /* Event flag error.  */
@@ -209,7 +215,7 @@ UINT    status;
 ULONG   actual_events;
 
 
-    
+
     /* Wait for event flags.  */
     while(1)
     {

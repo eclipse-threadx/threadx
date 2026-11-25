@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -44,11 +45,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    hardware exception                                                  */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-25-2024      Jerry Luo                                             */
 /*                                                                        */
 /**************************************************************************/
 
@@ -66,29 +62,37 @@
     .extern  trap_handler
     .extern  _tx_thread_context_restore
     trap_entry:
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-	addi sp, sp, -65*REGBYTES         // Allocate space for all registers - with floating point enabled
-#else
-	addi sp, sp, -32*REGBYTES         // Allocate space for all registers - without floating point enabled
+	addi sp, sp, -TX_RISCV_TRAP_FRAME_SIZE   // Interrupt frame from the port contract (528 with FP, 256 without)
+#if defined(__riscv_vector)
+    /* Allocate space for vector registers.  No register is saved yet, so
+       park t4 in the frame first and recover it after the allocation:
+       _tx_thread_context_save must still see the interrupted thread's t4. */
+    sd      t4, 15*8(sp)              // Park t4 (pre-vector sp)
+    csrr    t4, vlenb
+    slli    t4, t4, 5
+    addi    t4, t4, 4*8
+    sub     sp, sp, t4
+    add     t4, sp, t4                // Rebuild the pre-vector sp
+    ld      t4, 15*8(t4)              // Recover the parked t4
 #endif
 
-	STORE   x1, 28*REGBYTES(sp)       // Store RA, 28*REGBYTES(because call will override ra [ra is a calle register in riscv])
+	sd   x1, 224(sp)                  // Store RA (28*8 = 224, because call will override ra [ra is a callee register in riscv])
 
-    	call    _tx_thread_context_save    	
+    	call    _tx_thread_context_save
 
 	csrr a0, mcause
 	csrr a1, mepc
         csrr a2, mtval
-	addi    sp, sp, -8
+	addi    sp, sp, -16               // 16 bytes keep sp 16-byte aligned at the call
     	sd      ra, 0(sp)
     	call    trap_handler
     	ld      ra, 0(sp)
-    	addi    sp, sp, 8
-	call _tx_thread_context_restore 
+    addi    sp, sp, 16
+	call _tx_thread_context_restore
 	// it will nerver return
 _err:
 	wfi
-	j _err  
+	j _err
     .section .text
 /**************************************************************************/
 /*                                                                        */
@@ -133,31 +137,36 @@ _err:
 /**************************************************************************/
 /* VOID   _tx_initialize_low_level(VOID)
 {  */
-    .global  _tx_initialize_low_level
-    .weak    _tx_initialize_low_level
+    .global  _tx_initialize_low_level // Strong definition: must beat the port's weak default in any link order
     .extern  _end
     .extern  board_init
 _tx_initialize_low_level:
-    sd      sp, _tx_thread_system_stack_ptr, t0     // Save system stack pointer
+    la      t0, _tx_thread_system_stack_ptr
+    sd      sp, 0(t0)                              // Save system stack pointer
 
-    la      t0, _end            		    // Pickup first free address
-    sd      t0, _tx_initialize_unused_memory, t1    // Save unused memory address
+    la      t0, _end            		           // Pickup first free address
+    la      t1, _tx_initialize_unused_memory
+    sd      t0, 0(t1)                              // Save unused memory address
     li      t0, MSTATUS_MIE
-    csrrc   zero, mstatus, t0			    // clear MSTATUS_MIE bit
+    csrrc   zero, mstatus, t0			           // clear MSTATUS_MIE bit
     li 	    t0, (MSTATUS_MPP_M | MSTATUS_MPIE )
-    csrrs   zero, mstatus, t0			    // set MSTATUS_MPP, MPIE bit
-    li	    t0, (MIE_MTIE | MIE_MSIE | MIE_MEIE)
-    csrrs   zero, mie, t0			    // set mie
-#ifdef __riscv_flen
+    csrrs   zero, mstatus, t0			           // set MSTATUS_MPP, MPIE bit
+    li	    t0, (MIE_MTIE | MIE_MEIE)
+    csrrs   zero, mie, t0			               // set mie (no MIE_MSIE: cause 3 has no dispatch path and msip is never written)
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
     li      t0, MSTATUS_FS
-    csrrs   zero, mstatus, t0			    // set MSTATUS_FS bit to open f/d isa in riscv
+    csrrs   zero, mstatus, t0			           // set MSTATUS_FS bit to open f/d isa in riscv
     fscsr   x0
 #endif
-    addi    sp, sp, -8
+#ifdef __riscv_vector
+    li      t0, MSTATUS_VS
+    csrrs   zero, mstatus, t0			           // set MSTATUS_VS bit to open vector isa in riscv
+#endif
+    addi    sp, sp, -16                            // 16 bytes keep sp 16-byte aligned at the call
     sd	    ra, 0(sp)
     call    board_init
     ld	    ra, 0(sp)
-    addi    sp, sp, 8
+    addi    sp, sp, 16
     la	    t0, trap_entry
     csrw    mtvec, t0
     ret

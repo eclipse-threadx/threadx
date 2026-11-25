@@ -92,7 +92,7 @@ _mutex_release:
     .type _mutex_acquire, "function"
     .cfi_startproc
 _mutex_acquire:
-    // This uses a "ticket lock".  The lock is stored as a 32-bit value: 
+    // This uses a "ticket lock".  The lock is stored as a 32-bit value:
     // - the upper 16-bits record the thread's ticket number ("take a ticket")
     // - the lower 16-bits record the ticket being served    ("now serving")
 

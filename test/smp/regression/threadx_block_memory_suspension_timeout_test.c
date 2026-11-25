@@ -1,7 +1,21 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test timeouts on suspension on memory block pools.  */
+
+// Portions of this file were generated with AI assistance.
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 
 static unsigned long   thread_0_counter =  0;
 static TX_THREAD       thread_0;
@@ -44,8 +58,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -57,8 +71,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -70,8 +84,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -84,8 +98,8 @@ CHAR    *pointer;
     }
 
     /* Create block pool.  */
-    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, 320);
-    pointer = pointer + 320;
+    status =  tx_block_pool_create(&pool_0, "pool 0", 100, pointer, TX_TEST_BLOCK_POOL_BYTES(100, 3));
+    pointer = pointer + TX_TEST_BLOCK_POOL_BYTES(100, 3);
 
     /* Check status.  */
     if (status != TX_SUCCESS)
@@ -116,7 +130,7 @@ CHAR    *pointer_3;
     status =  tx_block_allocate(&pool_0, (VOID **) &pointer_1, TX_NO_WAIT);
     status += tx_block_allocate(&pool_0, (VOID **) &pointer_2, TX_NO_WAIT);
     status += tx_block_allocate(&pool_0, (VOID **) &pointer_3, TX_NO_WAIT);
-    
+
     /* Check status.  */
     if (status != TX_SUCCESS)
     {
@@ -135,15 +149,15 @@ CHAR    *pointer_3;
     /* Set all the memory of the blocks.  */
     TX_MEMSET(pointer_3, (CHAR) 0xEF, 100);
 
-    /* Sleep for 64 ticks to allow the other thread 6 timeouts on the block
-       pool.  */
+    /* Sleep long enough to allow the other threads to complete their expected
+       timeout cycles on the block pool.  */
     tx_thread_sleep(64);
 
     /* Incrment the run counter.  */
     thread_0_counter++;
 
     /* Check the counter of the other thread.  */
-    if ((thread_1_counter != 6) || (thread_2_counter != 3))
+    if ((thread_1_counter != 6UL) || (thread_2_counter != 3UL))
     {
 
         /* Block memory error.  */
@@ -152,7 +166,7 @@ CHAR    *pointer_3;
     }
     else
     {
-    
+
         /* Successful test.  */
         printf("SUCCESS!\n");
         test_control_return(0);
@@ -209,4 +223,3 @@ CHAR    *pointer_1;
         thread_2_counter++;
     }
 }
-

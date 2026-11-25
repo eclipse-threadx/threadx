@@ -4,8 +4,8 @@
   .global __tx_BadHandler
   .global __tx_SVCallHandler
   .global __tx_DBGHandler
-  .global PendSV_Handler 
-  .global __tx_SysTickHandler 
+  .global PendSV_Handler
+  .global __tx_SysTickHandler
   .global __tx_BadHandler
 
   .syntax unified
@@ -15,9 +15,9 @@
   .global _vectors
 
 _vectors:
-  .word __stack_end__ 
-  .word reset_handler 
-  .word __tx_NMIHandler 
+  .word __stack_end__
+  .word reset_handler
+  .word __tx_NMIHandler
   .word __tx_HardfaultHandler
   .word __tx_BadHandler
   .word __tx_BadHandler
@@ -29,7 +29,7 @@ _vectors:
   .word __tx_SVCallHandler    //_SVC_Handler - used by Threadx scheduler //
   .word __tx_DBGHandler
   .word 0 // Reserved
-  .word PendSV_Handler 
+  .word PendSV_Handler
   .word __tx_SysTickHandler   // Used by Threadx timer functionality
   .word __tx_BadHandler       // Populate with user Interrupt handler
   .word __tx_BadHandler

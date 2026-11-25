@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -68,14 +69,6 @@
 /*                                                                        */
 /*    POSIX internal Code                                                 */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Add 64-bit support,           */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 POSIX_MSG_QUEUE * posix_mq_create (const CHAR * mq_name,
                                       struct mq_attr * msgq_attr)
@@ -121,7 +114,7 @@ TX_QUEUE           *TheQ;
         return(TX_NULL);
     }
 
-    /* Now create a ThreadX message queue. 
+    /* Now create a ThreadX message queue.
        to store only the message pointer and message length.  */
     temp1 = tx_queue_create((&(posix_q->queue)),
                              (CHAR *)mq_name,
@@ -147,11 +140,11 @@ TX_QUEUE           *TheQ;
     /* Restore maximum message length.  */
     posix_q->q_attr.mq_msgsize = msgq_attr->mq_msgsize;
 
-    /* Flags are stored in que descriptor structure and 
+    /* Flags are stored in que descriptor structure and
        not in mq_att structure.  */
 
-    /* Create a byte pool for the  queue.  
-       Determine how much memory we need to store all messages in this queue.   
+    /* Create a byte pool for the  queue.
+       Determine how much memory we need to store all messages in this queue.
        11 bytes are added to counter overhead as well as alignment problem if any.  */
     size = ( ((msgq_attr->mq_maxmsg) + 1)  * (msgq_attr->mq_msgsize + 11) );
 
@@ -188,7 +181,7 @@ TX_QUEUE           *TheQ;
             return(TX_NULL);
         }
         /* Put the queue back into the POSIX queue pool.  */
-        posix_putback_queue(TheQ); 
+        posix_putback_queue(TheQ);
 
         /* User configuration error -  not enough memory.  */
         posix_errno =  EBADF;
@@ -211,7 +204,7 @@ TX_QUEUE           *TheQ;
         /* Restore interrupts.  */
         TX_RESTORE
 
-        /* Return ERROR.*/    
+        /* Return ERROR.*/
         return(TX_NULL);
     }
 

@@ -41,7 +41,7 @@ void set_irq_priority(unsigned int ID, unsigned int priority);
 
 // Enables the processor interface
 // Must been done one each core seperately
-void enable_gic_processor_interface(void);  
+void enable_gic_processor_interface(void);
 
 // Disables the processor interface
 void disable_gic_processor_interface(void);

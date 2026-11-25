@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -34,41 +34,41 @@ SP          .set    B15
 ADDRESS_MSK .set    0xFFFFFFF0
 ;
     .sect   ".text"
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_stack_build                              C667x/TI        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_stack_build                              C667x/TI        */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
+;/*                                                                        */
 ;/*    This function builds a stack frame on the supplied thread's stack.  */
 ;/*    The stack frame results in a fake interrupt return to the supplied  */
-;/*    function pointer.                                                   */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
+;/*    function pointer.                                                   */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    thread_ptr                            Pointer to thread control blk */
 ;/*    function_ptr                          Pointer to return function    */
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
 ;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
 ;/*    _tx_thread_create                     Create thread service         */
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -79,10 +79,10 @@ ADDRESS_MSK .set    0xFFFFFFF0
     .global _tx_thread_stack_build
 _tx_thread_stack_build:
 ;
-;       
+;
 ;    /* Build a fake interrupt frame.  The form of the fake interrupt stack
 ;       on the C667x should look like the following after it is built:
-;       
+;
 ;       Stack Top:      N/A         Available for use
 ;                       1           Interrupt stack frame type          4
 ;                       CSR         Initial value for CSR               8
@@ -160,7 +160,7 @@ _tx_thread_stack_build:
 ;
         LDW         *+A4(16),A0                         ; Pickup end of stack area
         MVKL        ADDRESS_MSK,A1                      ; Build address mask
-        MVKH        ADDRESS_MSK,A1                      ; 
+        MVKH        ADDRESS_MSK,A1                      ;
         MVC         CSR,B0                              ; Pickup current CSR
         AND         -2,B0,B0                            ; Clear GIE bit
         OR          2,B0,B0                             ; Set PGIE bit for interrupt return
@@ -171,7 +171,7 @@ _tx_thread_stack_build:
 ;    /* Actually build the stack frame.  */
 ;
         MVKL        1,A2                                ; Build stack type
-        ZERO        A3                                  ; Clear value 
+        ZERO        A3                                  ; Clear value
         STW         A2,*+A0(4)                          ; Interrupt stack type
         STW         B0,*+A0(8)                          ; Initial CSR
         STW         B4,*+A0(12)                         ; Thread shell entry point

@@ -27,12 +27,6 @@
 /*                                                                        */
 /*    Xtensa initialization routines.                                     */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 
 
@@ -49,7 +43,7 @@
 uint32_t xt_tick_divisor = 0;  /* cached number of cycles per tick */
 
 /*
-Compute and initialize at run-time the tick divisor (the number of 
+Compute and initialize at run-time the tick divisor (the number of
 processor clock cycles in an RTOS tick, used to set the tick timer).
 Called when the processor clock frequency is not known at compile-time.
 */

@@ -16,6 +16,8 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/tx_timer_interrupt.S
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(${PROJECT_NAME}
+    SYSTEM
+    PUBLIC
     inc
 )

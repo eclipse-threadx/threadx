@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -58,11 +59,6 @@
 /*    nested interrupt. If not, it returns to the interrupt thread if no  */
 /*    preemption is necessary.  Otherwise, if preemption is necessary or  */
 /*    if no thread was running, the function returns to the scheduler.    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
-/*  10-31-2022      Scott Larson            Updated EPK definitions,      */
-/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 

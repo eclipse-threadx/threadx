@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -148,7 +148,7 @@ _tx_exception_trampoline_end:
     .globl  _tx_exception_handler
 _tx_exception_handler:
     mfc0    $26, $13                            # Pickup the cause register
-    ehb                                         # 
+    ehb                                         #
     andi    $26, $26, 0x3C                      # Isolate the exception code
     bne     $26, $0, _tx_error_exceptions       # If non-zero, an error exception is present
     nop                                         # Delay slot
@@ -267,7 +267,7 @@ _tx_not_interrupt_4:
     li      $4,0                                # Build interrupt type
     la      $9, _tx_el_interrupt                # Build interrupt start logging address
     jal     $9                                  # Call interrupt start event logging
-    nop                                         # 
+    nop                                         #
 #endif
 
 #ifdef TX_ENABLE_EVENT_TRACE

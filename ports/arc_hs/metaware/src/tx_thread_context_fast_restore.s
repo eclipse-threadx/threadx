@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -23,11 +23,11 @@
 #endif
 
     .equ    BTA, 0x412
-    
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_context_fast_restore                   ARC_HS/MetaWare   */
 ;/*                                                           6.2.1        */
 ;/*  AUTHOR                                                                */
@@ -35,43 +35,34 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function restores the fast interrupt context, which can be a   */ 
-;/*    nesting condition on a non-fast ISR, an idle system restore, a      */ 
-;/*    restore of an interrupted thread, and a preemption of an interrupted*/ 
-;/*    thread.                                                             */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                  Interrupt Service Routines    */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-;/*                                            #include tx_user.h,         */
-;/*                                            resulting in version 6.2.1  */
+;/*    This function restores the fast interrupt context, which can be a   */
+;/*    nesting condition on a non-fast ISR, an idle system restore, a      */
+;/*    restore of an interrupted thread, and a preemption of an interrupted*/
+;/*    thread.                                                             */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_schedule                   Thread scheduling routine     */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                  Interrupt Service Routines    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_fast_restore(VOID)
 ;{
 
     .global _tx_thread_context_fast_restore
-    .type   _tx_thread_context_fast_restore, @function 
+    .type   _tx_thread_context_fast_restore, @function
 _tx_thread_context_fast_restore:
 ;
 ;    /* Note: it is assumed that the stack pointer is in the same position now as
@@ -98,7 +89,7 @@ _tx_thread_context_fast_restore:
 ;
 ;    /* Interrupts are nested.  */
 ;
-;    /* Just recover the saved registers and return to the point of 
+;    /* Just recover the saved registers and return to the point of
 ;       interrupt.  */
 ;
 
@@ -160,7 +151,7 @@ __tx_thread_preempt_restore:
     st      r0, [sp, 132]                               ; Temporarily save r0
     mov     r0, 3                                       ; Build hardware interrupt stack type
     st      r0,  [sp, 0]                                ; Setup interrupt stack type
-    
+
     .ifndef  TX_DISABLE_LP
     lr      r0, [LP_START]                              ; Pickup LP_START
     st      r0, [sp, 4]                                 ; Save LP_START
@@ -186,7 +177,7 @@ __tx_thread_preempt_restore:
     kflag   ilink                                       ; Move back to register bank 0
     b       __tx_preempt_save_done                      ; Done, finished with preemption save
 
-__tx_software_interrupt_context:    
+__tx_software_interrupt_context:
     st      ilink, [sp, 0]                              ; Save ilink (point of interrupt)
     st      r3, [sp, 4]                                 ; Save status32
     mov     ilink, sp                                   ; Pass the information back to the other register bank via ilink
@@ -223,7 +214,7 @@ __tx_software_interrupt_context:
     st      r1,  [sp, 128]                              ; Save r1
     st      r0,  [sp, 132]                              ; Save r0
     st      r30, [sp, 136]                              ; Save r30
-    
+
     .ifndef  TX_DISABLE_LP
     lr      r10, [LP_START]                             ; Pickup LP_START
     lr      r9,  [LP_END]                               ; Pickup LP_END

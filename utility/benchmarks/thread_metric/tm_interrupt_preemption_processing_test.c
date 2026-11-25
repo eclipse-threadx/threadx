@@ -1,16 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** Thread-Metric Component                                               */
 /**                                                                       */
 /**   Interrupt Preemption Processing Test                                */
@@ -19,27 +20,21 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    tm_interrupt_preemption_processing_test             PORTABLE C      */ 
-/*                                                           6.1.7        */ 
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    tm_interrupt_preemption_processing_test             PORTABLE C      */
+/*                                                           6.1.7        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This file defines the preemptive scheduling test.                   */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  10-15-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/**************************************************************************/
 
 #include "tm_api.h"
 
@@ -97,14 +92,14 @@ void  tm_interrupt_preemption_processing_initialize(void)
     /* Resume just thread 1.  */
     tm_thread_resume(1);
 
-    /* Create the reporting thread. It will preempt the other 
+    /* Create the reporting thread. It will preempt the other
        threads and print out the test results.  */
     tm_thread_create(5, 2, tm_interrupt_preemption_thread_report);
     tm_thread_resume(5);
 }
 
 
-/* Define the interrupt thread.  This thread is resumed from the 
+/* Define the interrupt thread.  This thread is resumed from the
    interrupt handler.  It runs and suspends.  */
 void  tm_interrupt_preemption_thread_0_entry(void)
 {
@@ -115,7 +110,7 @@ void  tm_interrupt_preemption_thread_0_entry(void)
         /* Increment this thread's counter.  */
         tm_interrupt_preemption_thread_0_counter++;
 
-        /* Suspend. This will allow the thread generating the 
+        /* Suspend. This will allow the thread generating the
            interrupt to run again.  */
         tm_thread_suspend(0);
     }
@@ -128,7 +123,7 @@ void  tm_interrupt_preemption_thread_1_entry(void)
     while(1)
     {
 
-        /* Force an interrupt. The underlying RTOS must see that the 
+        /* Force an interrupt. The underlying RTOS must see that the
            the interrupt handler is called from the appropriate software
            interrupt or trap. */
         TM_CAUSE_INTERRUPT
@@ -192,11 +187,11 @@ unsigned long   average;
         average =  total/3;
 
         /* See if there are any errors.  */
-        if ((tm_interrupt_preemption_thread_0_counter < (average - 1)) || 
+        if ((tm_interrupt_preemption_thread_0_counter < (average - 1)) ||
             (tm_interrupt_preemption_thread_0_counter > (average + 1)) ||
-            (tm_interrupt_preemption_thread_1_counter < (average - 1)) || 
+            (tm_interrupt_preemption_thread_1_counter < (average - 1)) ||
             (tm_interrupt_preemption_thread_1_counter > (average + 1)) ||
-            (tm_interrupt_preemption_handler_counter < (average - 1)) || 
+            (tm_interrupt_preemption_handler_counter < (average - 1)) ||
             (tm_interrupt_preemption_handler_counter > (average + 1)))
         {
 

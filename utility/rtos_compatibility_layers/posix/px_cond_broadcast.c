@@ -1,18 +1,20 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -26,18 +28,18 @@
 #include "px_int.h"    /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*  pthread_cond_broadcast                                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*  pthread_cond_broadcast                                PORTABLE C      */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    These functions shall unblock all threads currently blocked on a    */
 /*    specified condition variable cond.                                  */
 /*    If more than one thread is blocked on a condition variable,         */
@@ -53,20 +55,20 @@
 /*    calling pthread_cond_wait or pthread_cond_timedwait have associated */
 /*    with the condition variable during their waits; however,            */
 /*    if predictable scheduling behavior is required, then that mutex     */
-/*    shall be locked by the thread calling pthread_cond_broadcast.       */      
+/*    shall be locked by the thread calling pthread_cond_broadcast.       */
 /*    The pthread_cond_broadcast function shall have no effect if there   */
 /*    are no threads currently blocked on cond.                           */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*     cond                       condition variable                      */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*     Ok                        if successful                            */
 /*     Error                     in case of any errors                    */
 /*                                                                        */
-/*  CALLS                                                                 */ 
+/*  CALLS                                                                 */
 /*                                                                        */
 /*     tx_semaphore_prioritize       line up pthreads waiting at semaphore*/
 /*     tx_thread_identify            to check which pthread?              */
@@ -74,20 +76,14 @@
 /*     tx_semaphore_put              ThreadX semaphore put service        */
 /*     tx_thread_preemption_change   to enable thread preemption          */
 /*                                                                        */
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
+/*  CALLED BY                                                             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 INT pthread_cond_broadcast(pthread_cond_t *cond)
 {
-    
+
 TX_SEMAPHORE        *semaphore_ptr;
 TX_THREAD           *thread;
 UINT                 status;
@@ -96,13 +92,13 @@ UINT                 old_threshold,dummy;
 
 
     /* Get the condition variable's internal semaphore.  */
-    /* Simply convert the condition variable control block into a semaphore  a cast */ 
+    /* Simply convert the condition variable control block into a semaphore using casting.  */
     semaphore_ptr = (&( cond->cond_semaphore ));
     sem_count = semaphore_ptr->tx_semaphore_suspended_count;
 
     if (!sem_count)
         return(OK);
-    
+
     status = tx_semaphore_prioritize(semaphore_ptr);
 
     if ( status != TX_SUCCESS)
@@ -111,17 +107,17 @@ UINT                 old_threshold,dummy;
         posix_set_pthread_errno(EINVAL);
         return(EINVAL);
     }
-    
+
     /* get to know about current thread */
     thread = tx_thread_identify();
 
     /* Got the current thread , now raise its preemption threshold */
     /* that way the current thread does not get descheduled when   */
     /* threads with higher priority are activated */
-    tx_thread_preemption_change(thread,0,&old_threshold); 
+    tx_thread_preemption_change(thread,0,&old_threshold);
 
     while( sem_count)
-    {   
+    {
 
         status = tx_semaphore_put(semaphore_ptr);
         if ( status != TX_SUCCESS)

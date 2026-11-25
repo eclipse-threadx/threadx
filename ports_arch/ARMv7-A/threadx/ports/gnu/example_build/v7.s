@@ -3,7 +3,7 @@
 //
 // Copyright (c) 2011-2018 Arm Limited (or its affiliates). All rights reserved.
 // Use, modification and redistribution of this file is subject to your possession of a
-// valid End User License Agreement for the Arm Product of which these examples are part of 
+// valid End User License Agreement for the Arm Product of which these examples are part of
 // and your compliance with all applicable terms and conditions of such licence agreement.
 // ------------------------------------------------------------
 
@@ -20,7 +20,7 @@
 enableInterrupts:
     CPSIE   i
     BX      lr
-    
+
 
     .global disableInterrupts
     .type   disableInterrupts,function
@@ -28,7 +28,7 @@ enableInterrupts:
 disableInterrupts:
     CPSID   i
     BX      lr
-    
+
 
 // ------------------------------------------------------------
 // Cache Maintenance
@@ -44,7 +44,7 @@ enableCaches:
     MCR     p15, 0, r0, c1, c0, 0   // Write System Control Register
     ISB
     BX      lr
-    
+
 
 
     .global disableCaches
@@ -57,7 +57,7 @@ disableCaches:
     MCR     p15, 0, r0, c1, c0, 0   // Write System Control Register
     ISB
     BX      lr
-    
+
 
 
     .global cleanDCache
@@ -114,7 +114,7 @@ clean_dcache_finished:
     POP     {r4-r12}
 
     BX      lr
-    
+
 
     .global cleanInvalidateDCache
     .type   cleanInvalidateDCache,function
@@ -170,7 +170,7 @@ clean_invalidate_dcache_finished:
     POP     {r4-r12}
 
     BX      lr
-    
+
 
 
     .global invalidateCaches
@@ -229,7 +229,7 @@ invalidate_caches_skip:
 invalidate_caches_finished:
     POP     {r4-r12}
     BX      lr
-    
+
 
 
     .global invalidateCaches_IS
@@ -284,7 +284,7 @@ invalidate_caches_is_skip:
 invalidate_caches_is_finished:
     POP     {r4-r12}
     BX      lr
-    
+
 
 // ------------------------------------------------------------
 // TLB
@@ -297,7 +297,7 @@ invalidateUnifiedTLB:
     MOV     r0, #0
     MCR     p15, 0, r0, c8, c7, 0                 // TLBIALL - Invalidate entire unified TLB
     BX      lr
-    
+
 
     .global invalidateUnifiedTLB_IS
     .type   invalidateUnifiedTLB_IS,function
@@ -306,7 +306,7 @@ invalidateUnifiedTLB_IS:
     MOV     r0, #1
     MCR     p15, 0, r0, c8, c3, 0                 // TLBIALLIS - Invalidate entire unified TLB Inner Shareable
     BX      lr
-    
+
 
 // ------------------------------------------------------------
 // Branch Prediction
@@ -319,7 +319,7 @@ flushBranchTargetCache:
   MOV     r0, #0
   MCR     p15, 0, r0, c7, c5, 6                 // BPIALL - Invalidate entire branch predictor array
   BX      lr
-  
+
 
     .global flushBranchTargetCache_IS
     .type   flushBranchTargetCache_IS,function
@@ -328,7 +328,7 @@ flushBranchTargetCache_IS:
   MOV     r0, #0
   MCR     p15, 0, r0, c7, c1, 6                 // BPIALLIS - Invalidate entire branch predictor array Inner Shareable
   BX      lr
-  
+
 
 // ------------------------------------------------------------
 // High Vecs
@@ -343,7 +343,7 @@ enableHighVecs:
   MCR     p15, 0, r0, c1, c0, 0 // Write Control Register
   ISB
   BX      lr
-  
+
 
     .global disableHighVecs
     .type   disableHighVecs,function
@@ -354,7 +354,7 @@ disableHighVecs:
   MCR     p15, 0, r0, c1, c0, 0 // Write Control Register
   ISB
   BX      lr
-  
+
 
 // ------------------------------------------------------------
 // Context ID
@@ -366,7 +366,7 @@ disableHighVecs:
 getContextID:
   MRC     p15, 0, r0, c13, c0, 1 // Read Context ID Register
   BX      lr
-  
+
 
     .global setContextID
     .type   setContextID,function
@@ -374,7 +374,7 @@ getContextID:
 setContextID:
   MCR     p15, 0, r0, c13, c0, 1 // Write Context ID Register
   BX      lr
-  
+
 
 // ------------------------------------------------------------
 // ID registers
@@ -386,7 +386,7 @@ setContextID:
 getMIDR:
   MRC     p15, 0, r0, c0, c0, 0 // Read Main ID Register (MIDR)
   BX      lr
-  
+
 
     .global getMPIDR
     .type   getMPIDR,function
@@ -394,7 +394,7 @@ getMIDR:
 getMPIDR:
   MRC     p15, 0, r0, c0 ,c0, 5// Read Multiprocessor ID register (MPIDR)
   BX      lr
-  
+
 
 // ------------------------------------------------------------
 // CP15 SMP related
@@ -407,7 +407,7 @@ getMPIDR:
 getBaseAddr:
   MRC     p15, 4, r0, c15, c0, 0  // Read peripheral base address
   BX      lr
-  
+
 
 // ------------------------------------------------------------
 
@@ -419,7 +419,7 @@ getCPUID:
   MRC     p15, 0, r0, c0, c0, 5   // Read CPU ID register
   AND     r0, r0, #0x03           // Mask off, leaving the CPU ID field
   BX      lr
-  
+
 
 // ------------------------------------------------------------
 
@@ -431,7 +431,7 @@ goToSleep:
   WFI                             // Go into standby
   B       goToSleep               // Catch in case of rogue events
   BX      lr
-  
+
 
 // ------------------------------------------------------------
 
@@ -451,7 +451,7 @@ joinSMP:
     ISB
 
     BX      lr
-  
+
 
 // ------------------------------------------------------------
 
@@ -469,7 +469,7 @@ leaveSMP:
     ISB
 
     BX      lr
-  
+
 
 // ------------------------------------------------------------
 // End of v7.s

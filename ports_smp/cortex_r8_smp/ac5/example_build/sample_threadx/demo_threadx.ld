@@ -6,8 +6,8 @@
 ;    * (InRoot$$Sections)      ; Selects all sections that must be in a root region
 ;    * (+RO)
 ;  }
-;  
-;  SHARED_DATA +0x0 
+;
+;  SHARED_DATA +0x0
 ;  {
 ;    * (+RW,+ZI)
 ;  }
@@ -30,7 +30,7 @@ LOAD_ROOT 0x0
 	{
 		startup.o (StartUp, +FIRST)   ;startup code
 		* (InRoot$$Sections)          ;All library sections that must be in a root region
-		
+
 	}
 }
 LOAD 0x48000000
@@ -39,13 +39,13 @@ LOAD 0x48000000
     {
     	  demo_threadx.o (+RO)              ; Place main() in a root region for the benefit of software breakpoints
     }
-    
+
     ; increased from 32k to 64k
     CODE +0 0x10000
     {
     	  * (+RO)                    ; Application code, including C library
     }
-    
+
     SHARED_DATA +0 0x4000
     {
         * (+RW,+ZI)                         ; All RW and ZI Data

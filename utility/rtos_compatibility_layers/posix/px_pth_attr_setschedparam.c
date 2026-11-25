@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -26,18 +27,18 @@
 #include "px_int.h"    /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    pthread_attr_setschedparam                          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    pthread_attr_setschedparam                          PORTABLE C      */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This function sets the scheduling parameters attribute for the      */
 /*    pthread attributes object.                                          */
 /*                                                                        */
@@ -46,27 +47,21 @@
 /*                                                                        */
 /*    attr                           Address of the thread attributes     */
 /*    sched_param                    Address of structure containing the  */
-/*                                   scheduling parameters to set         */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*     0                             if successful                        */ 
-/*     Value                         in case of any error                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
+/*                                   scheduling parameters to set         */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*     0                             if successful                        */
+/*     Value                         in case of any error                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 INT pthread_attr_setschedparam(pthread_attr_t *attr,struct sched_param *param)
@@ -77,7 +72,7 @@ INT pthread_attr_setschedparam(pthread_attr_t *attr,struct sched_param *param)
         posix_errno = EINVAL;
         posix_set_pthread_errno(EINVAL);
         return(EINVAL);
-    }       
+    }
     if (param->sched_priority == 0)
     {
         posix_errno = EINVAL;
@@ -88,7 +83,7 @@ INT pthread_attr_setschedparam(pthread_attr_t *attr,struct sched_param *param)
     {
 
         attr->sched_attr.sched_priority = param->sched_priority;
-    }       
+    }
     return(OK);
 }
 

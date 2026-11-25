@@ -70,7 +70,7 @@ LR_ROM __RO_BASE __RO_SIZE  {                       ; load region size_region
   RW_RAM __RW_BASE __RW_SIZE  {                     ; RW data
    .ANY (+RW +ZI)
   }
-  
+
   SHARED_MEM SHARED_MEM_BASE SHARED_MEM_SIZE {
     sample_threadx_module_manager.o (sharedmem)
   }

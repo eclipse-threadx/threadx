@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -60,22 +61,6 @@
 /*                                                                        */
 /*    ThreadX Source                                                      */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  01-31-2022      Andres Mlinar           Updated comments,             */
-/*                                            added ARMv8.2-A support,    */
-/*                                            improved SMP code,          */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022      William E. Lamie        Modified comments, removed    */
-/*                                            FIFO queueing,              */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_protect
     .type    _tx_thread_smp_protect, @function
@@ -124,9 +109,9 @@ _get_protection:
     CBZ     w5, _got_protection                 // Did it succeed?  w5 = 0 means success!
     MSR     DAIF, x0                            // Restore interrupts
     B       _tx_thread_smp_protect              // Restart the protection attempt
-    
+
 _got_protection:
-    DMB     ISH                                 // 
+    DMB     ISH                                 //
     STR     w2, [x1, #4]                        // Save owning core
 _owned:
     LDR     w5, [x1, #8]                        // Pickup ownership count

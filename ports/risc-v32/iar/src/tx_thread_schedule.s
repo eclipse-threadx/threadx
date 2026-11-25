@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -40,48 +41,41 @@
 
     SECTION `.text`:CODE:REORDER:NOROOT(2)
     CODE
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _tx_thread_schedule                                RISC-V32/IAR     */
 /*                                                           6.1          */
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*    Tom van Leeuwen, Technolution B.V.                                  */
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function waits for a thread control block pointer to appear in */ 
-/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-/*    in the variable, the corresponding thread is resumed.               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function waits for a thread control block pointer to appear in */
+/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+/*    in the variable, the corresponding thread is resumed.               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-/*    _tx_thread_system_return             Return to system from thread   */ 
-/*    _tx_thread_context_restore           Restore thread's context       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */ 
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+/*    _tx_thread_system_return             Return to system from thread   */
+/*    _tx_thread_context_restore           Restore thread's context       */
+/**************************************************************************/
 /* VOID   _tx_thread_schedule(VOID)
 {  */
     PUBLIC  _tx_thread_schedule
@@ -101,7 +95,7 @@ _tx_thread_schedule_loop:
 
     /* }
     while(_tx_thread_execute_ptr == TX_NULL);  */
-    
+
     /* Yes! We have a thread to execute.  Lockout interrupts and
        transfer control to it.  */
     csrci   mstatus, 0x08                               ; Lockout interrupts
@@ -144,7 +138,7 @@ _tx_thread_schedule_loop:
 
     /* Determine if floating point registers need to be recovered.  */
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
     flw     f0, 0x7C(sp)                                ; Recover ft0
     flw     f1, 0x80(sp)                                ; Recover ft1
     flw     f2, 0x84(sp)                                ; Recover ft2
@@ -178,7 +172,7 @@ _tx_thread_schedule_loop:
     flw     f30,0xF4(sp)                                ; Recover ft10
     flw     f31,0xF8(sp)                                ; Recover ft11
     lw      t0, 0xFC(sp)                                ; Recover fcsr
-    csrw    fcsr, t0                                    ; 
+    csrw    fcsr, t0                                    ;
 #endif
 
     /* Recover standard registers.  */
@@ -217,8 +211,8 @@ _tx_thread_schedule_loop:
     lw      x30, 0x38(sp)                               ; Recover t5
     lw      x31, 0x34(sp)                               ; Recover t6
 
-#if __iar_riscv_base_isa == rv32e 
-    addi    sp, sp, 260                                 ; Recover stack frame - with floating point registers  
+#if __iar_riscv_base_isa == rv32e
+    addi    sp, sp, 260                                 ; Recover stack frame - with floating point registers
 #else
     addi    sp, sp, 128                                 ; Recover stack frame - without floating point registers
 #endif
@@ -226,7 +220,7 @@ _tx_thread_schedule_loop:
 
 _tx_thread_synch_return:
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
     flw     f8, 0x3C(sp)                                ; Recover fs0
     flw     f9, 0x40(sp)                                ; Recover fs1
     flw     f18,0x44(sp)                                ; Recover fs2
@@ -240,7 +234,7 @@ _tx_thread_synch_return:
     flw     f26,0x64(sp)                                ; Recover fs10
     flw     f27,0x68(sp)                                ; Recover fs11
     lw      t0, 0x6C(sp)                                ; Recover fcsr
-    csrw    fcsr, t0                                    ; 
+    csrw    fcsr, t0                                    ;
 #endif
 
     /* Recover standard preserved registers.  */
@@ -261,7 +255,7 @@ _tx_thread_synch_return:
     lw      x27, 0x04(sp)                               ; Recover s11
     lw      t0, 0x38(sp)                                ; Recover mstatus
     csrw    mstatus, t0                                 ; Store mstatus, enables interrupt
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
     addi    sp, sp, 116                                 ; Recover stack frame
 #else
     addi    sp, sp, 64                                  ; Recover stack frame
@@ -270,4 +264,4 @@ _tx_thread_synch_return:
 
 /* }  */
     END
-    
+

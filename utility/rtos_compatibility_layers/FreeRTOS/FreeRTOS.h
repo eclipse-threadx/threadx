@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -17,14 +18,6 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  03-02-2021     Andres Mlinar            Modified comment(s), fixed    */
-/*                                             interrupt macros,          */
-/*                                             resulting in version 6.1.5 */
 /**************************************************************************/
 
 #ifndef FREERTOS_H
@@ -311,7 +304,7 @@ UINT _tx_thread_interrupt_disable(VOID);
 #elif defined(__ARMCC_VERSION)
 #define portENABLE_INTERRUPTS() __enable_irq()
 #else
-VOID _tx_thread_interrupt_restore(UINT previous_posture);     
+VOID _tx_thread_interrupt_restore(UINT previous_posture);
 #define portENABLE_INTERRUPTS() _tx_thread_interrupt_restore(TX_INT_ENABLE)
 #endif
 #endif

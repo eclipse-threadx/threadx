@@ -52,12 +52,6 @@
 /*  changes to the saved state in the exception frame, the changes will   */
 /*  be applied when restoring the context.                                */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 
 

@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -46,6 +49,10 @@
 /*    _txm_module_manager_internal_load to load the data and prepare the  */
 /*    module for execution.                                               */
 /*                                                                        */
+/*    Deprecated: this function cannot bound the copy of the module       */
+/*    image, because it is not given its length. Use                      */
+/*    _txm_module_manager_memory_load_ext instead.                        */
+/*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
 /*    module_instance                   Module instance pointer           */
@@ -65,12 +72,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_memory_load(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location)
@@ -96,8 +97,8 @@ UINT                    status;
     /* Pickup the basic module sizes.  */
     code_size =  module_preamble -> txm_module_preamble_code_size;
 
-    /* Check for valid sizes.  */
-    if (code_size == 0)
+    /* Check for valid sizes. The instruction area holds the preamble, so it is never smaller.  */
+    if (code_size < ((ULONG) sizeof(TXM_MODULE_PREAMBLE)))
     {
 
         /* Invalid module preamble.  */
@@ -145,7 +146,7 @@ UINT                    status;
 
     /* Now load it in-place.  */
     status =  _txm_module_manager_internal_load(module_instance, module_name, (VOID *) code_start,
-                                                code_size, code_memory_ptr, code_allocation_size);
+                                                code_size, code_memory_ptr, code_allocation_size, ((ULONG) 0));
     if (status != TX_SUCCESS)
     {
 
@@ -158,4 +159,59 @@ UINT                    status;
 
     /* Return success.  */
     return(TX_SUCCESS);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_memory_load_ext                 PORTABLE C      */
+/*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Eclipse ThreadX contributors                                        */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function copies a module into module memory and loads it, as  */
+/*    _txm_module_manager_memory_load does, after checking the module     */
+/*    image against its length, so the copy never reads past the image.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_instance                   Module instance pointer           */
+/*    module_name                       Module name pointer               */
+/*    module_location                   Module code location              */
+/*    module_size                       Length of the module image        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_util_image_size_check                           */
+/*                                      Check the image against its length*/
+/*    _txm_module_manager_memory_load   Copy and load the module          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _txm_module_manager_memory_load_ext(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location, ULONG module_size)
+{
+
+UINT    status;
+
+
+    /* Nothing in the image is read until it is known to hold its preamble and its code.  */
+    status =  _txm_module_manager_util_image_size_check(module_location, module_size);
+    if (status == TX_SUCCESS)
+    {
+        status =  _txm_module_manager_memory_load(module_instance, module_name, module_location);
+    }
+
+    return(status);
 }

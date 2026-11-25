@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -14,16 +15,18 @@
 /**                                                                       */
 /** ThreadX Component                                                     */
 /**                                                                       */
-/**   Module Manager                                                      */
+/**   Thread                                                              */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
 #define TX_SOURCE_CODE
 
+
+/* Include necessary system files.  */
+
 #include "tx_api.h"
 #include "tx_thread.h"
-
 
 
 /**************************************************************************/
@@ -34,7 +37,7 @@
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    Scott Larson, Microsoft Corporation                                 */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -46,7 +49,7 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    status                            Completion status                 */
+/*    None                                                                */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -55,14 +58,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  01-31-2022     Andres Mlinar            Updated comments,             */
-/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_fp_disable(VOID)
@@ -91,3 +86,4 @@ ULONG       system_state;
         }
     }
 }
+

@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -34,55 +34,49 @@ DISABLE_INTS    DEFINE  0xC0                    ; Disable IRQ & FIQ interrupts
 #else
 DISABLE_INTS    DEFINE  0x80                    ; Disable IRQ interrupts
 #endif
-MODE_MASK       DEFINE  0x1F                    ; Mode mask 
+MODE_MASK       DEFINE  0x1F                    ; Mode mask
 FIQ_MODE_BITS   DEFINE  0x11                    ; FIQ mode bits
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_fiq_nesting_end                         Cortex-A8/IAR    */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_fiq_nesting_end                         Cortex-A8/IAR    */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function is called by the application from FIQ mode after      */ 
-;/*    _tx_thread_fiq_nesting_start has been called and switches the FIQ   */ 
-;/*    processing from system mode back to FIQ mode prior to the ISR       */ 
-;/*    calling _tx_thread_fiq_context_restore.  Note that this function    */ 
-;/*    assumes the system stack pointer is in the same position after      */ 
-;/*    nesting start function was called.                                  */ 
-;/*                                                                        */ 
-;/*    This function assumes that the system mode stack pointer was setup  */ 
-;/*    during low-level initialization (tx_initialize_low_level.s79).      */ 
-;/*                                                                        */ 
-;/*    This function returns with FIQ interrupts disabled.                 */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                                                */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function is called by the application from FIQ mode after      */
+;/*    _tx_thread_fiq_nesting_start has been called and switches the FIQ   */
+;/*    processing from system mode back to FIQ mode prior to the ISR       */
+;/*    calling _tx_thread_fiq_context_restore.  Note that this function    */
+;/*    assumes the system stack pointer is in the same position after      */
+;/*    nesting start function was called.                                  */
+;/*                                                                        */
+;/*    This function assumes that the system mode stack pointer was setup  */
+;/*    during low-level initialization (tx_initialize_low_level.s79).      */
+;/*                                                                        */
+;/*    This function returns with FIQ interrupts disabled.                 */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                                                */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_fiq_nesting_end(VOID)

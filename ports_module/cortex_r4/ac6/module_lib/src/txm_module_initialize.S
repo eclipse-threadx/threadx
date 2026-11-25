@@ -1,23 +1,23 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
-;/**************************************************************************/ 
-;/**************************************************************************/ 
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
-;/**                                                                       */ 
-;/**   Module                                                              */ 
-;/**                                                                       */ 
-;/**************************************************************************/ 
-;/**************************************************************************/ 
+;/**************************************************************************/
+;/**************************************************************************/
+;/**                                                                       */
+;/** ThreadX Component                                                     */
+;/**                                                                       */
+;/**   Module                                                              */
+;/**                                                                       */
+;/**************************************************************************/
+;/**************************************************************************/
 ;
 ;
 ;#define TX_SOURCE_CODE
@@ -43,43 +43,37 @@
 	.eabi_attribute Tag_ABI_PCS_R9_use,  1
 	.eabi_attribute Tag_ABI_PCS_RW_data, 2
     .arm
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _txm_module_initialize                          Cortex-R4/MPU/ARM   */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_initialize                          Cortex-R4/MPU/ARM   */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function initializes the module c runtime.                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function initializes the module c runtime.                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    heap_base                             Pointer to bottom of heap     */
 /*    heap_top                              Pointer to top of heap        */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    __scatterload                         Initialize C runtime          */
 /*    __rt_lib_init                         Initialize heap               */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _txm_module_thread_shell_entry        Start module thread           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _txm_module_thread_shell_entry        Start module thread           */
 /*                                                                        */
 /**************************************************************************/
 /* VOID   _txm_module_initialize(VOID *heap_base, VOID *heap_top) */
@@ -88,7 +82,7 @@
 
 _txm_module_initialize:
     PUSH    {r0-r12,lr}                         // Save dregs and LR
-    
+
     B       __scatterload                       // Call ARM func to initialize variables
 
 

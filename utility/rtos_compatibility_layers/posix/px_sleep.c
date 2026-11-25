@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -26,49 +27,43 @@
 #include "px_int.h"    /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*  sleep                                                  PORTABLE C     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*  sleep                                                  PORTABLE C     */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
+/*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    This function shall cause the calling thread to be suspended from   */
 /*    execution until either the number of realtime seconds specified by  */
-/*    the argument seconds has elapsed                                    */  
+/*    the argument seconds has elapsed                                    */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*   seconds                      Is the number of real-time (as opposed  */
 /*                                to CPU-time) seconds to suspend the     */
 /*                                calling thread.                         */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*   number of seconds remaining to sleep                                 */
 /*                                A nonzero value indicates sleep was     */
 /*                                interrupted. Zero is successful         */
 /*                                completion                              */
 /*                                                                        */
 /*                                                                        */
-/*  CALLS                                                                 */ 
+/*  CALLS                                                                 */
 /*                                                                        */
 /*    tx_thread_sleep             ThreadX thread sleep service            */
-/*                                                                        */  
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 UINT sleep(ULONG seconds)
@@ -90,7 +85,7 @@ UINT temp1, temp2, diff, result;
         result = ((seconds * CPU_TICKS_PER_SECOND) - diff);
     }
 
-    return (result/CPU_TICKS_PER_SECOND);    
-    
+    return (result/CPU_TICKS_PER_SECOND);
+
 }
 

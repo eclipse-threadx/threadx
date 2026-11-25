@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -22,6 +23,22 @@
 #define TXM_MODULE
 #include "txm_module.h"
 #ifndef TXM_MODULE_OBJECT_POINTER_GET_CALL_NOT_USED
+
+/* DEPRECATION NOTICE
+ * txm_module_object_pointer_get() is deprecated. Do not use it in new code.
+ *
+ * WHY: this function passes UINT_MAX as the name-buffer length to the
+ * underlying search. If the name pointer points to a buffer shorter than
+ * the searched string, the comparison can read past the end of the buffer,
+ * which is undefined behaviour.
+ *
+ * WHAT TO DO: replace calls with txm_module_object_pointer_get_extended(),
+ * passing the actual length of the name buffer as the third argument.
+ */
+#pragma message("txm_module_object_pointer_get() is deprecated. " \
+                "Use txm_module_object_pointer_get_extended() and pass " \
+                "the actual name buffer length.")
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -34,9 +51,10 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function is deprecated and calls the secure version of this    */
-/*    function (_txm_module_manager_object_pointer_get_extended) with the */
-/*    maximum possible name length since none was passed.                 */
+/*    DEPRECATED. Use _txm_module_object_pointer_get_extended() instead,  */
+/*    passing the actual name-buffer length.  This wrapper passes         */
+/*    UINT_MAX as the length, which can cause the name-comparison loop    */
+/*    to read past the end of a short buffer (undefined behaviour).       */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -67,15 +85,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Module application code                                             */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  01-31-2022      Scott Larson            Modified comments and added   */
-/*                                            CALL_NOT_USED option,       */
-/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _txm_module_object_pointer_get(UINT object_type, CHAR *name, VOID **object_ptr)

@@ -1,11 +1,11 @@
-                     Microsoft's Azure RTOS ThreadX for Cortex-A5x 
+                     Microsoft's Azure RTOS ThreadX for Cortex-A5x
 
                            Using the ARM Compiler 6 & DS
 
-1. Open the Azure RTOS Workspace 
+1. Open the Azure RTOS Workspace
 
-In order to build the ThreadX library and the ThreadX demonstration first load 
-the Azure RTOS Workspace, which is located inside your ThreadX installation 
+In order to build the ThreadX library and the ThreadX demonstration first load
+the Azure RTOS Workspace, which is located inside your ThreadX installation
 directory.
 
 Note: the workspace and projects were made using DS-5, so DS will prompt you
@@ -13,9 +13,9 @@ to migrate the projects. This is expected, so please do so.
 
 2.  Building the ThreadX run-time Library
 
-Building the ThreadX library is easy; simply select the Eclipse project file 
-"tx" and then select the build button. You should now observe the compilation 
-and assembly of the ThreadX library. This project build produces the ThreadX 
+Building the ThreadX library is easy; simply select the Eclipse project file
+"tx" and then select the build button. You should now observe the compilation
+and assembly of the ThreadX library. This project build produces the ThreadX
 library file tx.a.
 
 
@@ -24,39 +24,39 @@ library file tx.a.
 The ThreadX demonstration is designed to execute under the DS debugger on the
 VE-AEMv8x1 Bare Metal simulator.
 
-Building the demonstration is easy; simply open the workspace file, select the 
-sample_threadx project, and select the build button. Next, right-click on the 
+Building the demonstration is easy; simply open the workspace file, select the
+sample_threadx project, and select the build button. Next, right-click on the
 project and select "Debug As -> Debug Configurations". The debugger is setup
-for VE_AEMv8x1 Bare Metal Debug, so selecting "Debug" will launch the simulator, 
-load the sample_threadx.axf ELF file and run to main. You are now ready to 
+for VE_AEMv8x1 Bare Metal Debug, so selecting "Debug" will launch the simulator,
+load the sample_threadx.axf ELF file and run to main. You are now ready to
 execute the ThreadX demonstration.
 
 
 4.  System Initialization
 
-The entry point in ThreadX for the Cortex-A5x using ARM tools is at label 
-start64. This is defined within the ARM compiler's startup code. In addition, 
-this is where all static and global pre-set C variable initialization processing 
+The entry point in ThreadX for the Cortex-A5x using ARM tools is at label
+start64. This is defined within the ARM compiler's startup code. In addition,
+this is where all static and global pre-set C variable initialization processing
 takes place.
 
-The ThreadX tx_initialize_low_level.s file is responsible for determining the 
-first available RAM address for use by the application, which is supplied as the 
+The ThreadX tx_initialize_low_level.s file is responsible for determining the
+first available RAM address for use by the application, which is supplied as the
 sole input parameter to your application definition function, tx_application_define.
 
 
 5.  Register Usage and Stack Frames
 
-The 64-bit ARM compiler assumes that registers x0-x18 are scratch registers 
-for each function. All other registers used by a C function must be preserved 
-by the function. ThreadX takes advantage of this in situations where a context 
-switch happens as a result of making a ThreadX service call (which is itself a 
-C function). In such cases, the saved context of a thread is only the 
+The 64-bit ARM compiler assumes that registers x0-x18 are scratch registers
+for each function. All other registers used by a C function must be preserved
+by the function. ThreadX takes advantage of this in situations where a context
+switch happens as a result of making a ThreadX service call (which is itself a
+C function). In such cases, the saved context of a thread is only the
 non-scratch registers.
 
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
 All suspended threads have one of these two types of stack frames. The top
-of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the 
+of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the
 associated thread control block TX_THREAD.
 
 
@@ -75,10 +75,10 @@ FP not enabled and TX_THREAD.tx_thread_fp_enable == 0:
      0x040                  x22                         x21
      0x048                  x23                         x22
      0x050                  x20                         x19
-     0x058                  x21                         x20    
-     0x060                  x18                         x29    
-     0x068                  x19                         x30    
-     0x070                  x16                          
+     0x058                  x21                         x20
+     0x060                  x18                         x29
+     0x068                  x19                         x30
+     0x070                  x16
      0x078                  x17
      0x080                  x14
      0x088                  x15
@@ -97,7 +97,7 @@ FP not enabled and TX_THREAD.tx_thread_fp_enable == 0:
      0x0F0                  x0
      0x0F8                  x1
      0x100                  x29
-     0x108                  x30 
+     0x108                  x30
 
 
 FP enabled and TX_THREAD.tx_thread_fp_enable == 1:
@@ -146,19 +146,19 @@ FP enabled and TX_THREAD.tx_thread_fp_enable == 1:
      0x1F0                  q3
      0x200                  q0
      0x210                  q1
-     0x220                  x28                         
-     0x228                  reserved                    
-     0x230                  x26                         
-     0x238                  x27                         
-     0x240                  x24                         
-     0x248                  x25                         
-     0x250                  x22                         
-     0x258                  x23                         
-     0x260                  x20                         
-     0x268                  x21                             
-     0x270                  x18                             
-     0x278                  x19                             
-     0x280                  x16                          
+     0x220                  x28
+     0x228                  reserved
+     0x230                  x26
+     0x238                  x27
+     0x240                  x24
+     0x248                  x25
+     0x250                  x22
+     0x258                  x23
+     0x260                  x20
+     0x268                  x21
+     0x270                  x18
+     0x278                  x19
+     0x280                  x16
      0x288                  x17
      0x290                  x14
      0x298                  x15
@@ -177,20 +177,20 @@ FP enabled and TX_THREAD.tx_thread_fp_enable == 1:
      0x300                  x0
      0x308                  x1
      0x310                  x29
-     0x318                  x30 
+     0x318                  x30
 
 
 
 6.  Improving Performance
 
-The distribution version of ThreadX is built without any compiler optimizations. 
-This makes it easy to debug because you can trace or set breakpoints inside of 
-ThreadX itself. Of course, this costs some performance. To make it run faster, 
+The distribution version of ThreadX is built without any compiler optimizations.
+This makes it easy to debug because you can trace or set breakpoints inside of
+ThreadX itself. Of course, this costs some performance. To make it run faster,
 you can change the project settings to the desired compiler optimization level.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined.
 
 
 7.  Interrupt Handling
@@ -210,22 +210,22 @@ irq_handler:
 
   B        _tx_thread_context_restore
 
-By default, ThreadX assumes EL3 level of execution. Running and taking exceptions in EL1 
+By default, ThreadX assumes EL3 level of execution. Running and taking exceptions in EL1
 and EL2 can be done by simply building the ThreadX library with either EL1 or EL2 defined.
 
 
 8.  ThreadX Timer Interrupt
 
-ThreadX requires a periodic interrupt source to manage all time-slicing, thread sleeps, 
-timeouts, and application timers. Without such a timer interrupt source, these services 
-are not functional. However, all other ThreadX services are operational without a 
+ThreadX requires a periodic interrupt source to manage all time-slicing, thread sleeps,
+timeouts, and application timers. Without such a timer interrupt source, these services
+are not functional. However, all other ThreadX services are operational without a
 periodic timer source.
 
 
 9. ARM FP Support
 
 By default, FP support is disabled for each thread. If saving the context of the FP registers
-is needed, the following API call must be made from the context of the application thread - before 
+is needed, the following API call must be made from the context of the application thread - before
 the FP usage:
 
 void    tx_thread_fp_enable(void);

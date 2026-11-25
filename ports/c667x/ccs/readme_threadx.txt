@@ -1,4 +1,4 @@
-                  Microsoft's Azure RTOS ThreadX for TMS320C667x 
+                  Microsoft's Azure RTOS ThreadX for TMS320C667x
 
                        Using the TI Code Composer Tools
 
@@ -17,73 +17,73 @@ It is assumed the tools are installed in the default directories:
 CCS path by default - c:\ti\ccsv(version number)
 MCSDK path by default - c:\ti
 
-If the packages are installed in different directories, the ThreadX project 
+If the packages are installed in different directories, the ThreadX project
 settings must be adjusted.
 
-2. Open the Azure RTOS Workspace 
+2. Open the Azure RTOS Workspace
 
-In order to build the ThreadX library and the ThreadX demonstration first open 
-the Azure RTOS Workspace inside your ThreadX installation directory. 
+In order to build the ThreadX library and the ThreadX demonstration first open
+the Azure RTOS Workspace inside your ThreadX installation directory.
 
 
 3. Building the ThreadX run-time Library
 
-Building the ThreadX library is easy; simply import the CCS project file 
-"tx" and then select the build button. You should now observe the compilation 
-and assembly of the ThreadX library. This project build produces the ThreadX 
+Building the ThreadX library is easy; simply import the CCS project file
+"tx" and then select the build button. You should now observe the compilation
+and assembly of the ThreadX library. This project build produces the ThreadX
 library file tx.lib.
 
 
 4.  Demonstration System
 
-The ThreadX demonstration is designed to execute on the C6678EVM evaluation board. 
+The ThreadX demonstration is designed to execute on the C6678EVM evaluation board.
 
 Building the demonstration is easy; simply import the "sample_threadx_c6678evm" project.
-Now select "Project -> Build Active Project" to build the ThreadX demonstration, 
-which produces the sample_threadx.out file in the "Debug" directory. You are now 
+Now select "Project -> Build Active Project" to build the ThreadX demonstration,
+which produces the sample_threadx.out file in the "Debug" directory. You are now
 ready to run the ThreadX demonstration on the C6678EVM evaluation board.
 
-Please refer to Chapter 6 of the ThreadX User Guide for a complete description 
-of this demonstration. 
+Please refer to Chapter 6 of the ThreadX User Guide for a complete description
+of this demonstration.
 
 
 5.  System Initialization
 
-The entry point in ThreadX for the TMS320C667x using the TI tools is at label 
-_c_int00. This is defined within the TI library. In addition, this is 
-where all static and global pre-set C variable initialization processing 
+The entry point in ThreadX for the TMS320C667x using the TI tools is at label
+_c_int00. This is defined within the TI library. In addition, this is
+where all static and global pre-set C variable initialization processing
 takes place.
 
-The ThreadX initialization file tx_initialize_low_level.asm is responsible 
-for setting up various system data structures, the vector area, and a periodic 
-timer interrupt source. By default, the vector area is defined to be located in 
-the "vectors" section, which is defined at the top of tx_initialize_low_level.asm. 
-This area is located at address 0 for the demonstration. 
+The ThreadX initialization file tx_initialize_low_level.asm is responsible
+for setting up various system data structures, the vector area, and a periodic
+timer interrupt source. By default, the vector area is defined to be located in
+the "vectors" section, which is defined at the top of tx_initialize_low_level.asm.
+This area is located at address 0 for the demonstration.
 
-tx_initialize_low_level.asm is also where initialization of a periodic timer 
+tx_initialize_low_level.asm is also where initialization of a periodic timer
 interrupt source should take place.
 
-In addition, _tx_initialize_low_level determines the first available address 
-for use by the application. By default, free memory is assumed to start after 
+In addition, _tx_initialize_low_level determines the first available address
+for use by the application. By default, free memory is assumed to start after
 the .zend section in RAM (defined in tx_initialize_low_level). This section
 must be placed at the end of your other RAM sections. Please see sample_threadx.cmd
-for an example. The address of this section is passed to the application definition 
+for an example. The address of this section is passed to the application definition
 function, tx_application_define.
 
 
 6.  Register Usage and Stack Frames
 
-The TI TMS320C667x compiler assumes that registers A0-A9, A16-A31, B0-B9, and 
-B16-B31 are scratch registers for each function. All other registers used by 
-a C function must be preserved by the function. ThreadX takes advantage of this 
-in situations where a context switch happens as a result of making a ThreadX 
-service call (which is itself a C function). In such cases, the saved context 
+The TI TMS320C667x compiler assumes that registers A0-A9, A16-A31, B0-B9, and
+B16-B31 are scratch registers for each function. All other registers used by
+a C function must be preserved by the function. ThreadX takes advantage of this
+in situations where a context switch happens as a result of making a ThreadX
+service call (which is itself a C function). In such cases, the saved context
 of a thread is only the non-scratch registers.
 
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
 All suspended threads have one of these two types of stack frames. The top
-of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the 
+of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the
 associated thread control block TX_THREAD.
 
 
@@ -101,10 +101,10 @@ associated thread control block TX_THREAD.
      0x24                   A4                          A14
      0x28                   A5                          A15
      0x2C                   A6                          B10
-     0x30                   A7                          B11    
-     0x34                   A8                          B12    
-     0x38                   A9                          B13    
-     0x3C                   A10                         ILC  
+     0x30                   A7                          B11
+     0x34                   A8                          B12
+     0x38                   A9                          B13
+     0x3C                   A10                         ILC
      0x40                   A11                         RILC
      0x44                   A12
      0x48                   A13
@@ -159,38 +159,38 @@ associated thread control block TX_THREAD.
      0x10C                  ILC
      0x110                  RILC
      0x114                  ITSR
-    
+
 
 7.  Improving Performance
 
-The distribution version of ThreadX is built without any compiler 
-optimizations. This makes it easy to debug because you can trace or set 
-breakpoints inside of ThreadX itself. Of course, this costs some performance. 
+The distribution version of ThreadX is built without any compiler
+optimizations. This makes it easy to debug because you can trace or set
+breakpoints inside of ThreadX itself. Of course, this costs some performance.
 To make it run faster, you can replace the -g compiler option
-to a -O3 in the ThreadX project file to enable all compiler optimizations. 
+to a -O3 in the ThreadX project file to enable all compiler optimizations.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined.
 
 
 8.  Interrupt Handling
 
-ThreadX provides complete and high-performance interrupt handling for 
-TMS320C667x targets. There are a certain set of requirements that are 
+ThreadX provides complete and high-performance interrupt handling for
+TMS320C667x targets. There are a certain set of requirements that are
 defined in the following sub-sections:
 
 
 8.1  Vector Area
 
-The TMS320C667x interrupt vectors at in the section "vectors" and is defined at 
-the top of tx_initialize_low_level.asm. Each interrupt vector entry contains 
-a jump to a template interrupt processing shell. 
+The TMS320C667x interrupt vectors at in the section "vectors" and is defined at
+the top of tx_initialize_low_level.asm. Each interrupt vector entry contains
+a jump to a template interrupt processing shell.
 
 
 8.2  Interrupt Service Routine Shells
 
-The following interrupt processing shells are defined at the bottom of 
+The following interrupt processing shells are defined at the bottom of
 tx_initialize_low_level.asm:
 
 
@@ -207,18 +207,18 @@ tx_initialize_low_level.asm:
     __tx_int14_ISR
     __tx_int15_ISR
 
-Each interrupt ISR is entered with B3, A0-A4 is available (these registers are 
-saved in the initial vector processing). The default interrupt handling 
+Each interrupt ISR is entered with B3, A0-A4 is available (these registers are
+saved in the initial vector processing). The default interrupt handling
 includes calls to __tx_thread_context_save and __tx_thread_context_restore.
-Application ISR processing can be added between the context save/restore 
+Application ISR processing can be added between the context save/restore
 calls. Note that only the compiler scratch registers are available for use
 after context save return to the ISR.
 
-High-frequency interrupt handlers might not want to perform context 
-save/restore processing on each interrupt. If this is the case, any 
+High-frequency interrupt handlers might not want to perform context
+save/restore processing on each interrupt. If this is the case, any
 additional registers used must be saved and restored by the ISR and
 the interrupt return processing must restore the registers saved by the
-initial vector processing. This can be accomplished by adding the 
+initial vector processing. This can be accomplished by adding the
 following code to the end of the custom ISR handling:
 
         LDW         *+SP(20),A0                         ; Recover A0

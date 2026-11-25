@@ -1,66 +1,60 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
-;/**************************************************************************/ 
-;/**************************************************************************/ 
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
-;/**                                                                       */ 
-;/**   Module Manager                                                      */ 
-;/**                                                                       */ 
-;/**************************************************************************/ 
-;/**************************************************************************/ 
+;/**************************************************************************/
+;/**************************************************************************/
+;/**                                                                       */
+;/** ThreadX Component                                                     */
+;/**                                                                       */
+;/**   Module Manager                                                      */
+;/**                                                                       */
+;/**************************************************************************/
+;/**************************************************************************/
 ;
     IMPORT  _tx_thread_current_ptr
     IMPORT  _txm_module_manager_kernel_dispatch
-    
-    
+
+
     AREA ||.text||, CODE, READONLY, ALIGN=12
     PRESERVE8
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _txm_module_manager_user_mode_entry             Cortex-A7/MMU/AC5   */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _txm_module_manager_user_mode_entry             Cortex-A7/MMU/AC5   */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function allows modules to enter kernel mode.                  */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    SVC 1                                 Enter kernel mode             */ 
-;/*    SVC 2                                 Exit kernel mode              */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    Modules in user mode                                                */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
+;/*  DESCRIPTION                                                           */
 ;/*                                                                        */
-;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+;/*    This function allows modules to enter kernel mode.                  */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    SVC 1                                 Enter kernel mode             */
+;/*    SVC 2                                 Exit kernel mode              */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    Modules in user mode                                                */
 ;/*                                                                        */
 ;/**************************************************************************/
     EXPORT  _txm_module_manager_user_mode_entry
@@ -83,9 +77,9 @@ _txm_system_mode_exit
     BX      lr                              ; Return to the caller
     NOP
     NOP
-        
+
     ; Fill up 4kB page.
     ALIGN 4096
 _txm_module_manager_user_mode_end
-    
+
     END

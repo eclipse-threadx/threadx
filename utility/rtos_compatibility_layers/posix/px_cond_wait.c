@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -25,17 +26,17 @@
 #include "px_int.h"     /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*  pthread_cond_wait                                     PORTABLE C      */ 
-/*                                                           6.1.7        */ 
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*  pthread_cond_wait                                     PORTABLE C      */
+/*                                                           6.1.7        */
+/*  AUTHOR                                                                */
+/*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
+/*                                                                        */
+/*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    This function shall block on a condition variable. They shall be    */
 /*    called with mutex locked by the calling thread or undefined behavior*/
@@ -58,37 +59,31 @@
 /*    pthread_cond_wait operations on the same condition variable is      */
 /*    undefined; that is, a condition variable becomes bound to a unique  */
 /*    mutex when a thread waits on the condition variable, and this       */
-/*    (dynamic) binding shall end when the wait returns.                  */ 
+/*    (dynamic) binding shall end when the wait returns.                  */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*     cond                         condition variable                    */
 /*     mutex                        mutex to be associated with condition */
 /*                                  variable                              */
 /*                                                                        */
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*     OK                           if succesfull                         */
 /*     ERROR                        in case of any error                  */
 /*                                                                        */
-/*  CALLS                                                                 */ 
+/*  CALLS                                                                 */
 /*                                                                        */
 /*   pthread_mutex_unlock          unlocks the mutex held by the caller   */
 /*   tx_semaphore_get              try to get sempaphore internal to cond */
 /*   tx_semaphore_prioritize       prioritize all suspended pthreads      */
 /*   pthread_mutex_lock            lock the mutex                         */
 /*                                                                        */
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */ 
-/**************************************************************************/ 
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/**************************************************************************/
 INT pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
 
@@ -101,7 +96,7 @@ TX_THREAD       *thread;
     thread = tx_thread_identify();
 
     /* Raise its preemption threshold so it does not get descheduled. */
-    tx_thread_preemption_change(thread,0,&old_threshold); 
+    tx_thread_preemption_change(thread,0,&old_threshold);
 
     pthread_mutex_unlock(mutex);
 
@@ -128,7 +123,7 @@ TX_THREAD       *thread;
         posix_set_pthread_errno(EINVAL);
         return(EINVAL);
     }
-    
+
     pthread_mutex_lock(mutex);
     return(OK);
 }

@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -65,14 +67,6 @@
 /*    _tx_thread_terminate              Thread terminate processing       */
 /*    _tx_thread_wait_abort             Thread wait abort processing      */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_mutex_cleanup(TX_THREAD  *thread_ptr, ULONG suspension_sequence)
 {
@@ -86,6 +80,11 @@ UINT                suspended_count;
 TX_THREAD           *next_thread;
 TX_THREAD           *previous_thread;
 
+
+#ifdef TX_NOT_INTERRUPTABLE
+    /* Suspension sequences are not used in the non-interruptable kernel. */
+    (VOID) suspension_sequence;
+#endif
 
 #ifndef TX_NOT_INTERRUPTABLE
 
@@ -160,6 +159,14 @@ TX_THREAD           *previous_thread;
                                 /* Update the list head pointer.  */
                                 mutex_ptr -> tx_mutex_suspension_list =         next_thread;
                             }
+                        }
+
+                        /* Remove this waiter's inheritance before it can resume. */
+                        if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
+                        {
+                            _tx_thread_preempt_disable++;
+                            _tx_mutex_inherit_priority_update(mutex_ptr);
+                            _tx_thread_preempt_disable--;
                         }
 
                         /* Now we need to determine if this cleanup is from a terminate, timeout,
@@ -313,4 +320,3 @@ UINT        status;
     /* Restore interrupts.  */
     TX_RESTORE
 }
-

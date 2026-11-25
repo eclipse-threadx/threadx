@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -72,20 +72,6 @@
 ;/*  CALLED BY                                                             */
 ;/*                                                                        */
 ;/*    ISRs                                  Interrupt Service Routines    */
-;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
-;/*                                            removed unnecessary stack   */
-;/*                                            type placement,             */
-;/*                                            resulting in version 6.1.9  */
-;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.11 */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)

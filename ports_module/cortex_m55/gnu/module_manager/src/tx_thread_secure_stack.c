@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -29,6 +31,15 @@
 #define TX_SOURCE_CODE
 
 #include "tx_secure_interface.h"        /* Interface for NS code. */
+
+/* Secure-state code built with the security extension checks the thread pointers
+   it receives from the non-secure world.  */
+#ifdef __ARM_FEATURE_CMSE
+#if ((__ARM_FEATURE_CMSE & 2) == 2)
+#define TX_THREAD_SECURE_POINTER_CHECK
+#include <arm_cmse.h>                   /* Non-secure address checks. */
+#endif
+#endif
 
 /* Minimum size of secure stack. */
 #ifndef TX_THREAD_SECURE_STACK_MINIMUM
@@ -65,6 +76,31 @@ typedef struct TX_THREAD_SECURE_STACK_INFO_STRUCT
 static TX_THREAD_SECURE_STACK_INFO tx_thread_secure_context[TX_MAX_SECURE_CONTEXTS];
 /* Head of free secure context */
 static INT tx_head_free_index = 0U;
+
+/* Return TX_TRUE if a thread control block pointer received from the non-secure world
+   names non-secure memory that the non-secure caller may read and write.  */
+static UINT tx_thread_secure_pointer_valid(TX_THREAD *thread_ptr)
+{
+UINT    valid;
+
+#ifdef TX_THREAD_SECURE_POINTER_CHECK
+    if (cmse_check_address_range((VOID *) thread_ptr, sizeof(TX_THREAD), CMSE_NONSECURE | CMSE_MPU_READWRITE) == TX_NULL)
+    {
+        valid = TX_FALSE;
+    }
+    else
+    {
+        valid = TX_TRUE;
+    }
+#else
+
+    /* Built without the security extension, so no call arrives from a non-secure caller.  */
+    TX_PARAMETER_NOT_USED(thread_ptr);
+    valid = TX_TRUE;
+#endif
+
+    return(valid);
+}
 
 
 
@@ -123,7 +159,7 @@ ULONG   ipsr;
 INT     index;
 
     /* Make sure function is called from interrupt (threads should not call). */
-    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
     if (ipsr == 0)
     {
         status = TX_CALLER_ERROR;
@@ -131,14 +167,14 @@ INT     index;
     else
     {
         /* Set secure mode to use PSP. */
-        asm volatile("MRS     %0, CONTROL" : "=r" (control));   /* Get CONTROL register. */
+        __asm__ volatile("MRS     %0, CONTROL" : "=r" (control));   /* Get CONTROL register. */
         control |= 2;                                           /* Use PSP. */
-        asm volatile("MSR     CONTROL, %0" :: "r" (control));   /* Set CONTROL register. */
+        __asm__ volatile("MSR     CONTROL, %0" :: "r" (control));   /* Set CONTROL register. */
 
         /* Set process stack pointer and stack limit to 0 to throw exception when a thread
            without a secure stack calls a secure function that tries to use secure stack. */
-        asm volatile("MSR     PSPLIM, %0" :: "r" (0));
-        asm volatile("MSR     PSP, %0" :: "r" (0));
+        __asm__ volatile("MSR     PSPLIM, %0" :: "r" (0));
+        __asm__ volatile("MSR     PSP, %0" :: "r" (0));
 
         for (index = 0; index < TX_MAX_SECURE_CONTEXTS; index++)
         {
@@ -183,6 +219,7 @@ INT     index;
 /*  OUTPUT                                                                */
 /*                                                                        */
 /*    TX_THREAD_ERROR                       Invalid thread pointer        */
+/*    TX_PTR_ERROR                          Thread pointer not non-secure */
 /*    TX_SIZE_ERROR                         Invalid stack size            */
 /*    TX_CALLER_ERROR                       Invalid caller of function    */
 /*    status                                Actual completion status      */
@@ -225,7 +262,7 @@ INT     secure_context_index;
     status = TX_SUCCESS;
 
     /* Make sure function is called from interrupt (threads should not call). */
-    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
     if (ipsr == 0)
     {
         status = TX_CALLER_ERROR;
@@ -233,6 +270,13 @@ INT     secure_context_index;
     else if (stack_size < TX_THREAD_SECURE_STACK_MINIMUM || stack_size > TX_THREAD_SECURE_STACK_MAXIMUM)
     {
         status = TX_SIZE_ERROR;
+    }
+
+    /* The thread pointer comes from the non-secure world, so it must name non-secure
+       memory before it is read or written.  */
+    else if (tx_thread_secure_pointer_valid(thread_ptr) == TX_FALSE)
+    {
+        status = TX_PTR_ERROR;
     }
 
     /* Check if thread already has secure stack allocated. */
@@ -281,12 +325,12 @@ INT     secure_context_index;
                 thread_ptr -> tx_thread_secure_stack_context = (VOID *)(secure_context_index + 1);
 
                 /* Check if this thread is running by looking at its stack start and PSPLIM_NS */
-                asm volatile("MRS     %0, PSPLIM_NS" : "=r" (psplim_ns));   /* Get PSPLIM_NS register. */
+                __asm__ volatile("MRS     %0, PSPLIM_NS" : "=r" (psplim_ns));   /* Get PSPLIM_NS register. */
                 if(((ULONG) thread_ptr -> tx_thread_stack_start & 0xFFFFFFF8) == psplim_ns)
                 {
                     /* If this thread is running, set Secure PSP and PSPLIM. */
-                    asm volatile("MSR     PSPLIM, %0" :: "r" ((ULONG)(info_ptr -> tx_thread_secure_stack_limit)));
-                    asm volatile("MSR     PSP, %0" :: "r" ((ULONG)(info_ptr -> tx_thread_secure_stack_ptr)));
+                    __asm__ volatile("MSR     PSPLIM, %0" :: "r" ((ULONG)(info_ptr -> tx_thread_secure_stack_limit)));
+                    __asm__ volatile("MSR     PSP, %0" :: "r" ((ULONG)(info_ptr -> tx_thread_secure_stack_ptr)));
                 }
             }
 
@@ -335,6 +379,7 @@ INT     secure_context_index;
 /*  OUTPUT                                                                */
 /*                                                                        */
 /*    TX_THREAD_ERROR                       Invalid thread pointer        */
+/*    TX_PTR_ERROR                          Thread pointer not non-secure */
 /*    TX_CALLER_ERROR                       Invalid caller of function    */
 /*    status                                Actual completion status      */
 /*                                                                        */
@@ -369,48 +414,58 @@ INT     secure_context_index;
 
     status = TX_SUCCESS;
 
-    /* Pickup stack info id from thread. */
-    secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1;
-
     /* Make sure function is called from interrupt (threads should not call). */
-    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
     if (ipsr == 0)
     {
         status = TX_CALLER_ERROR;
     }
 
-    /* Check if secure context index is in valid range. */
-    else if (secure_context_index < 0 || secure_context_index >= TX_MAX_SECURE_CONTEXTS)
+    /* The thread pointer comes from the non-secure world, so it must name non-secure
+       memory before it is read or written.  */
+    else if (tx_thread_secure_pointer_valid(thread_ptr) == TX_FALSE)
     {
-        status = TX_THREAD_ERROR;
+        status = TX_PTR_ERROR;
     }
     else
     {
 
-        /* Pickup stack info from static array of secure contexts. */
-        info_ptr = &tx_thread_secure_context[secure_context_index];
+        /* Pickup stack info id from thread. */
+        secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1;
 
-        /* Check that this secure context is for this thread. */
-        if (info_ptr -> tx_thread_ptr != thread_ptr)
+        /* Check if secure context index is in valid range. */
+        if (secure_context_index < 0 || secure_context_index >= TX_MAX_SECURE_CONTEXTS)
         {
             status = TX_THREAD_ERROR;
         }
-
         else
         {
 
-            /* Free secure stack. */
-            free(info_ptr -> tx_thread_secure_stack_limit);
+            /* Pickup stack info from static array of secure contexts. */
+            info_ptr = &tx_thread_secure_context[secure_context_index];
 
-            TX_DISABLE
+            /* Check that this secure context is for this thread. */
+            if (info_ptr -> tx_thread_ptr != thread_ptr)
+            {
+                status = TX_THREAD_ERROR;
+            }
 
-            /* Free info struct. */
-            tx_thread_secure_context[secure_context_index].tx_next_free_index = tx_head_free_index;
-            tx_head_free_index = secure_context_index;
-            TX_RESTORE
+            else
+            {
 
-            /* Clear secure context from thread. */
-            thread_ptr -> tx_thread_secure_stack_context = 0;
+                /* Free secure stack. */
+                free(info_ptr -> tx_thread_secure_stack_limit);
+
+                TX_DISABLE
+
+                /* Free info struct. */
+                tx_thread_secure_context[secure_context_index].tx_next_free_index = tx_head_free_index;
+                tx_head_free_index = secure_context_index;
+                TX_RESTORE
+
+                /* Clear secure context from thread. */
+                thread_ptr -> tx_thread_secure_stack_context = 0;
+            }
         }
     }
 
@@ -469,17 +524,27 @@ void _tx_thread_secure_stack_context_save(TX_THREAD *thread_ptr)
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 ULONG   sp;
 ULONG   ipsr;
-INT secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1;
+INT     secure_context_index;
 
     /* This function should be called from scheduler only. */
-    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
     if (ipsr == 0)
     {
         return;
     }
 
+    /* The thread pointer comes from the non-secure world, so it must name non-secure
+       memory before it is read or written.  */
+    if (tx_thread_secure_pointer_valid(thread_ptr) == TX_FALSE)
+    {
+        return;
+    }
+
+    /* Pickup stack info id from thread. */
+    secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1;
+
     /* Check if secure context index is in valid range. */
-    else if (secure_context_index < 0 || secure_context_index >= TX_MAX_SECURE_CONTEXTS)
+    if (secure_context_index < 0 || secure_context_index >= TX_MAX_SECURE_CONTEXTS)
     {
         return;
     }
@@ -494,7 +559,7 @@ INT secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1
     }
 
     /* Check that stack pointer is in range */
-    asm volatile("MRS     %0, PSP" : "=r" (sp));   /* Get PSP register. */
+    __asm__ volatile("MRS     %0, PSP" : "=r" (sp));   /* Get PSP register. */
     if ((sp < (ULONG)info_ptr -> tx_thread_secure_stack_limit) ||
         (sp > (ULONG)info_ptr -> tx_thread_secure_stack_start))
     {
@@ -506,8 +571,8 @@ INT secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1
 
     /* Set process stack pointer and stack limit to 0 to throw exception when a thread
        without a secure stack calls a secure function that tries to use secure stack. */
-    asm volatile("MSR     PSPLIM, %0" :: "r" (0));
-    asm volatile("MSR     PSP, %0" :: "r" (0));
+    __asm__ volatile("MSR     PSPLIM, %0" :: "r" (0));
+    __asm__ volatile("MSR     PSP, %0" :: "r" (0));
 
     return;
 }
@@ -561,17 +626,27 @@ void _tx_thread_secure_stack_context_restore(TX_THREAD *thread_ptr)
 {
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 ULONG   ipsr;
-INT secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1;
+INT     secure_context_index;
 
     /* This function should be called from scheduler only. */
-    asm volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
     if (ipsr == 0)
     {
         return;
     }
 
+    /* The thread pointer comes from the non-secure world, so it must name non-secure
+       memory before it is read or written.  */
+    if (tx_thread_secure_pointer_valid(thread_ptr) == TX_FALSE)
+    {
+        return;
+    }
+
+    /* Pickup stack info id from thread. */
+    secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1;
+
     /* Check if secure context index is in valid range. */
-    else if (secure_context_index < 0 || secure_context_index >= TX_MAX_SECURE_CONTEXTS)
+    if (secure_context_index < 0 || secure_context_index >= TX_MAX_SECURE_CONTEXTS)
     {
         return;
     }
@@ -586,8 +661,8 @@ INT secure_context_index = (INT)thread_ptr -> tx_thread_secure_stack_context - 1
     }
 
     /* Set stack pointer and limit. */
-    asm volatile("MSR     PSPLIM, %0" :: "r" ((ULONG)info_ptr -> tx_thread_secure_stack_limit));
-    asm volatile("MSR     PSP, %0" :: "r" ((ULONG)info_ptr -> tx_thread_secure_stack_ptr));
+    __asm__ volatile("MSR     PSPLIM, %0" :: "r" ((ULONG)info_ptr -> tx_thread_secure_stack_limit));
+    __asm__ volatile("MSR     PSP, %0" :: "r" ((ULONG)info_ptr -> tx_thread_secure_stack_ptr));
 
     return;
 }

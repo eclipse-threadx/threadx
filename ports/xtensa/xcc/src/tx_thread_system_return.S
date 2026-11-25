@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -56,13 +57,6 @@
 /*    is saved since the compiler assumes temp registers are going to get */
 /*    slicked by a function call anyway.                                  */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
-/*  10-31-2022      Scott Larson            Updated EPK definitions,      */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 
 //  VOID   _tx_thread_system_return(VOID)
@@ -76,26 +70,25 @@ _tx_thread_system_return:
     Since this is solicited, no need to save regs compiler doesn't preserve.
     */
 
-#if XCHAL_HAVE_XEA3
     #ifdef __XTENSA_CALL0_ABI__
-    addi    sp, sp, -16
+    addi    a2, sp, -16                     /* avoid addi/addmi relaxation that */
+    mov     sp, a2                          /* might temporarily move sp up     */
     #else
     entry   sp, 48
     #endif
+#if XCHAL_HAVE_XEA3
     s32i    a0, sp, 0                       /* save return address */
-#else
-    #ifdef __XTENSA_CALL0_ABI__
-    addi    a2, sp, -XT_STK_FRMSZ           /* avoid addi/addmi relaxation that */
-    mov     sp, a2                          /* might temporarily move sp up     */
-    #else
-    entry   sp, XT_STK_FRMSZ
-    #endif
 #endif
 
 #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     /* Call the thread exit function to indicate the thread is no longer executing. */
 #ifdef __XTENSA_CALL0_ABI__
+    /* Preserve a0 across the call. */
+#if !XCHAL_HAVE_XEA3
+    s32i    a0, sp, 0
+#endif
     call0   _tx_execution_thread_exit
+    l32i    a0, sp, 0
 #else
     call8   _tx_execution_thread_exit
 #endif
@@ -115,6 +108,7 @@ _tx_thread_system_return:
     interrupts enabled, but we will have to revert SP to point above
     the exception frame because that is what the dispatch code expects.
     Must disable interrupts before that.
+    TODO: disable interrupts prior to stack allocation as we do for XEA2
     */
 
     movi    a0, .Lret
@@ -191,7 +185,27 @@ _tx_thread_system_return:
 
 #else /* XEA1 or XEA2 */
 
+    /* Disable interrupts before allocating the full stack frame.  Taking
+     * an interrupt will allocate a second exception stack frame, which will
+     * overrun a task stack of TX_MINIMUM_STACK bytes.
+     * Read PS so it can be saved off after stack adjustment.
+     */
     rsr     a2,  PS
+    XT_INTS_DISABLE(a3)
+
+    /* Allocate the remainder of the frame here; we already allocated
+     * 16 bytes for call0 or 48 bytes for windowed upon entry.
+     * This memory will be deallocated in the solicited exit logic prior
+     * to reenabling interrupts.
+     */
+    #ifdef __XTENSA_CALL0_ABI__
+    addi    a3, sp, -XT_STK_FRMSZ + 16              // avoid addi/addmi relaxation again
+    mov     sp, a3
+    #else
+    addi    a3, sp, -XT_STK_FRMSZ + 48
+    movsp   sp, a3
+    #endif
+
     s32i    a0,  sp, XT_STK_PC
     s32i    a2,  sp, XT_STK_PS
     #ifdef __XTENSA_CALL0_ABI__
@@ -211,8 +225,6 @@ _tx_thread_system_return:
     wsr     a2, PS
     rsync
     call0   xthal_window_spill_nw
-    l32i    a0,  sp, XT_STK_PS
-    wsr     a0,  PS                                 // Restore PS value
     rsync
     #endif
 
@@ -232,10 +244,9 @@ _tx_thread_system_return:
         a4  = &_tx_timer_time_slice
     */
 
-    /* Lock out interrupts (except hi-pri). */
+    /* Already locked out interrupts (except hi-pri). */
     /* Grab thread control block of current thread. */
     movi    a2, _tx_thread_current_ptr      /* a2 = &_tx_thread_current_ptr */
-    XT_INTS_DISABLE(a0)
     l32i    a3, a2, 0                       /* a3 points to TCB */
 
     /* Mark as having solicited entry to kernel (used on exit). */

@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -106,17 +107,6 @@ extern UINT  _txm_module_manager_usbx_stop(TXM_MODULE_INSTANCE *module_instance)
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  03-02-2021      Scott Larson            Modified comments, fix        */
-/*                                            object delete underflow,    */
-/*                                            resulting in version 6.1.5  */
-/*  03-08-2023      Scott Larson            Added tx_trace.h include,     */
-/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_stop(TXM_MODULE_INSTANCE *module_instance)

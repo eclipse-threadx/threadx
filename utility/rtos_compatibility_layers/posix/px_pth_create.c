@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -72,15 +73,15 @@
 /*                                         or the system-imposed limit on */
 /*                                         the number of pthreads in      */
 /*                                         a process PTHREAD_THREADS_MAX  */
-/*                                         would be exceeded.             */ 
+/*                                         would be exceeded.             */
 /*                                [EINVAL] value specified by attr is     */
 /*                                         invalid.                       */
 /*                                [EPERM]  The caller does not have       */
 /*                                         appropriate permission to set  */
 /*                                         the required scheduling        */
-/*                                         parameters or scheduling policy*/ 
-/*                                                                        */   
-/*                      This call will not return an error code of [EINTR]*/ 
+/*                                         parameters or scheduling policy*/
+/*                                                                        */
+/*                      This call will not return an error code of [EINTR]*/
 /*                                                                        */
 /*                                                                        */
 /*  CALLS                                                                 */
@@ -93,29 +94,20 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Add 64-bit support,           */
-/*                                            remove double parenthesis,  */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 INT pthread_create (pthread_t *thread, pthread_attr_t *attr,
                    void *(*start_routine)(void*),void *arg)
-{ 
+{
 
 TX_INTERRUPT_SAVE_AREA
 
 
 TX_THREAD        *thread_ptr;
-POSIX_TCB        *pthread_ptr, *current_thread_ptr; 
+POSIX_TCB        *pthread_ptr, *current_thread_ptr;
 INT               status,retval;
 
 
-   
+
     /* Make sure we're calling this routine from a thread context.  */
     if (!posix_in_thread_context())
     {
@@ -123,7 +115,7 @@ INT               status,retval;
         posix_internal_error(444);
     }
 
-    /* Disable interrupts.  */ 
+    /* Disable interrupts.  */
 
 
     /*  check for any pthread_t attr suggested */
@@ -136,25 +128,25 @@ INT               status,retval;
     {
         /* Check attributes passed , check for validity */
         if ( (attr->inuse) == TX_FALSE)
-        {   
+        {
             /* attributes passed are not valid, return with an error */
-            posix_errno = EINVAL;    
+            posix_errno = EINVAL;
             posix_set_pthread_errno(EINVAL);
             return(EINVAL);
         }
     }
 
 
-    /* Get a pthread control block for this new pthread */ 
+    /* Get a pthread control block for this new pthread */
     TX_DISABLE
-    status = posix_allocate_pthread_t(&pthread_ptr); 
+    status = posix_allocate_pthread_t(&pthread_ptr);
     TX_RESTORE
-    /* Make sure we got a Thread control block */ 
+    /* Make sure we got a Thread control block */
     if ((status == ERROR) || (!pthread_ptr))
     {
-        /* Configuration/resource error.  */ 
-        return(EAGAIN); 
-    }   
+        /* Configuration/resource error.  */
+        return(EAGAIN);
+    }
 
     if(attr->inherit_sched==PTHREAD_INHERIT_SCHED)
     {
@@ -187,17 +179,17 @@ INT               status,retval;
     }
 
     /* Now set up pthread initial parameters */
-    
+
     pthread_ptr->entry_parameter = arg;
     pthread_ptr->start_routine = start_routine;
     /* Newly created pthread not joined by anybody! */
     pthread_ptr->is_joined_by = TX_FALSE;
     pthread_ptr->joined_by_pthreadID =TX_FALSE;
-    /* Newly created pthread not yet joined to any other pthread */ 
-    pthread_ptr->is_joined_to = TX_FALSE; 
+    /* Newly created pthread not yet joined to any other pthread */
+    pthread_ptr->is_joined_to = TX_FALSE;
     pthread_ptr->joined_to_pthreadID = TX_FALSE;
-    
-    
+
+
     /* Allow cancel */
     pthread_ptr->cancel_state = PTHREAD_CANCEL_ENABLE;
     pthread_ptr->cancel_type = PTHREAD_CANCEL_DEFERRED;
@@ -215,18 +207,18 @@ INT               status,retval;
         /* problem allocating stack space */
         if (status == ERROR)
         {
-          /* Configuration/resource error.  */ 
-          return(EAGAIN); 
+          /* Configuration/resource error.  */
+          return(EAGAIN);
         }
-        
+
     }
 
     /* Create an event flags group for sigwait.  */
     retval =  tx_event_flags_create(&(pthread_ptr -> signals.signal_event_flags), "posix sigwait events");
-    
-   /* Get the thread info from the TCB.  */ 
-    thread_ptr = posix_tcb2thread(pthread_ptr); 
-    
+
+   /* Get the thread info from the TCB.  */
+    thread_ptr = posix_tcb2thread(pthread_ptr);
+
    /* Now actually create and start the thread.  */
    /* convert Posix priorities to Threadx priority */
     retval += tx_thread_create(thread_ptr,
@@ -238,27 +230,27 @@ INT               status,retval;
                                (TX_LOWEST_PRIORITY - pthread_ptr->current_priority + 1),
                                (TX_LOWEST_PRIORITY - pthread_ptr->threshold + 1),
                                pthread_ptr->time_slice,
-                               TX_AUTO_START); 
-    
+                               TX_AUTO_START);
+
     TX_THREAD_EXTENSION_PTR_SET(thread_ptr, pthread_ptr)
-    
-    /* See if ThreadX encountered an error */ 
+
+    /* See if ThreadX encountered an error */
     if (retval)
     {
-        /* Internal error */ 
-        posix_error_handler(3333); 
-        retval = EACCES; 
+        /* Internal error */
+        posix_error_handler(3333);
+        retval = EACCES;
     }
     else
     {
-        /* Everything is fine.  */ 
+        /* Everything is fine.  */
         /* create a pthreadID by type casting POSIX_TCB into pthread_t */
         pthread_ptr->pthreadID = (pthread_t )pthread_ptr;
         *thread = pthread_ptr->pthreadID ;
-        retval = OK; 
+        retval = OK;
     }
-    
-    /* Everything worked fine if we got here */ 
-    return(retval); 
+
+    /* Everything worked fine if we got here */
+    return(retval);
 
 }

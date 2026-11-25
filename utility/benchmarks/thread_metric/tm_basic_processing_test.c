@@ -1,16 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** Thread-Metric Component                                               */
 /**                                                                       */
 /**   Basic Processing Test                                               */
@@ -19,38 +20,38 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    tm_basic_processing_test                            PORTABLE C      */ 
-/*                                                           6.1.7        */ 
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    tm_basic_processing_test                            PORTABLE C      */
+/*                                                           6.1.7        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This file defines the basic test for determining board processing   */
 /*    capabilities                                                        */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  10-15-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/**************************************************************************/
 #include "tm_api.h"
 
 
 /* Define the counters used in the demo application...  */
 
-unsigned long   tm_basic_processing_counter;
+/* volatile because the reporting thread reads this while the processing thread
+   below increments it. The processing loop calls nothing, so without volatile
+   the compiler is free to keep the counter in a register for the lifetime of an
+   infinite loop and never write it back: at -O2 it does exactly that, and the
+   report reads 0 forever.  */
+
+volatile unsigned long   tm_basic_processing_counter;
 
 
-/* Test array.  We will just do a series of calculations on the 
-   test array to eat up processing bandwidth. The idea is that 
+/* Test array.  We will just do a series of calculations on the
+   test array to eat up processing bandwidth. The idea is that
    all RTOSes should produce the same metric here if everything
    else is equal, e.g. processor speed, memory speed, etc.  */
 
@@ -92,7 +93,7 @@ void  tm_basic_processing_initialize(void)
     /* Resume thread 0.  */
     tm_thread_resume(0);
 
-    /* Create the reporting thread. It will preempt the other 
+    /* Create the reporting thread. It will preempt the other
        threads and print out the test results.  */
     tm_thread_create(5, 2, tm_basic_processing_thread_report);
     tm_thread_resume(5);
@@ -103,7 +104,8 @@ void  tm_basic_processing_initialize(void)
 void  tm_basic_processing_thread_0_entry(void)
 {
 
-int     i;
+int             i;
+unsigned long   snapshot;
 
     /* Initialize the test array.   */
     for (i = 0; i < 1024; i++)
@@ -116,19 +118,28 @@ int     i;
     while(1)
     {
 
-        /* Loop through the basic processing array, add the previous 
+        /* Read the counter once per pass and use the copy in the loop below.
+           Reading the volatile counter inside the loop instead would add a
+           memory access to every one of the 1024 iterations and so change the
+           amount of work this test performs. That matters more here than
+           elsewhere in the suite: this test is the baseline the other results
+           are scaled against, so its throughput has to stay comparable with
+           previously published figures and with other RTOSes.  */
+        snapshot =  tm_basic_processing_counter;
+
+        /* Loop through the basic processing array, add the previous
            contents with the contents of the tm_basic_processing_counter
-           and xor the result with the previous value...   just to eat 
+           and xor the result with the previous value...   just to eat
            up some time.  */
         for (i = 0; i < 1024; i++)
         {
 
             /* Update each array entry.  */
-            tm_basic_processing_array[i] =  (tm_basic_processing_array[i] + tm_basic_processing_counter) ^ tm_basic_processing_array[i];
+            tm_basic_processing_array[i] =  (tm_basic_processing_array[i] + snapshot) ^ tm_basic_processing_array[i];
         }
 
         /* Increment the basic processing counter.  */
-        tm_basic_processing_counter++;
+        tm_basic_processing_counter =  snapshot + 1;
     }
 }
 

@@ -1,18 +1,20 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ * Copyright (c) 2026 Eclipse ThreadX contributors
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
+@ Portions of this file were generated with AI assistance.
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread                                                              */
 @/**                                                                       */
@@ -29,8 +31,6 @@
 @#include "tx_thread.h"
 @#include "tx_timer.h"
 @
-@/* Include macros for modifying the wait list.  */
-#include "tx_thread_smp_protection_wait_list_macros.h"
 
 #ifdef TX_ENABLE_FIQ_SUPPORT
 DISABLE_INTS    =       0xC0                    @ Disable IRQ & FIQ interrupts
@@ -51,11 +51,6 @@ SVC_MODE        =       0x93                    @ SVC mode
     .global      _tx_thread_preempt_disable
     .global      _tx_timer_interrupt_active
     .global      _tx_thread_smp_protection
-    .global      _tx_thread_smp_protect_wait_counts
-    .global      _tx_thread_smp_protect_wait_list
-    .global      _tx_thread_smp_protect_wait_list_lock_protect_in_force
-    .global      _tx_thread_smp_protect_wait_list_tail
-    .global      _tx_thread_smp_protect_wait_list_size
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
     .global      _tx_execution_isr_exit
 #endif
@@ -64,10 +59,10 @@ SVC_MODE        =       0x93                    @ SVC mode
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
 @/*    _tx_thread_context_restore                      SMP/Cortex-A5/GNU   */
 @/*                                                           6.1          */
 @/*  AUTHOR                                                                */
@@ -75,40 +70,34 @@ SVC_MODE        =       0x93                    @ SVC mode
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function restores the interrupt context if it is processing a  */ 
-@/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-@/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-@/*    if no thread was running, the function returns to the scheduler.    */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
-@/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    ISRs                                  Interrupt Service Routines    */ 
-@/*                                                                        */ 
-@/*  RELEASE HISTORY                                                       */ 
-@/*                                                                        */ 
-@/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*    This function restores the interrupt context if it is processing a  */
+@/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+@/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+@/*    if no thread was running, the function returns to the scheduler.    */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    _tx_thread_schedule                   Thread scheduling routine     */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    ISRs                                  Interrupt Service Routines    */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_context_restore(VOID)
 @{
     .global _tx_thread_context_restore
     .type _tx_thread_context_restore,function
-_tx_thread_context_restore: 
+_tx_thread_context_restore:
 @
 @    /* Lockout interrupts.  */
 @
@@ -139,13 +128,13 @@ _tx_thread_context_restore:
     ADD     r3, r3, r12                         @ Build array offset
     LDR     r2, [r3, #0]                        @ Pickup system state
     SUB     r2, r2, #1                          @ Decrement the counter
-    STR     r2, [r3, #0]                        @ Store the counter 
+    STR     r2, [r3, #0]                        @ Store the counter
     CMP     r2, #0                              @ Was this the first interrupt?
     BEQ     __tx_thread_not_nested_restore      @ If so, not a nested restore
 @
 @    /* Interrupts are nested.  */
 @
-@    /* Just recover the saved registers and return to the point of 
+@    /* Just recover the saved registers and return to the point of
 @       interrupt.  */
 @
     LDMIA   sp!, {r0, r10, r12, lr}             @ Recover SPSR, POI, and scratch regs
@@ -154,10 +143,10 @@ _tx_thread_context_restore:
     MOVS    pc, lr                              @ Return to point of interrupt
 @
 @    }
-__tx_thread_not_nested_restore: 
+__tx_thread_not_nested_restore:
 @
 @    /* Determine if a thread was interrupted and no preemption is required.  */
-@    else if (((_tx_thread_current_ptr[core]) && (_tx_thread_current_ptr[core] == _tx_thread_execute_ptr[core]) 
+@    else if (((_tx_thread_current_ptr[core]) && (_tx_thread_current_ptr[core] == _tx_thread_execute_ptr[core])
 @               || (_tx_thread_preempt_disable))
 @    {
 @
@@ -176,7 +165,7 @@ __tx_thread_not_nested_restore:
     LDR     r2, [r3, #0]                        @ Pickup actual preempt disable flag
     CMP     r2, #0                              @ Is it set?
     BNE     __tx_thread_no_preempt_restore      @ Yes, don't preempt this thread
-__tx_thread_skip_preempt_check: 
+__tx_thread_skip_preempt_check:
 
     LDR     r3, =_tx_thread_execute_ptr         @ Pickup address of execute thread ptr
     ADD     r3, r3, r12                         @ Build index to this core's execute thread ptr
@@ -185,7 +174,7 @@ __tx_thread_skip_preempt_check:
     BNE     __tx_thread_preempt_restore         @ No, preemption needs to happen
 @
 @
-__tx_thread_no_preempt_restore: 
+__tx_thread_no_preempt_restore:
 @
 @    /* Restore interrupted thread or ISR.  */
 @
@@ -203,78 +192,7 @@ __tx_thread_no_preempt_restore:
 @    else
 @    {
 @
-__tx_thread_preempt_restore: 
-@
-@    /* Was the thread being preempted waiting for the lock?  */
-@    if (_tx_thread_smp_protect_wait_counts[this_core] != 0)
-@    {
-@
-    LDR     r1, =_tx_thread_smp_protect_wait_counts @ Load waiting count list
-    LDR     r2, [r1, r10, LSL #2]               @ Load waiting value for this core
-    CMP     r2, #0
-    BEQ     _nobody_waiting_for_lock            @ Is the core waiting for the lock?
-@
-@    /* Do we not have the lock? This means the ISR never got the inter-core lock.  */
-@    if (_tx_thread_smp_protection.tx_thread_smp_protect_owned != this_core)
-@    {
-@
-    LDR     r1, =_tx_thread_smp_protection      @ Load address of protection structure
-    LDR     r2, [r1, #8]                        @ Pickup the owning core
-    CMP     r10, r2                             @ Compare our core to the owning core
-    BEQ     _this_core_has_lock                 @ Do we have the lock?
-@
-@    /* We don't have the lock. This core should be in the list. Remove it.  */
-@    _tx_thread_smp_protect_wait_list_remove(this_core);
-@
-    MOV     r0, r10                             @ Move the core ID to r0 for the macro
-              _tx_thread_smp_protect_wait_list_remove @ Call macro to remove core from the list
-    B       _nobody_waiting_for_lock            @ Leave
-@
-@    }
-@    else
-@    {
-@    /* We have the lock. This means the ISR got the inter-core lock, but
-@       never released it because it saw that there was someone waiting.
-@       Note this core is not in the list.  */
-@
-_this_core_has_lock: 
-@
-@    /* We're no longer waiting. Note that this should be zero since this happens during thread preemption.  */
-@    _tx_thread_smp_protect_wait_counts[core]--;
-@
-    LDR     r1, =_tx_thread_smp_protect_wait_counts @ Load waiting count list
-    LDR     r2, [r1, r10, LSL #2]               @ Load waiting value for this core
-    SUB     r2, r2, #1                          @ Decrement waiting value. Should be zero now
-    STR     r2, [r1, r10, LSL #2]               @ Store new waiting value
-@
-@    /* Now release the inter-core lock.  */
-@
-@    /* Set protected core as invalid.  */
-@    _tx_thread_smp_protection.tx_thread_smp_protect_core = 0xFFFFFFFF;
-@
-    LDR     r1, =_tx_thread_smp_protection      @ Load address of protection structure
-    MOV     r2, #0xFFFFFFFF                     @ Build invalid value
-    STR     r2, [r1, #8]                        @ Mark the protected core as invalid
-    DMB                                         @ Ensure that accesses to shared resource have completed
-@
-@    /* Release protection.  */
-@    _tx_thread_smp_protection.tx_thread_smp_protect_in_force = 0;
-@
-    MOV     r2, #0                              @ Build release protection value
-    STR     r2, [r1, #0]                        @ Release the protection
-    DSB     ISH                                 @ To ensure update of the protection occurs before other CPUs awake
-@
-@    /* Wake up waiting processors. Note interrupts are already enabled.  */
-@
-#ifdef TX_ENABLE_WFE
-    SEV                                         @ Send event to other CPUs
-#endif
-@
-@    }
-@    }
-@
-
-_nobody_waiting_for_lock: 
+__tx_thread_preempt_restore:
 
     LDMIA   sp!, {r3, r10, r12, lr}             @ Recover temporarily saved registers
     MOV     r1, lr                              @ Save lr (point of interrupt)
@@ -305,7 +223,7 @@ _nobody_waiting_for_lock:
     STR     r2, [sp, #-4]!                      @ Save FPSCR
     VSTMDB  sp!, {D16-D31}                      @ Save D16-D31
     VSTMDB  sp!, {D0-D15}                       @ Save D0-D15
-_tx_skip_irq_vfp_save: 
+_tx_skip_irq_vfp_save:
 #endif
 
     MOV     r3, #1                              @ Build interrupt stack type
@@ -318,7 +236,7 @@ _tx_skip_irq_vfp_save:
 @    {
 @
     LDR     r3, =_tx_timer_interrupt_active     @ Pickup timer interrupt active flag's address
-_tx_wait_for_timer_to_finish: 
+_tx_wait_for_timer_to_finish:
     LDR     r2, [r3, #0]                        @ Pickup timer interrupt active flag
     CMP     r2, #0                              @ Is the timer interrupt active?
     BNE     _tx_wait_for_timer_to_finish        @ If timer interrupt is active, wait until it completes
@@ -337,7 +255,7 @@ _tx_wait_for_timer_to_finish:
     STR     r2, [r3, #0]                        @ Disable global time-slice flag
 @
 @    }
-__tx_thread_dont_save_ts: 
+__tx_thread_dont_save_ts:
 @
 @
 @    /* Clear the current task pointer.  */
@@ -348,7 +266,7 @@ __tx_thread_dont_save_ts:
 @
 @    /* Set bit indicating this thread is ready for execution.  */
 @
-    LDR     r2, [r0, #152]                      @ Pickup the ready bit 
+    LDR     r2, [r0, #152]                      @ Pickup the ready bit
     ORR     r2, r2, #0x8000                     @ Set ready bit (bit 15)
     STR     r2, [r0, #152]                      @ Make this thread ready for executing again
     DMB                                         @ Ensure that accesses to shared resource have completed
@@ -359,7 +277,7 @@ __tx_thread_dont_save_ts:
     B       _tx_thread_schedule                 @ Return to scheduler
 @    }
 @
-__tx_thread_idle_system_restore: 
+__tx_thread_idle_system_restore:
 @
 @    /* Just return back to the scheduler!  */
 @

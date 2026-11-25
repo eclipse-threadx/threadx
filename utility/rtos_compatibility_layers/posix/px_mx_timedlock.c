@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -26,18 +27,18 @@
 #include "px_int.h"    /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    pthread_mutex_timedlock                             PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    pthread_mutex_timedlock                             PORTABLE C      */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This function locks the mutex object referenced. If the mutex is    */
 /*    already locked, the calling thread shall block until the mutex      */
 /*    becomes available as in the pthread_mutex_lock( ) function. If the  */
@@ -47,31 +48,25 @@
 /*    referenced by mutex in the locked state with the calling thread as  */
 /*    its owner.                                                          */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*    mutex                          Address of the mutex                 */
 /*    timespec                       Pointer to timespec structure which  */
 /*                                   holds timeout period in clock ticks  */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*     0                             if successful                        */ 
-/*     Value                         in case of any error                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*  tx_thread_identify               Get calling thread's pointer         */ 
-/*  tx_mutex_get                     ThreadX Mutex Service                */ 
 /*                                                                        */
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
+/*  OUTPUT                                                                */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*     0                             if successful                        */
+/*     Value                         in case of any error                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*  tx_thread_identify               Get calling thread's pointer         */
+/*  tx_mutex_get                     ThreadX Mutex Service                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 INT  pthread_mutex_timedlock(pthread_mutex_t *mutex, struct timespec *abs_timeout)

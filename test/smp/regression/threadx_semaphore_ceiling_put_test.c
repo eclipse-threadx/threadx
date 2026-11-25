@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test the semaphore ceiling put.  */
 
 #include   <stdio.h>
@@ -55,8 +66,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -68,8 +79,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -81,8 +92,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -108,7 +119,7 @@ CHAR    *pointer;
 
     /* Setup the semaphore notify callback.  */
     status =  tx_semaphore_put_notify(&semaphore_0, put_notify);
-    
+
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 
     /* Check for status.  */
@@ -205,15 +216,15 @@ UINT    status;
     /* At this point, we need to resume thread 2 and relinquish in order to get that thread suspended on the
        semaphore as well.  */
     tx_thread_resume(&thread_2);
-    tx_thread_relinquish(); 
-  
+    tx_thread_relinquish();
+
     /* Perform 2 semaphore put operations to resume both threads.  */
     status =  tx_semaphore_ceiling_put(&semaphore_0, 2);
     status += tx_semaphore_ceiling_put(&semaphore_0, 2);
 
     /* Let both threads run again.  */
-    tx_thread_relinquish(); 
-        
+    tx_thread_relinquish();
+
     /* Check the status and the run counter of the other thread.  */
     if ((status != TX_SUCCESS) || (thread_1_counter != 5) || (thread_2_counter != 3))
     {
@@ -222,7 +233,7 @@ UINT    status;
         printf("ERROR #11\n");
         test_control_return(1);
     }
-    
+
     /* Now turn off the semaphore notification.  */
     status =  tx_semaphore_put_notify(&semaphore_0, TX_NULL);
 
@@ -234,7 +245,7 @@ UINT    status;
 
     /* Put a semaphore on a semaphore that does not have suspension.  */
     status +=  tx_semaphore_ceiling_put(&semaphore_1, 2);
-    
+
     /* Repeat the semaphore ceiling put without notification process!  */
 
     /* Place an instance on the semaphore, this should resume the other thread
@@ -265,15 +276,15 @@ UINT    status;
     /* At this point, we need to resume thread 2 and relinquish in order to get that thread suspended on the
        semaphore as well.  */
     tx_thread_resume(&thread_2);
-    tx_thread_relinquish(); 
-  
+    tx_thread_relinquish();
+
     /* Perform 2 semaphore put operations to resume both threads.  */
     status =  tx_semaphore_ceiling_put(&semaphore_0, 2);
     status += tx_semaphore_ceiling_put(&semaphore_0, 2);
 
     /* Let both threads run again.  */
-    tx_thread_relinquish(); 
-        
+    tx_thread_relinquish();
+
     /* Check the status and the run counter of the other thread.  */
     if ((status != TX_SUCCESS) || (thread_1_counter != 9) || (thread_2_counter != 5))
     {
@@ -281,7 +292,7 @@ UINT    status;
         /* Semaphore error.  */
         printf("ERROR #11a\n");
         test_control_return(1);
-    }    
+    }
     else
     {
 
@@ -299,7 +310,7 @@ UINT    status;
 
     while(1)
     {
-    
+
         /* Increment thread run counter.  */
         thread_1_counter++;
 
@@ -320,7 +331,7 @@ UINT    status;
 
     while(1)
     {
-    
+
         /* Increment thread run counter.  */
         thread_2_counter++;
 

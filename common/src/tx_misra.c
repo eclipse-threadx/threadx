@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -32,7 +33,7 @@
 #include "tx_api.h"
 #else
 #define TX_THREAD_INIT
-//CHAR  _tx_version_id[100] =  "Copyright (c) 2024 Microsoft Corporation.  * ThreadX 6.1       MISRA C Compliant *";
+//CHAR  _tx_version_id[100] =  "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  * ThreadX 6.1       MISRA C Compliant *";
 
 #include "tx_api.h"
 #include "tx_thread.h"
@@ -819,15 +820,29 @@ UCHAR  *_tx_misra_entry_to_uchar_pointer_convert(TX_TRACE_BUFFER_ENTRY *pointer)
 /***********************************************************************************************/
 /***********************************************************************************************/
 /**                                                                                            */
-/**  UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer);                           */
+/**  const UCHAR  *_tx_misra_char_to_uchar_pointer_convert(TX_NAME_CONST CHAR *pointer);       */
 /**                                                                                            */
 /***********************************************************************************************/
 /***********************************************************************************************/
-UCHAR  *_tx_misra_char_to_uchar_pointer_convert(CHAR *pointer)
+const UCHAR  *_tx_misra_char_to_uchar_pointer_convert(TX_NAME_CONST CHAR *pointer)
 {
 
     /* Return a UCHAR pointer.  */
-    return((UCHAR *) ((VOID *) pointer));
+    return((const UCHAR *) ((const VOID *) pointer));
+}
+
+
+/***********************************************************************************************/
+/***********************************************************************************************/
+/**                                                                                            */
+/**  const UCHAR  *_tx_misra_const_uchar_pointer_add(const UCHAR *ptr, ULONG amount);          */
+/**                                                                                            */
+/***********************************************************************************************/
+/***********************************************************************************************/
+const UCHAR  *_tx_misra_const_uchar_pointer_add(const UCHAR *ptr, ULONG amount)
+{
+    ptr =  ptr + amount;
+    return(ptr);
 }
 
 

@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -78,12 +80,6 @@
 /*                                                                        */
 /*    _tx_thread_create                     Create thread service         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID)) */
 /* { */
@@ -148,7 +144,7 @@ _tx_thread_stack_build:
     BIC     r3, r3, #CPSR_MASK                  // Mask mode bits of CPSR
     ORR     r3, r3, #SYS_MODE                   // Build CPSR, SYS mode, interrupts enabled
 
-    TST     r1, 1                               // Test if Thumb bit is set in entry function address
+    TST     r1, #1                              // Test if Thumb bit is set in entry function address
     ITE NE
     ORRNE   r3, r3, #THUMB_BIT                  // Yes, set the Thumb bit
     BICEQ   r3, r3, #THUMB_BIT                  // No, clear the Thumb bit

@@ -1,18 +1,21 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -36,54 +39,49 @@
 void *_tx_linux_thread_entry(void *ptr);
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_stack_build                              Linux/GNU       */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_stack_build                              Linux/GNU       */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function builds a stack frame on the supplied thread's stack.  */
 /*    The stack frame results in a fake interrupt return to the supplied  */
-/*    function pointer.                                                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*    function pointer.                                                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    thread_ptr                            Pointer to thread control blk */
 /*    function_ptr                          Pointer to return function    */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    pthread_create                                                      */ 
-/*    pthread_setschedparam                                               */ 
-/*    _tx_linux_thread_suspend                                            */ 
-/*    sem_init                                                            */ 
-/*    printf                                                              */ 
-/*    _tx_linux_thread_resume                                             */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_thread_create                     Create thread service         */
-/*    _tx_thread_reset                      Reset thread service          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    pthread_create                                                      */
+/*    pthread_setschedparam                                               */
+/*    _tx_linux_thread_suspend                                            */
+/*    sem_init                                                            */
+/*    printf                                                              */
+/*    _tx_linux_thread_resume                                             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_thread_create                     Create thread service         */
+/*    _tx_thread_reset                      Reset thread service          */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
 {
+ALIGN_TYPE  fake_stack_ptr;
 struct sched_param sp;
 
     (VOID)function_ptr;
@@ -115,16 +113,21 @@ struct sched_param sp;
     sp.sched_priority = TX_LINUX_PRIORITY_USER_THREAD;
     pthread_setschedparam(thread_ptr -> tx_thread_linux_thread_id, SCHED_FIFO, &sp);
 
-    /* Setup the thread suspension type to solicited thread suspension.  
+    /* Setup the thread suspension type to solicited thread suspension.
        Pseudo interrupt handlers will suspend with this field set to 1.  */
     thread_ptr -> tx_thread_linux_suspension_type =  0;
 
-    /* Clear the disabled count that will keep track of the 
+    /* Clear the disabled count that will keep track of the
        tx_interrupt_control nesting.  */
     thread_ptr -> tx_thread_linux_int_disabled_flag =  0;
 
-    /* Setup a fake thread stack pointer.   */
-    thread_ptr -> tx_thread_stack_ptr =  (VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8);
+    /* Setup a fake thread stack pointer.  The stack end points at the last byte of the
+       thread's stack area and is therefore not necessarily aligned, so round the result
+       down to a ULONG boundary.  This pointer is dereferenced as a ULONG below and is
+       also the starting value of the stack checking logic's highest used pointer.  */
+    fake_stack_ptr =  (ALIGN_TYPE) ((VOID *) (((CHAR *) thread_ptr -> tx_thread_stack_end) - 8));
+    fake_stack_ptr =  fake_stack_ptr & (~((ALIGN_TYPE) (sizeof(ULONG) - 1)));
+    thread_ptr -> tx_thread_stack_ptr =  (VOID *) ((ALIGN_TYPE) fake_stack_ptr);
 
     /* Clear the first word of the stack.  */
     *(((ULONG *) thread_ptr -> tx_thread_stack_ptr) - 1) =  0;

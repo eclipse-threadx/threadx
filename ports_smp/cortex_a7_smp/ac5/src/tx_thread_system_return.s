@@ -1,18 +1,20 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026-present Eclipse ThreadX contributors
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
+; Portions of this file were generated with AI assistance.
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -35,16 +37,16 @@
     IMPORT      _tx_thread_preempt_disable
     IMPORT      _tx_thread_smp_protection
     IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-    IMPORT      _tx_execution_thread_exit        
+    IMPORT      _tx_execution_thread_exit
     ENDIF
 ;
 ;
         AREA ||.text||, CODE, READONLY
         PRESERVE8
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_system_return                        SMP/Cortex-A7/AC5   */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
@@ -52,33 +54,27 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function is target processor specific.  It is used to transfer */ 
-;/*    control from a thread back to the ThreadX system.  Only a           */ 
-;/*    minimal context is saved since the compiler assumes temp registers  */ 
-;/*    are going to get slicked by a function call anyway.                 */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                   Thread scheduling loop        */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ThreadX components                                                  */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function is target processor specific.  It is used to transfer */
+;/*    control from a thread back to the ThreadX system.  Only a           */
+;/*    minimal context is saved since the compiler assumes temp registers  */
+;/*    are going to get slicked by a function call anyway.                 */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_schedule                   Thread scheduling loop        */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ThreadX components                                                  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
@@ -112,7 +108,7 @@ _tx_skip_solicited_vfp_save
     MOV     r4, #0                              ; Build a solicited stack type
     MRS     r5, CPSR                            ; Pickup the CPSR
     STMDB   sp!, {r4-r5}                        ; Save type and CPSR
-;   
+;
 ;   /* Lockout interrupts.  */
 ;
     IF :DEF:TX_ENABLE_FIQ_SUPPORT
@@ -138,9 +134,10 @@ _tx_skip_solicited_vfp_save
     ADD     r2, r2, r12                         ; Build index into time-slice array
     LDR     r1, [r2, #0]                        ; Pickup current time slice
 ;
-;    /* Save current stack and switch to system stack.  */
+;    /* Save the current stack pointer in the thread's control block. The
+;       scheduler runs on this core's banked SVC mode stack, which the startup
+;       code set up, so there is no stack switch to perform.  */
 ;    _tx_thread_current_ptr[core] -> tx_thread_stack_ptr =  sp;
-;    sp = _tx_thread_system_stack_ptr[core];
 ;
     STR     sp, [r0, #8]                        ; Save thread stack pointer
 ;
@@ -184,8 +181,8 @@ __tx_thread_dont_save_ts
     CMP     r0, r2                              ; Is it the same as the current thread?
 __error_loop
     BNE     __error_loop                        ; If not, we have a problem!!
-    ENDIF    
-    
+    ENDIF
+
     LDR     r1, =_tx_thread_preempt_disable     ; Build address to preempt disable flag
     MOV     r2, #0                              ; Build clear value
     STR     r2, [r1, #0]                        ; Clear preempt disable flag

@@ -4,6 +4,16 @@ cmake_policy(SET CMP0057 NEW)
 project(regression_test LANGUAGES C)
 
 set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../regression)
+set(REPO_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../..)
+set(PORT_LOW_LEVEL_SOURCE ${REPO_ROOT}/ports_smp/${THREADX_ARCH}/${THREADX_TOOLCHAIN}/src/tx_initialize_low_level.c)
+set(GENERATED_LOW_LEVEL_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/tx_initialize_low_level.c)
+set(TESTCONTROL_WEAK_DEFAULTS_SOURCE ${REPO_ROOT}/test/shared/regression/testcontrol_weak_defaults.c)
+
+include_directories(${REPO_ROOT}/test/tx/regression)
+
+if(NOT EXISTS ${PORT_LOW_LEVEL_SOURCE})
+  message(FATAL_ERROR "Unable to locate tx_initialize_low_level.c for ${THREADX_ARCH}/${THREADX_TOOLCHAIN}")
+endif()
 
 set(regression_test_cases
     ${SOURCE_DIR}/threadx_block_memory_basic_test.c
@@ -15,6 +25,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_block_memory_thread_terminate_test.c
     ${SOURCE_DIR}/threadx_byte_memory_basic_test.c
     ${SOURCE_DIR}/threadx_byte_memory_information_test.c
+    ${SOURCE_DIR}/threadx_byte_memory_long_search_test.c
     ${SOURCE_DIR}/threadx_byte_memory_prioritize_test.c
     ${SOURCE_DIR}/threadx_byte_memory_suspension_test.c
     ${SOURCE_DIR}/threadx_byte_memory_suspension_timeout_test.c
@@ -34,14 +45,18 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_interrupt_control_test.c
     ${SOURCE_DIR}/threadx_mutex_basic_test.c
     ${SOURCE_DIR}/threadx_mutex_delete_test.c
+    ${SOURCE_DIR}/threadx_mutex_inherit_wait_exit_test.c
     ${SOURCE_DIR}/threadx_mutex_information_test.c
     ${SOURCE_DIR}/threadx_mutex_nested_priority_inheritance_test.c
     ${SOURCE_DIR}/threadx_mutex_no_preemption_test.c
     ${SOURCE_DIR}/threadx_mutex_preemption_test.c
+    ${SOURCE_DIR}/threadx_mutex_inherit_chain_test.c
+    ${SOURCE_DIR}/threadx_mutex_inherit_waiter_priority_change_test.c
     ${SOURCE_DIR}/threadx_mutex_priority_inheritance_test.c
     ${SOURCE_DIR}/threadx_mutex_proritize_test.c
     ${SOURCE_DIR}/threadx_mutex_suspension_timeout_test.c
     ${SOURCE_DIR}/threadx_mutex_thread_terminate_test.c
+    ${SOURCE_DIR}/threadx_object_delete_suspension_test.c
     ${SOURCE_DIR}/threadx_queue_basic_eight_word_test.c
     ${SOURCE_DIR}/threadx_queue_basic_four_word_test.c
     ${SOURCE_DIR}/threadx_queue_basic_one_word_test.c
@@ -74,9 +89,10 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_smp_random_resume_suspend_exclusion_test.c
     ${SOURCE_DIR}/threadx_smp_random_resume_suspend_test.c
     ${SOURCE_DIR}/threadx_smp_rebalance_exclusion_test.c
+    ${SOURCE_DIR}/threadx_smp_relinquish_rebalance_test.c
     ${SOURCE_DIR}/threadx_smp_relinquish_test.c
-    ${SOURCE_DIR}/threadx_smp_resume_suspend_accending_order_test.c
-    ${SOURCE_DIR}/threadx_smp_resume_suspend_decending_order_test.c
+    ${SOURCE_DIR}/threadx_smp_resume_suspend_ascending_order_test.c
+    ${SOURCE_DIR}/threadx_smp_resume_suspend_descending_order_test.c
     ${SOURCE_DIR}/threadx_smp_time_slice_test.c
     ${SOURCE_DIR}/threadx_smp_two_threads_one_core_test.c
     ${SOURCE_DIR}/threadx_thread_basic_execution_test.c
@@ -85,6 +101,7 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_thread_create_preemption_threshold_test.c
     ${SOURCE_DIR}/threadx_thread_delayed_suspension_test.c
     ${SOURCE_DIR}/threadx_thread_information_test.c
+    ${SOURCE_DIR}/threadx_thread_misaligned_stack_test.c
     ${SOURCE_DIR}/threadx_thread_multi_level_preemption_threshold_test.c
     ${SOURCE_DIR}/threadx_thread_multiple_non_current_test.c
     ${SOURCE_DIR}/threadx_thread_multiple_sleep_test.c
@@ -101,7 +118,10 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_thread_sleep_for_100ticks_test.c
     ${SOURCE_DIR}/threadx_thread_sleep_terminate_test.c
     ${SOURCE_DIR}/threadx_thread_stack_checking_test.c
+    ${SOURCE_DIR}/threadx_thread_stack_fill_value_test.c
     ${SOURCE_DIR}/threadx_thread_terminate_delete_test.c
+    ${SOURCE_DIR}/threadx_thread_exit_callback_transition_test.c
+    ${SOURCE_DIR}/threadx_smp_thread_exit_callback_remote_test.c
     ${SOURCE_DIR}/threadx_thread_time_slice_change_test.c
     ${SOURCE_DIR}/threadx_thread_wait_abort_and_isr_test.c
     ${SOURCE_DIR}/threadx_thread_wait_abort_test.c
@@ -114,21 +134,58 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_multiple_test.c
     ${SOURCE_DIR}/threadx_timer_simple_test.c
     ${SOURCE_DIR}/threadx_trace_basic_test.c
+    ${SOURCE_DIR}/threadx_trace_entry_update_test.c
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
 
 add_custom_command(
-  OUTPUT ${SOURCE_DIR}/tx_initialize_low_level.c
-  COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/generate_test_file.sh
+  OUTPUT ${GENERATED_LOW_LEVEL_SOURCE}
+  COMMAND ${CMAKE_COMMAND}
+          -DSOURCE_FILE=${PORT_LOW_LEVEL_SOURCE}
+          -DOUTPUT_FILE=${GENERATED_LOW_LEVEL_SOURCE}
+          -P ${CMAKE_CURRENT_LIST_DIR}/generate_test_file.cmake
+  DEPENDS ${PORT_LOW_LEVEL_SOURCE} ${CMAKE_CURRENT_LIST_DIR}/generate_test_file.cmake
   COMMENT "Generating tx_initialize_low_level.c for test")
 
-add_library(test_utility ${SOURCE_DIR}/tx_initialize_low_level.c
-                         ${SOURCE_DIR}/testcontrol.c)
-target_link_libraries(test_utility PUBLIC azrtos::threadx_smp)
-target_compile_definitions(test_utility PUBLIC CTEST BATCH_TEST)
+add_library(test_weak_defaults OBJECT ${TESTCONTROL_WEAK_DEFAULTS_SOURCE})
+target_link_libraries(test_weak_defaults PRIVATE azrtos::threadx_smp)
+target_compile_definitions(test_weak_defaults PRIVATE CTEST BATCH_TEST
+                                                       TEST_STACK_SIZE_PRINTF=4096)
+
+add_library(test_utility OBJECT ${GENERATED_LOW_LEVEL_SOURCE}
+                                ${SOURCE_DIR}/testcontrol.c)
+target_link_libraries(test_utility PRIVATE azrtos::threadx_smp)
+target_compile_definitions(test_utility PRIVATE CTEST BATCH_TEST
+                                                TEST_STACK_SIZE_PRINTF=4096)
 
 foreach(test_case ${regression_test_cases})
   get_filename_component(test_name ${test_case} NAME_WE)
-  add_executable(${test_name} ${test_case})
-  target_link_libraries(${test_name} PRIVATE test_utility)
+
+  if(test_name STREQUAL "threadx_initialize_kernel_setup_test")
+    add_executable(${test_name} ${test_case} $<TARGET_OBJECTS:test_weak_defaults>)
+  else()
+    add_executable(${test_name} ${test_case}
+                   $<TARGET_OBJECTS:test_utility>
+                   $<TARGET_OBJECTS:test_weak_defaults>)
+    target_compile_definitions(${test_name} PRIVATE CTEST BATCH_TEST
+                                                    TEST_STACK_SIZE_PRINTF=4096)
+  endif()
+
+  target_link_libraries(${test_name} PRIVATE azrtos::threadx_smp)
   add_test(${CMAKE_BUILD_TYPE}::${test_name} ${test_name})
 endforeach()
+
+add_executable(threadx_smp_execution_profile_get_test
+               ${SOURCE_DIR}/threadx_smp_execution_profile_get_test.c
+               ${REPO_ROOT}/utility/execution_profile_kit/smp_version/tx_execution_profile.c)
+target_include_directories(threadx_smp_execution_profile_get_test
+                           PRIVATE
+                           ${SOURCE_DIR}/execution_profile_test
+                           ${REPO_ROOT}/utility/execution_profile_kit/smp_version)
+target_compile_definitions(threadx_smp_execution_profile_get_test
+                           PRIVATE CTEST BATCH_TEST TEST_STACK_SIZE_PRINTF=4096)
+if(NOT MSVC)
+  target_compile_options(threadx_smp_execution_profile_get_test PRIVATE -m64)
+  target_link_options(threadx_smp_execution_profile_get_test PRIVATE -m64)
+endif()
+add_test(${CMAKE_BUILD_TYPE}::threadx_smp_execution_profile_get_test
+         threadx_smp_execution_profile_get_test)

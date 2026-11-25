@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+/* Portions of this file were generated with AI assistance. */
 
 
 /**************************************************************************/
@@ -64,19 +67,8 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
-/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022      Scott Larson            Modified comment(s),          */
-/*                                            check for null name,        */
-/*                                            resulting in version 6.1.12 */
-/*                                                                        */
 /**************************************************************************/
-VOID  _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, CHAR *object_name, ULONG parameter_1, ULONG parameter_2)
+VOID  _tx_trace_object_register(UCHAR object_type, VOID *object_ptr, TX_NAME_CONST CHAR *object_name, ULONG parameter_1, ULONG parameter_2)
 {
 
 #ifdef TX_ENABLE_EVENT_TRACE
@@ -85,6 +77,7 @@ UINT                            i, entries;
 UINT                            found, loop_break;
 TX_THREAD                       *thread_ptr;
 UCHAR                           *work_ptr;
+const UCHAR                     *name_ptr;
 TX_TRACE_OBJECT_ENTRY           *entry_ptr;
 
 
@@ -221,21 +214,21 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
                 for (i = ((ULONG) 0); i < (((ULONG) TX_TRACE_OBJECT_REGISTRY_NAME)-((ULONG) 1)); i++)
                 {
 
-                    /* Setup work pointer to the object name character.  */
-                    work_ptr =  TX_CHAR_TO_UCHAR_POINTER_CONVERT(object_name);
-                    work_ptr =  TX_UCHAR_POINTER_ADD(work_ptr, i);
+                    /* Setup name pointer to the object name character.  */
+                    name_ptr =  TX_CHAR_TO_UCHAR_POINTER_CONVERT(object_name);
+                    name_ptr =  TX_CONST_UCHAR_POINTER_ADD(name_ptr, i);
 
-                    /* Determine if object_name (work_ptr) is null.  */
-                    if (work_ptr == TX_NULL)
+                    /* Determine if object_name (name_ptr) is null.  */
+                    if (name_ptr == TX_NULL)
                     {
                         break;
                     }
 
                     /* Copy a character of the name.  */
-                    entry_ptr -> tx_trace_object_entry_name[i] =  (UCHAR) *work_ptr;
+                    entry_ptr -> tx_trace_object_entry_name[i] =  (UCHAR) *name_ptr;
 
                     /* Determine if we are at the end.  */
-                    if (*work_ptr == ((UCHAR) 0))
+                    if (*name_ptr == ((UCHAR) 0))
                     {
                         break;
                     }

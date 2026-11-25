@@ -1,4 +1,4 @@
-                     Microsoft's Azure RTOS ThreadX for ARM9 
+                     Microsoft's Azure RTOS ThreadX for ARM9
 
                                Thumb & 32-bit Mode
 
@@ -6,15 +6,15 @@
 
 1.  Building the ThreadX run-time Library
 
-First make sure you are in the "example_build" directory. Also, make sure that 
-you have setup your path and other environment variables necessary for the ARM 
-AC5 development environment. At this point you may run the build_threadx.bat 
-batch file. This will build the ThreadX run-time environment in the 
-"example_build" directory. 
+First make sure you are in the "example_build" directory. Also, make sure that
+you have setup your path and other environment variables necessary for the ARM
+AC5 development environment. At this point you may run the build_threadx.bat
+batch file. This will build the ThreadX run-time environment in the
+"example_build" directory.
 
-You should observe assembly and compilation of a series of ThreadX source 
-files. At the end of the batch file, they are all combined into the 
-run-time library file: tx.a. This file must be linked with your 
+You should observe assembly and compilation of a series of ThreadX source
+files. At the end of the batch file, they are all combined into the
+run-time library file: tx.a. This file must be linked with your
 application in order to use ThreadX.
 
 
@@ -23,39 +23,39 @@ application in order to use ThreadX.
 The ThreadX demonstration is designed to execute under the ARM
 Windows-based simulator.
 
-Building the demonstration is easy; simply execute the build_threadx_demo.bat 
-batch file while inside the "example_build" directory. 
+Building the demonstration is easy; simply execute the build_threadx_demo.bat
+batch file while inside the "example_build" directory.
 
-You should observe the compilation of sample_threadx.c (which is the demonstration 
-application) and linking with tx.a. The resulting file sample_threadx.axf 
+You should observe the compilation of sample_threadx.c (which is the demonstration
+application) and linking with tx.a. The resulting file sample_threadx.axf
 is a binary file that can be downloaded and executed on the ARM simulator.
 
 
 3.  System Initialization
 
-The entry point in ThreadX for the ARM9 using AC5 tools is at label 
-__main. This is defined within the AC5 compiler's startup code. In 
-addition, this is where all static and global pre-set C variable 
+The entry point in ThreadX for the ARM9 using AC5 tools is at label
+__main. This is defined within the AC5 compiler's startup code. In
+addition, this is where all static and global pre-set C variable
 initialization processing takes place.
 
-The ThreadX tx_initialize_low_level.s file is responsible for setting up 
-various system data structures, the vector area, and a periodic timer interrupt 
-source. By default, the vector area is defined to be located in the Init area, 
-which is defined at the top of tx_initialize_low_level.s. This area is typically 
-located at 0. In situations where this is impossible, the vectors at the beginning 
+The ThreadX tx_initialize_low_level.s file is responsible for setting up
+various system data structures, the vector area, and a periodic timer interrupt
+source. By default, the vector area is defined to be located in the Init area,
+which is defined at the top of tx_initialize_low_level.s. This area is typically
+located at 0. In situations where this is impossible, the vectors at the beginning
 of the Init area should be copied to address 0.
 
 This is also where initialization of a periodic timer interrupt source
 should take place.
 
-In addition, _tx_initialize_low_level determines the first available 
-address for use by the application, which is supplied as the sole input 
+In addition, _tx_initialize_low_level determines the first available
+address for use by the application, which is supplied as the sole input
 parameter to your application definition function, tx_application_define.
 
 
 4.  Assembler / Compiler Switches
 
-The following are compiler switches used in building the demonstration 
+The following are compiler switches used in building the demonstration
 system:
 
 Compiler Switch                 Meaning
@@ -71,10 +71,10 @@ Linker Switch                   Meaning
     -o demo.axf         Specifies demo output file name
     --elf               Specifies elf output file format
     --ro                Specifies that Read-Only memory starts at address 0
-    --first tx_initialize_low_level.o(Init) 
+    --first tx_initialize_low_level.o(Init)
                         Specifies that the first area loaded is Init
     --remove            Remove unused areas
-    --list              Specifies map file name 
+    --list              Specifies map file name
     --symbols           Specifies symbols for map file
     --map               Creates a map file
 
@@ -85,161 +85,161 @@ Application Defines
                                                 ThreadX assembly files. If used,
                                                 it should be used on all assembly
                                                 files and the generic C source of
-                                                ThreadX should be compiled with 
+                                                ThreadX should be compiled with
                                                 TX_ENABLE_FIQ_SUPPORT defined as well.
     --PD "TX_ENABLE_IRQ_NESTING SETL {TRUE}"    This assembler define enables IRQ
-                                                nested support. If IRQ nested 
+                                                nested support. If IRQ nested
                                                 interrupt support is needed, this
-                                                define should be applied to 
+                                                define should be applied to
                                                 tx_initialize_low_level.s.
     --PD "TX_ENABLE_FIQ_NESTING SETL {TRUE}"    This assembler define enables FIQ
-                                                nested support. If FIQ nested 
+                                                nested support. If FIQ nested
                                                 interrupt support is needed, this
-                                                define should be applied to 
+                                                define should be applied to
                                                 tx_initialize_low_level.s. In addition,
                                                 IRQ nesting should also be enabled.
     -DTX_ENABLE_FIQ_SUPPORT                     This compiler define enables FIQ
                                                 interrupt handling in the ThreadX
-                                                generic C source. This define 
+                                                generic C source. This define
                                                 should also be used in conjunction
                                                 with the corresponding assembler
-                                                define.                                               
+                                                define.
     -DTX_DISABLE_ERROR_CHECKING                 If defined before tx_api.h is included,
                                                 this define causes basic ThreadX error
                                                 checking to be disabled. Please see
-                                                Chapter 2 in the "ThreadX User Guide" 
+                                                Chapter 2 in the "ThreadX User Guide"
                                                 for more details.
 
-    -DTX_MAX_PRIORITIES                         Defines the priority levels for ThreadX. 
-                                                Legal values range from 32 through 
-                                                1024 (inclusive) and MUST be evenly divisible 
-                                                by 32. Increasing the number of priority levels 
-                                                supported increases the RAM usage by 128 bytes 
-                                                for every group of 32 priorities. However, there 
-                                                is only a negligible effect on performance. By 
+    -DTX_MAX_PRIORITIES                         Defines the priority levels for ThreadX.
+                                                Legal values range from 32 through
+                                                1024 (inclusive) and MUST be evenly divisible
+                                                by 32. Increasing the number of priority levels
+                                                supported increases the RAM usage by 128 bytes
+                                                for every group of 32 priorities. However, there
+                                                is only a negligible effect on performance. By
                                                 default, this value is set to 32 priority levels.
 
-    -DTX_MINIMUM_STACK                          Defines the minimum stack size (in bytes). It is 
-                                                used for error checking when threads are created. 
-                                                The default value is port-specific and is found 
+    -DTX_MINIMUM_STACK                          Defines the minimum stack size (in bytes). It is
+                                                used for error checking when threads are created.
+                                                The default value is port-specific and is found
                                                 in tx_port.h.
 
-    -DTX_TIMER_THREAD_STACK_SIZE                Defines the stack size (in bytes) of the internal 
-                                                ThreadX timer thread. This thread processes all 
-                                                thread sleep requests as well as all service call 
-                                                timeouts. In addition, all application timer callback 
-                                                routines are invoked from this context. The default 
+    -DTX_TIMER_THREAD_STACK_SIZE                Defines the stack size (in bytes) of the internal
+                                                ThreadX timer thread. This thread processes all
+                                                thread sleep requests as well as all service call
+                                                timeouts. In addition, all application timer callback
+                                                routines are invoked from this context. The default
                                                 value is port-specific and is found in tx_port.h.
 
-    -DTX_TIMER_THREAD_PRIORITY                  Defines the priority of the internal ThreadX timer 
-                                                thread. The default value is priority 0 - the highest 
-                                                priority in ThreadX. The default value is defined 
+    -DTX_TIMER_THREAD_PRIORITY                  Defines the priority of the internal ThreadX timer
+                                                thread. The default value is priority 0 - the highest
+                                                priority in ThreadX. The default value is defined
                                                 in tx_port.h.
 
-    -DTX_TIMER_PROCESS_IN_ISR                   Defined, this option eliminates the internal system 
-                                                timer thread for ThreadX. This results in improved 
-                                                performance on timer events and smaller RAM requirements 
-                                                because the timer stack and control block are no 
-                                                longer needed. However, using this option moves all 
-                                                the timer expiration processing to the timer ISR level. 
+    -DTX_TIMER_PROCESS_IN_ISR                   Defined, this option eliminates the internal system
+                                                timer thread for ThreadX. This results in improved
+                                                performance on timer events and smaller RAM requirements
+                                                because the timer stack and control block are no
+                                                longer needed. However, using this option moves all
+                                                the timer expiration processing to the timer ISR level.
                                                 By default, this option is not defined.
 
-    -DTX_REACTIVATE_INLINE                      Defined, this option performs reactivation of ThreadX 
-                                                timers in-line instead of using a function call. This 
-                                                improves performance but slightly increases code size. 
+    -DTX_REACTIVATE_INLINE                      Defined, this option performs reactivation of ThreadX
+                                                timers in-line instead of using a function call. This
+                                                improves performance but slightly increases code size.
                                                 By default, this option is not defined.
 
-    -DTX_DISABLE_STACK_FILLING                  Defined, placing the 0xEF value in each byte of each 
-                                                thread's stack is disabled. By default, this option is 
+    -DTX_DISABLE_STACK_FILLING                  Defined, placing the 0xEF value in each byte of each
+                                                thread's stack is disabled. By default, this option is
                                                 not defined.
 
-    -DTX_ENABLE_STACK_CHECKING                  Defined, this option enables ThreadX run-time stack checking, 
-                                                which includes analysis of how much stack has been used and 
-                                                examination of data pattern "fences" before and after the 
-                                                stack area. If a stack error is detected, the registered 
-                                                application stack error handler is called. This option does 
-                                                result in slightly increased overhead and code size. Please 
-                                                review the tx_thread_stack_error_notify API for more information. 
+    -DTX_ENABLE_STACK_CHECKING                  Defined, this option enables ThreadX run-time stack checking,
+                                                which includes analysis of how much stack has been used and
+                                                examination of data pattern "fences" before and after the
+                                                stack area. If a stack error is detected, the registered
+                                                application stack error handler is called. This option does
+                                                result in slightly increased overhead and code size. Please
+                                                review the tx_thread_stack_error_notify API for more information.
                                                 By default, this option is not defined.
 
-    -DTX_DISABLE_PREEMPTION_THRESHOLD           Defined, this option disables the preemption-threshold feature 
-                                                and slightly reduces code size and improves performance. Of course, 
-                                                the preemption-threshold capabilities are no longer available. 
+    -DTX_DISABLE_PREEMPTION_THRESHOLD           Defined, this option disables the preemption-threshold feature
+                                                and slightly reduces code size and improves performance. Of course,
+                                                the preemption-threshold capabilities are no longer available.
                                                 By default, this option is not defined.
 
-    -DTX_DISABLE_REDUNDANT_CLEARING             Defined, this option removes the logic for initializing ThreadX 
-                                                global C data structures to zero. This should only be used if 
-                                                the compiler's initialization code sets all un-initialized 
-                                                C global data to zero. Using this option slightly reduces 
-                                                code size and improves performance during initialization. 
+    -DTX_DISABLE_REDUNDANT_CLEARING             Defined, this option removes the logic for initializing ThreadX
+                                                global C data structures to zero. This should only be used if
+                                                the compiler's initialization code sets all un-initialized
+                                                C global data to zero. Using this option slightly reduces
+                                                code size and improves performance during initialization.
                                                 By default, this option is not defined.
 
-    -DTX_DISABLE_NOTIFY_CALLBACKS               Defined, this option disables the notify callbacks for various 
-                                                ThreadX objects. Using this option slightly reduces code size 
+    -DTX_DISABLE_NOTIFY_CALLBACKS               Defined, this option disables the notify callbacks for various
+                                                ThreadX objects. Using this option slightly reduces code size
                                                 and improves performance.
 
-    -DTX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO     Defined, this option enables the gathering of performance 
-                                                information on block pools. By default, this option is 
+    -DTX_BLOCK_POOL_ENABLE_PERFORMANCE_INFO     Defined, this option enables the gathering of performance
+                                                information on block pools. By default, this option is
                                                 not defined.
 
-    -DTX_BYTE_POOL_ENABLE_PERFORMANCE_INFO      Defined, this option enables the gathering of performance 
-                                                information on byte pools. By default, this option is 
+    -DTX_BYTE_POOL_ENABLE_PERFORMANCE_INFO      Defined, this option enables the gathering of performance
+                                                information on byte pools. By default, this option is
                                                 not defined.
 
-    -DTX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO    Defined, this option enables the gathering of performance 
-                                                information on event flags groups. By default, this option 
+    -DTX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO    Defined, this option enables the gathering of performance
+                                                information on event flags groups. By default, this option
                                                 is not defined.
 
-    -DTX_MUTEX_ENABLE_PERFORMANCE_INFO          Defined, this option enables the gathering of performance 
-                                                information on mutexes. By default, this option is 
+    -DTX_MUTEX_ENABLE_PERFORMANCE_INFO          Defined, this option enables the gathering of performance
+                                                information on mutexes. By default, this option is
                                                 not defined.
 
-    -DTX_QUEUE_ENABLE_PERFORMANCE_INFO          Defined, this option enables the gathering of performance 
-                                                information on queues. By default, this option is 
+    -DTX_QUEUE_ENABLE_PERFORMANCE_INFO          Defined, this option enables the gathering of performance
+                                                information on queues. By default, this option is
                                                 not defined.
 
-    -DTX_SEMAPHORE_ENABLE_PERFORMANCE_INFO      Defined, this option enables the gathering of performance 
-                                                information on semaphores. By default, this option is 
+    -DTX_SEMAPHORE_ENABLE_PERFORMANCE_INFO      Defined, this option enables the gathering of performance
+                                                information on semaphores. By default, this option is
                                                 not defined.
 
-    -DTX_THREAD_ENABLE_PERFORMANCE_INFO         Defined, this option enables the gathering of performance 
-                                                information on threads. By default, this option is 
+    -DTX_THREAD_ENABLE_PERFORMANCE_INFO         Defined, this option enables the gathering of performance
+                                                information on threads. By default, this option is
                                                 not defined.
 
-    -DTX_TIMER_ENABLE_PERFORMANCE_INFO          Defined, this option enables the gathering of performance 
-                                                information on timers. By default, this option is 
+    -DTX_TIMER_ENABLE_PERFORMANCE_INFO          Defined, this option enables the gathering of performance
+                                                information on timers. By default, this option is
                                                 not defined.
 
     -DTX_ENABLE_EVENT_TRACE                     Defined, this option enables the internal ThreadX trace
                                                 feature. The trace buffer is supplied at a later time
                                                 via an application call to tx_trace_enable.
 
-    -DTX_TRACE_TIME_SOURCE                      This defines the time-stamp source for event tracing. 
-                                                This define is only pertinent if the ThreadX library is 
+    -DTX_TRACE_TIME_SOURCE                      This defines the time-stamp source for event tracing.
+                                                This define is only pertinent if the ThreadX library is
                                                 built with TX_ENABLE_EVENT_TRACE defined.
 
-    -DTX_TRACE_TIME_MASK                        This defines the number of valid bits in the event trace 
-                                                time-stamp source defined previously. If the time-stamp 
-                                                source is 16-bits, this value should be 0xFFFF. Alternatively, 
-                                                if the time-stamp source is 32-bits, this value should be 
-                                                0xFFFFFFFF. This define is only pertinent if the ThreadX 
+    -DTX_TRACE_TIME_MASK                        This defines the number of valid bits in the event trace
+                                                time-stamp source defined previously. If the time-stamp
+                                                source is 16-bits, this value should be 0xFFFF. Alternatively,
+                                                if the time-stamp source is 32-bits, this value should be
+                                                0xFFFFFFFF. This define is only pertinent if the ThreadX
                                                 library is built with TX_ENABLE_EVENT_TRACE defined.
 
 
 
 5.  Register Usage and Stack Frames
 
-The AC5 compiler assumes that registers r0-r3 (a1-a4) and r12 (ip) are scratch 
-registers for each function. All other registers used by a C function must 
-be preserved by the function. ThreadX takes advantage of this in situations 
-where a context switch happens as a result of making a ThreadX service call 
-(which is itself a C function). In such cases, the saved context of a thread 
+The AC5 compiler assumes that registers r0-r3 (a1-a4) and r12 (ip) are scratch
+registers for each function. All other registers used by a C function must
+be preserved by the function. ThreadX takes advantage of this in situations
+where a context switch happens as a result of making a ThreadX service call
+(which is itself a C function). In such cases, the saved context of a thread
 is only the non-scratch registers.
 
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
 All suspended threads have one of these two types of stack frames. The top
-of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the 
+of the suspended thread's stack is pointed to by tx_thread_stack_ptr in the
 associated thread control block TX_THREAD.
 
 
@@ -257,39 +257,39 @@ associated thread control block TX_THREAD.
      0x20                   r6  (v3)                    r10 (v7)
      0x24                   r7  (v4)                    r11 (fp)
      0x28                   r8  (v5)                    r14 (lr)
-     0x2C                   r9  (v6)                        
-     0x30                   r10 (v7)                        
-     0x34                   r11 (fp)                        
-     0x38                   r12 (ip)                         
+     0x2C                   r9  (v6)
+     0x30                   r10 (v7)
+     0x34                   r11 (fp)
+     0x38                   r12 (ip)
      0x3C                   r14 (lr)
-     0x40                   PC 
+     0x40                   PC
 
 
 6.  Improving Performance
 
-The distribution version of ThreadX is built without any compiler 
-optimizations. This makes it easy to debug because you can trace or set 
-breakpoints inside of ThreadX itself. Of course, this costs some 
-performance. To make it run faster, you can change the build_threadx.bat file to 
-remove the -g option and enable all compiler optimizations. 
+The distribution version of ThreadX is built without any compiler
+optimizations. This makes it easy to debug because you can trace or set
+breakpoints inside of ThreadX itself. Of course, this costs some
+performance. To make it run faster, you can change the build_threadx.bat file to
+remove the -g option and enable all compiler optimizations.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined.
 
 
 7.  Interrupt Handling
 
 ThreadX provides complete and high-performance interrupt handling for ARM9
-targets. There are a certain set of requirements that are defined in the 
+targets. There are a certain set of requirements that are defined in the
 following sub-sections:
 
 
 7.1  Vector Area
 
 The ARM9 vectors start at address zero. The demonstration system startup
-Init area contains the vectors and is loaded at address zero. On actual 
-hardware platforms, this area might have to be copied to address 0. 
+Init area contains the vectors and is loaded at address zero. On actual
+hardware platforms, this area might have to be copied to address 0.
 
 
 7.2  IRQ ISRs
@@ -300,12 +300,12 @@ IRQ interrupts. The following sub-sections define the IRQ capabilities.
 
 7.2.1 Standard IRQ ISRs
 
-The standard ARM IRQ mechanism has a single interrupt vector at address 0x18. This IRQ 
-interrupt is managed by the __tx_irq_handler code in tx_initialize_low_level. The following 
+The standard ARM IRQ mechanism has a single interrupt vector at address 0x18. This IRQ
+interrupt is managed by the __tx_irq_handler code in tx_initialize_low_level. The following
 is the default IRQ handler defined in tx_initialize_low_level.s:
 
     EXPORT  __tx_irq_handler
-    EXPORT  __tx_irq_processing_return      
+    EXPORT  __tx_irq_processing_return
 __tx_irq_handler
 ;
 ;    /* Jump to context save to save system context.  */
@@ -313,7 +313,7 @@ __tx_irq_handler
 __tx_irq_processing_return
 ;
 ;    /* At this point execution is still in the IRQ mode. The CPSR, point of
-;       interrupt, and all C scratch registers are available for use. Note 
+;       interrupt, and all C scratch registers are available for use. Note
 ;       that IRQ interrupts are still disabled upon return from the context
 ;       save function.  */
 ;
@@ -326,7 +326,7 @@ __tx_irq_processing_return
 7.2.2 Vectored IRQ ISRs
 
 The vectored ARM IRQ mechanism has multiple interrupt vectors at addresses specified
-by the particular implementation. The following is an example IRQ handler defined in 
+by the particular implementation. The following is an example IRQ handler defined in
 tx_initialize_low_level.s:
 
     EXPORT  __tx_irq_example_handler
@@ -336,12 +336,12 @@ __tx_irq_example_handler
 
     STMDB   sp!, {r0-r3}                        ; Save some scratch registers
     MRS     r0, SPSR                            ; Pickup saved SPSR
-    SUB     lr, lr, #4                          ; Adjust point of interrupt 
+    SUB     lr, lr, #4                          ; Adjust point of interrupt
     STMDB   sp!, {r0, r10, r12, lr}             ; Store other scratch registers
     BL      _tx_thread_vectored_context_save    ; Call the vectored IRQ context save
 ;
 ;    /* At this point execution is still in the IRQ mode. The CPSR, point of
-;       interrupt, and all C scratch registers are available for use. Note 
+;       interrupt, and all C scratch registers are available for use. Note
 ;       that IRQ interrupts are still disabled upon return from the context
 ;       save function.  */
 ;
@@ -358,22 +358,22 @@ IRQ support, the entire library should be built with TX_ENABLE_IRQ_NESTING
 defined. With this defined, two new IRQ interrupt management services are
 available, namely _tx_thread_irq_nesting_start and _tx_thread_irq_nesting_end.
 These function should be called between the IRQ context save and restore
-calls. 
+calls.
 
-Execution between the calls to _tx_thread_irq_nesting_start and 
-_tx_thread_irq_nesting_end is enabled for IRQ nesting. This is achieved 
+Execution between the calls to _tx_thread_irq_nesting_start and
+_tx_thread_irq_nesting_end is enabled for IRQ nesting. This is achieved
 by switching from IRQ mode to SYS mode and enabling IRQ interrupts.
-The SYS mode stack is used during the SYS mode operation, which was 
+The SYS mode stack is used during the SYS mode operation, which was
 setup in tx_initialize_low_level.s. When nested IRQ interrupts are no longer required,
 calling the _tx_thread_irq_nesting_end service disables nesting by disabling
-IRQ interrupts and switching back to IRQ mode in preparation for the IRQ 
+IRQ interrupts and switching back to IRQ mode in preparation for the IRQ
 context restore service.
 
-The following is an example of enabling IRQ nested interrupts in a standard 
+The following is an example of enabling IRQ nested interrupts in a standard
 IRQ handler:
 
     EXPORT  __tx_irq_handler
-    EXPORT  __tx_irq_processing_return      
+    EXPORT  __tx_irq_processing_return
 __tx_irq_handler
 ;
 ;    /* Jump to context save to save system context.  */
@@ -381,10 +381,10 @@ __tx_irq_handler
 __tx_irq_processing_return
 ;
 ;    /* Enable nested IRQ interrupts. NOTE:  Since this service returns
-;       with IRQ interrupts enabled, all IRQ interrupt sources must be 
+;       with IRQ interrupts enabled, all IRQ interrupt sources must be
 ;       cleared prior to calling this service.  */
     BL      _tx_thread_irq_nesting_start
-;    
+;
 ;    /* Application ISR call(s) go here!  */
 ;
 ;    /* Disable nested IRQ interrupts. The mode is switched back to
@@ -397,12 +397,12 @@ __tx_irq_processing_return
 
 7.3  FIQ Interrupts
 
-By default, ARM9 FIQ interrupts are left alone by ThreadX. Of course, this 
-means that the application is fully responsible for enabling the FIQ interrupt 
-and saving/restoring any registers used in the FIQ ISR processing. To globally 
-enable FIQ interrupts, the application should enable FIQ interrupts at the 
-beginning of each thread or before any threads are created in tx_application_define. 
-In addition, the application must ensure that no ThreadX service calls are made 
+By default, ARM9 FIQ interrupts are left alone by ThreadX. Of course, this
+means that the application is fully responsible for enabling the FIQ interrupt
+and saving/restoring any registers used in the FIQ ISR processing. To globally
+enable FIQ interrupts, the application should enable FIQ interrupts at the
+beginning of each thread or before any threads are created in tx_application_define.
+In addition, the application must ensure that no ThreadX service calls are made
 from default FIQ ISRs, which is located in tx_initialize_low_level.s.
 
 
@@ -411,7 +411,7 @@ from default FIQ ISRs, which is located in tx_initialize_low_level.s.
 Full ThreadX management of FIQ interrupts is provided if the ThreadX sources
 are built with the TX_ENABLE_FIQ_SUPPORT defined. If the library is built
 this way, the FIQ interrupt handlers are very similar to the IRQ interrupt
-handlers defined previously. The following is default FIQ handler 
+handlers defined previously. The following is default FIQ handler
 defined in tx_initialize_low_level.s:
 
 
@@ -439,18 +439,18 @@ FIQ support, the entire library should be built with TX_ENABLE_FIQ_NESTING
 defined. With this defined, two new FIQ interrupt management services are
 available, namely _tx_thread_fiq_nesting_start and _tx_thread_fiq_nesting_end.
 These function should be called between the FIQ context save and restore
-calls. 
+calls.
 
-Execution between the calls to _tx_thread_fiq_nesting_start and 
-_tx_thread_fiq_nesting_end is enabled for FIQ nesting. This is achieved 
+Execution between the calls to _tx_thread_fiq_nesting_start and
+_tx_thread_fiq_nesting_end is enabled for FIQ nesting. This is achieved
 by switching from FIQ mode to SYS mode and enabling FIQ interrupts.
-The SYS mode stack is used during the SYS mode operation, which was 
+The SYS mode stack is used during the SYS mode operation, which was
 setup in tx_initialize_low_level.s. When nested FIQ interrupts are no longer required,
 calling the _tx_thread_fiq_nesting_end service disables nesting by disabling
-FIQ interrupts and switching back to FIQ mode in preparation for the FIQ 
+FIQ interrupts and switching back to FIQ mode in preparation for the FIQ
 context restore service.
 
-The following is an example of enabling FIQ nested interrupts in the 
+The following is an example of enabling FIQ nested interrupts in the
 typical FIQ handler:
 
 
@@ -466,7 +466,7 @@ __tx_fiq_processing_return
 ;       interrupt, and all C scratch registers are available for use.  */
 ;
 ;    /* Enable nested FIQ interrupts. NOTE:  Since this service returns
-;       with FIQ interrupts enabled, all FIQ interrupt sources must be 
+;       with FIQ interrupts enabled, all FIQ interrupt sources must be
 ;       cleared prior to calling this service.  */
     BL      _tx_thread_fiq_nesting_start
 ;
@@ -482,22 +482,22 @@ __tx_fiq_processing_return
 
 8.  ThreadX Timer Interrupt
 
-ThreadX requires a periodic interrupt source to manage all time-slicing, 
-thread sleeps, timeouts, and application timers. Without such a timer 
+ThreadX requires a periodic interrupt source to manage all time-slicing,
+thread sleeps, timeouts, and application timers. Without such a timer
 interrupt source, these services are not functional. However, all other
 ThreadX services are operational without a periodic timer source.
 
-To add the timer interrupt processing, simply make a call to 
+To add the timer interrupt processing, simply make a call to
 _tx_timer_interrupt in the IRQ processing. An example of this can be
 found in the file tx_initialize_low_level.s in the Integrator sub-directories.
 
 
 9.  Thumb/ARM9 Mixed Mode
 
-By default, ThreadX is setup for running in ARM9 32-bit mode. This is 
-also true for the demonstration system. It is possible to build any 
+By default, ThreadX is setup for running in ARM9 32-bit mode. This is
+also true for the demonstration system. It is possible to build any
 ThreadX file and/or the application in Thumb mode. The only exception
-to this is the file tx_thread_shell_entry.c. This file must always be built 
+to this is the file tx_thread_shell_entry.c. This file must always be built
 in 32-bit mode. In addition, if any Thumb code is used the entire ThreadX source-
 both C and assembly - should be built with the "-apcs /interwork" option.
 

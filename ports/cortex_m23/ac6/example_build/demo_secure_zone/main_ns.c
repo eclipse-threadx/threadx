@@ -63,7 +63,7 @@ void ThreadA (void *argument)  {
 
 static int callbackB (int val)  {
   uint32_t flags;
-  
+
   flags = osThreadFlagsWait (1U, osFlagsWaitAny, osWaitForever);
   if (flags == 1U)  {
     return (val+1);

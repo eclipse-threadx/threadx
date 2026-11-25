@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -222,12 +225,6 @@ extern VOID     *_tx_initialize_unused_memory;
 /*                                                                        */
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 VOID   _tx_initialize_low_level(VOID)
 {
@@ -350,7 +347,7 @@ int err;
 
         clock_gettime(CLOCK_REALTIME, &ts);
         ts.tv_nsec += timer_periodic_nsec;
-        if (ts.tv_nsec > 1000000000)
+        if (ts.tv_nsec >= 1000000000)
         {
             ts.tv_nsec -= 1000000000;
             ts.tv_sec++;
@@ -447,7 +444,7 @@ int err;
 
     clock_gettime(CLOCK_REALTIME, &ts);
     ts.tv_nsec += ns;
-    if (ts.tv_nsec > 1000000000)
+    if (ts.tv_nsec >= 1000000000)
     {
         ts.tv_nsec -= 1000000000;
         ts.tv_sec++;

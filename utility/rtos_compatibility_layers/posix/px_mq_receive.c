@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -66,14 +67,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Add 64-bit support,           */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 ssize_t mq_receive( mqd_t mqdes, VOID * pMsg, size_t msgLen, ULONG *pMsgPrio)
 {
@@ -88,9 +81,9 @@ VOID                * msgbuf1;
 UCHAR               * msgbuf2;
 VOID                * message_source;
 
-    /* Assign a temporary variable for clarity.  */ 
-    Queue = &(mqdes->f_data->queue); 
-    q_ptr = (POSIX_MSG_QUEUE * )mqdes->f_data; 
+    /* Assign a temporary variable for clarity.  */
+    Queue = &(mqdes->f_data->queue);
+    q_ptr = (POSIX_MSG_QUEUE * )mqdes->f_data;
 
     /* First, check for an invalid queue pointer.  */
     if ((!q_ptr) || ( (q_ptr -> px_queue_id) != PX_QUEUE_ID))
@@ -139,7 +132,7 @@ VOID                * message_source;
     else
             wait_option = TX_WAIT_FOREVER;
 
-    
+
     /* Try to get a message from the message queue.  */
     /* Create a temporary buffer to get message pointer and message length.  */
     temp1 = posix_memory_allocate((sizeof(ULONG)) * TX_POSIX_MESSAGE_SIZE, (VOID**)&msgbuf1);
@@ -163,12 +156,12 @@ VOID                * message_source;
 
            /* All ok  */
             temp1 = OK;
-            break; 
+            break;
         }
 
         case TX_DELETED:
         {
-            break; 
+            break;
         }
 
         case TX_QUEUE_EMPTY:
@@ -208,7 +201,7 @@ VOID                * message_source;
             return(temp1);
         }
     }
-   
+
     /* Assign a variable for clarity.  */
     my_ptr = ( ULONG *)msgbuf1;
 
@@ -221,10 +214,10 @@ VOID                * message_source;
     this_ptr          =   (CHAR *)(*my_ptr);
     length_of_message =    *(++my_ptr);
     priority_of_message = *(++my_ptr);
-    
+
 #endif
     message_source    = (VOID *)this_ptr;
-    
+
     /* Copy message into supplied buffer.  */
     msgbuf2 = (UCHAR *)pMsg;
 
@@ -246,7 +239,7 @@ VOID                * message_source;
         {
             *(msgbuf2++) = *((UCHAR *)(this_ptr++));
         }
- 
+
         temp1 = mycount;
     }
 
@@ -261,12 +254,12 @@ VOID                * message_source;
         return(ERROR);
     }
 
-    /* Copy message priority */ 
-    if (pMsgPrio) 
+    /* Copy message priority */
+    if (pMsgPrio)
     {
         *pMsgPrio = priority_of_message;
     }
-    
+
     /* All done  */
     return(length_of_message);
 }

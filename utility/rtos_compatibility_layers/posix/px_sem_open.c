@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -64,21 +65,13 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Update comparison with NULL,  */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 sem_t * sem_open(const CHAR * name, ULONG oflag, ...)
 {
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_SEMAPHORE     *TheSem; 
+TX_SEMAPHORE     *TheSem;
 sem_t            *semid;
 ULONG             retval;
 ULONG             len;
@@ -92,7 +85,7 @@ mode_t            mode;
     {
         /* return POSIX error.  */
         posix_internal_error(444);
-        
+
         /* return error.  */
         return (( sem_t * )SEM_FAILED);
     }
@@ -134,7 +127,7 @@ mode_t            mode;
             posix_set_pthread_errno(ENOENT);
 
             /* Return the SEM_FAILED error.  */
-            return(( sem_t * )SEM_FAILED);    
+            return(( sem_t * )SEM_FAILED);
         }
         if( (oflag == O_CREAT) || ( (oflag & (O_CREAT|O_EXCL )) == (O_CREAT|O_EXCL) ) )
         {
@@ -206,7 +199,7 @@ mode_t            mode;
             posix_sem->refCnt = value;
 
             /* Give the caller the semaphore ID.  */
-            semid = (sem_t * )TheSem; 
+            semid = (sem_t * )TheSem;
 
             /* Restore interrupts.  */
             TX_RESTORE

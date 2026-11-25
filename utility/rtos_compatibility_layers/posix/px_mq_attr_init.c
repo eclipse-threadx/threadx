@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -57,12 +58,6 @@
 /*                                                                        */
 /*    POSIX internal Code                                                 */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 VOID posix_qattr_init(VOID)
 {
@@ -70,7 +65,7 @@ VOID posix_qattr_init(VOID)
 struct mq_attr   * q_attr;
 
     q_attr = &(posix_qattr_default);
-    
+
     /* This queue is not currently in use.  */
     q_attr->mq_flags = MQ_FLAGS;
     q_attr->mq_maxmsg = MQ_MAXMSG;

@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /******************************************************************************
 	TORNADO AMC modules Software Development Kit (SDK). Rev 4A.
 	Definitions, macros and API functions for DSP Environment.
@@ -11,7 +22,7 @@
 
 	Description:
 	------------
-	This file contains definitions, macros and API functions for TORNADO AMC 
+	This file contains definitions, macros and API functions for TORNADO AMC
 	modules on-board DSP environment and must be included in the user
 	C-application for TORNADO AMC modules.
 

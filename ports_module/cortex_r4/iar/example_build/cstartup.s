@@ -136,19 +136,19 @@ __iar_program_start:
         MSR     cpsr_c, r0              ; Change the mode
         LDR     r1, =SFE(FIQ_STACK)     ; End of FIQ_STACK
         BIC     sp,r1,#0x7              ; Make sure SP is 8 aligned
-        
+
         ;; Set up the SVC stack pointer.
 
         CPS     #SVC_MODE
         LDR     r1, =SFE(SVC_STACK)     ; End of SVC_STACK
         BIC     sp,r1,#0x7              ; Make sure SP is 8 aligned
-        
+
         ;; Set up the abort stack pointer.
 
         CPS     #ABT_MODE
         LDR     r1, =SFE(ABT_STACK)     ; End of ABT_STACK
         BIC     sp,r1,#0x7              ; Make sure SP is 8 aligned
-        
+
         ;; Set up the normal stack pointer.
 
         BIC     r0 ,r0, #MODE_MSK       ; Clear the mode bits

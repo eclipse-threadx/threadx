@@ -9,7 +9,7 @@ LOAD 0x80000000
   {
     * (+RW, +ZI)
   }
-  
+
   ARM_LIB_STACKHEAP 0x80090000 EMPTY -0x00040000
   {}
 }

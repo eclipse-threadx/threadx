@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -39,53 +39,40 @@
 
     section .text:CODE:ROOT
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_context_restore                           RXv3/IAR       */
 ;/*                                                           6.1.11       */
-;/*  AUTHOR                                                                */ 
-;/*                                                                        */ 
+;/*  AUTHOR                                                                */
+;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
-;/*                                                                        */ 
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function restores the interrupt context if it is processing a  */ 
-;/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-;/*    if no thread was running, the function returns to the scheduler.    */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                  Interrupt Service Routines    */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */ 
-;/*                                                                        */ 
-;/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s), and      */ 
-;/*                                            added FPU support,          */ 
-;/*                                            resulting in version 6.1.9  */ 
-;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.11 */
-;/*                                                                        */ 
-;/**************************************************************************/ 
+;/*                                                                        */
+;/*  DESCRIPTION                                                           */
+;/*                                                                        */
+;/*    This function restores the interrupt context if it is processing a  */
+;/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+;/*    if no thread was running, the function returns to the scheduler.    */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_schedule                   Thread scheduling routine     */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                  Interrupt Service Routines    */
+;/*                                                                        */
+;/**************************************************************************/
     public __tx_thread_context_restore
 
 __tx_thread_context_restore:
@@ -102,7 +89,7 @@ __tx_thread_context_restore:
      MOV.L    [R1], R2
      SUB      #1, R2
      MOV.L    R2,[R1]
-     BEQ      __tx_thread_not_nested_restore 
+     BEQ      __tx_thread_not_nested_restore
 
 ;
 ;    /* Interrupts are nested.  */
@@ -111,7 +98,7 @@ __tx_thread_context_restore:
 ;       and return to the point of interrupt.  */
 ;
 __tx_thread_nested_restore:
-     POPC    FPSW                               ; Restore FPU status   
+     POPC    FPSW                               ; Restore FPU status
      POPM    R14-R15                            ; Restore R14-R15
      POPM    R3-R5                              ; Restore R3-R5
      POPM    R1-R2                              ; Restore R1-R2
@@ -124,17 +111,17 @@ __tx_thread_not_nested_restore:
 ;    else if (((_tx_thread_current_ptr) && (_tx_thread_current_ptr == _tx_thread_execute_ptr))
 ;               || (_tx_thread_preempt_disable))
 ;    {
-    
+
      MOV.L    #__tx_thread_current_ptr, R1      ; Pickup current thread ptr address
      MOV.L    [R1], R2
      CMP      #0, R2
-     BEQ      __tx_thread_idle_system_restore 
-     
+     BEQ      __tx_thread_idle_system_restore
+
      MOV.L    #__tx_thread_preempt_disable, R3  ; Pick up preempt disable flag
      MOV.L    [R3], R3
      CMP      #0, R3
      BNE      __tx_thread_no_preempt_restore    ; If pre-empt disable flag set, we simply return to the original point of interrupt regardless
-     
+
      MOV.L    #__tx_thread_execute_ptr, R3      ; (_tx_thread_current_ptr != _tx_thread_execute_ptr)
      CMP      [R3], R2
      BNE      __tx_thread_preempt_restore       ; Jump to pre-empt restoring
@@ -175,7 +162,7 @@ __tx_thread_dont_save_ts:
 
      SETPSW   U                                 ; User stack
      PUSHM    R6-R13
-     
+
      MVFACGU   #0, A1, R4                       ; Save accumulators.
      MVFACHI   #0, A1, R5
      MVFACLO   #0, A1, R6
@@ -184,7 +171,7 @@ __tx_thread_dont_save_ts:
      MVFACHI   #0, A0, R5
      MVFACLO   #0, A0, R6
      PUSHM     R4-R6
-     
+
 #if (__DPFPU == 1)
     MOV.L   144[R2], R4                         ; Get tx_thread_fpu_enable.
     CMP     #0, R4

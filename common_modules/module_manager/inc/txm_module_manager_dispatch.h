@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2025 Eclipse ThreadX Contributors
+ * Copyright (c) 2026 Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -32,7 +35,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BLOCK_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BLOCK_POOL_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(VOID *)))
@@ -51,7 +54,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_BLOCK_POOL_CREATE_CALL_NOT_USED
 /* UINT _txe_block_pool_create(
     TX_BLOCK_POOL *pool_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     ULONG block_size, -> extra_parameters[0]
     VOID *pool_start, -> extra_parameters[1]
     ULONG pool_size, -> extra_parameters[2]
@@ -70,7 +73,7 @@ ALIGN_TYPE return_value;
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
             return(TXM_MODULE_INVALID_MEMORY);
 
-        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[4])))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[1], extra_parameters[2]))
@@ -79,7 +82,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_block_pool_create(
         (TX_BLOCK_POOL *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (ULONG) extra_parameters[0],
         (VOID *) extra_parameters[1],
         (ULONG) extra_parameters[2],
@@ -100,7 +103,10 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BLOCK_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BLOCK_POOL_OBJECT))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, param_0, sizeof(TX_BLOCK_POOL)))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -120,7 +126,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_BLOCK_POOL_INFO_GET_CALL_NOT_USED
 /* UINT _txe_block_pool_info_get(
     TX_BLOCK_POOL *pool_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *available_blocks, -> extra_parameters[0]
     ULONG *total_blocks, -> extra_parameters[1]
     TX_THREAD **first_suspended, -> extra_parameters[2]
@@ -134,7 +140,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BLOCK_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BLOCK_POOL_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
@@ -161,7 +167,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_block_pool_info_get(
         (TX_BLOCK_POOL *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (TX_THREAD **) extra_parameters[2],
@@ -187,7 +193,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BLOCK_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BLOCK_POOL_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
@@ -268,7 +274,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BLOCK_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BLOCK_POOL_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -334,7 +340,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BYTE_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BYTE_POOL_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(VOID *)))
@@ -357,7 +363,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_BYTE_POOL_CREATE_CALL_NOT_USED
 /* UINT _txe_byte_pool_create(
     TX_BYTE_POOL *pool_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     VOID *pool_start, -> extra_parameters[0]
     ULONG pool_size, -> extra_parameters[1]
     UINT pool_control_block_size -> extra_parameters[2]
@@ -384,7 +390,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_byte_pool_create(
         (TX_BYTE_POOL *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (VOID *) extra_parameters[0],
         (ULONG) extra_parameters[1],
         (UINT) extra_parameters[2]
@@ -404,7 +410,10 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BYTE_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BYTE_POOL_OBJECT))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, param_0, sizeof(TX_BYTE_POOL)))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -424,7 +433,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_BYTE_POOL_INFO_GET_CALL_NOT_USED
 /* UINT _txe_byte_pool_info_get(
     TX_BYTE_POOL *pool_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *available_bytes, -> extra_parameters[0]
     ULONG *fragments, -> extra_parameters[1]
     TX_THREAD **first_suspended, -> extra_parameters[2]
@@ -438,7 +447,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BYTE_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BYTE_POOL_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
@@ -465,7 +474,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_byte_pool_info_get(
         (TX_BYTE_POOL *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (TX_THREAD **) extra_parameters[2],
@@ -494,7 +503,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BYTE_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BYTE_POOL_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
@@ -602,7 +611,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_BYTE_POOL)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_BYTE_POOL_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -657,7 +666,7 @@ ALIGN_TYPE block_header_start;
 #ifndef TXM_EVENT_FLAGS_CREATE_CALL_NOT_USED
 /* UINT _txe_event_flags_create(
     TX_EVENT_FLAGS_GROUP *group_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     UINT event_control_block_size -> param_2
    ); */
 static ALIGN_TYPE _txm_module_manager_tx_event_flags_create_dispatch(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2)
@@ -676,7 +685,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_event_flags_create(
         (TX_EVENT_FLAGS_GROUP *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (UINT) param_2
     );
     return(return_value);
@@ -694,7 +703,10 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_EVENT_FLAGS_GROUP)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_EVENT_FLAGS_OBJECT))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, param_0, sizeof(TX_EVENT_FLAGS_GROUP)))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -726,7 +738,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_EVENT_FLAGS_GROUP)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_EVENT_FLAGS_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[1], sizeof(ULONG)))
@@ -750,7 +762,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_EVENT_FLAGS_INFO_GET_CALL_NOT_USED
 /* UINT _txe_event_flags_info_get(
     TX_EVENT_FLAGS_GROUP *group_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *current_flags, -> extra_parameters[0]
     TX_THREAD **first_suspended, -> extra_parameters[1]
     ULONG *suspended_count, -> extra_parameters[2]
@@ -763,7 +775,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_EVENT_FLAGS_GROUP)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_EVENT_FLAGS_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
@@ -787,7 +799,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_event_flags_info_get(
         (TX_EVENT_FLAGS_GROUP *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (TX_THREAD **) extra_parameters[1],
         (ULONG *) extra_parameters[2],
@@ -812,7 +824,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_EVENT_FLAGS_GROUP)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_EVENT_FLAGS_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
@@ -895,7 +907,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_EVENT_FLAGS_GROUP)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_EVENT_FLAGS_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -922,7 +934,7 @@ VOID (*events_set_notify)(TX_EVENT_FLAGS_GROUP *);
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_EVENT_FLAGS_GROUP)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_EVENT_FLAGS_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         /* Since we need to write to the object, ensure it's valid.  */
@@ -957,7 +969,7 @@ VOID (*events_set_notify)(TX_EVENT_FLAGS_GROUP *);
 #ifndef TXM_MUTEX_CREATE_CALL_NOT_USED
 /* UINT _txe_mutex_create(
     TX_MUTEX *mutex_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     UINT inherit, -> extra_parameters[0]
     UINT mutex_control_block_size -> extra_parameters[1]
    ); */
@@ -980,7 +992,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_mutex_create(
         (TX_MUTEX *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (UINT) extra_parameters[0],
         (UINT) extra_parameters[1]
     );
@@ -999,7 +1011,10 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_MUTEX)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_MUTEX_OBJECT))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, param_0, sizeof(TX_MUTEX)))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1028,7 +1043,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_MUTEX)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_MUTEX_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1043,7 +1058,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_MUTEX_INFO_GET_CALL_NOT_USED
 /* UINT _txe_mutex_info_get(
     TX_MUTEX *mutex_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *count, -> extra_parameters[0]
     TX_THREAD **owner, -> extra_parameters[1]
     TX_THREAD **first_suspended, -> extra_parameters[2]
@@ -1057,7 +1072,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_MUTEX)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_MUTEX_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
@@ -1084,7 +1099,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_mutex_info_get(
         (TX_MUTEX *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (TX_THREAD **) extra_parameters[1],
         (TX_THREAD **) extra_parameters[2],
@@ -1112,7 +1127,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_MUTEX)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_MUTEX_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
@@ -1211,7 +1226,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_MUTEX)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_MUTEX_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1233,7 +1248,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_MUTEX)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_MUTEX_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1247,7 +1262,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_QUEUE_CREATE_CALL_NOT_USED
 /* UINT _txe_queue_create(
     TX_QUEUE *queue_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     UINT message_size, -> extra_parameters[0]
     VOID *queue_start, -> extra_parameters[1]
     ULONG queue_size, -> extra_parameters[2]
@@ -1275,7 +1290,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_queue_create(
         (TX_QUEUE *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (UINT) extra_parameters[0],
         (VOID *) extra_parameters[1],
         (ULONG) extra_parameters[2],
@@ -1296,7 +1311,10 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_QUEUE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, param_0, sizeof(TX_QUEUE)))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1324,8 +1342,15 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_QUEUE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* Only the module manager and the owning module's callback thread use a callback
+           request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_queue_flush(
@@ -1349,12 +1374,18 @@ TX_QUEUE *queue_ptr;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_QUEUE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* Only the module manager posts to a callback request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
 
         /* We need to get the size of the message from the queue.  */
         queue_ptr =  (TX_QUEUE *) param_0;
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_READ(module_instance, param_1, queue_ptr -> tx_queue_message_size))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_READ(module_instance, param_1, sizeof(ULONG)*queue_ptr -> tx_queue_message_size))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1370,7 +1401,7 @@ TX_QUEUE *queue_ptr;
 #ifndef TXM_QUEUE_INFO_GET_CALL_NOT_USED
 /* UINT _txe_queue_info_get(
     TX_QUEUE *queue_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *enqueued, -> extra_parameters[0]
     ULONG *available_storage, -> extra_parameters[1]
     TX_THREAD **first_suspended, -> extra_parameters[2]
@@ -1384,7 +1415,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_QUEUE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
@@ -1411,7 +1442,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_queue_info_get(
         (TX_QUEUE *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (TX_THREAD **) extra_parameters[2],
@@ -1439,7 +1470,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_QUEUE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
@@ -1538,8 +1569,15 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_QUEUE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* Only the module manager and the owning module's callback thread use a callback
+           request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_queue_prioritize(
@@ -1563,8 +1601,15 @@ TX_QUEUE *queue_ptr;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_QUEUE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module receives only from its own callback request queue.  */
+        if ((TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0)) &&
+            (((TX_QUEUE *) param_0) != &(module_instance -> txm_module_instance_callback_request_queue)))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
 
         /* We need to get the max size of the buffer from the queue.  */
         queue_ptr =  (TX_QUEUE *) param_0;
@@ -1595,8 +1640,14 @@ TX_QUEUE *queue_ptr;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_QUEUE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* Only the module manager posts to a callback request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
 
         /* We need to get the size of the message from the queue.  */
         queue_ptr =  (TX_QUEUE *) param_0;
@@ -1627,8 +1678,15 @@ VOID (*queue_send_notify)(TX_QUEUE *);
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_QUEUE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_QUEUE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* Only the module manager and the owning module's callback thread use a callback
+           request queue.  */
+        if (TXM_MODULE_MANAGER_CALLBACK_REQUEST_QUEUE(param_0))
+        {
+            return(TXM_MODULE_INVALID_MEMORY);
+        }
 
         /* Since we need to write to the object, ensure it's valid.  */
         if ((queue_ptr == TX_NULL) || (queue_ptr -> tx_queue_id != TX_QUEUE_ID))
@@ -1671,7 +1729,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_SEMAPHORE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_SEMAPHORE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1686,7 +1744,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_SEMAPHORE_CREATE_CALL_NOT_USED
 /* UINT _txe_semaphore_create(
     TX_SEMAPHORE *semaphore_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     ULONG initial_count, -> extra_parameters[0]
     UINT semaphore_control_block_size -> extra_parameters[1]
    ); */
@@ -1709,7 +1767,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_semaphore_create(
         (TX_SEMAPHORE *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (ULONG) extra_parameters[0],
         (UINT) extra_parameters[1]
     );
@@ -1728,7 +1786,10 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_SEMAPHORE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_SEMAPHORE_OBJECT))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, param_0, sizeof(TX_SEMAPHORE)))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1757,7 +1818,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_SEMAPHORE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_SEMAPHORE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1772,7 +1833,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_SEMAPHORE_INFO_GET_CALL_NOT_USED
 /* UINT _txe_semaphore_info_get(
     TX_SEMAPHORE *semaphore_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     ULONG *current_value, -> extra_parameters[0]
     TX_THREAD **first_suspended, -> extra_parameters[1]
     ULONG *suspended_count, -> extra_parameters[2]
@@ -1785,7 +1846,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_SEMAPHORE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_SEMAPHORE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
@@ -1809,7 +1870,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_semaphore_info_get(
         (TX_SEMAPHORE *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (ULONG *) extra_parameters[0],
         (TX_THREAD **) extra_parameters[1],
         (ULONG *) extra_parameters[2],
@@ -1834,7 +1895,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_SEMAPHORE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_SEMAPHORE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
@@ -1915,7 +1976,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_SEMAPHORE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_SEMAPHORE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1937,7 +1998,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_SEMAPHORE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_SEMAPHORE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -1962,7 +2023,7 @@ VOID (*semaphore_put_notify)(TX_SEMAPHORE *);
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_SEMAPHORE)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_SEMAPHORE_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         /* Since we need to write to the object, ensure it's valid.  */
@@ -1997,7 +2058,7 @@ VOID (*semaphore_put_notify)(TX_SEMAPHORE *);
 #ifndef TXM_THREAD_CREATE_CALL_NOT_USED
 /* UINT _txe_thread_create(
     TX_THREAD *thread_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     VOID (*entry_function)(ULONG entry_input), -> extra_parameters[0]
     ULONG entry_input, -> extra_parameters[1]
     VOID *stack_start, -> extra_parameters[2]
@@ -2036,7 +2097,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txm_module_manager_thread_create(
         (TX_THREAD *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         module_instance -> txm_module_instance_shell_entry_function,
         (VOID (*)(ULONG entry_input)) extra_parameters[0],
         (ULONG) extra_parameters[1],
@@ -2060,22 +2121,48 @@ ALIGN_TYPE return_value;
 static ALIGN_TYPE _txm_module_manager_tx_thread_delete_dispatch(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE param_0)
 {
 
-ALIGN_TYPE return_value;
+TX_THREAD  *thread_ptr;
+ALIGN_TYPE  return_value;
+ALIGN_TYPE  stack_status;
+
+    thread_ptr =   (TX_THREAD *) param_0;
+    stack_status = (ALIGN_TYPE) TX_SUCCESS;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, param_0, sizeof(TX_THREAD)))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
-    return_value = (ALIGN_TYPE) _txe_thread_delete(
-        (TX_THREAD *) param_0
-    );
+    return_value = (ALIGN_TYPE) _txe_thread_delete(thread_ptr);
 
-    /* Deallocate object memory.  */
+    /* Deallocate the kernel stack for a user-mode thread.  The pointer is tested
+       rather than the module's properties: both thread create paths clear the whole
+       control block before filling it in, so a thread that carries no kernel stack
+       the manager allocated holds TX_NULL here, and a user-mode module can be given
+       the address of such a thread.  */
+    if ((return_value == TX_SUCCESS) &&
+        (module_instance -> txm_module_instance_property_flags & TXM_MODULE_USER_MODE) &&
+        (thread_ptr -> tx_thread_module_kernel_stack_start != TX_NULL))
+    {
+        stack_status = _txm_module_manager_object_deallocate(thread_ptr -> tx_thread_module_kernel_stack_start);
+    }
+
+    /* Deallocate thread object memory. This must be attempted even when the kernel
+       stack could not be released, otherwise a successful thread delete would leave
+       the thread object allocated forever.  */
     if (return_value == TX_SUCCESS)
     {
-        return_value = _txm_module_manager_object_deallocate((VOID *) param_0);
+        return_value = _txm_module_manager_object_deallocate((VOID *) thread_ptr);
+
+        /* Report the kernel stack failure if the thread object was released.  */
+        if ((return_value == TX_SUCCESS) && (stack_status != TX_SUCCESS))
+        {
+            return_value = stack_status;
+        }
     }
     return(return_value);
 }
@@ -2096,7 +2183,7 @@ VOID (*thread_entry_exit_notify)(TX_THREAD *, UINT);
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         /* Since we need to write to the object, ensure it's valid.  */
@@ -2147,7 +2234,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_THREAD_INFO_GET_CALL_NOT_USED
 /* UINT _txe_thread_info_get(
     TX_THREAD *thread_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     UINT *state, -> extra_parameters[0]
     ULONG *run_count, -> extra_parameters[1]
     UINT *priority, -> extra_parameters[2]
@@ -2163,7 +2250,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
@@ -2196,7 +2283,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_thread_info_get(
         (TX_THREAD *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (UINT *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (UINT *) extra_parameters[2],
@@ -2249,7 +2336,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
@@ -2389,10 +2476,21 @@ static ALIGN_TYPE _txm_module_manager_tx_thread_preemption_change_dispatch(TXM_M
 
 ALIGN_TYPE return_value;
 
+    if (param_1 < module_instance -> txm_module_instance_maximum_priority)
+    {
+        return(TX_THRESH_ERROR);
+    }
+
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_2, sizeof(UINT)))
             return(TXM_MODULE_INVALID_MEMORY);
@@ -2418,10 +2516,21 @@ static ALIGN_TYPE _txm_module_manager_tx_thread_priority_change_dispatch(TXM_MOD
 
 ALIGN_TYPE return_value;
 
+    if (param_1 < module_instance -> txm_module_instance_maximum_priority)
+    {
+        return(TX_PRIORITY_ERROR);
+    }
+
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_2, sizeof(UINT)))
             return(TXM_MODULE_INVALID_MEMORY);
@@ -2457,8 +2566,14 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txm_module_manager_thread_reset(
@@ -2479,8 +2594,14 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_thread_resume(
@@ -2536,8 +2657,14 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_thread_suspend(
@@ -2565,7 +2692,7 @@ TX_THREAD *thread_ptr;
         {
             return(TXM_MODULE_INVALID_MEMORY);
         }
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -2615,8 +2742,14 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_thread_terminate(
@@ -2639,8 +2772,14 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_2, sizeof(ULONG)))
             return(TXM_MODULE_INVALID_MEMORY);
@@ -2666,8 +2805,14 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
+
+        /* A module may control only threads it owns.  */
+        if (((TX_THREAD *) param_0) -> tx_thread_module_instance_ptr != (VOID *) module_instance)
+        {
+            return(TXM_MODULE_INVALID);
+        }
     }
 
     return_value = (ALIGN_TYPE) _txe_thread_wait_abort(
@@ -2714,7 +2859,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_TIMER)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_TIMER_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -2738,7 +2883,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_TIMER)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_TIMER_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -2754,7 +2899,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_TIMER_CREATE_CALL_NOT_USED
 /* UINT _txe_timer_create(
     TX_TIMER *timer_ptr, -> param_0
-    CHAR *name_ptr, -> param_1
+    TX_NAME_CONST CHAR *name_ptr, -> param_1
     VOID (*expiration_function)(ULONG), -> extra_parameters[0]
     ULONG expiration_input, -> extra_parameters[1]
     ULONG initial_ticks, -> extra_parameters[2]
@@ -2797,7 +2942,7 @@ VOID (*expiration_function)(ULONG);
 
     return_value = (ALIGN_TYPE) _txe_timer_create(
         (TX_TIMER *) param_0,
-        (CHAR *) param_1,
+        (TX_NAME_CONST CHAR *) param_1,
         (VOID (*)(ULONG)) expiration_function,
         (ULONG) extra_parameters[1],
         (ULONG) extra_parameters[2],
@@ -2835,7 +2980,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_TIMER)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_TIMER_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -2857,7 +3002,10 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_TIMER)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_TIMER_OBJECT))
+            return(TXM_MODULE_INVALID_MEMORY);
+
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_DELETION(module_instance, param_0, sizeof(TX_TIMER)))
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
@@ -2877,7 +3025,7 @@ ALIGN_TYPE return_value;
 #ifndef TXM_TIMER_INFO_GET_CALL_NOT_USED
 /* UINT _txe_timer_info_get(
     TX_TIMER *timer_ptr, -> param_0
-    CHAR **name, -> param_1
+    TX_NAME_CONST CHAR **name, -> param_1
     UINT *active, -> extra_parameters[0]
     ULONG *remaining_ticks, -> extra_parameters[1]
     ULONG *reschedule_ticks, -> extra_parameters[2]
@@ -2890,7 +3038,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_TIMER)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_TIMER_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(CHAR *)))
@@ -2914,7 +3062,7 @@ ALIGN_TYPE return_value;
 
     return_value = (ALIGN_TYPE) _txe_timer_info_get(
         (TX_TIMER *) param_0,
-        (CHAR **) param_1,
+        (TX_NAME_CONST CHAR **) param_1,
         (UINT *) extra_parameters[0],
         (ULONG *) extra_parameters[1],
         (ULONG *) extra_parameters[2],
@@ -2940,7 +3088,7 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_TIMER)))
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_TIMER_OBJECT))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_1, sizeof(ULONG)))
@@ -3028,9 +3176,18 @@ static ALIGN_TYPE _txm_module_manager_tx_trace_buffer_full_notify_dispatch(TXM_M
 
 ALIGN_TYPE return_value;
 
-    return_value = (ALIGN_TYPE) _tx_trace_buffer_full_notify(
-        (VOID (*)(VOID *buffer)) param_0
-    );
+    /* The kernel calls this notification directly from privileged code, with no
+       trampoline, so a user-mode module may not register one.  */
+    if ((module_instance -> txm_module_instance_property_flags & TXM_MODULE_USER_MODE) != ((ULONG) 0))
+    {
+        return_value = (ALIGN_TYPE) TXM_MODULE_INVALID_PROPERTIES;
+    }
+    else
+    {
+        return_value = (ALIGN_TYPE) _tx_trace_buffer_full_notify(
+            (VOID (*)(VOID *buffer)) param_0
+        );
+    }
     return(return_value);
 }
 #endif
@@ -3221,41 +3378,6 @@ static ALIGN_TYPE _txm_module_manager_txm_module_object_deallocate_dispatch(TXM_
 {
 
 ALIGN_TYPE return_value;
-TXM_MODULE_ALLOCATED_OBJECT *object_ptr;
-ALIGN_TYPE object_end;
-ALIGN_TYPE object_pool_end;
-
-    if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
-    {
-        /* Is the object pool created?  */
-        if (_txm_module_manager_object_pool_created == TX_TRUE)
-        {
-
-            /* Get the module allocated object.  */
-            object_ptr =  ((TXM_MODULE_ALLOCATED_OBJECT *) param_0) - 1;
-
-            /* Get the end address of the object pool.  */
-            object_pool_end = (ALIGN_TYPE) (_txm_module_manager_object_pool.tx_byte_pool_start + _txm_module_manager_object_pool.tx_byte_pool_size);
-
-            /* Check that the pointer is in the object pool.  */
-            if ((ALIGN_TYPE) object_ptr < (ALIGN_TYPE) _txm_module_manager_object_pool.tx_byte_pool_start ||
-                (ALIGN_TYPE) object_ptr >= (ALIGN_TYPE) object_pool_end)
-            {
-                /* Pointer is outside of the object pool.  */
-                return(TXM_MODULE_INVALID_MEMORY);
-            }
-
-            /* Get the end addresses of the object.  */
-            object_end = ((ALIGN_TYPE) object_ptr) + sizeof(TXM_MODULE_ALLOCATED_OBJECT) + object_ptr -> txm_module_object_size;
-
-            /* Check that the object is in the object pool.  */
-            if (object_end >= object_pool_end)
-            {
-                /* Object is outside of the object pool.  */
-                return(TXM_MODULE_INVALID_MEMORY);
-            }
-        }
-    }
 
     return_value = (ALIGN_TYPE) _txm_module_manager_object_deallocate(
         (VOID *) param_0
@@ -3277,11 +3399,10 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
-            return(TXM_MODULE_INVALID_MEMORY);
-
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, param_2, sizeof(VOID *)))
-            return(TXM_MODULE_INVALID_MEMORY);
+        /* This service carries no name length, so the manager searches with the largest
+           length a UINT can hold and no readable range can be proven for the name.  A
+           memory-protected module must use the extended service, which declares one.  */
+        return(TXM_MODULE_INVALID_MEMORY);
     }
 
     return_value = (ALIGN_TYPE) _txm_module_manager_object_pointer_get(
@@ -3307,10 +3428,13 @@ ALIGN_TYPE return_value;
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
-        if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING(module_instance, param_1))
+        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
             return(TXM_MODULE_INVALID_MEMORY);
 
-        if (!TXM_MODULE_MANAGER_ENSURE_INSIDE_MODULE_DATA(module_instance, (ALIGN_TYPE)extra_parameters, sizeof(ALIGN_TYPE[2])))
+        /* The name length has to be checked before it is trusted, so the extra parameter
+           array is checked first.  The comparison reads the declared length plus the
+           terminator that follows it, and all of that must be inside the module.  */
+        if (!TXM_MODULE_MANAGER_PARAM_CHECK_DEREFERENCE_STRING_RANGE(module_instance, param_1, (UINT) extra_parameters[0]))
             return(TXM_MODULE_INVALID_MEMORY);
 
         if (!TXM_MODULE_MANAGER_PARAM_CHECK_BUFFER_WRITE(module_instance, extra_parameters[1], sizeof(VOID *)))

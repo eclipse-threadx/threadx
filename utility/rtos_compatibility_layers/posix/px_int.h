@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -33,15 +34,6 @@
 /*    This file defines the constants, structures, etc.needed to          */
 /*    implement the Evacuation Kit for POSIX Users (POSIX)                */
 /*                                                                        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Remove unneeded values,       */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef _TX_PX_INT_H
@@ -68,7 +60,7 @@ extern TX_THREAD *     _tx_thread_execute_ptr;
 
 /* declares posix objects in the px_pth_init.c file */
 #ifdef  PX_OBJECT_INIT
-#define PX_OBJECT_DECLARE 
+#define PX_OBJECT_DECLARE
 #else
 #define PX_OBJECT_DECLARE extern
 #endif
@@ -93,7 +85,7 @@ PX_OBJECT_DECLARE TX_THREAD                    posix_system_manager;
 PX_OBJECT_DECLARE TX_BYTE_POOL          posix_heap_byte_pool;
 
 /* Define a static pool of pthread Control Blocks (TCB). If more pthreades are
-   required the constant PTHREAD_THREADS_MAX (in tx_posix.h) may be modified.   */ 
+   required the constant PTHREAD_THREADS_MAX (in tx_posix.h) may be modified.   */
 PX_OBJECT_DECLARE POSIX_TCB             ptcb_pool[PTHREAD_THREADS_MAX];
 
 #if POSIX_MAX_QUEUES!= 0
@@ -123,11 +115,11 @@ PX_OBJECT_DECLARE pthread_mutexattr_t   posix_default_mutex_attr;
 
 PX_OBJECT_DECLARE unsigned int posix_errno;
 
-   
+
 /**************************************************************************/
 /*                      Local prototypes                                  */
 /**************************************************************************/
-/* Define Evacuation Kit for POSIX function prototypes.  */ 
+/* Define Evacuation Kit for POSIX function prototypes.  */
 
 INT                   posix_get_pthread_errno(pthread_t ptid);
 
@@ -159,7 +151,7 @@ VOID                  posix_internal_error(ULONG error_code);
 VOID                  posix_error_handler(ULONG error_code);
 
 INT                   posix_memory_allocate(ULONG size, VOID **memory_ptr);
- 
+
 INT                   posix_queue_delete(POSIX_MSG_QUEUE  * q_ptr);
 
 VOID                  posix_putback_queue(TX_QUEUE * qid);

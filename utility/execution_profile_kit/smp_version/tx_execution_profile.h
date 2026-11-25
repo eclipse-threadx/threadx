@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -24,20 +25,20 @@
 #define TX_EXECUTION_PROFILE_H
 
 
-/*  The thread execution profile kit is designed to track thread execution time 
-    based on the hardware timer defined by TX_EXECUTION_TIME_SOURCE and 
-    TX_EXECUTION_MAX_TIME_SOURCE below. When the thread's total time reaches 
+/*  The thread execution profile kit is designed to track thread execution time
+    based on the hardware timer defined by TX_EXECUTION_TIME_SOURCE and
+    TX_EXECUTION_MAX_TIME_SOURCE below. When the thread's total time reaches
     the maximum value, it remains there until the time is reset to 0 via a call
-    to tx_thread_execution_time_reset. There are several assumptions to the 
+    to tx_thread_execution_time_reset. There are several assumptions to the
     operation of this kit, as follows:
 
     1. In tx_port.h replace:
         #define TX_THREAD_EXTENSION_3"
       with:
         #define TX_THREAD_EXTENSION_3           unsigned long long  tx_thread_execution_time_total; \
-                                                unsigned long       tx_thread_execution_time_last_start; 
+                                                unsigned long       tx_thread_execution_time_last_start;
 
-    2.  The TX_EXECUTION_TIME_SOURCE and TX_EXECUTION_MAX_TIME_SOURCE macros are 
+    2.  The TX_EXECUTION_TIME_SOURCE and TX_EXECUTION_MAX_TIME_SOURCE macros are
         defined to utilize a local hardware time source.
 
     3.  The following routines are called from assembly code:
@@ -46,9 +47,9 @@
             VOID  _tx_execution_isr_enter(void);
             VOID  _tx_execution_isr_exit(void);
 
-    4.  The ThreadX library must be rebuilt with TX_ENABLE_EXECUTION_CHANGE_NOTIFY so 
-        that these macros are expanded in the TX_THREAD structure and so the assembly code macros 
-        are enabled to call the execution profile routines.  
+    4.  The ThreadX library must be rebuilt with TX_ENABLE_EXECUTION_CHANGE_NOTIFY so
+        that these macros are expanded in the TX_THREAD structure and so the assembly code macros
+        are enabled to call the execution profile routines.
 
     5.  Add tx_execution_profile.c to the application build.  */
 

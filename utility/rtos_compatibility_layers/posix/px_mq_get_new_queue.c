@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -58,24 +59,18 @@
 /*                                                                        */
 /*    POSIX internal Code                                                 */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 POSIX_MSG_QUEUE  * posix_get_new_queue(ULONG maxnum)
 {
 
-ULONG                   i; 
-POSIX_MSG_QUEUE        *q_ptr; 
-VOID                   *bp; 
-INT                     retval; 
-ULONG                   size; 
+ULONG                   i;
+POSIX_MSG_QUEUE        *q_ptr;
+VOID                   *bp;
+INT                     retval;
+ULONG                   size;
 
 
-    /* Determine how much memory we need for the queue. 
+    /* Determine how much memory we need for the queue.
        The queue holds "maxnum" entries;  each entry is 2 ULONG.  */
     size   = (maxnum * (TX_4_ULONG * sizeof(ULONG)));
 
@@ -91,14 +86,14 @@ ULONG                   size;
     /* try to find one that is not "in use".  */
     /* Search the queue pool for an available queue.  */
    for (i = 0, q_ptr = &(posix_queue_pool[0]);
-            i < POSIX_MAX_QUEUES; 
+            i < POSIX_MAX_QUEUES;
             i++, q_ptr++)
    {
         /* Make sure the queue is not "in use".   */
         if (q_ptr->in_use == TX_FALSE)
         {
             /* This queue is now in use.  */
-            q_ptr->in_use = TX_TRUE; 
+            q_ptr->in_use = TX_TRUE;
 
             /* Point to allocated memory.  */
             q_ptr->storage = bp;
@@ -106,10 +101,10 @@ ULONG                   size;
             q_ptr->px_queue_id = PX_QUEUE_ID;
 
             /* Stop searching.  */
-            break; 
+            break;
         }
    }
-   /* If we didn't find a free queue, free the allocated memory. */ 
+   /* If we didn't find a free queue, free the allocated memory. */
    if ( i >= POSIX_MAX_QUEUES)
    {
        posix_memory_release(bp);

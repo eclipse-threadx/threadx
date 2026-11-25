@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -14,9 +15,9 @@
 #include <stdio.h>
 
 
-/* Define the TRAP instruction. This is used by the Interrupt Processing and Interrupt Preemption Processing tests. 
-   The SVC instruction below is for Cortex-M architectures using IAR tools. This will likely need to be modified 
-   for different processors and/or development tools. 
+/* Define the TRAP instruction. This is used by the Interrupt Processing and Interrupt Preemption Processing tests.
+   The SVC instruction below is for Cortex-M architectures using IAR tools. This will likely need to be modified
+   for different processors and/or development tools.
 
    Note also that for the Interrupt Processing test there is the assumption that the SVC ISR looks like:
 

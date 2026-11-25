@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -26,45 +27,39 @@
 #include "px_int.h"    /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    pthread_attr_setstackaddr                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    pthread_attr_setstackaddr                           PORTABLE C      */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*     This function sets the stack address associated with a pthread     */
-/*     attributes                                                         */     
+/*  DESCRIPTION                                                           */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*     This function sets the stack address associated with a pthread     */
+/*     attributes                                                         */
+/*                                                                        */
+/*  INPUT                                                                 */
 /*                                                                        */
 /*    attr                           Address of the thread attributes     */
 /*    stackaddr                      Address of variable to contain the   */
-/*                                   stack address to set                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*     0                             if successful                        */ 
-/*     Value                         in case of any error                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
+/*                                   stack address to set                 */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*     0                             if successful                        */
+/*     Value                         in case of any error                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 INT pthread_attr_setstackaddr(pthread_attr_t *attr,void *stackaddr)
@@ -76,7 +71,7 @@ INT pthread_attr_setstackaddr(pthread_attr_t *attr,void *stackaddr)
         posix_errno = EINVAL;
         posix_set_pthread_errno(EINVAL);
         return(EINVAL);
-    }   
+    }
     else
     {
         attr->stack_address = stackaddr;

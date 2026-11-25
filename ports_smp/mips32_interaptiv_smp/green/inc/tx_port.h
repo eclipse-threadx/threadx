@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -41,12 +42,6 @@
 /*    directly use native C data types.  Instead, ThreadX creates its     */
 /*    own special types that can be mapped to actual data types by this   */
 /*    file to guarantee consistency in the interface and functionality.   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-08-2023      Scott Larson            Initial release version 6.2.1 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -343,7 +338,7 @@ ULONG   _tx_misra_time_stamp_get(VOID);
         extern void __tx_cpp_exception_cleanup(TX_THREAD *thread_ptr);          \
         __tx_cpp_exception_cleanup(thread_ptr);                                 \
     }
-#else 
+#else
 #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  \
     {                                                                           \
         #pragma weak __cpp_exception_cleanup                                    \
@@ -514,7 +509,7 @@ THREAD_SMP_DECLARE ULONG    _tx_thread_smp_initial_fpu_control_register;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation. * ThreadX SMP MIPS32_interAptiv/Green Hills Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX SMP MIPS32_interAptiv/Green Hills Version 6.5.2.202603b *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

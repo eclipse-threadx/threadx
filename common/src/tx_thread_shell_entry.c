@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -62,14 +65,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Initial thread stack frame                                          */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_shell_entry(VOID)
@@ -141,6 +136,17 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
 
 #ifdef TX_NOT_INTERRUPTABLE
 
+    /* Set the suspending flag, so that the completion transition is marked as in
+       progress for the same interval it is marked in the interruptable
+       configuration below.  Nothing in this configuration needs the flag to cancel
+       an interrupted suspension -- interrupts stay disabled through the whole
+       transition -- but the notification callback and the completion extension
+       below are application code, reached by a direct call, and interrupt lockout
+       does not stop either of them from calling a thread lifecycle service on this
+       same control block.  The flag is what _tx_thread_delete and _tx_thread_reset
+       test in order to refuse one.  */
+    thread_ptr -> tx_thread_suspending =  TX_TRUE;
+
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 
     /* Determine if an application callback routine is specified.  */
@@ -154,6 +160,15 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
 
     /* Perform any additional activities for tool or user purpose.  */
     TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
+
+    /* Clear the suspending flag.  It has to be cleared here rather than after the
+       call below, because _tx_thread_system_ni_suspend returns to the scheduler for
+       a thread that is the current thread, which this one is, and so does not come
+       back.  Clearing it afterwards would leave a normally completed thread marked
+       as transitioning for ever and therefore permanently undeletable.  Clearing it
+       here loses nothing: everything from this point to the detachment runs with
+       interrupts disabled and calls no application code.  */
+    thread_ptr -> tx_thread_suspending =  TX_FALSE;
 
     /* Call actual non-interruptable thread suspension routine.  */
     _tx_thread_system_ni_suspend(thread_ptr, ((ULONG) 0));

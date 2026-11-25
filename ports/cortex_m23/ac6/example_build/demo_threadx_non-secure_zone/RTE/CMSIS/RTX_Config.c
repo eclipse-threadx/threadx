@@ -24,17 +24,17 @@
  *
  * -----------------------------------------------------------------------------
  */
- 
+
 #include "cmsis_compiler.h"
 #include "rtx_os.h"
- 
+
 // OS Idle Thread
 __WEAK __NO_RETURN void osRtxIdleThread (void *argument) {
   (void)argument;
 
   for (;;) {}
 }
- 
+
 // OS Error Callback function
 __WEAK uint32_t osRtxErrorNotify (uint32_t code, void *object_id) {
   (void)object_id;

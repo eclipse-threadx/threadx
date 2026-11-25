@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -56,28 +58,6 @@
 /*                                                                        */
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020      Scott Larson            Initial Version 6.1.3         */
-/*  04-02-2021      Scott Larson            Modified comments and fixed   */
-/*                                            MPU region configuration,   */
-/*                                            resulting in version 6.1.6  */
-/*  06-02-2021      Scott Larson            Fixed extended stack handling */
-/*                                            when calling kernel APIs,   */
-/*                                            resulting in version 6.1.7  */
-/*  04-25-2022      Scott Larson            Optimized MPU configuration,  */
-/*                                            added BASEPRI support,      */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Removed the code path to skip */
-/*                                            MPU reloading,              */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022      Scott Larson            Added low power support,      */
-/*                                            resulting in version 6.2.0  */
-/*  03-08-2023      Scott Larson            Added preproc FPU option,     */
-/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
@@ -226,7 +206,7 @@ BusFault_Handler:
     STR     r1, [r0]                                // Store ICSR
     DSB                                             // Wait for memory access to complete
 #ifdef TX_PORT_USE_BASEPRI
-    MOV     r0, 0                                   // Disable BASEPRI masking (enable interrupts)
+    MOV     r0, #0                                  // Disable BASEPRI masking (enable interrupts)
     MSR     BASEPRI, r0
 #else
     CPSIE   i                                       // Enable interrupts
@@ -264,7 +244,7 @@ __tx_ts_handler:
     BL      _tx_execution_thread_exit               // Call the thread exit function
     POP     {r0, lr}                                // Recover LR
 #ifdef TX_PORT_USE_BASEPRI
-    MOV     r0, 0                                   // Disable BASEPRI masking (enable interrupts)
+    MOV     r0, #0                                  // Disable BASEPRI masking (enable interrupts)
     MSR     BASEPRI, r0
 #else
     CPSIE   i                                       // Enable interrupts
@@ -284,6 +264,34 @@ __tx_ts_handler:
 
     STR     r3, [r0]                                // Set _tx_thread_current_ptr to NULL
     MRS     r12, PSP                                // Pickup PSP pointer (thread's stack pointer)
+
+    /* A user-mode thread of a memory-protected module sets its own PSP, and the stores that
+       preserve its context are privileged, so they are made only if they stay within the
+       thread's stack. Otherwise the context goes on the thread's kernel stack, which the
+       module cannot reach, and the thread faults when it resumes.  */
+    LDR     r3, [r1, #0x98]                         // Pickup current user mode flag
+    CBZ     r3, __tx_ts_psp_checked                 // Kernel mode, PSP is the kernel's
+    LDR     r3, [r1, #0x90]                         // Pickup the module instance pointer
+    LDR     r3, [r3, #0x0C]                         // Pickup the module property flags
+    TST     r3, #2                                  // Is the module memory protected?
+    BEQ     __tx_ts_psp_checked                     // No, nothing to protect
+    LDR     r3, [r1, #16]                           // Pickup thread stack end
+    CMP     r12, r3                                 // Is PSP above the stack?
+    BHI     __tx_ts_psp_bad                         // Yes, do not store through it
+    LDR     r3, [r1, #12]                           // Pickup thread stack start
+    ADD     r3, r3, #36                             // Room for r4-r11 and LR
+#ifdef __ARM_FP
+    TST     LR, #0x10                               // Is the VFP extended frame present?
+    BNE     __tx_ts_psp_room                        // No, no VFP registers to save
+    ADD     r3, r3, #64                             // Yes, also room for s16-s31
+__tx_ts_psp_room:
+#endif
+    CMP     r12, r3                                 // Do the stores fit above the stack start?
+    BHS     __tx_ts_psp_checked                     // Yes, save the context where it belongs
+__tx_ts_psp_bad:
+    LDR     r12, [r1, #0xA8]                        // No, save it on the kernel stack instead
+__tx_ts_psp_checked:
+    MOV     r3, #0                                  // Rebuild NULL value
     STMDB   r12!, {r4-r11}                          // Save its remaining registers
 #ifdef __ARM_FP
     TST     LR, #0x10                               // Determine if the VFP extended frame is present
@@ -355,9 +363,19 @@ __tx_ts_wait:
 #endif
 
 #ifdef TX_ENABLE_WFI
+#ifdef TX_PORT_USE_BASEPRI
+    CPSID   i                                       // Mask every interrupt with PRIMASK, which WFI ignores
+    MOV     r1, #0                                  // Clear BASEPRI so that an interrupt masked by it
+    MSR     BASEPRI, r1                             //   is still able to wake the processor
+#endif
     DSB                                             // Ensure no outstanding memory transactions
     WFI                                             // Wait for interrupt
     ISB                                             // Ensure pipeline is flushed
+#ifdef TX_PORT_USE_BASEPRI
+    LDR     r1, =TX_PORT_BASEPRI                    // Restore the BASEPRI mask
+    MSR     BASEPRI, r1
+    CPSIE   i                                       // Clear PRIMASK; a pending interrupt is taken here
+#endif
 #endif
 
 #ifdef TX_LOW_POWER
@@ -542,7 +560,7 @@ SVC_Handler:
     ORREQ   lr, lr, #0x10                           // Set bit, return with standard frame
     STR     r3, [r2, #0xB0]                         // Save thread stack pointer
     BIC     r3, #1                                  // Clear possibly OR'd bit
-    
+
     /* Build kernel stack by copying thread stack two registers at a time */
     ADD     r3, r3, #32                             // Start at bottom of hardware stack
     LDMDB   r3!, {r1-r2}
@@ -648,20 +666,20 @@ _tx_svc_secure_alloc:
     CMP     r1, r2                                  // Did we come from _tx_thread_secure_stack_allocate?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came.
-    
+
     PUSH    {r0, lr}                                // Save SP and EXC_RETURN
     LDM     r0, {r0-r3}                             // Load function parameters from stack
     BL      _tx_thread_secure_mode_stack_allocate
     POP     {r12, lr}                               // Restore SP and EXC_RETURN
     STR     r0, [r12]                               // Store function return value
     BX      lr
-    
+
 _tx_svc_secure_free:
     LDR     r2, =_tx_free_return                    // Load address of where we should have come from
     CMP     r1, r2                                  // Did we come from _tx_thread_secure_stack_free?
     IT      NE                                      // If no (not equal), then...
     BXNE    lr                                      // return from where we came.
-    
+
     PUSH    {r0, lr}                                // Save SP and EXC_RETURN
     LDM     r0, {r0-r3}                             // Load function parameters from stack
     BL      _tx_thread_secure_mode_stack_free

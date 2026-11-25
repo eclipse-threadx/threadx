@@ -7,7 +7,7 @@ define symbol __ICFEDIT_intvec_start__       = 0x00000000;
 define symbol __ICFEDIT_region_ROM_start__   = 0x00000040;
 define symbol __ICFEDIT_region_ROM_end__     = 0x000FFFFF;      //Module in 0x00100000-0x0013FFFF
 define symbol __ICFEDIT_region_RAM_start__   = 0x08000000;
-define symbol __ICFEDIT_region_RAM_end__     = 0x081FFFFF;      
+define symbol __ICFEDIT_region_RAM_end__     = 0x081FFFFF;
 /*-Sizes-*/
 define symbol __ICFEDIT_size_cstack__   = 0x200;
 define symbol __ICFEDIT_size_svcstack__ = 0x100;
@@ -33,7 +33,7 @@ define block FIQ_STACK with alignment = 8, size = __ICFEDIT_size_fiqstack__ { };
 define block UND_STACK with alignment = 8, size = __ICFEDIT_size_undstack__ { };
 define block ABT_STACK with alignment = 8, size = __ICFEDIT_size_abtstack__ { };
 define block HEAP      with alignment = 8, size = __ICFEDIT_size_heap__     { };
-define block PAGE_ALIGN with alignment = 4096 { section page_align }; 
+define block PAGE_ALIGN with alignment = 4096 { section page_align };
 
 initialize by copy { readwrite };
 initialize by copy with packing = none { section __DLIB_PERTHREAD }; // Required in a multi-threaded application

@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Timer                                                               */
 @/**                                                                       */
@@ -50,55 +50,49 @@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_timer_interrupt                             SMP/Cortex-A9/GNU   */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_timer_interrupt                             SMP/Cortex-A9/GNU   */
 @/*                                                           6.1          */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function processes the hardware timer interrupt.  This         */ 
-@/*    processing includes incrementing the system clock and checking for  */ 
-@/*    time slice and/or timer expiration.  If either is found, the        */ 
-@/*    interrupt context save/restore functions are called along with the  */ 
-@/*    expiration functions.                                               */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
-@/*    _tx_thread_time_slice                 Time slice interrupted thread */ 
-@/*    _tx_thread_smp_protect                Get SMP protection            */ 
-@/*    _tx_thread_smp_unprotect              Releast SMP protection        */ 
-@/*    _tx_timer_expiration_process          Timer expiration processing   */ 
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    interrupt vector                                                    */ 
-@/*                                                                        */ 
-@/*  RELEASE HISTORY                                                       */ 
-@/*                                                                        */ 
-@/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*    This function processes the hardware timer interrupt.  This         */
+@/*    processing includes incrementing the system clock and checking for  */
+@/*    time slice and/or timer expiration.  If either is found, the        */
+@/*    interrupt context save/restore functions are called along with the  */
+@/*    expiration functions.                                               */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    _tx_thread_time_slice                 Time slice interrupted thread */
+@/*    _tx_thread_smp_protect                Get SMP protection            */
+@/*    _tx_thread_smp_unprotect              Releast SMP protection        */
+@/*    _tx_timer_expiration_process          Timer expiration processing   */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    interrupt vector                                                    */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_timer_interrupt(VOID)
 @{
     .global _tx_timer_interrupt
     .type _tx_timer_interrupt,function
-_tx_timer_interrupt: 
+_tx_timer_interrupt:
 @
 @    /* Upon entry to this routine, it is assumed that context save has already
 @       been called, and therefore the compiler scratch registers are available
@@ -109,7 +103,7 @@ _tx_timer_interrupt:
     CMP     r0, #0                              @ Only process timer interrupts from core 0 (to change this simply change the constant!)
     BEQ     __tx_process_timer                  @ If the same process the interrupt
     BX      lr                                  @ Return to caller if not matched
-__tx_process_timer: 
+__tx_process_timer:
 
     STMDB   sp!, {r4, lr}                       @ Save the lr and r4 register on the stack
     BL      _tx_thread_smp_protect              @ Get protection
@@ -154,7 +148,7 @@ __tx_process_timer:
 @    }
 @    else
 @    {
-__tx_timer_no_timer: 
+__tx_timer_no_timer:
 @
 @        /* No timer expired, increment the timer pointer.  */
 @        _tx_timer_current_ptr++;
@@ -175,12 +169,12 @@ __tx_timer_no_timer:
     LDR     r3, =_tx_timer_list_start           @ Pickup addr of timer list start
     LDR     r0, [r3, #0]                        @ Set current pointer to list start
 @
-__tx_timer_skip_wrap: 
+__tx_timer_skip_wrap:
 @
     STR     r0, [r1, #0]                        @ Store new current timer pointer
 @    }
 @
-__tx_timer_done: 
+__tx_timer_done:
 @
 @
 @    /* Did a timer expire?  */
@@ -198,10 +192,10 @@ __tx_timer_done:
     BL      _tx_timer_expiration_process        @ Call the timer expiration handling routine
 @
 @    }
-__tx_timer_dont_activate: 
+__tx_timer_dont_activate:
 @
 @    /* Call time-slice processing.  */
-@    _tx_thread_time_slice(); 
+@    _tx_thread_time_slice();
 
     BL      _tx_thread_time_slice               @ Call time-slice processing
 @

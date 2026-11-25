@@ -94,7 +94,7 @@ get_private_timer_count PROC
 
   BX      lr
   ENDP
-  
+
 ; ------------------------------------------------------------
 
   EXPORT clear_private_timer_irq

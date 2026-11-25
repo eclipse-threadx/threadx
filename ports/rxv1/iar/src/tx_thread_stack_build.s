@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -55,30 +55,16 @@
 ;/*                                                                        */
 ;/*    _tx_thread_create                     Create thread service         */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  08-02-2021     William E. Lamie         Initial Version 6.1.8         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
-;/*                                            removed unnecessary stack   */
-;/*                                            type placement,             */
-;/*                                            resulting in version 6.1.9  */
-;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.11 */
-;/*                                                                        */
 ;/**************************************************************************/
 
     public __tx_thread_stack_build
 
 __tx_thread_stack_build:
 ;
-;       
+;
 ;    /* Build an interrupt frame.  The form of the fake interrupt stack
 ;       on the Renesas RX should look like the following after it is built:
-;       
+;
 ;  Stack Top:           ACC0
 ;                       R6
 ;                       R7
@@ -131,11 +117,11 @@ __tx_thread_stack_build:
     MOV.L R4,[-R3]
 
 ;    /* Setup stack pointer.  */
-;    thread_ptr -> tx_thread_stack_ptr =  R1;   
+;    thread_ptr -> tx_thread_stack_ptr =  R1;
     MOV.L R3, 8[R1]
                                                  ; Store initial SP in thread control block
     RTS
-                                 
+
 ;}
 
     END

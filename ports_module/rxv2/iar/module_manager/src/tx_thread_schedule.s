@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -62,17 +63,6 @@
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
 /*    _tx_thread_context_restore           Restore thread's context       */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
-/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
-/*                                            removed unnecessary stack   */
-/*                                            type checking,              */
-/*                                            resulting in version 6.1.9  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
 // {
@@ -134,40 +124,40 @@ __tx_thread_schedule_loop:
     MOV.L   156[R2],R1                          // Pickup user_mode
     CMP     #0,R1                               // Is protection required for this thread?
     BEQ     skip_mpu_setup                      // No, skip MPU setup
-    
+
     MOV.L   #0x00086408,R1                      // Region 1 Start Page Register address
     MOV.L   144[R2],R2                          // Address of module instance ptr at offset 144 in TCB
     ADD     #100,R2,R2                          // Get address of MPU table in module struct, starting at region 1
-    
+
     // Region 0 (Trampoline from User mode to ThreadX) set up in txm_module_manager_setup_mpu_registers.c
-    
+
     // Build region 1 (User code)
     MOV.L   [R2+],R4                            // Pickup region 1 start page, increment to region 1 end page
     MOV.L   R4,[R1+]                            // Setup region 1 start page reg, increment to region 1 end page reg.
     MOV.L   [R2+],R4                            // Pickup region 1 end page, increment to region 2 start page
     MOV.L   R4,[R1+]                            // Setup region 1 end page reg, increment to region 2 start page reg.
-    
+
     // Build region 2 (User data)
     MOV.L   [R2+],R4                            // Pickup region 2 start page, increment to region 2 end page
     MOV.L   R4,[R1+]                            // Setup region 2 start page reg, increment to region 2 end page reg.
     MOV.L   [R2+],R4                            // Pickup region 2 end page, increment to region 3 start page
     MOV.L   R4,[R1+]                            // Setup region 2 end page reg, increment to region 3 start page reg.
-    
+
     // Build region 3 (Shared memory)
     MOV.L   [R2+],R4                            // Pickup region 3 start page, increment to region 3 end page
     MOV.L   R4,[R1+]                            // Setup region 3 start page reg, increment to region 3 end page reg.
     MOV.L   [R2+],R4                            // Pickup region 3 end page, increment to region 4 start page
     MOV.L   R4,[R1+]                            // Setup region 3 end page reg, increment to region 4 start page reg.
-    
+
     // Region 4-7 unused
-    
+
     // Setup background region
     MOV.L   #0x00086504,R1                      // Pickup MPBAC
     MOV     #0,[R1]                             // Read/Write/Execute prohibited.
     // Enable MPU
     MOV.L   #0x00086500,R1                      // Pickup MPEN
     MOV     #1,[R1]                             // Enable MPU
-    
+
 skip_mpu_setup
 
     POPM    R1-R3                               // Restore accumulators.
@@ -180,7 +170,7 @@ skip_mpu_setup
     MVTACGU R1, A1
 
     POPM    R6-R13                              // Recover interrupt stack frame
-    POPC    FPSW 
+    POPC    FPSW
     POPM    R14-R15
     POPM    R3-R5
     POPM    R1-R2
@@ -195,7 +185,7 @@ skip_mpu_setup
     The priority of this interrupt is set to the lowest priority within
     tx_initialize_low_level() and triggered by ThreadX when calling
     _tx_thread_system_return(). */
-    
+
     public ___interrupt_27
 ___interrupt_27:
 
@@ -206,7 +196,7 @@ ___interrupt_27:
     BRA __tx_thread_context_restore
 
 
-/* You may have to modify BSP to use this handler. 
+/* You may have to modify BSP to use this handler.
     // MPU Memory access violation
     PUBLIC ___excep_access_inst
     PUBLIC ___violation_handler
@@ -260,15 +250,15 @@ ___violation_handler
     MOV.L   R3, 32[R1]                          // Save R1
     POP     R3                                  // Recall R2
     MOV.L   R3, 36[R1]                          // Save R2
-    
+
     BSR     __txm_module_manager_memory_fault_handler    // Call memory manager fault handler
-    
+
     // Decrement and save system state
     MOV.L   #__tx_thread_system_state, R1       // Pickup address of system state
     MOV.L   [R1], R2                            // Pickup system state
     SUB     #1, R2                              // Decrement
     MOV.L   R2, [R1]                            // Store new system state
-    
+
     MOV.L   #__tx_thread_current_ptr, R2        // Pickup address of current thread pointer
     MOV.L   #0, [R2]                            // Clear current thread pointer
     BRA     __tx_thread_schedule                // Attempt to schedule the next thread
@@ -284,15 +274,15 @@ __txm_module_manager_kernel
     CMP     #__txm_module_manager_user_mode_entry+3, R5   // Did we come from user_mode_entry?
     BEQ     __txm_module_manager_entry          // If so, continue.
     RTE                                         // If not, then return from where we came.
-    
+
 __txm_module_manager_entry
     // We are entering the kernel from a module thread with user mode selected.
-    // At this point, we are out of user mode!    
+    // At this point, we are out of user mode!
     // Clear current user mode.
     MOV.L   #__tx_thread_current_ptr, R5
     MOV     [R5],R5
     MOV     #0,152[R5]
-    
+
     // Switch to kernel stack
     PUSHM   R1-R2
     MVFC    USP, R1                             // Pickup module thread stack pointer
@@ -312,7 +302,7 @@ __txm_module_manager_entry
     MOV.L   4[SP], R5
     BCLR    #20, R5
     MOV.L   R5, 4[SP]
-    
+
     // Return to user_mode_entry where kernel_dispatch will be called.
     RTE
 
@@ -324,12 +314,12 @@ __txm_module_manager_entry
 __txm_module_manager_user_mode_entry
 
     INT #26     // Enter ThreadX kernel (exit User mode).
-    
+
     // At this point, we are out of user mode.
     // Simply call the kernel dispatch function.
     MOV.L #__txm_module_manager_kernel_dispatch,R5
     JSR R5
-    
+
     // Restore user mode while inside of ThreadX.
     MOV.L   #__tx_thread_current_ptr, R5
     MOV     [R5],R5
@@ -348,7 +338,7 @@ __txm_module_manager_user_mode_entry
 #endif
     MOV.L   172[R5], R5                         // Pickup module thread stack pointer
     MVTC    R5, USP                             // Set stack pointer
-    
+
 
     // USP is set for an RTS, need to set for RTE to set User mode in PSW.
     // Push return address on SP
@@ -359,21 +349,21 @@ __txm_module_manager_user_mode_entry
     BSET   #20,R5
     MOV.L  R5,4[SP]
     RTE
-    
+
     // Fill rest of page with NOPs.
     NOP
     NOP
     NOP
     NOP
-    
+
     NOP
     NOP
     NOP
     NOP
-    
+
     NOP
     NOP
     NOP
     NOP
-    
+
     END

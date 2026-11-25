@@ -1,18 +1,20 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026 Eclipse ThreadX contributors
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
+; Portions of this file were generated with AI assistance.
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread - Low Level SMP Support                                      */
 ;/**                                                                       */
@@ -33,14 +35,13 @@
     IMPORT     _tx_thread_current_ptr
     IMPORT     _tx_thread_smp_protection
     IMPORT     _tx_thread_preempt_disable
-    IMPORT     _tx_thread_smp_protect_wait_counts
 
         AREA ||.text||, CODE, READONLY
         PRESERVE8
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_smp_unprotect                        SMP/Cortex-A7/AC5   */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
@@ -48,33 +49,27 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function releases previously obtained protection. The supplied */ 
-;/*    previous SR is restored. If the value of _tx_thread_system_state    */ 
-;/*    and _tx_thread_preempt_disable are both zero, then multithreading   */ 
-;/*    is enabled as well.                                                 */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    Previous Status Register                                            */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ThreadX Source                                                      */
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function releases previously obtained protection. The supplied */
+;/*    previous SR is restored. If the value of _tx_thread_system_state    */
+;/*    and _tx_thread_preempt_disable are both zero, then multithreading   */
+;/*    is enabled as well.                                                 */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    Previous Status Register                                            */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ThreadX Source                                                      */
 ;/*                                                                        */
 ;/**************************************************************************/
     EXPORT  _tx_thread_smp_unprotect
@@ -109,10 +104,6 @@ _tx_thread_smp_unprotect
     CMP     r3, #0                              ; Is the preempt disable flag set?
     BNE     _still_protected                    ; Yes, skip the protection release
 
-    LDR     r2,=_tx_thread_smp_protect_wait_counts ; Build build address of wait counts
-    LDR     r3, [r2, r1, LSL #2]                ; Pickup wait list value
-    CMP     r3, #0                              ; Are any entities on this core waiting?
-    BNE     _still_protected                    ; Yes, skip the protection release
 
     LDR     r2,=_tx_thread_smp_protection       ; Build address of protection structure
     MOV     r3, #0xFFFFFFFF                     ; Build invalid value

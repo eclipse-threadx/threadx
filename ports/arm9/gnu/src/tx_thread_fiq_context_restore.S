@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread                                                              */
 @/**                                                                       */
@@ -25,7 +25,7 @@
 SVC_MODE        =       0xD3                    @ SVC mode
 FIQ_MODE        =       0xD1                    @ FIQ mode
 DISABLE_INTS    =       0xC0                    @ Disable IRQ/FIQ interrupts
-MODE_MASK       =       0x1F                    @ Mode mask 
+MODE_MASK       =       0x1F                    @ Mode mask
 THUMB_MASK      =       0x20                    @ Thumb bit mask
 IRQ_MODE_BITS   =       0x12                    @ IRQ mode bits
 SVC_MODE_BITS   =       0x13                    @ SVC mode value
@@ -47,47 +47,38 @@ SVC_MODE_BITS   =       0x13                    @ SVC mode value
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_fiq_context_restore                       ARM9/GNU       */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_fiq_context_restore                       ARM9/GNU       */
 @/*                                                           6.2.1        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function restores the fiq interrupt context when processing a  */ 
-@/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-@/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-@/*    if no thread was running, the function returns to the scheduler.    */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
-@/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    FIQ ISR                               Interrupt Service Routines    */ 
-@/*                                                                        */ 
-@/*  RELEASE HISTORY                                                       */ 
-@/*                                                                        */ 
-@/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-@/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-@/*                                            #include tx_user.h,         */
-@/*                                            resulting in version 6.2.1  */
+@/*    This function restores the fiq interrupt context when processing a  */
+@/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+@/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+@/*    if no thread was running, the function returns to the scheduler.    */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    _tx_thread_schedule                   Thread scheduling routine     */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    FIQ ISR                               Interrupt Service Routines    */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_fiq_context_restore(VOID)
@@ -116,13 +107,13 @@ _tx_thread_fiq_context_restore:
     LDR     r3, =_tx_thread_system_state        @ Pickup address of system state variable
     LDR     r2, [r3]                            @ Pickup system state
     SUB     r2, r2, #1                          @ Decrement the counter
-    STR     r2, [r3]                            @ Store the counter 
+    STR     r2, [r3]                            @ Store the counter
     CMP     r2, #0                              @ Was this the first interrupt?
     BEQ     __tx_thread_fiq_not_nested_restore  @ If so, not a nested restore
 @
 @    /* Interrupts are nested.  */
 @
-@    /* Just recover the saved registers and return to the point of 
+@    /* Just recover the saved registers and return to the point of
 @       interrupt.  */
 @
     LDMIA   sp!, {r0, r10, r12, lr}             @ Recover SPSR, POI, and scratch regs
@@ -213,7 +204,7 @@ __tx_thread_fiq_preempt_restore:
     BEQ     __tx_thread_fiq_dont_save_ts        @ No, don't save it
 @
 @        _tx_thread_current_ptr -> tx_thread_time_slice =  _tx_timer_time_slice;
-@        _tx_timer_time_slice =  0; 
+@        _tx_timer_time_slice =  0;
 @
     STR     r2, [r0, #24]                       @ Save thread's time-slice
     MOV     r2, #0                              @ Clear value

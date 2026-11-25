@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -36,9 +37,10 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function is deprecated and calls the secure version of this    */
-/*    function (_txm_module_manager_object_pointer_get_extended) with the */
-/*    maximum possible name length since none was passed.                 */
+/*    DEPRECATED. Use _txm_module_manager_object_pointer_get_extended()   */
+/*    instead, passing the actual name-buffer length.  This wrapper       */
+/*    passes UINT_MAX as the length, which can cause the name-comparison  */
+/*    loop to read past the end of a short buffer (undefined behaviour).  */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -70,12 +72,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_object_pointer_get(UINT object_type, CHAR *name, VOID **object_ptr)

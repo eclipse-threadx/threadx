@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -175,6 +177,8 @@ volatile UINT               _tx_thread_preempt_disable;
    termination. This pointer is setup during mutex initialization.  */
 
 VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
+/* Optional mutex inheritance update, installed by mutex creation. */
+UINT            (*_tx_thread_mutex_priority_update)(TX_THREAD *thread_ptr, UINT new_priority);
 
 
 /* Define the global build options variable.  This contains a bit map representing
@@ -341,12 +345,6 @@ const CHAR _tx_thread_special_string[] =
 /*                                                                        */
 /*    _tx_initialize_high_level         High level initialization         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_initialize(VOID)
 {
@@ -390,6 +388,7 @@ VOID  _tx_thread_initialize(VOID)
 
     /* Initialize the thread mutex release function pointer.  */
     _tx_thread_mutex_release =      TX_NULL;
+    _tx_thread_mutex_priority_update =  TX_NULL;
 
 #ifdef TX_ENABLE_STACK_CHECKING
 

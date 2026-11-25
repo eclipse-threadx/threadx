@@ -12,7 +12,7 @@ Eclipse ThreadX has been integrated to the semiconductor's SDKs and development 
 
 We also provide [getting started guide](https://github.com/eclipse-threadx/getting-started) and [samples](https://github.com/eclipse-threadx/samples) using development boards from semiconductors you can build and test with.
 
-See [Overview of Eclipse ThreadX RTOS](https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/threadx/overview-threadx.md) for the high-level overview. 
+See [Overview of Eclipse ThreadX RTOS](https://threadx.io/releases/6.5.1/threadx/main/overview-threadx.html) for the high-level overview.
 
 ## Repository Structure and Usage
 ### Directory layout
@@ -23,8 +23,8 @@ See [Overview of Eclipse ThreadX RTOS](https://github.com/eclipse-threadx/rtos-d
     ├── common_modules               # Core ThreadX module files
     ├── common_smp                   # Core ThreadX SMP files
     ├── docs                         # Documentation supplements
-    ├── ports                        # Architecture and compiler specific files. See below for directory breakdown     
-    │   ├── cortex_m7     
+    ├── ports                        # Architecture and compiler specific files. See below for directory breakdown
+    │   ├── cortex_m7
     │   │   ├── iar                  # Example IAR compiler sample project
     │   │   │   ├── example build    # IAR workspace and sample project files
     │   │   │   ├── inc              # tx_port.h for this architecture
@@ -32,7 +32,7 @@ See [Overview of Eclipse ThreadX RTOS](https://github.com/eclipse-threadx/rtos-d
     │   │   ├── ac6                  # Example ac6/Keil sample project
     │   │   ├── gnu                  # Example gnu sample project
     │   │   └── ...
-    │   └── ...        
+    │   └── ...
     ├── ports_modules                # Architecture and compiler specific files for threadX modules
     ├── ports_smp                    # Architecture and compiler specific files for threadX SMP
     ├── samples                      # demo_threadx.c
@@ -87,7 +87,7 @@ The master branch has the most recent code with all new features and bug fixes. 
 /*  xx-xx-xxxx      Scott Larson            Include tx_user.h,            */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
-/**************************************************************************/ 
+/**************************************************************************/
 ```
 
 ## Supported Architecture Ports
@@ -97,8 +97,8 @@ The master branch has the most recent code with all new features and bug fixes. 
 arc_em      cortex_a12        cortex_m0     cortex_r4
 arc_hs      cortex_a15        cortex_m23    cortex_r5
 arm11       cortex_a17        cortex_m3     cortex_r7
-arm9        cortex_a34        cortex_m33    
-c667x       cortex_a35        cortex_m4    
+arm9        cortex_a34        cortex_m33
+c667x       cortex_a35        cortex_m4
 linux       cortex_a5         cortex_m55
 risc-v32    cortex_a53        cortex_m7
 rxv1        cortex_a55        cortex_m85
@@ -118,7 +118,7 @@ xtensa      cortex_a65ae
 ```
 
 ### ThreadX Modules
-[Eclipse ThreadX Modules](https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/threadx-modules/chapter1.md) component provides an infrastructure for applications to dynamically load modules that are built separately from the resident portion of the application.
+[Eclipse ThreadX Modules](https://threadx.io/releases/6.5.1/threadx-modules/main/chapter1.html) component provides an infrastructure for applications to dynamically load modules that are built separately from the resident portion of the application.
 ```
 cortex_a35
 cortex_a35_smp
@@ -134,7 +134,7 @@ rxv2
 ```
 
 ### ThreadX SMP
-[Eclipse ThreadX SMP](https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/threadx/threadx-smp/chapter1.md) is a high-performance real-time SMP kernel designed specifically for embedded applications.
+[Eclipse ThreadX SMP](https://threadx.io/releases/6.5.1/threadx/main/threadx-smp/chapter1.html) is a high-performance real-time SMP kernel designed specifically for embedded applications.
 ```
 arc_hs_smp
 cortex_a34_smp
@@ -210,7 +210,7 @@ License terms for using Eclipse ThreadX are defined in the LICENSE.txt file of t
 
 The following are references to additional ThreadX RTOS resources:
 
-- **Product introduction**: https://github.com/eclipse-threadx/rtos-docs
+- **Product introduction**: https://threadx.io/releases/latest
 - **Product issues and bugs, or feature requests**: https://github.com/eclipse-threadx/threadx/issues
 - **TraceX Installer**: https://aka.ms/azrtos-tracex-installer
 

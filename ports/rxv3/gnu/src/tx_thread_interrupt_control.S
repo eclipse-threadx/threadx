@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -59,18 +59,6 @@
 ;/*  CALLED BY                                                             */
 ;/*                                                                        */
 ;/*    Application Code                                                    */
-;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s),          */ 
-;/*                                            resulting in version 6.1.9  */ 
-;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.11 */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;UINT   _tx_thread_interrupt_control(UINT new_posture)

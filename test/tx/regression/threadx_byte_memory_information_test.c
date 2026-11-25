@@ -1,7 +1,21 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test byte memory information.  */
 
 #include   <stdio.h>
 #include   "tx_api.h"
+#include   "threadx_test_port.h"
 #include   "tx_byte_pool.h"
 
 
@@ -76,7 +90,7 @@ static void    test_isr(void)
         tx_thread_wait_abort(&thread_3);
 
         /* End the ISR processing.  */
-        test_status =  2;    
+        test_status =  2;
         test_isr_dispatch =  TX_NULL;
     }
 }
@@ -101,8 +115,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -114,8 +128,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -127,8 +141,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -140,8 +154,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 3,
+            pointer, TEST_STACK_SIZE_PRINTF,
             3, 3, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -153,8 +167,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 4,
+            pointer, TEST_STACK_SIZE_PRINTF,
             4, 4, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -166,8 +180,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 5,
+            pointer, TEST_STACK_SIZE_PRINTF,
             5, 5, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -179,8 +193,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_6, "thread 6", thread_6_entry, 6,
+            pointer, TEST_STACK_SIZE_PRINTF,
             6, 6, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -193,9 +207,9 @@ CHAR    *pointer;
     }
 
     /* Create the byte_pool with one byte.  */
-    status =  tx_byte_pool_create(&byte_pool_0, "byte_pool 0", pointer, 100);
+    status =  tx_byte_pool_create(&byte_pool_0, "byte_pool 0", pointer, TX_TEST_BYTE_POOL_BYTES(100));
     pointer = pointer + 100;
-    
+
     /* Check for status.  */
     if (status != TX_SUCCESS)
     {
@@ -214,7 +228,7 @@ static void    thread_0_entry(ULONG thread_input)
 
 UINT            status;
 VOID            *pointer;
-CHAR            *name;
+TX_NAME_CONST CHAR *name;
 ULONG           available;
 ULONG           fragments;
 TX_THREAD       *first_suspended;
@@ -274,7 +288,7 @@ ULONG           timeouts;
         printf("ERROR #11\n");
         test_control_return(1);
     }
-    
+
     /* At this point we are going to get more than 2 threads suspended.  */
     tx_thread_resume(&thread_1);
     tx_thread_resume(&thread_2);
@@ -285,7 +299,7 @@ ULONG           timeouts;
 
     /* Prioritize the byte pool suspension list.  */
     status =  tx_byte_pool_prioritize(&byte_pool_0);
-    
+
     /* Check status and make sure thread 3 is now at the front of the suspension list.  */
     if ((status != TX_SUCCESS) || (byte_pool_0.tx_byte_pool_suspension_list != &thread_3))
     {
@@ -297,7 +311,7 @@ ULONG           timeouts;
 
     /* Now loop to test the interrupt of the prioritize loop logic.  */
     test_status =  1;
-    test_isr_dispatch =  test_isr;  
+    test_isr_dispatch =  test_isr;
     do
     {
 
@@ -357,7 +371,7 @@ ULONG           timeouts;
     status += tx_byte_pool_info_get(&byte_pool_0, &name, &available, &fragments, &first_suspended, &suspended_count, &next_pool);
 
     /* Check the status.  */
-    if ((status != TX_SUCCESS) || (available != byte_pool_0.tx_byte_pool_available) || (fragments != byte_pool_0.tx_byte_pool_fragments) || 
+    if ((status != TX_SUCCESS) || (name != byte_pool_0.tx_byte_pool_name) || (available != byte_pool_0.tx_byte_pool_available) || (fragments != byte_pool_0.tx_byte_pool_fragments) ||
         (first_suspended != &thread_4) || (suspended_count != byte_pool_0.tx_byte_pool_suspended_count) || (next_pool != &byte_pool_0))
     {
 
@@ -371,7 +385,7 @@ ULONG           timeouts;
 
     /* Get the byte pool performance information.  */
     status =  tx_byte_pool_performance_info_get(TX_NULL, &allocates, &releases, &fragments_searched, &merges, &splits, &suspensions, &timeouts);
-    
+
     /* Check the status.  */
     if (status != TX_PTR_ERROR)
     {
@@ -380,10 +394,10 @@ ULONG           timeouts;
         printf("ERROR #18\n");
         test_control_return(1);
     }
-    
+
     /* Get the byte pool performance information.  */
     status =  tx_byte_pool_performance_info_get(&byte_pool_1, &allocates, &releases, &fragments_searched, &merges, &splits, &suspensions, &timeouts);
-    
+
     /* Check the status.  */
     if (status != TX_PTR_ERROR)
     {
@@ -395,11 +409,11 @@ ULONG           timeouts;
 
     /* Get the byte pool performance information.  */
     status =  tx_byte_pool_performance_info_get(&byte_pool_0, &allocates, &releases, &fragments_searched, &merges, &splits, &suspensions, &timeouts);
-    
+
     /* Check the status.  */
-    if ((status != TX_SUCCESS) || (allocates != byte_pool_0.tx_byte_pool_performance_allocate_count) || (releases != byte_pool_0.tx_byte_pool_performance_release_count) || 
-        (fragments_searched != byte_pool_0.tx_byte_pool_performance_search_count) || (merges != byte_pool_0.tx_byte_pool_performance_merge_count) || 
-        (splits != byte_pool_0.tx_byte_pool_performance_split_count) || (suspensions != byte_pool_0.tx_byte_pool_performance_suspension_count) || 
+    if ((status != TX_SUCCESS) || (allocates != byte_pool_0.tx_byte_pool_performance_allocate_count) || (releases != byte_pool_0.tx_byte_pool_performance_release_count) ||
+        (fragments_searched != byte_pool_0.tx_byte_pool_performance_search_count) || (merges != byte_pool_0.tx_byte_pool_performance_merge_count) ||
+        (splits != byte_pool_0.tx_byte_pool_performance_split_count) || (suspensions != byte_pool_0.tx_byte_pool_performance_suspension_count) ||
         (timeouts != byte_pool_0.tx_byte_pool_performance_timeout_count))
     {
 
@@ -410,11 +424,11 @@ ULONG           timeouts;
 
     /* Get the byte pool system performance information.  */
     status =  tx_byte_pool_performance_system_info_get(&allocates, &releases, &fragments_searched, &merges, &splits, &suspensions, &timeouts);
-    
+
     /* Check the status.  */
-    if ((status != TX_SUCCESS) || (allocates != _tx_byte_pool_performance_allocate_count) || (releases != _tx_byte_pool_performance_release_count) || 
-        (fragments_searched != _tx_byte_pool_performance_search_count) || (merges != _tx_byte_pool_performance_merge_count) || 
-        (splits != _tx_byte_pool_performance_split_count) || (suspensions != _tx_byte_pool_performance_suspension_count) || 
+    if ((status != TX_SUCCESS) || (allocates != _tx_byte_pool_performance_allocate_count) || (releases != _tx_byte_pool_performance_release_count) ||
+        (fragments_searched != _tx_byte_pool_performance_search_count) || (merges != _tx_byte_pool_performance_merge_count) ||
+        (splits != _tx_byte_pool_performance_split_count) || (suspensions != _tx_byte_pool_performance_suspension_count) ||
         (timeouts != _tx_byte_pool_performance_timeout_count))
     {
 

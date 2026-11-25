@@ -1,12 +1,14 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026-present Eclipse ThreadX contributors
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
+; Portions of this file were generated with AI assistance.
 ;
 ;
 ;/**************************************************************************/
@@ -30,21 +32,19 @@
 ;#include "tx_timer.h"
 ;
 ;
-        EXTERN  _tx_thread_system_stack_ptr
         EXTERN  _tx_initialize_unused_memory
         EXTERN  _tx_timer_interrupt
-        EXTERN  __vector_table
         EXTERN  _tx_execution_isr_enter
         EXTERN  _tx_execution_isr_exit
 ;
 ;
 SYSTEM_CLOCK      EQU   7200000
 SYSTICK_CYCLES    EQU   ((SYSTEM_CLOCK / 100) -1)
-        
+
     RSEG    FREE_MEM:DATA
     PUBLIC  __tx_free_memory_start
 __tx_free_memory_start
-    DS32    4        
+    DS32    4
 ;
 ;
         SECTION `.text`:CODE:NOROOT(2)
@@ -83,12 +83,6 @@ __tx_free_memory_start
 ;/*                                                                        */
 ;/*    _tx_initialize_kernel_enter           ThreadX entry function        */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-/*  01-31-2022      Scott Larson            Initial Version 6.1.10        */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
 ;{
@@ -105,19 +99,6 @@ _tx_initialize_low_level:
     ADDS    r1, r1, #4                              //
     STR     r1, [r0]                                // Setup first unused memory pointer
 
-    /* Setup Vector Table Offset Register.  */
-
-    LDR     r0, =0xE000ED08                         // Build address of NVIC registers
-    LDR     r1, =__vector_table                     // Pickup address of vector table
-    STR     r1, [r0]                                // Set vector table address
-
-    /* Set system stack pointer from vector value.  */
-
-    LDR     r0, =_tx_thread_system_stack_ptr        // Build address of system stack pointer
-    LDR     r1, =__vector_table                     // Pickup address of vector table
-    LDR     r1, [r1]                                // Pickup reset stack pointer
-    STR     r1, [r0]                                // Save system stack pointer
-
     /* Enable the cycle count register.  */
 
     LDR     r0, =0xE0001000                         // Build address of DWT register
@@ -129,6 +110,9 @@ _tx_initialize_low_level:
     /* Configure SysTick for 100Hz clock, or 16384 cycles if no reference.  */
 
     LDR     r0, =0xE000E000                         // Build address of NVIC registers
+    LDR     r1, =0
+    STR     r1, [r0, #0x10]                         // Reset SysTick Control
+    STR     r1, [r0, #0x18]                         // Reset SysTick Counter Value
     LDR     r1, =SYSTICK_CYCLES
     MOVS    r2, #0x14
     STR     r1, [r0, r2]                         // Setup SysTick Reload Value
@@ -178,7 +162,7 @@ __tx_SysTickHandler:
     MOV     lr, r1
     BX      lr
 ; }
-        
+
     END
-                
+
 

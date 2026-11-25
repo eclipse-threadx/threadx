@@ -27,12 +27,6 @@
 /*                                                                        */
 /*  Xtensa-specific interrupt handler wrapper.                            */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 
 
@@ -46,7 +40,7 @@
 #include "tx_thread.h"
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-#include "tx_execution_profile.h"
+#include "../../utility/execution_profile_kit/tx_execution_profile.h"
 #endif
 
 

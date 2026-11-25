@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -20,7 +22,10 @@
 /**************************************************************************/
 
 
-SYSTEM_CLOCK        =     6000000
+#ifndef TX_PORT_SYSTEM_CLOCK_HZ
+#define TX_PORT_SYSTEM_CLOCK_HZ 6000000
+#endif
+SYSTEM_CLOCK        =     TX_PORT_SYSTEM_CLOCK_HZ
 SYSTICK_CYCLES      =     ((SYSTEM_CLOCK / 100) -1)
 
 /* Setup the stack and heap areas.  */

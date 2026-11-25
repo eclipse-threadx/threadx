@@ -60,10 +60,10 @@ define block HEAP     with alignment = 4, size = _HEAP_SIZE { };
 //                                     { ro section .dataflash* };
 
 define movable block ROPI with alignment = 4, fixed order, static base CB
-{ 
+{
   ro object txm_module_preamble_rx65n.o,
-  ro, 
-  ro data 
+  ro,
+  ro data
 };
 
 define movable block RWPI with alignment = 8, fixed order, static base SB

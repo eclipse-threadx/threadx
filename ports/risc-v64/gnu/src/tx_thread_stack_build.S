@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -19,9 +20,9 @@
 /**************************************************************************/
 /**************************************************************************/
 
-#include "tx_port.h"
-
     .section .text
+#include "tx_port.h"
+    .equ    TX_TRAP_FRAME_SIZE, TX_RISCV_TRAP_FRAME_SIZE
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -31,6 +32,7 @@
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
+/*    Wei-Chen Lai, National Cheng Kung University                        */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
@@ -43,7 +45,7 @@
 /*    thread_ptr                            Pointer to thread control blk */
 /*    function_ptr                          Pointer to return function    */
 /*                                                                        */
-/*  OUTPUT                                                                */
+/*  OUTPUT                                                                 */
 /*                                                                        */
 /*    None                                                                */
 /*                                                                        */
@@ -54,12 +56,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_thread_create                     Create thread service         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-08-2023      Scott Larson            Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -99,7 +95,7 @@ _tx_thread_stack_build:
                     x11     26      Initial a1
                     x10     27      Initial a0
                     x1      28      Initial ra
-                    --      29      reserved
+                    mstatus 29      Initial mstatus
                     mepc    30      Initial mepc
 If floating point support:
                     f0      31      Inital ft0
@@ -135,94 +131,136 @@ If floating point support:
                     f30     61      Inital ft10
                     f31     62      Inital ft11
                     fscr    63      Inital fscr
+If vector extension support:
+                    vstart  64      Initial vstart
+                    vtype   65      Initial vtype
+                    vl      66      Initial vl
+                    vcsr    67      Initial vcsr
+                    v0      68      Initial v0
+                    v1      69      Initial v1
+                    ...
+                    v31     99      Initial v31
+
+    With floating point enabled, 8 pad bytes sit at the top of the frame
+    (bytes 520-527) so the 528-byte total keeps sp 16-byte aligned.
 
     Stack Bottom: (higher memory address)  */
 
-    LOAD    t0, 4*REGBYTES(a0)                          // Pickup end of stack area
+    ld      t0, 24(a0)                                  // Pickup end of stack area
     li      t1, ~15                                     // Build 16-byte alignment mask
     and     t0, t0, t1                                  // Make sure 16-byte alignment
 
     /* Actually build the stack frame.  */
 
-#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    addi    t0, t0, -65*REGBYTES
+    addi    t0, t0, -TX_TRAP_FRAME_SIZE
+
+#if defined(__riscv_vector)
+    /* Vector extension support: calculate space based on vlenb */
+    csrr    t4, vlenb                                   // Get vector register byte length
+    slli    t4, t4, 5                                   // Multiply by 32 (number of vector registers)
+    addi    t4, t4, 4*8                                 // Add vector CSR space: vstart, vtype, vl, vcsr
+    sub     t0, t0, t4                                  // Allocate vector space for the stack frame
 #else
-    addi    t0, t0, -32*REGBYTES                        // Allocate space for the stack frame
+    li      t4, 0
 #endif
+
     li      t1, 1                                       // Build stack type
-    STORE   t1,  0*REGBYTES(t0)                         // Place stack type on the top
-    STORE   x0,  1*REGBYTES(t0)                         // Initial s11
-    STORE   x0,  2*REGBYTES(t0)                         // Initial s10
-    STORE   x0,  3*REGBYTES(t0)                         // Initial s9
-    STORE   x0,  4*REGBYTES(t0)                         // Initial s8
-    STORE   x0,  5*REGBYTES(t0)                         // Initial s7
-    STORE   x0,  6*REGBYTES(t0)                         // Initial s6
-    STORE   x0,  7*REGBYTES(t0)                         // Initial s5
-    STORE   x0,  8*REGBYTES(t0)                         // Initial s4
-    STORE   x0,  9*REGBYTES(t0)                         // Initial s3
-    STORE   x0, 10*REGBYTES(t0)                         // Initial s2
-    STORE   x0, 11*REGBYTES(t0)                         // Initial s1
-    STORE   x0, 12*REGBYTES(t0)                         // Initial s0
-    STORE   x0, 13*REGBYTES(t0)                         // Initial t6
-    STORE   x0, 14*REGBYTES(t0)                         // Initial t5
-    STORE   x0, 15*REGBYTES(t0)                         // Initial t4
-    STORE   x0, 16*REGBYTES(t0)                         // Initial t3
-    STORE   x0, 17*REGBYTES(t0)                         // Initial t2
-    STORE   x0, 18*REGBYTES(t0)                         // Initial t1
-    STORE   x0, 19*REGBYTES(t0)                         // Initial t0
-    STORE   x0, 20*REGBYTES(t0)                         // Initial a7
-    STORE   x0, 21*REGBYTES(t0)                         // Initial a6
-    STORE   x0, 22*REGBYTES(t0)                         // Initial a5
-    STORE   x0, 23*REGBYTES(t0)                         // Initial a4
-    STORE   x0, 24*REGBYTES(t0)                         // Initial a3
-    STORE   x0, 25*REGBYTES(t0)                         // Initial a2
-    STORE   x0, 26*REGBYTES(t0)                         // Initial a1
-    STORE   x0, 27*REGBYTES(t0)                         // Initial a0
-    STORE   x0, 28*REGBYTES(t0)                         // Initial ra
-    STORE   a1, 30*REGBYTES(t0)                         // Initial mepc
+    sd      t1,  0*8(t0)                                // Place stack type on the top
+    sd      zero,  1*8(t0)                              // Initial s11
+    sd      zero,  2*8(t0)                              // Initial s10
+    sd      zero,  3*8(t0)                              // Initial s9
+    sd      zero,  4*8(t0)                              // Initial s8
+    sd      zero,  5*8(t0)                              // Initial s7
+    sd      zero,  6*8(t0)                              // Initial s6
+    sd      zero,  7*8(t0)                              // Initial s5
+    sd      zero,  8*8(t0)                              // Initial s4
+    sd      zero,  9*8(t0)                              // Initial s3
+    sd      zero, 10*8(t0)                              // Initial s2
+    sd      zero, 11*8(t0)                              // Initial s1
+    sd      zero, 12*8(t0)                              // Initial s0
+    sd      zero, 13*8(t0)                              // Initial t6
+    sd      zero, 14*8(t0)                              // Initial t5
+    sd      zero, 15*8(t0)                              // Initial t4
+    sd      zero, 16*8(t0)                              // Initial t3
+    sd      zero, 17*8(t0)                              // Initial t2
+    sd      zero, 18*8(t0)                              // Initial t1
+    sd      zero, 19*8(t0)                              // Initial t0
+    sd      zero, 20*8(t0)                              // Initial a7
+    sd      zero, 21*8(t0)                              // Initial a6
+    sd      zero, 22*8(t0)                              // Initial a5
+    sd      zero, 23*8(t0)                              // Initial a4
+    sd      zero, 24*8(t0)                              // Initial a3
+    sd      zero, 25*8(t0)                              // Initial a2
+    sd      zero, 26*8(t0)                              // Initial a1
+    sd      zero, 27*8(t0)                              // Initial a0
+    sd      zero, 28*8(t0)                              // Initial ra
+    li      t1, 0x2000                                  // mstatus.FS = Initial
+    sd      t1, 29*8(t0)                                // Initial mstatus
+    sd      a1, 30*8(t0)                                // Initial mepc/sepc (thread entry point)
 #if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-    STORE   x0, 31*REGBYTES(t0)                         // Inital ft0
-    STORE   x0, 32*REGBYTES(t0)                         // Inital ft1
-    STORE   x0, 33*REGBYTES(t0)                         // Inital ft2
-    STORE   x0, 34*REGBYTES(t0)                         // Inital ft3
-    STORE   x0, 35*REGBYTES(t0)                         // Inital ft4
-    STORE   x0, 36*REGBYTES(t0)                         // Inital ft5
-    STORE   x0, 37*REGBYTES(t0)                         // Inital ft6
-    STORE   x0, 38*REGBYTES(t0)                         // Inital ft7
-    STORE   x0, 39*REGBYTES(t0)                         // Inital fs0
-    STORE   x0, 40*REGBYTES(t0)                         // Inital fs1
-    STORE   x0, 41*REGBYTES(t0)                         // Inital fa0
-    STORE   x0, 42*REGBYTES(t0)                         // Inital fa1
-    STORE   x0, 43*REGBYTES(t0)                         // Inital fa2
-    STORE   x0, 44*REGBYTES(t0)                         // Inital fa3
-    STORE   x0, 45*REGBYTES(t0)                         // Inital fa4
-    STORE   x0, 46*REGBYTES(t0)                         // Inital fa5
-    STORE   x0, 47*REGBYTES(t0)                         // Inital fa6
-    STORE   x0, 48*REGBYTES(t0)                         // Inital fa7
-    STORE   x0, 49*REGBYTES(t0)                         // Inital fs2
-    STORE   x0, 50*REGBYTES(t0)                         // Inital fs3
-    STORE   x0, 51*REGBYTES(t0)                         // Inital fs4
-    STORE   x0, 52*REGBYTES(t0)                         // Inital fs5
-    STORE   x0, 53*REGBYTES(t0)                         // Inital fs6
-    STORE   x0, 54*REGBYTES(t0)                         // Inital fs7
-    STORE   x0, 55*REGBYTES(t0)                         // Inital fs8
-    STORE   x0, 56*REGBYTES(t0)                         // Inital fs9
-    STORE   x0, 57*REGBYTES(t0)                         // Inital fs10
-    STORE   x0, 58*REGBYTES(t0)                         // Inital fs11
-    STORE   x0, 59*REGBYTES(t0)                         // Inital ft8
-    STORE   x0, 60*REGBYTES(t0)                         // Inital ft9
-    STORE   x0, 61*REGBYTES(t0)                         // Inital ft10
-    STORE   x0, 62*REGBYTES(t0)                         // Inital ft11
-    csrr    a1, fcsr                                    // Read fcsr and use it for initial value for each thread
-    STORE   a1, 63*REGBYTES(t0)                         // Initial fscr
-    STORE   x0, 64*REGBYTES(t0)                         // Reserved word (0)
+    sd      zero, 31*8(t0)                              // Initial ft0
+    sd      zero, 32*8(t0)                              // Initial ft1
+    sd      zero, 33*8(t0)                              // Initial ft2
+    sd      zero, 34*8(t0)                              // Initial ft3
+    sd      zero, 35*8(t0)                              // Initial ft4
+    sd      zero, 36*8(t0)                              // Initial ft5
+    sd      zero, 37*8(t0)                              // Initial ft6
+    sd      zero, 38*8(t0)                              // Initial ft7
+    sd      zero, 39*8(t0)                              // Initial fs0
+    sd      zero, 40*8(t0)                              // Initial fs1
+    sd      zero, 41*8(t0)                              // Initial fa0
+    sd      zero, 42*8(t0)                              // Initial fa1
+    sd      zero, 43*8(t0)                              // Initial fa2
+    sd      zero, 44*8(t0)                              // Initial fa3
+    sd      zero, 45*8(t0)                              // Initial fa4
+    sd      zero, 46*8(t0)                              // Initial fa5
+    sd      zero, 47*8(t0)                              // Initial fa6
+    sd      zero, 48*8(t0)                              // Initial fa7
+    sd      zero, 49*8(t0)                              // Initial fs2
+    sd      zero, 50*8(t0)                              // Initial fs3
+    sd      zero, 51*8(t0)                              // Initial fs4
+    sd      zero, 52*8(t0)                              // Initial fs5
+    sd      zero, 53*8(t0)                              // Initial fs6
+    sd      zero, 54*8(t0)                              // Initial fs7
+    sd      zero, 55*8(t0)                              // Initial fs8
+    sd      zero, 56*8(t0)                              // Initial fs9
+    sd      zero, 57*8(t0)                              // Initial fs10
+    sd      zero, 58*8(t0)                              // Initial fs11
+    sd      zero, 59*8(t0)                              // Initial ft8
+    sd      zero, 60*8(t0)                              // Initial ft9
+    sd      zero, 61*8(t0)                              // Initial ft10
+    sd      zero, 62*8(t0)                              // Initial ft11
+    sd      zero, 63*8(t0)                              // Initial fcsr (0: no sticky flags, round-to-nearest)
+#endif
+
+#if defined(__riscv_vector)
+    /* Clear vector register space */
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    addi    t2, t0, 64*8                                // t2 = start of vector registers
 #else
-    STORE   x0, 31*REGBYTES(t0)                         // Reserved word (0)
+    addi    t2, t0, 31*8                                // t2 = start of vector registers
+#endif
+    add     t3, t2, t4                                  // t3 = end of vector registers
+
+vector_clear_loop:
+    beq     t2, t3, vector_clear_done                   // Done if reached end
+    sd      zero, 0(t2)                                 // Clear 8 bytes
+    addi    t2, t2, 8                                   // Move to next 8 bytes
+    j       vector_clear_loop
+
+vector_clear_done:
+#endif
+
+    add     t2, t0, t4
+#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
+    sd      zero, 64*8(t2)                              // Reserved word (0)
+#else
+    sd      zero, 31*8(t2)                              // Reserved word (0)
 #endif
 
     /* Setup stack pointer.  */
     /* thread_ptr -> tx_thread_stack_ptr =  t0;  */
 
-    STORE   t0, 2*REGBYTES(a0)                          // Save stack pointer in thread's
+    sd      t0, 8(a0)                                   // Save stack pointer in thread's
     ret                                                 //   control block and return
 /* }  */

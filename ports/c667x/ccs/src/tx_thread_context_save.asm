@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -39,40 +39,40 @@ SP          .set    B15
 ;
 ;
     .sect   ".text"
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_context_save                             C667x/TI        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_context_save                             C667x/TI        */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function saves the context of an executing thread in the       */ 
-;/*    beginning of interrupt processing.  The function also ensures that  */ 
-;/*    the system stack is used upon return to the calling ISR.            */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                                                */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
+;/*                                                                        */
+;/*    This function saves the context of an executing thread in the       */
+;/*    beginning of interrupt processing.  The function also ensures that  */
+;/*    the system stack is used upon return to the calling ISR.            */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                                                */
+;/*                                                                        */
+;/*  RELEASE HISTORY                                                       */
+;/*                                                                        */
 ;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
 ;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
@@ -93,7 +93,7 @@ _tx_thread_context_save:
 ;    {
 ;
         MVKL        _tx_thread_system_state,A0          ; Build address of system state
-        MVKH        _tx_thread_system_state,A0          ; 
+        MVKH        _tx_thread_system_state,A0          ;
         LDW         *A0,A1                              ; Pickup current system state
         STW         A5,*+SP(40)                         ; Save A5
         STW         A6,*+SP(44)                         ; Save A6
@@ -101,7 +101,7 @@ _tx_thread_context_save:
         STW         A8,*+SP(52)                         ; Save A8
  [!A1]  B           _tx_thread_not_nested_save          ; If 0, not a nested save condition
         MVKL        _tx_thread_current_ptr,A3           ; Build address of current thread ptr
-        MVKH        _tx_thread_current_ptr,A3           ; 
+        MVKH        _tx_thread_current_ptr,A3           ;
         LDW         *A3,A2                              ; Pickup current thread pointer
         ADD         1,A1,A1                             ; Increment the system state (nested) counter
         STW         A1,*A0                              ; Store system state
@@ -261,7 +261,7 @@ _tx_thread_idle_system_save:
 ;
 ;    /* Interrupt occurred in the scheduling loop.  */
 ;
-;    /* Not much to do here, just adjust the stack pointer, and return to ISR 
+;    /* Not much to do here, just adjust the stack pointer, and return to ISR
 ;       processing.  */
 ;
         B           B3                                  ; Return to ISR

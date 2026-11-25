@@ -16,25 +16,25 @@ for the RXv2
 
 3.  System Initialization
 
-The system entry point using Renesas tools is at the label _PowerON_Reset_PC. 
-Use the resetprg.c file that comes with your release. Most notable is that Threadx 
-applications run in supervisor mode and do not use user mode. Hence switching to 
+The system entry point using Renesas tools is at the label _PowerON_Reset_PC.
+Use the resetprg.c file that comes with your release. Most notable is that Threadx
+applications run in supervisor mode and do not use user mode. Hence switching to
 user mode has been commented out.
 
 The vector area is set up using either intprg.c or in the file tx_initialize_low_level.src.
-The file tx_initialize_low_level.src is responsible for setting up various system data 
-structures, interrupt vectors, and a periodic timer. This is the ideal place add 
+The file tx_initialize_low_level.src is responsible for setting up various system data
+structures, interrupt vectors, and a periodic timer. This is the ideal place add
 application specific hardware initialization code.
 
-ThreadX utilizes CMT0 as a periodic timer interrupt source. The CMT0 interrupt is 
-typically setup for 10ms periodic interrupts and the interrupt priority level is set to 
+ThreadX utilizes CMT0 as a periodic timer interrupt source. The CMT0 interrupt is
+typically setup for 10ms periodic interrupts and the interrupt priority level is set to
 level 5 with the symbol CMT_RX_CFG_IPR in r_cmt_rx_config.h of Renesas CMT timer module
 (r_cmt_rx). You may change any of the timer parameters to suit your needs.
 
-In addition, _tx_initialize_low_level determines the first available address for use by 
-the application, which is supplied as the sole input parameter to your application 
-definition function, tx_application_define(). The mechanism is implemented by creating the 
-FREEMEM section, this section should be linked last in the RAM area. tx_initialize_low_level 
+In addition, _tx_initialize_low_level determines the first available address for use by
+the application, which is supplied as the sole input parameter to your application
+definition function, tx_application_define(). The mechanism is implemented by creating the
+FREEMEM section, this section should be linked last in the RAM area. tx_initialize_low_level
 will pick up the starting label of this section and put it in the global variable:
 _tx_initialize_unused_memory
 
@@ -42,15 +42,15 @@ _tx_initialize_unused_memory
 4.  Context Switch, Register Usage and Stack Frames
 
 The RXv2 port for ThreadX uses the first software interrupt, SWINT, i.e., interrupt #27,
-to perform context switch with the interrupt priority level 1. This ISR is thus reserved 
-when using ThreadX and the SWINT should not be manipulated in any way by the application. 
-The port will setup the interrupt within _tx_initialize_low_level and the compiler will 
-automatically install the necessary interrupt vector. As such no additional initialization 
+to perform context switch with the interrupt priority level 1. This ISR is thus reserved
+when using ThreadX and the SWINT should not be manipulated in any way by the application.
+The port will setup the interrupt within _tx_initialize_low_level and the compiler will
+automatically install the necessary interrupt vector. As such no additional initialization
 is necessary by the application.
 
 The following defines the saved context stack frame used by the ThreadX port. The
-state of the CPU registers at the time of a context switch is saved on the running 
-thread's stack The top of the suspended thread's stack is pointed to by 
+state of the CPU registers at the time of a context switch is saved on the running
+thread's stack The top of the suspended thread's stack is pointed to by
 tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
     Offset        Interrupted Stack Frame
@@ -76,24 +76,24 @@ tx_thread_stack_ptr in the associated thread control block TX_THREAD.
      0x48                   R2
      0x4C                   PC - return address
      0x50                   PSW
-     
+
 Note: By default ccrx does not save the state of the accumulator registers ACC0 and ACC1
 when entering an ISR. This means that if the ISR uses any of the DSP instructions the
 content of those registers could be corrupted. Saving and restoring of the acummulators
 can be enabled by adding the -save_acc command line option.
 
-     
+
 5.  Improving Performance
 
-The distribution version of ThreadX is built without any compiler 
-optimizations.  This makes it easy to debug because you can trace or set 
-breakpoints inside of ThreadX itself.  Of course, this costs some 
-performance.  To make ThreadX run faster, you can change the ThreadX Library 
-project to disable debug information and enable the desired optimizations.  
+The distribution version of ThreadX is built without any compiler
+optimizations.  This makes it easy to debug because you can trace or set
+breakpoints inside of ThreadX itself.  Of course, this costs some
+performance.  To make ThreadX run faster, you can change the ThreadX Library
+project to disable debug information and enable the desired optimizations.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined before tx_api.h is included. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined before tx_api.h is included.
 
 
 6. Timer Processing
@@ -105,18 +105,18 @@ a Renesas Fit CMT periodic timer module (r_cmt_rx) is used as the timer source.
 
 7.  Interrupt Handling
 
-Interrupt handling is unaffected by the ThreadX port as such user interrupts can be 
+Interrupt handling is unaffected by the ThreadX port as such user interrupts can be
 written according to the toolchain's documentation. It is recommended not to use interrupt
 priority 1 as this is the priority of the context switch interrupt. However using interrupt
-priority 1 won't cause any negative side effects but doing so may slightly reduce 
+priority 1 won't cause any negative side effects but doing so may slightly reduce
 performance. Please refer to the toolchain documentation for additional details on how to
 define interrupt service routines.
 
 
 8. Execution Profiling
 
-The RX port adds support for the Execution Profiling Kit (EPK). The EPK consists 
-of the files tx_execution_profile.c and tx_execution_profile.h. See the documentation 
+The RX port adds support for the Execution Profiling Kit (EPK). The EPK consists
+of the files tx_execution_profile.c and tx_execution_profile.h. See the documentation
 of the EPK for generic usage details.
 
 To add the EPK to your RXv2 release make the following modifications:
@@ -135,7 +135,7 @@ typedef unsigned long long              EXECUTION_TIME;
 typedef unsigned long                   EXECUTION_TIME;
 #define TX_EXECUTION_MAX_TIME_SOURCE    0xFFFF
 #endif
-                                        
+
 /* Define basic constants for the execution profile kit.  */
 
 #define TX_EXECUTION_TIME_SOURCE         (EXECUTION_TIME)  *((USHORT *) 0x8800A)
@@ -158,14 +158,14 @@ information associated with this specific port of ThreadX:
             tx_thread_schedule.src              Added low power support
 
 01-31-2022  Release 6.1.10 changes:
-            tx_port.h                           Removed system state macro, and added 
+            tx_port.h                           Removed system state macro, and added
                                                 missing interrupt control defines
             tx_timer_interrupt.src              Added missing thread preemption logic
 
 10-15-2021  Release 6.1.9 changes:
-            tx_thread_context_restore.src       Removed unnecessary stack type placement 
+            tx_thread_context_restore.src       Removed unnecessary stack type placement
             tx_thread_schedule.src              Removed unnecessary stack type checking
-            tx_thread_stack_build.src           Removed unnecessary stack type placement 
+            tx_thread_stack_build.src           Removed unnecessary stack type placement
 
 06-02-2021  Release 6.1.7 changes:
             readme_threadx.txt                  Updated instructions on how to use execution profile.

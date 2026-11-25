@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -26,45 +27,39 @@
 #include "px_int.h"    /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    pthread_mutexattr_init                              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    pthread_mutexattr_init                              PORTABLE C      */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This function initializes a pthread mutex attributes object to      */
 /*    default values, if the object is already created this call will     */
 /*    return an error.                                                    */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*    attr                           Pointer to a mutex attributes        */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*     0                             If successful                        */ 
-/*     Value                         In case of any error                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    posix_allocate_pthread_mutexattr  Get a new mutexattr object        */ 
-/*    set_default_mutexattr             Set mutexattr with default values */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*     0                             If successful                        */
+/*     Value                         In case of any error                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    posix_allocate_pthread_mutexattr  Get a new mutexattr object        */
+/*    set_default_mutexattr             Set mutexattr with default values */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 INT pthread_mutexattr_init(pthread_mutexattr_t *attr)
@@ -73,7 +68,7 @@ INT pthread_mutexattr_init(pthread_mutexattr_t *attr)
 TX_INTERRUPT_SAVE_AREA
 
 
-    /* Disable interrupts.  */ 
+    /* Disable interrupts.  */
     TX_DISABLE
 
     /* Check this attributes object exists ? */

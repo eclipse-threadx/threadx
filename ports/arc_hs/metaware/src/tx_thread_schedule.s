@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 
@@ -56,18 +56,6 @@
 ;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
 ;/*    _tx_thread_system_return             Return to system from thread   */
 ;/*    _tx_thread_context_restore           Restore thread's context       */
-;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  10-15-2021     Andres Mlinar            Modified comment(s),          */
-;/*                                            use schedule reenter,       */
-;/*                                            resulting in version 6.1.9  */
-;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-;/*                                            #include tx_user.h,         */
-;/*                                            resulting in version 6.2.1  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -149,11 +137,11 @@ __tx_thread_schedule_loop:
     ld      r2, [sp, 4]                                 ; Pickup status32
     kflag   r2                                          ; Enter the proper register bank
     ld      r3, [sp, 8]                                 ; Pickup the saved interrupt posture
-    add     sp, sp, 12                                  ; Recover small stack frame 
-    j_s.d   [blink]                                     ; Return to thread and restore flags 
+    add     sp, sp, 12                                  ; Recover small stack frame
+    j_s.d   [blink]                                     ; Return to thread and restore flags
     seti    r3                                          ; Recover STATUS32
 
-__tx_hw_interrupt_restore:    
+__tx_hw_interrupt_restore:
 
     mov     r0, 0x2                                     ; Pretend level 1 interrupt is returning
     sr      r0, [AUX_IRQ_ACT]                           ;
@@ -163,10 +151,10 @@ __tx_hw_interrupt_restore:
     sr      r0, [LP_START]                              ; Restore LP_START
     ld      r1, [sp, 8]                                 ; Recover LP_END
     sr      r1, [LP_END]                                ; Restore LP_END
-    ld      r2, [sp, 12]                                ; Recover LP_COUNT      
+    ld      r2, [sp, 12]                                ; Recover LP_COUNT
     mov     LP_COUNT, r2
     .endif
-    
+
     .ifdef   TX_ENABLE_ACC
     ld      r58, [sp, 140]                              ; Recover r58
     ld      r59, [sp, 144]                              ; Recover r59
@@ -180,7 +168,7 @@ __tx_hw_interrupt_restore:
     kflag   r0                                          ; Switch to the proper register bank
     add     sp, sp, 160                                 ; Recover the interrupt stack frame
     rtie                                                ; Return to point of interrupt
-    
+
 __tx_restore_non_hw_context:
 ;
 ;    /* Determine if an interrupt frame or a synchronous task suspension frame

@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -56,18 +56,6 @@
 ;/*                                                                        */
 ;/*    ISRs                                                                */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  08-02-2021     William E. Lamie         Initial Version 6.1.8         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.9  */
-;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.11 */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_save(VOID)
 ;{
@@ -81,7 +69,7 @@ __tx_thread_context_save:
 ;                           SP+4 ->     Saved R1
 ;                           SP+8 ->     Saved R2
 ;                           SP+12->     Interrupted PC
-;                           SP+16->     Interrupted PSW
+;                           SP+16->     Interrupted PSW  */
 ;
 ;    /* Check for a nested interrupt condition.  */
 ;    if (_tx_thread_system_state++)

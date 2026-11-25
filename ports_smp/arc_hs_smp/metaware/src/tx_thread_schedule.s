@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -33,14 +33,14 @@
 ;
 ;
 ;    /* Define the lock for the ARC simulator workaround.  The ARC HS SMP
-;       simulator does not execute cores in a lock-step fashion, i.e., a 
+;       simulator does not execute cores in a lock-step fashion, i.e., a
 ;       core can stall for many cycles while the other core executes. This
 ;       does not happen on actual hardware and thus the need for a schedule
-;       lock is not required since:  1) ThreadX SMP will not load the same 
-;       thread into two places on the _tx_thread_execute_list, and moving 
-;       a thread from one entry on the _tx_thread_execute_list to another 
+;       lock is not required since:  1) ThreadX SMP will not load the same
+;       thread into two places on the _tx_thread_execute_list, and moving
+;       a thread from one entry on the _tx_thread_execute_list to another
 ;       is more than the 5 instructions executed between examination of the
-;       the _tx_thread_execute_list thread and clearing its ready bit in 
+;       the _tx_thread_execute_list thread and clearing its ready bit in
 ;       preparation for scheduling.  */
 ;
     .ifdef TX_ARC_SIMULATOR_WORKAROUND
@@ -49,14 +49,14 @@
     .type   _tx_thread_schedule_lock,@object
 _tx_thread_schedule_lock:
     .word    0
-    
+
     .endif
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_schedule                             SMP/ARC_HS/MetaWare */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
@@ -64,34 +64,28 @@ _tx_thread_schedule_lock:
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function waits for a thread control block pointer to appear in */ 
-;/*    the _tx_thread_execute_ptr array. Once a thread pointer appears     */ 
-;/*    in the variable, the corresponding thread is resumed.               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-;/*    _tx_thread_system_return             Return to system from thread   */ 
-;/*    _tx_thread_context_restore           Restore thread's context       */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function waits for a thread control block pointer to appear in */
+;/*    the _tx_thread_execute_ptr array. Once a thread pointer appears     */
+;/*    in the variable, the corresponding thread is resumed.               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+;/*    _tx_thread_system_return             Return to system from thread   */
+;/*    _tx_thread_context_restore           Restore thread's context       */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -105,7 +99,7 @@ _tx_thread_schedule_restart:
     st      r3, [r7]
     dmb     3
     .endif
-    
+
     .global _tx_thread_schedule
     .type   _tx_thread_schedule, @function
 _tx_thread_schedule:
@@ -128,7 +122,7 @@ _tx_thread_schedule:
     .endif
     asl     r4, r1, 2                                   ; Build index into core arrays
     mov     r7, _tx_thread_execute_ptr                  ; Pickup base of the execute thread pointer
-    add     r7, r7, r4                                  ; Build address of current thread pointer 
+    add     r7, r7, r4                                  ; Build address of current thread pointer
 
 __tx_thread_schedule_loop:
 ;
@@ -146,14 +140,14 @@ _continue:
     b       _tx_thread_schedule
 _got_lock:
     .endif
-   
+
     ld      r0, [r7]                                    ; Pickup next thread to execute
     breq    r0, 0, _tx_thread_schedule_restart          ; If NULL, keep looking
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr[core] == TX_NULL);
-;    
-;    
+;
+;
 ;    /* Now make sure the thread's ready bit is set.  */
 ;
     ld      r5, [r0, 164]                               ; Pickup the ready bit for this thread to see if it can be executed
@@ -175,7 +169,7 @@ _got_lock:
 ;    _tx_thread_current_ptr[core] =  _tx_thread_execute_ptr[core];
 ;
     mov     r7, _tx_thread_current_ptr                  ; Build address of current thread pointer
-    add     r7, r7, r4                                  ; 
+    add     r7, r7, r4                                  ;
     st      r0, [r7]                                    ; Setup current thread pointer
 ;
 ;    /* Increment the run count for this thread.  */
@@ -190,7 +184,7 @@ _got_lock:
 ;    _tx_timer_time_slice[core] =  _tx_thread_current_ptr -> tx_thread_time_slice;
 ;
     mov     r6, _tx_timer_time_slice                    ; Build address of time-slice for this core
-    add     r6, r6, r4                                  ; 
+    add     r6, r6, r4                                  ;
     st      r5, [r6]                                    ; Setup time-slice
 ;
     .ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
@@ -232,8 +226,8 @@ _got_lock:
     ld      r13, [sp, 64]                               ; Recover r13
     ld      r1,  [sp, 68]                               ; Pickup status32
     ld      r30, [sp, 72]                               ; Recover r30
-    add     sp, sp, 76                                  ; Recover solicited stack frame 
-    j_s.d   [blink]                                     ; Return to thread and restore flags 
+    add     sp, sp, 76                                  ; Recover solicited stack frame
+    j_s.d   [blink]                                     ; Return to thread and restore flags
     seti    r1                                          ; Recover STATUS32
 ;
 __tx_thread_schedule_int_ret:
@@ -246,10 +240,10 @@ __tx_thread_schedule_int_ret:
     sr      r0, [LP_START]                              ; Restore LP_START
     ld      r1, [sp, 8]                                 ; Recover LP_END
     sr      r1, [LP_END]                                ; Restore LP_END
-    ld      r2, [sp, 12]                                ; Recover LP_COUNT      
+    ld      r2, [sp, 12]                                ; Recover LP_COUNT
     mov     LP_COUNT, r2
     .endif
-    
+
     ld      r0, [sp, 156]                               ; Pickup saved BTA
     sr      r0, [BTA]                                   ; Recover BTA
     ld      blink, [sp, 16]                             ; Recover blink
@@ -287,8 +281,8 @@ __tx_thread_schedule_int_ret:
     ld      r58, [sp, 140]                              ; Recover r58
     ld      r59, [sp, 144]                              ; Recover r59
     .endif
-    add     sp, sp, 160                                 ; Recover interrupt stack frame 
-    rtie                                                ; Return to point of interrupt   
+    add     sp, sp, 160                                 ; Recover interrupt stack frame
+    rtie                                                ; Return to point of interrupt
 ;
 ;}
 ;

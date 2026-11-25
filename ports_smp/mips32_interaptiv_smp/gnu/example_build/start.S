@@ -78,17 +78,17 @@ Technologies or an authorized third party.
 
 .section ".vector_0x000","ax"
     .globl tlb_refill_exception
-tlb_refill_exception:    
+tlb_refill_exception:
     sdbbp
 
 .section ".vector_0x100","ax"
     .globl cache_error_exception
-cache_error_exception:    
+cache_error_exception:
     sdbbp
 
 .section ".vector_0x180","ax"
     .globl general_exception
-general_exception:    
+general_exception:
 
 /* EL Change: Branch to ThreadX error handling.  */
 
@@ -144,10 +144,10 @@ iv1_interrupt:
 
 /* EL Change end.  */
 
-    
+
 .section ".vector_0x280","ax"
     .globl xtlb_refill
-xtlb_refill:    
+xtlb_refill:
     sdbbp
 
 .section ".vector_0x300","ax"
@@ -205,7 +205,7 @@ init_common_resources:  // initializes resources for virtual or physical "cpu".
     sw v1, 1088(v0)
     sw v1, 1096(v0)
     sw v1, 1104(v0)
-    .globl clear_done    
+    .globl clear_done
 clear_done:
 
     la a2,     init_cp0    // Init CP0 Status, Count, Compare, Watch*, and Cause.
@@ -298,10 +298,10 @@ init_sys_resources:     // We are core0 vpe0.
     nop
 
     /* EL Change.  Ensure that the VPE release flag is cleared ahead of BSS clear.  */
-    
+
     la      $8, _tx_thread_smp_release_cores_flag   # Build address of release flag
     sw      $0, 0($8)                               # Clear the flag explicity to make other VPEs don't see it before everything is initialized
-    
+
     /* EL end Change.  */
 
 
@@ -346,14 +346,14 @@ init_done:
     mtc0    r23_cpu_num, $4,2                   # Save the logical VPE in UserLocal so we don't have calculate it over and over!  */
 
     /* Save the stack pointer in the array indexed by cpu number.  */
-    
+
     la      $8, _tx_thread_system_stack_ptr     # Build address of base of system stack array
     sll     $9, r23_cpu_num, 2                  # Build offset into array
     addu    $8, $8, $9                          # Build address of array entry
     sw      $29, 0($8)                          # Store system stack for each VPE
 
     /* Setup status register in preparation for entering ThreadX.  */
-    
+
     mfc0    $8, $12                             # Pickup SR
     li      $9, 0xFFFFFFF8                      # Build mask to clear error, exception bits
     and     $8, $8, $9                          # Clear bits
@@ -363,46 +363,46 @@ init_done:
 
     /* Check for Core 0, VPE 0 for processing ThreadX initialization.  All other VPEs will wait until the first
        VPE has completed initialization before running.  */
-    
+
     bne     r23_cpu_num, $0, _additional_vpe    # If non-zero, an additional vpe is present
-    nop                                         # 
-    
+    nop                                         #
+
     /* Core 0, VPE 0 processing.  */
-    
+
     /* Save some information in globals.  */
-    
+
     la      $8, _tx_thread_smp_detected_cores   # Build address of total number of cores detected
     addiu   $9, r19_more_cores, 1               # Calculate the total cores
     sw      $9, 0($8)                           # Save in global variable
-    
+
     la      $8, _tx_thread_smp_detected_vpes_per_core # Build address of VPEs per core detected
     addiu   $9, r20_more_vpes, 1                # Caculate the total vpes per core
     sw      $9, 0($8)                           # Save in global variable
 
-  
+
     /* Simply branch to main to finish initializing ThreadX SMP.  */
-    
+
     bal     main                                # Branch to main
-    nop                                         # 
-    
+    nop                                         #
+
     /* If return, branch to all_done code.  */
-    
+
     b      all_done
-    nop 
-    
-        
+    nop
+
+
 _additional_vpe:
 
-   
+
     /* Additional VPE, transfer control to ThreadX.  */
-    
+
     b       _tx_thread_smp_initialize_wait          # Enter ThreadX for additional VPEs
     nop
 
     .globl all_done
 all_done:
     b       all_done
-    
+
 /* Comment out the previous "init_done" code since it is replaced with ThreadX-specfic code.  */
 #if 0
 
@@ -441,7 +441,7 @@ all_done:
     // All cpu spin on atomic potato++
 
 //    la a1, potato
-    
+
 try_again:
     ll a0, 0(a1)
     addiu a0, a0, 1
@@ -452,7 +452,7 @@ try_again:
 
     b try_again                           // Success, do again.
     nop
- 
+
     b       all_done
     nop
 #endif

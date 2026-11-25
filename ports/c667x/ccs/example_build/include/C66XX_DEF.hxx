@@ -791,53 +791,53 @@
 //=============================================================================
 //============ PLL controller registers =======================================
 //=============================================================================
-// PLL control register - r/w 
+// PLL control register - r/w
 #define C66XX_PLL_PLLCTL_RG_OFFSET							0x100
-// PLL secondary control register - r/w 
+// PLL secondary control register - r/w
 #define C66XX_PLL_SECCTL_RG_OFFSET							0x108
-// PLL multiplier control register - r/w 
+// PLL multiplier control register - r/w
 #define C66XX_PLL_PLLM_RG_OFFSET							0x110
-// PLL controller divider 1 register - r/w 
+// PLL controller divider 1 register - r/w
 #define C66XX_PLL_PLLDIV1_RG_OFFSET							0x118
-// PLL controller divider 2 register - r/w 
+// PLL controller divider 2 register - r/w
 #define C66XX_PLL_PLLDIV2_RG_OFFSET							0x11c
-// PLL controller divider 3 register - r/w 
+// PLL controller divider 3 register - r/w
 #define C66XX_PLL_PLLDIV3_RG_OFFSET							0x120
-// PLL controller command register - r/w 
+// PLL controller command register - r/w
 #define C66XX_PLL_PLLCMD_RG_OFFSET							0x138
-// PLL controller status register - r/w 
+// PLL controller status register - r/w
 #define C66XX_PLL_PLLSTAT_RG_OFFSET							0x13c
-// PLL controller clock align control register - r/w 
+// PLL controller clock align control register - r/w
 #define C66XX_PLL_ALNCTL_RG_OFFSET							0x140
-// PLL controller divider ratio change status register - r/w 
+// PLL controller divider ratio change status register - r/w
 #define C66XX_PLL_DCHANGE_RG_OFFSET							0x144
 // SYSCLK status register - r-only
 #define C66XX_PLL_SYSTAT_RG_OFFSET							0x150
-// PLL controller divider 4 register - r/w 
+// PLL controller divider 4 register - r/w
 #define C66XX_PLL_PLLDIV4_RG_OFFSET							0x160
-// PLL controller divider 5 register - r/w 
+// PLL controller divider 5 register - r/w
 #define C66XX_PLL_PLLDIV5_RG_OFFSET							0x164
-// PLL controller divider 6 register - r/w 
+// PLL controller divider 6 register - r/w
 #define C66XX_PLL_PLLDIV6_RG_OFFSET							0x168
-// PLL controller divider 7 register - r/w 
+// PLL controller divider 7 register - r/w
 #define C66XX_PLL_PLLDIV7_RG_OFFSET							0x16c
-// PLL controller divider 8 register - r/w 
+// PLL controller divider 8 register - r/w
 #define C66XX_PLL_PLLDIV8_RG_OFFSET							0x170
-// PLL controller divider 9 register - r/w 
+// PLL controller divider 9 register - r/w
 #define C66XX_PLL_PLLDIV9_RG_OFFSET							0x174
-// PLL controller divider 10 register - r/w 
+// PLL controller divider 10 register - r/w
 #define C66XX_PLL_PLLDIV10_RG_OFFSET						0x178
-// PLL controller divider 11 register - r/w 
+// PLL controller divider 11 register - r/w
 #define C66XX_PLL_PLLDIV11_RG_OFFSET						0x17c
-// PLL controller divider 12 register - r/w 
+// PLL controller divider 12 register - r/w
 #define C66XX_PLL_PLLDIV12_RG_OFFSET						0x180
-// PLL controller divider 13 register - r/w 
+// PLL controller divider 13 register - r/w
 #define C66XX_PLL_PLLDIV13_RG_OFFSET						0x184
-// PLL controller divider 14 register - r/w 
+// PLL controller divider 14 register - r/w
 #define C66XX_PLL_PLLDIV14_RG_OFFSET						0x188
-// PLL controller divider 15 register - r/w 
+// PLL controller divider 15 register - r/w
 #define C66XX_PLL_PLLDIV15_RG_OFFSET						0x18c
-// PLL controller divider 16 register - r/w 
+// PLL controller divider 16 register - r/w
 #define C66XX_PLL_PLLDIV16_RG_OFFSET						0x190
 
 #define C66XX_PLL_PLLCTL_RG_ADDR							(C66XX_PLL_RG_AREA_SADDR + C66XX_PLL_PLLCTL_RG_OFFSET)

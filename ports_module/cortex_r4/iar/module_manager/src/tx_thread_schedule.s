@@ -1,23 +1,23 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
-;/**************************************************************************/ 
-;/**************************************************************************/ 
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
-;/**                                                                       */ 
-;/**   Thread                                                              */ 
-;/**                                                                       */ 
-;/**************************************************************************/ 
-;/**************************************************************************/ 
+;/**************************************************************************/
+;/**************************************************************************/
+;/**                                                                       */
+;/** ThreadX Component                                                     */
+;/**                                                                       */
+;/**   Thread                                                              */
+;/**                                                                       */
+;/**************************************************************************/
+;/**************************************************************************/
 ;
 ;
     EXTERN     _tx_thread_execute_ptr
@@ -36,45 +36,39 @@ SYS_MODE            EQU     0x1F            ; SYS mode
 MODE_MASK           EQU     0x1F            ; Mode mask
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                             Cortex-R4/MPU/IAR   */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_schedule                             Cortex-R4/MPU/IAR   */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function waits for a thread control block pointer to appear in */ 
-;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-;/*    in the variable, the corresponding thread is resumed.               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-;/*    _tx_thread_system_return             Return to system from thread   */ 
-;/*    _tx_thread_context_restore           Restore thread's context       */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
+;/*  DESCRIPTION                                                           */
 ;/*                                                                        */
-;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+;/*    This function waits for a thread control block pointer to appear in */
+;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+;/*    in the variable, the corresponding thread is resumed.               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+;/*    _tx_thread_system_return             Return to system from thread   */
+;/*    _tx_thread_context_restore           Restore thread's context       */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -121,7 +115,7 @@ SWI_Handler
     ;
     ; The service call is handled here
     ;
-    
+
     CMP     r0, #0                              ; Is it a schedule request?
     BEQ     _tx_handler_svc_schedule            ; Yes, go there
 
@@ -130,7 +124,7 @@ SWI_Handler
 
     CMP     r0, #2                              ; Is it a system mode exit request?
     BEQ     _tx_handler_svc_super_exit          ; Yes, go there
-    
+
     LDR     r2, =0x123456
     CMP     r0, r2                              ; Is it an ARM request?
     BEQ     _tx_handler_svc_arm                 ; Yes, go there
@@ -148,11 +142,11 @@ _tx_handler_svc_unrecognized_loop               ; We should never get here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; SVC 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; At this point we have an SVC 1, which means we are entering 
+    ; At this point we have an SVC 1, which means we are entering
     ; supervisor mode to service a kernel call.
 _tx_handler_svc_super_enter
     ; Make sure that we have been called from the system mode enter location (security)
-    LDR     r2, =_txm_system_mode_enter         ; Load the address of the known call point 
+    LDR     r2, =_txm_system_mode_enter         ; Load the address of the known call point
     SUB     r1, lr, #4                          ; Calculate the address of the actual call
     CMP     r1, r2                              ; Did we come from txm_module_manager_user_mode_entry?
     BNE     _tx_handler_svc_unrecognized        ; Return to where we came
@@ -162,13 +156,13 @@ _tx_handler_svc_super_enter
     LDR     r2, [r1]                            ; Load current thread location from the pointer (pointer indirection)
     MOV     r1, #0                              ; Load the new user mode flag value (user mode flag clear -> not user mode -> system)
     STR     r1, [r2, #0x9C]                     ; Clear the current user mode selection for thread
-    
+
     ; Now we enter the system mode and return
     LDMFD   sp!, {r0, r3}                       ; Get spsr from the stack
     BIC     r0, r0, #MODE_MASK                  ; clear mode field
     ORR     r0, r0, #SYS_MODE                   ; system mode code
     MSR     SPSR_cxsf, r0                       ; Restore the spsr
-    
+
     LDR     r1, [r2, #0xA8]                     ; Load the module kernel stack pointer
     CPS     #SYS_MODE						    ; Switch to SYS mode
     MOV		r3, sp							    ; Grab thread stack pointer
@@ -182,15 +176,15 @@ _tx_handler_svc_super_enter
     STRD    r0, r1, [r2, #0x0C]                 ; Set stack start and end
 #endif
     LDMFD   sp!, {r0-r3, r12, pc}^              ; Restore the registers and return
-    
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; SVC 2
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; At this point we have an SVC 2, which means we are exiting 
+    ; At this point we have an SVC 2, which means we are exiting
     ; supervisor mode after servicing a kernel call.
 _tx_handler_svc_super_exit
     ; Make sure that we have been called from the system mode exit location (security)
-    LDR     r2, =_txm_system_mode_exit          ; Load the address of the known call point 
+    LDR     r2, =_txm_system_mode_exit          ; Load the address of the known call point
     SUB     r1, lr, #4                          ; Calculate the address of the actual call
     CMP     r1, r2                              ; Did we come from txm_module_manager_user_mode_entry?
     BNE     _tx_handler_svc_unrecognized        ; Return to where we came
@@ -218,19 +212,19 @@ _tx_handler_svc_super_exit
     STRD    r0, r1, [r2, #0x0C]                 ; Set stack start and end
 #endif
     LDMFD   sp!, {r0-r3, r12, pc}^              ; Restore the registers and return
-    
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; ARM Semihosting
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 _tx_handler_svc_arm
-    
+
     ; *** TODO: handle semihosting requests or ARM angel requests ***
-    
+
     ; just return
     LDMFD   sp!, {r0, r3}                       ; Get spsr from the stack
     MSR     SPSR_cxsf, r0                       ; Restore the spsr
     LDMFD   sp!, {r0-r3, r12, pc}^              ; Restore the registers and return
-    
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; SVC 0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -239,10 +233,10 @@ _tx_handler_svc_schedule
 
     LDMFD   sp!, {r0, r3}                       ; Get spsr from stack
     MSR     SPSR_cxsf, r0                       ; Restore spsr
-    LDMFD   sp!, {r0-r3, r12, lr}               ; Restore the registers 
+    LDMFD   sp!, {r0-r3, r12, lr}               ; Restore the registers
 
-    ; This code waits for a thread control block pointer to appear in 
-    ; the _tx_thread_execute_ptr variable.  Once a thread pointer appears 
+    ; This code waits for a thread control block pointer to appear in
+    ; the _tx_thread_execute_ptr variable.  Once a thread pointer appears
     ; in the variable, the corresponding thread is resumed.
 ;
 ;    /* Enable interrupts.  */
@@ -262,7 +256,7 @@ __tx_thread_schedule_loop
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr == TX_NULL);
-;    
+;
 ;    /* Yes! We have a thread to execute.  Lockout interrupts and
 ;       transfer control to it.  */
 ;
@@ -319,7 +313,7 @@ __tx_thread_schedule_loop
     MRC     p15, 0, r3, c6, c1, 0               ; Read DRBAR into r3
     CMP     r2, r3                              ; Is module already loaded?
     BEQ     _tx_end_mpu_update                  ; Yes - skip memory protection setup
-    
+
     ; Disable MPU before applying new regions.
     MRC     p15, 0, r2, c1, c0, 0               ; Read SCTLR
     BIC     r2, r2, #1                          ; Disable MPU
@@ -343,7 +337,7 @@ _tx_mpu_loop
     ADD     r3, r3, #1                          ; Increment loop index
     CMP     r3, #0xB                            ; Check the limit
     BLE     _tx_mpu_loop                        ; Loop if not finished
-    
+
     ; Enable MPU with new regions.
     MRC     p15, 0, r2, c1, c0, 0               ; Read SCTLR
     ORR     r2, r2, #1                          ; Enable MPU
@@ -351,18 +345,18 @@ _tx_mpu_loop
     DSB
     MCR     p15, 0, r2, c1, c0, 0               ; Write to SCTLR
     ISB
-    ; 
+    ;
 _tx_end_mpu_update
     ; **************************************************************************
-    
+
     CMP     r4, #0                              ; Check for synchronous context switch
     BEQ     _tx_solicited_return
-    
+
     MSR     SPSR_cxsf, r5                       ; Setup SPSR for return
     LDR     r1, [r0, #8]                        ; Get thread SP
     LDR     lr, [r1, #0x40]                     ; Get thread PC
     CPS     #SYS_MODE                           ; Enter SYS mode
-    
+
 #ifdef __ARMVFP__
     LDR     r2, [r0, #144]                      ; Pickup the VFP enabled flag
     CMP     r2, #0                              ; Is the VFP enabled?
@@ -375,7 +369,7 @@ _tx_end_mpu_update
     CPS     #SYS_MODE                           ; Enter SYS mode
 _tx_skip_interrupt_vfp_restore
 #endif
-    
+
     LDMIA   sp!, {r0-r12, lr}                   ; Restore registers
     ADD     sp, sp, #4                          ; Fix stack pointer
     CPS     #SVC_MODE                           ; Enter SVC mode
@@ -384,7 +378,7 @@ _tx_skip_interrupt_vfp_restore
 _tx_solicited_return
     MOV     r2, r5                              ; Move CPSR to scratch register
     CPS     #SYS_MODE                           ; Enter SYS mode
-    
+
 #ifdef __ARMVFP__
     LDR     r1, [r0, #144]                      ; Pickup the VFP enabled flag
     CMP     r1, #0                              ; Is the VFP enabled?
@@ -394,7 +388,7 @@ _tx_solicited_return
     VMSR    FPSCR, r4                           ; Restore FPSCR
 _tx_skip_solicited_vfp_restore
 #endif
-    
+
     LDMIA   sp!, {r4-r11, lr}                   ; Restore registers
     MOV     r1, lr                              ; Copy lr to r1 to preserve across mode change
     CPS     #SVC_MODE                           ; Enter SVC mode
@@ -404,11 +398,11 @@ _tx_skip_solicited_vfp_restore
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; End SWI_Handler
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
+
 #ifdef __ARMVFP__
     PUBLIC  tx_thread_vfp_enable
     CODE32
-tx_thread_vfp_enable??rA    
+tx_thread_vfp_enable??rA
 tx_thread_vfp_enable
     MRS     r2, CPSR                            ; Pickup the CPSR
     CPSID   i                                   ; Disable IRQ interrupts
@@ -424,7 +418,7 @@ __tx_no_thread_to_enable:
 
     PUBLIC  tx_thread_vfp_disable
     CODE32
-tx_thread_vfp_disable??rA    
+tx_thread_vfp_disable??rA
 tx_thread_vfp_disable
     MRS     r2, CPSR                            ; Pickup the CPSR
     CPSID   i                                   ; Disable IRQ interrupts

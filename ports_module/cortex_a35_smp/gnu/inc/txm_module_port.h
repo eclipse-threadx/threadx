@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -34,12 +36,6 @@
 /*                                                                        */
 /*    This file defines the basic module constants, interface structures, */
 /*    and function prototypes.                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Andres Mlinar            Initial Version 6.1.3         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -119,9 +115,11 @@ The following extensions must also be defined in tx_port.h:
 #define TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS    0x00000004
 
 
-/* Define the supported options for this module.   */
+/* Define the supported options for this module. Module threads run at the Module Manager's
+   exception level and call it directly, so this port cannot isolate a module and refuses
+   user mode and memory protection at load.  */
 
-#define TXM_MODULE_MANAGER_SUPPORTED_OPTIONS    (TXM_MODULE_USER_MODE | TXM_MODULE_MEMORY_PROTECTION | TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS)
+#define TXM_MODULE_MANAGER_SUPPORTED_OPTIONS    (TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS)
 #define TXM_MODULE_MANAGER_REQUIRED_OPTIONS     0
 
 
@@ -255,8 +253,9 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
 
 /* Define the macros to perform port-specific checks when passing pointers to the kernel.  */
 
-/* Define macro to make sure object is inside the module's data.  */
-#define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size) (TX_SUCCESS)
+/* Define macro to make sure object is inside the module's data. No module on this port has
+   memory protection, so this is never asked; any range is refused if it is.  */
+#define TXM_MODULE_MANAGER_CHECK_INSIDE_DATA(module_instance, obj_ptr, obj_size) (TX_FALSE)
 
 /* Define some internal prototypes to this module port.  */
 
@@ -273,6 +272,6 @@ ALIGN_TYPE _txm_module_manager_port_dispatch(TXM_MODULE_INSTANCE *module_instanc
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module Cortex-A35/GNU Version 6.4.2 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module Cortex-A35/GNU Version 6.5.0.202601 *";
 
 #endif

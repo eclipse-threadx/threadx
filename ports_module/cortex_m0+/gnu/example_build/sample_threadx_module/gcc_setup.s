@@ -1,4 +1,6 @@
 
+// Portions of this file were generated with AI assistance.
+
     .text
     .align 4
     .syntax unified
@@ -16,7 +18,7 @@ _gcc_setup:
     mov     r5,r0
 
     /* Copy GOT table. */
-  
+
     ldr     r0, =__got_load_start__
     subs    r0,r0,r3
     add     r0,r0,r5
@@ -44,13 +46,13 @@ flash_area:
 address_built:
     str     r6, [r1]        // Store in new GOT table
     adds     r0, r0, #4      // Move to next entry
-    adds    r1, r1, #4      // 
+    adds    r1, r1, #4      //
     b       new_got_setup   // Continue at the top of the loop
 got_setup_done:
 
 
     /* Copy initialised sections into RAM if required. */
-  
+
     ldr     r0, =__data_load_start__
     subs    r0,r0,r3
     add     r0,r0,r5
@@ -61,9 +63,9 @@ got_setup_done:
     subs    r2,r2,r4
     add     r2,r2,r9
     bl      crt0_memory_copy
-  
+
     /* Zero bss. */
-    
+
     ldr     r0, =__bss_start__
     subs    r0,r0,r4
     add     r0,r0,r9
@@ -72,6 +74,46 @@ got_setup_done:
     add     r1,r1,r9
     movs    r2, #0
     bl      crt0_memory_set
+
+    /* Apply the R_ARM_RELATIVE relocations that target the module data area.  */
+
+    ldr     r3, =__FLASH_segment_start__ // crt0_memory_copy used r3 as a scratch register
+    ldr     r0, =__reldyn_load_start__
+    subs    r0,r0,r3
+    add     r0,r0,r5
+    ldr     r1, =__reldyn_end__
+    subs    r1,r1,r3
+    add     r1,r1,r5
+
+new_reldyn_setup:
+    cmp     r0, r1              // See if there are more relocation entries
+    beq     reldyn_setup_done   // No, done with the relocations
+    ldr     r6, [r0]            // Pickup the r_offset field
+    ldr     r7, [r0, #4]        // Pickup the r_info field
+    adds    r0, r0, #8          // Move to the next entry
+    uxtb    r7, r7              // The relocation type is in the low byte
+    cmp     r7, #23             // Is it R_ARM_RELATIVE?
+    bne     new_reldyn_setup    // No, only R_ARM_RELATIVE is supported
+    cmp     r6, r4              // Does it target the code or the data area?
+    blt     new_reldyn_setup    // The code area is shared and read-only, skip it
+    subs    r6, r6, r4          // Compute offset of data area
+    add     r6, r6, r9          // Build the address of the word to relocate
+    ldr     r7, [r6]            // Pickup the link time address stored there
+    cmp     r7, #0              // Is it 0?
+    beq     new_reldyn_setup    // Yes, just skip the adjustment
+    cmp     r7, r4              // Is it in the code or data area?
+    blt     reldyn_flash_area   // If less than, it is a code address
+    subs    r7, r7, r4          // Compute offset of data area
+    add     r7, r7, r9          // Build address based on the loaded data address
+    b       reldyn_built        // Finished building address
+reldyn_flash_area:
+    subs    r7, r7, r3          // Compute offset of code area
+    add     r7, r7, r5          // Build address based on the loaded code address
+reldyn_built:
+    str     r7, [r6]            // Store the relocated address back
+    b       new_reldyn_setup    // Continue at the top of the loop
+reldyn_setup_done:
+
 
 
     /* Setup heap - not recommended for Threadx but here for compatibility reasons */
@@ -87,12 +129,12 @@ got_setup_done:
     str     r2, [r0]
     adds    r0, r0, #4
     str     r1, [r0]
-    
+
     /* Store other preserved registers. */
 	pop     {r3-r7}
 	mov     lr, r8
  	bx      lr                                  // Return to caller
-	
+
  .align 4
 
   /* Startup helper functions. */
@@ -128,4 +170,4 @@ memory_set_done:
 
     /* Setup attibutes of heap section so it doesn't take up room in the elf file */
     .section .heap, "wa", %nobits
-  
+

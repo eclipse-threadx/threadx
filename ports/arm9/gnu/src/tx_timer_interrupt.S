@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Timer                                                               */
 @/**                                                                       */
@@ -48,7 +48,7 @@
     .type   $_tx_timer_interrupt,function
 $_tx_timer_interrupt:
      BX        pc                               @ Switch to 32-bit mode
-     NOP                                        @ 
+     NOP                                        @
     .arm
      STMFD     sp!, {lr}                        @ Save return address
      BL        _tx_timer_interrupt              @ Call _tx_timer_interrupt function
@@ -58,49 +58,40 @@ $_tx_timer_interrupt:
 @
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_timer_interrupt                                  ARM9/GNU       */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_timer_interrupt                                  ARM9/GNU       */
 @/*                                                           6.2.1        */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function processes the hardware timer interrupt.  This         */ 
-@/*    processing includes incrementing the system clock and checking for  */ 
-@/*    time slice and/or timer expiration.  If either is found, the        */ 
-@/*    interrupt context save/restore functions are called along with the  */ 
-@/*    expiration functions.                                               */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
-@/*    _tx_thread_time_slice                 Time slice interrupted thread */ 
-@/*    _tx_timer_expiration_process          Timer expiration processing   */ 
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    interrupt vector                                                    */ 
-@/*                                                                        */ 
-@/*  RELEASE HISTORY                                                       */ 
-@/*                                                                        */ 
-@/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-@/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-@/*                                            #include tx_user.h,         */
-@/*                                            resulting in version 6.2.1  */
+@/*    This function processes the hardware timer interrupt.  This         */
+@/*    processing includes incrementing the system clock and checking for  */
+@/*    time slice and/or timer expiration.  If either is found, the        */
+@/*    interrupt context save/restore functions are called along with the  */
+@/*    expiration functions.                                               */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    _tx_thread_time_slice                 Time slice interrupted thread */
+@/*    _tx_timer_expiration_process          Timer expiration processing   */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    interrupt vector                                                    */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_timer_interrupt(VOID)
@@ -125,7 +116,7 @@ _tx_timer_interrupt:
 @    if (_tx_timer_time_slice)
 @    {
 @
-    LDR     r3, =_tx_timer_time_slice           @ Pickup address of time-slice 
+    LDR     r3, =_tx_timer_time_slice           @ Pickup address of time-slice
     LDR     r2, [r3]                            @ Pickup time-slice
     CMP     r2, #0                              @ Is it non-active?
     BEQ     __tx_timer_no_time_slice            @ Yes, skip time-slice processing
@@ -243,7 +234,7 @@ __tx_timer_dont_activate:
 @    if (_tx_timer_expired_time_slice)
 @    {
 @
-    LDR     r3, =_tx_timer_expired_time_slice   @ Pickup address of time-slice expired 
+    LDR     r3, =_tx_timer_expired_time_slice   @ Pickup address of time-slice expired
     LDR     r2, [r3]                            @ Pickup the actual flag
     CMP     r2, #0                              @ See if the flag is set
     BEQ     __tx_timer_not_ts_expiration        @ No, skip time-slice processing

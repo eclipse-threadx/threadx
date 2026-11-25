@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -59,14 +60,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_trace_object_unregister(VOID *object_ptr)
 {
@@ -85,7 +78,7 @@ TX_TRACE_OBJECT_ENTRY           *entry_ptr;
         /* Registry is setup, proceed.  */
 
         /* Pickup the total entries.  */
-        entries =  _tx_trace_total_registry_entries;
+        entries =  (UINT) _tx_trace_total_registry_entries;
 
         /* Loop to find available entry.  */
         for (i = ((ULONG) 0); i < entries; i++)

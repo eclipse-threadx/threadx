@@ -1,7 +1,7 @@
 //----------------------------------------------------------------
 // Copyright (c) 2005-2018 Arm Limited (or its affiliates). All rights reserved.
 // Use, modification and redistribution of this file is subject to your possession of a
-// valid End User License Agreement for the Arm Product of which these examples are part of 
+// valid End User License Agreement for the Arm Product of which these examples are part of
 // and your compliance with all applicable terms and conditions of such licence agreement.
 //
 // Cortex-A8MP example - Startup Code
@@ -37,7 +37,7 @@ enableGIC:
     STR     r1, [r0]                   // Write the GIC Enable Register  (ICDDCR)
 
     BX      lr
-  
+
 // ------------------------------------------------------------
 
     .global disableGIC
@@ -54,7 +54,7 @@ disableGIC:
     STR     r1, [r0]                   // Write the GIC Enable Register  (ICDDCR)
 
     BX      lr
-        
+
 
 // ------------------------------------------------------------
 
@@ -84,10 +84,10 @@ enableIntID:
     STR     r3, [r0, r2]               // Store out  (ICDISER)
 
     BX      lr
-        
+
 
 // ------------------------------------------------------------
-  
+
     .global disableIntID
     .type   disableIntID,function
     // void disableIntID(unsigned int ID)
@@ -112,7 +112,7 @@ disableIntID:
     STR     r3, [r0, r2]               // Store out (ICDICER)
 
     BX      lr
-        
+
 
 // ------------------------------------------------------------
 
@@ -130,7 +130,7 @@ setIntPriority:
         // r0 = base addr
         // r1 = priority
         // r2 = ID
-  
+
         // Make sure that priority value is only 5 bits, and convert to expected format
         AND     r1, r1, #0x1F
         MOV     r1, r1, LSL #3
@@ -156,7 +156,7 @@ setIntPriority:
         STR     r3, [r0]                   // And store it back again  (ICDIPR)
 
         BX      lr
-        
+
 
 // ------------------------------------------------------------
 
@@ -175,7 +175,7 @@ enableGICProcessorInterface:
         STR     r1, [r0, #0x0]           // Write the Processor Interface Control register  (ICCICR/ICPICR)
 
         BX      lr
-        
+
 
 
 // ------------------------------------------------------------
@@ -195,7 +195,7 @@ disableGICProcessorInterface:
         STR     r1, [r0, #0x0]           // Write the Processor Interface Control register  (ICCICR/ICPICR)
 
         BX      lr
-        
+
 
 
 // ------------------------------------------------------------
@@ -214,8 +214,8 @@ setPriorityMask:
         STR     r0, [r1, #0x4]          // Write the Priority Mask register (ICCPMR/ICCIPMR)
 
         BX      lr
-        
-  
+
+
 // ------------------------------------------------------------
 
         .global setBinaryPoint
@@ -231,7 +231,7 @@ setBinaryPoint:
        STR     r0, [r1, #0x8]       // Write the Binary register   (ICCBPR/ICCBPR)
 
        BX      lr
-       
+
 
 // ------------------------------------------------------------
 
@@ -245,7 +245,7 @@ readIntAck:
 
        LDR     r0, [r0, #0xC]           // Read the Interrupt Acknowledge Register  (ICCIAR)
        BX      lr
-       
+
 
 // ------------------------------------------------------------
 
@@ -262,8 +262,8 @@ writeEOI:
        STR     r0, [r1, #0x10]           // Write ID to the End of Interrupt register (ICCEOIR)
 
        BX      lr
-       
-  
+
+
 //----------------------------------------------------------------
 // SGI
 //----------------------------------------------------------------

@@ -1,52 +1,47 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
-/**************************************************************************/ 
-/**************************************************************************/ 
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
-/**                                                                       */ 
-/**   Module                                                              */ 
-/**                                                                       */ 
-/**************************************************************************/ 
-/**************************************************************************/ 
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Module                                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
-/*                                                                        */ 
-/*    txm_module_port.h                               Cortex-R4/MPU/ARM   */ 
+/**************************************************************************/
+/*                                                                        */
+/*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
+/*                                                                        */
+/*    txm_module_port.h                               Cortex-R4/MPU/ARM   */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Scott Larson, Microsoft Corporation                                 */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This file defines the basic module constants, interface structures, */ 
-/*    and function prototypes.                                            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
+/*  DESCRIPTION                                                           */
 /*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
+/*    This file defines the basic module constants, interface structures, */
+/*    and function prototypes.                                            */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef TXM_MODULE_PORT_H
 #define TXM_MODULE_PORT_H
 
-/* It is assumed that the base ThreadX tx_port.h file has been modified to add the 
+/* It is assumed that the base ThreadX tx_port.h file has been modified to add the
   following extensions to the ThreadX thread control block (this code should replace
   the corresponding macro define in tx_port.h):
 
@@ -89,9 +84,9 @@ The following extensions must also be defined in tx_port.h:
 #define TXM_MODULE_KERNEL_STACK_SIZE            1024
 #endif
 
-/* Defined, these options allows a memory-protected module to access kernel objects. 
-   For example, when a module needs to send/receive a message from a kernel queue. 
-   This does not allow modules to create or delete objects outside of their memory. 
+/* Defined, these options allows a memory-protected module to access kernel objects.
+   For example, when a module needs to send/receive a message from a kernel queue.
+   This does not allow modules to create or delete objects outside of their memory.
    Default setting for these values is undefined.  */
 /* #define TXM_MODULE_ENABLE_KERNEL_BLOCK_POOL_ACCESS */
 /* #define TXM_MODULE_ENABLE_KERNEL_BYTE_POOL_ACCESS */
@@ -166,7 +161,7 @@ The following extensions must also be defined in tx_port.h:
 #define INLINE_DECLARE inline
 
 /* Define the number of MPU entries assigned to the code and data sections.
-   On Cortex-R parts, there are 12 total entries. ThreadX uses one for access 
+   On Cortex-R parts, there are 12 total entries. ThreadX uses one for access
    to the kernel entry function, thus 11 remain for code and data protection.  */
 #define TXM_MODULE_MPU_TOTAL_ENTRIES        12
 #define TXM_MODULE_MPU_CODE_ENTRIES         4
@@ -234,7 +229,7 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
     TXM_MODULE_MANAGER_MEMORY_FAULT_INFO    _txm_module_manager_memory_fault_info;
 
 /* Define the macro to check the stack available in dispatch.  */
-#define TXM_MODULE_MANAGER_CHECK_STACK_AVAILABLE 
+#define TXM_MODULE_MANAGER_CHECK_STACK_AVAILABLE
 
 /* Define the macro to check the module properties.  */
 
@@ -248,7 +243,7 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
         {                                                                           \
             _tx_mutex_put(&_txm_module_manager_mutex);                              \
             return(TXM_MODULE_INVALID_PROPERTIES);                                  \
-        }                                                                           
+        }
 
 
 /* Define the macro to check the code alignment.  */
@@ -359,7 +354,7 @@ UINT  _txm_module_manager_inside_data_check(TXM_MODULE_INSTANCE *module_instance
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module Cortex-R4/MPU/ARM Version 6.4.2 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module Cortex-R4/MPU/ARM Version 6.5.0.202601 *";
 
 #endif
 

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -30,54 +31,48 @@
 #include <stdio.h>
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_system_return                            Linux/GNU       */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_system_return                            Linux/GNU       */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is target processor specific.  It is used to transfer */ 
-/*    control from a thread back to the system.  Only a minimal context   */ 
-/*    is saved since the compiler assumes temp registers are going to get */ 
-/*    slicked by a function call anyway.                                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_linux_debug_entry_insert                                        */ 
-/*    tx_linux_mutex_lock                                                 */ 
-/*    pthread_self                                                        */ 
-/*    pthread_getschedparam                                               */ 
-/*    pthread_equal                                                       */ 
-/*    tx_linux_mutex_recursive_unlock                                     */ 
-/*    tx_linux_mutex_unlock                                               */ 
-/*    pthread_exit                                                        */ 
-/*    tx_linux_sem_post                                                   */ 
-/*    sem_trywait                                                         */
-/*    tx_linux_sem_wait                                                   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX components                                                  */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*    This function is target processor specific.  It is used to transfer */
+/*    control from a thread back to the system.  Only a minimal context   */
+/*    is saved since the compiler assumes temp registers are going to get */
+/*    slicked by a function call anyway.                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_linux_debug_entry_insert                                        */
+/*    tx_linux_mutex_lock                                                 */
+/*    pthread_self                                                        */
+/*    pthread_getschedparam                                               */
+/*    pthread_equal                                                       */
+/*    tx_linux_mutex_recursive_unlock                                     */
+/*    tx_linux_mutex_unlock                                               */
+/*    pthread_exit                                                        */
+/*    tx_linux_sem_post                                                   */
+/*    sem_trywait                                                         */
+/*    tx_linux_sem_wait                                                   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX components                                                  */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_system_return(VOID)
@@ -104,13 +99,13 @@ int         exit_code = 0;
     /* Pickup the current thread pointer.  */
     temp_thread_ptr =  _tx_thread_current_ptr;
 
-    /* Determine if this is a thread (0) and it does not 
+    /* Determine if this is a thread (0) and it does not
        match the current thread pointer.  */
-    if ((_tx_linux_threadx_thread) && 
-        ((!temp_thread_ptr) || (!pthread_equal(temp_thread_ptr -> tx_thread_linux_thread_id, thread_id)))) 
-    { 
+    if ((_tx_linux_threadx_thread) &&
+        ((!temp_thread_ptr) || (!pthread_equal(temp_thread_ptr -> tx_thread_linux_thread_id, thread_id))))
+    {
 
-        /* This indicates the Linux thread was actually terminated by ThreadX is only 
+        /* This indicates the Linux thread was actually terminated by ThreadX is only
            being allowed to run in order to cleanup its resources.  */
         /* Unlock linux mutex. */
         tx_linux_mutex_recursive_unlock(_tx_linux_mutex);
@@ -176,19 +171,19 @@ int         exit_code = 0;
     /* Pickup the current thread pointer.  */
     temp_thread_ptr =  _tx_thread_current_ptr;
 
-    /* Determine if this is a thread and it does not 
+    /* Determine if this is a thread and it does not
        match the current thread pointer.  */
-    if ((_tx_linux_threadx_thread) && 
-        ((!temp_thread_ptr) || (!pthread_equal(temp_thread_ptr -> tx_thread_linux_thread_id, thread_id)))) 
-    { 
+    if ((_tx_linux_threadx_thread) &&
+        ((!temp_thread_ptr) || (!pthread_equal(temp_thread_ptr -> tx_thread_linux_thread_id, thread_id))))
+    {
 
         /* Unlock Linux mutex.  */
         tx_linux_mutex_recursive_unlock(_tx_linux_mutex);
 
-        /* This indicates the Linux thread was actually terminated by ThreadX and is only 
+        /* This indicates the Linux thread was actually terminated by ThreadX and is only
            being allowed to run in order to cleanup its resources.  */
         pthread_exit((void *)&exit_code);
-    } 
+    }
 
     /* Now determine if the application thread last had interrupts disabled.  */
 

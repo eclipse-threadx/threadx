@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -76,12 +77,6 @@
 /*                                                                        */
 /*    ISRs                                                                */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
  /* VOID   _tx_thread_fiq_context_save(VOID) */
 /* { */
@@ -90,7 +85,7 @@
     .type   _tx_thread_fiq_context_save, "function"
 _tx_thread_fiq_context_save:
 
-    /* Upon entry to this routine, it is assumed that IRQ interrupts are locked 
+    /* Upon entry to this routine, it is assumed that IRQ interrupts are locked
        out, we are in IRQ mode, and all registers are intact.  */
 
     /* Check for a nested interrupt condition.  */

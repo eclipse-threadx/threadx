@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -57,12 +58,6 @@
 /*                                                                        */
 /*    interrupt vector                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Andres Mlinar            Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_timer_interrupt(VOID)
 // {
@@ -86,7 +81,7 @@ _tx_timer_interrupt:
     // if (_tx_timer_time_slice)
     // {
 
-    LDR     x3, =_tx_timer_time_slice           // Pickup address of time-slice 
+    LDR     x3, =_tx_timer_time_slice           // Pickup address of time-slice
     LDR     w2, [x3, #0]                        // Pickup time-slice
     CMP     w2, #0                              // Is it non-active?
     BEQ     __tx_timer_no_time_slice            // Yes, skip time-slice processing
@@ -203,7 +198,7 @@ __tx_timer_dont_activate:
     // if (_tx_timer_expired_time_slice)
     // {
 
-    LDR     x3, =_tx_timer_expired_time_slice   // Pickup addr of time-slice expired 
+    LDR     x3, =_tx_timer_expired_time_slice   // Pickup addr of time-slice expired
     LDR     w2, [x3, #0]                        // Pickup the actual flag
     CMP     w2, #0                              // See if the flag is set
     BEQ     __tx_timer_not_ts_expiration        // No, skip time-slice processing

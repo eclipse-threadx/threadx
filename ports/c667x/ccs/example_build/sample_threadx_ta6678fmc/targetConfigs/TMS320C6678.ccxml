@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configurations XML_version="1.2" id="configurations_0">
-    
+
 <configuration XML_version="1.2" id="Texas Instruments XDS100v1 USB Debug Probe_0">
         <instance XML_version="1.2" desc="Texas Instruments XDS100v1 USB Debug Probe_0" href="connections/TIXDS100usb_Connection.xml" id="Texas Instruments XDS100v1 USB Debug Probe_0" xml="TIXDS100usb_Connection.xml" xmlpath="connections"/>
         <connection XML_version="1.2" id="Texas Instruments XDS100v1 USB Debug Probe_0">

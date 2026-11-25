@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -48,9 +49,9 @@
 /*     at which time an implicit call to exit() occurs).                  */
 /*     The pthread_exit() function provides an interface similar to exit()*/
 /*     but on a per-thread basis.                                         */
-/*                                                                        */   
-/*     pthread_exit() does not return.                                    */                 
-/*                                                                        */   
+/*                                                                        */
+/*     pthread_exit() does not return.                                    */
+/*                                                                        */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*       value_ptr                 exit parameter                         */
@@ -66,12 +67,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 VOID pthread_exit(void *value_ptr)
 {
@@ -79,15 +74,15 @@ VOID pthread_exit(void *value_ptr)
 TX_THREAD   *thread_ptr;
 POSIX_TCB   *pthread_ptr;
 
-    /* Get the thread identifier of the currently running thread */ 
-    thread_ptr = tx_thread_identify(); 
+    /* Get the thread identifier of the currently running thread */
+    thread_ptr = tx_thread_identify();
     /* get posix TCB for this pthread */
     pthread_ptr = (POSIX_TCB *)thread_ptr;
-        
-    /* Signal the housekeeping ThreadX thread to delete the requested pthread */ 
-    posix_destroy_pthread(pthread_ptr,value_ptr); 
 
-    /* Indicate success.  */ 
-    return; 
+    /* Signal the housekeeping ThreadX thread to delete the requested pthread */
+    posix_destroy_pthread(pthread_ptr,value_ptr);
+
+    /* Indicate success.  */
+    return;
 
 }

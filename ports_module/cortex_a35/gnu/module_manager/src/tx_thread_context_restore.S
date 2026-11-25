@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -56,12 +57,6 @@
 /*                                                                        */
 /*    ISRs                                  Interrupt Service Routines    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Andres Mlinar            Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_restore(VOID)
 // {
@@ -87,13 +82,13 @@ _tx_thread_context_restore:
     LDR     x3, =_tx_thread_system_state        // Pickup address of system state var
     LDR     w2, [x3, #0]                        // Pickup system state
     SUB     w2, w2, #1                          // Decrement the counter
-    STR     w2, [x3, #0]                        // Store the counter 
+    STR     w2, [x3, #0]                        // Store the counter
     CMP     w2, #0                              // Was this the first interrupt?
     BEQ     __tx_thread_not_nested_restore      // If so, not a nested restore
 
     /* Interrupts are nested.  */
 
-    /* Just recover the saved registers and return to the point of 
+    /* Just recover the saved registers and return to the point of
        interrupt.  */
 
     LDP     x4, x5, [sp], #16                   // Pickup saved SPSR/DAIF and ELR_EL

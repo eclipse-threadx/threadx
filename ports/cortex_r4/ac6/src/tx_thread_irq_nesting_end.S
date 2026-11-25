@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -77,12 +78,6 @@
 /*                                                                        */
 /*    ISRs                                                                */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_irq_nesting_end(VOID) */
 /* { */
@@ -96,7 +91,7 @@ _tx_thread_irq_nesting_end:
     #else
     CPSID   i                                   // Disable IRQ interrupts
     #endif
-    
+
     LDMIA   sp!, {r1, lr}                       // Pickup saved lr (and r1 throw-away for
                                                 //   8-byte alignment logic)
     CPS     #IRQ_MODE                           // Switch back to IRQ mode

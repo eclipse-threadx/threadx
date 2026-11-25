@@ -1,23 +1,23 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
-;/**************************************************************************/ 
-;/**************************************************************************/ 
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
-;/**                                                                       */ 
-;/**   Thread                                                              */ 
-;/**                                                                       */ 
-;/**************************************************************************/ 
-;/**************************************************************************/ 
+;/**************************************************************************/
+;/**************************************************************************/
+;/**                                                                       */
+;/** ThreadX Component                                                     */
+;/**                                                                       */
+;/**   Thread                                                              */
+;/**                                                                       */
+;/**************************************************************************/
+;/**************************************************************************/
 
 SVC_MODE        EQU     0x13                    ; SVC mode
 SYS_MODE        EQU     0x1F                    ; SYS mode
@@ -31,47 +31,38 @@ THUMB_MASK      EQU     0x20                    ; Thumb bit (5) of CPSR/SPSR
 
     EXTERN       _tx_thread_schedule
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_stack_build                          Cortex-A7/MMU/IAR   */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_stack_build                          Cortex-A7/MMU/IAR   */
 ;/*                                                           6.3.0        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function builds a stack frame on the supplied thread's stack.  */ 
-;/*    The stack frame results in a fake interrupt return to the supplied  */ 
-;/*    function pointer.                                                   */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    thread_ptr                            Pointer to thread control blk */ 
-;/*    function_ptr                          Pointer to return function    */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_thread_create                     Create thread service         */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
+;/*  DESCRIPTION                                                           */
 ;/*                                                                        */
-;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-;/*  10-31-2023      Yajun Xia               Modified comment(s),          */
-;/*                                            Added thumb mode support,   */
-;/*                                            resulting in version 6.3.0  */
+;/*    This function builds a stack frame on the supplied thread's stack.  */
+;/*    The stack frame results in a fake interrupt return to the supplied  */
+;/*    function pointer.                                                   */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    thread_ptr                            Pointer to thread control blk */
+;/*    function_ptr                          Pointer to return function    */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_thread_create                     Create thread service         */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(VOID))
@@ -85,10 +76,10 @@ THUMB_MASK      EQU     0x20                    ; Thumb bit (5) of CPSR/SPSR
 #endif
 _tx_thread_stack_build
 ;
-;       
+;
 ;    /* Build a fake interrupt frame.  The form of the fake interrupt stack
 ;       on the Cortex-A7 should look like the following after it is built:
-;       
+;
 ;       Stack Top:      1           Interrupt stack frame type
 ;                       CPSR        Initial value for CPSR
 ;                       a1 (r0)     Initial value for a1

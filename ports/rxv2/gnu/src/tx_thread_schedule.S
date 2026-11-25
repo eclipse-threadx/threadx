@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -75,21 +75,6 @@
 ;/*    _tx_thread_system_return             Return to system from thread   */
 ;/*    _tx_thread_context_restore           Restore thread's context       */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
-;/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
-;/*                                            removed unnecessary stack   */
-;/*                                            type checking,              */
-;/*                                            resulting in version 6.1.9  */
-;/*  01-31-2022     William E. Lamie         Modified comment(s),          */
-;/*                                            resulting in version 6.1.10 */
-;/*  04-25-2022     William E. Lamie         Modified comment(s), and      */ 
-;/*                                            added low power support,    */ 
-;/*                                            resulting in version 6.1.11 */ 
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
 ;{
@@ -107,7 +92,7 @@ __tx_thread_schedule_loop:
     MOV.L    [R1],R2                             ; Pickup next thread to execute
     CMP      #0,R2                               ; Is it NULL?
     BNE      __tx_thread_thread_ready            ; Not NULL, schedule the thread
-                                                 ; Idle system - no thread is ready    
+                                                 ; Idle system - no thread is ready
 #if (TX_LOW_POWER == 1)
     MOV.L    #__tx_thread_preempt_disable, R1    ; Load prempt disable flag.
     MOV.L    [R1], R2
@@ -136,7 +121,7 @@ __tx_thread_thread_ready:
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr == TX_NULL);
-;    
+;
 ;    /* Yes! We have a thread to execute. Note that interrupts are locked out at this point.  */
 ;
 ;    /* Setup the current thread pointer.  */

@@ -10,7 +10,7 @@ __HEAPSIZE__ = 128;
 
 SECTIONS
 {
-  .vectors : 
+  .vectors :
   {
     KEEP(*(.vectors .vectors.*))
   } > FLASH
@@ -45,7 +45,7 @@ SECTIONS
 		KEEP(*(.eh_frame*))
 	} > FLASH
 
-	.ARM.extab : 
+	.ARM.extab :
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 	} > FLASH
@@ -59,7 +59,7 @@ SECTIONS
 
 	__data_load_start__ = ALIGN (4);
 
-	.data : AT (__data_load_start__) 
+	.data : AT (__data_load_start__)
 	{
 		__data_start__ = .;
 
@@ -89,7 +89,7 @@ SECTIONS
 		KEEP(*(.jcr*))
 		. = ALIGN(4);
 		/* All data end */
-		
+
     __data_end__ = .;
 
 	} > RAM
@@ -104,7 +104,7 @@ SECTIONS
 		__bss_end__ = .;
 
 	} > RAM
-	
+
 	.heap (COPY):
 	{
     __heap_start__ = ALIGN(4);

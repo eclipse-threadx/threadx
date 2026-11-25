@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -56,12 +57,6 @@
 /*    _tx_thread_system_return             Return to system from thread   */
 /*    _tx_thread_context_restore           Restore thread's context       */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Andres Mlinar            Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
 // {
@@ -76,15 +71,15 @@ _tx_thread_schedule:
     // Wait for a thread to execute.  */
     // do
     // {
-    
+
     LDR     x1, =_tx_thread_execute_ptr         // Address of thread execute ptr
 
 #ifdef TX_ENABLE_WFI
 __tx_thread_schedule_loop:
     LDR     x0, [x1, #0]                        // Pickup next thread to execute
     CMP     x0, #0                              // Is it NULL?
-    BNE     _tx_thread_schedule_thread          // 
-    WFI                                         // 
+    BNE     _tx_thread_schedule_thread          //
+    WFI                                         //
     B       __tx_thread_schedule_loop           // Keep looking for a thread
 _tx_thread_schedule_thread:
 #else
@@ -96,7 +91,7 @@ __tx_thread_schedule_loop:
 
     // }
     // while(_tx_thread_execute_ptr == TX_NULL);
-    
+
     /* Yes! We have a thread to execute.  Lockout interrupts and
        transfer control to it.  */
 
@@ -105,7 +100,7 @@ __tx_thread_schedule_loop:
     /* Setup the current thread pointer.  */
     // _tx_thread_current_ptr =  _tx_thread_execute_ptr;
 
-    LDR     x1, =_tx_thread_current_ptr         // Pickup address of current thread 
+    LDR     x1, =_tx_thread_current_ptr         // Pickup address of current thread
     STR     x0, [x1, #0]                        // Setup current thread pointer
 
     /* Increment the run count for this thread.  */
@@ -119,7 +114,7 @@ __tx_thread_schedule_loop:
     /* Setup time-slice, if present.  */
     // _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;
 
-    LDR     x2, =_tx_timer_time_slice           // Pickup address of time slice 
+    LDR     x2, =_tx_timer_time_slice           // Pickup address of time slice
                                                 //   variable
     LDR     x4, [x0, #8]                        // Switch stack pointers
     MOV     sp, x4                              //

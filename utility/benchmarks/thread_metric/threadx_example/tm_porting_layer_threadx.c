@@ -1,16 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** Thread-Metric Component                                               */
 /**                                                                       */
 /**   Porting Layer (ThreadX Example)                                     */
@@ -26,7 +27,7 @@
 #endif
 
 
-/* For smallest size, the ThreadX library and application code should be built 
+/* For smallest size, the ThreadX library and application code should be built
    with the following options defined (easiest to add in tx_port.h):
 
 #define TX_ENABLE_EXECUTION_CHANGE_NOTIFY
@@ -110,7 +111,7 @@ void            (*tm_initialization_function)(void);
 VOID  tm_thread_entry(ULONG thread_input);
 
 
-/* This function called from main performs basic RTOS initialization, 
+/* This function called from main performs basic RTOS initialization,
    calls the test initialization function, and then starts the RTOS function.  */
 void  tm_initialize(void (*test_initialization_function)(void))
 {
@@ -119,13 +120,13 @@ void  tm_initialize(void (*test_initialization_function)(void))
     tm_initialization_function =  test_initialization_function;
 
     /* Call the previously defined initialization function.  */
-    (tm_initialization_function)();   
+    (tm_initialization_function)();
 }
 
 
 /* This function takes a thread ID and priority and attempts to create the
-   file in the underlying RTOS.  Valid priorities range from 1 through 31, 
-   where 1 is the highest priority and 31 is the lowest. If successful, 
+   file in the underlying RTOS.  Valid priorities range from 1 through 31,
+   where 1 is the highest priority and 31 is the lowest. If successful,
    the function should return TM_SUCCESS. Otherwise, TM_ERROR should be returned.   */
 int  tm_thread_create(int thread_id, int priority, void (*entry_function)(void))
 {
@@ -197,7 +198,7 @@ void tm_thread_relinquish(void)
 
 
 /* This function suspends the specified thread for the specified number
-   of seconds.  If successful, the function should return TM_SUCCESS. 
+   of seconds.  If successful, the function should return TM_SUCCESS.
    Otherwise, TM_ERROR should be returned.  */
 void tm_thread_sleep(int seconds)
 {
@@ -216,7 +217,7 @@ UINT    status;
 
 
     /* Create the specified queue with 16-byte messages.  */
-    status =  tx_queue_create(&tm_queue_array[queue_id], "Thread-Metric test", TX_4_ULONG, 
+    status =  tx_queue_create(&tm_queue_array[queue_id], "Thread-Metric test", TX_4_ULONG,
                               &tm_queue_memory_area[queue_id*TM_THREADX_QUEUE_SIZE], TM_THREADX_QUEUE_SIZE);
 
     /* Determine if the queue create was successful.  */
@@ -227,7 +228,7 @@ UINT    status;
 }
 
 
-/* This function sends a 16-byte message to the specified queue.  If successful, 
+/* This function sends a 16-byte message to the specified queue.  If successful,
    the function should return TM_SUCCESS. Otherwise, TM_ERROR should be returned.  */
 int  tm_queue_send(int queue_id, unsigned long *message_ptr)
 {
@@ -246,7 +247,7 @@ UINT    status;
 }
 
 
-/* This function receives a 16-byte message from the specified queue.  If successful, 
+/* This function receives a 16-byte message from the specified queue.  If successful,
    the function should return TM_SUCCESS. Otherwise, TM_ERROR should be returned.  */
 int  tm_queue_receive(int queue_id, unsigned long *message_ptr)
 {
@@ -342,8 +343,8 @@ UINT    status;
 }
 
 
-/* This function allocates a 128 byte block from the specified memory pool.  
-   If successful, the function should return TM_SUCCESS. Otherwise, TM_ERROR 
+/* This function allocates a 128 byte block from the specified memory pool.
+   If successful, the function should return TM_SUCCESS. Otherwise, TM_ERROR
    should be returned.  */
 int  tm_memory_pool_allocate(int pool_id, unsigned char **memory_ptr)
 {
@@ -362,8 +363,8 @@ UINT    status;
 }
 
 
-/* This function releases a previously allocated 128 byte block from the specified 
-   memory pool. If successful, the function should return TM_SUCCESS. Otherwise, TM_ERROR 
+/* This function releases a previously allocated 128 byte block from the specified
+   memory pool. If successful, the function should return TM_SUCCESS. Otherwise, TM_ERROR
    should be returned.  */
 int  tm_memory_pool_deallocate(int pool_id, unsigned char *memory_ptr)
 {

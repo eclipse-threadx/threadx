@@ -1,10 +1,10 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
@@ -59,14 +59,6 @@
 @/*                                                                        */
 @/*    ThreadX components                                                  */
 @/*                                                                        */
-@/*  RELEASE HISTORY                                                       */
-@/*                                                                        */
-@/*    DATE              NAME                      DESCRIPTION             */
-@/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-@/*  03-08-2023      Scott Larson            Include tx_user.h,            */
-@/*                                            resulting in version 6.2.1  */
-@/*                                                                        */
 @/**************************************************************************/
 @/* VOID   _tx_thread_system_return(VOID)
 @{  */
@@ -80,12 +72,15 @@ _tx_thread_system_return:
     LDR     r0, =0x10000000                         @ Load PENDSVSET bit
     LDR     r1, =0xE000ED04                         @ Load NVIC base
     STR     r0, [r1]                                @ Set PENDSVBIT in ICSR
+    DSB     #0xF                                    @ Ensure memory access is complete
+    ISB     #0xF                                    @ Flush pipeline
     MRS     r0, IPSR                                @ Pickup IPSR
     CMP     r0, #0                                  @ Is it a thread returning?
     BNE     _isr_context                            @ If ISR, skip interrupt enable
     MRS     r1, PRIMASK                             @ Thread context returning, pickup PRIMASK
     CPSIE   i                                       @ Enable interrupts
     MSR     PRIMASK, r1                             @ Restore original interrupt posture
+    ISB     #0xF                                    @ Flush pipeline
 _isr_context:
     BX      lr                                      @ Return to caller
 @/* }  */

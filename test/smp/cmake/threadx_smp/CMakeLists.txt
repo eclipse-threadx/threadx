@@ -1,17 +1,22 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-# Set up the project
-project(threadx_smp
-    VERSION 6.0.0 
-    LANGUAGES C ASM
-)
-
 if(NOT DEFINED THREADX_ARCH)
     message(FATAL_ERROR "Error: THREADX_ARCH not defined")
 endif()
 if(NOT DEFINED THREADX_TOOLCHAIN)
     message(FATAL_ERROR "Error: THREADX_TOOLCHAIN not defined")
 endif()
+
+set(THREADX_SMP_PROJECT_LANGUAGES C)
+if(NOT ((THREADX_ARCH STREQUAL "win64") AND (THREADX_TOOLCHAIN STREQUAL "vs_2022")))
+    list(APPEND THREADX_SMP_PROJECT_LANGUAGES ASM)
+endif()
+
+# Set up the project
+project(threadx_smp
+    VERSION 6.0.0
+    LANGUAGES ${THREADX_SMP_PROJECT_LANGUAGES}
+)
 
 set(PROJECT_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../..)
 
@@ -37,10 +42,11 @@ if (NOT TX_USER_FILE)
     set(TX_USER_FILE ${PROJECT_DIR}/common_smp/inc/tx_user_sample.h)
 else()
     message(STATUS "Using custom tx_user.h file from ${TX_USER_FILE}")
-endif()    
+endif()
 configure_file(${TX_USER_FILE} ${CUSTOM_INC_DIR}/tx_user.h COPYONLY)
-target_include_directories(${PROJECT_NAME} 
-    PUBLIC 
+target_include_directories(${PROJECT_NAME}
+    SYSTEM
+    PUBLIC
     ${CUSTOM_INC_DIR}
 )
 target_compile_definitions(${PROJECT_NAME} PUBLIC "TX_INCLUDE_USER_DEFINE_FILE" )

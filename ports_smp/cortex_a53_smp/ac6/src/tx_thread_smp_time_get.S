@@ -1,13 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -55,20 +57,9 @@
 /*                                                                        */
 /*    ThreadX Source                                                      */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  01-31-2022     Andres Mlinar            Updated comments,             */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_time_get
     .type    _tx_thread_smp_time_get, @function
 _tx_thread_smp_time_get:
-    MOV     x0, #0          // FIXME: Get timer
+    MRS     x0, CNTPCT_EL0  // Read generic timer physical count
     RET

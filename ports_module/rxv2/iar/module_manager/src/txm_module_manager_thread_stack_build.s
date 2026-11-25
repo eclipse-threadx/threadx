@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -53,13 +54,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_thread_create                     Create thread service         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022          Scott Larson        Initial Version 6.1.10        */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_manager_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(TX_THREAD *, TXM_MODULE_INSTANCE *))
 // {
@@ -68,7 +62,7 @@ __txm_module_manager_thread_stack_build:
 
     /* Build an interrupt frame.  The form of the fake interrupt stack
        on the Renesas RX should look like the following after it is built:
-       
+
     Stack Top:  1       Interrupt stack frame type
                 ACC0
                 ACC1
@@ -103,9 +97,9 @@ __txm_module_manager_thread_stack_build:
     BMC     #20,R4                              // if user mode, set mode bit of initial PSW
     MOV.L   R4, [-R3]                           // initial PSW
     MOV.L   R2, [-R3]                           // initial PC
-    
+
     MOV.L   8[R1], R4                           // Pickup thread entry info pointer, which is in the stack pointer position of the thread control block.
-                                                //   It was setup in the txm_module_manager_thread_create function. It will be overwritten later in this 
+                                                //   It was setup in the txm_module_manager_thread_create function. It will be overwritten later in this
                                                 //   function with the actual, initial stack pointer.
     MOV.L   R4,[-R3]                            // initial R2, which is the module entry information.
     MOV.L   R1,[-R3]                            // initial R1, which is the thread control block.

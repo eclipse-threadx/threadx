@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -34,12 +35,6 @@
 /*                                                                        */
 /*    This file defines the basic module constants, interface structures, */
 /*    and function prototypes.                                            */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022      Scott Larson            Initial Version 6.1.10        */
 /*                                                                        */
 /**************************************************************************/
 
@@ -90,7 +85,7 @@ The following extensions must also be defined in tx_port.h:
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 */
 
-#define TXM_MODULE_THREAD_ENTRY_INFO_USER_EXTENSION 
+#define TXM_MODULE_THREAD_ENTRY_INFO_USER_EXTENSION
 
 /* Define constants specific to the tools the module can be built with for this particular modules port.  */
 
@@ -255,7 +250,7 @@ typedef struct TXM_MODULE_MANAGER_MEMORY_FAULT_INFO_STRUCT
         {                                                                           \
             _tx_mutex_put(&_txm_module_manager_mutex);                              \
             return(TXM_MODULE_INVALID_PROPERTIES);                                  \
-        }                                                                           
+        }
 
 
 /* Define the macro to check the code alignment.  */
@@ -395,6 +390,6 @@ VOID  _txm_module_manager_setup_mpu_registers(TXM_MODULE_INSTANCE *module_instan
 
 #define TXM_MODULE_MANAGER_VERSION_ID   \
 CHAR                            _txm_module_manager_version_id[] =  \
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module RXv2/IAR Version 6.4.2 *";
+                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Module RXv2/IAR Version 6.5.0.202601 *";
 
 #endif

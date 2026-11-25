@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Initialize                                                          */
 ;/**                                                                       */
@@ -22,10 +22,10 @@
 #include "tx_user.h"
 #endif
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_initialize_fast_interrupt_setup               ARC_HS/MetaWare   */
 ;/*                                                           6.2.1        */
 ;/*  AUTHOR                                                                */
@@ -33,35 +33,26 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function initializes register bank 1 for fast interrupt use.   */ 
-;/*    The initialization includes setting the stack pointer to the value  */ 
-;/*    supplied by the caller.                                             */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    stack_ptr                             Pointer to stack for bank 1   */
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    Application                                                         */
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-;/*                                            #include tx_user.h,         */
-;/*                                            resulting in version 6.2.1  */
+;/*    This function initializes register bank 1 for fast interrupt use.   */
+;/*    The initialization includes setting the stack pointer to the value  */
+;/*    supplied by the caller.                                             */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    stack_ptr                             Pointer to stack for bank 1   */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    Application                                                         */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_fast_interrupt_setup(VOID *stack_ptr)
@@ -71,7 +62,7 @@
 _tx_initialize_fast_interrupt_setup:
 ;
 ;  /* Assume this routine is being called from initialization, with interrupts
-;     disabled and from register bank 0. Also assume that the stack pointer 
+;     disabled and from register bank 0. Also assume that the stack pointer
 ;     input is valid, i.e., there is no error checking on the validity of
 ;     register_bank.  */
 ;

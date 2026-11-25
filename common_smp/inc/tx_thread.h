@@ -1,14 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
-
+// Portions of this file were generated with AI assistance.
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -35,14 +36,6 @@
 /*    This file defines the ThreadX thread control component, including   */
 /*    data types and external references.  It is assumed that tx_api.h    */
 /*    and tx_port.h have already been included.                           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-31-2023     Tiejun Zhou              Fixed MISRA2012 rule 8.3,     */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -89,7 +82,7 @@
                 _tx_thread_stack_error_handler((thread_ptr));                                                                   \
                 TX_DISABLE                                                                                                      \
             }                                                                                                                   \
-            if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                                \
+            else if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                           \
             {                                                                                                                   \
                 TX_RESTORE                                                                                                      \
                 _tx_thread_stack_analyze((thread_ptr));                                                                         \
@@ -319,6 +312,8 @@ THREAD_DECLARE  volatile UINT               _tx_thread_preempt_disable;
    termination. This pointer is setup during mutex initialization.  */
 
 THREAD_DECLARE  VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
+/* Optional mutex inheritance update, installed by mutex creation. */
+THREAD_DECLARE  UINT            (*_tx_thread_mutex_priority_update)(TX_THREAD *thread_ptr, UINT new_priority);
 
 
 /* Define the global build options variable.  This contains a bit map representing
@@ -1178,6 +1173,11 @@ TX_THREAD       *last_thread;
 TX_THREAD       *thread_remap_list[TX_THREAD_SMP_MAX_CORES];
 
 
+    /* Limit the supplied core maps to the cores that are actually present.  */
+    available_cores =       available_cores & ((ULONG) TX_THREAD_SMP_CORE_MASK);
+    thread_possible_cores = thread_possible_cores & ((ULONG) TX_THREAD_SMP_CORE_MASK);
+    test_possible_cores =   test_possible_cores & ((ULONG) TX_THREAD_SMP_CORE_MASK);
+
     /* Clear the last thread cores in the search.  */
     last_thread_cores =  ((ULONG) 0);
 
@@ -1187,6 +1187,9 @@ TX_THREAD       *thread_remap_list[TX_THREAD_SMP_MAX_CORES];
     /* Setup the core queue indices.  */
     queue_first =  ((UINT) 0);
     queue_last =   ((UINT) 0);
+
+    /* Initialize the first core queue entry.  */
+    core_queue[0] =  ((UINT) 0);
 
     /* Build a list of possible cores for this thread to execute on, starting
        with the previously mapped core.  */

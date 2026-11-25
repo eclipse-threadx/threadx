@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -18,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
 /* Include macros for modifying the wait list.  */
 #include "tx_thread_smp_protection_wait_list_macros.h"
@@ -30,8 +33,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_protect                           Cortex-A35-SMP/AC6 */
-/*                                                           6.1.11       */
+/*    _tx_thread_smp_protect                             ARMv8-A-SMP      */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -57,19 +60,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Source                                                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  01-31-2022      Andres Mlinar           Updated comments,             */
-/*                                            added ARMv8.2-A support,    */
-/*                                            improved SMP code,          */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022      William E. Lamie        Modified comments, removed    */
-/*                                            FIFO queueing,              */
-/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_protect
@@ -119,9 +109,9 @@ _get_protection:
     CBZ     w5, _got_protection                 // Did it succeed?  w5 = 0 means success!
     MSR     DAIF, x0                            // Restore interrupts
     B       _tx_thread_smp_protect              // Restart the protection attempt
-    
+
 _got_protection:
-    DMB     ISH                                 // 
+    DMB     ISH                                 //
     STR     w2, [x1, #4]                        // Save owning core
 _owned:
     LDR     w5, [x1, #8]                        // Pickup ownership count

@@ -48,15 +48,6 @@ int32_t xt_timer_intnum = -1;
 /*    available RAM memory address for tx_application_define.             */
 /*    It also sets the default heap region for the optional C library.    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
-/*  04-25-2022      Scott Larson            Modified comments and updated */
-/*                                            function names,             */
-/*                                            resulting in version 6.1.11 */
-/*                                                                        */
 /**************************************************************************/
 VOID   _tx_initialize_low_level(VOID)
 {
@@ -89,6 +80,8 @@ VOID   _tx_initialize_low_level(VOID)
 
     /* Disable interrupts - don't want any that interact with ThreadX yet. */
     TX_DISABLE
+    /* Suppress compiler warning about set but not used variable. */
+    (void) interrupt_save;
 
     /*
     Disable stack limit checking if present. Whatever was set up earlier
@@ -123,8 +116,8 @@ VOID   _tx_initialize_low_level(VOID)
     Initialize co-processor management for threads. Leave CPENABLE alone.
     This is called from a normal Xtensa single-threaded run-time environment
     before multi-threading has commenced. All co-processors are enabled.
-    It is important NOT to clear CPENABLE yet because tx_application_define() 
-    is user code which might use a co-processor. The co-processor exception 
+    It is important NOT to clear CPENABLE yet because tx_application_define()
+    is user code which might use a co-processor. The co-processor exception
     handler does not expect to be called outside a thread.
     */
     _xt_coproc_init();

@@ -1,18 +1,21 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026 Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -29,46 +32,45 @@
 #include "tx_thread.h"
 #include "tx_timer.h"
 
+/* Set to non-zero by the atexit handler in tx_initialize_low_level.c when the
+   process is calling exit().  Prevents SuspendThread() from being called on
+   a thread that may be holding the CRT heap lock.  */
+extern volatile LONG    _tx_win32_exiting;
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_context_save                           Win32/Visual      */ 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_context_save                           Win32/Visual      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function saves the context of an executing thread in the       */ 
-/*    beginning of interrupt processing.  The function also ensures that  */ 
-/*    the system stack is used upon return to the calling ISR.            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    SuspendThread                         Win32 thread suspend          */ 
-/*    _tx_win32_critical_section_obtain     Obtain critical section       */ 
-/*    _tx_win32_critical_section_release    Release critical section      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISRs                                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*    This function saves the context of an executing thread in the       */
+/*    beginning of interrupt processing.  The function also ensures that  */
+/*    the system stack is used upon return to the calling ISR.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    SuspendThread                         Win32 thread suspend          */
+/*    _tx_win32_critical_section_obtain     Obtain critical section       */
+/*    _tx_win32_critical_section_release    Release critical section      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISRs                                                                */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_context_save(VOID)
@@ -91,6 +93,15 @@ TX_THREAD   *thread_ptr;
     if ((thread_ptr) && (_tx_thread_system_state == 0))
     {
 
+        /* Skip if the process is calling exit().  Suspending a thread that
+           holds the CRT heap lock causes a permanent deadlock because any
+           subsequent malloc in another thread will block forever.  */
+        if (_tx_win32_exiting)
+        {
+            _tx_win32_critical_section_release(&_tx_win32_critical_section);
+            return;
+        }
+
         /* Yes, this is the first interrupt and an application thread is running...
            suspend it!  */
 
@@ -109,4 +120,3 @@ TX_THREAD   *thread_ptr;
     /* Exit Win32 critical section.  */
     _tx_win32_critical_section_release(&_tx_win32_critical_section);
 }
-

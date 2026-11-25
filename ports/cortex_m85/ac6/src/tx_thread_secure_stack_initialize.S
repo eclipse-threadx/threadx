@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -52,18 +53,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    TX_PORT_SPECIFIC_PRE_INITIALIZATION                                 */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
-/*  07-29-2022      Scott Larson            Modified comments and changed */
-/*                                            secure stack initialization */
-/*                                            macro to port-specific,     */
-/*                                            resulting in version 6.1.12 */
-/*  03-08-2023      Scott Larson            Include tx_user.h,            */
-/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_secure_stack_initialize(VOID)

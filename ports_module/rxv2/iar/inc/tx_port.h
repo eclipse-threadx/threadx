@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -42,21 +43,6 @@
 /*    own special types that can be mapped to actual data types by this   */
 /*    file to guarantee consistency in the interface and functionality.   */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-30-2020     William E. Lamie         Initial Version 6.1.3         */
-/*  06-02-2021     William E. Lamie         Modified comments,            */
-/*                                            resulting in version 6.1.7  */
-/*  10-15-2021     William E. Lamie         Modified comment(s),          */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     William E. Lamie         Modified comment(s), removed  */
-/*                                            system state macro, and     */
-/*                                            added missing interrupt     */
-/*                                            control defines,            */
-/*                                            resulting in version 6.1.10 */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_PORT_H
@@ -70,13 +56,13 @@
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
 
 
-/* Yes, include the user defines in tx_user.h. The defines in this file may 
+/* Yes, include the user defines in tx_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
 #endif
 
-/* Define ThreadX basic types for this port.  */ 
+/* Define ThreadX basic types for this port.  */
 
 #define VOID                                    void
 typedef char                                    CHAR;
@@ -118,8 +104,8 @@ typedef unsigned short                          USHORT;
 #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
 #endif
 
-#ifndef TX_TIMER_THREAD_PRIORITY    
-#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */ 
+#ifndef TX_TIMER_THREAD_PRIORITY
+#define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
 #endif
 
 
@@ -144,7 +130,7 @@ typedef unsigned short                          USHORT;
 #define TX_INLINE_INITIALIZATION
 
 
-/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is 
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -156,11 +142,11 @@ typedef unsigned short                          USHORT;
 
 
 /* Define the TX_THREAD control block extensions for this port. The main reason
-   for the multiple macros is so that backward compatibility can be maintained with 
+   for the multiple macros is so that backward compatibility can be maintained with
    existing ThreadX kernel awareness modules.  */
 
-#define TX_THREAD_EXTENSION_0          
-#define TX_THREAD_EXTENSION_1                  
+#define TX_THREAD_EXTENSION_0
+#define TX_THREAD_EXTENSION_1
 #define TX_THREAD_EXTENSION_2                   VOID    *tx_thread_module_instance_ptr;         \
                                                 VOID    *tx_thread_module_entry_info_ptr;       \
                                                 ULONG   tx_thread_module_current_user_mode;     \
@@ -174,7 +160,7 @@ typedef unsigned short                          USHORT;
                                                 ULONG   tx_thread_module_stack_size;            \
                                                 VOID    *tx_thread_module_reserved;             \
                                                 VOID    *tx_thread_iar_tls_pointer;
-#define TX_THREAD_EXTENSION_3          
+#define TX_THREAD_EXTENSION_3
 
 
 /* Define the port extensions of the remaining ThreadX objects.  */
@@ -195,11 +181,11 @@ typedef unsigned short                          USHORT;
                                                 VOID   (*tx_timer_module_expiration_function)(ULONG id);
 
 
-/* Define the user extension field of the thread control block.  Nothing 
+/* Define the user extension field of the thread control block.  Nothing
    additional is needed for this port so it is defined as white space.  */
 
 #ifndef TX_THREAD_USER_EXTENSION
-#define TX_THREAD_USER_EXTENSION    
+#define TX_THREAD_USER_EXTENSION
 #endif
 
 
@@ -207,8 +193,8 @@ typedef unsigned short                          USHORT;
    tx_thread_shell_entry, and tx_thread_terminate.  */
 
 
-#define TX_THREAD_CREATE_EXTENSION(thread_ptr)                                  
-#define TX_THREAD_DELETE_EXTENSION(thread_ptr)                                  
+#define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+#define TX_THREAD_DELETE_EXTENSION(thread_ptr)
 #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
 #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
 
@@ -234,9 +220,9 @@ typedef unsigned short                          USHORT;
 #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
 #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
 
-/* Define ThreadX interrupt lockout and restore macros for protection on 
-   access of critical kernel information.  The restore interrupt macro must 
-   restore the interrupt posture of the running thread prior to the value 
+/* Define ThreadX interrupt lockout and restore macros for protection on
+   access of critical kernel information.  The restore interrupt macro must
+   restore the interrupt posture of the running thread prior to the value
    present prior to the disable macro.  In most cases, the save area macro
    is used to define a local function save area for the disable and restore
    macros.  */
@@ -286,8 +272,8 @@ static void _tx_thread_system_return_inline(void)
 /* Define the version ID of ThreadX.  This may be utilized by the application.  */
 
 #ifdef TX_THREAD_INIT
-CHAR                            _tx_version_id[] = 
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX RXv2/IAR Version 6.4.2 *";
+CHAR                            _tx_version_id[] =
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX RXv2/IAR Version 6.5.2.202603b *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

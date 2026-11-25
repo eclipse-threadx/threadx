@@ -88,8 +88,8 @@ typedef struct /* see "Arm Cortex-Mxx Technical Reference Manual r0p1"
 #define ITGU_BASE    (0xE001E500UL)         /* ITCM Gating Unit */
 #define DTGU_BASE    (0xE001E600UL)         /* DTCM Gating Unit */
 
-#define ITGU         ((TGU_TypeDef *) ITGU_BASE)     
-#define DTGU         ((TGU_TypeDef *) DTGU_BASE)     
+#define ITGU         ((TGU_TypeDef *) ITGU_BASE)
+#define DTGU         ((TGU_TypeDef *) DTGU_BASE)
 /*****************************************************************/
 
 
@@ -160,7 +160,7 @@ void SystemInit (void)
 
   /* configure unsecure code area: ITCM 512K 0x00080000 - 0x00100000 */
   // blk_cfg = ITGU->CFG & 0xF;             /* = 0x7 */
-  // blk_size = 1UL << (blk_cfg + 5U);      /* = 0x1000 (4K) */ 
+  // blk_size = 1UL << (blk_cfg + 5U);      /* = 0x1000 (4K) */
   ITGU->LUT[4] = 0xFFFFFFFF;
   ITGU->LUT[5] = 0xFFFFFFFF;
   ITGU->LUT[6] = 0xFFFFFFFF;
@@ -168,7 +168,7 @@ void SystemInit (void)
 
   /* configure unsecure data area: DTCM 512K 0x20080000 - 0x20100000 */
   // blk_cfg = DTGU->CFG & 0xF;             /* = 0x7 */
-  // blk_size = 1UL << (blk_cfg + 5U);      /* = 0x1000 (4K) */ 
+  // blk_size = 1UL << (blk_cfg + 5U);      /* = 0x1000 (4K) */
   DTGU->LUT[4] = 0xFFFFFFFF;
   DTGU->LUT[5] = 0xFFFFFFFF;
   DTGU->LUT[6] = 0xFFFFFFFF;

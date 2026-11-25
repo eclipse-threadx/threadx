@@ -1,11 +1,11 @@
 
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -21,12 +21,6 @@
 /*    Structure offsets depend on the compiler, so are tools-specific,    */
 /*    which usually means port-specific since a compiler's struct         */
 /*    packing rules depend on properties of the target architecture.      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
 /*                                                                        */
 /**************************************************************************/
 

@@ -1,16 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** Thread-Metric Component                                               */
 /**                                                                       */
 /**   Interrupt Processing Test                                           */
@@ -18,27 +19,21 @@
 /**************************************************************************/
 /**************************************************************************/
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    tm_interrupt_processing_test                        PORTABLE C      */ 
-/*                                                           6.1.7        */ 
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    tm_interrupt_processing_test                        PORTABLE C      */
+/*                                                           6.1.7        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This file defines the No-preemption interrupt processing test.      */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  10-15-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/**************************************************************************/
 #include "tm_api.h"
 
 
@@ -87,14 +82,14 @@ void  tm_interrupt_processing_initialize(void)
     /* Create thread that generates the interrupt at priority 10.  */
     tm_thread_create(0, 10, tm_interrupt_thread_0_entry);
 
-    /* Create a semaphore that will be posted from the interrupt 
+    /* Create a semaphore that will be posted from the interrupt
        handler.  */
     tm_semaphore_create(0);
 
     /* Resume just thread 0.  */
     tm_thread_resume(0);
 
-    /* Create the reporting thread. It will preempt the other 
+    /* Create the reporting thread. It will preempt the other
        threads and print out the test results.  */
     tm_thread_create(5, 2, tm_interrupt_thread_report);
     tm_thread_resume(5);
@@ -118,13 +113,13 @@ int status;
     while(1)
     {
 
-        /* Force an interrupt. The underlying RTOS must see that the 
+        /* Force an interrupt. The underlying RTOS must see that the
            the interrupt handler is called from the appropriate software
            interrupt or trap. */
        TM_CAUSE_INTERRUPT
 
         /* We won't get back here until the interrupt processing is complete,
-           including the setting of the semaphore from the interrupt 
+           including the setting of the semaphore from the interrupt
            handler.  */
 
         /* Pickup the semaphore set by the interrupt handler. */
@@ -189,9 +184,9 @@ unsigned long   average;
         average =  total/2;
 
         /* See if there are any errors.  */
-        if ((tm_interrupt_thread_0_counter < (average - 1)) || 
+        if ((tm_interrupt_thread_0_counter < (average - 1)) ||
             (tm_interrupt_thread_0_counter > (average + 1)) ||
-            (tm_interrupt_handler_counter < (average - 1)) || 
+            (tm_interrupt_handler_counter < (average - 1)) ||
             (tm_interrupt_handler_counter > (average + 1)))
         {
 

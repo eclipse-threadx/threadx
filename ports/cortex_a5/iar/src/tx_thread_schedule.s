@@ -1,18 +1,19 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -43,48 +44,39 @@ ENABLE_INTS     DEFINE  0x80                    ; IRQ Interrupts enabled mask
 ;
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                                Cortex-A5/IAR    */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_schedule                                Cortex-A5/IAR    */
 ;/*                                                           6.1.9        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function waits for a thread control block pointer to appear in */ 
-;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-;/*    in the variable, the corresponding thread is resumed.               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-;/*    _tx_thread_system_return             Return to system from thread   */ 
-;/*    _tx_thread_context_restore           Restore thread's context       */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
-;/*                                            execution profile support,  */
-;/*                                            resulting in version 6.1.9  */
+;/*    This function waits for a thread control block pointer to appear in */
+;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+;/*    in the variable, the corresponding thread is resumed.               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+;/*    _tx_thread_system_return             Return to system from thread   */
+;/*    _tx_thread_context_restore           Restore thread's context       */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -114,7 +106,7 @@ __tx_thread_schedule_loop
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr == TX_NULL);
-;    
+;
 ;    /* Yes! We have a thread to execute.  Lockout interrupts and
 ;       transfer control to it.  */
 ;
@@ -123,7 +115,7 @@ __tx_thread_schedule_loop
 ;    /* Setup the current thread pointer.  */
 ;    _tx_thread_current_ptr =  _tx_thread_execute_ptr;
 ;
-    LDR     r1, =_tx_thread_current_ptr         ; Pickup address of current thread 
+    LDR     r1, =_tx_thread_current_ptr         ; Pickup address of current thread
     STR     r0, [r1, #0]                        ; Setup current thread pointer
 ;
 ;    /* Increment the run count for this thread.  */
@@ -137,7 +129,7 @@ __tx_thread_schedule_loop
 ;    /* Setup time-slice, if present.  */
 ;    _tx_timer_time_slice =  _tx_thread_current_ptr -> tx_thread_time_slice;
 ;
-    LDR     r2, =_tx_timer_time_slice           ; Pickup address of time slice 
+    LDR     r2, =_tx_timer_time_slice           ; Pickup address of time slice
                                                 ;   variable
     LDR     sp, [r0, #8]                        ; Switch stack pointers
     STR     r3, [r2, #0]                        ; Setup time-slice
@@ -202,7 +194,7 @@ _tx_skip_solicited_vfp_restore:
 #ifdef __ARMVFP__
     PUBLIC  tx_thread_vfp_enable
     CODE32
-tx_thread_vfp_enable??rA    
+tx_thread_vfp_enable??rA
 tx_thread_vfp_enable
     MRS     r2, CPSR                            ; Pickup the CPSR
 #ifdef TX_ENABLE_FIQ_SUPPORT
@@ -222,7 +214,7 @@ __tx_no_thread_to_enable:
 
     PUBLIC  tx_thread_vfp_disable
     CODE32
-tx_thread_vfp_disable??rA    
+tx_thread_vfp_disable??rA
 tx_thread_vfp_disable
     MRS     r2, CPSR                            ; Pickup the CPSR
 #ifdef TX_ENABLE_FIQ_SUPPORT
@@ -242,4 +234,5 @@ __tx_no_thread_to_disable:
 #endif
 
     END
+
 

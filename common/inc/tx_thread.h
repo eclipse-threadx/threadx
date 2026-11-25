@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -35,21 +36,6 @@
 /*    This file defines the ThreadX thread control component, including   */
 /*    data types and external references.  It is assumed that tx_api.h    */
 /*    and tx_port.h have already been included.                           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Yuxin Zhou               Modified comment(s), and      */
-/*                                            moved TX_THREAD_GET_SYSTEM_ */
-/*                                            STATE to tx_api.h,          */
-/*                                            resulting in version 6.1.2  */
-/*  10-15-2021     Scott Larson             Modified comment(s), improved */
-/*                                            stack check error handling, */
-/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -239,7 +225,7 @@
                 _tx_thread_stack_error_handler((thread_ptr));                                                                   \
                 TX_DISABLE                                                                                                      \
             }                                                                                                                   \
-            if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                                \
+            else if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                           \
             {                                                                                                                   \
                 TX_RESTORE                                                                                                      \
                 _tx_thread_stack_analyze((thread_ptr));                                                                         \
@@ -402,6 +388,8 @@ THREAD_DECLARE  volatile UINT   _tx_thread_preempt_disable;
    termination. This pointer is setup during mutex initialization.  */
 
 THREAD_DECLARE  VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
+/* Optional mutex inheritance update, installed by mutex creation. */
+THREAD_DECLARE  UINT            (*_tx_thread_mutex_priority_update)(TX_THREAD *thread_ptr, UINT new_priority);
 
 
 /* Define the global build options variable.  This contains a bit map representing

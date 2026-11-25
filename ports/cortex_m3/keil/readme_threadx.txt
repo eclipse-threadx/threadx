@@ -1,4 +1,4 @@
-                     Microsoft's Azure RTOS ThreadX for Cortex-M3 
+                     Microsoft's Azure RTOS ThreadX for Cortex-M3
 
                                Thumb & 32-bit Mode
 
@@ -6,29 +6,29 @@
 
 1.  Building the ThreadX run-time Library
 
-Building the ThreadX library is easy, simply load the project file 
-ThreadX_Library.Uv2, which is located inside the "example_build" directory. 
+Building the ThreadX library is easy, simply load the project file
+ThreadX_Library.Uv2, which is located inside the "example_build" directory.
 
 Once the ThreadX library files are displayed in the project window,
 select the "Build Target" operation and observe the compilation and assembly
-of the ThreadX library. This project build produces the ThreadX library 
+of the ThreadX library. This project build produces the ThreadX library
 file ThreadX_Library.lib.
 
 
 2.  Demonstration System
 
 The ThreadX demonstration is designed to execute under the Keil simulator or
-Cortex-M3 hardware. This demonstration is slightly smaller than typical ThreadX 
+Cortex-M3 hardware. This demonstration is slightly smaller than typical ThreadX
 demonstrations, and thus requires less than 7KB of Flash and less than 4KB of RAM.
 
-Building the demonstration is easy; simply open the ThreadX demonstration 
-project file ThreadX_Demo.Uv2, which is located inside the "example_build" 
-directory. 
+Building the demonstration is easy; simply open the ThreadX demonstration
+project file ThreadX_Demo.Uv2, which is located inside the "example_build"
+directory.
 
-Once open, select the "Build Target" operation and observe the compilation of 
-sample_threadx.c (which is the demonstration application) and linking with 
-ThreadX_Library.lib. The resulting file ThreadX_Demo.axf is a binary file that 
-can be downloaded and executed under the uVision simulator or Cortex-M3 hardware. 
+Once open, select the "Build Target" operation and observe the compilation of
+sample_threadx.c (which is the demonstration application) and linking with
+ThreadX_Library.lib. The resulting file ThreadX_Demo.axf is a binary file that
+can be downloaded and executed under the uVision simulator or Cortex-M3 hardware.
 
 For simulator execution, the following memory regions need to be defined via
 the "Debug -> Memory Map" dialog:
@@ -39,17 +39,17 @@ the "Debug -> Memory Map" dialog:
 
 3.  System Initialization
 
-The entry point in ThreadX for the Cortex-M3 using Keil tools is at label 
-__main. This is defined within the Keil compiler's startup code. In 
-addition, this is where all static and global pre-set C variable 
+The entry point in ThreadX for the Cortex-M3 using Keil tools is at label
+__main. This is defined within the Keil compiler's startup code. In
+addition, this is where all static and global pre-set C variable
 initialization processing takes place.
 
-The ThreadX tx_initialize_low_level.s file is responsible for setting up 
-various system data structures, the vector area, and a periodic timer interrupt 
-source. 
+The ThreadX tx_initialize_low_level.s file is responsible for setting up
+various system data structures, the vector area, and a periodic timer interrupt
+source.
 
-In addition, _tx_initialize_low_level determines the first available 
-address for use by the application, which is supplied as the sole input 
+In addition, _tx_initialize_low_level determines the first available
+address for use by the application, which is supplied as the sole input
 parameter to your application definition function, tx_application_define.
 
 
@@ -58,11 +58,11 @@ parameter to your application definition function, tx_application_define.
 The following defines the saved context stack frames for context switches
 that occur as a result of interrupt handling or from thread-level API calls.
 All suspended threads have the same stack frame in the Cortex-M3 version of
-ThreadX. The top of the suspended thread's stack is pointed to by 
+ThreadX. The top of the suspended thread's stack is pointed to by
 tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
 
-  Stack Offset     Stack Contents 
+  Stack Offset     Stack Contents
 
      0x00               r4
      0x04               r5
@@ -84,21 +84,21 @@ tx_thread_stack_ptr in the associated thread control block TX_THREAD.
 
 5.  Improving Performance
 
-The distribution version of ThreadX is built without any compiler 
-optimizations. This makes it easy to debug because you can trace or set 
-breakpoints inside of ThreadX itself. Of course, this costs some 
-performance. To make it run faster, you can change the ThreadX_Library.Uv2 
-project to debugging and enable all compiler optimizations. 
+The distribution version of ThreadX is built without any compiler
+optimizations. This makes it easy to debug because you can trace or set
+breakpoints inside of ThreadX itself. Of course, this costs some
+performance. To make it run faster, you can change the ThreadX_Library.Uv2
+project to debugging and enable all compiler optimizations.
 
-In addition, you can eliminate the ThreadX basic API error checking by 
-compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING 
-defined. 
+In addition, you can eliminate the ThreadX basic API error checking by
+compiling your application code with the symbol TX_DISABLE_ERROR_CHECKING
+defined.
 
 
 6.  Interrupt Handling
 
 ThreadX provides complete and high-performance interrupt handling for Cortex-M3
-targets. There are a certain set of requirements that are defined in the 
+targets. There are a certain set of requirements that are defined in the
 following sub-sections:
 
 

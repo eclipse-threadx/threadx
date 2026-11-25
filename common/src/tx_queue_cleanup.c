@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -65,14 +66,6 @@
 /*    _tx_thread_terminate              Thread terminate processing       */
 /*    _tx_thread_wait_abort             Thread wait abort processing      */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_queue_cleanup(TX_THREAD  *thread_ptr, ULONG suspension_sequence)
 {
@@ -115,6 +108,19 @@ TX_THREAD           *previous_thread;
                     if (queue_ptr -> tx_queue_suspended_count != TX_NO_SUSPENSIONS)
                     {
 #else
+
+                        /* TX_NOT_INTERRUPTABLE path: the revalidation guards present in the
+                           interruptable path above (cleanup pointer, suspension sequence, NULL
+                           queue pointer, queue ID, and suspended count checks) are intentionally
+                           omitted here.  Those guards exist to handle the race window that opens
+                           when the interruptable path calls TX_RESTORE before invoking cleanup,
+                           allowing another context to service or abort the suspension in between.
+                           In TX_NOT_INTERRUPTABLE mode the caller keeps interrupts disabled across
+                           the entire cleanup call, so that race window never exists.  Additionally,
+                           every path that resumes a suspended thread (tx_queue_send, tx_queue_receive,
+                           tx_queue_flush, tx_queue_delete) clears tx_thread_suspend_cleanup before
+                           calling _tx_thread_system_ni_resume, making a double-cleanup impossible
+                           under the NI serialisation guarantee.  */
 
                         /* Setup pointer to queue control block.  */
                         queue_ptr =  TX_VOID_TO_QUEUE_POINTER_CONVERT(thread_ptr -> tx_thread_suspend_control_block);

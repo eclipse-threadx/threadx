@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -75,13 +76,6 @@ SVC_MODE        EQU     0x93                    // SVC mode
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ISRs                                  Interrupt Service Routines    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2022      Scott Larson            Initial Version 6.2.0         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_restore(VOID)
 // {

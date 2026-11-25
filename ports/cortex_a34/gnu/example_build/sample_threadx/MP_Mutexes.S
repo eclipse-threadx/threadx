@@ -4,7 +4,7 @@
 //
 // Copyright (c) 2012-2019 Arm Limited (or its affiliates). All rights reserved.
 // Use, modification and redistribution of this file is subject to your possession of a
-// valid End User License Agreement for the Arm Product of which these examples are part of 
+// valid End User License Agreement for the Arm Product of which these examples are part of
 // and your compliance with all applicable terms and conditions of such licence agreement.
 //
 
@@ -92,7 +92,7 @@ _mutex_release:
     .type _mutex_acquire, "function"
     .cfi_startproc
 _mutex_acquire:
-    // This uses a "ticket lock".  The lock is stored as a 32-bit value: 
+    // This uses a "ticket lock".  The lock is stored as a 32-bit value:
     // - the upper 16-bits record the thread's ticket number ("take a ticket")
     // - the lower 16-bits record the ticket being served    ("now serving")
 

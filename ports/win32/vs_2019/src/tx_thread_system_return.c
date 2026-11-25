@@ -1,18 +1,21 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -30,53 +33,47 @@
 #include <stdio.h>
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_system_return                          Win32/Visual      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_system_return                          Win32/Visual      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is target processor specific.  It is used to transfer */ 
-/*    control from a thread back to the system.  Only a minimal context   */ 
-/*    is saved since the compiler assumes temp registers are going to get */ 
-/*    slicked by a function call anyway.                                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_win32_critical_section_obtain     Obtain critical section       */ 
-/*    _tx_win32_critical_section_release    Release critical section      */ 
-/*    _tx_win32_critical_section_release_all                              */ 
-/*                                          Release critical section      */ 
-/*    ExitThread                            Win32 thread exit             */ 
-/*    GetCurrentThread                      Win32 get current thread      */ 
-/*    GetCurrentThreadId                    Win32 get current thread ID   */ 
-/*    GetThreadPriority                     Win32 get thread priority     */ 
-/*    ReleaseSemaphore                      Win32 release semaphore       */ 
-/*    WaitForSingleObject                   Win32 wait on semaphore       */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX components                                                  */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*    This function is target processor specific.  It is used to transfer */
+/*    control from a thread back to the system.  Only a minimal context   */
+/*    is saved since the compiler assumes temp registers are going to get */
+/*    slicked by a function call anyway.                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_win32_critical_section_obtain     Obtain critical section       */
+/*    _tx_win32_critical_section_release    Release critical section      */
+/*    _tx_win32_critical_section_release_all                              */
+/*                                          Release critical section      */
+/*    ExitThread                            Win32 thread exit             */
+/*    GetCurrentThread                      Win32 get current thread      */
+/*    GetCurrentThreadId                    Win32 get current thread ID   */
+/*    GetThreadPriority                     Win32 get thread priority     */
+/*    ReleaseSemaphore                      Win32 release semaphore       */
+/*    WaitForSingleObject                   Win32 wait on semaphore       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX components                                                  */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_system_return(VOID)
@@ -86,8 +83,9 @@ TX_THREAD   *temp_thread_ptr;
 HANDLE      temp_run_semaphore;
 UINT        temp_thread_state;
 HANDLE      threadhandle;
-int         threadpriority; 
+int         threadpriority;
 DWORD       threadid;
+ULONG       handoff_spin_count;
 
 
     /* Enter Win32 critical section.  */
@@ -102,7 +100,7 @@ DWORD       threadid;
     /* First, determine if the thread was terminated.  */
 
     /* Pickup the priority of the current thread.  */
-    threadpriority =  GetThreadPriority(threadhandle); 
+    threadpriority =  GetThreadPriority(threadhandle);
 
     /* Pickup the ID of the current thread.  */
     threadid =  GetCurrentThreadId();
@@ -110,21 +108,21 @@ DWORD       threadid;
     /* Pickup the current thread pointer.  */
     temp_thread_ptr =  _tx_thread_current_ptr;
 
-    /* Determine if this is a thread (THREAD_PRIORITY_LOWEST) and it does not 
+    /* Determine if this is a thread (THREAD_PRIORITY_LOWEST) and it does not
        match the current thread pointer.  */
-    if ((threadpriority == THREAD_PRIORITY_LOWEST) && 
-        ((!temp_thread_ptr) || (temp_thread_ptr -> tx_thread_win32_thread_id != threadid))) 
-    { 
+    if ((threadpriority == THREAD_PRIORITY_LOWEST) &&
+        ((!temp_thread_ptr) || (temp_thread_ptr -> tx_thread_win32_thread_id != threadid)))
+    {
 
-        /* This indicates the Win32 thread was actually terminated by ThreadX and is only 
+        /* This indicates the Win32 thread was actually terminated by ThreadX and is only
            being allowed to run in order to cleanup its resources.  */
-        
+
         /* Release critical section.  */
         _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
-        
+
         /* Exit thread.  */
-        ExitThread(0); 
-    } 
+        ExitThread(0);
+    }
 
     /* Determine if the time-slice is active.  */
     if (_tx_timer_time_slice)
@@ -154,6 +152,7 @@ DWORD       threadid;
        on.  Note that the main scheduling algorithm will take care of
        setting the current thread pointer to NULL.  */
     ReleaseSemaphore(_tx_win32_scheduler_semaphore, 1, NULL);
+    _tx_win32_scheduler_wake();
 
     /* Leave Win32 critical section.  */
     _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
@@ -166,9 +165,25 @@ DWORD       threadid;
         ExitThread(0);
     }
 
-    /* Wait on the run semaphore for this thread.  This won't get set again
-       until the thread is scheduled.  */
-    WaitForSingleObject(temp_run_semaphore, INFINITE);
+    /* Spin briefly for the scheduler to grant this thread a new time-slice,
+       then block so suspended threads do not consume host CPU indefinitely.  */
+    handoff_spin_count =  TX_WIN32_HANDOFF_SPIN_COUNT;
+    while (WaitForSingleObject(temp_run_semaphore, 0) != WAIT_OBJECT_0)
+    {
+        if (handoff_spin_count != 0)
+        {
+            handoff_spin_count--;
+            SwitchToThread();
+        }
+        else
+        {
+            WaitForSingleObject(temp_run_semaphore, INFINITE);
+            break;
+        }
+    }
+
+    /* Acknowledge that the thread is once again executing ThreadX code.  */
+    ReleaseSemaphore(temp_thread_ptr -> tx_thread_win32_thread_start_semaphore, 1, NULL);
 
     /* Enter Win32 critical section.  */
     _tx_win32_critical_section_obtain(&_tx_win32_critical_section);
@@ -181,19 +196,19 @@ DWORD       threadid;
     /* Pickup the current thread pointer.  */
     temp_thread_ptr =  _tx_thread_current_ptr;
 
-    /* Determine if this is a thread (THREAD_PRIORITY_LOWEST) and it does not 
+    /* Determine if this is a thread (THREAD_PRIORITY_LOWEST) and it does not
        match the current thread pointer.  */
-    if ((threadpriority == THREAD_PRIORITY_LOWEST) && 
-        ((!temp_thread_ptr) || (temp_thread_ptr -> tx_thread_win32_thread_id != threadid))) 
-    { 
+    if ((threadpriority == THREAD_PRIORITY_LOWEST) &&
+        ((!temp_thread_ptr) || (temp_thread_ptr -> tx_thread_win32_thread_id != threadid)))
+    {
 
         /* Leave Win32 critical section.  */
         _tx_win32_critical_section_release_all(&_tx_win32_critical_section);
 
-        /* This indicates the Win32 thread was actually terminated by ThreadX and is only 
+        /* This indicates the Win32 thread was actually terminated by ThreadX and is only
            being allowed to run in order to cleanup its resources.  */
-        ExitThread(0); 
-    } 
+        ExitThread(0);
+    }
 
     /* Now determine if the application thread last had interrupts disabled.  */
 
@@ -208,4 +223,3 @@ DWORD       threadid;
         _tx_win32_critical_section_release(&_tx_win32_critical_section);
     }
 }
-

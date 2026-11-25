@@ -41,12 +41,6 @@
 /* anyway, and are always restored even in Call0 ABI. Only A14, A15 are   */
 /* truly handled as callee-save regs.                                     */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 
 
@@ -71,7 +65,7 @@ interrupt stack frame defined in xtensa_rtos.h.
 Its counterpart is _xt_context_restore (which also restores A12, A13).
 
 Caller is expected to have saved PC, PS, A0, A1 (SP), A12, A13 in the frame.
-This function preserves A12 & A13 in order to provide the caller with 2 scratch 
+This function preserves A12 & A13 in order to provide the caller with 2 scratch
 regs that need not be saved over the call to this function. The choice of which
 2 regs to provide is governed by xthal_window_spill_nw and xthal_save_extra_nw,
 to avoid moving data more than necessary. Caller can assign regs accordingly.
@@ -80,7 +74,7 @@ Entry Conditions:
     A0  = Return address in caller.
     A1  = Stack pointer of interrupted thread or handler ("interruptee").
     Original A12, A13 have already been saved in the interrupt stack frame.
-    Other processor state except PC, PS, A0, A1 (SP), A12, A13, is as at the 
+    Other processor state except PC, PS, A0, A1 (SP), A12, A13, is as at the
     point of interruption.
     If windowed ABI, PS.EXCM = 1 (exceptions disabled).
 
@@ -137,7 +131,7 @@ _xt_context_save:
     s32i    a3,  sp, XT_STK_ATOMCTL
     #endif
 
-    #if XT_USE_SWPRI
+    #ifdef XT_USE_SWPRI
     /* Save virtual priority mask */
     movi    a3,  _xt_vpri_mask
     l32i    a3,  a3, 0
@@ -156,8 +150,8 @@ _xt_context_save:
     and underflow exceptions disabled (assured by PS.EXCM == 1).
     */
     s32i    a12, sp, XT_STK_TMP0        /* temp. save stuff in stack frame */
-    s32i    a13, sp, XT_STK_TMP1    
-    s32i    a9,  sp, XT_STK_TMP2    
+    s32i    a13, sp, XT_STK_TMP1
+    s32i    a9,  sp, XT_STK_TMP2
 
     /*
     Save the overlay state if we are supporting overlays. Since we just saved
@@ -177,12 +171,12 @@ _xt_context_save:
     call0   xthal_window_spill_nw       /* preserves only a4,5,8,9,12,13 */
     addi    sp,  sp, -XT_STK_FRMSZ
     l32i    a12, sp, XT_STK_TMP0        /* recover stuff from stack frame */
-    l32i    a13, sp, XT_STK_TMP1    
-    l32i    a9,  sp, XT_STK_TMP2    
+    l32i    a13, sp, XT_STK_TMP1
+    l32i    a9,  sp, XT_STK_TMP2
     #endif
 
     #if XCHAL_EXTRA_SA_SIZE > 0
-    /*  
+    /*
     NOTE: Normally the xthal_save_extra_nw macro only affects address
     registers a2-a5. It is theoretically possible for Xtensa processor
     designers to write TIE that causes more address registers to be
@@ -212,7 +206,7 @@ _xt_context_restore
     !! MUST BE CALLED ONLY BY 'CALL0' INSTRUCTION !!
 
 Restores all Xtensa processor state except PC, PS, A0, A1 (SP) (and in Call0
-ABI, A14, A15 which are preserved by all interrupt handlers) from an interrupt 
+ABI, A14, A15 which are preserved by all interrupt handlers) from an interrupt
 stack frame defined in xtensa_rtos.h .
 Its counterpart is _xt_context_save (whose caller saved A12, A13).
 
@@ -225,7 +219,7 @@ Entry Conditions:
 Exit conditions:
     A0  = Return address in caller.
     A1  = Stack pointer of interrupted thread or handler ("interruptee").
-    Other processor state except PC, PS, A0, A1 (SP), is as at the point 
+    Other processor state except PC, PS, A0, A1 (SP), is as at the point
     of interruption.
 
 *******************************************************************************/
@@ -236,7 +230,7 @@ Exit conditions:
 _xt_context_restore:
 
     #if XCHAL_EXTRA_SA_SIZE > 0
-    /*  
+    /*
     NOTE: Normally the xthal_restore_extra_nw macro only affects address
     registers a2-a5. It is theoretically possible for Xtensa processor
     designers to write TIE that causes more address registers to be
@@ -312,7 +306,7 @@ _xt_context_restore:
 
     /*
     Call0 ABI callee-saved regs a12-15 do not need to be restored here.
-    However a12-13 were saved for scratch before XT_RTOS_INT_ENTER(), 
+    However a12-13 were saved for scratch before XT_RTOS_INT_ENTER(),
     so need to be restored anyway, despite being callee-saved in Call0.
     */
     l32i    a12, sp, XT_STK_A12
@@ -324,7 +318,7 @@ _xt_context_restore:
 
     ret
 
-#endif /* XCHAL_HAVE_XEA3 */
+#endif /* XCHAL_HAVE_XEA2 */
 
 
 /*******************************************************************************
@@ -337,7 +331,7 @@ to "unowned". Leaves CPENABLE as it found it (does NOT clear it).
 Called during initialization of the RTOS, before any threads run.
 
 This may be called from normal Xtensa single-threaded application code which
-might use co-processors. The Xtensa run-time initialization enables all 
+might use co-processors. The Xtensa run-time initialization enables all
 co-processors. They must remain enabled here, else a co-processor exception
 might occur outside of a thread, which the exception handler doesn't expect.
 
@@ -378,13 +372,13 @@ _xt_coproc_init:
 
 _xt_coproc_release
 
-Releases any and all co-processors owned by a given thread. The thread is 
+Releases any and all co-processors owned by a given thread. The thread is
 identified by it's co-processor state save area defined in xtensa_context.h .
 
 Must be called before a thread's co-proc save area is deleted to avoid
 memory corruption when the exception handler tries to save the state.
 May be called when a thread terminates or completes but does not delete
-the co-proc save area, to avoid the exception handler having to save the 
+the co-proc save area, to avoid the exception handler having to save the
 thread's co-proc state before another thread can use it (optimization).
 
 Entry Conditions:

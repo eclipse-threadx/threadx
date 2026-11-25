@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -54,7 +55,7 @@
 #endif
    .text
    .eabi_attribute Tag_ABI_align_preserved, 1
-       
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -87,12 +88,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ISRs                                  Interrupt Service Routines    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_thread_context_restore(VOID)
@@ -181,15 +176,15 @@ __tx_thread_preempt_restore:
 
     LDMIA   sp!, {r3, r10, r12, lr}             // Recover temporarily saved registers
     MOV     r1, lr                              // Save lr (point of interrupt)
-    
+
     CPS     #SVC_MODE                           // Switch to SVC mode to save context on thread stack
     STR     r1, [sp, #-4]!                      // Save point of interrupt
     STMDB   sp!, {r4-r12, lr}                   // Save upper half of registers
     MOV     r4, r3                              // Save SPSR in r4
-    
+
     CPS     #IRQ_MODE                           // Switch back to IRQ mode
     LDMIA   sp!, {r0-r3}                        // Recover r0-r3
-    
+
     CPS     #SVC_MODE                           // Switch to SVC mode to save remaining context on thread stack
     STMDB   sp!, {r0-r3}                        // Save r0-r3 on thread's stack
 

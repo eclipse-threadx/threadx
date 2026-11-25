@@ -40,7 +40,7 @@
 
 typedef volatile uint32_t									__C66XX_IO_DATA_TYPE__;
 
-// read-back data bitmask for DSP memory-mapped registers (32-bit wide) 
+// read-back data bitmask for DSP memory-mapped registers (32-bit wide)
 #define C66XX_RG_DATA_BITMASK								0xffffffff
 //=============================================================================
 

@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -100,14 +101,6 @@ VOID     *_tx_initialize_unused_memory;
 /*                                        is optionally called by         */
 /*                                        compiler's startup code.        */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 VOID    _tx_initialize_high_level(VOID)
 {
@@ -118,16 +111,21 @@ VOID    _tx_initialize_high_level(VOID)
     /* Initialize the event log, if enabled.  */
     TX_EL_INITIALIZE
 
+
     /* Call the thread control initialization function.  */
     _tx_thread_initialize();
 
+
 #ifndef TX_NO_TIMER
+
 
     /* Call the timer control initialization function.  */
     _tx_timer_initialize();
+
 #endif
 
 #ifndef TX_DISABLE_REDUNDANT_CLEARING
+
 
     /* Call the semaphore initialization function.  */
     _tx_semaphore_initialize();
@@ -146,6 +144,6 @@ VOID    _tx_initialize_high_level(VOID)
 
     /* Call the mutex initialization function.  */
     _tx_mutex_initialize();
+
 #endif
 }
-

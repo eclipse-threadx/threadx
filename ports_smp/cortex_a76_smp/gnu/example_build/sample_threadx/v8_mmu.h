@@ -101,7 +101,7 @@
 #define TT_S1_ATTR_PXN    (1 << 53)
 #define TT_S1_ATTR_UXN    (1 << 54)
 
-// PBHA bits[62:59] - If Armv8.2-TTPBHA is implemented, hardware can use these bits 
+// PBHA bits[62:59] - If Armv8.2-TTPBHA is implemented, hardware can use these bits
 // for IMPLEMENTATIONDEFINED purposes, otherwise IGNORED
 
 #define TT_S1_MAIR_DEV_nGnRnE 0b00000000

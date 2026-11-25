@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -26,48 +27,42 @@
 #include "px_int.h"     /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    pthread_mutex_trylock                               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    pthread_mutex_trylock                               PORTABLE C      */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This function shall be equivalent to pthread_mutex_lock(), except   */
 /*    that if the mutex object referenced by mutex is currently locked    */
 /*    (by any thread,including the current thread), the call shall return */
 /*    immediately. If the mutex type is PTHREAD_MUTEX_RECURSIVE and the   */
 /*    mutex is currently owned by the calling thread,the mutex lock count */
 /*    shall be incremented by one and the pthread_mutex_trylock()function */
-/*    shall immediately return success.                                   */ 
+/*    shall immediately return success.                                   */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*    mutex                          Pointer to the mutex object          */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*     0                             If successful                        */ 
-/*     Value                         In case of any error                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    tx_mutex_get                   ThreadX Mutex get service.           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*     0                             If successful                        */
+/*     Value                         In case of any error                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    tx_mutex_get                   ThreadX Mutex get service.           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 INT pthread_mutex_trylock(pthread_mutex_t *mutex)
@@ -81,13 +76,13 @@ INT          retval,status;
 
     /* Try to get the mutex */
     status = tx_mutex_get( mutex_ptr, TX_NO_WAIT);
-   
+
     switch ( status)
     {
         case TX_SUCCESS:
             retval = OK;
             break;
-        
+
         case TX_DELETED:
             posix_errno  = EINVAL;
 	        posix_set_pthread_errno(EINVAL);

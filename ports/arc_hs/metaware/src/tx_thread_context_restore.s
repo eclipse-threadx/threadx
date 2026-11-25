@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 
@@ -55,19 +55,6 @@
 ;/*  CALLED BY                                                             */
 ;/*                                                                        */
 ;/*    ISRs                                  Interrupt Service Routines    */
-;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  10-15-2021     Andres Mlinar            Modified comment(s), and      */
-;/*                                            r25/r30 are caller saved,   */
-;/*                                            use schedule_reenter,       */
-;/*                                            resulting in version 6.1.9  */
-;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-;/*                                            #include tx_user.h,         */
-;/*                                            resulting in version 6.2.1  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)
@@ -249,7 +236,7 @@ __tx_thread_preempt_restore:
     b       __tx_preempt_save_done                      ; Done, finished with preemption save
     nop
 
-__tx_software_interrupt_context:    
+__tx_software_interrupt_context:
     mov     r6, 1                                       ; Build interrupt stack type
     st      r6,  [r7, 0]                                ; Setup interrupt stack type
     st      fp,  [r7, 24]                               ; Save fp

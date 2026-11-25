@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -22,10 +22,10 @@
 #include "tx_user.h"
 #endif
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_register_bank_assign                   ARC_HS/MetaWare   */
 ;/*                                                           6.2.1        */
 ;/*  AUTHOR                                                                */
@@ -33,37 +33,28 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
+;/*                                                                        */
 ;/*    This function builds a stack frame on the supplied thread's stack.  */
 ;/*    The stack frame results in a fake interrupt return to the supplied  */
-;/*    function pointer.                                                   */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
+;/*    function pointer.                                                   */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
 ;/*    thread_ptr                            Pointer to thread control blk */
 ;/*    register_bank                         Register bank number          */
-;/*                                            (1 through max-1)           */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    Application                                                         */
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
+;/*                                            (1 through max-1)           */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-;/*                                            #include tx_user.h,         */
-;/*                                            resulting in version 6.2.1  */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    Application                                                         */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_register_bank_assign(VOID *thread_ptr, UINT register_bank)
@@ -75,9 +66,9 @@ _tx_thread_register_bank_assign:
 ;  /* Assume this routine is being called from initialization, with interrupts
 ;     disabled and from register bank 0. Also assume that the thread pointer and
 ;     register bank input is valid, i.e., there is no error checking on the validity of
-;     the thread pointer or the register_bank.  
+;     the thread pointer or the register_bank.
 ;
-;     It is worth noting that if fast interrupts are being used, register bank 1 
+;     It is worth noting that if fast interrupts are being used, register bank 1
 ;     is reserved for the fast interrupt processing, so thread register bank assignments
 ;     should begin at bank 2.  */
 ;
@@ -101,7 +92,7 @@ _tx_thread_register_bank_assign:
     bclr    r3, r3, 17                                  ;
     bclr    r3, r3, 18                                  ;
     kflag   r3                                          ; Move back to register bank 0
-    mov     r5, 3                                       ; Build type for hardware interrupt context 
+    mov     r5, 3                                       ; Build type for hardware interrupt context
     j_s.d   [blink]                                     ; Return to caller
     st      r5, [r4, 0]                                 ; Set stack frame type
 ;}

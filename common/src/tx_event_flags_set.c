@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -66,18 +67,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
-/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022      William E. Lamie        Modified comment(s), and      */
-/*                                            added corrected preemption  */
-/*                                            check logic, resulting in   */
-/*                                            version 6.1.11              */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_event_flags_set(TX_EVENT_FLAGS_GROUP *group_ptr, ULONG flags_to_set, UINT set_option)
@@ -336,8 +325,8 @@ VOID            (*events_set_notify)(struct TX_EVENT_FLAGS_GROUP_STRUCT *notify_
                 /* Disable preemption while we process the suspended list.  */
                 _tx_thread_preempt_disable++;
 
-                /* Since we have temporarily disabled preemption globally, set the preempt 
-                   check flag to check for any preemption condition - including from 
+                /* Since we have temporarily disabled preemption globally, set the preempt
+                   check flag to check for any preemption condition - including from
                    unrelated ISR processing.  */
                 preempt_check =  TX_TRUE;
 

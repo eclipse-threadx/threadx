@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -62,14 +65,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  12-31-2020      Scott Larson            Modified comment(s),          */
-/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_start(TXM_MODULE_INSTANCE *module_instance)
@@ -132,7 +127,7 @@ UINT    status;
     }
 
     /* Create the module's callback request queue.  */
-    status = _tx_queue_create(&(module_instance -> txm_module_instance_callback_request_queue), "Module Callback Request Queue", (sizeof(TXM_MODULE_CALLBACK_MESSAGE)/sizeof(ULONG)),
+    status = _tx_queue_create(&(module_instance -> txm_module_instance_callback_request_queue), _txm_module_manager_callback_request_queue_name, (sizeof(TXM_MODULE_CALLBACK_MESSAGE)/sizeof(ULONG)),
                               module_instance -> txm_module_instance_callback_request_queue_area, sizeof(module_instance -> txm_module_instance_callback_request_queue_area));
 
     /* Determine if there was an error.  */

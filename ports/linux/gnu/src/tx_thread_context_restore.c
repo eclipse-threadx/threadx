@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -31,50 +32,44 @@
 
 extern sem_t _tx_linux_isr_semaphore;
 UINT _tx_linux_timer_waiting = 0;
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_thread_context_restore                          Linux/GNU       */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_context_restore                          Linux/GNU       */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function restores the interrupt context if it is processing a  */ 
-/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-/*    if no thread was running, the function returns to the scheduler.    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_linux_debug_entry_insert                                        */ 
-/*    tx_linux_mutex_lock                                                 */ 
-/*    sem_trywait                                                         */
-/*    tx_linux_sem_post                                                   */ 
-/*    tx_linux_sem_wait                                                   */ 
-/*    _tx_linux_thread_resume                                             */ 
-/*    tx_linux_mutex_recursive_unlock                                     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISRs                                  Interrupt Service Routines    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*    This function restores the interrupt context if it is processing a  */
+/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+/*    if no thread was running, the function returns to the scheduler.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_linux_debug_entry_insert                                        */
+/*    tx_linux_mutex_lock                                                 */
+/*    sem_trywait                                                         */
+/*    tx_linux_sem_post                                                   */
+/*    tx_linux_sem_wait                                                   */
+/*    _tx_linux_thread_resume                                             */
+/*    tx_linux_mutex_recursive_unlock                                     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISRs                                  Interrupt Service Routines    */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_context_restore(VOID)
@@ -101,7 +96,7 @@ VOID   _tx_thread_context_restore(VOID)
         if ((_tx_thread_preempt_disable == 0) && (_tx_thread_current_ptr != _tx_thread_execute_ptr))
         {
 
-            /* Preempt the running application thread.  We don't need to suspend the 
+            /* Preempt the running application thread.  We don't need to suspend the
                application thread since that is done in the context save processing.  */
 
             /* Indicate that this thread was suspended asynchronously.  */

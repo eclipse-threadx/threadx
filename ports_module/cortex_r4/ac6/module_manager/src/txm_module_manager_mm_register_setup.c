@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -54,12 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _txm_module_manager_mm_register_setup                               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_module_manager_region_size_get(ULONG block_size)
@@ -519,7 +514,7 @@ ALIGN_TYPE shared_memory_address_end;
     {
         return(TX_FALSE);
     }
-    
+
     /* Check if the object is inside the module data.  */
     if ((obj_ptr >= (ALIGN_TYPE) module_instance -> txm_module_instance_data_start) &&
         ((obj_ptr + obj_size) <= ((ALIGN_TYPE) module_instance -> txm_module_instance_data_end + 1)))

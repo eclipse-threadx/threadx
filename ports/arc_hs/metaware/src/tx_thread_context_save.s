@@ -1,12 +1,15 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026 Eclipse ThreadX contributors
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
+
+; Portions of this file were generated with AI assistance.
 
 ;/**************************************************************************/
 ;/**************************************************************************/
@@ -54,18 +57,6 @@
 ;/*  CALLED BY                                                             */
 ;/*                                                                        */
 ;/*    ISRs                                                                */
-;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  10-15-2021     Andres Mlinar            Modified comment(s), and      */
-;/*                                            r25/r30 are caller saved,   */
-;/*                                            resulting in version 6.1.9  */
-;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-;/*                                            #include tx_user.h,         */
-;/*                                            resulting in version 6.2.1  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_save(VOID)
@@ -185,10 +176,17 @@ __tx_thread_not_nested_save:
 ;    _tx_thread_current_ptr -> tx_thread_stack_ptr =  sp;
 ;
     st      sp, [r1, 8]                                 ; Save thread's stack pointer
+;
+;    /* Switch to the system stack.  */
+;    sp =  _tx_thread_system_stack_ptr;
+;
+    ld      sp, [gp, _tx_thread_system_stack_ptr@sda]   ; Switch to system stack
 
     .ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 ;
-;    /* Call the ISR enter function to indicate an ISR is executing.  */
+;    /* Call the ISR enter function to indicate an ISR is executing.  The call is
+;       made after the switch to the system stack so that it does not consume any
+;       of the interrupted thread's stack.  */
 ;
     sub     sp, sp, 32                                  ; Allocating some space on the stack
     st      blink, [sp, 16]                             ; Save blink
@@ -198,12 +196,7 @@ __tx_thread_not_nested_save:
     add     sp, sp, 32                                  ; Recover the stack space
     .endif
 
-;
-;    /* Switch to the system stack.  */
-;    sp =  _tx_thread_system_stack_ptr;
-;
-    j_s.d   [blink]                                     ; Return to calling ISR
-    ld      sp, [gp, _tx_thread_system_stack_ptr@sda]   ; Switch to system stack
+    j_s     [blink]                                     ; Return to calling ISR
 ;
 ;    }
 ;    else

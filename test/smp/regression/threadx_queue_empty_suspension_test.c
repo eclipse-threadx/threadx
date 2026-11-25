@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test empty queue suspension of queue that supports 3 messages
    that are each 2 ULONG in size.  */
 
@@ -54,8 +65,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -67,8 +78,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -80,8 +91,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -107,7 +118,7 @@ CHAR    *pointer;
 
     /* Setup queue send notification.  */
     status =  tx_queue_send_notify(&queue_0, queue_notify);
-    
+
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 
     /* Check for status.  */
@@ -117,7 +128,7 @@ CHAR    *pointer;
         printf("Running Queue Empty Suspension Test................................. ERROR #5\n");
         test_control_return(1);
     }
-    
+
 #else
 
     /* Check for status.  */
@@ -128,7 +139,7 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-#endif 
+#endif
 }
 
 
@@ -193,12 +204,12 @@ ULONG   source_message[2] = {0x12345678, 0};
 
     /* Now resume thread 2 to get another thread suspended on an empty queue.  */
     tx_thread_resume(&thread_2);
-    
+
     /* Now send 2 messages to wakeup both threads!  */
     source_message[0]++;
     status =  tx_queue_send(&queue_0, &source_message[0], TX_NO_WAIT);
     status += tx_queue_send(&queue_0, &source_message[0], TX_NO_WAIT);
-    
+
     /* Check status and run count of other thread - it should have got the
        message already.  */
     if ((status != TX_SUCCESS) || (thread_1_counter != 2) || (thread_2_counter != 1))

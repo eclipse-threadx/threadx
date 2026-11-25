@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -54,12 +55,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX components                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Andres Mlinar            Initial Version 6.1.3         */
 /*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_system_return(VOID)
@@ -156,13 +151,13 @@ __tx_thread_dont_save_ts:
     STR     x4, [x5, x8, LSL #3]                // Clear current thread pointer
 
     /* Set ready bit in thread control block.  */
-    
+
     MOV     x3, #1                              // Build ready value
-    STR     w3, [x6, #260]                      // Make the thread ready 
-    DMB     ISH                                 // 
-    
+    STR     w3, [x6, #260]                      // Make the thread ready
+    DMB     ISH                                 //
+
     /* Now clear protection. It is assumed that protection is in force whenever this routine is called.  */
-    
+
     LDR     x3, =_tx_thread_smp_protection      // Pickup address of protection structure
     LDR     x1, =_tx_thread_preempt_disable     // Build address to preempt disable flag
     STR     w4, [x1, #0]                        // Clear preempt disable flag

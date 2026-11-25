@@ -21,6 +21,41 @@ on:
         default: './test/cmake'
         required: false
         type: string
+      # Minutes for the install step. Ten suits a consumer that only installs
+      # packages, which is all of them bar GUIX: measured install steps run 0.2
+      # to 0.5 minutes, and NetX Duo's secure interoperability job, which builds
+      # OpenSSL and wolfSSL from source, takes 2.1 to 2.8. GUIX also builds a
+      # configuration here, because its regression suite is staged across the
+      # install, build and test steps to fit their limits, so it needs longer.
+      # The default keeps every other consumer exactly where it was.
+      install_timeout_minutes:
+        default: 10
+        required: false
+        type: number
+      # Minutes for the build step, on the same reasoning as the install step
+      # above. Fifteen suits a consumer that builds once: measured build steps
+      # are 0.5 minutes for LevelX, 1.1 for FileX and 6.4 for USBX. GUIX builds
+      # five configurations here as part of its staging and reaches 11.8, which
+      # is 79 per cent of the cap and shrinking as tests are added.
+      build_timeout_minutes:
+        default: 15
+        required: false
+        type: number
+      # Minutes for the test step. Sixty covers every ThreadX suite, whose
+      # longest observed run is 37 minutes. NetX Duo runs all 43 configurations
+      # of its full suite in this one step, which took 201 minutes on 25 Oct
+      # 2026, so it passes a larger value.
+      test_timeout_minutes:
+        default: 60
+        required: false
+        type: number
+      # Keep the .deb files apt downloads in the install step in the Actions
+      # cache, so a later run installs them without fetching them again. See the
+      # apt cache steps below.
+      apt_cache:
+        default: true
+        required: false
+        type: boolean
       skip_test:
         default: false
         required: false
@@ -29,8 +64,40 @@ on:
         default: false
         required: false
         type: boolean
+      # The merged report, not one configuration's. Every configuration is
+      # instrumented now (TX_COVERAGE below) and coverage.sh --merge unions
+      # them; default_build_coverage was one build of five, and the code the
+      # other four select was absent from its denominator rather than uncovered
+      # in it.
       coverage_name:
-        default: 'default_build_coverage'
+        default: 'merged'
+        required: false
+        type: string
+      # The lower and upper threshold percentages handed to
+      # CodeCoverageSummary, lower first. The lower one is a hard floor: the
+      # step below sets fail_below_min, so a run whose merged line rate falls
+      # under it turns the job red.
+      #
+      # Both must be whole numbers. Probed against the pinned action on a
+      # runner, 26 Aug 2026: '99.9 100' is rejected with
+      # 'System.ArgumentException - Threshold parameter set incorrectly.' and
+      # the step fails whether or not fail_below_min is set, because the action
+      # parses each half with an integer parse. So a floor can be 99 or 100 and
+      # nothing between, and the intended 99.9 is not expressible.
+      #
+      # The floor is compared against the LINE rate only -- not the branch
+      # rate, and not the lower of the two. Probed on the same run: the
+      # ThreadX report at 100.00% lines and 77.67% branches passes a floor of
+      # 99. Worth knowing, because branch coverage is around 78% in both
+      # suites while the project asks for 100%, and a floor set from the
+      # headline line figure says nothing about it.
+      #
+      # Each suite sets its own in regression_test.yml, because they do not
+      # sit at the same figure. The default here is the action's own, low
+      # enough to be no floor at all in practice -- a caller that collects
+      # coverage is expected to name its number.
+      coverage_thresholds:
+        default: '50 75'
         required: false
         type: string
       skip_deploy:
@@ -56,66 +123,182 @@ jobs:
       issues: read
       checks: write
       pull-requests: write
-      
+
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    # Actions are pinned to a commit SHA, with the version in the trailing
+    # comment. A tag can be moved; a SHA cannot, so this is what makes "which
+    # code ran in CI" answerable from the repository. Dependabot moves these
+    # pins and rewrites the comment with them -- see .github/dependabot.yml.
     - name: Check out the repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         submodules: true
-    
+
+    # The apt cache. The install scripts retry and bound every fetch, but a
+    # mirror can be slow without being down: on 23 Oct 2026 it served packages
+    # at 50 to 250 KB/s while indexes still came at 12 MB/s, and the ThreadX and
+    # RISC-V installs timed out on all three attempts inside an 11 MB and a 58 MB
+    # file. With the .deb files restored from the Actions cache, apt fetches
+    # only the indexes and whatever changed since the cache was saved.
+    #
+    # It is done here rather than in the install scripts so that every caller's
+    # script gets it unchanged: an apt.conf.d entry points apt-get's archive
+    # directory at the restored one. A restored file cannot alter what is
+    # installed, because apt checks every .deb against the hash in the signed
+    # index before using it, and fetches it again if the two differ.
+    #
+    # The key carries the runner image, whose package versions the cache
+    # matches, and the install script, whose package list it holds. A miss on
+    # either still restores the closest older cache, so a new image or one
+    # added package costs only the packages that changed.
+    - name: Prepare the apt cache key
+      id: apt_key
+      if: ${{ inputs.apt_cache }}
+      env:
+        INSTALL_SCRIPT: ${{ inputs.install_script }}
+      run: |
+        echo "dir=${RUNNER_TEMP}/apt-archives" >> "$GITHUB_OUTPUT"
+        echo "image=${ImageOS}-${ImageVersion}" >> "$GITHUB_OUTPUT"
+        echo "script=$( (sha256sum "$INSTALL_SCRIPT" 2> /dev/null || echo none) | cut -c1-16)" >> "$GITHUB_OUTPUT"
+
+    - name: Restore the apt cache
+      id: apt_restore
+      if: ${{ inputs.apt_cache }}
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.apt_key.outputs.dir }}
+        key: apt-${{ steps.apt_key.outputs.image }}-${{ steps.apt_key.outputs.script }}
+        restore-keys: |
+          apt-${{ steps.apt_key.outputs.image }}-
+          apt-
+
+    # apt downloads as the unprivileged _apt user, which must own partial/.
+    # Keep-Downloaded-Packages is set because the apt front end deletes what it
+    # installed by default; apt-get keeps it, but a caller's script may use
+    # either.
+    - name: Point apt at the cache
+      if: ${{ inputs.apt_cache }}
+      env:
+        APT_DIR: ${{ steps.apt_key.outputs.dir }}
+      run: |
+        sudo mkdir -p "$APT_DIR/partial"
+        sudo chown _apt:root "$APT_DIR/partial"
+        printf 'Dir::Cache::Archives "%s/";\nAPT::Keep-Downloaded-Packages "true";\nBinary::apt::APT::Keep-Downloaded-Packages "true";\n' "$APT_DIR" \
+          | sudo tee /etc/apt/apt.conf.d/99-ci-archive-cache > /dev/null
+        echo "apt cache: $(find "$APT_DIR" -maxdepth 1 -name '*.deb' | wc -l) packages restored"
+
+    # apt and PyPI have stalled this step twice, for 55 minutes and for over two
+    # hours, against a normal 27 to 152 seconds. Nothing here had a timeout, so a
+    # stall ran until the six hour job limit and cost a whole run rather than
+    # failing and being retried.
     - name: Install softwares
+      timeout-minutes: ${{ inputs.install_timeout_minutes }}
       run: ${{ inputs.install_script }}
 
+    # Saved straight after the install rather than at the end of the job, so a
+    # run whose tests fail still leaves the packages for the next one. autoclean
+    # drops .deb files the indexes no longer list, so the cache does not grow
+    # with every superseded version. apt's lock file and partial/ are root-only
+    # and are removed so the cache action, which runs unprivileged, can read the
+    # rest.
+    - name: Save the apt cache
+      if: ${{ inputs.apt_cache && steps.apt_restore.outputs.cache-hit != 'true' }}
+      env:
+        APT_DIR: ${{ steps.apt_key.outputs.dir }}
+      run: |
+        sudo apt-get autoclean -qq
+        sudo rm -rf "$APT_DIR/partial" "$APT_DIR/lock"
+        sudo chmod -R a+rX "$APT_DIR"
+        echo "apt cache: $(find "$APT_DIR" -maxdepth 1 -name '*.deb' | wc -l) packages, $(du -sh "$APT_DIR" | cut -f1)"
+
+    - name: Upload the apt cache
+      if: ${{ inputs.apt_cache && steps.apt_restore.outputs.cache-hit != 'true' }}
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.apt_key.outputs.dir }}
+        key: apt-${{ steps.apt_key.outputs.image }}-${{ steps.apt_key.outputs.script }}
+
+    # TX_COVERAGE instruments every build configuration rather than only the one
+    # whose name ends in _coverage. It has to be set for the build as well as the
+    # test: the build is where -fprofile-arcs is decided, and the test run is
+    # where the reports are collected and merged.
     - name: Build
+      timeout-minutes: ${{ inputs.build_timeout_minutes }}
+      env:
+        TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.build_script }}
 
     - name: Test
+      timeout-minutes: ${{ inputs.test_timeout_minutes }}
+      env:
+        TX_COVERAGE: ${{ inputs.skip_coverage && 'OFF' || 'ON' }}
       run: ${{ inputs.test_script }}
-      
+
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2.11.0
+      uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
       if: always()
       with:
         check_name: Test Results ${{ inputs.result_affix }}
         files: |
           ${{ inputs.cmake_path }}/build/*/*.xml
-          
+
     - name: Upload Test Results
       if: success() || failure()
-      uses: actions/upload-artifact@v4.6.0
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: test_reports ${{ inputs.result_affix }}
         path: |
           ${{ inputs.cmake_path }}/build/*.txt
           ${{ inputs.cmake_path }}/build/*/Testing/**/*.xml
           ${{ inputs.cmake_path }}/build/**/regression/output_files/*.bin
-    
-    - name: Configure GitHub Pages
-      uses: actions/configure-pages@v3.0.6
 
+    - name: Configure GitHub Pages
+      uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+    # The coverage steps below run even when a test failed. cmake_bootstrap.sh
+    # now produces the report in that case, and the run whose behaviour changed
+    # is the one whose coverage is worth reading; previously a single flaky test
+    # suppressed the report for the whole run. !cancelled() rather than always(),
+    # so a cancelled run still stops promptly -- the same idiom the
+    # deploy_code_coverage job below already uses. The ${{ }} is required: a bare
+    # ! opens a YAML tag, and the expression will not parse without it.
+    #
+    # fail_below_min turns the summary into a gate. Until now coverage could
+    # fall from any figure to any other and no check went red, against a
+    # project target of 100% -- a stated requirement measured with a gauge
+    # that could not fail.
+    #
+    # One thing the floor does not defend, and it is the likeliest way for
+    # coverage to break: an empty report reads as 100%. gcovr writes
+    # line-rate="1.0" beside lines-valid="0" when it finds no data, and the
+    # action reports 'Line Rate = 100% (0 / 0)' and passes any floor --
+    # probed on a runner, 26 Aug 2026. The check that catches that is the
+    # emptiness assertion in each suite's coverage.sh, not this one.
     - name: Generate Code Coverage Results Summary
-      if: (!inputs.skip_coverage)
-      uses: irongut/CodeCoverageSummary@v1.3.0
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
+      uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
       with:
         filename: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}.xml
         format: markdown
         badge: true
         hide_complexity: true
         output: file
+        thresholds: ${{ inputs.coverage_thresholds }}
+        fail_below_min: true
 
     - name: Write Code Coverage Summary
-      if: (!inputs.skip_coverage)
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       run: |
         echo "## Coverage Report ${{ inputs.result_affix }}" >> $GITHUB_STEP_SUMMARY
         cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
     - name: Create CheckRun for Code Coverage
-      if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
-      uses: LouisBrunner/checks-action@v1.6.2
+      if: ${{ !cancelled() && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage) }}
+      uses: LouisBrunner/checks-action@937cbbcde3259005b50746dc91cde29098aac2ff # v3.1.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Code Coverage ${{ inputs.result_affix }}
@@ -125,38 +308,79 @@ jobs:
         output_text_description_file: code-coverage-results.md
 
     - name: Add Code Coverage PR Comment
-      if: ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage)
-      uses: marocchino/sticky-pull-request-comment@v2
+      if: ${{ !cancelled() && ((github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)) && (!inputs.skip_coverage) }}
+      uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
       with:
         header: Code Coverage ${{ inputs.result_affix }}
         path: code-coverage-results.md
 
     # Add sudo to move coverage folder created by root user
     - name: Prepare Coverage GitHub Pages
-      if: (!inputs.skip_coverage)
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
       run: >-
         if [ "${{ inputs.result_affix }}" != "" ] && ${{ inputs.skip_deploy }}; then
           sudo mv ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }} \
             ${{ inputs.cmake_path }}/coverage_report/${{ inputs.result_affix }}
         fi
-          
+
+    - name: Coverage Report name
+      id: artifact
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
+      run: echo "coverage_report=coverage_report-$(date +%s)" >> $GITHUB_OUTPUT
+
+    # per_configuration is excluded deliberately. deploy_code_coverage downloads
+    # every coverage_report-* artifact with merge-multiple, so whatever is in
+    # here lands on the published site -- and each suite's per-configuration
+    # directories carry the same names, so ThreadX's would overwrite SMP's.
+    # The top level therefore holds only the suite directory and the merged XML,
+    # which is the shape the deploy already expects.
     - name: Upload Code Coverage Artifacts
-      uses: actions/upload-artifact@v4.6.0
-      if: (inputs.skip_deploy && !inputs.skip_coverage)
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      if: ${{ !cancelled() && (inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
-        name: coverage_report
-        path: ${{ inputs.cmake_path }}/coverage_report
-        retention-days: 1
-          
+          name: ${{ steps.artifact.outputs.coverage_report }}
+          path: |
+            ${{ inputs.cmake_path }}/coverage_report
+            !${{ inputs.cmake_path }}/coverage_report/per_configuration/**
+          retention-days: 1
+
+    # The per-configuration reports, kept separately so they are downloadable
+    # when the merged number moves and the question is which configuration moved
+    # it. The name deliberately does not match coverage_report-*, so the deploy
+    # job's pattern does not pick it up and it never reaches the published site.
+    - name: Upload Per-Configuration Coverage
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      if: ${{ !cancelled() && (!inputs.skip_coverage) }}
+      with:
+          name: coverage_detail ${{ inputs.result_affix }}
+          path: ${{ inputs.cmake_path }}/coverage_report/per_configuration
+          retention-days: 1
+
     - name: Upload Code Coverage Pages
-      uses: actions/upload-pages-artifact@v2.0.0
-      if: (!inputs.skip_deploy && !inputs.skip_coverage)
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+      if: ${{ !cancelled() && (!inputs.skip_deploy && !inputs.skip_coverage) }}
       with:
         path: ${{ inputs.cmake_path }}/coverage_report/${{ inputs.coverage_name }}
-  
+
+  # The gate is the dependency's own result, not failure() and cancelled().
+  # Those two report the status of the workflow rather than of run_tests, so a
+  # run_tests that is cancelled -- which is what a job that never gets a runner
+  # ends up as -- leaves both false and lets the deploy proceed to download an
+  # artifact the cancelled job never uploaded.
+  #
+  # The one exception is a caller passing skip_test, such as the deploy jobs
+  # of ThreadX and NetX Duo: run_tests is skipped by design, and the steps below
+  # download the coverage the caller's other jobs uploaded. The caller's needs
+  # gates those jobs. !cancelled() is required because an if without a status
+  # function implies success(), which is false when run_tests is skipped.
   deploy_code_coverage:
-    runs-on: ubuntu-latest
-    if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && !inputs.skip_coverage && !inputs.skip_deploy && !failure() && !cancelled()
+    runs-on: ubuntu-24.04
+    if: >-
+      !cancelled() &&
+      ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) &&
+      !inputs.skip_coverage && !inputs.skip_deploy &&
+      (needs.run_tests.result == 'success' ||
+      (inputs.skip_test && needs.run_tests.result == 'skipped'))
     needs: run_tests
     environment:
       name: github-pages
@@ -166,30 +390,66 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/download-artifact@v4.1.7
+    # Selects the coverage artifacts by pattern rather than by name.
+    #
+    # This used to ask for ${{ steps.artifact.outputs.coverage_report }},
+    # which is set by the "Coverage Report name" step of run_tests -- a
+    # different job. The steps context does not cross jobs, so that
+    # expression evaluated to the empty string and the action fell back to
+    # its documented behaviour for an unspecified name: "No input name,
+    # artifact-ids or pattern filtered specified, downloading all
+    # artifacts". It pulled down four, the two coverage reports and the two
+    # test_reports bundles of JUnit XML, each into a directory named after
+    # the artifact -- so the published site carried the test reports as well
+    # as the coverage, under paths containing a run timestamp that changed
+    # on every publish.
+    #
+    # merge-multiple puts the contents of both coverage artifacts directly
+    # into coverage_report rather than under a directory named for each
+    # artifact. Each one holds a single directory named for its suite,
+    # ThreadX or SMP, renamed from merged by the "Prepare Coverage GitHub
+    # Pages" step, so the merge yields exactly the two suite directories the
+    # deploy expects, and the artifact name -- with its timestamp -- stops
+    # appearing in the published path at all.
+    #
+    # The two artifacts also each carry a merged.xml -- it was
+    # default_build_coverage.xml until #665 instrumented every configuration
+    # and unioned them -- and the merge means one overwrites the other.
+    # Verified on the runner: both hold merged.xml. That file is consumed by
+    # CodeCoverageSummary back in run_tests and is not read here, so this is
+    # untidy rather than wrong.
+    - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
       if: ${{ inputs.skip_test }}
       with:
-        name: coverage_report
+        pattern: coverage_report-*
+        merge-multiple: true
+        path: ${{ inputs.cmake_path }}/coverage_report
 
     - name: Upload Code Coverage Pages
-      uses: actions/upload-pages-artifact@v2.0.0
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
       if: ${{ inputs.skip_test }}
       with:
         path: .
 
-    - name: Delete Duplicate Code Coverage Artifact 
-      uses: geekyeggo/delete-artifact@v2
+    # The artifacts are named coverage_report-<epoch> by run_tests, so the
+    # bare name matched nothing: useGlob defaults to true in this action, and
+    # as a glob "coverage_report" matches only the literal string. The step
+    # has therefore been deleting nothing. It does not fail on a miss, which
+    # is why that went unnoticed; retention-days: 1 on the upload is what has
+    # actually been clearing these up.
+    - name: Delete Duplicate Code Coverage Artifact
+      uses: geekyeggo/delete-artifact@176a747ab7e287e3ff4787bf8a148716375ca118 # v6.0.0
       with:
-          name: coverage_report
+          name: coverage_report-*
 
     - name: Deploy GitHub Pages site
       id: deployment
-      uses: actions/deploy-pages@v1.2.9
+      uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
     - name: Write Code Coverage Report URL
       run: >-
         if [ "${{ inputs.deploy_list }}" != "" ]; then
-          for i in ${{ inputs.deploy_list }}; do            
+          for i in ${{ inputs.deploy_list }}; do
             echo 'Coverage report for ' $i ':${{ steps.deployment.outputs.page_url }}'$i >>  $GITHUB_STEP_SUMMARY
           done
         else

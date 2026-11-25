@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -70,18 +71,6 @@
 /*                                                                        */
 /*    _tx_byte_allocate                 Allocate bytes of memory          */
 /*    _tx_byte_release                  Release bytes of memory           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      William E. Lamie        Initial Version 6.1           */
-/*  06-02-2021      Scott Larson            Improve possible free bytes   */
-/*                                            calculation, and reduced    */
-/*                                            number of search resets,    */
-/*                                            resulting in version 6.1.7  */
-/*  10-31-2023      Tiejun Zhou             Fixed MISRA2012 rule 10.4_a,  */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UCHAR  *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size)

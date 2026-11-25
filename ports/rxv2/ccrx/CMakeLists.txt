@@ -2,7 +2,7 @@
 target_sources(${PROJECT_NAME}
     PRIVATE
     # {{BEGIN_TARGET_SOURCES}}
-	${CMAKE_CURRENT_LIST_DIR}/src/tx_initialize_low_level.src 
+	${CMAKE_CURRENT_LIST_DIR}/src/tx_initialize_low_level.src
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_context_restore.src
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_context_save.src
 	${CMAKE_CURRENT_LIST_DIR}/src/tx_thread_interrupt_control.src
@@ -14,6 +14,7 @@ target_sources(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME}
+    SYSTEM
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/inc
 )

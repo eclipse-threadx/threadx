@@ -7,7 +7,7 @@ OUTPUT_ARCH(arm)
 SECTIONS
 {
   . = 0x00000000;
-    
+
   .vectors      : {reset.o(.text) }
 
   /* Read-only sections, merged into text segment: */
@@ -94,8 +94,8 @@ SECTIONS
     *(.gnu.linkonce.t*)
     *(.glue_7t) *(.glue_7)
   } =0
-  .init          : 
-  { 
+  .init          :
+  {
     KEEP (*(.init))
   } =0
   _etext = .;
@@ -120,7 +120,7 @@ SECTIONS
   .data1   : { *(.data1) }
   .eh_frame : { KEEP (*(.eh_frame)) }
   .gcc_except_table : { *(.gcc_except_table) }
-  .ctors   : 
+  .ctors   :
   {
     /* gcc uses crtbegin.o to find the start of
        the constructors, so we make sure it is
@@ -153,9 +153,9 @@ SECTIONS
   /* We want the small data sections together, so single-instruction offsets
      can access them all, and initialized data all before uninitialized, so
      we can shorten the on-disk segment size.  */
-  .sdata     : 
+  .sdata     :
   {
-    *(.sdata) 
+    *(.sdata)
     *(.sdata.*)
     *(.gnu.linkonce.s.*)
   }
@@ -191,7 +191,7 @@ SECTIONS
 
     _stack_bottom = ABSOLUTE(.) ;
 
-    /* Allocate room for stack. This must be big enough for the IRQ, FIQ, and 
+    /* Allocate room for stack. This must be big enough for the IRQ, FIQ, and
        SYS stack if nested interrupts are enabled.  */
     .   =  ALIGN(8) ;
     .   += 4096 ;

@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 
@@ -57,23 +57,6 @@
 ;/*  CALLED BY                                                             */
 ;/*                                                                        */
 ;/*    interrupt vector                                                    */
-;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  12-31-2020     Scott Larson             Modified comment(s), remove   */
-;/*                                            unneeded load of            */
-;/*                                            _tx_thread_preempt_disable, */
-;/*                                            resulting in version 6.1.3  */
-;/*  10-15-2021     Yuxin Zhou               Modified comment(s), and      */
-;/*                                            fixed possible race         */
-;/*                                            condition on preemption     */         
-;/*                                            resulting in version 6.1.9  */
-;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-;/*                                            #include tx_user.h,         */
-;/*                                            resulting in version 6.2.1  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_timer_interrupt(VOID)

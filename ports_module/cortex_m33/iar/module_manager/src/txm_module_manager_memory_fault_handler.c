@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -71,12 +72,6 @@ TXM_MODULE_MANAGER_FAULT_INFO
 /*                                                                        */
 /*    Fault handler                                                       */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  08-02-2021      Scott Larson            Initial Version 6.1.8         */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_memory_fault_handler(VOID)
 {
@@ -89,7 +84,7 @@ TX_THREAD               *thread_ptr;
 
     /* Initialize the module instance pointer to NULL.  */
     module_instance_ptr =  TX_NULL;
-    
+
     /* Is there a thread?  */
     if (thread_ptr)
     {
@@ -99,7 +94,7 @@ TX_THREAD               *thread_ptr;
         /* Terminate the current thread.  */
         _tx_thread_terminate(_tx_thread_current_ptr);
     }
-    
+
     /* Determine if there is a user memory fault notification callback.  */
     if (_txm_module_manager_fault_notify)
     {

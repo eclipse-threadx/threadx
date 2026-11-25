@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -33,8 +34,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -49,23 +50,17 @@
 
     .text
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function saves the context of an executing thread in the       */ 
-/*    beginning of interrupt processing.  The function also ensures that  */ 
-/*    the system stack is used upon return to the calling ISR.            */ 
-/*                                                                        */ 
-/*    Interrupts remain disabled and no exceptions are triggered!         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */ 
-/**************************************************************************/ 
+/**************************************************************************/
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function saves the context of an executing thread in the       */
+/*    beginning of interrupt processing.  The function also ensures that  */
+/*    the system stack is used upon return to the calling ISR.            */
+/*                                                                        */
+/*    Interrupts remain disabled and no exceptions are triggered!         */
+/*                                                                        */
+/**************************************************************************/
 
 //  VOID   _tx_thread_context_save(VOID)
 //  {
@@ -77,13 +72,13 @@ _tx_thread_context_save:
     /*
     Please note: Control flow might seem strange. This is because it has been
     optimized to avoid taken branches in the longest normal path (the critical
-    one for worst-case latency), presumed to be a non-nested interrupt and 
+    one for worst-case latency), presumed to be a non-nested interrupt and
     non-idle) and to hide pipeline interlock cycles where possible.
     */
 
     /*
     Save a couple of scratch regs to work with that are preserved over the
-    call to _xt_context_save. The latter assumes the interruptee's values 
+    call to _xt_context_save. The latter assumes the interruptee's values
     of these are already saved and these regs contain different data to be
     preserved, so doesn't save them in the stack frame, and thereby requires
     that its caller have already saved them in the interrupt stack frame.
@@ -107,7 +102,7 @@ _tx_thread_context_save:
 .Ln_tx_thread_not_nested_save:
 
     /* Otherwise, not nested, check to see if a thread was running. */
-    //  else 
+    //  else
     //  {
     //      if (_tx_thread_current_ptr)
     //      {
@@ -127,10 +122,10 @@ _tx_thread_context_save:
 
 .L_tx_thread_idle_system_save:
 
-    /* 
+    /*
     If interrupted in the idle state, it's not necessary to save any context.
-    But even in the idle case where we are already on the system stack, it is 
-    necessary to reset the (system) stack pointer so a series of consecutive 
+    But even in the idle case where we are already on the system stack, it is
+    necessary to reset the (system) stack pointer so a series of consecutive
     interrupts in the idle state do not keep moving the SP downward.
     */
 
@@ -146,7 +141,7 @@ _tx_thread_context_save:
     /* Nested interrupt condition. */
     /* Save the rest of the interrupted context and return to ISR. */
     call0   _xt_context_save
-    
+
     mov     a0,  a12                     /* retrieve return address */
     ret
 

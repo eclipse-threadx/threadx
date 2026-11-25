@@ -1,7 +1,18 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
     .text
     .align 4
     .syntax unified
-    .section .preamble
+    .section .preamble, "ax"
 
     /* Define public symbols.  */
     .global __txm_module_preamble
@@ -33,7 +44,7 @@ __txm_module_preamble:
                                                                 //           1 -> User mode execution
     .dc.l      _txm_module_thread_shell_entry - . - 0           // Module Shell Entry Point
     .dc.l      demo_module_start - . - 0                        // Module Start Thread Entry Point
-    .dc.l      0                                                // Module Stop Thread Entry Point 
+    .dc.l      0                                                // Module Stop Thread Entry Point
     .dc.l      1                                                // Module Start/Stop Thread Priority
     .dc.l      1024                                             // Module Start/Stop Thread Stack Size
     .dc.l      _txm_module_callback_request_thread_entry - . - 0 // Module Callback Thread Entry

@@ -1,18 +1,20 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026 Eclipse ThreadX contributors
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
+; Portions of this file were generated with AI assistance.
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -47,51 +49,45 @@ SVC_MODE        EQU     0x93                    ; SVC mode
     IMPORT      _tx_timer_time_slice
     IMPORT      _tx_thread_schedule
     IMPORT      _tx_thread_preempt_disable
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
     IMPORT      _tx_execution_isr_exit
     ENDIF
 ;
 ;
         AREA ||.text||, CODE, READONLY
         PRESERVE8
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_context_restore                         Cortex-R5/AC5    */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_context_restore                         Cortex-R5/AC5    */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function restores the interrupt context if it is processing a  */ 
-;/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-;/*    if no thread was running, the function returns to the scheduler.    */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                  Interrupt Service Routines    */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function restores the interrupt context if it is processing a  */
+;/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+;/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+;/*    if no thread was running, the function returns to the scheduler.    */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_schedule                   Thread scheduling routine     */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                  Interrupt Service Routines    */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_restore(VOID)
@@ -107,7 +103,7 @@ _tx_thread_context_restore
     CPSID   i                                   ; Disable IRQ interrupts
     ENDIF
 
-    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY
+    IF :DEF:TX_ENABLE_EXECUTION_CHANGE_NOTIFY :LOR: :DEF:TX_EXECUTION_PROFILE_ENABLE
 ;
 ;    /* Call the ISR exit function to indicate an ISR is complete.  */
 ;
@@ -121,13 +117,13 @@ _tx_thread_context_restore
     LDR     r3, =_tx_thread_system_state        ; Pickup address of system state var
     LDR     r2, [r3, #0]                        ; Pickup system state
     SUB     r2, r2, #1                          ; Decrement the counter
-    STR     r2, [r3, #0]                        ; Store the counter 
+    STR     r2, [r3, #0]                        ; Store the counter
     CMP     r2, #0                              ; Was this the first interrupt?
     BEQ     __tx_thread_not_nested_restore      ; If so, not a nested restore
 ;
 ;    /* Interrupts are nested.  */
 ;
-;    /* Just recover the saved registers and return to the point of 
+;    /* Just recover the saved registers and return to the point of
 ;       interrupt.  */
 ;
     LDMIA   sp!, {r0, r10, r12, lr}             ; Recover SPSR, POI, and scratch regs
@@ -193,7 +189,7 @@ __tx_thread_preempt_restore
 
     LDR     r1, =_tx_thread_current_ptr         ; Pickup address of current thread ptr
     LDR     r0, [r1, #0]                        ; Pickup current thread pointer
-    
+
     IF  {TARGET_FPU_VFP} = {TRUE}
     LDR     r2, [r0, #144]                      ; Pickup the VFP enabled flag
     CMP     r2, #0                              ; Is the VFP enabled?
@@ -251,4 +247,3 @@ __tx_thread_idle_system_restore
 ;}
 ;
     END
-

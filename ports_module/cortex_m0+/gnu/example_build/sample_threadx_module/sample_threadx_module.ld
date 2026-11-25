@@ -130,7 +130,7 @@ SECTIONS
     KEEP (*(.got*))
     . = ALIGN(4);
     _egot = .;
-  } 
+  }
   __got_end__ =  __got_load_start__ + SIZEOF(.got);
 
   __rodata_load_start__ = ALIGN(__got_end__ , 4);
@@ -140,7 +140,7 @@ SECTIONS
     *(.rodata .rodata.* .gnu.linkonce.r.*)
   }
   __rodata_end__ = __rodata_start__ + SIZEOF(.rodata);
- 
+
   __code_size__ =  SIZEOF(.data) + __rodata_end__ - __FLASH_segment_start__;
 
   __fast_load_start__ = ALIGN(__rodata_end__ , 4);
@@ -210,6 +210,14 @@ SECTIONS
   __heap_end__ = __heap_start__ + SIZEOF(.heap);
 
   __data_size__ =  __heap_end__ - __RAM_segment_start__;
+
+  /* The dynamic linking metadata is not used by the module manager.  Discarding
+     it keeps it out of the binary image produced from this ELF file.  */
+
+  /DISCARD/ :
+  {
+    *(.dynamic)
+  }
 
 }
 

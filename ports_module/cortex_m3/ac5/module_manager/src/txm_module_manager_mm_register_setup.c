@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -93,16 +94,6 @@ const ULONG txm_module_default_mpu_registers[32] =
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _txm_module_manager_mm_register_setup                               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*  03-08-2023      Scott Larson            Changed from lookup table to  */
-/*                                            calculation and check for   */
-/*                                            minumum block size,         */
-/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _txm_module_manager_region_size_get(ULONG block_size)

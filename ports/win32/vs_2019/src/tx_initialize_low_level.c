@@ -1,18 +1,20 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026 Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Initialize                                                          */
 /**                                                                       */
@@ -35,19 +37,43 @@
 
 TX_WIN32_CRITICAL_SECTION       _tx_win32_critical_section;
 HANDLE                          _tx_win32_scheduler_semaphore;
+HANDLE                          _tx_win32_scheduler_wake_event;
 DWORD                           _tx_win32_scheduler_id;
 ULONG                           _tx_win32_global_int_disabled_flag;
 LARGE_INTEGER                   _tx_win32_time_stamp;
 ULONG                           _tx_win32_system_error;
+HANDLE                          _tx_win32_timer_handle;
+HANDLE                          _tx_win32_timer_thread_handle;
+UINT                            _tx_win32_isr_waiting_count;
+volatile LONG                   _tx_win32_dispatch_count;
 extern TX_THREAD                *_tx_thread_current_ptr;
+
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+/* Auto-reset event used by the scheduler to kick the timer thread so that the
+   simulated clock advances immediately when no thread is ready to run, instead
+   of waiting for the wall-clock periodic timer.  This makes the simulation
+   CPU-bound rather than wall-clock-bound during idle periods, mirroring the
+   Linux port's TX_LINUX_NO_IDLE_ENABLE behavior.  */
+HANDLE                          _tx_win32_timer_kick_event;
+#endif
+
+/* Flag set by the atexit handler to stop the timer thread before CRT cleanup
+   suspends any application threads.  Declared volatile so both the main thread
+   (which sets it) and the timer thread (which reads it) see the change.  */
+volatile LONG                   _tx_win32_exiting = 0;
 
 
 /* Define simulated timer interrupt.  This is done inside a thread, which is
-   how other interrupts may be defined as well.  See code below for an 
+   how other interrupts may be defined as well.  See code below for an
    example.  */
 
 UINT                            _tx_win32_timer_id;
-VOID CALLBACK                   _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2);
+VOID CALLBACK                   _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2);
+static VOID                     _tx_win32_timer_start(VOID);
+static VOID                     _tx_win32_timer_due_set(LONGLONG period_ms, LARGE_INTEGER *due_time);
+static LONGLONG                 _tx_win32_timer_deadline;
+static LONGLONG                 _tx_win32_timer_frequency;
+static DWORD WINAPI             _tx_win32_timer_thread_entry(LPVOID thread_input);
 
 
 #ifdef TX_WIN32_DEBUG_ENABLE
@@ -115,22 +141,22 @@ void    _tx_win32_debug_entry_insert(char *action, char *file, unsigned long lin
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_current_thread =     _tx_thread_current_ptr;
     if (_tx_thread_current_ptr)
         _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_current_thread_id =  _tx_thread_current_ptr -> tx_thread_win32_thread_id;
-    else 
+    else
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_current_thread_id =  0;
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_execute_thread =     _tx_thread_execute_ptr;
     if (_tx_thread_execute_ptr)
         _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_execute_thread_id =  _tx_thread_execute_ptr -> tx_thread_win32_thread_id;
-    else 
+    else
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_execute_thread_id =  0;
     _tx_win32_debug_entry_array[_tx_win32_debug_entry_index].tx_win32_debug_entry_running_id =         GetCurrentThreadId();
 
     /* Now move to the next entry.  */
     _tx_win32_debug_entry_index++;
-    
+
     /* Determine if we need to wrap the list.  */
     if (_tx_win32_debug_entry_index >= TX_WIN32_DEBUG_EVENT_SIZE)
     {
-    
+
         /* Yes, wrap the list!  */
         _tx_win32_debug_entry_index =  0;
     }
@@ -149,6 +175,10 @@ void            _tx_timer_interrupt(void);
 VOID            _tx_initialize_low_level(VOID);
 VOID            _tx_thread_context_save(VOID);
 VOID            _tx_thread_context_restore(VOID);
+VOID            _tx_win32_scheduler_wake(VOID);
+
+/* Forward declaration of the process-exit cleanup function.  */
+static void     _tx_win32_exit_cleanup(void);
 
 
 /* Define other external variable references.  */
@@ -156,50 +186,44 @@ VOID            _tx_thread_context_restore(VOID);
 extern VOID     *_tx_initialize_unused_memory;
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_initialize_low_level                          Win32/Visual      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_initialize_low_level                          Win32/Visual      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is responsible for any low-level processor            */ 
-/*    initialization, including setting up interrupt vectors, setting     */ 
-/*    up a periodic timer interrupt source, saving the system stack       */ 
-/*    pointer for use in ISR processing later, and finding the first      */ 
-/*    available RAM memory address for tx_application_define.             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    CreateMutex                           Win32 create mutex            */ 
-/*    CreateThread                          Win32 create thread           */ 
-/*    CreateSemaphore                       Win32 create semaphore        */ 
-/*    GetCurrentThreadId                    Win32 get current thread ID   */ 
-/*    SetProcessAffinityMask                Win32 process affinity set    */ 
-/*    SetThreadPriority                     Win32 set thread priority     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*    This function is responsible for any low-level processor            */
+/*    initialization, including setting up interrupt vectors, setting     */
+/*    up a periodic timer interrupt source, saving the system stack       */
+/*    pointer for use in ISR processing later, and finding the first      */
+/*    available RAM memory address for tx_application_define.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    InitializeCriticalSection             Win32 initialize lock        */
+/*    CreateThread                          Win32 create thread           */
+/*    CreateSemaphore                       Win32 create semaphore        */
+/*    GetCurrentThreadId                    Win32 get current thread ID   */
+/*    SetProcessAffinityMask                Win32 process affinity set    */
+/*    SetThreadPriority                     Win32 set thread priority     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _tx_initialize_kernel_enter           ThreadX entry function        */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_initialize_low_level(VOID)
@@ -213,7 +237,7 @@ VOID   _tx_initialize_low_level(VOID)
     /* Limit this ThreadX simulation on Win32 to a single core.  */
     if (SetProcessAffinityMask( GetCurrentProcess(), 1 ) == 0)
     {
-    
+
         /* Error restricting the process to one core.  */
         printf("ThreadX Win32 error restricting the process to one core!\n");
         while(1)
@@ -230,24 +254,81 @@ VOID   _tx_initialize_low_level(VOID)
     /* Pickup the unique Id of the current thread, which will also be the Id of the scheduler.  */
     _tx_win32_scheduler_id =        GetCurrentThreadId();
 
-    /* Create the system critical section mutex. This is used by the system to block all other access,
+    /* Initialize the system critical section. This is used by the system to block all other access,
        analogous to an interrupt lockout on an embedded target.  */
-    _tx_win32_critical_section.tx_win32_critical_section_mutex_handle =  CreateMutex(NULL, FALSE, NULL);
+    InitializeCriticalSection(&_tx_win32_critical_section.tx_win32_critical_section_lock);
     _tx_win32_critical_section.tx_win32_critical_section_nested_count =  0;
     _tx_win32_critical_section.tx_win32_critical_section_owner =         0;
-       
+
     /* Create the semaphore that regulates when the scheduler executes.  */
     _tx_win32_scheduler_semaphore =  CreateSemaphore(NULL, 0, 1, NULL);
 
+    /* Create the event that wakes the scheduler whenever the ready state changes.  */
+    _tx_win32_scheduler_wake_event =  CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (_tx_win32_scheduler_wake_event == NULL)
+    {
+        printf("ThreadX Win32 error creating scheduler wake event!\n");
+        while(1)
+        {
+        }
+    }
+
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+
+    /* Create the auto-reset event used to kick the timer thread when the
+       scheduler detects an idle system (see _tx_thread_schedule).  */
+    _tx_win32_timer_kick_event =  CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (_tx_win32_timer_kick_event == NULL)
+    {
+        printf("ThreadX Win32 error creating timer kick event!\n");
+        while(1)
+        {
+        }
+    }
+#endif
+
     /* Initialize the global interrupt disabled flag.  */
     _tx_win32_global_int_disabled_flag =  TX_FALSE;
+    _tx_win32_isr_waiting_count =         0;
 
     /* Done, return to caller.  */
 }
 
 
+/* Called by the C runtime during exit() before any CRT cleanup.  Sets the
+   exiting flag so the timer thread and context-save code stop touching
+   application OS threads (which may hold the CRT heap lock), then forcibly
+   terminates the timer thread so it cannot fire again during cleanup.  */
+
+static void _tx_win32_exit_cleanup(void)
+{
+
+    /* Signal all timer-path code to stop.  */
+    _InterlockedExchange(&_tx_win32_exiting, 1);
+
+    /* Unblock the timer thread if it is waiting on the waitable timer.  */
+    if (_tx_win32_timer_handle != NULL)
+    {
+        CancelWaitableTimer(_tx_win32_timer_handle);
+    }
+
+    /* Wait up to 50 ms for the timer thread to exit on its own.  */
+    if (_tx_win32_timer_thread_handle != NULL)
+    {
+        if (WaitForSingleObject(_tx_win32_timer_thread_handle, 50) != WAIT_OBJECT_0)
+        {
+
+            /* Force-terminate if it has not stopped in time.  */
+            TerminateThread(_tx_win32_timer_thread_handle, 0);
+        }
+        _tx_win32_timer_thread_handle = NULL;
+    }
+}
+
+
+
 /* This routine is called after initialization is complete in order to start
-   all interrupt threads.  Interrupt threads in addition to the timer may 
+   all interrupt threads.  Interrupt threads in addition to the timer may
    be added to this routine as well.  */
 
 void _tx_initialize_start_interrupts(void)
@@ -267,22 +348,196 @@ void _tx_initialize_start_interrupts(void)
 
     wTimerRes = min(max(tc.wPeriodMin, TX_TIMER_PERIODIC), tc.wPeriodMax);
 
-    /* Start a specified timer event. The timer runs in its own thread.
-       It calls the specified callback function when the event is activated.  */
-    _tx_win32_timer_id = timeSetEvent(TX_TIMER_PERIODIC, wTimerRes, _tx_win32_timer_interrupt, 0, TIME_PERIODIC);
+    /* Request the best available timer resolution for the simulation.  */
+    if (timeBeginPeriod(wTimerRes) != TIMERR_NOERROR)
+    {
+        printf("ThreadX Win32 error configuring timer resolution!\n");
+        while (1)
+        {
+        }
+    }
+
+    /* Create the periodic waitable timer used to drive simulated interrupts.  */
+#if (TX_WIN32_USE_HIGH_RESOLUTION_TIMER != 0)
+    _tx_win32_timer_handle =  CreateWaitableTimerEx(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+    if (_tx_win32_timer_handle == NULL)
+#endif
+    {
+        _tx_win32_timer_handle =  CreateWaitableTimer(NULL, FALSE, NULL);
+    }
+
+    if (_tx_win32_timer_handle == NULL)
+    {
+        printf("ThreadX Win32 error creating timer handle!\n");
+        while (1)
+        {
+        }
+    }
+
+    /* Create the timer thread so interrupts are serialized through one execution context.  */
+    _tx_win32_timer_thread_handle =  CreateThread(NULL, 0, _tx_win32_timer_thread_entry, NULL, 0, NULL);
+    if (_tx_win32_timer_thread_handle == NULL)
+    {
+        printf("ThreadX Win32 error creating timer thread!\n");
+        while (1)
+        {
+        }
+    }
+
+    SetThreadPriority(_tx_win32_timer_thread_handle, THREAD_PRIORITY_HIGHEST);
+
+    _tx_win32_timer_id =  1;
+
+    /* Register exit cleanup so the timer thread is stopped before CRT cleanup
+       runs.  Without this, exit() can deadlock: the CRT holds the heap lock
+       while the timer fires and suspends the exiting thread via SuspendThread,
+       causing any subsequent malloc to block forever.  */
+    atexit(_tx_win32_exit_cleanup);
+
+    /* Start the first simulated tick.  */
+    _tx_win32_timer_start();
 }
 
 /* Define the ThreadX system timer interrupt.  Other interrupts may be simulated
    in a similar way.  */
 
-VOID CALLBACK _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2)
+VOID CALLBACK _tx_win32_timer_interrupt(UINT wTimerID, UINT msg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2)
 {
+    TX_PARAMETER_NOT_USED(wTimerID);
+    TX_PARAMETER_NOT_USED(msg);
+    TX_PARAMETER_NOT_USED(dwUser);
+    TX_PARAMETER_NOT_USED(dw1);
+    TX_PARAMETER_NOT_USED(dw2);
+
+    /* Skip the interrupt entirely if exit() has been called.  The CRT heap
+       lock may be held by the exiting thread; calling SuspendThread() on it
+       at this point causes a permanent deadlock.  */
+    if (_tx_win32_exiting)
+        return;
+
     /* Call ThreadX context save for interrupt preparation.  */
     _tx_thread_context_save();
 
-    /* Call the ThreadX system timer interrupt processing.  */
-    _tx_timer_interrupt();
+    /* Fire TX_WIN32_TICKS_PER_INTERRUPT ticks inside a single interrupt
+       context.  The SuspendThread/ResumeThread overhead is amortized across
+       all N ticks, and all timer-based delays shrink by factor N.  The
+       relative ordering of thread wakeups is preserved because each call to
+       _tx_timer_interrupt() advances the tick counter by exactly one step and
+       processes the timers that expire at that step.  */
+    {
+        UINT _tick_i;
+        for (_tick_i = 0; _tick_i < TX_WIN32_TICKS_PER_INTERRUPT; _tick_i++)
+            _tx_timer_interrupt();
+    }
 
     /* Call ThreadX context restore for interrupt completion.  */
     _tx_thread_context_restore();
+
+    /* Wake the scheduler so it can promptly observe timer-driven work.  */
+    _tx_win32_scheduler_wake();
+}
+
+
+static DWORD WINAPI _tx_win32_timer_thread_entry(LPVOID thread_input)
+{
+    TX_PARAMETER_NOT_USED(thread_input);
+
+    /* Drive periodic simulated interrupts from a single thread.
+       Exit the loop when _tx_win32_exiting is set by the atexit handler.  */
+    while (!_tx_win32_exiting)
+    {
+#ifdef TX_WIN32_NO_IDLE_ENABLE
+
+        /* Wake either on the periodic wall-clock timer or on a scheduler kick
+           (issued when the system is idle).  Firing on the kick advances the
+           simulated clock immediately, without waiting for the wall clock.  */
+        HANDLE  _wait_handles[2];
+
+        _wait_handles[0] =  _tx_win32_timer_handle;
+        _wait_handles[1] =  _tx_win32_timer_kick_event;
+        if (WaitForMultipleObjects(2, _wait_handles, FALSE, INFINITE) == WAIT_FAILED)
+            break;
+#else
+        if (WaitForSingleObject(_tx_win32_timer_handle, INFINITE) != WAIT_OBJECT_0)
+            break;
+#endif
+        if (_tx_win32_exiting)
+            break;
+        _tx_win32_timer_interrupt(0, 0, 0, 0, 0);
+        if (_tx_win32_exiting)
+            break;
+        _tx_win32_timer_start();
+    }
+    return 0;
+}
+
+
+VOID   _tx_win32_scheduler_wake(VOID)
+{
+
+    /* Wake the scheduler if it is waiting for a state change.  */
+    if (_tx_win32_scheduler_wake_event != NULL)
+    {
+        SetEvent(_tx_win32_scheduler_wake_event);
+    }
+}
+
+
+static VOID  _tx_win32_timer_start(VOID)
+{
+
+LARGE_INTEGER   due_time;
+
+
+    _tx_win32_timer_due_set((LONGLONG) TX_TIMER_PERIODIC, &due_time);
+#if (TX_WIN32_USE_HIGH_RESOLUTION_TIMER != 0)
+    if (SetWaitableTimerEx(_tx_win32_timer_handle, &due_time, 0, NULL, NULL, NULL, 0) == 0)
+#else
+    if (SetWaitableTimer(_tx_win32_timer_handle, &due_time, 0, NULL, NULL, FALSE) == 0)
+#endif
+    {
+        printf("ThreadX Win32 error starting timer!\n");
+        while (1)
+        {
+        }
+    }
+}
+
+
+/* Advances the timer deadline by one period and returns the relative due time to
+   it, so that interrupt latency does not accumulate into the period.  */
+static VOID  _tx_win32_timer_due_set(LONGLONG period_ms, LARGE_INTEGER *due_time)
+{
+
+LARGE_INTEGER   now;
+LONGLONG        period;
+LONGLONG        remaining;
+
+
+    if (_tx_win32_timer_frequency == 0LL)
+    {
+        QueryPerformanceFrequency(&now);
+        _tx_win32_timer_frequency =  now.QuadPart;
+    }
+
+    QueryPerformanceCounter(&now);
+    period =  (period_ms * _tx_win32_timer_frequency) / 1000LL;
+    _tx_win32_timer_deadline +=  period;
+
+    /* Resynchronize instead of bursting when more than a period late, and when an
+       early interrupt has left the deadline more than a period ahead.  */
+    if ((_tx_win32_timer_deadline <= (now.QuadPart - period)) ||
+        (_tx_win32_timer_deadline > (now.QuadPart + period)))
+    {
+        _tx_win32_timer_deadline =  now.QuadPart + period;
+    }
+
+    /* Convert to a negative, relative due time in 100 ns units; a deadline
+       already reached fires at once.  */
+    remaining =  ((_tx_win32_timer_deadline - now.QuadPart) * 10000000LL) / _tx_win32_timer_frequency;
+    if (remaining < 1LL)
+    {
+        remaining =  1LL;
+    }
+    due_time -> QuadPart =  -remaining;
 }

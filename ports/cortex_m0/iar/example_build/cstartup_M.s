@@ -2,16 +2,16 @@
         PUBLIC  __vector_table
 
         SECTION .text:CODE:REORDER(1)
-        
+
         ;; Keep vector table even if it's not referenced
         REQUIRE __vector_table
-        
+
         THUMB
-        
+
         ;; Forward declaration of sections.
         SECTION CSTACK:DATA:NOROOT(3)
         SECTION .intvec:CODE:NOROOT(2)
-        
+
         DATA
 
 __vector_table
@@ -53,7 +53,7 @@ __vector_table
 __Reset_Vector:
         CPSID   i                                       ; Disable interrupts
         LDR     r0, =__iar_program_start
-        BX      r0     
+        BX      r0
 
 NMI_Handler
 HardFault_Handler

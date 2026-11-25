@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -43,7 +46,7 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    This function creates a thread and places it on the list of created */
-/*    threads.                                                            */
+/*    threads. Stack alignment preserves the full port-defined address.   */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -74,26 +77,8 @@
 /*    Application Code                                                    */
 /*    _tx_timer_initialize                  Create system timer thread    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
-/*  09-30-2020      William E. Lamie        Modified comment(s), and      */
-/*                                            changed stack calculations  */
-/*                                            to use ALIGN_TYPE integers, */
-/*                                            resulting in version 6.1    */
-/*  06-02-2021      William E. Lamie        Modified comment(s), and      */
-/*                                            supported TX_MISRA_ENABLE,  */
-/*  08-02-2021      Scott Larson            Removed unneeded cast,        */
-/*                                            resulting in version 6.1.8  */
-/*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
-/*                                            added option for random     */
-/*                                            number stack filling,       */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
-UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr, VOID (*entry_function)(ULONG id), ULONG entry_input,
+UINT  _tx_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr, VOID (*entry_function)(ULONG id), ULONG entry_input,
                             VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                             ULONG time_slice, UINT auto_start)
 {
@@ -110,18 +95,26 @@ UCHAR                   *temp_ptr;
 ALIGN_TYPE              new_stack_start;
 ALIGN_TYPE              updated_stack_start;
 #endif
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING) && !defined(TX_DISABLE_STACK_FILLING)
+ULONG                   stack_fill_value;
+#endif
 
 #ifndef TX_DISABLE_STACK_FILLING
 #if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
 
     /* Initialize the stack fill value to a 8-bit random value.  */
-    thread_ptr -> tx_thread_stack_fill_value = ((ULONG) TX_RAND()) & 0xFFUL;
+    stack_fill_value =  ((ULONG) TX_RAND()) & 0xFFUL;
 
     /* Duplicate the random value in each of the 4 bytes of the stack fill value.  */
-    thread_ptr -> tx_thread_stack_fill_value = thread_ptr -> tx_thread_stack_fill_value |
-                    (thread_ptr -> tx_thread_stack_fill_value << 8) |
-                    (thread_ptr -> tx_thread_stack_fill_value << 16) |
-                    (thread_ptr -> tx_thread_stack_fill_value << 24);
+    stack_fill_value =  stack_fill_value |
+                    (stack_fill_value << 8) |
+                    (stack_fill_value << 16) |
+                    (stack_fill_value << 24);
+
+    /* Store the fill value in the control block so that the stack fill below picks it up
+       through the TX_STACK_FILL macro.  The control block is cleared further down in this
+       function, so the value is stored again once that has been done.  */
+    thread_ptr -> tx_thread_stack_fill_value =  stack_fill_value;
 #endif
 
     /* Set the thread stack to a pattern prior to creating the initial
@@ -137,12 +130,11 @@ ALIGN_TYPE              updated_stack_start;
        overflow conditions during run-time.  */
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
 
-    /* Ensure the starting stack address is evenly aligned.  */
-#ifdef TX_MISRA_ENABLE
-    new_stack_start = TX_POINTER_TO_ULONG_CONVERT(stack_start);
-#else
-    new_stack_start =  TX_POINTER_TO_ALIGN_TYPE_CONVERT(stack_start);
-#endif /* TX_MISRA_ENABLE */
+    /* Ensure the starting stack address is evenly aligned. The port-defined
+       ALIGN_TYPE preserves all pointer bits, even when ULONG is narrower.
+       MISRA C:2012/2023 Rule 11.6 (C:2004 Rule 11.3) deviation: these
+       pointer/integer conversions are required for address alignment.  */
+    new_stack_start =  (ALIGN_TYPE) ((VOID *) stack_start);
     updated_stack_start =  (((new_stack_start) + ((sizeof(ULONG)) - ((ULONG) 1)) ) & (~((sizeof(ULONG)) - ((ULONG) 1))));
 
     /* Determine if the starting stack address is different.  */
@@ -154,11 +146,7 @@ ALIGN_TYPE              updated_stack_start;
     }
 
     /* Update the starting stack pointer.  */
-#ifdef TX_MISRA_ENABLE
-    stack_start = TX_ULONG_TO_POINTER_CONVERT(updated_stack_start);
-#else
-    stack_start =  TX_ALIGN_TYPE_TO_POINTER_CONVERT(updated_stack_start);
-#endif /* TX_MISRA_ENABLE */
+    stack_start =  (VOID *) ((ALIGN_TYPE) updated_stack_start);
 #endif
 
     /* Prepare the thread control block prior to placing it on the created
@@ -166,6 +154,14 @@ ALIGN_TYPE              updated_stack_start;
 
     /* Initialize thread control block to all zeros.  */
     TX_MEMSET(thread_ptr, 0, (sizeof(TX_THREAD)));
+
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING) && !defined(TX_DISABLE_STACK_FILLING)
+
+    /* Clearing the control block reset the stack fill value, so store the value that was
+       actually used to fill the stack again.  Otherwise the stack checking and stack analyze
+       routines would look for a pattern that is not the one present in the stack.  */
+    thread_ptr -> tx_thread_stack_fill_value =  stack_fill_value;
+#endif
 
     /* Place the supplied parameters into the thread's control block.  */
     thread_ptr -> tx_thread_name =              name_ptr;

@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -29,10 +29,10 @@
 ;#include "tx_timer.h"
 ;
 ;
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_system_return                        SMP/ARC_HS/MetaWare */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
@@ -40,33 +40,27 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function is target processor specific.  It is used to transfer */ 
-;/*    control from a thread back to the ThreadX system.  Only a           */ 
-;/*    minimal context is saved since the compiler assumes temp registers  */ 
-;/*    are going to get slicked by a function call anyway.                 */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                   Thread scheduling loop        */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ThreadX components                                                  */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function is target processor specific.  It is used to transfer */
+;/*    control from a thread back to the ThreadX system.  Only a           */
+;/*    minimal context is saved since the compiler assumes temp registers  */
+;/*    are going to get slicked by a function call anyway.                 */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    _tx_thread_schedule                   Thread scheduling loop        */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ThreadX components                                                  */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
@@ -87,7 +81,7 @@ _tx_thread_system_return:
     .endif
     asl     r4, r1, 2                                   ; Build index into core arrays
     mov     r7, _tx_thread_current_ptr                  ; Pickup base of the current thread pointer
-    add     r7, r7, r4                                  ; Build address of current thread pointer 
+    add     r7, r7, r4                                  ; Build address of current thread pointer
     ld      r0, [r7]                                    ; Pickup current thread ptr
     sub     sp, sp, 76                                  ; Allocate a solicited stack frame
     mov     r3, 0                                       ; Build a solicited stack type
@@ -115,7 +109,7 @@ _tx_thread_system_return:
 ;    _tx_thread_current_ptr[core] -> tx_thread_stack_ptr =  sp;
 ;    sp = _tx_thread_system_stack_ptr[core];
 ;
-;   
+;
     st      sp, [r0, 8]                                 ; Save thread's stack pointer
     mov     r6, _tx_thread_system_stack_ptr             ; Pickup address of system stack pointer
     add     r6, r6, r4                                  ; Build address of this core's entry
@@ -138,8 +132,8 @@ _tx_thread_system_return:
     mov     r1, r14                                     ; Recover current core executing
     mov     r7, r15                                     ; Recover current thread pointer for core
     mov     blink, r16                                  ; Recover blink
-    asl     r4, r1, 2                                   ; Build index into core arrays 
-   
+    asl     r4, r1, 2                                   ; Build index into core arrays
+
     .endif
 ;
 ;    /* Determine if the time-slice is active.  */
@@ -147,7 +141,7 @@ _tx_thread_system_return:
 ;    {
 ;
     mov     r6, _tx_timer_time_slice                    ; Build address of current time-slice
-    add     r6, r6, r4                                  ; 
+    add     r6, r6, r4                                  ;
     ld      r5, [r6]                                    ; Pickup current time-slice
     breq    r5, 0, __tx_thread_dont_save_ts             ; If not, skip save processing
 ;

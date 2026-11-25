@@ -51,15 +51,15 @@ SECTIONS
   {
     _fdata = ABSOLUTE(.);	/* Start of initialised data		*/
     *(.data*)
-   
+
     . = ALIGN(8);
 
     _gp = ABSOLUTE(. + 0x7ff0); /* Base of small data			*/
     LC8 = ABSOLUTE(. + 0x7ff0); /* Base of small data			*/
 
-    *(.lit8) 
-    *(.lit4) 
-    *(.sdata*) 
+    *(.lit8)
+    *(.lit4)
+    *(.sdata*)
 
     . = ALIGN(8);
 
@@ -68,10 +68,10 @@ SECTIONS
 
   /**** Uninitialised data ****/
 
-  .sbss : 
-  { 
+  .sbss :
+  {
     _start_sbss = .;
-    *(.sbss*) 
+    *(.sbss*)
     *(.scommon)
     _end_sbss = .;
   }

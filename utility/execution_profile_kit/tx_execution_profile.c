@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -49,15 +50,15 @@
 
    1. The TX_EXECUTION_TIME_SOURCE and TX_EXECUTION_MAX_TIME_SOURCE macros are
       defined to utilize a local hardware time source.
-   
+
    2. ThreadX 5.4 (or later) is being used, with the assembly code enabled to
       call the following routines from assembly code:
-      
+
             VOID  _tx_execution_thread_enter(void);
             VOID  _tx_execution_thread_exit(void);
             VOID  _tx_execution_isr_enter(void);
             VOID  _tx_execution_isr_exit(void);
-      
+
     3. The ThreadX library assembly code must be rebuilt with TX_EXECUTION_PROFILE_ENABLE so
        that these macros are expanded in the TX_THREAD structure and so the assembly code macros
        are enabled to call the execution profile routines.
@@ -66,7 +67,7 @@
 
 
 /* Externally reference several internal ThreadX variables.  */
-   
+
 extern ULONG                            _tx_thread_system_state;
 extern UINT                             _tx_thread_preempt_disable;
 extern TX_THREAD                        *_tx_thread_current_ptr;
@@ -89,7 +90,7 @@ EXECUTION_TIME_SOURCE_TYPE              _tx_execution_isr_time_last_start;
 
 
 /* Define the system idle time gathering information. For idle time that exceeds the range of the timer
-   source, another timer source may be needed. In addition, the total thread execution time added to the 
+   source, another timer source may be needed. In addition, the total thread execution time added to the
    total ISR time, less the total system time is also a measure of idle time.  */
 
 EXECUTION_TIME                          _tx_execution_idle_time_total;
@@ -131,12 +132,6 @@ ULONG                                   _tx_execution_isr_nest_counter = 0;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    xxx                               xxx                               */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  04-25-2022      Scott Larson            Initial Version 6.1.11        */
 /*                                                                        */
 /**************************************************************************/
 VOID  _tx_execution_initialize(void)
@@ -209,10 +204,10 @@ EXECUTION_TIME              new_total_time;
     /* This thread is being scheduled.  Simply setup the last start time in the
        thread control block.  */
     thread_ptr -> tx_thread_execution_time_last_start =  current_time;
-    
+
     /* Pickup the last idle start time.  */
     last_start_time =  _tx_execution_idle_time_last_start;
-    
+
     /* Determine if idle time is being measured.  */
     if (_tx_execution_idle_active)
     {
@@ -220,34 +215,34 @@ EXECUTION_TIME              new_total_time;
         /* Determine how to calculate the difference.  */
         if (current_time >= last_start_time)
         {
-        
+
             /* Simply subtract.  */
             delta_time =  (EXECUTION_TIME) (current_time - last_start_time);
         }
         else
         {
-        
+
             /* Timer wrapped, compute the delta assuming incrementing time counter.  */
             delta_time =  (EXECUTION_TIME) (current_time + ((((EXECUTION_TIME_SOURCE_TYPE) TX_EXECUTION_MAX_TIME_SOURCE) + 1) - last_start_time));
         }
-    
+
         /* Pickup the total time.  */
         total_time =  _tx_execution_idle_time_total;
 
         /* Now compute the new total time.  */
         new_total_time =  total_time + delta_time;
-        
+
         /* Determine if a rollover on the total time is present.  */
         if (new_total_time < total_time)
         {
-        
+
             /* Rollover. Set the total time to max value.  */
             new_total_time =  (EXECUTION_TIME) TX_EXECUTION_MAX_TIME_SOURCE;
         }
-    
+
         /* Now store back the total idle time.  */
         _tx_execution_idle_time_total =  new_total_time;
-        
+
         /* Disable the idle time measurement.  */
         _tx_execution_idle_active = TX_FALSE;
     }
@@ -311,7 +306,7 @@ EXECUTION_TIME              delta_time;
     /* Determine if there is a thread.  */
     if (thread_ptr)
     {
-    
+
         /* Pickup the current time.  */
         current_time =  TX_EXECUTION_TIME_SOURCE;
 
@@ -324,17 +319,17 @@ EXECUTION_TIME              delta_time;
 
             /* Clear the last start time.  */
             thread_ptr -> tx_thread_execution_time_last_start =  0;
-      
+
             /* Determine how to calculate the difference.  */
             if (current_time >= last_start_time)
             {
-        
+
                 /* Simply subtract.  */
                 delta_time =  (EXECUTION_TIME) (current_time - last_start_time);
-            }        
+            }
             else
             {
-        
+
                 /* Timer wrapped, compute the delta assuming incrementing time counter.  */
                 delta_time =  (EXECUTION_TIME) (current_time + ((((EXECUTION_TIME_SOURCE_TYPE) TX_EXECUTION_MAX_TIME_SOURCE) + 1) - last_start_time));
             }
@@ -344,25 +339,25 @@ EXECUTION_TIME              delta_time;
 
             /* Now compute the new total time.  */
             new_total_time =  total_time + delta_time;
-        
+
             /* Determine if a rollover on the total time is present.  */
             if (new_total_time < total_time)
             {
-        
+
                 /* Rollover. Set the total time to max value.  */
                 new_total_time =  (EXECUTION_TIME) TX_EXECUTION_MAX_TIME_SOURCE;
             }
-    
+
             /* Store back the new total time.  */
             thread_ptr -> tx_thread_execution_time_total =  new_total_time;
-            
+
             /* Now accumulate this thread's execution time into the total thread execution time.  */
             new_total_time =  _tx_execution_thread_time_total + delta_time;
-            
+
             /* Determine if a rollover on the total time is present.  */
             if (new_total_time < _tx_execution_thread_time_total)
             {
-        
+
                 /* Rollover. Set the total time to max value.  */
                 new_total_time =  (EXECUTION_TIME) TX_EXECUTION_MAX_TIME_SOURCE;
             }
@@ -454,7 +449,7 @@ EXECUTION_TIME              delta_time;
         /* Determine if a thread was interrupted.  */
         if (thread_ptr)
         {
-        
+
             /* Pickup the last start time.  */
             last_start_time =  thread_ptr -> tx_thread_execution_time_last_start;
 
@@ -464,17 +459,17 @@ EXECUTION_TIME              delta_time;
 
                 /* Clear the last start time.  */
                 thread_ptr -> tx_thread_execution_time_last_start =  0;
-        
+
                 /* Determine how to calculate the difference.  */
                 if (current_time >= last_start_time)
                 {
-        
+
                     /* Simply subtract.  */
                     delta_time =  (EXECUTION_TIME) (current_time - last_start_time);
-                }        
+                }
                 else
                 {
-        
+
                     /* Timer wrapped, compute the delta assuming incrementing time counter.  */
                     delta_time =  (EXECUTION_TIME) (current_time + ((((EXECUTION_TIME_SOURCE_TYPE) TX_EXECUTION_MAX_TIME_SOURCE) + 1) - last_start_time));
                 }
@@ -484,72 +479,72 @@ EXECUTION_TIME              delta_time;
 
                 /* Now compute the new total time.  */
                 new_total_time =  total_time + delta_time;
-        
+
                 /* Determine if a rollover on the total time is present.  */
                 if (new_total_time < total_time)
                 {
-        
+
                     /* Rollover. Set the total time to max value.  */
                     new_total_time =  (EXECUTION_TIME) TX_EXECUTION_MAX_TIME_SOURCE;
                 }
-    
+
                 /* Store back the new total time.  */
                 thread_ptr -> tx_thread_execution_time_total =  new_total_time;
 
                 /* Now accumulate this thread's execution time into the total thread execution time.  */
                 new_total_time =  _tx_execution_thread_time_total + delta_time;
-            
+
                 /* Determine if a rollover on the total time is present.  */
                 if (new_total_time < _tx_execution_thread_time_total)
                 {
-        
+
                     /* Rollover. Set the total time to max value.  */
                     new_total_time =  (EXECUTION_TIME) TX_EXECUTION_MAX_TIME_SOURCE;
-                }            
+                }
 
                 /* Store back the new total time.  */
                 _tx_execution_thread_time_total =  new_total_time;
             }
         }
-        
+
         /* Has idle time started?  */
         else if (_tx_execution_idle_active)
         {
-        
+
             /* Pickup the last idle start time.  */
             last_start_time =  _tx_execution_idle_time_last_start;
-    
+
             /* Determine how to calculate the difference.  */
             if (current_time >= last_start_time)
             {
-        
+
                 /* Simply subtract.  */
                 delta_time =  (EXECUTION_TIME) (current_time - last_start_time);
-            }        
+            }
             else
             {
-        
+
                 /* Timer wrapped, compute the delta assuming incrementing time counter.  */
                 delta_time =  (EXECUTION_TIME) (current_time + ((((EXECUTION_TIME_SOURCE_TYPE) TX_EXECUTION_MAX_TIME_SOURCE) + 1) - last_start_time));
             }
-    
+
             /* Pickup the total time.  */
             total_time =  _tx_execution_idle_time_total;
 
             /* Now compute the new total time.  */
             new_total_time =  total_time + delta_time;
-        
+
             /* Determine if a rollover on the total time is present.  */
             if (new_total_time < total_time)
             {
-        
+
                 /* Rollover. Set the total time to max value.  */
                 new_total_time =  (EXECUTION_TIME) TX_EXECUTION_MAX_TIME_SOURCE;
             }
-    
+
             /* Now store back the total idle time.  */
-            _tx_execution_idle_time_total =  new_total_time;    
-        
+            _tx_execution_idle_time_total =  new_total_time;
+
             /* Disable the idle time measurement.  */
             _tx_execution_idle_active = TX_FALSE;
         }
@@ -611,7 +606,7 @@ EXECUTION_TIME_SOURCE_TYPE  current_time;
 EXECUTION_TIME              delta_time;
 
 
-    /* Determine if this is the first interrupt. Nested interrupts are all treated as 
+    /* Determine if this is the first interrupt. Nested interrupts are all treated as
        general interrupt processing.  */
 #ifdef TX_CORTEX_M_EPK
     if ((TX_THREAD_GET_SYSTEM_STATE()) && (_tx_execution_isr_nest_counter == 1))
@@ -625,17 +620,17 @@ EXECUTION_TIME              delta_time;
 
         /* Pickup the last start time.  */
         last_start_time =  _tx_execution_isr_time_last_start;
-        
+
         /* Determine how to calculate the difference.  */
         if (current_time >= last_start_time)
         {
-        
+
            /* Simply subtract.  */
            delta_time =  (EXECUTION_TIME) (current_time - last_start_time);
         }
         else
         {
-        
+
             /* Timer wrapped, compute the delta assuming incrementing time counter.  */
             delta_time =  (EXECUTION_TIME) (current_time + (((EXECUTION_TIME_SOURCE_TYPE) TX_EXECUTION_MAX_TIME_SOURCE) - last_start_time));
         }
@@ -645,18 +640,18 @@ EXECUTION_TIME              delta_time;
 
         /* Now compute the new total time.  */
         new_total_time =  total_time + delta_time;
-        
+
         /* Determine if a rollover on the total time is present.  */
         if (new_total_time < total_time)
         {
-        
+
             /* Rollover. Set the total time to max value.  */
             new_total_time =  (EXECUTION_TIME) TX_EXECUTION_MAX_TIME_SOURCE;
         }
-    
+
         /* Store back the new total time.  */
         _tx_execution_isr_time_total =  new_total_time;
-        
+
         /* Pickup the current thread control block.  */
         thread_ptr =  _tx_thread_current_ptr;
 
@@ -667,22 +662,22 @@ EXECUTION_TIME              delta_time;
             /* Now determine if the thread will execution is going to occur immediately.  */
             if ((thread_ptr == _tx_thread_execute_ptr) || (_tx_thread_preempt_disable))
             {
-            
+
                 /* Yes, setup the thread last start time in the thread control block.  */
                 thread_ptr -> tx_thread_execution_time_last_start =  current_time;
             }
         }
-        
+
         /* Determine if the system is now idle.  */
         if (_tx_thread_execute_ptr == TX_NULL)
         {
-        
+
             /* Yes, idle system. Pickup the start of idle time.  */
             _tx_execution_idle_time_last_start =  TX_EXECUTION_TIME_SOURCE;
             _tx_execution_idle_active = TX_TRUE;
         }
     }
-    
+
 #ifdef TX_CORTEX_M_EPK
     /* Decrement the nested interrupt counter.  */
     _tx_execution_isr_nest_counter--;
@@ -779,8 +774,8 @@ UINT  _tx_execution_thread_total_time_reset(void)
 {
 
 TX_INTERRUPT_SAVE_AREA
-            
-TX_THREAD       *thread_ptr;            
+
+TX_THREAD       *thread_ptr;
 UINT            total_threads;
 
 

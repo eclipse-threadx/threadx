@@ -1,16 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** Thread-Metric Component                                               */
 /**                                                                       */
 /**   Cooperative Scheduling Test                                         */
@@ -18,27 +19,21 @@
 /**************************************************************************/
 /**************************************************************************/
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    tm_cooperative_scheduling_test                      PORTABLE C      */ 
-/*                                                           6.1.7        */ 
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    tm_cooperative_scheduling_test                      PORTABLE C      */
+/*                                                           6.1.7        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This file defines the cooperative scheduling test.                  */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  10-15-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/**************************************************************************/
 #include "tm_api.h"
 
 
@@ -99,7 +94,7 @@ void  tm_cooperative_scheduling_initialize(void)
     tm_thread_resume(3);
     tm_thread_resume(4);
 
-    /* Create the reporting thread. It will preempt the other 
+    /* Create the reporting thread. It will preempt the other
        threads and print out the test results.  */
     tm_thread_create(5, 2, tm_cooperative_thread_report);
     tm_thread_resume(5);
@@ -112,7 +107,7 @@ void  tm_cooperative_thread_0_entry(void)
 
     while(1)
     {
-      
+
         /* Relinquish to all other threads at same priority.  */
         tm_thread_relinquish();
 
@@ -217,7 +212,7 @@ unsigned long   average;
 
         /* Calculate the average of all the counters.  */
         average =  total/5;
-		
+
 		/* WCC - integrity check */
 		printf("tm_cooperative_thread_0_counter: %d\n", tm_cooperative_thread_0_counter);
 		printf("tm_cooperative_thread_1_counter: %d\n", tm_cooperative_thread_1_counter);
@@ -226,15 +221,15 @@ unsigned long   average;
 		printf("tm_cooperative_thread_4_counter: %d\n", tm_cooperative_thread_4_counter);
 
         /* See if there are any errors.  */
-        if ((tm_cooperative_thread_0_counter < (average - 1)) || 
+        if ((tm_cooperative_thread_0_counter < (average - 1)) ||
             (tm_cooperative_thread_0_counter > (average + 1)) ||
-            (tm_cooperative_thread_1_counter < (average - 1)) || 
+            (tm_cooperative_thread_1_counter < (average - 1)) ||
             (tm_cooperative_thread_1_counter > (average + 1)) ||
-            (tm_cooperative_thread_2_counter < (average - 1)) || 
+            (tm_cooperative_thread_2_counter < (average - 1)) ||
             (tm_cooperative_thread_2_counter > (average + 1)) ||
-            (tm_cooperative_thread_3_counter < (average - 1)) || 
+            (tm_cooperative_thread_3_counter < (average - 1)) ||
             (tm_cooperative_thread_3_counter > (average + 1)) ||
-            (tm_cooperative_thread_4_counter < (average - 1)) || 
+            (tm_cooperative_thread_4_counter < (average - 1)) ||
             (tm_cooperative_thread_4_counter > (average + 1)))
         {
 

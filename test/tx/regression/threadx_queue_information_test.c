@@ -1,3 +1,16 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test the queue information services.  */
 
 #include   <stdio.h>
@@ -43,8 +56,8 @@ CHAR    *pointer;
 
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -91,7 +104,7 @@ UINT        status;
 ULONG       source_message = 0x12345678UL;
 ULONG       dest_message;
 ULONG       expected_message;
-CHAR        *name;
+TX_NAME_CONST CHAR *name;
 ULONG       enqueued;
 ULONG       available_storage;
 TX_THREAD   *first_suspended;
@@ -147,9 +160,9 @@ ULONG       timeouts;
         printf("ERROR #5\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_0, &source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_0, &source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -199,7 +212,7 @@ ULONG       timeouts;
     }
 
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_0, &source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_0, &source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -246,7 +259,7 @@ ULONG       timeouts;
     source_message++;
     status +=  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);
     source_message++;
-        
+
     if (status != TX_SUCCESS)
     {
 
@@ -254,9 +267,9 @@ ULONG       timeouts;
         printf("ERROR #13\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -332,9 +345,9 @@ ULONG       timeouts;
         printf("ERROR #19\n");
         test_control_return(1);
     }
-    
+
     /* Attempt to place something on a full queue.  */
-    status =  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);    
+    status =  tx_queue_send(&queue_1, &source_message, TX_NO_WAIT);
 
     /* Should be an error.  */
     if (status != TX_QUEUE_FULL)
@@ -397,9 +410,9 @@ ULONG       timeouts;
     status =  tx_queue_info_get(&queue_0, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_queue_info_get(&queue_0, &name, &enqueued, &available_storage, &first_suspended, &suspended_count, &next_queue);
 
-    /* Check for errors.  */    
-    if ((status != TX_SUCCESS) || (enqueued != queue_0.tx_queue_enqueued) || (available_storage != queue_0.tx_queue_available_storage) || 
-        (first_suspended != queue_0.tx_queue_suspension_list) || (suspended_count != queue_0.tx_queue_suspended_count) || 
+    /* Check for errors.  */
+    if ((status != TX_SUCCESS) || (name != queue_0.tx_queue_name) || (enqueued != queue_0.tx_queue_enqueued) || (available_storage != queue_0.tx_queue_available_storage) ||
+        (first_suspended != queue_0.tx_queue_suspension_list) || (suspended_count != queue_0.tx_queue_suspended_count) ||
         (next_queue != queue_0.tx_queue_created_next))
     {
 
@@ -413,7 +426,7 @@ ULONG       timeouts;
     /* Test null pointer for queue performance info get.  */
     status =  _tx_queue_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_PTR_ERROR)
     {
 
@@ -426,9 +439,9 @@ ULONG       timeouts;
     status =  tx_queue_performance_info_get(&queue_0, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_queue_performance_info_get(&queue_0, &messages_sent, &messages_received, &empty_suspensions, &full_suspensions, &full_errors, &timeouts);
 
-    /* Check for errors.  */    
-    if ((status != TX_SUCCESS) || (messages_sent != queue_0.tx_queue_performance_messages_sent_count) || (messages_received != queue_0.tx_queue_performance_messages_received_count) || 
-        (empty_suspensions != queue_0.tx_queue_performance_empty_suspension_count) || (full_suspensions != queue_0.tx_queue_performance_full_suspension_count) || 
+    /* Check for errors.  */
+    if ((status != TX_SUCCESS) || (messages_sent != queue_0.tx_queue_performance_messages_sent_count) || (messages_received != queue_0.tx_queue_performance_messages_received_count) ||
+        (empty_suspensions != queue_0.tx_queue_performance_empty_suspension_count) || (full_suspensions != queue_0.tx_queue_performance_full_suspension_count) ||
         (full_errors != queue_0.tx_queue_performance_full_error_count) || (timeouts != queue_0.tx_queue_performance_timeout_count))
     {
 
@@ -441,9 +454,9 @@ ULONG       timeouts;
     status =  tx_queue_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
     status += tx_queue_performance_system_info_get(&messages_sent, &messages_received, &empty_suspensions, &full_suspensions, &full_errors, &timeouts);
 
-    /* Check for errors.  */    
-    if ((status != TX_SUCCESS) || (messages_sent != _tx_queue_performance_messages_sent_count) || (messages_received != _tx_queue_performance__messages_received_count) || 
-        (empty_suspensions != _tx_queue_performance_empty_suspension_count) || (full_suspensions != _tx_queue_performance_full_suspension_count) || 
+    /* Check for errors.  */
+    if ((status != TX_SUCCESS) || (messages_sent != _tx_queue_performance_messages_sent_count) || (messages_received != _tx_queue_performance__messages_received_count) ||
+        (empty_suspensions != _tx_queue_performance_empty_suspension_count) || (full_suspensions != _tx_queue_performance_full_suspension_count) ||
         (full_errors != _tx_queue_performance_full_error_count) || (timeouts != _tx_queue_performance_timeout_count))
     {
 
@@ -457,7 +470,7 @@ ULONG       timeouts;
     /* Get performance information.  */
     status =  tx_queue_performance_info_get(&queue_0, &messages_sent, &messages_received, &empty_suspensions, &full_suspensions, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -469,7 +482,7 @@ ULONG       timeouts;
     /* Get performance information.  */
     status =  tx_queue_performance_info_get(TX_NULL, &messages_sent, &messages_received, &empty_suspensions, &full_suspensions, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -481,7 +494,7 @@ ULONG       timeouts;
     /* Get performance information.  */
     status =  tx_queue_performance_info_get(TX_NULL, TX_NULL, &messages_received, &empty_suspensions, &full_suspensions, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -493,7 +506,7 @@ ULONG       timeouts;
     /* Get performance information.  */
     status =  tx_queue_performance_info_get(TX_NULL, TX_NULL, TX_NULL, &empty_suspensions, &full_suspensions, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -505,7 +518,7 @@ ULONG       timeouts;
     /* Get performance information.  */
     status =  tx_queue_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, &full_suspensions, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -517,7 +530,7 @@ ULONG       timeouts;
     /* Get performance information.  */
     status =  tx_queue_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -529,7 +542,7 @@ ULONG       timeouts;
     /* Get performance information.  */
     status =  tx_queue_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -541,7 +554,7 @@ ULONG       timeouts;
     /* Get performance information.  */
     status =  tx_queue_performance_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -553,7 +566,7 @@ ULONG       timeouts;
     /* Get system performance information.  */
     status =  tx_queue_performance_system_info_get(&messages_sent, &messages_received, &empty_suspensions, &full_suspensions, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -565,7 +578,7 @@ ULONG       timeouts;
     /* Get system performance information.  */
     status =  tx_queue_performance_system_info_get(TX_NULL, &messages_received, &empty_suspensions, &full_suspensions, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -577,7 +590,7 @@ ULONG       timeouts;
     /* Get system performance information.  */
     status =  tx_queue_performance_system_info_get(TX_NULL, TX_NULL, &empty_suspensions, &full_suspensions, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -589,7 +602,7 @@ ULONG       timeouts;
     /* Get system performance information.  */
     status =  tx_queue_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, &full_suspensions, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -601,7 +614,7 @@ ULONG       timeouts;
     /* Get system performance information.  */
     status =  tx_queue_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, &full_errors, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -613,7 +626,7 @@ ULONG       timeouts;
     /* Get system performance information.  */
     status =  tx_queue_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, &timeouts);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 
@@ -625,7 +638,7 @@ ULONG       timeouts;
     /* Get system performance information.  */
     status =  tx_queue_performance_system_info_get(TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL, TX_NULL);
 
-    /* Should be an error!  */ 
+    /* Should be an error!  */
     if (status != TX_FEATURE_NOT_ENABLED)
     {
 

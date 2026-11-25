@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+/* Portions of this file were generated with AI assistance. */
 
 
 /**************************************************************************/
@@ -62,17 +65,8 @@
 /*                                                                        */
 /*    Module application code                                             */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  01-31-2022      Scott Larson            Modified comments and added   */
-/*                                            CALL_NOT_USED option,       */
-/*                                            resulting in version 6.1.10 */
-/*                                                                        */
 /**************************************************************************/
-UINT _txe_queue_info_get(TX_QUEUE *queue_ptr, CHAR **name, ULONG *enqueued, ULONG *available_storage, TX_THREAD **first_suspended, ULONG *suspended_count, TX_QUEUE **next_queue)
+UINT _txe_queue_info_get(TX_QUEUE *queue_ptr, TX_NAME_CONST CHAR **name, ULONG *enqueued, ULONG *available_storage, TX_THREAD **first_suspended, ULONG *suspended_count, TX_QUEUE **next_queue)
 {
 
 UINT return_value;

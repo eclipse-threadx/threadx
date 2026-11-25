@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -77,6 +79,7 @@ UINT  _txm_module_manager_external_memory_enable(TXM_MODULE_INSTANCE *module_ins
 {
 
 ULONG   address;
+ULONG   limit;
 ULONG   shared_index;
 
     /* Determine if the module manager has not been initialized yet.  */
@@ -145,8 +148,9 @@ ULONG   shared_index;
     /* Set base address register with start address, sanitized attributes and execute never.  */
     module_instance -> txm_module_instance_mpu_registers[shared_index].txm_module_mpu_region_base_address = address | (attributes & TXM_MODULE_ATTRIBUTE_MASK) | TXM_MODULE_ATTRIBUTE_EXECUTE_NEVER;
 
-    /* Set the limit address (data start + length-1), attribute index, and enable bit.  */
-    module_instance -> txm_module_instance_mpu_registers[shared_index].txm_module_mpu_region_limit_address = (address + length-1) | TXM_MODULE_ATTRIBUTE_INDEX | TXM_MODULE_ATTRIBUTE_REGION_ENABLE;
+    /* Clear the address bits reserved for the MPU attributes in the limit register.  */
+    limit = (address + length - 1UL) & ~((ULONG) TXM_MODULE_MPU_ALIGNMENT - 1UL);
+    module_instance -> txm_module_instance_mpu_registers[shared_index].txm_module_mpu_region_limit_address = limit | TXM_MODULE_ATTRIBUTE_INDEX | TXM_MODULE_ATTRIBUTE_REGION_ENABLE;
 
     /* Keep track of shared memory address and length in module instance.  */
     module_instance -> txm_module_instance_shared_memory_address[module_instance -> txm_module_instance_shared_memory_count] = address;

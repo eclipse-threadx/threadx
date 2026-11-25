@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -44,37 +45,6 @@
 /*                                                                        */
 /*    This file replaces the previous Cortex-M33 files. It unifies        */
 /*    the Cortex-M33 compilers into one common file.                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  03-02-2021      Scott Larson            Modified comment(s), added    */
-/*                                            ULONG64_DEFINED,            */
-/*                                            resulting in version 6.1.5  */
-/*  06-02-2021      Scott Larson            Modified comment(s), removed  */
-/*                                            unneeded header file, funcs */
-/*                                            set_control and get_control */
-/*                                            changed to inline,          */
-/*                                            added symbol to enable      */
-/*                                            stack error handler,        */
-/*                                            resulting in version 6.1.7  */
-/*  10-15-2021      Scott Larson            Modified comment(s), improved */
-/*                                            stack check error handling, */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022      Scott Larson            Modified comment(s), unified  */
-/*                                            this file across compilers, */
-/*                                            fixed predefined macro,     */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022      Scott Larson            Modified comments and added   */
-/*                                            volatile to registers,      */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Modified comments and changed */
-/*                                            secure stack initialization */
-/*                                            macro to port-specific,     */
-/*                                            described BASEPRI usage,    */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -705,7 +675,7 @@ VOID                                            _tx_thread_interrupt_restore(UIN
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation. * ThreadX Cortex-M33 Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * ThreadX Cortex-M33 Version 6.5.2.202603b *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -71,12 +72,6 @@ UINT    tx_low_power_entered;
 /*                                                                        */
 /*    _tx_thread_schedule                   Thread scheduling loop        */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*                                                                        */
 /**************************************************************************/
 VOID  tx_low_power_enter(VOID)
 {
@@ -88,12 +83,12 @@ ULONG   any_expired;
 
     /*  The below macro is user-defined code to determine
         if low power mode is beneficial for the application.
-        Reasons for not entering low power mode include 
-        the overhead associated with entering and exiting low power mode 
-        outweighs the savings given when the next interrupt is expected. 
-        In addition, the application might also be in a state where 
-        responsiveness is more important than power savings. In such 
-        situations, using a "reduced power mode" might make more sense. 
+        Reasons for not entering low power mode include
+        the overhead associated with entering and exiting low power mode
+        outweighs the savings given when the next interrupt is expected.
+        In addition, the application might also be in a state where
+        responsiveness is more important than power savings. In such
+        situations, using a "reduced power mode" might make more sense.
         In any case, if low power mode is not desired, simply return at
         this point in the code.  */
     #ifdef TX_LOW_POWER_USER_CHECK
@@ -102,45 +97,45 @@ ULONG   any_expired;
 
     /* Disable interrupts while we prepare for low power mode.  */
     TX_DISABLE
-    
+
     /*  At this point, we want to enter low power mode, since nothing
-        meaningful is going on in the system. However, in order to keep 
-        the ThreadX timer services accurate, we must first determine the 
-        next ThreadX timer expiration in terms of ticks. This is 
+        meaningful is going on in the system. However, in order to keep
+        the ThreadX timer services accurate, we must first determine the
+        next ThreadX timer expiration in terms of ticks. This is
         accomplished via the tx_timer_get_next API.  */
     any_expired =  tx_timer_get_next(&tx_low_power_next_expiration);
-    
+
     /* There are two possibilities:
         1:  A ThreadX timer is active. tx_timer_get_next returns TX_TRUE.
             Program the hardware timer source such that the next timer
-            interrupt is equal to: tx_low_power_next_expiration*tick_frequency. 
+            interrupt is equal to: tx_low_power_next_expiration*tick_frequency.
             In most applications, the tick_frequency is 10ms, but this is
-            completely application specific in ThreadX, typically set up 
+            completely application specific in ThreadX, typically set up
             in tx_low_level_initialize.
         2:  There are no ThreadX timers active. tx_timer_get_next returns TX_FALSE.
-            If you don't care about maintaining the ThreadX system clock, you can simply 
-            sleep forever (until an interrupt wakes you up). 
-            If you do want to maintain the ThreadX system clock, 
+            If you don't care about maintaining the ThreadX system clock, you can simply
+            sleep forever (until an interrupt wakes you up).
+            If you do want to maintain the ThreadX system clock,
             program the hardware timer so you can keep track of elapsed time.  */
     #ifdef TX_LOW_POWER_USER_TIMER_SETUP
     TX_LOW_POWER_USER_TIMER_SETUP(any_expired, tx_low_power_next_expiration);
     #endif
-    
 
-    /* Set the flag indicating that low power has been entered. This 
+
+    /* Set the flag indicating that low power has been entered. This
        flag is checked in tx_low_power_exit to determine if the logic
        used to adjust the ThreadX time is required.  */
     tx_low_power_entered =  TX_TRUE;
-    
+
     /* Re-enable interrupts before low power mode is entered.  */
     TX_RESTORE
-    
+
     /* User code to enter low power mode.  */
     #ifdef TX_LOW_POWER_USER_ENTER
     TX_LOW_POWER_USER_ENTER;
     #endif
 
-    /* If the low power code returns, this routine returns to the 
+    /* If the low power code returns, this routine returns to the
        tx_thread_schedule loop.  */
 }
 
@@ -198,23 +193,23 @@ ULONG   tx_low_power_adjust_ticks;
 
         /* Clear the low power entered flag.  */
         tx_low_power_entered =  TX_FALSE;
-        
-        /* User code to exit low power mode and reprogram the 
+
+        /* User code to exit low power mode and reprogram the
            timer to the desired interrupt frequency.  */
         #ifdef TX_LOW_POWER_USER_EXIT
         TX_LOW_POWER_USER_EXIT;
         #endif
-    
-        /* User code to determine how many timer ticks (interrupts) that 
-           the ThreadX time should be incremented to properly adjust 
-           for the time in low power mode. The result is assumed to be 
+
+        /* User code to determine how many timer ticks (interrupts) that
+           the ThreadX time should be incremented to properly adjust
+           for the time in low power mode. The result is assumed to be
            placed in tx_low_power_adjust_ticks.  */
         #ifdef TX_LOW_POWER_USER_TIMER_ADJUST
         tx_low_power_adjust_ticks = TX_LOW_POWER_USER_TIMER_ADJUST;
         #else
         tx_low_power_adjust_ticks = (ULONG)0;
         #endif
-        
+
         /* Determine if the ThreadX timer needs incrementing.  */
         if (tx_low_power_adjust_ticks)
         {
@@ -330,7 +325,7 @@ ULONG                       expiration_time = (ULONG) 0xFFFFFFFF;
 
             } while (next_timer != *timer_list_head);
         }
-        
+
         /* This timer entry is NULL, so just move to the next one.  */
         timer_list_head++;
 
@@ -438,14 +433,14 @@ TX_TIMER_INTERNAL           *temp_list_head;
         else
             _tx_timer_time_slice =  1;
     }
-    
+
     /* Calculate the proper place to position the timer.  */
     timer_list_head =  _tx_timer_current_ptr;
 
     /* Setup the temporary list pointer.  */
     temp_list_head =  TX_NULL;
 
-    /* Loop to pull all timers off the timer structure and put on the 
+    /* Loop to pull all timers off the timer structure and put on the
        the temporary list head.  */
     for (i = 0; i < TX_TIMER_ENTRIES; i++)
     {
@@ -468,7 +463,7 @@ TX_TIMER_INTERNAL           *temp_list_head;
                 {
 
                     /* Calculate the actual expiration time.  */
-                    next_timer -> tx_timer_internal_remaining_ticks =  
+                    next_timer -> tx_timer_internal_remaining_ticks =
                                     next_timer -> tx_timer_internal_remaining_ticks - (TX_TIMER_ENTRIES - i) + 1;
                 }
                 else
@@ -491,7 +486,7 @@ TX_TIMER_INTERNAL           *temp_list_head;
             if (temp_list_head == TX_NULL)
             {
 
-                /* First item on the list.  Move the entire 
+                /* First item on the list.  Move the entire
                    linked list.  */
                 temp_list_head =  *timer_list_head;
             }
@@ -509,7 +504,7 @@ TX_TIMER_INTERNAL           *temp_list_head;
             /* Now clear the current timer head pointer.  */
             *timer_list_head =  TX_NULL;
         }
-        
+
         /* Move to next timer entry.  */
         timer_list_head++;
 
@@ -535,7 +530,7 @@ TX_TIMER_INTERNAL           *temp_list_head;
         /* Move the temp list head pointer to the next pointer.  */
         temp_list_head =  next_timer -> tx_timer_internal_active_next;
 
-        /* Determine if the remaining time is greater than the time increment 
+        /* Determine if the remaining time is greater than the time increment
            value - this is the normal case.  */
         if (next_timer -> tx_timer_internal_remaining_ticks > time_increment)
         {

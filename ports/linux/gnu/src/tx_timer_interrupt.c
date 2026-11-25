@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
@@ -30,49 +31,43 @@
 
 
 VOID   _tx_timer_interrupt(VOID);
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _tx_timer_interrupt                                 Linux/GNU       */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_interrupt                                 Linux/GNU       */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function processes the hardware timer interrupt.  This         */ 
-/*    processing includes incrementing the system clock and checking for  */ 
-/*    time slice and/or timer expiration.  If either is found, the        */ 
-/*    interrupt context save/restore functions are called along with the  */ 
-/*    expiration functions.                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_linux_debug_entry_insert                                        */ 
-/*    tx_linux_mutex_lock                                                 */ 
-/*    tx_linux_mutex_unlock                                               */ 
-/*    _tx_timer_expiration_process                                        */ 
-/*    _tx_thread_time_slice                                               */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    interrupt vector                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+/*    This function processes the hardware timer interrupt.  This         */
+/*    processing includes incrementing the system clock and checking for  */
+/*    time slice and/or timer expiration.  If either is found, the        */
+/*    interrupt context save/restore functions are called along with the  */
+/*    expiration functions.                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_linux_debug_entry_insert                                        */
+/*    tx_linux_mutex_lock                                                 */
+/*    tx_linux_mutex_unlock                                               */
+/*    _tx_timer_expiration_process                                        */
+/*    _tx_thread_time_slice                                               */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    interrupt vector                                                    */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_timer_interrupt(VOID)

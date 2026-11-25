@@ -351,7 +351,7 @@ primary_cpu_init PROC
 
 ;  ; Translation tables
 ;  ; -------------------
-;  ; The translation tables are generated at boot time.  
+;  ; The translation tables are generated at boot time.
 ;  ; First the table is zeroed.  Then the individual valid
 ;  ; entries are written in
 ;  ;

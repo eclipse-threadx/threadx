@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -51,12 +52,12 @@
 /*    Eventually, you should call pthread_join() or pthread_detach() for  */
 /*    every thread that is created joinable (with a detachstate of        */
 /*    PTHREAD_CREATE_JOINABLE)so that the system can reclaim all resources*/
-/*    associated with the thread. Failure to join to or detach joinable   */ 
+/*    associated with the thread. Failure to join to or detach joinable   */
 /*    threads will result in memory and other resource leaks until the    */
 /*    process ends. If thread doesn't represent a valid undetached thread,*/
-/*    pthread_detach() will return ESRCH.                                 */ 
-/*                                                                        */ 
-/*    Note: this function must be called from a POSIX context; if it is   */  
+/*    pthread_detach() will return ESRCH.                                 */
+/*                                                                        */
+/*    Note: this function must be called from a POSIX context; if it is   */
 /*    called from  ThreadX context an error is returned.                  */
 /*                                                                        */
 /*  INPUT                                                                 */
@@ -77,12 +78,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 INT pthread_join(pthread_t thread, VOID **value_ptr)
 
@@ -93,9 +88,9 @@ INT pthread_join(pthread_t thread, VOID **value_ptr)
     TX_THREAD   *target_thread;
 
 
-    /* Get the TCB for the currently running pthread   */ 
+    /* Get the TCB for the currently running pthread   */
     current_ptr = posix_thread2tcb(tx_thread_identify());
-    
+
     /* Make sure that a TCB was returned.  */
     if (!current_ptr)
     {
@@ -136,7 +131,7 @@ INT pthread_join(pthread_t thread, VOID **value_ptr)
         /* but target pthread is already terminated */
         /* return the return value of the terminated thread */
         target_ptr = posix_tid2tcb(thread);
-        if(value_ptr)*value_ptr = target_ptr->value_ptr; 
+        if(value_ptr)*value_ptr = target_ptr->value_ptr;
         return(OK);
     }
 
@@ -176,9 +171,9 @@ INT pthread_join(pthread_t thread, VOID **value_ptr)
     TX_RESTORE
 
     /* Now calling pthread will suspend itself and wait till target pthread exits */
-        tx_thread_suspend ( &(current_ptr->thread_info));  
+        tx_thread_suspend ( &(current_ptr->thread_info));
     /* target pthread exited and thus current pthread will resume now */
     /* store return value if value_ptr is valid */
-    if(value_ptr)*value_ptr = target_ptr->value_ptr; 
+    if(value_ptr)*value_ptr = target_ptr->value_ptr;
     return(OK);
 }

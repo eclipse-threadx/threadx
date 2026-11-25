@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -60,14 +63,6 @@
 /*                                                                        */
 /*    ThreadX internal code                                               */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_stack_analyze(TX_THREAD *thread_ptr)
 {
@@ -77,6 +72,10 @@ TX_INTERRUPT_SAVE_AREA
 ULONG       *stack_ptr;
 ULONG       *stack_lowest;
 ULONG       *stack_highest;
+ULONG       *probe_ptr;
+ULONG       *stack_limit;
+ULONG       probe_count;
+UINT        fill_present;
 ULONG       size;
 
 
@@ -101,9 +100,15 @@ ULONG       size;
                 /* Pickup the highest stack pointer.  */
                 stack_highest =  TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_highest_ptr);
 
-                /* Determine if the pointer is null.  */
-                if (stack_highest != TX_NULL)
+                /* Determine if the pointer is null or if the highest stack pointer is not above the
+                   start of the stack. The latter indicates a stack overflow or a corrupted thread
+                   control block, and the unsigned pointer arithmetic in the binary search below would
+                   wrap around and never converge, hanging the caller.  */
+                if ((stack_highest != TX_NULL) && (stack_highest > stack_lowest))
                 {
+
+                    /* Remember the upper bound of the search so the scan below cannot run past it.  */
+                    stack_limit =  stack_highest;
 
                     /* Restore interrupts.  */
                     TX_RESTORE
@@ -117,8 +122,49 @@ ULONG       size;
                         size =  (ULONG) (TX_ULONG_POINTER_DIF(stack_highest, stack_lowest))/((ULONG) 2);
                         stack_ptr =  TX_ULONG_POINTER_ADD(stack_lowest, size);
 
-                        /* Determine if the pattern is still there.  */
-                        if (*stack_ptr != TX_STACK_FILL)
+                        /* Determine if the pattern is still there.  To avoid stopping on an
+                           unwritten hole inside an otherwise used region, require several
+                           consecutive fill words, working towards the lowest address.  The scan
+                           stops at the lowest known fill location, since everything at or below
+                           that point is already known to hold the fill pattern.  */
+                        fill_present =  TX_TRUE;
+                        probe_ptr =     stack_ptr;
+                        probe_count =   TX_THREAD_STACK_ANALYZE_FILL_WORDS;
+                        while (probe_count != ((ULONG) 0))
+                        {
+
+                            /* Determine if this word still holds the fill pattern.  */
+                            if (*probe_ptr != TX_STACK_FILL)
+                            {
+
+                                /* No, the probe location is in use.  */
+                                fill_present =  TX_FALSE;
+                                probe_count =   ((ULONG) 0);
+                            }
+                            else
+                            {
+
+                                /* Yes, account for this word.  */
+                                probe_count--;
+
+                                /* Determine if the lowest known fill location has been reached.  */
+                                if (probe_ptr <= stack_lowest)
+                                {
+
+                                    /* Yes, nothing further to check.  */
+                                    probe_count =  ((ULONG) 0);
+                                }
+                                else
+                                {
+
+                                    /* Position to the previous word in the stack.  */
+                                    probe_ptr =  TX_ULONG_POINTER_SUB(probe_ptr, 1);
+                                }
+                            }
+                        }
+
+                        /* Determine if the probe location is in use.  */
+                        if (fill_present == TX_FALSE)
                         {
 
                             /* Update the stack highest, since we need to look in the upper half now.  */
@@ -134,7 +180,7 @@ ULONG       size;
                     } while(size > ((ULONG) 1));
 
                     /* Position to first used word - at this point we are within a few words.  */
-                    while (*stack_ptr == TX_STACK_FILL)
+                    while ((stack_ptr < stack_limit) && (*stack_ptr == TX_STACK_FILL))
                     {
 
                         /* Position to next word in stack.  */

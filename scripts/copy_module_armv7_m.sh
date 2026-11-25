@@ -1,4 +1,15 @@
 #!/bin/bash
+##############################################################################
+# Copyright (c) 2024 Microsoft Corporation
+# Copyright (c) 2026 Eclipse ThreadX contributors
+#
+# This program and the accompanying materials are made available under the
+# terms of the MIT License which is available at
+# https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: MIT
+##############################################################################
+
 
 # There is only one tx_port.h file that covers three architectures: M3/M4/M7 and four tools: ac5/ac6/gnu/iar.
 # This file is in threadx/ports_module/armv7-m/inc. We are going to ignore GHS.
@@ -44,7 +55,7 @@ do
         echo "$source_inc_folder -> $target"
         cp -rf $source_inc_folder/* $target
         find $target -type f -exec sed -i "s/$source_string/$target_string_pre${mcu: -1}/g" {} \;
-        
+
         # Copy common files
         source=$source_folder/$source_common_folder;
         target=$ports_module_folder/$mcu/$ide/$target_common_folder

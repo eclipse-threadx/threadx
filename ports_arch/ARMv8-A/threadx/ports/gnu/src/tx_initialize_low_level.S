@@ -1,13 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -58,17 +60,6 @@
 /*                                                                        */
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  01-31-2022     Andres Mlinar            Updated comments,             */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Tiejun Zhou              Modified comment(s), added    */
-/*                                            #include tx_user.h,         */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_initialize_low_level(VOID)
 // {
@@ -93,10 +84,9 @@ _tx_initialize_low_level:
 
     LDR     x0, =_tx_initialize_unused_memory   // Pickup address of unused memory ptr
     LDR     x1, =__top_of_ram                   // Pickup unused memory address
-    LDR     x1, [x1]                            //
     STR     x1, [x0]                            // Store unused memory address
 
     /* Done, return to caller.  */
 
     RET                                         // Return to caller
-// } 
+// }

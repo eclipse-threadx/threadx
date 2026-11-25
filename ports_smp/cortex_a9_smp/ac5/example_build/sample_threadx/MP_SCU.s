@@ -40,13 +40,13 @@ get_num_cpus PROC
 
   ; Get base address of private perpherial space
   MRC     p15, 4, r0, c15, c0, 0  ; Read periph base address
-  
+
   LDR     r0, [r0, #0x004]        ; Read SCU Configuration register
   AND     r0, r0, #0x3            ; Bits 1:0 gives the number of cores
 
   BX      lr
   ENDP
-  
+
 ; ------------------------------------------------------------
 
   EXPORT go_to_sleep
@@ -170,14 +170,14 @@ disable_maintenance_broadcast PROC
 secure_SCU_invalidate PROC
   AND     r0, r0, #0x03           ; Mask off unused bits of CPU ID
   MOV     r0, r0, LSL #2          ; Convert into bit offset (four bits per core)
-  
+
   AND     r1, r1, #0x0F           ; Mask off unused bits of ways
   MOV     r1, r1, LSL r0          ; Shift ways into the correct CPU field
 
   MRC     p15, 4, r2, c15, c0, 0  ; Read periph base address
 
   STR     r1, [r2, #0x0C]         ; Write to SCU Invalidate All in Secure State
-  
+
   BX      lr
 
   ENDP

@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -18,7 +19,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .text
     .align 3
@@ -26,8 +29,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_unprotect                         Cortex-A35-SMP/AC6 */
-/*                                                           6.1.10       */
+/*    _tx_thread_smp_unprotect                           ARMv8-A-SMP      */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -54,15 +57,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Source                                                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  01-31-2022     Andres Mlinar            Updated comments,             */
-/*                                             added ARMv8.2-A support,   */
-/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_unprotect
@@ -102,11 +96,6 @@ _tx_thread_smp_unprotect:
     LDR     x2,=_tx_thread_preempt_disable      // Build address of preempt disable flag
     LDR     w3, [x2]                            // Pickup preempt disable flag
     CMP     w3, #0                              // Is the preempt disable flag set?
-    BNE     _still_protected                    // Yes, skip the protection release
-
-    LDR     x2,=_tx_thread_smp_protect_wait_counts // Build build address of wait counts
-    LDR     w3, [x2, x1, LSL #2]                // Pickup wait list value
-    CMP     w3, #0                              // Are any entities on this core waiting?
     BNE     _still_protected                    // Yes, skip the protection release
 
     LDR     x2,=_tx_thread_smp_protection       // Build address of protection structure

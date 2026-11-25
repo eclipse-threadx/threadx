@@ -28,12 +28,6 @@
 /*    Xtensa coprocessor handling routines. This code is only active if   */
 /*    one or more coprocessors are present.                               */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Cadence Design Systems   Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 
 
@@ -225,7 +219,7 @@ _xt_coproc_handler:
 
 _tx_thread_coproc_state:
 
-        // return ( _tx_thread_system_state == 0 && _tx_thread_current_ptr != 0 
+        // return ( _tx_thread_system_state == 0 && _tx_thread_current_ptr != 0
         //          ? (&_tx_thread_current_ptr->tx_thread_cp_state) : 0 )
 
         movi    a15, _tx_thread_system_state    // check if interrupt state
@@ -512,15 +506,15 @@ _xt_coproc_exc:
         .global     _xt_coproc_exc
         .type       _xt_coproc_exc,@function
         .align      4
-  
+
 _xt_coproc_exc:
-    
+
         mov     a0, sp                          // Allocate stack frame
         addi    sp, sp, -XT_STK_FRMSZ
         s32i    a0, sp, XT_STK_A1               // save SP
 #if XCHAL_HAVE_WINDOWED
         s32e    a0, sp, -12                     // for debug backtrace
-#endif  
+#endif
         rsr     a0, PS
         s32i    a0, sp, XT_STK_PS               // save PS
         rsr     a0, EPC_1

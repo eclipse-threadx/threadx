@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -63,14 +64,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Update comparison with NULL,  */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 mqd_t  mq_open(const CHAR * mqName, ULONG oflags,...)
 {
@@ -81,7 +74,7 @@ struct mq_attr      *q_attr;
 mode_t               mode;
 va_list              create_queue;
 ULONG                len;
-ULONG                temp1; 
+ULONG                temp1;
 
     len = strlen(mqName);
     if(len > PATH_MAX)
@@ -134,16 +127,16 @@ ULONG                temp1;
                  return((struct mq_des *)ERROR);
              }
 
-             /* If q_attr is NULL then the default attributes of the struct 
+             /* If q_attr is NULL then the default attributes of the struct
                 mq_attr are used */
              if(q_attr == NULL)
              {
                  q_attr = &(posix_qattr_default);
                  temp1 = q_attr->mq_maxmsg;
-                 temp1= temp1 ;         /* Just to keep complier happy */ 
+                 temp1= temp1 ;         /* Just to keep complier happy */
              }
 
-             /* Create a queue which returns posix queue if successful and 
+             /* Create a queue which returns posix queue if successful and
                 NULL if fails.  */
              if(!(posix_queue = posix_mq_create(mqName, q_attr)))
              {

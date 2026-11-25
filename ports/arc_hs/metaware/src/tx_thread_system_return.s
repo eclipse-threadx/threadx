@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 
@@ -54,18 +54,6 @@
 ;/*                                                                        */
 ;/*    ThreadX components                                                  */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  10-15-2021     Andres Mlinar            Modified comments,            */
-;/*                                            use schedule reenter,       */
-;/*                                            resulting in version 6.1.9  */
-;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-;/*                                            #include tx_user.h,         */
-;/*                                            resulting in version 6.2.1  */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_system_return(VOID)
 ;{
@@ -87,7 +75,7 @@ _tx_thread_system_return:
     mov     r4, 2                                       ; Build solicited hardward stack frame type
     st      r4, [sp, 0]                                 ; Set stack frame type
     st      r3, [sp, 4]                                 ; Save status32
-    st      r2, [sp, 8]                                 ; Save interrupt posture        
+    st      r2, [sp, 8]                                 ; Save interrupt posture
     st      sp, [r0, 8]                                 ; Save thread's stack pointer
     bclr    r3, r3, 16                                  ; Build register bank 0 value
     bclr    r3, r3, 17                                  ;
@@ -120,7 +108,7 @@ __tx_software_context:
     st      r30, [sp, 72]                               ; Save r30
     st      sp,  [r0, 8]                                ; Save thread's stack pointer
 __tx_save_done:
-;   
+;
     .ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 ;
 ;    /* Call the thread exit function to indicate the thread is no longer executing.  */

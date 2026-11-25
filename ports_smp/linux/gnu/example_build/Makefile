@@ -34,7 +34,7 @@ $(OUTPUT_FOLDER):
 
 sample_threadx: $(OUTPUT_FOLDER)/sample_threadx.o tx.a
 	echo LD $@
-	$(LINK) -o $@ $^ $(LIBS) 
+	$(LINK) -o $@ $^ $(LIBS)
 
 tx.a: $(OUTPUT_FOLDER) $(LINUX_OBJS) $(GENERIC_OBJS)
 	echo AR $@
@@ -68,7 +68,7 @@ files:
 	do \
 		filename=`basename $$file`; \
 		[ "$$file" == "sample_threadx.c" ] || echo "$$filename \\" >> $(FILE_LIST); \
-	done; 
+	done;
 	@printf "\n" >> $(FILE_LIST);
 	@echo 'LINUX_OBJS = $$(LINUX_SRCS:%.c=$(OUTPUT_FOLDER)/%.o)' >> $(FILE_LIST);
 	@printf "\n\n" >> $(FILE_LIST);
@@ -77,7 +77,7 @@ files:
 	do \
 		filename=`basename $$file`; \
 		[ "$$file" == "sample_threadx.c" ] || echo "$$filename \\" >> $(FILE_LIST); \
-	done; 
+	done;
 	@printf "\n" >> $(FILE_LIST);
 	@echo 'GENERIC_OBJS = $$(GENERIC_SRCS:%.c=$(OUTPUT_FOLDER)/generic/%.o)' >> $(FILE_LIST);
 

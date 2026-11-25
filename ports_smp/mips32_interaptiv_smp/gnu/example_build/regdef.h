@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 #ifndef __REGDEF_H
 #define __REGDEF_H
 
@@ -9,7 +20,7 @@
 #define a1      $5
 #define a2      $6
 #define a3      $7
-#define t0      $8      
+#define t0      $8
 #define t1      $9
 #define t2      $10
 #define t3      $11
@@ -17,7 +28,7 @@
 #define t5      $13
 #define t6      $14
 #define t7      $15
-#define s0      $16     
+#define s0      $16
 #define s1      $17
 #define s2      $18
 #define s3      $19
@@ -25,9 +36,9 @@
 #define s5      $21
 #define s6      $22
 #define s7      $23
-#define t8      $24     
+#define t8      $24
 #define t9      $25
-#define jp      $25     
+#define jp      $25
 #define k0      $26     /* reserved for OS */
 #define k1      $27     /* reserved for OS */
 #define gp      $28     /* global pointer */

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Thread                                                              */
 /**                                                                       */
@@ -28,7 +29,7 @@
 /*  #include "tx_api.h"
     #include "tx_thread.h"
     #include "tx_timer.h"  */
-    
+
     EXTERN      _tx_thread_execute_ptr
     EXTERN      _tx_thread_current_ptr
     EXTERN      _tx_timer_time_slice
@@ -42,47 +43,40 @@
 
     SECTION `.text`:CODE:REORDER:NOROOT(2)
     CODE
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _tx_thread_context_restore                         RISC-V32/IAR     */
 /*                                                           6.1          */
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*    Tom van Leeuwen, Technolution B.V.                                  */
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function restores the interrupt context if it is processing a  */ 
-/*    nested interrupt.  If not, it returns to the interrupt thread if no */ 
-/*    preemption is necessary.  Otherwise, if preemption is necessary or  */ 
-/*    if no thread was running, the function returns to the scheduler.    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_thread_schedule                   Thread scheduling routine     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ISRs                                  Interrupt Service Routines    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */ 
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function restores the interrupt context if it is processing a  */
+/*    nested interrupt.  If not, it returns to the interrupt thread if no */
+/*    preemption is necessary.  Otherwise, if preemption is necessary or  */
+/*    if no thread was running, the function returns to the scheduler.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_thread_schedule                   Thread scheduling routine     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ISRs                                  Interrupt Service Routines    */
+/**************************************************************************/
 /* VOID   _tx_thread_context_restore(VOID)
 {  */
     PUBLIC  _tx_thread_context_restore
@@ -108,10 +102,10 @@ _tx_thread_context_restore:
 
     /* Interrupts are nested.  */
 
-    /* Just recover the saved registers and return to the point of 
+    /* Just recover the saved registers and return to the point of
        interrupt.  */
-       
-#if __iar_riscv_base_isa == rv32e 
+
+#if __iar_riscv_base_isa == rv32e
 
     /* Recover floating point registers.  */
 
@@ -136,7 +130,7 @@ _tx_thread_context_restore:
     flw     f30,0xF4(sp)                                ; Recover ft10
     flw     f31,0xF8(sp)                                ; Recover ft11
     lw      t0, 0xFC(sp)                                ; Recover fcsr
-    csrw    fcsr, t0                                    ; 
+    csrw    fcsr, t0                                    ;
 #endif
 
     /* Recover standard registers.  */
@@ -169,7 +163,7 @@ _tx_thread_context_restore:
     lw      x30, 0x38(sp)                               ; Recover t5
     lw      x31, 0x34(sp)                               ; Recover t6
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
     addi    sp, sp, 260                                 ; Recover stack frame - with floating point enabled
 #else
     addi    sp, sp, 128                                 ; Recover stack frame - without floating point enabled
@@ -201,7 +195,7 @@ _tx_thread_no_preempt_restore:
 
     lw      sp, 8(t1)                                   ; Switch back to thread's stack
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
 
     /* Recover floating point registers.  */
 
@@ -226,7 +220,7 @@ _tx_thread_no_preempt_restore:
     flw     f30,0xF4(sp)                                ; Recover ft10
     flw     f31,0xF8(sp)                                ; Recover ft11
     lw      t0, 0xFC(sp)                                ; Recover fcsr
-    csrw    fcsr, t0                                    ; 
+    csrw    fcsr, t0                                    ;
 #endif
 
     /* Recover the saved context and return to the point of interrupt.  */
@@ -258,7 +252,7 @@ _tx_thread_no_preempt_restore:
     lw      x30, 0x38(sp)                               ; Recover t5
     lw      x31, 0x34(sp)                               ; Recover t6
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
     addi    sp, sp, 260                                 ; Recover stack frame - with floating point enabled
 #else
     addi    sp, sp, 128                                 ; Recover stack frame - without floating point enabled
@@ -276,10 +270,10 @@ _tx_thread_preempt_restore:
     ori     t3, x0, 1                                   ; Build interrupt stack type
     sw      t3, 0(t0)                                   ; Store stack type
 
-#if __iar_riscv_base_isa == rv32e 
+#if __iar_riscv_base_isa == rv32e
 
     /* Store floating point preserved registers.  */
- 
+
     fsw     f8,  0x9C(t0)                               ; Store fs0
     fsw     f9,  0xA0(t0)                               ; Store fs1
     fsw     f18, 0xC4(t0)                               ; Store fs2

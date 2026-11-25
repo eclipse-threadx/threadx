@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Initialize                                                          */
 ;/**                                                                       */
@@ -90,45 +90,39 @@ __vectors
 ;
 ;
         AREA ||.text||, CODE, READONLY
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_low_level                           Cortex-R4/AC5    */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_initialize_low_level                           Cortex-R4/AC5    */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function is responsible for any low-level processor            */ 
-;/*    initialization, including setting up interrupt vectors, setting     */ 
-;/*    up a periodic timer interrupt source, saving the system stack       */ 
-;/*    pointer for use in ISR processing later, and finding the first      */ 
-;/*    available RAM memory address for tx_application_define.             */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter           ThreadX entry function        */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function is responsible for any low-level processor            */
+;/*    initialization, including setting up interrupt vectors, setting     */
+;/*    up a periodic timer interrupt source, saving the system stack       */
+;/*    pointer for use in ISR processing later, and finding the first      */
+;/*    available RAM memory address for tx_application_define.             */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter           ThreadX entry function        */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_initialize_low_level(VOID)
@@ -179,7 +173,7 @@ _tx_initialize_low_level
 ;    _tx_thread_system_stack_ptr = (VOID_PTR) (sp);
 ;
     LDR     r1, =_tx_thread_system_stack_ptr    ; Pickup address of system stack ptr
-    LDR     r0, [r1, #0]                        ; Pickup system stack 
+    LDR     r0, [r1, #0]                        ; Pickup system stack
     ADD     r0, r0, #4                          ; Increment to next free word
 ;
 ;    /* Save the first available memory address.  */
@@ -201,7 +195,7 @@ _tx_initialize_low_level
 ;
 ;
 ;/* Define initial heap/stack routine for the ARM RealView (and ADS) startup code.  This
-;   routine will set the initial stack to use the ThreadX IRQ & FIQ & 
+;   routine will set the initial stack to use the ThreadX IRQ & FIQ &
 ;   (optionally SYS) stack areas.  */
 ;
     EXPORT  __user_initial_stackheap
@@ -253,7 +247,7 @@ __tx_reserved_handler
 ;
 ;
     EXPORT  __tx_irq_handler
-    EXPORT  __tx_irq_processing_return      
+    EXPORT  __tx_irq_processing_return
 __tx_irq_handler
 ;
 ;    /* Jump to context save to save system context.  */
@@ -261,21 +255,21 @@ __tx_irq_handler
 __tx_irq_processing_return
 ;
 ;    /* At this point execution is still in the IRQ mode.  The CPSR, point of
-;       interrupt, and all C scratch registers are available for use.  In 
+;       interrupt, and all C scratch registers are available for use.  In
 ;       addition, IRQ interrupts may be re-enabled - with certain restrictions -
 ;       if nested IRQ interrupts are desired.  Interrupts may be re-enabled over
-;       small code sequences where lr is saved before enabling interrupts and 
+;       small code sequences where lr is saved before enabling interrupts and
 ;       restored after interrupts are again disabled.  */
 ;
 ;
     BL      _tx_timer_interrupt                 ; Timer interrupt handler
 _tx_not_timer_interrupt
 ;
-;    /* Interrupt nesting is allowed after calling _tx_thread_irq_nesting_start 
+;    /* Interrupt nesting is allowed after calling _tx_thread_irq_nesting_start
 ;       from IRQ mode with interrupts disabled.  This routine switches to the
-;       system mode and returns with IRQ interrupts enabled.  
-;       
-;       NOTE:  It is very important to ensure all IRQ interrupts are cleared 
+;       system mode and returns with IRQ interrupts enabled.
+;
+;       NOTE:  It is very important to ensure all IRQ interrupts are cleared
 ;       prior to enabling nested IRQ interrupts.  */
     IF :DEF:TX_ENABLE_IRQ_NESTING
     BL      _tx_thread_irq_nesting_start
@@ -285,7 +279,7 @@ _tx_not_timer_interrupt
 ;    /* Application IRQ handlers can be called here!  */
 ;
 ;    /* If interrupt nesting was started earlier, the end of interrupt nesting
-;       service must be called before returning to _tx_thread_context_restore.  
+;       service must be called before returning to _tx_thread_context_restore.
 ;       This routine returns in processing in IRQ mode with interrupts disabled.  */
     IF :DEF:TX_ENABLE_IRQ_NESTING
     BL      _tx_thread_irq_nesting_end
@@ -301,28 +295,28 @@ _tx_not_timer_interrupt
 __tx_example_vectored_irq_handler
 ;
 ;
-;    /* Save initial context and call context save to prepare for 
+;    /* Save initial context and call context save to prepare for
 ;       vectored ISR execution.  */
 ;
 ;    STMDB   sp!, {r0-r3}                        ; Save some scratch registers
 ;    MRS     r0, SPSR                            ; Pickup saved SPSR
-;    SUB     lr, lr, #4                          ; Adjust point of interrupt 
+;    SUB     lr, lr, #4                          ; Adjust point of interrupt
 ;    STMDB   sp!, {r0, r10, r12, lr}             ; Store other scratch registers
 ;    BL      _tx_thread_vectored_context_save    ; Vectored context save
 ;
 ;    /* At this point execution is still in the IRQ mode.  The CPSR, point of
-;       interrupt, and all C scratch registers are available for use.  In 
+;       interrupt, and all C scratch registers are available for use.  In
 ;       addition, IRQ interrupts may be re-enabled - with certain restrictions -
 ;       if nested IRQ interrupts are desired.  Interrupts may be re-enabled over
-;       small code sequences where lr is saved before enabling interrupts and 
+;       small code sequences where lr is saved before enabling interrupts and
 ;       restored after interrupts are again disabled.  */
 ;
 ;
-;    /* Interrupt nesting is allowed after calling _tx_thread_irq_nesting_start 
+;    /* Interrupt nesting is allowed after calling _tx_thread_irq_nesting_start
 ;       from IRQ mode with interrupts disabled.  This routine switches to the
-;       system mode and returns with IRQ interrupts enabled.  
-;       
-;       NOTE:  It is very important to ensure all IRQ interrupts are cleared 
+;       system mode and returns with IRQ interrupts enabled.
+;
+;       NOTE:  It is very important to ensure all IRQ interrupts are cleared
 ;       prior to enabling nested IRQ interrupts.  */
 ;    IF :DEF:TX_ENABLE_IRQ_NESTING
 ;    BL      _tx_thread_irq_nesting_start
@@ -331,7 +325,7 @@ __tx_example_vectored_irq_handler
 ;    /* Application IRQ handlers can be called here!  */
 ;
 ;    /* If interrupt nesting was started earlier, the end of interrupt nesting
-;       service must be called before returning to _tx_thread_context_restore.  
+;       service must be called before returning to _tx_thread_context_restore.
 ;       This routine returns in processing in IRQ mode with interrupts disabled.  */
 ;    IF :DEF:TX_ENABLE_IRQ_NESTING
 ;    BL      _tx_thread_irq_nesting_end
@@ -353,11 +347,11 @@ __tx_fiq_processing_return
 ;    /* At this point execution is still in the FIQ mode.  The CPSR, point of
 ;       interrupt, and all C scratch registers are available for use.  */
 ;
-;    /* Interrupt nesting is allowed after calling _tx_thread_fiq_nesting_start 
+;    /* Interrupt nesting is allowed after calling _tx_thread_fiq_nesting_start
 ;       from FIQ mode with interrupts disabled.  This routine switches to the
-;       system mode and returns with FIQ interrupts enabled. 
+;       system mode and returns with FIQ interrupts enabled.
 ;
-;       NOTE:  It is very important to ensure all FIQ interrupts are cleared 
+;       NOTE:  It is very important to ensure all FIQ interrupts are cleared
 ;       prior to enabling nested FIQ interrupts.  */
     IF  :DEF:TX_ENABLE_FIQ_NESTING
     BL      _tx_thread_fiq_nesting_start

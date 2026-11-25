@@ -38,7 +38,7 @@ enable_GIC PROC
 
   BX      lr
   ENDP
-  
+
 ; ------------------------------------------------------------
 
   EXPORT disable_GIC
@@ -88,7 +88,7 @@ enable_irq_id PROC
   ENDP
 
 ; ------------------------------------------------------------
-  
+
   EXPORT  disable_irq_id
   ; void disable_irq_id(unsigned int ID)
   ; Disables the interrupt source number ID
@@ -131,7 +131,7 @@ set_irq_priority PROC
   ; r0 = base addr
   ; r1 = priority
   ; r2 = ID
-  
+
   ; Make sure that priority value is only 5 bits, and convert to expected format
   AND     r1, r1, #0x1F
   MOV     r1, r1, LSL #3
@@ -207,12 +207,12 @@ set_priority_mask PROC
   ; Get base address of private perpherial space
   MOV     r1, r0                  ; Back up passed in ID value
   MRC     p15, 4, r0, c15, c0, 0  ; Read periph base address
-  
+
   STR     r1, [r0, #0x0104]       ; Write the Priority Mask register (ICCPMR/ICCIPMR)
 
   BX      lr
   ENDP
-  
+
 ; ------------------------------------------------------------
 
   EXPORT  set_binary_port
@@ -255,7 +255,7 @@ write_end_of_irq PROC
 
   BX      lr
   ENDP
-  
+
 ; ------------------------------------------------------------
 ; SGI
 ; ------------------------------------------------------------

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -26,18 +27,18 @@
 #include "px_int.h"     /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    pthread_mutex_init                                   PORTABLE C     */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    pthread_mutex_init                                   PORTABLE C     */
 /*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
 /*                                                                        */
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
+/*  DESCRIPTION                                                           */
+/*                                                                        */
 /*    This function shall init the mutex object referenced by mutex with  */
 /*    attributes specified by attr.                                       */
 /*    If attr is NULL, the default mutex attributes are used; the effect  */
@@ -45,31 +46,25 @@
 /*    attributes object. Upon successful initialization,the state of the  */
 /*    mutex becomes initialized and unlocked.                             */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*    mutex                          Pointer to a pthread mutex object    */
 /*    attr                           Pointer to mutex attributes          */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*     0                             If successful                        */ 
-/*     Value                         In case of any error                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    posix_internal_error           In case of some special errors       */ 
-/*    posix_in_thread_context        Check whether called from a thread   */
-/*    tx_mutex_create                Create a ThreadX Mutex object        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*     0                             If successful                        */
+/*     Value                         In case of any error                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    posix_internal_error           In case of some special errors       */
+/*    posix_in_thread_context        Check whether called from a thread   */
+/*    tx_mutex_create                Create a ThreadX Mutex object        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 INT pthread_mutex_init(pthread_mutex_t *mutex ,pthread_mutexattr_t *attr)
@@ -89,7 +84,7 @@ ULONG             status,retval;
         posix_internal_error(444);
     }
 
-    /* Disable interrupts.  */ 
+    /* Disable interrupts.  */
     TX_DISABLE
 
     /* Check for any pthread_mutexattr_t suggested */
@@ -102,9 +97,9 @@ ULONG             status,retval;
     {
         /* attributes passed , check for validity */
         if  (( (attr->in_use) == TX_FALSE)|| (attr->type!=PTHREAD_MUTEX_RECURSIVE))
-        {   
+        {
             /* attributes passed is not valid, return with an error */
-            /* Restore interrupts.  */ 
+            /* Restore interrupts.  */
             TX_RESTORE
             posix_errno = EINVAL;
 	        posix_set_pthread_errno(EINVAL);
@@ -114,13 +109,13 @@ ULONG             status,retval;
 
     mutex_ptr = (&(mutex->mutex_info)) ;
 
-    /* Now actually create the mutex */ 
+    /* Now actually create the mutex */
     status = tx_mutex_create(mutex_ptr, "PMTX", TX_INHERIT);
-   
+
     if ( status == TX_SUCCESS)
     {
         mutex->in_use = TX_TRUE;
-        retval = OK;   
+        retval = OK;
     }
     else
     {
@@ -129,7 +124,7 @@ ULONG             status,retval;
 	    posix_set_pthread_errno(EINVAL);
         retval = EINVAL;
     }
-   
+
     TX_RESTORE
-    return(retval); 
+    return(retval);
 }

@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -75,22 +76,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  12-31-2020      Scott Larson            Modified comment(s), added    */
-/*                                            port-specific dispatch,     */
-/*                                            resulting in version 6.1.3  */
-/*  04-02-2021      Scott Larson            Modified comment(s),          */
-/*                                            added optional defines to   */
-/*                                            remove unneeded functions,  */
-/*                                            resulting in version 6.1.6  */
-/*  01-31-2022      Scott Larson            Modified comments and added   */
-/*                                            CALL_NOT_USED option,       */
-/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 ALIGN_TYPE _txm_module_manager_kernel_dispatch(ULONG kernel_request, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE param_2)
@@ -439,7 +424,7 @@ TXM_MODULE_INSTANCE *module_instance;
         break;
     }
     #endif
-    
+
     #ifndef TXM_QUEUE_SEND_CALL_NOT_USED
     case TXM_QUEUE_SEND_CALL:
     {

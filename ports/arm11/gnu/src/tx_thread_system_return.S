@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread                                                              */
 @/**                                                                       */
@@ -48,7 +48,7 @@ DISABLE_INTS    =       0x80                    @ IRQ interrupts disabled
 $_tx_thread_system_return:
     .thumb
      BX        pc                               @ Switch to 32-bit mode
-     NOP                                        @ 
+     NOP                                        @
     .arm
      STMFD     sp!, {lr}                        @ Save return address
      BL        _tx_thread_system_return         @ Call _tx_thread_system_return function
@@ -58,47 +58,38 @@ $_tx_thread_system_return:
 @
     .text
     .align  2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_system_return                            ARM11/GNU       */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_system_return                            ARM11/GNU       */
 @/*                                                            6.2.1       */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function is target processor specific.  It is used to transfer */ 
-@/*    control from a thread back to the ThreadX system.  Only a           */ 
-@/*    minimal context is saved since the compiler assumes temp registers  */ 
-@/*    are going to get slicked by a function call anyway.                 */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
-@/*    _tx_thread_schedule                   Thread scheduling loop        */ 
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    ThreadX components                                                  */ 
-@/*                                                                        */ 
-@/*  RELEASE HISTORY                                                       */ 
-@/*                                                                        */ 
-@/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-@/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-@/*                                            #include tx_user.h,         */
-@/*                                            resulting in version 6.2.1  */
+@/*    This function is target processor specific.  It is used to transfer */
+@/*    control from a thread back to the ThreadX system.  Only a           */
+@/*    minimal context is saved since the compiler assumes temp registers  */
+@/*    are going to get slicked by a function call anyway.                 */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    _tx_thread_schedule                   Thread scheduling loop        */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    ThreadX components                                                  */
 @/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_system_return(VOID)
@@ -112,12 +103,12 @@ _tx_thread_system_return:
     MOV     r0, #0                      @ Build a solicited stack type
     MRS     r1, CPSR                    @ Pickup the CPSR
     STMDB   sp!, {r0-r1, r4-r11, lr}    @ Save minimal context
-@   
+@
 @   /* Lockout interrupts.  */
 @
     ORR     r2, r1, #DISABLE_INTS       @ Build disable interrupt CPSR
     MSR     CPSR_cxsf, r2               @ Disable interrupts
-    
+
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
 @
 @    /* Call the thread exit function to indicate the thread is no longer executing.  */

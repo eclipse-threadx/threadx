@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test event flag suspension with a single suspended thread
    being terminated at the same priority level.  */
 
@@ -54,8 +65,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 17, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -67,8 +78,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -80,8 +91,8 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             18, 18, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -106,7 +117,7 @@ CHAR    *pointer;
 
     /* Register the event set notify function.  */
     status =  tx_event_flags_set_notify(&group_0, event_set_notify);
-    
+
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
 
     /* Check status.  */
@@ -160,7 +171,7 @@ UINT    status;
         printf("ERROR #7\n");
         test_control_return(1);
     }
- 
+
     /* Now terminate thread 1.  */
     status =  tx_thread_terminate(&thread_1);
 
@@ -206,9 +217,9 @@ UINT    status;
         test_control_return(1);
     }
 
-    /* At this point, thread 2 is suspended on the flags again. Or some flags that are 
+    /* At this point, thread 2 is suspended on the flags again. Or some flags that are
        not needed.  */
-       
+
     /* Set an event flag that is not needed.  */
     status =  tx_event_flags_set(&group_0, 0x00000001, TX_OR);
 
@@ -231,7 +242,7 @@ UINT    status;
     tx_thread_sleep(5);
 
     /* Check status and run counters.  */
-    if ((status != TX_SUCCESS) || (thread_1_counter != 1) || (thread_2_counter != 3) || 
+    if ((status != TX_SUCCESS) || (thread_1_counter != 1) || (thread_2_counter != 3) ||
         (_tx_thread_preempt_disable))
     {
 
@@ -280,7 +291,7 @@ UINT    status;
         /* Check status.  */
         if (status != TX_SUCCESS)
         {
-            thread_1_counter =  0;  /* Make an error!  */ 
+            thread_1_counter =  0;  /* Make an error!  */
             return;
         }
     }

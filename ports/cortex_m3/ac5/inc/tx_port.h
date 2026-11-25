@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -44,23 +47,6 @@
 /*                                                                        */
 /*    This file replaces the previous Cortex-M3/M4/M7 files. It unifies   */
 /*    the ARMv7-M architecture and compilers into one common file.        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
-/*  01-31-2022      Scott Larson            Modified comments, updated    */
-/*                                            typedef to fix misra        */
-/*                                            violation,                  */
-/*                                            fixed predefined macro,     */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022      Scott Larson            Modified comments and added   */
-/*                                            volatile to registers,      */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Modified comments and         */
-/*                                            described BASEPRI usage,    */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -371,7 +357,7 @@ void _tx_vfp_access(void);
 
 /* A thread can be terminated by another thread, so we first check if it's self-terminating and not in an ISR.
    If so, deactivate the FPU via CONTROL.FPCA. Otherwise we are in an interrupt or another thread is terminating
-   this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the FPU to flush 
+   this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the FPU to flush
    the lazy FPU save, then restore the CONTROL.FPCA state. */
 
 #ifndef TX_MISRA_ENABLE
@@ -530,7 +516,7 @@ ULONG   _tx_misra_ipsr_get(VOID);
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __clz(__rbit((m)));
 #elif defined(__GNUC__) /* GCC and AC6 Compiler */
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       __asm__ volatile (" RBIT %0,%1 ": "=r" (m) : "r" (m) ); \
-                                                __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) ); 
+                                                __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) );
 #endif
 
 
@@ -555,8 +541,9 @@ unsigned int posture;
 #ifdef TX_PORT_USE_BASEPRI
 __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsigned int basepri_value)
 {
-    __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
+    __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value) : "memory");
 }
+
 #else
 __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
 {
@@ -568,7 +555,7 @@ __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsign
 {
 #ifdef TX_PORT_USE_BASEPRI
     __set_basepri_value(int_posture);
-    //__asm__ volatile ("MSR  BASEPRI,%0": : "r" (int_posture): "memory");
+    __asm__ volatile ("" : : : "memory");
 #else
     __asm__ volatile ("MSR  PRIMASK,%0": : "r" (int_posture): "memory");
 #endif
@@ -594,6 +581,7 @@ unsigned int interrupt_save;
 
     /* Set PendSV to invoke ThreadX scheduler.  */
     *((volatile ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
+    __asm__ volatile ("dsb sy \n isb sy " : : : "memory");
     if (__get_ipsr_value() == 0)
     {
         interrupt_save = __get_interrupt_posture();
@@ -603,6 +591,7 @@ unsigned int interrupt_save;
         __enable_interrupts();
 #endif
         __restore_interrupt(interrupt_save);
+        __asm__ volatile ("isb sy " : : : "memory");
     }
 }
 
@@ -715,7 +704,7 @@ void    tx_thread_fpu_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-M3/AC5 Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Cortex-M3/AC5 Version 6.5.2.202603b *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

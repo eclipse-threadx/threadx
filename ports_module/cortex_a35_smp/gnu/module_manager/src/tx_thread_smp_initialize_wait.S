@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -54,12 +55,6 @@
 /*                                                                        */
 /*    Hardware                                                            */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     William E. Lamie         Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_initialize_wait
     .type    _tx_thread_smp_initialize_wait, @function
@@ -80,7 +75,7 @@ _tx_thread_smp_initialize_wait:
     ADDS    x2, x2, x3, LSL #2                  // Calculate CPU ID
 #endif
 
-    /* Make sure the system state for this core is TX_INITIALIZE_IN_PROGRESS before we check the release 
+    /* Make sure the system state for this core is TX_INITIALIZE_IN_PROGRESS before we check the release
        flag.  */
 
     LDR     w1, =0xF0F0F0F0                     // Build TX_INITIALIZE_IN_PROGRESS flag
@@ -91,7 +86,7 @@ wait_for_initialize:
     BNE     wait_for_initialize                 // Not equal, just spin here
 
     /* Save the system stack pointer for this core.  */
-    
+
     LDR     x0, =_tx_thread_system_stack_ptr    // Pickup address of system stack ptr
     MOV     x1, sp                              // Pickup SP
     SUB     x1, x1, #15                         //
@@ -100,30 +95,30 @@ wait_for_initialize:
 
 
     /* Pickup the release cores flag.  */
-    
+
     LDR     x4, =_tx_thread_smp_release_cores_flag  // Build address of release cores flag
-wait_for_release:    
+wait_for_release:
     LDR     w0, [x4, #0]                        // Pickup the flag
     CMP     w0, #0                              // Is it set?
     BEQ     wait_for_release                    // Wait for the flag to be set
-    
+
     /* Core 0 has released this core.  */
-    
+
     /* Clear this core's system state variable.  */
-    
+
     MOV     x0, #0                              // Build clear value
     STR     w0, [x3, x2, LSL #2]                // Set the current system state for this core to zero
-    
+
     /* Now wait for core 0 to finish it's initialization.  */
-    
+
 core_0_wait_loop:
     LDR     w0, [x3, #0]                        // Pickup the current system state for core 0
     CMP     w0, #0                              // Is it 0?
     BNE     core_0_wait_loop                    // No, keep waiting for core 0 to finish its initialization
-    
+
     /* Initialization is complete, enter the scheduling loop!  */
-    
-    B       _tx_thread_schedule                 // Enter the scheduling loop for this core    
+
+    B       _tx_thread_schedule                 // Enter the scheduling loop for this core
 
     RET
 

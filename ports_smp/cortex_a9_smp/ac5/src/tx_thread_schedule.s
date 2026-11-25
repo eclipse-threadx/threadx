@@ -1,18 +1,21 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; * Copyright (c) 2026 Eclipse ThreadX contributors
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
+; Portions of this file were generated with AI assistance.
+;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -40,45 +43,39 @@
 ;
         AREA ||.text||, CODE, READONLY
         PRESERVE8
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                             SMP/Cortex-A9/AC5   */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_schedule                             SMP/Cortex-A9/AC5   */
 ;/*                                                            6.1         */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function waits for a thread control block pointer to appear in */ 
-;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-;/*    in the variable, the corresponding thread is resumed.               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-;/*    _tx_thread_system_return             Return to system from thread   */ 
-;/*    _tx_thread_context_restore           Restore thread's context       */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function waits for a thread control block pointer to appear in */
+;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+;/*    in the variable, the corresponding thread is resumed.               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+;/*    _tx_thread_system_return             Return to system from thread   */
+;/*    _tx_thread_context_restore           Restore thread's context       */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -122,7 +119,7 @@ _tx_thread_schedule
 ;
 ;    }
 ;    while(_tx_thread_execute_ptr[core] == TX_NULL);
-;    
+;
 ;    /* Get the lock for accessing the thread's ready bit.  */
 ;
     MOV     r2, #172                            ; Build offset to the lock
@@ -169,6 +166,7 @@ _tx_thread_ready_for_execution
     LDR     r2, =_tx_thread_current_ptr         ; Pickup address of current thread
     ADD     r2, r2, r12                         ; Build index into the current thread array
     STR     r0, [r2, #0]                        ; Setup current thread pointer
+    DMB                                         ; Ensure the current thread pointer write completes
 ;
 ;    /* In the time between reading the execute pointer and assigning
 ;       it to the current pointer, the execute pointer was changed by
@@ -185,7 +183,7 @@ _tx_thread_ready_for_execution
     MOV     r1, #0                              ; Build clear value
     STR     r1, [r2, #0]                        ; Clear current thread pointer
 
-    LDR     r1, [r0, #152]                      ; Pickup the ready bit 
+    LDR     r1, [r0, #152]                      ; Pickup the ready bit
     ORR     r1, r1, #0x8000                     ; Set ready bit (bit 15)
     STR     r1, [r0, #152]                      ; Make this thread ready for executing again
     DMB                                         ; Ensure that accesses to shared resource have completed
@@ -205,7 +203,7 @@ _execute_pointer_did_not_change
 ;    /* Setup time-slice, if present.  */
 ;    _tx_timer_time_slice[core] =  _tx_thread_current_ptr[core] -> tx_thread_time_slice;
 ;
-    LDR     r2, =_tx_timer_time_slice           ; Pickup address of time slice 
+    LDR     r2, =_tx_timer_time_slice           ; Pickup address of time slice
                                                 ;   variable
     ADD     r2, r2, r12                         ; Build index into the time-slice array
     LDR     sp, [r0, #8]                        ; Switch stack pointers
@@ -241,7 +239,7 @@ _execute_pointer_did_not_change
 _tx_skip_interrupt_vfp_restore
     ENDIF
     LDMIA   sp!, {r0-r12, lr, pc}^              ; Return to point of thread interrupt
-    
+
 _tx_solicited_return
     IF  {TARGET_FPU_VFP} = {TRUE}
     MSR     CPSR_cxsf, r5                       ; Recover CPSR

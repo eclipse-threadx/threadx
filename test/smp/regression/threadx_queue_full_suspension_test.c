@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test queue full suspension of queue that supports 3 messages
    that are each 2 ULONG in size.  */
 
@@ -66,8 +77,8 @@ CHAR    *pointer;
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
 
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -79,12 +90,12 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&thread_1a, "thread 1a", thread_1a_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_1a, "thread 1a", thread_1a_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             17, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -96,12 +107,12 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status +=  tx_thread_create(&thread_2a, "thread 2a", thread_2a_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status +=  tx_thread_create(&thread_2a, "thread 2a", thread_2a_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -131,7 +142,7 @@ CHAR    *pointer;
     status =  tx_queue_send_notify(&queue_0, queue_notify);
 
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
-    
+
     /* Check for status.  */
     if (status != TX_SUCCESS)
     {
@@ -167,7 +178,7 @@ ULONG   dest_message[2];
 
     /* Inform user.  */
     printf("Running Queue Full Suspension Test.................................. ");
-    
+
     /* Perform the one word queue version.  */
 
     /* Suspend to get thread 1a to pend on the queue.  */
@@ -179,14 +190,14 @@ ULONG   dest_message[2];
     tx_queue_delete(&queue_0a);
     status +=  tx_queue_create(&queue_0a, "queue 0a", TX_1_ULONG, queue_area, sizeof(queue_area));
 
-    
+
     /* Fill the queue with an initial 3 messages!  */
     status +=  tx_queue_send(&queue_0a, &source_message[0], TX_NO_WAIT);
     status +=  tx_queue_send(&queue_0a, &source_message[0], TX_NO_WAIT);
     status +=  tx_queue_send(&queue_0a, &source_message[0], TX_NO_WAIT);
     source_message[0]++;
 
-    /* Receive two of the messages back to put the first received message at the end 
+    /* Receive two of the messages back to put the first received message at the end
        of the queue.  */
     status += tx_queue_receive(&queue_0a, &dest_message[0], TX_NO_WAIT);
     status += tx_queue_receive(&queue_0a, &dest_message[0], TX_NO_WAIT);
@@ -219,12 +230,12 @@ ULONG   dest_message[2];
         test_control_return(1);
     }
 
-    /* Perform the two word queue version.  */ 
-    
+    /* Perform the two word queue version.  */
+
     /* Reset the source message.  */
     source_message[0] = 0x12345678;
-    source_message[1] = 0;   
-    
+    source_message[1] = 0;
+
     /* Resume threads 1 and 2.  */
     tx_thread_resume(&thread_1);
     tx_thread_resume(&thread_2);
@@ -235,7 +246,7 @@ ULONG   dest_message[2];
     status +=  tx_queue_send(&queue_0, &source_message[0], TX_NO_WAIT);
     source_message[0]++;
 
-    /* Receive two of the messages back to put the first received message at the end 
+    /* Receive two of the messages back to put the first received message at the end
        of the queue.  */
     status += tx_queue_receive(&queue_0, &dest_message[0], TX_NO_WAIT);
     status += tx_queue_receive(&queue_0, &dest_message[0], TX_NO_WAIT);

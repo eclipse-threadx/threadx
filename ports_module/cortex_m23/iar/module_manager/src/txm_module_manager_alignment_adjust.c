@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -60,12 +61,6 @@
 /*                                                                        */
 /*    Initial thread stack frame                                          */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,
                                            ULONG *code_size,
@@ -77,7 +72,7 @@ VOID  _txm_module_manager_alignment_adjust(TXM_MODULE_PREAMBLE *module_preamble,
     /* Round code and data size UP to TXM_MODULE_MPU_ALIGNMENT bytes. */
     *code_size = (*code_size + TXM_MODULE_MPU_ALIGNMENT - 1) & ~(TXM_MODULE_MPU_ALIGNMENT - 1);
     *data_size = (*data_size + TXM_MODULE_MPU_ALIGNMENT - 1) & ~(TXM_MODULE_MPU_ALIGNMENT - 1);
-    
+
     /* Alignment for code and data is TXM_MODULE_MPU_ALIGNMENT bytes. */
     *code_alignment =   TXM_MODULE_MPU_ALIGNMENT;
     *data_alignment =   TXM_MODULE_MPU_ALIGNMENT;

@@ -1,13 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -18,7 +20,9 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifdef TX_INCLUDE_USER_DEFINE_FILE
+#include "tx_user.h"
+#endif
 
     .text
     .align 3
@@ -26,8 +30,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_smp_time_get                          Cortex-A35-SMP/AC6 */
-/*                                                           6.1.10       */
+/*    _tx_thread_smp_time_get                            ARMv8-A-SMP      */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -53,17 +57,9 @@
 /*                                                                        */
 /*    ThreadX Source                                                      */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  01-31-2022     Andres Mlinar            Updated comments,             */
-/*                                            resulting in version 6.1.10 */
-/*                                                                        */
 /**************************************************************************/
     .global  _tx_thread_smp_time_get
     .type    _tx_thread_smp_time_get, @function
 _tx_thread_smp_time_get:
-    MOV     x0, #0          // FIXME: Get timer
+    MRS     x0, CNTPCT_EL0  // Read generic timer physical count
     RET

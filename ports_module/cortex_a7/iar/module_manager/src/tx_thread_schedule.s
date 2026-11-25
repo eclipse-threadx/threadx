@@ -1,23 +1,23 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
-;/**************************************************************************/ 
-;/**************************************************************************/ 
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
-;/**                                                                       */ 
-;/**   Thread                                                              */ 
-;/**                                                                       */ 
-;/**************************************************************************/ 
-;/**************************************************************************/ 
+;/**************************************************************************/
+;/**************************************************************************/
+;/**                                                                       */
+;/** ThreadX Component                                                     */
+;/**                                                                       */
+;/**   Thread                                                              */
+;/**                                                                       */
+;/**************************************************************************/
+;/**************************************************************************/
 ;
 ;
     EXTERN     _tx_thread_execute_ptr
@@ -26,7 +26,7 @@
 #if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     EXTERN     _tx_execution_thread_enter
 #endif
-    
+
 IRQ_MODE            EQU     0xD2            ; IRQ mode
 USR_MODE            EQU     0x10            ; USR mode
 SVC_MODE            EQU     0x13            ; SVC mode
@@ -38,7 +38,7 @@ IRQ_MASK            EQU     0x80            ; Interrupt bit mask
 FIQ_MASK            EQU     0x40            ; Interrupt bit mask
 #endif
 
-MODE_MASK           EQU     0x1F            ; Mode mask 
+MODE_MASK           EQU     0x1F            ; Mode mask
 THUMB_MASK          EQU     0x20            ; Thumb bit mask
 
     EXTERN       _txm_system_mode_enter
@@ -47,48 +47,39 @@ THUMB_MASK          EQU     0x20            ; Thumb bit mask
 
 
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_schedule                             Cortex-A7/MMU/IAR   */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_schedule                             Cortex-A7/MMU/IAR   */
 ;/*                                                           6.3.0        */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    Scott Larson, Microsoft Corporation                                 */
 ;/*                                                                        */
-;/*  DESCRIPTION                                                           */ 
-;/*                                                                        */ 
-;/*    This function waits for a thread control block pointer to appear in */ 
-;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */ 
-;/*    in the variable, the corresponding thread is resumed.               */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    _tx_initialize_kernel_enter          ThreadX entry function         */ 
-;/*    _tx_thread_system_return             Return to system from thread   */ 
-;/*    _tx_thread_context_restore           Restore thread's context       */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
+;/*  DESCRIPTION                                                           */
 ;/*                                                                        */
-;/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-;/*  10-31-2023      Yajun Xia               Modified comment(s),          */
-;/*                                            Added thumb mode support,   */
-;/*                                            resulting in version 6.3.0  */
+;/*    This function waits for a thread control block pointer to appear in */
+;/*    the _tx_thread_execute_ptr variable.  Once a thread pointer appears */
+;/*    in the variable, the corresponding thread is resumed.               */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    _tx_initialize_kernel_enter          ThreadX entry function         */
+;/*    _tx_thread_system_return             Return to system from thread   */
+;/*    _tx_thread_context_restore           Restore thread's context       */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
@@ -161,11 +152,11 @@ _tx_handler_svc_unrecognized
     BKPT    0x0000
 _tx_handler_svc_unrecognized_loop           ; We should never get here
     B       _tx_handler_svc_unrecognized_loop
-    
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; SVC 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; At this point we have an SVC 1, which means we are entering 
+    ; At this point we have an SVC 1, which means we are entering
     ; supervisor mode to service a kernel call.
 _tx_handler_svc_super_enter
     ; Make sure that we have been called from the system mode enter location (security)
@@ -213,7 +204,7 @@ _tx_handler_svc_super_enter
 ;   /* The reason for adding this segment is that IAR's simulator
 ;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
-    MRS      lr, SPSR    
+    MRS      lr, SPSR
     STR      lr, [sp, #-4]
     SUB      lr, sp, #8
     RFE      lr
@@ -228,7 +219,7 @@ _tx_handler_svc_super_enter
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; SVC 2
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; At this point we have an SVC 2, which means we are exiting 
+    ; At this point we have an SVC 2, which means we are exiting
     ; supervisor mode after servicing a kernel call.
 _tx_handler_svc_super_exit:
     ; Make sure that we have been called from the system mode exit location (security)
@@ -266,14 +257,14 @@ _tx_handler_svc_super_exit:
     LDRD    r0, r1, [r2, #0xB4]             ; Load the module thread stack start and end
     STRD    r0, r1, [r2, #0x0C]             ; Set stack start and end
 #endif
-    
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; ARM Semihosting
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 _tx_handler_svc_arm
-    
+
     ; *** TODO: handle semihosting requests or ARM angel requests ***
-    
+
     ; Restore the registers and return
 #if defined(THUMB_MODE)
     POP     {r0-r3, r12, lr}
@@ -282,7 +273,7 @@ _tx_handler_svc_arm
 ;   /* The reason for adding this segment is that IAR's simulator
 ;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
-    MRS      lr, SPSR    
+    MRS      lr, SPSR
     STR      lr, [sp, #-4]
     SUB      lr, sp, #8
     RFE      lr
@@ -303,8 +294,8 @@ _tx_handler_svc_schedule
     POP   {r0-r3, r12, lr}                  ; Restore the registers
 
 
-    ; This code waits for a thread control block pointer to appear in 
-    ; the _tx_thread_execute_ptr variable.  Once a thread pointer appears 
+    ; This code waits for a thread control block pointer to appear in
+    ; the _tx_thread_execute_ptr variable.  Once a thread pointer appears
     ; in the variable, the corresponding thread is resumed.
 ;
 ;    /* Enable interrupts.  */
@@ -407,10 +398,10 @@ __tx_thread_schedule_loop
 
     ; test address translation
     ;mcr p15, 0, r0, c7, c8, 0
-    
+
 _tx_skip_mmu_update
     ; **************************************************************************
-    
+
     CMP     r4, #0                          ; Check for synchronous context switch
     BEQ     _tx_solicited_return
 
@@ -442,7 +433,7 @@ _tx_skip_interrupt_vfp_restore
 ;   /* The reason for adding this segment is that IAR's simulator
 ;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
-    MRS      lr, SPSR    
+    MRS      lr, SPSR
     STR      lr, [sp, #-4]
     SUB      lr, sp, #8
     RFE      lr
@@ -453,7 +444,7 @@ _tx_skip_interrupt_vfp_restore
 _tx_solicited_return
     MOV     r2, r5                          ; Move CPSR to scratch register
     CPS     #SYS_MODE                       ; Enter SYS mode
-    
+
 #ifdef __ARMVFP__
     LDR     r1, [r0, #144]                  ; Pickup the VFP enabled flag
     CMP     r1, #0                          ; Is the VFP enabled?
@@ -464,7 +455,7 @@ _tx_solicited_return
     VMSR    FPSCR, r4                       ; Restore FPSCR
 _tx_skip_solicited_vfp_restore
 #endif
-    
+
     POP     {r4-r11, lr}                    ; Restore registers
     MOV     r1, lr                          ; Copy lr to r1 to preserve across mode change
     CPS     #SVC_MODE                       ; Enter SVC mode
@@ -475,7 +466,7 @@ _tx_skip_solicited_vfp_restore
 ;   /* The reason for adding this segment is that IAR's simulator
 ;      may not handle PC-relative instructions correctly in thumb mode.*/
     STR      lr, [sp, #-8]
-    MRS      lr, SPSR    
+    MRS      lr, SPSR
     STR      lr, [sp, #-4]
     SUB      lr, sp, #8
     RFE      lr
@@ -486,7 +477,7 @@ _tx_skip_solicited_vfp_restore
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; End SWI_Handler
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
+
 #ifdef __ARMVFP__
     PUBLIC  tx_thread_vfp_enable
 #ifdef THUMB_MODE

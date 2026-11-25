@@ -1,10 +1,10 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
@@ -69,15 +69,6 @@
 ;/*    _tx_thread_system_return             Return to system from thread   */
 ;/*    _tx_thread_context_restore           Restore thread's context       */
 ;/*                                                                        */
-;/*  RELEASE HISTORY                                                       */
-;/*                                                                        */
-;/*    DATE              NAME                      DESCRIPTION             */
-;/*                                                                        */
-;/*  09-30-2020     William E. Lamie        Initial Version 6.1            */
-;/*  03-02-2021     Scott Larson            Modified comment(s), add       */
-;/*                                           low power code,              */
-;/*                                           resulting in version 6.1.5   */
-;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_schedule(VOID)
 ;{
@@ -123,7 +114,7 @@ __tx_PendSVHandler:
 ;
 __tx_ts_handler:
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))  
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 ;
 ;    /* Call the thread exit function to indicate the thread is no longer executing.  */
 ;
@@ -207,7 +198,7 @@ __tx_ts_restore:
 ;
     STR     r5, [r4]                                ; Setup global time-slice
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))   
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 ;
 ;    /* Call the thread entry function to indicate the thread is executing.  */
 ;

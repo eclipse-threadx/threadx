@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -39,7 +42,7 @@ extern pthread_t _tx_linux_timer_id;
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _tx_thread_schedule                                 Linux/GNU       */ 
+/*    _tx_thread_schedule                                 Linux/GNU       */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -72,12 +75,6 @@ extern pthread_t _tx_linux_timer_id;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 VOID   _tx_thread_schedule(VOID)
@@ -121,15 +118,15 @@ struct timespec ts;
 
                 clock_gettime(CLOCK_REALTIME, &ts);
                 ts.tv_nsec += 200000;
-                if (ts.tv_nsec > 1000000000)
+                if (ts.tv_nsec >= 1000000000)
                 {
                     ts.tv_nsec -= 1000000000;
                     ts.tv_sec++;
                 }
                 sem_timedwait(&_tx_linux_semaphore_no_idle, &ts);
-#else                
+#else
                 nanosleep(&ts, &ts);
-#endif /* TX_LINUX_NO_IDLE_ENABLE */                
+#endif /* TX_LINUX_NO_IDLE_ENABLE */
             }
         }
 
@@ -205,6 +202,49 @@ struct timespec ts;
 
     }
 }
+
+/* Define the ThreadX Linux mutex lock function.  The wait is timed and retried
+   rather than left to pthread_mutex_lock, because a thread can be signalled into
+   the port's suspend handler while it is parked on this mutex.  That handler does
+   not return until the thread is resumed, so the wake-up the next unlock sends is
+   delivered to a thread that never retries and is lost.  Any other thread parked
+   on the mutex then waits on a mutex that is free.  Retrying on a timeout costs
+   nothing when the mutex is handed over normally, and turns that lost wake-up into
+   a delay of at most the retry period.  */
+
+void  _tx_linux_mutex_lock_retry(pthread_mutex_t *mutex)
+{
+
+INT             linux_status;
+struct timespec ts;
+
+
+    do
+    {
+
+        /* Set the deadline for this attempt.  */
+        clock_gettime(CLOCK_REALTIME, &ts);
+        ts.tv_nsec =  ts.tv_nsec + TX_LINUX_MUTEX_RETRY_NSEC;
+        if (ts.tv_nsec >= 1000000000)
+        {
+
+            ts.tv_nsec =  ts.tv_nsec - 1000000000;
+            ts.tv_sec++;
+        }
+
+        linux_status =  pthread_mutex_timedlock(mutex, &ts);
+
+        /* Anything but the deadline expiring is a real failure to obtain the
+           mutex, so stop retrying.  */
+        if ((linux_status != 0) && (linux_status != ETIMEDOUT))
+        {
+
+            break;
+        }
+
+    } while (linux_status != 0);
+}
+
 
 void _tx_thread_delete_port_completion(TX_THREAD *thread_ptr, UINT tx_saved_posture)
 {

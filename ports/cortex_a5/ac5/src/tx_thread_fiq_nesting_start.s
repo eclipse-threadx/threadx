@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -35,48 +35,42 @@ SYS_MODE_BITS   EQU     0x1F                    ; System mode bits
 ;
 ;
         AREA ||.text||, CODE, READONLY
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
-;/*    _tx_thread_fiq_nesting_start                       Cortex-A5/AC5    */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
+;/*    _tx_thread_fiq_nesting_start                       Cortex-A5/AC5    */
 ;/*                                                           6.1          */
 ;/*  AUTHOR                                                                */
 ;/*                                                                        */
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function is called by the application from FIQ mode after      */ 
-;/*    _tx_thread_fiq_context_save has been called and switches the FIQ    */ 
-;/*    processing to the system mode so nested FIQ interrupt processing    */ 
-;/*    is possible (system mode has its own "lr" register).  Note that     */ 
-;/*    this function assumes that the system mode stack pointer was setup  */ 
-;/*    during low-level initialization (tx_initialize_low_level.s).        */ 
-;/*                                                                        */ 
-;/*    This function returns with FIQ interrupts enabled.                  */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                                                */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+;/*    This function is called by the application from FIQ mode after      */
+;/*    _tx_thread_fiq_context_save has been called and switches the FIQ    */
+;/*    processing to the system mode so nested FIQ interrupt processing    */
+;/*    is possible (system mode has its own "lr" register).  Note that     */
+;/*    this function assumes that the system mode stack pointer was setup  */
+;/*    during low-level initialization (tx_initialize_low_level.s).        */
+;/*                                                                        */
+;/*    This function returns with FIQ interrupts enabled.                  */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                                                */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_fiq_nesting_start(VOID)

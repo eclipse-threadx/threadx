@@ -12,13 +12,13 @@ LOAD 0x80000000
     {
         startup.o (StartUp, +FIRST)
         * (+RO, +RW, +ZI)
-        
+
     }
     ;XTABLES +0 ALIGN 0x1000
     ;{
-    ;   xtables.o (*) 
+    ;   xtables.o (*)
     ;}
-    
+
     SYS_STACK +0 ALIGN 8 EMPTY 0x1000
     {
     }
@@ -34,13 +34,13 @@ LOAD 0x80000000
     ; All stacks and heap are aligned to a cache-line boundary
     ;
     ARM_LIB_STACK    +0 ALIGN 64 EMPTY 4 * 0x4000 {}
-    
+
     ;
     ; Handler stacks for all CPUs
     ; All stacks and heap are aligned to a cache-line boundary
     ;
     HANDLER_STACK    +0 ALIGN 64 EMPTY 4 * 0x4000 {}
-    
+
     ;
     ; Stacks for EL3
     ;
@@ -217,34 +217,34 @@ LOAD 0x80000000
 ;    {
 ;        *( +RO )
 ;    }
-;    
+;
 ;    XTABLES +0 ALIGN 0x1000
 ;    {
-;        xtables.o (*) 
+;        xtables.o (*)
 ;    }
 ;}
 ;
 ;RW AlignExpr(ImageLimit(XTABLES), 0x1000)
-;{   
+;{
 ;    RWSEC +0
 ;    {
 ;        *( +RW )
 ;    }
-;    
+;
 ;    ZISEC +0
 ;    {
 ;        *( +ZI )
 ;    }
-;    
+;
 ;    SYS_STACK +0 ALIGN 8 EMPTY 0x1000
 ;    {
 ;    }
-;    
+;
 ;    ; 512 MiB heap
 ;    HEAP +0 ALIGN 8 EMPTY 0x10000000
 ;    {
 ;    }
-;    
+;
 ;    ; Free Memory section
 ;    FREE_MEMORY +0 ALIGN 8 EMPTY 0x10000000
 ;    {
@@ -254,7 +254,7 @@ LOAD 0x80000000
 ;    TASK_STACKS +0 ALIGN 16 EMPTY (4 * 0x8000000)
 ;    {
 ;    }
-;    
+;
 ;    ; Per-CPU 128 MiB handler stacks
 ;    HANDLER_STACKS +0 ALIGN 16 EMPTY (4 * 0x8000000)
 ;    {

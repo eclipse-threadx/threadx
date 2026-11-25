@@ -200,7 +200,7 @@ by_pass
 ;  MRC     p15, 0, r0, c0, c0, 5     ; Read CPU ID register
 ;  ANDS    r0, r0, #0x03             ; Mask off, leaving the CPU ID field
 ;  BNE     by_pass2
-;  
+;
 ;  MOV     r0, #0x04 ; Code for SYS_WRITE0
 ;  LDR     r1, =irq_handler_message1
 ;  SVC     0x123456
@@ -494,7 +494,7 @@ primaryCPUInit PROC
   MOV     r0, #0x1F
   BL      set_priority_mask            ; Set priority mask (local)
 
-  ; [EL] Change start - don't enable interrupts here!  
+  ; [EL] Change start - don't enable interrupts here!
   ;CPSIE   i                            ; Clear CPSR I bit
   ; [EL] Change end
 
@@ -513,7 +513,7 @@ primaryCPUInit PROC
   MOV     r1, #0x0
   BL      init_private_timer
   BL      start_private_timer
-  
+
   ;
   ; Enable receipt of SGI 0
   ; ------------------------

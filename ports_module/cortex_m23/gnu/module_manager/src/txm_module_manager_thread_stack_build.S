@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -55,12 +56,6 @@
 /*                                                                        */
 /*    _tx_thread_create                     Create thread service         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _txm_module_manager_thread_stack_build(TX_THREAD *thread_ptr, VOID (*function_ptr)(TX_THREAD *, TXM_MODULE_INSTANCE *))
 // {
@@ -93,7 +88,7 @@ _txm_module_manager_thread_stack_build:
     Stack Bottom: (higher memory address)  */
 
     LDR     r2, [r0, #16]                       // Pickup end of stack area
-    MOVW    r3, #0x7                            // 
+    MOVW    r3, #0x7                            //
     BICS    r2, r2, r3                          // Align frame for 8-byte alignment
     SUBS    r2, r2, #68                         // Subtract frame size
 #ifdef TX_SINGLE_MODE_SECURE

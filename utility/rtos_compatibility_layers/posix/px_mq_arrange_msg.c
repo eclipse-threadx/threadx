@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -57,15 +58,6 @@
 /*                                                                        */
 /*    POSIX internal Code                                                 */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Modified comments,            */
-/*                                            fixed message swap logic,   */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
 ULONG posix_arrange_msg(TX_QUEUE *Queue, ULONG *pMsgPrio)
 {
@@ -115,7 +107,7 @@ ULONG posix_arrange_msg(TX_QUEUE *Queue, ULONG *pMsgPrio)
 
             /* copy FIFO order to the message  */
             minNo = *q_read;
-            
+
             /* Found higher priority message.  */
             maxPrio = priority;
 
@@ -131,10 +123,10 @@ ULONG posix_arrange_msg(TX_QUEUE *Queue, ULONG *pMsgPrio)
 
             /* copy number to the local variable.  */
             number2 = *q_read;
-            
+
             /* Go to next message.  */
             q_read++;
-            
+
             /* find the oldest of the messages in this priority level.  */
             if( number2 < minNo )
             {

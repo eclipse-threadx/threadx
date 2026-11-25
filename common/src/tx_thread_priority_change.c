@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -71,19 +73,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     William E. Lamie         Modified comment(s), and      */
-/*                                            change thread state from    */
-/*                                            TX_SUSPENDED to             */
-/*                                            TX_PRIORITY_CHANGE before   */
-/*                                            calling                     */
-/*                                            _tx_thread_system_suspend,  */
-/*                                            resulting in version 6.1    */
-/*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_priority_change(TX_THREAD *thread_ptr, UINT new_priority, UINT *old_priority)
 {
@@ -93,6 +82,7 @@ TX_INTERRUPT_SAVE_AREA
 TX_THREAD       *execute_ptr;
 TX_THREAD       *next_execute_ptr;
 UINT            original_priority;
+UINT            mutex_priority_updated;
 
 
     /* Lockout interrupts while the thread is being suspended.  */
@@ -107,8 +97,21 @@ UINT            original_priority;
     /* Log this kernel call.  */
     TX_EL_THREAD_PRIORITY_CHANGE_INSERT
 
+    /* Mutex creation installs the hook before a thread can wait on a mutex.  */
+    mutex_priority_updated =  TX_FALSE;
+    if (thread_ptr -> tx_thread_state == TX_MUTEX_SUSP)
+    {
+        mutex_priority_updated =  (_tx_thread_mutex_priority_update)(thread_ptr, new_priority);
+    }
+
+    if (mutex_priority_updated == TX_TRUE)
+    {
+        TX_RESTORE
+        _tx_thread_system_preempt_check();
+    }
+
     /* Determine if this thread is currently ready.  */
-    if (thread_ptr -> tx_thread_state != TX_READY)
+    else if (thread_ptr -> tx_thread_state != TX_READY)
     {
 
         /* Setup the user priority and threshold in the thread's control

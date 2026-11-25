@@ -1,13 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -60,14 +62,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_sleep(ULONG timer_ticks)
@@ -161,6 +155,9 @@ TX_THREAD       *thread_ptr;
             thread_ptr -> tx_thread_state =    TX_SLEEP;
 
 #ifdef TX_NOT_INTERRUPTABLE
+
+            /* Initialize the status to successful.  */
+            thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;
 
             /* Call actual non-interruptable thread suspension routine.  */
             _tx_thread_system_ni_suspend(thread_ptr, timer_ticks);

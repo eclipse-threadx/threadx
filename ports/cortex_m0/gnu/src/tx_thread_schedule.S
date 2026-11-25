@@ -1,10 +1,10 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
@@ -72,19 +72,6 @@
 @/*    _tx_thread_system_return             Return to system from thread   */
 @/*    _tx_thread_context_restore           Restore thread's context       */
 @/*                                                                        */
-@/*  RELEASE HISTORY                                                       */
-@/*                                                                        */
-@/*    DATE              NAME                      DESCRIPTION             */
-@/*                                                                        */
-@/*  05-19-2020     William E. Lamie        Initial Version 6.0            */
-@/*  09-30-2020     William E. Lamie        Modified comment(s),           */
-@/*                                            resulting in version 6.1    */
-@/*  03-02-2021     Scott Larson            Modified comment(s), add       */
-@/*                                           low power code,              */
-@/*                                           resulting in version 6.1.5   */
-@/*  03-08-2023      Scott Larson            Include tx_user.h,            */
-@/*                                            resulting in version 6.2.1  */
-@/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_schedule(VOID)
 @{
@@ -108,8 +95,8 @@ _tx_thread_schedule:
 @
 @    /* Enter the scheduler for the first time.  */
 @
-    LDR     r0, =#0x10000000                        @ Load PENDSVSET bit
-    LDR     r1, =#0xE000ED04                        @ Load NVIC base
+    LDR     r0, =0x10000000                        @ Load PENDSVSET bit
+    LDR     r1, =0xE000ED04                        @ Load NVIC base
     STR     r0, [r1]                                @ Set PENDSVBIT in ICSR
     DSB                                             @ Complete all memory accesses
     ISB                                             @ Flush pipeline
@@ -139,7 +126,7 @@ __tx_SVCallHandler:
     .thumb_func
 __tx_ts_handler:
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))  
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 @
 @    /* Call the thread exit function to indicate the thread is no longer executing.  */
 @
@@ -222,7 +209,7 @@ __tx_ts_restore:
 @
     STR     r5, [r4]                                @ Setup global time-slice
 
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))     
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
 @
 @    /* Call the thread entry function to indicate the thread is executing.  */
 @

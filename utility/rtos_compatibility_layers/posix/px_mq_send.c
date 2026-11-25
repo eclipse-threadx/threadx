@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -59,6 +60,7 @@
 /*                                                                        */
 /*    tx_thread_identify                returns currently running thread  */
 /*    tx_byte_allocate                  allocate memory                   */
+/*    tx_byte_release                   release memory                    */
 /*    tx_queue_send                     ThreadX queue send                */
 /*    posix_priority_search             search message for same priority  */
 /*                                                                        */
@@ -67,22 +69,14 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021      William E. Lamie        Initial Version 6.1.7         */
-/*  10-31-2022      Scott Larson            Add 64-bit support,           */
-/*                                            resulting in version 6.2.0  */
-/*                                                                        */
 /**************************************************************************/
-INT  mq_send( mqd_t mqdes, const CHAR * msg_ptr, size_t msg_len, 
+INT  mq_send( mqd_t mqdes, const CHAR * msg_ptr, size_t msg_len,
                 ULONG msg_prio )
 {
 
-TX_QUEUE           *Queue; 
-UINT                temp1; 
-POSIX_MSG_QUEUE    *q_ptr; 
+TX_QUEUE           *Queue;
+UINT                temp1;
+POSIX_MSG_QUEUE    *q_ptr;
 VOID               *bp;
 UCHAR              *source;
 UCHAR              *destination;
@@ -90,9 +84,9 @@ UCHAR              *save_ptr;
 ULONG               mycount;
 ULONG               msg[TX_POSIX_MESSAGE_SIZE];
 
-    /* Assign a temporary variable for clarity.  */ 
-    Queue = &(mqdes->f_data->queue); 
-    q_ptr = (POSIX_MSG_QUEUE * )mqdes->f_data; 
+    /* Assign a temporary variable for clarity.  */
+    Queue = &(mqdes->f_data->queue);
+    q_ptr = (POSIX_MSG_QUEUE * )mqdes->f_data;
 
     /* First, check for an invalid queue pointer.  */
     if ( (!q_ptr) || ( (q_ptr -> px_queue_id) != PX_QUEUE_ID))
@@ -104,9 +98,9 @@ ULONG               msg[TX_POSIX_MESSAGE_SIZE];
         /* Return ERROR.  */
         return(ERROR);
     }
-    /* Make sure if we're calling this routine from a ISR timeout 
-        is set to zero.  */ 
-    if (!(tx_thread_identify())) 
+    /* Make sure if we're calling this routine from a ISR timeout
+        is set to zero.  */
+    if (!(tx_thread_identify()))
     {
         /* POSIX doesn't have error for this, hence give default.  */
         posix_errno = EINTR ;
@@ -166,16 +160,25 @@ ULONG               msg[TX_POSIX_MESSAGE_SIZE];
         return(ERROR);
     }
 
-    /* Now try to allocate memory to save the message from the 
+    /* Now try to allocate memory to save the message from the
       queue's byte pool.  */
     temp1 = tx_byte_allocate((TX_BYTE_POOL * )&(q_ptr->vq_message_area), &bp,
                              msg_len, TX_NO_WAIT);
 
     if (temp1 != TX_SUCCESS)
     {
-    posix_internal_error(9999);
-    }   
-    /* Got the memory , Setup source and destination pointers 
+        posix_internal_error(9999);
+
+        /* posix_internal_error() does not return today, but do not depend on
+           that: bp is indeterminate here, so falling through would copy
+           msg_len bytes through an unset pointer.  */
+        posix_errno = ENOMEM;
+        posix_set_pthread_errno(ENOMEM);
+
+        /* Return ERROR.  */
+        return(ERROR);
+    }
+    /* Got the memory , Setup source and destination pointers
        Cast them in UCHAR as message length is in bytes.  */
     source      =  (UCHAR * ) msg_ptr;
     destination =  (UCHAR * ) bp;
@@ -208,9 +211,14 @@ ULONG               msg[TX_POSIX_MESSAGE_SIZE];
     temp1 = tx_queue_send(Queue, msg, TX_WAIT_FOREVER);
     if ( temp1 != TX_SUCCESS)
     {
+        /* The message was never handed over to the queue, so this function
+           still owns the private buffer. Release it before returning,
+           otherwise it is leaked from the queue's byte pool.  */
+        tx_byte_release(bp);
+
         /* POSIX doesn't have error for this, hence give default.  */
         posix_errno = EINTR ;
-	    posix_set_pthread_errno(EINTR);
+        posix_set_pthread_errno(EINTR);
 
         /* Return ERROR.  */
         return(ERROR);

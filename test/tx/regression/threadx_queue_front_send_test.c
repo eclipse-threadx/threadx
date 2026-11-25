@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test is designed to test immediate response queue services including queue front send.
    This test is for queue sizes of 2 ULONG.  */
 
@@ -60,8 +71,8 @@ CHAR    *pointer;
 
     /* Put system definition stuff in here, e.g. thread creates and other assorted
        create information.  */
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 0,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_AUTO_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -73,12 +84,12 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status =  tx_thread_create(&thread_1a, "thread 1a", thread_1a_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1a, "thread 1a", thread_1a_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             16, 16, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -90,12 +101,12 @@ CHAR    *pointer;
         test_control_return(1);
     }
 
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
-    status =  tx_thread_create(&thread_2a, "thread 2a", thread_2a_entry, 2,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2a, "thread 2a", thread_2a_entry, 2,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, 100, TX_DONT_START);
     pointer = pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -125,7 +136,7 @@ CHAR    *pointer;
     status =  tx_queue_send_notify(&queue_0, queue_notify);
 
 #ifndef TX_DISABLE_NOTIFY_CALLBACKS
-    
+
     /* Check for status.  */
     if (status != TX_SUCCESS)
     {
@@ -164,7 +175,7 @@ ULONG   temp[2];
     printf("Running Queue Front Test............................................ ");
 
     /* Perform the 1 word queue front send test.  */
-    
+
     /* Increment thread 0 counter.  */
     thread_0_counter++;
 
@@ -178,7 +189,7 @@ ULONG   temp[2];
         printf("ERROR #7a\n");
         test_control_return(1);
     }
-    
+
     /* Place a new message on the front of the queue.  */
     temp[0] =  0xF000001;
     status =  tx_queue_front_send(&queue_0a, &temp[0], TX_NO_WAIT);
@@ -226,17 +237,17 @@ ULONG   temp[2];
         printf("ERROR #11a\n");
         test_control_return(1);
     }
-    
-    /* At this point the queue is empty. Resume another thread to 
+
+    /* At this point the queue is empty. Resume another thread to
        suspend on an empty queue.  */
     tx_thread_resume(&thread_1a);
-    
+
     /* Relinquish to get this thread suspended on the empty queue.  */
     tx_thread_relinquish();
-    
+
     /* Resume thread 2a to get another thread suspended on the empty queue.  */
     tx_thread_resume(&thread_2a);
-    
+
     /* Now send something to the front of the queue, which will resume
        the first waiting thread.  */
     temp[0] =  0xFF00002;
@@ -262,10 +273,10 @@ ULONG   temp[2];
         printf("ERROR #13a\n");
         test_control_return(1);
     }
-    
+
     /* Now relinquish again to let the other thread process the message.  */
     tx_thread_relinquish();
-    
+
     /* At this point, the other thread should have placed 2 messages on the queue
        so we will now send to the front, but without suspension.  */
     temp[0] =  0xFF00003;
@@ -293,11 +304,11 @@ ULONG   temp[2];
 
     /* Now resume thread 2a to get another thread suspended on the queue.  */
     tx_thread_resume(&thread_2a);
-    
+
     temp[0] =  0xFF00004;
     status =  tx_queue_front_send(&queue_0a, &temp[0], TX_WAIT_FOREVER);
-    
-    /* When we get back, the other thread has received all the messages and 
+
+    /* When we get back, the other thread has received all the messages and
        verified they are in order AND relinquished.  */
     if ((status != TX_SUCCESS) || (thread_1a_counter != 1))
     {
@@ -307,7 +318,7 @@ ULONG   temp[2];
         test_control_return(1);
     }
 
-   
+
     /* Perform the multiword queue front send test.  */
 
 
@@ -328,7 +339,7 @@ ULONG   temp[2];
         printf("ERROR #7\n");
         test_control_return(1);
     }
-    
+
     /* Place a new message on the front of the queue.  */
     temp[0] =  0xF000001;
     status =  tx_queue_front_send(&queue_0, &temp[0], TX_NO_WAIT);
@@ -376,17 +387,17 @@ ULONG   temp[2];
         printf("ERROR #11\n");
         test_control_return(1);
     }
-    
-    /* At this point the queue is empty. Resume another thread to 
+
+    /* At this point the queue is empty. Resume another thread to
        suspend on an empty queue.  */
     tx_thread_resume(&thread_1);
-    
+
     /* Relinquish to get this thread suspended on the empty queue.  */
     tx_thread_relinquish();
-    
+
     /* Resume thread 2 to get another thread suspended on the empty queue.  */
     tx_thread_resume(&thread_2);
-    
+
     /* Now send something to the front of the queue, which will resume
        the first waiting thread.  */
     temp[0] =  0xFF00002;
@@ -412,10 +423,10 @@ ULONG   temp[2];
         printf("ERROR #13\n");
         test_control_return(1);
     }
-    
+
     /* Now relinquish again to let the other thread process the message.  */
     tx_thread_relinquish();
-    
+
     /* At this point, the other thread should have placed 2 messages on the queue
        so we will now send to the front, but without suspension.  */
     temp[0] =  0xFF00003;
@@ -443,11 +454,11 @@ ULONG   temp[2];
 
     /* Now resume thread 2 to get another thread suspended on the queue.  */
     tx_thread_resume(&thread_2);
-    
+
     temp[0] =  0xFF00004;
     status =  tx_queue_front_send(&queue_0, &temp[0], TX_WAIT_FOREVER);
-    
-    /* When we get back, the other thread has received all the messages and 
+
+    /* When we get back, the other thread has received all the messages and
        verified they are in order AND relinquished.  */
     if ((status != TX_SUCCESS) || (thread_1_counter != 1))
     {
@@ -480,18 +491,18 @@ ULONG   dest_message[2];
     /* Determine if the message is good.  */
     if ((status != TX_SUCCESS) || (dest_message[0] != 0xFF00002))
         return;
-        
+
     /* Now fill the queue with two messages.   */
     status =  tx_queue_send(&queue_0, &source_message[0], TX_WAIT_FOREVER);
     source_message[0]++;
     status +=  tx_queue_front_send(&queue_0, &source_message[0], TX_WAIT_FOREVER);
-    
+
     if (status != TX_SUCCESS)
         return;
 
     /* Now let thread 0 send to the front of the queue with suspension.  */
     tx_thread_relinquish();
-    
+
     /* Attempt to receive three messages from the queue.  */
     status =  tx_queue_receive(&queue_0, &dest_message[0], TX_NO_WAIT);
 
@@ -518,10 +529,10 @@ ULONG   dest_message[2];
     status =  tx_queue_send(&queue_0, &source_message[0], TX_WAIT_FOREVER);
     source_message[0]++;
     status +=  tx_queue_front_send(&queue_0, &source_message[0], TX_WAIT_FOREVER);
-    
+
     if (status != TX_SUCCESS)
         return;
-    
+
     /* Now let thread 0 send to the front of the queue with suspension.  */
     tx_thread_relinquish();
 
@@ -552,11 +563,11 @@ ULONG   dest_message[2];
     /* Should be an error.  */
     if ((status != TX_SUCCESS) || (dest_message[0] != 0xEE000003))
         return;
-        
+
     /* Increment this threads counter.  */
     thread_1_counter++;
 }
-    
+
 
 static void    thread_2_entry(ULONG thread_input)
 {
@@ -567,7 +578,7 @@ ULONG   destination_message[2];
 
     /* Receive message.  */
     tx_queue_receive(&queue_0, &destination_message[0], TX_WAIT_FOREVER);
-    
+
     /* Self suspend.  */
     tx_thread_suspend(&thread_2);
 
@@ -590,18 +601,18 @@ ULONG   dest_message[2];
     /* Determine if the message is good.  */
     if ((status != TX_SUCCESS) || (dest_message[0] != 0xFF00002))
         return;
-        
+
     /* Now fill the queue with two messages.   */
     status =  tx_queue_send(&queue_0a, &source_message[0], TX_WAIT_FOREVER);
     source_message[0]++;
     status +=  tx_queue_front_send(&queue_0a, &source_message[0], TX_WAIT_FOREVER);
-    
+
     if (status != TX_SUCCESS)
         return;
 
     /* Now let thread 0 send to the front of the queue with suspension.  */
     tx_thread_relinquish();
-    
+
     /* Attempt to receive three messages from the queue.  */
     status =  tx_queue_receive(&queue_0a, &dest_message[0], TX_NO_WAIT);
 
@@ -628,10 +639,10 @@ ULONG   dest_message[2];
     status =  tx_queue_send(&queue_0a, &source_message[0], TX_WAIT_FOREVER);
     source_message[0]++;
     status +=  tx_queue_front_send(&queue_0a, &source_message[0], TX_WAIT_FOREVER);
-    
+
     if (status != TX_SUCCESS)
         return;
-    
+
     /* Now let thread 0 send to the front of the queue with suspension.  */
     tx_thread_relinquish();
 
@@ -662,11 +673,11 @@ ULONG   dest_message[2];
     /* Should be an error.  */
     if ((status != TX_SUCCESS) || (dest_message[0] != 0xEE000003))
         return;
-        
+
     /* Increment this threads counter.  */
     thread_1a_counter++;
 }
-    
+
 
 static void    thread_2a_entry(ULONG thread_input)
 {
@@ -677,7 +688,7 @@ ULONG   destination_message[2];
 
     /* Receive message.  */
     tx_queue_receive(&queue_0a, &destination_message[0], TX_WAIT_FOREVER);
-    
+
     /* Self suspend.  */
     tx_thread_suspend(&thread_2a);
 

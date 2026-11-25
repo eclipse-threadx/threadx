@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -87,12 +88,6 @@ __align(8) UCHAR txm_heap[TXM_MODULE_HEAP_SIZE];
 /*                                                                        */
 /*    Initial thread stack frame                                          */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_ENTRY_INFO *thread_info)
 {
@@ -108,14 +103,14 @@ VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_EN
     {
         /* Initialize the C environment.  */
         _txm_module_initialize();
-        
+
         /* Save the entry info pointer, for later use.  */
         _txm_module_entry_info =  thread_info;
-        
+
         /* Save the kernel function dispatch address. This is used to make all resident calls from
            the module.  */
         _txm_module_kernel_call_dispatcher =  thread_info -> txm_module_thread_entry_info_kernel_call_dispatcher;
-        
+
         /* Ensure that we have a valid pointer.  */
         while (!_txm_module_kernel_call_dispatcher)
         {
@@ -123,7 +118,7 @@ VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_EN
                An error here typically indicates the resident portion of _tx_thread_schedule
                is not supporting the trap to obtain the function pointer.   */
         }
-        
+
         /* Resume the module's callback thread, already created in the manager.  */
         _txe_thread_resume(thread_info -> txm_module_thread_entry_info_callback_request_thread);
     }

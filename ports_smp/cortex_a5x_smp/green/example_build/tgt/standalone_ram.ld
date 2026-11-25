@@ -66,5 +66,5 @@ SECTIONS
 //    __ghs_romend    = MEMENDADDR(flash_rsvd2);
     __ghs_ramstart  = MEMADDR(dram_rsvd1);
     __ghs_ramend    = MEMENDADDR(dram_rsvd2);
-        
+
 }

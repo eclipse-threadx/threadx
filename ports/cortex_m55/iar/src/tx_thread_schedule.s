@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -73,23 +76,6 @@
 /*                                                                        */
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  04-02-2021      Scott Larson            Modified comment(s), added    */
-/*                                            low power code,             */
-/*                                            resulting in version 6.1.6  */
-/*  06-02-2021      Scott Larson            Added secure stack initialize */
-/*                                            in SVC handler,             */
-/*                                            resulting in version 6.1.7  */
-/*  04-25-2022      Scott Larson            Added BASEPRI support,        */
-/*                                            resulting in version 6.1.11 */
-/*  03-08-2023      Scott Larson            Added preproc FPU option,     */
-/*                                            resulting in version 6.2.1  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
 // {
@@ -145,7 +131,7 @@ __tx_ts_handler:
     BL      _tx_execution_thread_exit               // Call the thread exit function
     POP     {r0, lr}                                // Recover LR
 #ifdef TX_PORT_USE_BASEPRI
-    MOV     r0, 0                                   // Disable BASEPRI masking (enable interrupts)
+    MOV     r0, #0                                  // Disable BASEPRI masking (enable interrupts)
     MSR     BASEPRI, r0
 #else
     CPSIE   i                                       // Enable interrupts
@@ -294,9 +280,19 @@ __tx_ts_wait:
 #endif
 
 #ifdef TX_ENABLE_WFI
+#ifdef TX_PORT_USE_BASEPRI
+    CPSID   i                                       // Mask every interrupt with PRIMASK, which WFI ignores
+    MOV     r1, #0                                  // Clear BASEPRI so that an interrupt masked by it
+    MSR     BASEPRI, r1                             //   is still able to wake the processor
+#endif
     DSB                                             // Ensure no outstanding memory transactions
     WFI                                             // Wait for interrupt
     ISB                                             // Ensure pipeline is flushed
+#ifdef TX_PORT_USE_BASEPRI
+    LDR     r1, =TX_PORT_BASEPRI                    // Restore the BASEPRI mask
+    MSR     BASEPRI, r1
+    CPSIE   i                                       // Clear PRIMASK; a pending interrupt is taken here
+#endif
 #endif
 
 #ifdef TX_LOW_POWER
@@ -348,7 +344,7 @@ SVC_Handler:
 
     CMP     r1, #2                                  // Is it a secure stack free request?
     BEQ     _tx_svc_secure_free                     // Yes, go there
-    
+
     CMP     r1, #3                                  // Is it a secure stack init request?
     BEQ     _tx_svc_secure_init                     // Yes, go there
 

@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -65,14 +66,6 @@
 /*                                                                        */
 /*    Application code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-15-2021      Scott Larson            Initial Version 6.1.9         */
-/*  03-08-2023      Scott Larson            Update defines,               */
-/*                                            resulting in version 6.2.1  */
-/*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_external_memory_enable(TXM_MODULE_INSTANCE *module_instance,
                                                  VOID *start_address,
@@ -114,7 +107,7 @@ ULONG   attributes_check = 0;
         /* Invalid module pointer.  */
         return(TX_PTR_ERROR);
     }
-    
+
     /* Determine if the module instance is in the loaded state.  */
     if (module_instance -> txm_module_instance_state != TXM_MODULE_LOADED)
     {
@@ -124,71 +117,71 @@ ULONG   attributes_check = 0;
         /* Return error if the module is not ready.  */
         return(TX_START_ERROR);
     }
-    
+
     /* Determine if there are shared memory entries available.  */
     if(module_instance -> txm_module_instance_shared_memory_count >= TXM_MODULE_MANAGER_MPU_SHARED_ENTRIES)
     {
         /* Release the protection mutex.  */
         _tx_mutex_put(&_txm_module_manager_mutex);
-        
+
         /* No more entries available.  */
         return(TX_NO_MEMORY);
     }
-    
+
     /* Start address and length must adhere to Cortex-M7 MPU.
        The address must align with the block size.  */
-    
+
     block_size = _txm_power_of_two_block_size(length);
     address = (ULONG) start_address;
     if(address != (address & ~(block_size - 1)))
     {
         /* Release the protection mutex.  */
         _tx_mutex_put(&_txm_module_manager_mutex);
-        
+
         /* Return alignment error.  */
         return(TXM_MODULE_ALIGNMENT_ERROR);
     }
-    
+
     /* At this point, we have a valid address and block size.
        Set up MPU registers.  */
-    
+
     /* Pick up index into shared memory entries.  */
     shared_index = TXM_MODULE_MANAGER_MPU_SHARED_INDEX + module_instance -> txm_module_instance_shared_memory_count;
-    
+
     /* Save address register with address, MPU region, set Valid bit.  */
     module_instance -> txm_module_instance_mpu_registers[shared_index].txm_module_mpu_region_address = address | shared_index | TXM_MPU_VALID_BIT;
-    
+
     /* Calculate the region size.  */
     region_size = _txm_module_manager_region_size_get(block_size);
-    
+
     /* Calculate the subregion bits.  */
     srd_bits = _txm_module_manager_calculate_srd_bits(block_size, length);
-    
+
     /* Generate SRD, size, and enable attributes.  */
     size_register = srd_bits | (region_size << 1) | TXM_ENABLE_REGION | TXM_MODULE_MPU_SHARED_ACCESS_CONTROL;
-    
+
     /* Check for optional write attribute.  */
     if(attributes & TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE)
     {
         attributes_check = TXM_MODULE_MANAGER_ATTRIBUTE_WRITE_MPU_BIT;
     }
-    
+
     /* Save attribute-size register. */
     module_instance -> txm_module_instance_mpu_registers[shared_index].txm_module_mpu_region_attribute_size = attributes_check | size_register;
-    
+
     /* Keep track of shared memory address and length in module instance.  */
     module_instance -> txm_module_instance_shared_memory_address[module_instance -> txm_module_instance_shared_memory_count] = address;
     module_instance -> txm_module_instance_shared_memory_length[module_instance -> txm_module_instance_shared_memory_count] = length;
-    
+
     /* Increment counter.  */
     module_instance -> txm_module_instance_shared_memory_count++;
-    
+
     /* Release the protection mutex.  */
     _tx_mutex_put(&_txm_module_manager_mutex);
-    
+
     /* Return success.  */
     return(TX_SUCCESS);
-    
+
 #else
 
 ULONG   block_size;
@@ -224,7 +217,7 @@ TXM_MODULE_PREAMBLE     *module_preamble;
         /* Invalid module pointer.  */
         return(TX_PTR_ERROR);
     }
-    
+
     /* Determine if the module instance is in the loaded state.  */
     if (module_instance -> txm_module_instance_state != TXM_MODULE_LOADED)
     {
@@ -234,7 +227,7 @@ TXM_MODULE_PREAMBLE     *module_preamble;
         /* Return error if the module is not ready.  */
         return(TX_START_ERROR);
     }
-    
+
     /* Check if preamble shared mem and mem protection property bits are set.  */
     module_preamble = module_instance -> txm_module_instance_preamble_ptr;
     if((module_preamble -> txm_module_preamble_property_flags & (TXM_MODULE_MEMORY_PROTECTION | TXM_MODULE_SHARED_EXTERNAL_MEMORY_ACCESS))
@@ -246,49 +239,49 @@ TXM_MODULE_PREAMBLE     *module_preamble;
         /* Return error if bit not set.  */
         return(TXM_MODULE_INVALID_PROPERTIES);
     }
-    
+
     /* Start address and length must adhere to Cortex-M MPU.
        The address must align with the block size.  */
-    
+
     block_size = _txm_power_of_two_block_size(length);
     address = (ULONG) start_address;
     if(address != (address & ~(block_size - 1)))
     {
         /* Release the protection mutex.  */
         _tx_mutex_put(&_txm_module_manager_mutex);
-        
+
         /* Return alignment error.  */
         return(TXM_MODULE_ALIGNMENT_ERROR);
     }
-    
+
     /* At this point, we have a valid address and block size.
        Set up MPU registers.  */
     module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MANAGER_SHARED_MPU_REGION].txm_module_mpu_region_address = address | TXM_MODULE_MANAGER_SHARED_MPU_REGION | TXM_MPU_VALID_BIT;
-    
+
     /* Calculate the region size.  */
     region_size = _txm_module_manager_region_size_get(block_size);
     /* Calculate the subregion bits.  */
     subregion_bits = _txm_module_manager_calculate_srd_bits(block_size, length);
-    
+
     /* Check for valid attributes.  */
     if(attributes & TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE)
     {
         attributes_check = TXM_MODULE_MANAGER_ATTRIBUTE_WRITE_MPU_BIT;
     }
-    
+
     /* Build register with attributes. */
     module_instance -> txm_module_instance_mpu_registers[TXM_MODULE_MANAGER_SHARED_MPU_REGION].txm_module_mpu_region_attribute_size = (region_size << 1) | subregion_bits | attributes_check | TXM_MODULE_MPU_SHARED_ACCESS_CONTROL | TXM_ENABLE_REGION;
-    
+
     /* Keep track of shared memory address and length in module instance.  */
     module_instance -> txm_module_instance_shared_memory_address = address;
     module_instance -> txm_module_instance_shared_memory_length = length;
-    
+
     /* Recalculate MPU settings.  */
     _txm_module_manager_mm_register_setup(module_instance);
-    
+
     /* Release the protection mutex.  */
     _tx_mutex_put(&_txm_module_manager_mutex);
-    
+
     /* Return success.  */
     return(TX_SUCCESS);
 

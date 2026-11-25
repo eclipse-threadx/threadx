@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** POSIX wrapper for THREADX                                             */ 
+/**                                                                       */
+/** POSIX wrapper for THREADX                                             */
 /**                                                                       */
 /**                                                                       */
 /**                                                                       */
@@ -26,16 +27,16 @@
 #include "px_int.h"    /* Posix helper functions */
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    pthread_setcancelstate                              PORTABLE C      */ 
-/*                                                           6.1.7        */ 
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    pthread_setcancelstate                              PORTABLE C      */
+/*                                                           6.1.7        */
+/*  AUTHOR                                                                */
+/*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
-/*                                                                        */ 
+/*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
 /*    The pthread_setcancelstate()function shall atomically both set the  */
@@ -44,31 +45,25 @@
 /*    by oldstate.Legal values for state are PTHREAD_CANCEL_ENABLE and    */
 /*    PTHREAD_CANCEL_DISABLE.                                             */
 /*                                                                        */
-/*  INPUT                                                                 */ 
+/*  INPUT                                                                 */
 /*                                                                        */
 /*    state                          New cancelability state to be set    */
 /*    oldstate                       Pointer to old cancelability state   */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
 /*                                                                        */
-/*     0                             if successful                        */ 
-/*     Value                         in case of any error                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */ 
-/**************************************************************************/ 
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*     0                             if successful                        */
+/*     Value                         in case of any error                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/**************************************************************************/
 INT pthread_setcancelstate (INT state, INT *oldstate)
 {
 
@@ -78,12 +73,12 @@ TX_THREAD     *thread_ptr;
 POSIX_TCB     *pthread_ptr;
 
     /* First check for validity of the new cancel state to be set  */
-    if ( (state  == PTHREAD_CANCEL_ENABLE) || (state == PTHREAD_CANCEL_DISABLE) ) 
+    if ( (state  == PTHREAD_CANCEL_ENABLE) || (state == PTHREAD_CANCEL_DISABLE) )
     {
         TX_DISABLE
 
-            /* Get the thread identifier of the currently running thread */ 
-            thread_ptr = tx_thread_identify(); 
+            /* Get the thread identifier of the currently running thread */
+            thread_ptr = tx_thread_identify();
             /* get posix TCB for this pthread */
             pthread_ptr = (POSIX_TCB *)thread_ptr;
             *oldstate = pthread_ptr->cancel_state;
@@ -99,4 +94,4 @@ POSIX_TCB     *pthread_ptr;
         posix_set_pthread_errno(EINVAL);
         return (EINVAL);
     }
-}    
+}

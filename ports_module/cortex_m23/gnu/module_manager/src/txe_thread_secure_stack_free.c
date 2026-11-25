@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -61,12 +62,6 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*                                                                        */
 /**************************************************************************/
 UINT    _txe_thread_secure_stack_free(TX_THREAD *thread_ptr)
 {
@@ -74,10 +69,10 @@ UINT    _txe_thread_secure_stack_free(TX_THREAD *thread_ptr)
     return(TX_FEATURE_NOT_ENABLED);
 #else
 UINT    status;
-    
+
     /* Default status to success.  */
     status =  TX_SUCCESS;
-    
+
     /* Check for an invalid thread pointer.  */
     if (thread_ptr == TX_NULL)
     {
@@ -93,7 +88,7 @@ UINT    status;
         /* Thread pointer is invalid, return appropriate error code.  */
         status =  TX_THREAD_ERROR;
     }
-    
+
     /* Check for interrupt call.  */
     if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
     {
@@ -104,7 +99,7 @@ UINT    status;
             status =  TX_CALLER_ERROR;
         }
     }
-    
+
     /* Determine if everything is okay.  */
     if (status == TX_SUCCESS)
     {

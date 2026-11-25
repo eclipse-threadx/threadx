@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 /**************************************************************************/
 /**************************************************************************/
@@ -17,26 +20,6 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  10-15-2021     William E. Lamie         Modified comment(s), and      */
-/*                                            fixed compiler warnings,    */
-/*                                            resulting in version 6.1.7  */
-/*  01-31-2022     William E. Lamie         Modified comment(s), and      */
-/*                                            fixed compiler warnings,    */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Cindy Deng               Added simple static scheduler */
-/*                                            start flag, corrected stack */
-/*                                            allocation size,            */
-/*                                            resulting in version 6.1.12 */
-/*  12-31-2023     Xiuwen Cai               Modified comment(s), and      */
-/*                                            added check for overflow in */
-/*                                            queue size calculation,     */
-/*                                            resulting in version 6.4.0  */
-/*                                                                        */
 /**************************************************************************/
 
 #include <stdint.h>
@@ -367,6 +350,7 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
     ret = tx_thread_create(&pxTaskBuffer->thread, (CHAR *)pcName, txfr_thread_wrapper, (ULONG)pvParameters,
             puxStackBuffer, stack_depth_bytes, prio, prio, 0u, TX_DONT_START);
     if(ret != TX_SUCCESS) {
+        (void)tx_semaphore_delete(&pxTaskBuffer->notification_sem);
         TX_FREERTOS_ASSERT_FAIL();
         return NULL;
     }
@@ -375,6 +359,12 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
 
     ret = tx_thread_resume(&pxTaskBuffer->thread);
     if(ret != TX_SUCCESS) {
+        /* The thread exists but was never started. It has to be terminated
+           before it can be deleted, which is the order the idle task uses when
+           it reaps a deleted task.  */
+        (void)tx_thread_terminate(&pxTaskBuffer->thread);
+        (void)tx_thread_delete(&pxTaskBuffer->thread);
+        (void)tx_semaphore_delete(&pxTaskBuffer->notification_sem);
         TX_FREERTOS_ASSERT_FAIL();
         return NULL;
     }
@@ -662,7 +652,7 @@ void vTaskPrioritySet(TaskHandle_t xTask,
 char *pcTaskGetName(TaskHandle_t xTaskToQuery)
 {
     TX_THREAD *p_thread;
-    char *p_task_name;
+    TX_NAME_CONST CHAR *p_task_name;
     UINT ret;
 
     if(xTaskToQuery == NULL) {
@@ -677,7 +667,8 @@ char *pcTaskGetName(TaskHandle_t xTaskToQuery)
         return 0;
     }
 
-    return p_task_name;
+    /* FreeRTOS exposes task names through a writable pointer type. */
+    return (char *)p_task_name;
 }
 
 
@@ -1506,6 +1497,7 @@ QueueHandle_t xQueueCreateStatic(UBaseType_t uxQueueLength,
 
     ret = tx_semaphore_create(&pxQueueBuffer->write_sem, "", uxQueueLength);
     if(ret != TX_SUCCESS) {
+        (void)tx_semaphore_delete(&pxQueueBuffer->read_sem);
         return NULL;
     }
 
@@ -1562,11 +1554,16 @@ QueueHandle_t xQueueCreate(UBaseType_t uxQueueLength, UBaseType_t uxItemSize)
 
     ret = tx_semaphore_create(&p_queue->read_sem, "", 0u);
     if(ret != TX_SUCCESS) {
+        txfr_free(p_mem);
+        txfr_free(p_queue);
         return NULL;
     }
 
     ret = tx_semaphore_create(&p_queue->write_sem, "", uxQueueLength);
     if(ret != TX_SUCCESS) {
+        (void)tx_semaphore_delete(&p_queue->read_sem);
+        txfr_free(p_mem);
+        txfr_free(p_queue);
         return NULL;
     }
 

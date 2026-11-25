@@ -58,7 +58,7 @@ void hw_setup(void)
 
   // NOTE:
   // This code assumes that the IRQ and FIQ exceptions
-  // have been routed to the appropriate EL.  In this 
+  // have been routed to the appropriate EL.  In this
   // example that is done in the startup.s file
 }
 

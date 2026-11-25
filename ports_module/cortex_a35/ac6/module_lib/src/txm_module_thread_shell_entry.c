@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -80,12 +81,6 @@ ALIGN_TYPE                      (*_txm_module_kernel_call_dispatcher)(ULONG type
 /*                                                                        */
 /*    Initial thread stack frame                                          */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Andres Mlinar            Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 VOID  _txm_module_thread_shell_entry(TX_THREAD *thread_ptr, TXM_MODULE_THREAD_ENTRY_INFO *thread_info)
 {
@@ -122,7 +117,7 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
                An error here typically indicates the resident portion of _tx_thread_schedule
                is not supporting the trap to obtain the function pointer.   */
         }
-        
+
         /* Resume the module's callback thread, already created in the manager.  */
         _txe_thread_resume(thread_info -> txm_module_thread_entry_info_callback_request_thread);
     }

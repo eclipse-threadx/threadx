@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -59,53 +60,67 @@ __tx_free_memory_start:
 /*                                                                        */
 /*    _tx_initialize_kernel_enter           ThreadX entry function        */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  03-08-2023      Scott Larson            Initial Version 6.2.1         */
-/*                                                                        */
 /**************************************************************************/
 /* VOID   _tx_initialize_low_level(VOID)
 {  */
     .global  _tx_initialize_low_level
     .weak    _tx_initialize_low_level
 _tx_initialize_low_level:
-    sd      sp, _tx_thread_system_stack_ptr, t0     // Save system stack pointer
+    /* Save the system stack pointer.  */
+    /* _tx_thread_system_stack_ptr = sp;  */
+    la      t0, _tx_thread_system_stack_ptr
+    sd      sp, 0(t0)                                   // Save system stack pointer
 
-    la      t0, __tx_free_memory_start              // Pickup first free address
-    sd      t0, _tx_initialize_unused_memory, t1    // Save unused memory address
+    /* Pickup first free address.  */
+    /* _tx_initialize_unused_memory(__tx_free_memory_start);  */
+    la      t0, __tx_free_memory_start                  // Pickup first free address
+    la      t1, _tx_initialize_unused_memory
+    sd      t0, 0(t1)                                   // Save unused memory address
 
+    /* Initialize floating point control/status register if floating point is enabled.  */
 #ifdef __riscv_flen
-    fscsr x0
+#ifdef TX_RISCV_SMODE
+    li      t0, 0x2000                                  // Set sstatus.FS to Initial (bits 14:13 = 01) so the fcsr write cannot trap
+    csrrs   zero, sstatus, t0
+#else
+    li      t0, 0x2000                                  // Set mstatus.FS to Initial (bits 14:13 = 01) so the fcsr write cannot trap
+    csrrs   zero, mstatus, t0
+#endif
+    li      t0, 0
+    csrw    fcsr, t0                                    // Clear FP control/status register
+#endif
+
+#ifdef __riscv_vector
+    li      t0, 0x200                                   // Set VS=Initial before a vector restore
+#ifdef TX_RISCV_SMODE
+    csrrs   zero, sstatus, t0
+#else
+    csrrs   zero, mstatus, t0
+#endif
 #endif
 
     ret
 
+/* Timer Interrupt Handler Note:
+   Platform-specific implementations must provide their own timer ISR.
+   The timer interrupt handler should follow this execution flow:
 
-    /* Define the actual timer interrupt/exception handler.  */
+   1. Disable interrupts (if not done by hardware exception entry)
+   2. Allocate interrupt stack frame (65*8 bytes with FP, 32*8 bytes without)
+   3. Save RA (x1) on the stack at offset 28*8
+   4. Call _tx_thread_context_save to save thread context
+   5. Call _tx_timer_interrupt to process the timer tick
+   6. Call _tx_thread_context_restore to resume execution (does not return)
 
-    .global  timer1_plic_IRQHandler
-    //.global  __minterrupt_000007
-    //EXTWEAK __require_minterrupt_vector_table
-timer1_plic_IRQHandler:
-//__minterrupt_000007:
-    //REQUIRE __require_minterrupt_vector_table
+   Example (for CLINT timer):
 
+       _tx_timer_interrupt_handler:
+           addi    sp, sp, -32*8
+           sd      ra, 28*8(sp)
+           call    _tx_thread_context_save
+           call    _tx_timer_interrupt
+           j       _tx_thread_context_restore
 
-    /* Before calling _tx_thread_context_save, we have to allocate an interrupt
-       stack frame and save the current value of x1 (ra). */
-//#if defined(__riscv_float_abi_single) || defined(__riscv_float_abi_double)
-//    addi    sp, sp, -520                            // Allocate space for all registers - with floating point enabled
-//#else
-//    addi    sp, sp, -256                            // Allocate space for all registers - without floating point enabled
-//#endif
-//    sd      x1, 224(sp)                             // Store RA
-//    call    _tx_thread_context_save                 // Call ThreadX context save
-
-    /* Call the ThreadX timer routine.  */
-    call    _tx_timer_interrupt                     // Call timer interrupt handler
-    call    timer1_interrupt
-    ret
-    /* Timer interrupt processing is done, jump to ThreadX context restore.  */
-//    j       _tx_thread_context_restore              // Jump to ThreadX context restore function. Note: this does not return!
+   The port assumes Machine mode (M-mode) execution.
+   For Supervisor mode (S-mode), use sstatus and SIE/SPIE instead of mstatus.
+   See the RISC-V Privileged Specification for more details. */

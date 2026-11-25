@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -42,19 +43,6 @@
 /*    own special types that can be mapped to actual data types by this   */
 /*    file to guarantee consistency in the interface and functionality.   */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  04-02-2021      Scott Larson            Initial Version 6.1.6         */
-/*  04-25-2022      Scott Larson            Modified comments and added   */
-/*                                            volatile to registers,      */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022      Scott Larson            Modified comments and changed */
-/*                                            secure stack initialization */
-/*                                            macro to port-specific,     */
-/*                                            resulting in version 6.1.12 */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef TX_PORT_H
@@ -63,7 +51,7 @@
 /* Determine if the optional ThreadX user define file should be used.  */
 #ifdef TX_INCLUDE_USER_DEFINE_FILE
 
-/* Yes, include the user defines in tx_user.h. The defines in this file may 
+/* Yes, include the user defines in tx_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "tx_user.h"
@@ -107,24 +95,24 @@ UINT    _tx_thread_secure_stack_free(struct TX_THREAD_STRUCT *tx_thread);
     #error "Do not define TX_ENABLE_STACK_CHECKING"
 #endif
 
-/* If user does not want to terminate thread on stack overflow, 
+/* If user does not want to terminate thread on stack overflow,
    #define the TX_THREAD_NO_TERMINATE_STACK_ERROR symbol.
    The thread will be rescheduled and continue to cause the exception.
    It is suggested user code handle this by registering a notification with the
    tx_thread_stack_error_notify function. */
 /*#define TX_THREAD_NO_TERMINATE_STACK_ERROR */
 
-/* Define the system API mappings based on the error checking 
-   selected by the user.  Note: this section is only applicable to 
+/* Define the system API mappings based on the error checking
+   selected by the user.  Note: this section is only applicable to
    application source code, hence the conditional that turns off this
    stuff when the include file is processed by the ThreadX source. */
 
 #ifndef TX_SOURCE_CODE
 
 
-/* Determine if error checking is desired.  If so, map API functions 
+/* Determine if error checking is desired.  If so, map API functions
    to the appropriate error checking front-ends.  Otherwise, map API
-   functions to the core functions that actually perform the work. 
+   functions to the core functions that actually perform the work.
    Note: error checking is enabled by default.  */
 
 #ifdef TX_DISABLE_ERROR_CHECKING
@@ -380,12 +368,12 @@ static void _set_control(unsigned int _control)
                                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 0x4);                                          \
                                                                         _tx_misra_control_set(_tx_vfp_state);                                                     \
                                                                     }
-                                                                    
+
 #endif
 
 /* A thread can be terminated by another thread, so we first check if it's self-terminating and not in an ISR.
    If so, deactivate the FPU via CONTROL.FPCA. Otherwise we are in an interrupt or another thread is terminating
-   this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the FPU to flush 
+   this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the FPU to flush
    the lazy FPU save, then restore the CONTROL.FPCA state. */
 
 #ifndef TX_MISRA_ENABLE
@@ -527,9 +515,9 @@ extern void    _tx_thread_secure_stack_initialize(void);
 #endif
 
 
-/* Define ThreadX interrupt lockout and restore macros for protection on 
-   access of critical kernel information.  The restore interrupt macro must 
-   restore the interrupt posture of the running thread prior to the value 
+/* Define ThreadX interrupt lockout and restore macros for protection on
+   access of critical kernel information.  The restore interrupt macro must
+   restore the interrupt posture of the running thread prior to the value
    present prior to the disable macro.  In most cases, the save area macro
    is used to define a local function save area for the disable and restore
    macros.  */
@@ -576,7 +564,7 @@ unsigned int          was_masked;
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX Cortex-M23/AC6 Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX Cortex-M23/AC6 Version 6.5.2.202603b *";
 #else
 #ifdef TX_MISRA_ENABLE
 extern  CHAR                    _tx_version_id[100];

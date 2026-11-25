@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -61,12 +64,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX Source                                                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 void  _tx_thread_smp_unprotect(UINT new_interrupt_posture)
@@ -129,11 +126,18 @@ pthread_t   current_thread_id;
             _tx_linux_debug_entry_insert("UNPROTECT-nested", __FILE__, __LINE__);
         }
 
-        /* Only release the critical section.  */
-        _tx_linux_mutex_release(&_tx_linux_mutex);
     }
 
-    /* Release the critical section.  */
+    /* Release the critical section taken by the matching _tx_thread_smp_protect.
+       The protection and the critical section are separate counts, and this
+       release is owed whether or not the protection still names this core: the
+       protection can be cleared by another core while this one holds the
+       critical section it took.  The critical section is only handed back to
+       Linux when its nesting count reaches zero, so a release skipped here is
+       never made up and the mutex stays locked for the life of the process.  */
+    _tx_linux_mutex_release(&_tx_linux_mutex);
+
+    /* Release the critical section taken on entry.  */
     _tx_linux_mutex_release(&_tx_linux_mutex);
 
 }

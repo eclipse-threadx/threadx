@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -48,7 +50,7 @@ TX_THREAD *     _tx_thread_current_ptr;
 
 
 /* Define the variable that holds the next thread to execute.  It is important
-   to remember that this is not necessarily equal to the current thread 
+   to remember that this is not necessarily equal to the current thread
    pointer.  */
 
 TX_THREAD *     _tx_thread_execute_ptr;
@@ -65,7 +67,7 @@ ULONG           _tx_thread_created_count;
 
 
 /* Define the current state variable.  When this value is 0, a thread
-   is executing or the system is idle.  Other values indicate that 
+   is executing or the system is idle.  Other values indicate that
    interrupt or initialization processing is active.  This variable is
    initialized to TX_INITIALIZE_IN_PROGRESS to indicate initialization is
    active.  */
@@ -74,15 +76,15 @@ volatile ULONG  _tx_thread_system_state =  TX_INITIALIZE_IN_PROGRESS;
 
 
 /* Define the 32-bit priority bit-maps. There is one priority bit map for each
-   32 priority levels supported. If only 32 priorities are supported there is 
-   only one bit map. Each bit within a priority bit map represents that one 
+   32 priority levels supported. If only 32 priorities are supported there is
+   only one bit map. Each bit within a priority bit map represents that one
    or more threads at the associated thread priority are ready.  */
 
 ULONG           _tx_thread_priority_maps[TX_MAX_PRIORITIES/32];
 
 
-/* Define the priority map active bit map that specifies which of the previously 
-   defined priority maps have something set. This is only necessary if more than 
+/* Define the priority map active bit map that specifies which of the previously
+   defined priority maps have something set. This is only necessary if more than
    32 priorities are supported.  */
 
 #if TX_MAX_PRIORITIES > 32
@@ -92,17 +94,17 @@ ULONG           _tx_thread_priority_map_active;
 
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
-/* Define the 32-bit preempt priority bit maps.  There is one preempt bit map 
-   for each 32 priority levels supported. If only 32 priorities are supported 
-   there is only one bit map. Each set set bit corresponds to a preempted priority 
-   level that had preemption-threshold active to protect against preemption of a 
+/* Define the 32-bit preempt priority bit maps.  There is one preempt bit map
+   for each 32 priority levels supported. If only 32 priorities are supported
+   there is only one bit map. Each set set bit corresponds to a preempted priority
+   level that had preemption-threshold active to protect against preemption of a
    range of relatively higher priority threads.  */
 
 ULONG           _tx_thread_preempted_maps[TX_MAX_PRIORITIES/32];
 
 
-/* Define the preempt map active bit map that specifies which of the previously 
-   defined preempt maps have something set. This is only necessary if more than 
+/* Define the preempt map active bit map that specifies which of the previously
+   defined preempt maps have something set. This is only necessary if more than
    32 priorities are supported.  */
 
 #if TX_MAX_PRIORITIES > 32
@@ -110,7 +112,7 @@ ULONG           _tx_thread_preempted_map_active;
 #endif
 #endif
 
-/* Define the variable that holds the highest priority group ready for 
+/* Define the variable that holds the highest priority group ready for
    execution.  It is important to note that this is not necessarily the same
    as the priority of the thread pointed to by _tx_execute_thread.  */
 
@@ -126,16 +128,18 @@ TX_THREAD *     _tx_thread_priority_list[TX_MAX_PRIORITIES];
 
 
 /* Define the global preempt disable variable.  If this is non-zero, preemption is
-   disabled.  It is used internally by ThreadX to prevent preemption of a thread in 
+   disabled.  It is used internally by ThreadX to prevent preemption of a thread in
    the middle of a service that is resuming or suspending another thread.  */
 
 volatile UINT   _tx_thread_preempt_disable;
 
 
-/* Define the global function pointer for mutex cleanup on thread completion or 
+/* Define the global function pointer for mutex cleanup on thread completion or
    termination. This pointer is setup during mutex initialization.  */
 
 VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
+/* Optional mutex inheritance update, installed by mutex creation. */
+UINT            (*_tx_thread_mutex_priority_update)(TX_THREAD *thread_ptr, UINT new_priority);
 
 
 /* Define the global build options variable.  This contains a bit map representing
@@ -176,8 +180,8 @@ ULONG           _tx_build_options;
 
 #if defined(TX_ENABLE_STACK_CHECKING) || defined(TX_PORT_THREAD_STACK_ERROR_HANDLING)
 
-/* Define the global function pointer for stack error handling. If a stack error is 
-   detected and the application has registered a stack error handler, it will be 
+/* Define the global function pointer for stack error handling. If a stack error is
+   detected and the application has registered a stack error handler, it will be
    called via this function pointer.  */
 
 VOID            (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_ptr);
@@ -192,20 +196,20 @@ VOID            (*_tx_thread_application_stack_error_handler)(TX_THREAD *thread_
 ULONG           _tx_thread_performance_resume_count;
 
 
-/* Define the total number of thread suspensions. Each time a thread enters a 
+/* Define the total number of thread suspensions. Each time a thread enters a
    suspended state this variable is incremented.  */
 
 ULONG           _tx_thread_performance_suspend_count;
 
 
-/* Define the total number of solicited thread preemptions. Each time a thread is 
+/* Define the total number of solicited thread preemptions. Each time a thread is
    preempted by directly calling a ThreadX service, this variable is incremented.  */
 
 ULONG           _tx_thread_performance_solicited_preemption_count;
 
 
-/* Define the total number of interrupt thread preemptions. Each time a thread is 
-   preempted as a result of an ISR calling a ThreadX service, this variable is 
+/* Define the total number of interrupt thread preemptions. Each time a thread is
+   preempted as a result of an ISR calling a ThreadX service, this variable is
    incremented.  */
 
 ULONG           _tx_thread_performance_interrupt_preemption_count;
@@ -217,45 +221,45 @@ ULONG           _tx_thread_performance_interrupt_preemption_count;
 ULONG           _tx_thread_performance_priority_inversion_count;
 
 
-/* Define the total number of time-slices.  Each time a time-slice operation is 
-   actually performed (another thread is setup for running) this variable is 
+/* Define the total number of time-slices.  Each time a time-slice operation is
+   actually performed (another thread is setup for running) this variable is
    incremented.  */
 
 ULONG           _tx_thread_performance_time_slice_count;
 
 
-/* Define the total number of thread relinquish operations.  Each time a thread 
+/* Define the total number of thread relinquish operations.  Each time a thread
    relinquish operation is actually performed (another thread is setup for running)
    this variable is incremented.  */
 
 ULONG           _tx_thread_performance_relinquish_count;
 
 
-/* Define the total number of thread timeouts. Each time a thread has a 
+/* Define the total number of thread timeouts. Each time a thread has a
    timeout this variable is incremented.  */
 
 ULONG           _tx_thread_performance_timeout_count;
 
 
-/* Define the total number of thread wait aborts. Each time a thread's suspension 
+/* Define the total number of thread wait aborts. Each time a thread's suspension
    is lifted by the tx_thread_wait_abort call this variable is incremented.  */
 
 ULONG           _tx_thread_performance_wait_abort_count;
 
 
-/* Define the total number of idle system thread returns. Each time a thread returns to 
+/* Define the total number of idle system thread returns. Each time a thread returns to
    an idle system (no other thread is ready to run) this variable is incremented.  */
 
 ULONG           _tx_thread_performance_idle_return_count;
 
 
-/* Define the total number of non-idle system thread returns. Each time a thread returns to 
+/* Define the total number of non-idle system thread returns. Each time a thread returns to
    a non-idle system (another thread is ready to run) this variable is incremented.  */
 
 ULONG           _tx_thread_performance_non_idle_return_count;
 
 
-/* Define the last TX_THREAD_EXECUTE_LOG_SIZE threads scheduled in ThreadX. This 
+/* Define the last TX_THREAD_EXECUTE_LOG_SIZE threads scheduled in ThreadX. This
    is a circular list, where the index points to the oldest entry.  */
 
 ULONG           _tx_thread_performance__execute_log_index;
@@ -266,7 +270,7 @@ TX_THREAD *     _tx_thread_performance_execute_log[TX_THREAD_EXECUTE_LOG_SIZE];
 /* Define special string.  */
 
 #ifndef TX_MISRA_ENABLE
-const CHAR _tx_thread_special_string[] = 
+const CHAR _tx_thread_special_string[] =
   "G-ML-EL-ML-BL-DL-BL-GB-GL-M-D-DL-GZ-KH-EL-CM-NH-HA-GF-DD-JC-YZ-CT-AT-DW-USA-CA-SD-SDSU";
 #endif
 
@@ -302,25 +306,11 @@ const CHAR _tx_thread_special_string[] =
 /*                                                                        */
 /*    _tx_initialize_high_level         High level initialization         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  06-02-2021     Yuxin Zhou               Modified comment(s), added    */
-/*                                            Execution Profile support,  */
-/*                                            resulting in version 6.1.7  */
-/*  10-15-2021     Yuxin Zhou               Modified comment(s), improved */
-/*                                            stack check error handling, */
-/*                                            resulting in version 6.1.9  */   
-/*                                                                        */
 /**************************************************************************/
 VOID  _tx_thread_initialize(VOID)
 {
 
-    /* Note: the system stack pointer and the system state variables are 
+    /* Note: the system stack pointer and the system state variables are
        initialized by the low and high-level initialization functions,
        respectively.  */
 
@@ -360,6 +350,7 @@ VOID  _tx_thread_initialize(VOID)
 
     /* Initialize the thread mutex release function pointer.  */
     _tx_thread_mutex_release =      TX_NULL;
+    _tx_thread_mutex_priority_update =  TX_NULL;
 
 #ifdef TX_ENABLE_STACK_CHECKING
 
@@ -388,8 +379,8 @@ VOID  _tx_thread_initialize(VOID)
 #endif
 
     /* Setup the build options flag. This is used to identify how the ThreadX library was constructed.  */
-    _tx_build_options =  _tx_build_options 
-                            | (((ULONG) (TX_MAX_PRIORITIES/32)) << 24) 
+    _tx_build_options =  _tx_build_options
+                            | (((ULONG) (TX_MAX_PRIORITIES/32)) << 24)
 #ifdef TX_NOT_INTERRUPTABLE
                             | (((ULONG) 1) << 31)
 #endif

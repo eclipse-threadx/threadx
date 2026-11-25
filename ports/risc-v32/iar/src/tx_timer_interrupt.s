@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
@@ -41,49 +42,42 @@
 
     SECTION `.mtext`:CODE:REORDER:NOROOT(2)
     CODE
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _tx_timer_interrupt                                RISC-V32/IAR     */
 /*                                                           6.1          */
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    William E. Lamie, Microsoft Corporation                             */ 
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
 /*    Tom van Leeuwen, Technolution B.V.                                  */
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function processes the hardware timer interrupt.  This         */ 
-/*    processing includes incrementing the system clock and checking for  */ 
-/*    time slice and/or timer expiration.  If either is found, the        */ 
-/*    interrupt context save/restore functions are called along with the  */ 
-/*    expiration functions.                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _tx_timer_expiration_process          Timer expiration processing   */ 
-/*    _tx_thread_time_slice                 Time slice interrupted thread */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    interrupt vector                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */ 
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function processes the hardware timer interrupt.  This         */
+/*    processing includes incrementing the system clock and checking for  */
+/*    time slice and/or timer expiration.  If either is found, the        */
+/*    interrupt context save/restore functions are called along with the  */
+/*    expiration functions.                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_timer_expiration_process          Timer expiration processing   */
+/*    _tx_thread_time_slice                 Time slice interrupted thread */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    interrupt vector                                                    */
+/**************************************************************************/
 /* VOID   _tx_timer_interrupt(VOID)
 {  */
     PUBLIC      _tx_timer_interrupt
@@ -230,4 +224,3 @@ _tx_timer_nothing_expired:
 
 /* }  */
     END
-    

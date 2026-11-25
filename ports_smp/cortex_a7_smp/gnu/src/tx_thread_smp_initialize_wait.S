@@ -1,18 +1,18 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
 @
 @/**************************************************************************/
 @/**************************************************************************/
-@/**                                                                       */ 
-@/** ThreadX Component                                                     */ 
+@/**                                                                       */
+@/** ThreadX Component                                                     */
 @/**                                                                       */
 @/**   Thread - Low Level SMP Support                                      */
 @/**                                                                       */
@@ -38,43 +38,37 @@
     .arm
     .text
     .align 2
-@/**************************************************************************/ 
-@/*                                                                        */ 
-@/*  FUNCTION                                               RELEASE        */ 
-@/*                                                                        */ 
-@/*    _tx_thread_smp_initialize_wait                  SMP/Cortex-A7/GNU   */ 
+@/**************************************************************************/
+@/*                                                                        */
+@/*  FUNCTION                                               RELEASE        */
+@/*                                                                        */
+@/*    _tx_thread_smp_initialize_wait                  SMP/Cortex-A7/GNU   */
 @/*                                                            6.1         */
 @/*  AUTHOR                                                                */
 @/*                                                                        */
 @/*    William E. Lamie, Microsoft Corporation                             */
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
-@/*                                                                        */ 
-@/*    This function is the place where additional cores wait until        */ 
-@/*    initialization is complete before they enter the thread scheduling  */ 
-@/*    loop.                                                               */ 
-@/*                                                                        */ 
-@/*  INPUT                                                                 */ 
-@/*                                                                        */ 
-@/*    None                                                                */ 
-@/*                                                                        */ 
-@/*  OUTPUT                                                                */ 
-@/*                                                                        */ 
-@/*    None                                                                */
-@/*                                                                        */ 
-@/*  CALLS                                                                 */ 
-@/*                                                                        */ 
-@/*    _tx_thread_schedule                   Thread scheduling loop        */
-@/*                                                                        */ 
-@/*  CALLED BY                                                             */ 
-@/*                                                                        */ 
-@/*    Hardware                                                            */ 
-@/*                                                                        */ 
-@/*  RELEASE HISTORY                                                       */ 
-@/*                                                                        */ 
-@/*    DATE              NAME                      DESCRIPTION             */
 @/*                                                                        */
-@/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
+@/*    This function is the place where additional cores wait until        */
+@/*    initialization is complete before they enter the thread scheduling  */
+@/*    loop.                                                               */
+@/*                                                                        */
+@/*  INPUT                                                                 */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  OUTPUT                                                                */
+@/*                                                                        */
+@/*    None                                                                */
+@/*                                                                        */
+@/*  CALLS                                                                 */
+@/*                                                                        */
+@/*    _tx_thread_schedule                   Thread scheduling loop        */
+@/*                                                                        */
+@/*  CALLED BY                                                             */
+@/*                                                                        */
+@/*    Hardware                                                            */
 @/*                                                                        */
 @/**************************************************************************/
     .global _tx_thread_smp_initialize_wait
@@ -95,7 +89,7 @@ _tx_thread_smp_initialize_wait:
     AND     r10, r10, #0x03                     @ Mask off, leaving the CPU ID field
     LSL     r10, r10, #2                        @ Build offset to array indexes
 @
-@    /* Make sure the system state for this core is TX_INITIALIZE_IN_PROGRESS before we check the release 
+@    /* Make sure the system state for this core is TX_INITIALIZE_IN_PROGRESS before we check the release
 @       flag.  */
 @
     LDR     r3, =_tx_thread_system_state        @ Build address of system state variable
@@ -113,10 +107,10 @@ wait_for_initialize:
 wait_for_release:
     LDR     r3, [r2]                            @ Pickup the flag
     CMP     r3, #0                              @ Is it set?
-    BEQ     wait_for_release                    @ Wait for the flag to be set 
+    BEQ     wait_for_release                    @ Wait for the flag to be set
 @
 @    /* Core 0 has released this core.  */
-@    
+@
 @    /* Clear this core's system state variable.  */
 @
     LDR     r3, =_tx_thread_system_state        @ Build address of system state variable
@@ -126,7 +120,7 @@ wait_for_release:
 @
 @    /* Now wait for core 0 to finish it's initialization.  */
 @
-    LDR     r3, =_tx_thread_system_state        @ Build address of system state variable of logical 0 
+    LDR     r3, =_tx_thread_system_state        @ Build address of system state variable of logical 0
 
 core_0_wait_loop:
     LDR     r2, [r3]                            @ Pickup system state for core 0

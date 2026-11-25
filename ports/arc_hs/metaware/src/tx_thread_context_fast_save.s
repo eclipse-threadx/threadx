@@ -1,18 +1,18 @@
 ;/***************************************************************************
-; * Copyright (c) 2024 Microsoft Corporation 
-; * 
+; * Copyright (c) 2024 Microsoft Corporation
+; *
 ; * This program and the accompanying materials are made available under the
 ; * terms of the MIT License which is available at
 ; * https://opensource.org/licenses/MIT.
-; * 
+; *
 ; * SPDX-License-Identifier: MIT
 ; **************************************************************************/
 ;
 ;
 ;/**************************************************************************/
 ;/**************************************************************************/
-;/**                                                                       */ 
-;/** ThreadX Component                                                     */ 
+;/**                                                                       */
+;/** ThreadX Component                                                     */
 ;/**                                                                       */
 ;/**   Thread                                                              */
 ;/**                                                                       */
@@ -22,10 +22,10 @@
 #include "tx_user.h"
 #endif
 
-;/**************************************************************************/ 
-;/*                                                                        */ 
-;/*  FUNCTION                                               RELEASE        */ 
-;/*                                                                        */ 
+;/**************************************************************************/
+;/*                                                                        */
+;/*  FUNCTION                                               RELEASE        */
+;/*                                                                        */
 ;/*    _tx_thread_context_fast_save                      ARC_HS/MetaWare   */
 ;/*                                                           6.2.1        */
 ;/*  AUTHOR                                                                */
@@ -33,46 +33,37 @@
 ;/*    William E. Lamie, Microsoft Corporation                             */
 ;/*                                                                        */
 ;/*  DESCRIPTION                                                           */
-;/*                                                                        */ 
-;/*    This function saves the context of an executing thread in the       */ 
-;/*    beginning of fast interrupt processing. The function assumes that   */ 
-;/*    fast interrupts are enabled (priority 0) and multiple register      */ 
-;/*    banks are available. In this case, register bank 1 is reserved by   */ 
-;/*    hardware for fast interrupts. Additional assumptions include that   */ 
-;/*    there will be no nested fast interrupts and the LP_START, LP_END,   */ 
-;/*    and LP_COUNT registers are not used in the application's fast       */ 
-;/*    interrupt ISR.                                                      */ 
-;/*                                                                        */ 
-;/*  INPUT                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  OUTPUT                                                                */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLS                                                                 */ 
-;/*                                                                        */ 
-;/*    None                                                                */ 
-;/*                                                                        */ 
-;/*  CALLED BY                                                             */ 
-;/*                                                                        */ 
-;/*    ISRs                                                                */ 
-;/*                                                                        */ 
-;/*  RELEASE HISTORY                                                       */ 
-;/*                                                                        */ 
-;/*    DATE              NAME                      DESCRIPTION             */
 ;/*                                                                        */
-;/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-;/*  03-08-2023     Cindy Deng               Modified comment(s), added    */
-;/*                                            #include tx_user.h,         */
-;/*                                            resulting in version 6.2.1  */
+;/*    This function saves the context of an executing thread in the       */
+;/*    beginning of fast interrupt processing. The function assumes that   */
+;/*    fast interrupts are enabled (priority 0) and multiple register      */
+;/*    banks are available. In this case, register bank 1 is reserved by   */
+;/*    hardware for fast interrupts. Additional assumptions include that   */
+;/*    there will be no nested fast interrupts and the LP_START, LP_END,   */
+;/*    and LP_COUNT registers are not used in the application's fast       */
+;/*    interrupt ISR.                                                      */
+;/*                                                                        */
+;/*  INPUT                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  OUTPUT                                                                */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLS                                                                 */
+;/*                                                                        */
+;/*    None                                                                */
+;/*                                                                        */
+;/*  CALLED BY                                                             */
+;/*                                                                        */
+;/*    ISRs                                                                */
 ;/*                                                                        */
 ;/**************************************************************************/
 ;VOID   _tx_thread_context_fast_save(VOID)
 ;{
     .global _tx_thread_context_fast_save
-    .type   _tx_thread_context_fast_save, @function 
+    .type   _tx_thread_context_fast_save, @function
 _tx_thread_context_fast_save:
 ;
 ;    /* Increment nested interrupt count.  */

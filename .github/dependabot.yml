@@ -1,0 +1,91 @@
+version: 2
+
+# Keeps the pinned action SHAs moving.
+#
+# Every action reference under .github/workflows is a 40-character commit SHA
+# with the version in a trailing comment. A SHA pin *without* this file is worse
+# than a floating tag: it freezes CI on whatever was current the day it was
+# written, which is how actions/cache@v1 came to sit in ci_cortex_m.yml until
+# GitHub started auto-failing every request that used it. Measured on
+# 2026-08-24, before the catch-up: download-artifact was four majors behind,
+# checkout and upload-artifact three each, cache and upload-pages-artifact two.
+# Nothing had ever reported that, because there was no configuration here -- nor
+# in netxduo, filex, guix or rtos-docs-asciidoc, so this file sets the pattern
+# rather than following one.
+#
+# Dependabot understands the SHA form and rewrites the trailing version comment
+# together with the pin, so the comment cannot drift away from the SHA it
+# describes. That is what keeps "which exact code ran in our CI" answerable from
+# the repository, which the SBOM and certification work needs on its own.
+#
+# Two things this does not fix. It reports drift, not silence: a workflow that
+# never triggers rots unnoticed no matter what is pinned in it, and the trigger
+# fixes in ci_cortex_m.yml and regression_test.yml are the cure for that. And it
+# does nothing at all until this file reaches the default branch -- see the note
+# on target-branch below.
+#
+# There is no entry for any other ecosystem, and that is a decision rather than
+# an oversight: the project forbids external dependencies, there are no
+# submodules, and the one pinned tool -- gcovr in scripts/install.sh -- lives in
+# a shell script that no Dependabot ecosystem can parse. That pin moves by hand.
+updates:
+  - package-ecosystem: "github-actions"
+    # "/" is the only accepted value for this ecosystem; it covers
+    # .github/workflows and .github/actions. The five reusable-workflow
+    # references in regression_test.yml are local paths
+    # (./.github/workflows/regression_template.yml) and are correctly left
+    # alone -- they carry no version to move.
+    directory: "/"
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Etc/UTC"
+
+    # Dependabot reads this file from the repository's DEFAULT branch, which is
+    # master. But master is deliberately kept behind dev, and pull requests
+    # belong on dev, where the regression suites gate them. target-branch sends
+    # the pull requests to dev and makes Dependabot read the workflows it is
+    # updating from dev as well.
+    #
+    # The consequence to plan for: landing this file on dev arms it, it does not
+    # fire it. Nothing happens until a release merge carries it to master.
+    #
+    # Setting target-branch also opts out of Dependabot *security* updates,
+    # which only ever run against the default branch. For this ecosystem the
+    # cost is small -- an action advisory arrives as an ordinary version bump on
+    # the weekly run -- but it is a real trade and not a detail to rediscover
+    # later.
+    target-branch: "dev"
+
+    groups:
+      # Patch and minor arrive together in one pull request: they are the
+      # routine traffic, and reviewing them one at a time is how an update queue
+      # starts being ignored, which is the failure mode this file exists to
+      # prevent. Majors stay ungrouped, one pull request each, because every
+      # breaking change this repository has met in an action set has been a
+      # major -- download-artifact v8 defaulting digest-mismatch to error, and
+      # upload-artifact v6 requiring runner 2.327.1 or newer, are both from the
+      # last catch-up.
+      actions-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+    # Nine distinct third-party and first-party actions are in use. Dependabot's
+    # default limit of five would hold majors back with nothing saying that it
+    # had; ten leaves room for a wave without becoming a silent cap.
+    open-pull-requests-limit: 10
+
+    labels:
+      - "dependencies"
+
+    # Reviewers are not listed here. .github/CODEOWNERS already routes every
+    # path to @eclipse-threadx/admins and Dependabot honours it.
+    #
+    # Commit subjects are left at Dependabot's own "Bump x from a to b" wording.
+    # The project asks for a past-tense subject and still gets one: these pull
+    # requests are squash-merged, and the subject is set at that point.

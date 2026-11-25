@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -33,8 +34,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** ThreadX Component                                                     */ 
+/**                                                                       */
+/** ThreadX Component                                                     */
 /**                                                                       */
 /**   Timer                                                               */
 /**                                                                       */
@@ -49,26 +50,17 @@
 
     .text
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This function processes the hardware timer interrupt.  This         */ 
-/*    processing includes incrementing the system clock and checking for  */ 
-/*    time slice and/or timer expiration.  If either is found, the        */ 
-/*    interrupt context save/restore functions are called along with the  */ 
-/*    expiration functions.                                               */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  12-31-2020      Cadence Design Systems  Initial Version 6.1.3         */
-/*  04-25-2022      Scott Larson            Modified comments and updated */
-/*                                            function name,              */
-/*                                            resulting in version 6.1.11 */
-/*                                                                        */ 
-/**************************************************************************/ 
+/**************************************************************************/
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function processes the hardware timer interrupt.  This         */
+/*    processing includes incrementing the system clock and checking for  */
+/*    time slice and/or timer expiration.  If either is found, the        */
+/*    interrupt context save/restore functions are called along with the  */
+/*    expiration functions.                                               */
+/*                                                                        */
+/**************************************************************************/
 
 //  VOID   _tx_timer_interrupt(VOID)
 //  {
@@ -99,13 +91,13 @@ _tx_timer_interrupt:
 
     /*
     Xtensa timers work by comparing a cycle counter with a preset value.
-    Once the match occurs an interrupt is generated, and the handler has 
+    Once the match occurs an interrupt is generated, and the handler has
     to set a new cycle count into the comparator. To avoid clock drift
     due to interrupt latency, the new cycle count is computed from the old,
-    not the time the interrupt was serviced. However if a timer interrupt 
+    not the time the interrupt was serviced. However if a timer interrupt
     is ever serviced more than one tick late, it is necessary to process
-    multiple ticks until the new cycle count is in the future, otherwise 
-    the next timer interrupt would not occur until after the cycle counter 
+    multiple ticks until the new cycle count is in the future, otherwise
+    the next timer interrupt would not occur until after the cycle counter
     had wrapped (2^32 cycles later).
 
     do {

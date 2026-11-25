@@ -55,7 +55,7 @@ extern TX_THREAD *_tx_thread_current_ptr;
 
   If you customize the System Library, you should remove ind_thrd.c
   from the libsys.gpj subproject.
-  
+
  */
 
 /* Provide global __eh_globals value to support C++ exception handling

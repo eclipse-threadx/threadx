@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -66,13 +67,6 @@ IRQ_MODE_BITS   EQU     0x12                    // IRQ mode bits
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ISRs                                                                */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2022      Scott Larson            Initial Version 6.2.0         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_irq_nesting_end(VOID)
 // {

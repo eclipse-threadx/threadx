@@ -1,10 +1,10 @@
 @/***************************************************************************
-@ * Copyright (c) 2024 Microsoft Corporation 
-@ * 
+@ * Copyright (c) 2024 Microsoft Corporation
+@ *
 @ * This program and the accompanying materials are made available under the
 @ * terms of the MIT License which is available at
 @ * https://opensource.org/licenses/MIT.
-@ * 
+@ *
 @ * SPDX-License-Identifier: MIT
 @ **************************************************************************/
 @
@@ -31,7 +31,7 @@
     .global  _tx_thread_schedule
     .global  _tx_thread_preempt_disable
     .global _tx_execution_isr_exit
-#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))                                        
+#if (defined(TX_ENABLE_EXECUTION_CHANGE_NOTIFY) || defined(TX_EXECUTION_PROFILE_ENABLE))
     .global  _tx_execution_isr_exit
 #endif
 @
@@ -74,17 +74,6 @@
 @/*                                                                        */
 @/*    ISRs                                  Interrupt Service Routines    */
 @/*                                                                        */
-@/*  RELEASE HISTORY                                                       */
-@/*                                                                        */
-@/*    DATE              NAME                      DESCRIPTION             */
-@/*                                                                        */
-@/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
-@/*  09-30-2020     Scott Larson             Modified comment(s), and      */
-@/*                                            cleaned up whitespace,      */
-@/*                                            resulting in version 6.1    */
-@/*  03-08-2023      Scott Larson            Include tx_user.h,            */
-@/*                                            resulting in version 6.2.1  */
-@/*                                                                        */
 @/**************************************************************************/
 @VOID   _tx_thread_context_restore(VOID)
 @{
@@ -96,7 +85,14 @@ _tx_thread_context_restore:
     /* Call the ISR exit function to indicate an ISR is complete.  */
     PUSH    {r0, lr}                                // Save return address
     BL      _tx_execution_isr_exit                  // Call the ISR exit function
-    POP     {r0, lr}                                // Recover return address
+    POP     {r0, r1}                                // Recover r0 and the return address
+    MOV     lr, r1                                  // This core cannot POP into LR: the
+                                                    //   16-bit Thumb POP takes r0-r7 and
+                                                    //   pc only.  MOV to a high register
+                                                    //   is permitted, so restore LR from
+                                                    //   a scratch register.  r1 is free --
+                                                    //   the BL above may clobber r0-r3,
+                                                    //   which is why r0 is saved at all.
 #endif
     BX      lr
 @}

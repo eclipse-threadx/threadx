@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -54,12 +55,6 @@
 /*                                                                        */
 /*    ISRs                                                                */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  12-31-2020     Andres Mlinar            Initial Version 6.1.3         */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_context_save(VOID)
 // {
@@ -68,7 +63,7 @@
 _tx_thread_context_save:
 
     /* Upon entry to this routine, it is assumed that IRQ/FIQ interrupts are locked
-       out, x29 (frame pointer), x30 (link register) are saved, we are in EL1, 
+       out, x29 (frame pointer), x30 (link register) are saved, we are in EL1,
        and all other registers are intact.  */
 
     /* Check for a nested interrupt condition.  */
@@ -137,7 +132,7 @@ __tx_thread_not_nested_save:
     LDR     x1, =_tx_thread_current_ptr         // Pickup address of current thread ptr
     LDR     x0, [x1, #0]                        // Pickup current thread pointer
     CMP     x0, #0                              // Is it NULL?
-    BEQ     __tx_thread_idle_system_save        // If so, interrupt occurred in 
+    BEQ     __tx_thread_idle_system_save        // If so, interrupt occurred in
                                                 //   scheduling loop - nothing needs saving!
 
     /* Save minimal context of interrupted thread.  */
@@ -196,7 +191,7 @@ __tx_thread_idle_system_save:
 
     /* Interrupt occurred in the scheduling loop.  */
 
-    /* Not much to do here, just adjust the stack pointer, and return to IRQ 
+    /* Not much to do here, just adjust the stack pointer, and return to IRQ
        processing.  */
 
 #ifdef TX_ENABLE_EXECUTION_CHANGE_NOTIFY
@@ -209,8 +204,8 @@ __tx_thread_idle_system_save:
 #endif
 
     ADD     sp, sp, #48                         // Recover saved registers
-    RET                                         // Continue IRQ processing  
+    RET                                         // Continue IRQ processing
 
     // }
-// } 
+// }
 

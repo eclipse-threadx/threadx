@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 // ----------------------------------------------------------
 // GIC400 - Generic Interrupt Controller
 //
@@ -102,7 +113,7 @@ void enableIntID(unsigned int ID)
 void disableIntID(unsigned int ID)
 {
   unsigned int bank;
-  
+
   bank = ID/32;        // There are 32 IDs per register, need to work out which register to access
   ID   = ID & 0x1f;    // ... and which bit within the register
 
@@ -136,7 +147,7 @@ unsigned int getIntPriority(unsigned int ID)
     return 0;
 
   return gic_dist->GICD_IPRIORITYR[ID];
-} 
+}
 
 // ------------------------------------------------------------
 

@@ -64,7 +64,7 @@ stop_private_timer:
 get_private_timer_count:
 
   BX      lr
-  
+
 // ------------------------------------------------------------
 
   // void clear_private_timer_irq(void)

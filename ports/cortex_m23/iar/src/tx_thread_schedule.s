@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -69,19 +70,6 @@
 /*                                                                        */
 /*    _tx_initialize_kernel_enter          ThreadX entry function         */
 /*    _tx_thread_system_return             Return to system from thread   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020      Scott Larson            Initial Version 6.1           */
-/*  04-02-2021      Scott Larson            Modified comment(s), added    */
-/*                                            low power code,             */
-/*                                            resulting in version 6.1.6  */
-/*  06-02-2021      Scott Larson            Added secure stack initialize */
-/*                                            in SVC handler,             */
-/*                                            resulting in version 6.1.7  */
-/*                                                                        */
 /**************************************************************************/
 // VOID   _tx_thread_schedule(VOID)
 // {
@@ -314,7 +302,7 @@ _tx_get_svc:
 
     CMP     r1, #2                                  // Is it a secure stack free request?
     BEQ     _tx_svc_secure_free                     // Yes, go there
-    
+
     CMP     r1, #3                                  // Is it a secure stack init request?
     BEQ     _tx_svc_secure_init                     // Yes, go there
 

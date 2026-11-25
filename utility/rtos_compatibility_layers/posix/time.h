@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -34,13 +35,6 @@
 /*    implement time related functionality for the Evacuation Kit         */
 /*    for POSIX Users (POSIX)                                             */
 /*                                                                        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  06-02-2021     William E. Lamie         Initial Version 6.1.7         */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef _TX_PX_TIME_H
@@ -53,7 +47,7 @@ typedef  ULONG  time_t;
 
 typedef INT clockid_t;
 
-struct timespec 
+struct timespec
 {
     time_t    tv_sec;                /* time in terms of seconds */
     ULONG     tv_nsec;               /* remaining time in terms of nano seconds*/
@@ -62,7 +56,7 @@ struct timespec
 struct itimerspec
 {
     struct timespec  it_interval ;         /* Timer period. */
-    struct timespec  it_value;             /* Timer expiration. */ 
+    struct timespec  it_value;             /* Timer expiration. */
 };
 
 #define CLOCK_REALTIME  1

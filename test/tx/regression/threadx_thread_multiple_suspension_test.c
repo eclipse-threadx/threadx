@@ -1,5 +1,16 @@
-/* This test is designed to see if multiple threads can be created and suspend.  
-   The order the suspension and resumption occurs makes sure everything is working 
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
+/* This test is designed to see if multiple threads can be created and suspend.
+   The order the suspension and resumption occurs makes sure everything is working
    right. All the counters should increment at the same rate.  */
 
 #include   <stdio.h>
@@ -59,8 +70,8 @@ CHAR    *pointer;
        create information.  */
 
     /* Create thread 0.  */
-    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_0, "thread 0", thread_0_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             13, 13, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -73,8 +84,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 1.  */
-    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_1, "thread 1", thread_1_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             (TX_MAX_PRIORITIES/2), (TX_MAX_PRIORITIES/2), TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -87,8 +98,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 2.  */
-    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_2, "thread 2", thread_2_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             (TX_MAX_PRIORITIES/2), (TX_MAX_PRIORITIES/2), TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -101,8 +112,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 3.  */
-    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_3, "thread 3", thread_3_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             (TX_MAX_PRIORITIES/2), (TX_MAX_PRIORITIES/2), TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -115,8 +126,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 4.  */
-    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_4, "thread 4", thread_4_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             15, 15, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -129,8 +140,8 @@ CHAR    *pointer;
     }
 
     /* Create thread 5.  Make this thread non-preemptable for the range of priorities here...  */
-    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 1,  
-            pointer, TEST_STACK_SIZE_PRINTF, 
+    status =  tx_thread_create(&thread_5, "thread 5", thread_5_entry, 1,
+            pointer, TEST_STACK_SIZE_PRINTF,
             (TX_MAX_PRIORITIES-1), 13, TX_NO_TIME_SLICE, TX_AUTO_START);
     pointer =  pointer + TEST_STACK_SIZE_PRINTF;
 
@@ -160,7 +171,7 @@ static void    thread_0_entry(ULONG thread_input)
 
         /* Suspend this thread... */
         tx_thread_suspend(&thread_0);
-    
+
         /* Resume thread 5...  */
         tx_thread_resume(&thread_5);
     }
@@ -252,7 +263,7 @@ UINT    status;
     }
 
     /* Make sure that each thread has run once.  */
-    if ((thread_0_counter != 1) || (thread_1_counter != 1) || 
+    if ((thread_0_counter != 1) || (thread_1_counter != 1) ||
         (thread_2_counter != 1) || (thread_3_counter != 1) ||
         (thread_4_counter != 1))
     {
@@ -277,7 +288,7 @@ UINT    status;
     }
 
     /* Make sure that each thread has run once.  */
-    if ((thread_0_counter != 1) || (thread_1_counter != 1) || 
+    if ((thread_0_counter != 1) || (thread_1_counter != 1) ||
         (thread_2_counter != 1) || (thread_3_counter != 1) ||
         (thread_4_counter != 1))
     {
@@ -301,7 +312,7 @@ UINT    status;
     }
 
     /* Make sure that each thread has run once.  */
-    if ((thread_0_counter != 1) || (thread_1_counter != 1) || 
+    if ((thread_0_counter != 1) || (thread_1_counter != 1) ||
         (thread_2_counter != 1) || (thread_3_counter != 1) ||
         (thread_4_counter != 1))
     {
@@ -325,7 +336,7 @@ UINT    status;
     }
 
     /* Make sure that each thread has run once.  */
-    if ((thread_0_counter != 1) || (thread_1_counter != 1) || 
+    if ((thread_0_counter != 1) || (thread_1_counter != 1) ||
         (thread_2_counter != 1) || (thread_3_counter != 1) ||
         (thread_4_counter != 1))
     {
@@ -349,7 +360,7 @@ UINT    status;
     }
 
     /* Make sure that each thread has run once.  */
-    if ((thread_0_counter != 1) || (thread_1_counter != 1) || 
+    if ((thread_0_counter != 1) || (thread_1_counter != 1) ||
         (thread_2_counter != 1) || (thread_3_counter != 1) ||
         (thread_4_counter != 1))
     {
@@ -373,7 +384,7 @@ UINT    status;
     }
 
     /* Make sure that each thread has run once.  */
-    if ((thread_0_counter != 1) || (thread_1_counter != 1) || 
+    if ((thread_0_counter != 1) || (thread_1_counter != 1) ||
         (thread_2_counter != 1) || (thread_3_counter != 1) ||
         (thread_4_counter != 1))
     {
@@ -398,7 +409,7 @@ UINT    status;
     }
 
     /* Make sure that each thread has run twice.  */
-    if ((thread_0_counter != 2) || (thread_1_counter != 2) || 
+    if ((thread_0_counter != 2) || (thread_1_counter != 2) ||
         (thread_2_counter != 2) || (thread_3_counter != 2) ||
         (thread_4_counter != 2))
     {
@@ -410,7 +421,7 @@ UINT    status;
 
     /* Suspend a thread that is already suspended.  */
     status = tx_thread_suspend(&thread_4);
-    
+
     /* Check for error condition.  */
     if (status != TX_SUCCESS)
     {
@@ -420,7 +431,7 @@ UINT    status;
     }
     else
     {
-    
+
         /* Increment thread 5 counter.  */
         thread_5_counter++;
 

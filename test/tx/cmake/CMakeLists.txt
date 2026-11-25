@@ -1,12 +1,33 @@
+##############################################################################
+# Copyright (c) 2026 Eclipse ThreadX contributors
+#
+# This program and the accompanying materials are made available under the
+# terms of the MIT License which is available at
+# https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: MIT
+##############################################################################
+
+# Portions of this file were generated with AI assistance.
+
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 cmake_policy(SET CMP0054 NEW)
 cmake_policy(SET CMP0057 NEW)
 
+if((DEFINED THREADX_ARCH) AND ((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64")))
+  set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+endif()
+
 project(threadx_test LANGUAGES C)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
 # Set build configurations
 set(BUILD_CONFIGURATIONS default_build_coverage disable_notify_callbacks_build
-                         stack_checking_build stack_checking_rand_fill_build trace_build)
+                         stack_checking_build stack_checking_rand_fill_build trace_build
+                         misra_build misra_trace_build)
 set(CMAKE_CONFIGURATION_TYPES
     ${BUILD_CONFIGURATIONS}
     CACHE STRING "list of supported configuration types" FORCE)
@@ -22,24 +43,51 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}.")
-set(default_build_coverage -DTX_QUEUE_MESSAGE_MAX_SIZE=32)
-set(disable_notify_callbacks_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_DISABLE_NOTIFY_CALLBACKS)
-set(stack_checking_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_ENABLE_STACK_CHECKING)
-set(stack_checking_rand_fill_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_ENABLE_STACK_CHECKING -DTX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
-set(trace_build -DTX_QUEUE_MESSAGE_MAX_SIZE=32 -DTX_ENABLE_EVENT_TRACE)
+set(default_build_coverage TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_MUTEX_INHERIT_CHAIN_MAX=2)
+set(disable_notify_callbacks_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_DISABLE_NOTIFY_CALLBACKS)
+set(stack_checking_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING)
+set(stack_checking_rand_fill_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING TX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
+set(trace_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_EVENT_TRACE)
 
-add_compile_options(
-  -m32
-  -std=c99
-  -ggdb
-  -g3
-  -gdwarf-2
-  -fdiagnostics-color
-  -Werror
-  -DTX_REGRESSION_TEST
-  -DTEST_STACK_SIZE_PRINTF=4096
+# TX_MISRA_ENABLE routes the kernel's pointer conversions, its memset and its
+# stack check through the shim in common/src/tx_misra.c, which every
+# configuration above compiles out entirely. It is also the source the MISRA
+# analysis runs against, so without this the build that is analysed and the build
+# that is tested are different builds of the same tree.
+#
+# The second adds event tracing, because the shim has a region behind
+# TX_ENABLE_EVENT_TRACE that neither macro alone reaches.
+#
+# Both defects found here were invisible for the same reason: #741 broke under
+# TX_MISRA_ENABLE and #745 under both macros together, and neither combination
+# was built anywhere.
+set(misra_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_MISRA_ENABLE)
+set(misra_trace_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_MISRA_ENABLE TX_ENABLE_EVENT_TRACE)
+
+add_compile_definitions(
+  TX_REGRESSION_TEST
+  TEST_STACK_SIZE_PRINTF=4096
   ${${CMAKE_BUILD_TYPE}})
-add_link_options(-m32)
+
+# The Windows simulators keep simulated time on the host clock by default. The
+# suite runs them at five ticks per millisecond so long timeouts finish quickly.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+  add_compile_definitions(TX_TIMER_PERIODIC=1 TX_WIN32_TICKS_PER_INTERRUPT=5)
+endif()
+
+if(MSVC)
+  add_compile_options(/W3 /Zi)
+  add_link_options(/DEBUG /INCREMENTAL:NO)
+else()
+  add_compile_options(
+    -m32
+    -ggdb
+    -g3
+    -gdwarf-2
+    -fdiagnostics-color
+    -Werror)
+  add_link_options(-m32)
+endif()
 
 enable_testing()
 
@@ -47,28 +95,88 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../.. threadx)
 add_subdirectory(regression)
 add_subdirectory(samples)
 
-# Coverage
-if(CMAKE_BUILD_TYPE MATCHES ".*_coverage")
-  target_compile_options(threadx PRIVATE -fprofile-arcs -ftest-coverage)
-  target_link_options(threadx PRIVATE -fprofile-arcs -ftest-coverage)
+# The two configurations this change has to reach, TX_NOT_INTERRUPTABLE and
+# TX_DISABLE_ERROR_CHECKING, are not among the five above and cannot be reached
+# from the regression suite, which links one library per configuration. This
+# directory compiles the sources concerned directly. It is listed last rather than
+# beside regression on purpose: every branch in the current fix set adds an
+# add_subdirectory line immediately after regression, and putting a second one
+# there turns a set of clean merges into a set of one-line conflicts.
+# These two compile a hand-picked set of common/src sources directly instead of
+# linking the threadx library, which is what lets them reach feature macros the
+# library-per-configuration model cannot. That does not survive TX_MISRA_ENABLE:
+# the kernel's TX_MEMSET and its conversions become calls into tx_misra.c, and
+# pulling the shim into these targets pulls its own callees after it. Neither
+# exists to test the shim, and the regression suite covers it, so the MISRA
+# configurations skip them.
+if(NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
+  add_subdirectory(thread_transition)
 endif()
 
-target_compile_options(
-  threadx
-  PRIVATE -Werror
-          -Wall
-          -Wextra
-          -pedantic
-          -fmessage-length=0
-          -fsigned-char
-          -ffunction-sections
-          -fdata-sections
-          -Wunused
-          -Wuninitialized
-          -Wmissing-declarations
-          -Wconversion
-          -Wpointer-arith
-          # -Wshadow
-          -Wlogical-op
-          -Waggregate-return
-          -Wfloat-equal)
+# Host tests for the Module Manager. Listed after thread_transition for the reason
+# given above it: additions here are appended rather than inserted, so that branches
+# adding a directory of their own merge cleanly. They compile the module ports'
+# headers, which accept only IAR, AC5 and GNU-compatible compilers, so MSVC builds
+# skip them.
+if(NOT MSVC AND NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
+  add_subdirectory(module_manager)
+endif()
+
+# Coverage
+#
+# The gate here used to be the build type alone, and only one of the five
+# configurations -- default_build_coverage -- has a name matching "*_coverage".
+# So four configurations built and ran every test and their coverage was thrown
+# away. That is not redundancy discarded: each configuration selects a different
+# set of TX_ feature macros, so the code the other four compile is *absent from
+# the denominator* rather than reported as uncovered. A figure taken from one of
+# them is the executable-line count of one configuration, not of the kernel.
+#
+# TX_COVERAGE instruments a build regardless of its name. It defaults to OFF and
+# the build-type match is kept, so configuring a single configuration by hand
+# behaves exactly as it did before; the regression run turns it on for all five
+# and merges the results.
+option(TX_COVERAGE "Instrument this build for coverage regardless of build type" OFF)
+if(TX_COVERAGE OR CMAKE_BUILD_TYPE MATCHES ".*_coverage")
+  if(NOT MSVC)
+    target_compile_options(threadx PRIVATE -fprofile-arcs -ftest-coverage)
+    target_link_options(threadx PRIVATE -fprofile-arcs -ftest-coverage)
+  endif()
+endif()
+
+if(MSVC)
+  target_compile_options(threadx PRIVATE /W3)
+else()
+  target_compile_options(
+    threadx
+    PRIVATE -Werror
+            -Wall
+            -Wextra
+            -pedantic
+            -fmessage-length=0
+            -fsigned-char
+            -ffunction-sections
+            -fdata-sections
+            -Wunused
+            -Wuninitialized
+            -Wmissing-declarations
+            -Wconversion
+            -Wpointer-arith
+            # -Wshadow
+            -Wlogical-op
+            -Waggregate-return
+            -Wfloat-equal)
+endif()
+
+# Preserve native32 host coverage and also exercise the Linux pointer-width
+# mismatch with a native64 kernel, including MISRA plus stack checking.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND THREADX_ARCH STREQUAL "linux" AND
+   THREADX_TOOLCHAIN STREQUAL "gnu" AND
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+  add_subdirectory(thread_stack_alignment)
+endif()
+
+# Port-level tests for the Windows simulators.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+  add_subdirectory(windows_port)
+endif()

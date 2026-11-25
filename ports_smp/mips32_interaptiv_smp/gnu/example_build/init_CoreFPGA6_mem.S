@@ -64,6 +64,6 @@ LEAF(init_CoreFPGA6_mem)
 */
         jr ra
         nop
-	
+
 END(init_CoreFPGA6_mem)
 

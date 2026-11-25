@@ -1,12 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -41,18 +44,6 @@
 /*    directly use native C data types.  Instead, ThreadX creates its     */
 /*    own special types that can be mapped to actual data types by this   */
 /*    file to guarantee consistency in the interface and functionality.   */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     William E. Lamie         Initial Version 6.1           */
-/*  04-02-2021     Bhupendra Naphade        Modified comment(s),updated   */
-/*                                            macro definition,           */
-/*                                            resulting in version 6.1.6  */
-/*  10-15-2021     William E. Lamie         Modified comment(s), added    */
-/*                                            symbol ULONG64_DEFINED,     */
-/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -173,7 +164,7 @@ typedef uint64_t                                ULONG64;
 #define ULONG64_DEFINED
 
 
-/* Define automated coverage test extensions...  These are required for the 
+/* Define automated coverage test extensions...  These are required for the
    ThreadX regression test.  */
 
 typedef unsigned int    TEST_FLAG;
@@ -298,7 +289,7 @@ extern UINT             priority_change_extension_selection;
                                                 else                                                            \
                                                 {                                                               \
                                                     test_stack_analyze_flag =     ((TEST_FLAG) 0);              \
-                                                }                                                               
+                                                }
 
 #define TX_INITIALIZE_KERNEL_ENTER_EXTENSION    if (test_initialize_flag == ((TEST_FLAG) 1))                    \
                                                 {                                                               \
@@ -384,13 +375,21 @@ void    _tx_linux_debug_entry_insert(char *action, char *file, unsigned long lin
 
 */
 
-#ifndef TX_MISRA_ENABLE
+/* The clock below is read for every trace event in both builds. The MISRA form
+   of the in-line insert takes the time stamp as an argument rather than reading
+   it itself, so the macro has to be an expression; that is why it carries no
+   trailing semicolon.  */
+
 #ifndef TX_TRACE_TIME_SOURCE
 #define TX_TRACE_TIME_SOURCE                    ((ULONG) (_tx_linux_time_stamp.tv_nsec))
 #endif
-#else
+
+/* Declared here rather than used: this port supplies its own time stamp above,
+   but the generic definition in common_smp/src/tx_misra.c is compiled for this
+   port and needs a declaration in scope.  */
+
+#ifdef TX_MISRA_ENABLE
 ULONG   _tx_misra_time_stamp_get(VOID);
-#define TX_TRACE_TIME_SOURCE                    _tx_misra_time_stamp_get()
 #endif
 
 #ifndef TX_TRACE_TIME_MASK
@@ -514,6 +513,16 @@ typedef struct
 } TX_LINUX_MUTEX;
 
 
+/* Define how long a thread waits on the Linux mutex before retrying. A thread
+   parked on the mutex can be suspended by the port's signal handler and so never
+   act on the wake-up the next release sends it, which leaves the wake-up lost
+   and every other waiter parked on a mutex that is free.  */
+
+#ifndef TX_LINUX_MUTEX_RETRY_NSEC
+#define TX_LINUX_MUTEX_RETRY_NSEC       1000000
+#endif
+
+
 /* Define Linux-specific critical section APIs.  */
 
 void _tx_linux_mutex_obtain(TX_LINUX_MUTEX *mutex);
@@ -633,7 +642,7 @@ void                        _tx_thread_smp_debug_entry_insert(ULONG id, ULONG su
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation.  *  ThreadX SMP/Linux/gcc Version 6.4.2 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX SMP/Linux/gcc Version 6.5.2.202603b *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
