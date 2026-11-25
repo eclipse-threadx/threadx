@@ -202,6 +202,17 @@ Instruction for building the ThreadX as static library using Arm GNU Toolchain a
     $ cmake --build ./build
     ```
 
+    To build ThreadX with module manager support, enable `THREADX_MODULE_MANAGER`:
+
+    ```bash
+    $ cmake -Bbuild-mm -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_m4.cmake -DTHREADX_MODULE_MANAGER=ON .
+
+    $ cmake --build ./build-mm
+    ```
+
+    When enabled, the `azrtos::threadx` target includes the module manager kernel sources and public include headers (`txm_module.h`) for downstream targets.
+
+
 ## Licensing
 
 License terms for using Eclipse ThreadX are defined in the LICENSE.txt file of this repo. Please refer to this file for all definitive licensing information for all content, incl. the history of this repo.
