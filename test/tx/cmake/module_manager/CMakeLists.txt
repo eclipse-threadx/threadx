@@ -393,3 +393,29 @@ target_compile_options(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_load_bounds_test
          threadx_module_manager_load_bounds_test)
+
+# Exercise Secure stack guard paths with simulated registers and CMSE results.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  set(cortex_m55_module_dir ${REPO_ROOT}/ports_module/cortex_m55/gnu)
+  set(secure_stack_source
+      ${cortex_m55_module_dir}/module_manager/src/tx_thread_secure_stack.c)
+  add_executable(threadx_module_manager_secure_stack_guard_test
+                 ${SOURCE_DIR}/threadx_module_manager_secure_stack_guard_test.c
+                 ${secure_stack_source})
+  target_include_directories(threadx_module_manager_secure_stack_guard_test
+                             PRIVATE ${SOURCE_DIR}/secure_stack
+                                     ${REPO_ROOT}/common/inc
+                                     ${cortex_m55_module_dir}/inc)
+  target_compile_definitions(threadx_module_manager_secure_stack_guard_test
+                             PRIVATE TX_DISABLE_INLINE __ARM_FEATURE_CMSE=3)
+  target_compile_options(threadx_module_manager_secure_stack_guard_test
+                         PRIVATE -Wall -Wextra -Wno-attributes -UNDEBUG)
+  if(TX_COVERAGE OR CMAKE_BUILD_TYPE MATCHES ".*_coverage")
+    set_source_files_properties(${secure_stack_source} PROPERTIES
+                                COMPILE_OPTIONS "-fprofile-arcs;-ftest-coverage")
+    target_link_options(threadx_module_manager_secure_stack_guard_test
+                        PRIVATE -fprofile-arcs -ftest-coverage)
+  endif()
+  add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_secure_stack_guard_test
+           threadx_module_manager_secure_stack_guard_test)
+endif()

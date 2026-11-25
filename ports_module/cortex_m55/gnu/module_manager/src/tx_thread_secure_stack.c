@@ -31,6 +31,7 @@
 #define TX_SOURCE_CODE
 
 #include "tx_secure_interface.h"        /* Interface for NS code. */
+#include "tx_thread_secure_stack_registers.h"
 
 /* Secure-state code built with the security extension checks the thread pointers
    it receives from the non-secure world.  */
@@ -159,7 +160,7 @@ ULONG   ipsr;
 INT     index;
 
     /* Make sure function is called from interrupt (threads should not call). */
-    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    TX_SECURE_REGISTER_READ(IPSR, ipsr);
     if (ipsr == 0)
     {
         status = TX_CALLER_ERROR;
@@ -167,14 +168,14 @@ INT     index;
     else
     {
         /* Set secure mode to use PSP. */
-        __asm__ volatile("MRS     %0, CONTROL" : "=r" (control));   /* Get CONTROL register. */
+        TX_SECURE_REGISTER_READ(CONTROL, control);
         control |= 2;                                           /* Use PSP. */
-        __asm__ volatile("MSR     CONTROL, %0" :: "r" (control));   /* Set CONTROL register. */
+        TX_SECURE_REGISTER_WRITE(CONTROL, control);
 
         /* Set process stack pointer and stack limit to 0 to throw exception when a thread
            without a secure stack calls a secure function that tries to use secure stack. */
-        __asm__ volatile("MSR     PSPLIM, %0" :: "r" (0));
-        __asm__ volatile("MSR     PSP, %0" :: "r" (0));
+        TX_SECURE_REGISTER_WRITE(PSPLIM, 0U);
+        TX_SECURE_REGISTER_WRITE(PSP, 0U);
 
         for (index = 0; index < TX_MAX_SECURE_CONTEXTS; index++)
         {
@@ -262,7 +263,7 @@ INT     secure_context_index;
     status = TX_SUCCESS;
 
     /* Make sure function is called from interrupt (threads should not call). */
-    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    TX_SECURE_REGISTER_READ(IPSR, ipsr);
     if (ipsr == 0)
     {
         status = TX_CALLER_ERROR;
@@ -325,12 +326,12 @@ INT     secure_context_index;
                 thread_ptr -> tx_thread_secure_stack_context = (VOID *)(secure_context_index + 1);
 
                 /* Check if this thread is running by looking at its stack start and PSPLIM_NS */
-                __asm__ volatile("MRS     %0, PSPLIM_NS" : "=r" (psplim_ns));   /* Get PSPLIM_NS register. */
+                TX_SECURE_REGISTER_READ(PSPLIM_NS, psplim_ns);
                 if(((ULONG) thread_ptr -> tx_thread_stack_start & 0xFFFFFFF8) == psplim_ns)
                 {
                     /* If this thread is running, set Secure PSP and PSPLIM. */
-                    __asm__ volatile("MSR     PSPLIM, %0" :: "r" ((ULONG)(info_ptr -> tx_thread_secure_stack_limit)));
-                    __asm__ volatile("MSR     PSP, %0" :: "r" ((ULONG)(info_ptr -> tx_thread_secure_stack_ptr)));
+                    TX_SECURE_REGISTER_WRITE(PSPLIM, (ULONG) info_ptr -> tx_thread_secure_stack_limit);
+                    TX_SECURE_REGISTER_WRITE(PSP, (ULONG) info_ptr -> tx_thread_secure_stack_ptr);
                 }
             }
 
@@ -416,7 +417,7 @@ INT     secure_context_index;
     status = TX_SUCCESS;
 
     /* Make sure function is called from interrupt (threads should not call). */
-    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    TX_SECURE_REGISTER_READ(IPSR, ipsr);
     if (ipsr == 0)
     {
         status = TX_CALLER_ERROR;
@@ -455,10 +456,10 @@ INT     secure_context_index;
             {
 
                 /* Clear the active secure stack registers before releasing that stack.  */
-                __asm__ volatile("MRS     %0, PSPLIM" : "=r" (psplim));
+                TX_SECURE_REGISTER_READ(PSPLIM, psplim);
                 if (psplim == (ULONG) info_ptr -> tx_thread_secure_stack_limit)
                 {
-                    __asm__ volatile("MSR     PSPLIM, %0\n\tMSR     PSP, %0" :: "r" (0UL) : "memory");
+                    TX_SECURE_STACK_CLEAR_BEFORE_FREE();
                 }
 
                 /* Free secure stack. */
@@ -536,7 +537,7 @@ ULONG   ipsr;
 INT     secure_context_index;
 
     /* This function should be called from scheduler only. */
-    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    TX_SECURE_REGISTER_READ(IPSR, ipsr);
     if (ipsr == 0)
     {
         return;
@@ -568,7 +569,7 @@ INT     secure_context_index;
     }
 
     /* Check that stack pointer is in range */
-    __asm__ volatile("MRS     %0, PSP" : "=r" (sp));   /* Get PSP register. */
+    TX_SECURE_REGISTER_READ(PSP, sp);
     if ((sp < (ULONG)info_ptr -> tx_thread_secure_stack_limit) ||
         (sp > (ULONG)info_ptr -> tx_thread_secure_stack_start))
     {
@@ -580,8 +581,8 @@ INT     secure_context_index;
 
     /* Set process stack pointer and stack limit to 0 to throw exception when a thread
        without a secure stack calls a secure function that tries to use secure stack. */
-    __asm__ volatile("MSR     PSPLIM, %0" :: "r" (0));
-    __asm__ volatile("MSR     PSP, %0" :: "r" (0));
+    TX_SECURE_REGISTER_WRITE(PSPLIM, 0U);
+    TX_SECURE_REGISTER_WRITE(PSP, 0U);
 
     return;
 }
@@ -638,7 +639,7 @@ ULONG   ipsr;
 INT     secure_context_index;
 
     /* This function should be called from scheduler only. */
-    __asm__ volatile("MRS     %0, IPSR" : "=r" (ipsr));   /* Get IPSR register. */
+    TX_SECURE_REGISTER_READ(IPSR, ipsr);
     if (ipsr == 0)
     {
         return;
@@ -670,8 +671,8 @@ INT     secure_context_index;
     }
 
     /* Set stack pointer and limit. */
-    __asm__ volatile("MSR     PSPLIM, %0" :: "r" ((ULONG)info_ptr -> tx_thread_secure_stack_limit));
-    __asm__ volatile("MSR     PSP, %0" :: "r" ((ULONG)info_ptr -> tx_thread_secure_stack_ptr));
+    TX_SECURE_REGISTER_WRITE(PSPLIM, (ULONG) info_ptr -> tx_thread_secure_stack_limit);
+    TX_SECURE_REGISTER_WRITE(PSP, (ULONG) info_ptr -> tx_thread_secure_stack_ptr);
 
     return;
 }
