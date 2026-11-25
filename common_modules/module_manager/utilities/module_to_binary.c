@@ -14,6 +14,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
+
+#include "module_converter_elf32.h"
 
 
 /* MISRA C:2012 Rule 21.3 and Dir 4.12 deviation: dynamic memory is used in this
@@ -32,70 +35,7 @@
 
 FILE	*source_file;
 FILE    *binary_file;
-
-
-#define ELF_ID_STRING_SIZE	    16
-#define ELF_ARM_MACHINE_TYPE    40
-#define ELF_EXECUTABLE          2
-
-
-typedef struct ELF_HEADER_STRUCT
-{
-    unsigned char   elf_header_id_string[ELF_ID_STRING_SIZE];
-    unsigned short  elf_header_file_type;
-    unsigned short  elf_header_machinge_type;
-    unsigned long   elf_header_version;
-    unsigned long   elf_header_entry_address;
-    unsigned long   elf_header_program_header_offset;
-    unsigned long   elf_header_section_header_offset;
-    unsigned long   elf_header_processor_flags;
-    unsigned short  elf_header_size;
-    unsigned short  elf_header_program_header_size;
-    unsigned short  elf_header_program_header_entries;
-    unsigned short  elf_header_section_header_size;
-    unsigned short  elf_header_section_header_entries;
-    unsigned short  elf_header_section_string_index;
-} ELF_HEADER;
-
-
-typedef struct ELF_PROGRAM_HEADER_STRUCT
-{
-    unsigned long   elf_program_header_type;
-    unsigned long   elf_program_header_offset;
-    unsigned long   elf_program_header_virtual_address;
-    unsigned long   elf_program_header_physical_address;
-    unsigned long   elf_program_header_file_size;
-    unsigned long   elf_program_header_memory_size;
-    unsigned long   elf_program_header_flags;
-    unsigned long   elf_program_header_alignment;
-} ELF_PROGRAM_HEADER;
-
-
-typedef struct ELF_SECTION_HEADER_STRUCT
-{
-    unsigned long   elf_section_header_name;
-    unsigned long   elf_section_header_type;
-    unsigned long   elf_section_header_flags;
-    unsigned long   elf_section_header_address;
-    unsigned long   elf_section_header_offset;
-    unsigned long   elf_section_header_size;
-    unsigned long   elf_section_header_link;
-    unsigned long   elf_section_header_info;
-    unsigned long   elf_section_header_alignment;
-    unsigned long   elf_section_header_entry_size;
-} ELF_SECTION_HEADER;
-
-
-typedef struct ELF_SYMBOL_TABLE_ENTRY_STRUCT
-{
-    unsigned long   elf_symbol_table_entry_name;
-    unsigned long   elf_symbol_table_entry_address;
-    unsigned long   elf_symbol_table_entry_size;
-    unsigned char   elf_symbol_table_entry_info;
-    unsigned char   elf_symbol_table_entry_other;
-    unsigned short  elf_symbol_table_entry_shndx;
-
-} ELF_SYMBOL_TABLE_ENTRY;
+long    source_file_size;
 
 
 typedef struct CODE_SECTION_ENTRY_STRUCT
@@ -109,7 +49,8 @@ typedef struct CODE_SECTION_ENTRY_STRUCT
 /* Define global variables.  */
 
 ELF_HEADER              header;
-ELF_PROGRAM_HEADER      *program_header;
+unsigned char           *program_header;
+unsigned char           *raw_section_header_table;
 ELF_SECTION_HEADER      *section_header;
 unsigned char           *section_string_table;
 unsigned char           *main_string_table;
@@ -122,18 +63,53 @@ CODE_SECTION_ENTRY		*code_section_array;
 
 /* Define helper functions.  */
 
-int elf_object_read(unsigned long offset, void *object_address, int object_size)
+/* Read a byte range from the input ELF file after checking its bounds.
+   Version: 6.5.2.  */
+int elf_object_read(unsigned long offset, void *object_address, size_t object_size)
 {
 
-int             i;
+size_t          i;
 int             alpha;
 unsigned char   *buffer;
+unsigned long   remaining_bytes;
+
+    /* Accept empty tables and reject reads outside the input file.  */
+    if (object_size == 0)
+    {
+
+        return(0);
+    }
+
+    /* Reject offsets or lengths outside the opened source file.  */
+    if ((source_file_size < 0) || (offset > (unsigned long)LONG_MAX) ||
+        (offset > (unsigned long)source_file_size))
+    {
+
+        return(1);
+    }
+
+    remaining_bytes =  (unsigned long)source_file_size - offset;
+    if (object_size > remaining_bytes)
+    {
+
+        return(1);
+    }
+
+    if (object_address == NULL)
+    {
+
+        return(1);
+    }
 
     /* Setup the buffer pointer.  */
     buffer =  (unsigned char *) object_address;
 
     /* Seek to the proper position in the file.  */
-    fseek(source_file, offset, SEEK_SET);
+    if (fseek(source_file, (long)offset, SEEK_SET) != 0)
+    {
+
+        return(1);
+    }
 
     /* Read the ELF object.  */
     for (i = 0; i < object_size; i++)
@@ -156,6 +132,7 @@ unsigned char   *buffer;
    tolerate being called with resources that were never acquired. The areas it
    releases are the file scope pointers declared above.  */
 
+/* Close converter files and release allocated ELF buffers. Version: 6.5.2.  */
 static void converter_cleanup(void)
 {
 
@@ -181,6 +158,9 @@ static void converter_cleanup(void)
        is supplied a NULL pointer, so no test is required here.  */
     free(program_header);
     program_header =  NULL;
+    /* Release the temporary on-disk section-header bytes.  */
+    free(raw_section_header_table);
+    raw_section_header_table =  NULL;
     free(section_header);
     section_header =  NULL;
     free(section_string_table);
@@ -190,6 +170,7 @@ static void converter_cleanup(void)
 }
 
 
+/* Convert an ELF32 module into a binary file. Version: 6.5.2.  */
 int main(int argc, char* argv[])
 {
 
@@ -198,6 +179,9 @@ unsigned long           address;
 unsigned long           size;
 unsigned long           allocation_size;
 unsigned char           *code_buffer;
+unsigned char           raw_header[MODULE_ELF32_HEADER_SIZE];
+unsigned long           table_index;
+unsigned char           *raw_section_entry;
 unsigned long			code_section_index;
 CODE_SECTION_ENTRY		code_section_temp;
 unsigned char           zero_value;
@@ -231,7 +215,42 @@ unsigned char           zero_value;
         return(2);
     }
 
-    /* Attempt to open the binary file for writing.  */
+    /* Record file length, then validate/decode raw ELF header bytes
+       before creating the output file.  */
+    /* Record the input size so every later read can reject out-of-range data.  */
+    if (fseek(source_file, 0L, SEEK_END) != 0)
+    {
+
+        printf("**** Error: unable to determine source ELF file size **** \n");
+        converter_cleanup();
+        return(6);
+    }
+
+    source_file_size =  ftell(source_file);
+    if ((source_file_size < 0) || (fseek(source_file, 0L, SEEK_SET) != 0))
+    {
+
+        printf("**** Error: unable to determine source ELF file size **** \n");
+        converter_cleanup();
+        return(6);
+    }
+
+    /* Read and decode the fixed-size ELF32 header from raw file bytes.  */
+    if ((elf_object_read(0, raw_header, sizeof(raw_header)) != 0) ||
+        (module_elf32_decode_header(raw_header, sizeof(raw_header), &header) != 0))
+    {
+
+        /* Print an error message out.  */
+        printf("**** Error: invalid or unsupported ELF32 little-endian header **** \n");
+
+        /* Close the files and release the ELF areas.  */
+        converter_cleanup();
+
+        return(6);
+    }
+
+    /* Attempt to open the binary file for writing only after the input header
+       has been accepted.  */
     binary_file =  fopen(argv[2], "wb");
 
     /* Determine if the binary file was opened properly.  */
@@ -241,24 +260,12 @@ unsigned char           zero_value;
         /* Print an error message out and wait for user key hit.  */
         printf("**** Error: open failed on binary output file **** \n");
         printf("            File: %s   ", argv[2]);
+        converter_cleanup();
         return(3);
     }
 
-    /* Read the ELF header.  */
-    if (elf_object_read(0, &header, sizeof(header)) != 0)
-    {
-
-        /* Print an error message out.  */
-        printf("**** Error: read failed on the ELF header **** \n");
-
-        /* Close the files and release the ELF areas.  */
-        converter_cleanup();
-
-        return(6);
-    }
-
     /* Allocate memory for the program header(s).  */
-    allocation_size =  sizeof(ELF_PROGRAM_HEADER)*header.elf_header_program_header_entries;
+    allocation_size =  MODULE_ELF32_PROGRAM_HEADER_SIZE*header.elf_header_program_header_entries;
     program_header =   malloc(allocation_size);
 
     /* Determine if the memory allocation was successful. Note that an empty area
@@ -288,12 +295,14 @@ unsigned char           zero_value;
         return(6);
     }
 
+    /* Read section headers as raw ELF bytes, then decode each
+       fixed-width field into host-side values.  */
     /* Allocate memory for the section header(s).  */
-    allocation_size =  sizeof(ELF_SECTION_HEADER)*header.elf_header_section_header_entries;
-    section_header =   malloc(allocation_size);
+    allocation_size =  MODULE_ELF32_SECTION_HEADER_SIZE*header.elf_header_section_header_entries;
+    raw_section_header_table =  malloc(allocation_size);
 
     /* Determine if the memory allocation was successful.  */
-    if ((section_header == NULL) && (allocation_size != 0))
+    if ((raw_section_header_table == NULL) && (allocation_size != 0))
     {
 
         /* Print an error message out.  */
@@ -306,7 +315,7 @@ unsigned char           zero_value;
     }
 
     /* Read the section header(s).  */
-    if (elf_object_read(header.elf_header_section_header_offset, section_header, allocation_size) != 0)
+    if (elf_object_read(header.elf_header_section_header_offset, raw_section_header_table, allocation_size) != 0)
     {
 
         /* Print an error message out.  */
@@ -317,6 +326,36 @@ unsigned char           zero_value;
 
         return(6);
     }
+
+    /* Allocate host-side section records and decode each ELF32 entry.  */
+    allocation_size =  sizeof(ELF_SECTION_HEADER)*header.elf_header_section_header_entries;
+    section_header =   malloc(allocation_size);
+    if ((section_header == NULL) && (allocation_size != 0))
+    {
+
+        printf("**** Error: memory allocation failed for decoded section headers **** \n");
+        converter_cleanup();
+        return(5);
+    }
+
+    for (table_index = 0; table_index < header.elf_header_section_header_entries; table_index++)
+    {
+
+        raw_section_entry =  raw_section_header_table +
+                             (table_index*MODULE_ELF32_SECTION_HEADER_SIZE);
+        if (module_elf32_decode_section_header(raw_section_entry,
+                                               MODULE_ELF32_SECTION_HEADER_SIZE,
+                                               &section_header[table_index]) != 0)
+        {
+
+            printf("**** Error: invalid ELF32 section header **** \n");
+            converter_cleanup();
+            return(6);
+        }
+    }
+
+    free(raw_section_header_table);
+    raw_section_header_table =  NULL;
 
     /* Determine if the section string table index supplied by the ELF header is
        inside the section header area that was just read.  */
