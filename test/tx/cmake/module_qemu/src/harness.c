@@ -274,4 +274,7 @@ VOID  tx_application_define(VOID *first_unused_memory)
 {
     (VOID) tx_thread_create(&harness_thread, "Module Manager Thread", harness_thread_entry, 0UL,
                             first_unused_memory, HARNESS_STACK_SIZE, 1U, 1U, TX_NO_TIME_SLICE, TX_AUTO_START);
+#ifdef MODULE_QEMU_TEST_INITIALIZE
+    harness_test_initialize();
+#endif
 }

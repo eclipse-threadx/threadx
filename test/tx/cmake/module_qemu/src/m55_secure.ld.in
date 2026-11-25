@@ -51,6 +51,5 @@ SECTIONS
         __stack_end__ = .;
     } > RAM
 
-    end = .;
     .gnu.sgstubs ORIGIN(NSC) : { *(.gnu.sgstubs*) } > NSC
 }
