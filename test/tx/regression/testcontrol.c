@@ -168,6 +168,7 @@ void    threadx_interrupt_control_application_define(void *);
 
 void    threadx_mutex_basic_application_define(void *);
 void    threadx_mutex_inherit_chain_application_define(void *);
+void    threadx_mutex_inherit_waiter_priority_change_application_define(void *);
 void    threadx_mutex_delete_application_define(void *);
 void    threadx_mutex_preemption_application_define(void *);
 void    threadx_mutext_no_preemption_application_define(void *);
@@ -289,6 +290,7 @@ TEST_ENTRY  test_control_tests[] =
 
     threadx_mutex_basic_application_define,
     threadx_mutex_inherit_chain_application_define,
+    threadx_mutex_inherit_waiter_priority_change_application_define,
     threadx_mutex_delete_application_define,
     threadx_mutex_preemption_application_define,
     threadx_mutext_no_preemption_application_define,
