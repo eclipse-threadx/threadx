@@ -125,4 +125,3 @@ jobs:
       run: |
         cmake --build ./build-mm
         cmake --build ./build-mm --target threadx-module-manager-consumer-check
-

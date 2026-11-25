@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -257,7 +258,7 @@ typedef unsigned short                          USHORT;
 
 /* Redefine the macro for calculating the lowest bit set. */
 #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       m = m & ((ULONG) (-((LONG) m))); \
-                                                asm volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) ); \
+                                                __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m) ); \
                                                 b = 31 - b;
 
 /* Define ThreadX interrupt lockout and restore macros for protection on
@@ -273,15 +274,15 @@ typedef unsigned short                          USHORT;
 
 #define TX_DISABLE \
     { \
-      asm volatile (" MRS %0,CPSR": "=r" (interrupt_save)); \
-      asm volatile (" CPSID if"); \
+      __asm__ volatile (" MRS %0,CPSR": "=r" (interrupt_save)); \
+      __asm__ volatile (" CPSID if"); \
     }
 #define TX_RESTORE \
   { \
     if ((interrupt_save & 0x40) == 0) \
-      asm volatile (" CPSIE f"); \
+      __asm__ volatile (" CPSIE f"); \
     if ((interrupt_save & 0x80) == 0) \
-      asm volatile (" CPSIE i"); \
+      __asm__ volatile (" CPSIE i"); \
   }
 
 
@@ -289,13 +290,13 @@ typedef unsigned short                          USHORT;
 
 #define TX_DISABLE \
   { \
-    asm volatile (" MRS %0,CPSR": "=r" (interrupt_save)); \
-    asm volatile (" CPSID i"); \
+    __asm__ volatile (" MRS %0,CPSR": "=r" (interrupt_save)); \
+    __asm__ volatile (" CPSID i"); \
   }
 #define TX_RESTORE \
   { \
     if ((interrupt_save & 0x80) == 0) \
-      asm volatile (" CPSIE i"); \
+      __asm__ volatile (" CPSIE i"); \
   }
 
 #endif
@@ -321,7 +322,7 @@ void    tx_thread_vfp_disable(void);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX ARMv7-A Version 6.5.2.202603 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadX ARMv7-A Version 6.5.2.202603b *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif
