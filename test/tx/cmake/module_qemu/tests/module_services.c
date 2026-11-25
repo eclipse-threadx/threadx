@@ -113,9 +113,17 @@ ULONG   kernel_word;
                                                              worker_stack, sizeof(worker_stack),
                                                              2U, 2U, TX_NO_TIME_SLICE, TX_AUTO_START));
 
+#ifdef MODULE_QEMU_CORTEX_M55
+    MODULE_SHARED[MODULE_OUT_SECURE_ALLOC] = (ULONG) tx_thread_secure_stack_allocate(worker_thread, WORKER_STACK_SIZE);
+#endif
+
     message = MODULE_QUEUE_MESSAGE;
     record_status(MODULE_OUT_CREATE_STATUS, tx_queue_send(message_queue, &message, TX_NO_WAIT));
     MODULE_SHARED[MODULE_OUT_SEMAPHORE_STATUS] = (ULONG) tx_semaphore_get(done_semaphore, WAIT_TICKS);
+
+#ifdef MODULE_QEMU_CORTEX_M55
+    MODULE_SHARED[MODULE_OUT_SECURE_FREE] = (ULONG) tx_thread_secure_stack_free(worker_thread);
+#endif
 
     start_time = tx_time_get();
     (VOID) tx_thread_sleep(SLEEP_TICKS);

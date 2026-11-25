@@ -37,15 +37,26 @@
 #   cmake --build build/module_qemu_m3
 #   ctest --test-dir build/module_qemu_m3 --output-on-failure
 #
-# MODULE_QEMU_PORT is cortex_m3 (QEMU mps2-an385) or cortex_m4 (mps2-an386,
-# built for its FPU with the hard-float ABI).
+# MODULE_QEMU_PORT selects Cortex-M3 (mps2-an385), Cortex-M4 (mps2-an386),
+# or Cortex-M55 (mps3-an547). MODULE_QEMU_M55_DUAL_STATE boots the M55
+# Module Manager in the Non-secure state with ThreadX secure stack services.
 
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 project(threadx_module_qemu LANGUAGES C ASM)
 
 set(MODULE_QEMU_PORT "cortex_m3" CACHE STRING "Cortex-M module port to build and run")
-set_property(CACHE MODULE_QEMU_PORT PROPERTY STRINGS cortex_m3 cortex_m4)
+set_property(CACHE MODULE_QEMU_PORT PROPERTY STRINGS cortex_m3 cortex_m4 cortex_m55)
+option(MODULE_QEMU_M55_DUAL_STATE "Run the Cortex-M55 Module Manager in the Non-secure state" OFF)
+option(MODULE_QEMU_TIMER_IN_ISR "Process timer expirations in the interrupt handler" OFF)
+
+if(MODULE_QEMU_TIMER_IN_ISR)
+    add_compile_definitions(TX_TIMER_PROCESS_IN_ISR)
+endif()
+
+set(MANAGER_CODE_ORIGIN 0x00000000)
+set(MANAGER_CODE_LENGTH 0x00400000)
+set(MANAGER_RAM_LENGTH 0x00100000)
 
 if(MODULE_QEMU_PORT STREQUAL "cortex_m3")
     set(PORT_CPU_FLAGS -mcpu=cortex-m3 -mthumb)
@@ -53,14 +64,39 @@ if(MODULE_QEMU_PORT STREQUAL "cortex_m3")
 elseif(MODULE_QEMU_PORT STREQUAL "cortex_m4")
     set(PORT_CPU_FLAGS -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
     set(QEMU_MACHINE mps2-an386)
+elseif(MODULE_QEMU_PORT STREQUAL "cortex_m55")
+    set(PORT_CPU_FLAGS -mcpu=cortex-m55 -mthumb -mfloat-abi=hard)
+    set(QEMU_MACHINE mps3-an547)
+    set(MANAGER_CODE_LENGTH 0x00080000)
+    set(MANAGER_RAM_LENGTH 0x00040000)
+    add_compile_definitions(MODULE_QEMU_CORTEX_M55 MODULE_SHARED_BASE=0x20040000UL
+                            TX_PORT_SYSTEM_CLOCK_HZ=32000000)
+    set(CMAKE_C_STANDARD 99)
+    set(CMAKE_C_STANDARD_REQUIRED ON)
+    set(CMAKE_C_EXTENSIONS OFF)
+    if(MODULE_QEMU_M55_DUAL_STATE)
+        set(M55_GATEWAY_START 0x0000F000)
+        set(MANAGER_CODE_ORIGIN 0x00010000)
+        set(MANAGER_CODE_LENGTH 0x00070000)
+    endif()
 else()
-    message(FATAL_ERROR "MODULE_QEMU_PORT must be cortex_m3 or cortex_m4, not '${MODULE_QEMU_PORT}'")
+    message(FATAL_ERROR "Unsupported MODULE_QEMU_PORT '${MODULE_QEMU_PORT}'")
 endif()
 
 set(REPO_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../..)
 set(PORT_DIR ${REPO_ROOT}/ports_module/${MODULE_QEMU_PORT}/gnu)
 set(HARNESS_SRC ${CMAKE_CURRENT_LIST_DIR}/src)
 set(HARNESS_TESTS ${CMAKE_CURRENT_LIST_DIR}/tests)
+set(MANAGER_LINKER_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/manager.ld)
+configure_file(${HARNESS_SRC}/manager.ld.in ${MANAGER_LINKER_SCRIPT} @ONLY)
+
+set(MODULE_IMAGE_SUPPORT ${PORT_DIR}/example_build)
+if(MODULE_QEMU_PORT STREQUAL "cortex_m55")
+    # These GNU startup and linker files describe the position independent module ABI.
+    set(MODULE_IMAGE_SUPPORT ${REPO_ROOT}/ports_module/cortex_m4/gnu/example_build)
+else()
+    set(MANAGER_LOW_LEVEL ${HARNESS_SRC}/tx_initialize_low_level.S)
+endif()
 
 message(STATUS "Module port: ${MODULE_QEMU_PORT}, QEMU machine: ${QEMU_MACHINE}")
 
@@ -84,6 +120,13 @@ file(GLOB TXM_PORT_SRC
      ${PORT_DIR}/module_manager/src/*.s
      ${PORT_DIR}/module_manager/src/*.c)
 file(GLOB TXM_MANAGER_SRC ${REPO_ROOT}/common_modules/module_manager/src/*.c)
+if(MODULE_QEMU_M55_DUAL_STATE)
+    if(NOT MODULE_QEMU_PORT STREQUAL "cortex_m55")
+        message(FATAL_ERROR "MODULE_QEMU_M55_DUAL_STATE requires cortex_m55")
+    endif()
+    set(SECURE_STACK_SOURCE ${PORT_DIR}/module_manager/src/tx_thread_secure_stack.c)
+    list(REMOVE_ITEM TXM_PORT_SRC ${SECURE_STACK_SOURCE})
+endif()
 
 add_library(threadx_module STATIC ${TX_COMMON_SRC} ${TXM_PORT_SRC} ${TXM_MANAGER_SRC})
 target_include_directories(threadx_module PUBLIC
@@ -91,6 +134,32 @@ target_include_directories(threadx_module PUBLIC
     ${REPO_ROOT}/common/inc
     ${REPO_ROOT}/common_modules/inc
     ${REPO_ROOT}/common_modules/module_manager/inc)
+
+if(MODULE_QEMU_PORT STREQUAL "cortex_m55")
+    if(MODULE_QEMU_M55_DUAL_STATE)
+        set(SECURE_LINKER_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/m55_secure.ld)
+        set(SECURE_IMPORT ${CMAKE_CURRENT_BINARY_DIR}/m55_secure_import.o)
+        configure_file(${HARNESS_SRC}/m55_secure.ld.in ${SECURE_LINKER_SCRIPT} @ONLY)
+        add_executable(m55_secure.elf ${HARNESS_SRC}/m55_secure_startup.S
+                       ${HARNESS_SRC}/m55_secure_heap.c ${SECURE_STACK_SOURCE})
+        target_include_directories(m55_secure.elf PRIVATE $<TARGET_PROPERTY:threadx_module,INCLUDE_DIRECTORIES>)
+        target_compile_options(m55_secure.elf PRIVATE -mcmse)
+        target_link_options(m55_secure.elf PRIVATE
+            -mcmse -T${SECURE_LINKER_SCRIPT} -nostartfiles --specs=nano.specs --specs=nosys.specs
+            -Wl,--no-warn-rwx-segments
+            -Wl,--section-start=.gnu.sgstubs=${M55_GATEWAY_START}
+            -Wl,--cmse-implib,--out-implib=${SECURE_IMPORT}.tmp)
+        set_target_properties(m55_secure.elf PROPERTIES LINK_DEPENDS ${SECURE_LINKER_SCRIPT})
+        add_custom_command(TARGET m55_secure.elf POST_BUILD
+            BYPRODUCTS ${SECURE_IMPORT}
+            COMMAND ${CMAKE_COMMAND} -E rename ${SECURE_IMPORT}.tmp ${SECURE_IMPORT}
+            VERBATIM)
+        target_link_libraries(threadx_module INTERFACE ${SECURE_IMPORT})
+        set(QEMU_SECURE_IMAGE --secure-elf $<TARGET_FILE:m55_secure.elf>)
+    else()
+        target_compile_definitions(threadx_module PUBLIC TX_SINGLE_MODE_SECURE)
+    endif()
+endif()
 
 # ---------------------------------------------------------------------------
 # The module-side library: the API shims that run inside a module.  It belongs
@@ -118,6 +187,9 @@ target_include_directories(txm_module_lib PUBLIC
     ${REPO_ROOT}/common/inc
     ${REPO_ROOT}/common_modules/inc)
 target_compile_options(txm_module_lib PRIVATE -fpic ${MODULE_PIC_FLAGS})
+if(MODULE_QEMU_PORT STREQUAL "cortex_m55" AND NOT MODULE_QEMU_M55_DUAL_STATE)
+    target_compile_definitions(txm_module_lib PUBLIC TX_SINGLE_MODE_SECURE)
+endif()
 
 # ---------------------------------------------------------------------------
 # A test module: one source, built with a given preamble property word, linked
@@ -128,14 +200,14 @@ target_compile_options(txm_module_lib PRIVATE -fpic ${MODULE_PIC_FLAGS})
 function(module_qemu_add_module name source properties)
     add_executable(${name}.elf
         ${HARNESS_SRC}/module_preamble.S
-        ${PORT_DIR}/example_build/gcc_setup.s
+        ${MODULE_IMAGE_SUPPORT}/gcc_setup.s
         ${source})
     target_include_directories(${name}.elf PRIVATE ${HARNESS_SRC})
     target_compile_definitions(${name}.elf PRIVATE TEST_MODULE_PROPERTIES=${properties})
     target_compile_options(${name}.elf PRIVATE -fpie ${MODULE_PIC_FLAGS})
     target_link_libraries(${name}.elf PRIVATE txm_module_lib)
     target_link_options(${name}.elf PRIVATE
-        -T${PORT_DIR}/example_build/sample_threadx_module.ld
+        -T${MODULE_IMAGE_SUPPORT}/sample_threadx_module.ld
         -nostartfiles
         -nostdlib
         -Wl,-pie
@@ -144,7 +216,7 @@ function(module_qemu_add_module name source properties)
         -Wl,--no-warn-rwx-segments
         -Wl,-Map=${name}.map)
     set_target_properties(${name}.elf PROPERTIES
-        LINK_DEPENDS ${PORT_DIR}/example_build/sample_threadx_module.ld)
+        LINK_DEPENDS ${MODULE_IMAGE_SUPPORT}/sample_threadx_module.ld)
 
     set(bin ${CMAKE_CURRENT_BINARY_DIR}/${name}.bin)
     add_custom_command(
@@ -167,7 +239,6 @@ endfunction()
 # bit 2 shared memory access.
 module_qemu_add_module(module_services_protected  ${HARNESS_TESTS}/module_services.c 0x02000007)
 module_qemu_add_module(module_services_privileged ${HARNESS_TESTS}/module_services.c 0x02000000)
-module_qemu_add_module(module_stack_frame         ${HARNESS_TESTS}/module_stack_frame.c 0x02000007)
 
 # ---------------------------------------------------------------------------
 # The manager images, one per test, and the CTest entries that run them.
@@ -187,7 +258,7 @@ function(module_qemu_add_test name test_source)
 
     add_executable(${name}.elf
         ${HARNESS_SRC}/startup.S
-        ${HARNESS_SRC}/tx_initialize_low_level.S
+        ${MANAGER_LOW_LEVEL}
         ${HARNESS_SRC}/harness.c
         ${HARNESS_TESTS}/harness_checks.c
         ${test_source}
@@ -195,14 +266,14 @@ function(module_qemu_add_test name test_source)
     target_include_directories(${name}.elf PRIVATE ${HARNESS_SRC} ${HARNESS_TESTS})
     target_link_libraries(${name}.elf PRIVATE threadx_module)
     target_link_options(${name}.elf PRIVATE
-        -T${HARNESS_SRC}/manager.ld
+        -T${MANAGER_LINKER_SCRIPT}
         -nostartfiles
         --specs=nano.specs
         --specs=nosys.specs
         -Wl,--gc-sections
         -Wl,--no-warn-rwx-segments
         -Wl,-Map=${name}.map)
-    set_target_properties(${name}.elf PROPERTIES LINK_DEPENDS ${HARNESS_SRC}/manager.ld)
+    set_target_properties(${name}.elf PROPERTIES LINK_DEPENDS ${MANAGER_LINKER_SCRIPT})
     foreach(blob IN LISTS blobs)
         add_dependencies(${name}.elf ${blob}_bin)
     endforeach()
@@ -212,14 +283,21 @@ function(module_qemu_add_test name test_source)
                  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/run_qemu_test.py
                          --qemu ${QEMU_SYSTEM_ARM}
                          --machine ${QEMU_MACHINE}
-                         --elf $<TARGET_FILE:${name}.elf>)
+                         --elf $<TARGET_FILE:${name}.elf> ${QEMU_SECURE_IMAGE})
     endif()
 endfunction()
 
 module_qemu_add_test(test_module_lifecycle  ${HARNESS_TESTS}/test_module_lifecycle.c  module_services_protected)
 module_qemu_add_test(test_module_fault      ${HARNESS_TESTS}/test_module_fault.c      module_services_protected)
 module_qemu_add_test(test_module_privileged ${HARNESS_TESTS}/test_module_privileged.c module_services_privileged)
-module_qemu_add_test(test_module_stack_frame ${HARNESS_TESTS}/test_module_stack_frame.c module_stack_frame)
+if(MODULE_QEMU_M55_DUAL_STATE)
+    module_qemu_add_test(test_secure_stack ${HARNESS_TESTS}/test_secure_stack.c)
+    target_compile_definitions(test_secure_stack.elf PRIVATE MODULE_QEMU_TEST_INITIALIZE)
+endif()
+if(NOT MODULE_QEMU_PORT STREQUAL "cortex_m55")
+    module_qemu_add_module(module_stack_frame ${HARNESS_TESTS}/module_stack_frame.c 0x02000007)
+    module_qemu_add_test(test_module_stack_frame ${HARNESS_TESTS}/test_module_stack_frame.c module_stack_frame)
+endif()
 
 if(NOT (Python3_FOUND AND QEMU_SYSTEM_ARM))
     message(STATUS "qemu-system-arm or Python 3 not found; the images build but no tests are registered.")

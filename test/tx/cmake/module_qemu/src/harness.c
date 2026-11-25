@@ -42,6 +42,12 @@
 
 #define HARNESS_STACK_SIZE          ((ULONG) 2048UL)
 
+#ifdef MODULE_QEMU_CORTEX_M55
+#define HARNESS_SHARED_WRITE        TXM_MODULE_ATTRIBUTE_READ_WRITE
+#else
+#define HARNESS_SHARED_WRITE        TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE
+#endif
+
 #define SEMIHOSTING_SYS_WRITE0      ((ULONG) 0x04UL)
 #define SEMIHOSTING_SYS_EXIT        ((ULONG) 0x18UL)
 #define SEMIHOSTING_EXIT_SUCCESS    ((ULONG) 0x20026UL)     /* ADP_Stopped_ApplicationExit  */
@@ -192,7 +198,7 @@ ULONG   index;
 UINT  harness_shared_grant(TXM_MODULE_INSTANCE *module_instance)
 {
     return(txm_module_manager_external_memory_enable(module_instance, (VOID *) MODULE_SHARED_BASE,
-                                                     MODULE_SHARED_SIZE, TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE));
+                                                     MODULE_SHARED_SIZE, HARNESS_SHARED_WRITE));
 }
 
 
@@ -223,6 +229,11 @@ static VOID  harness_thread_entry(ULONG thread_input)
 {
     (VOID) thread_input;
 
+#ifdef MODULE_QEMU_CORTEX_M55
+    harness_expect("shared grant before initialization", (ULONG) harness_shared_grant(TX_NULL),
+                   (ULONG) TX_NOT_AVAILABLE);
+#endif
+
     harness_expect("txm_module_manager_initialize",
                    (ULONG) txm_module_manager_initialize((VOID *) harness_module_memory, HARNESS_MODULE_MEMORY_SIZE),
                    (ULONG) TX_SUCCESS);
@@ -240,6 +251,20 @@ static VOID  harness_thread_entry(ULONG thread_input)
 
 int  main(void)
 {
+#ifdef MODULE_QEMU_CORTEX_M55
+    /* No thread exists before kernel entry. Check both notification modes.  */
+    _txm_module_manager_memory_fault_handler();
+    harness_expect("early fault without notification", harness_fault_count, 0UL);
+    harness_expect("register early fault notification",
+                   (ULONG) txm_module_manager_memory_fault_notify(harness_fault_notify), (ULONG) TX_SUCCESS);
+    _txm_module_manager_memory_fault_handler();
+    harness_expect("early fault reported", harness_fault_count, 1UL);
+    harness_expect("early fault has no thread", (ULONG) (harness_fault_thread == TX_NULL), (ULONG) TX_TRUE);
+    harness_expect("early fault has no module", (ULONG) (harness_fault_module == TX_NULL), (ULONG) TX_TRUE);
+    harness_expect("clear early fault notification",
+                   (ULONG) txm_module_manager_memory_fault_notify(TX_NULL), (ULONG) TX_SUCCESS);
+    harness_fault_count = 0UL;
+#endif
     tx_kernel_enter();
     return(0);
 }
@@ -249,4 +274,7 @@ VOID  tx_application_define(VOID *first_unused_memory)
 {
     (VOID) tx_thread_create(&harness_thread, "Module Manager Thread", harness_thread_entry, 0UL,
                             first_unused_memory, HARNESS_STACK_SIZE, 1U, 1U, TX_NO_TIME_SLICE, TX_AUTO_START);
+#ifdef MODULE_QEMU_TEST_INITIALIZE
+    harness_test_initialize();
+#endif
 }

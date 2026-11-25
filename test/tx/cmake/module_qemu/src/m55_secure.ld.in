@@ -1,0 +1,55 @@
+/* Copyright (c) 2026 Eclipse ThreadX contributors
+ * SPDX-License-Identifier: MIT
+ * Portions of this file were generated with AI assistance.
+ */
+
+/* The Secure boot image and gateway occupy the first 64 KiB of AN547 ITCM.
+   The last 128 KiB of DTCM hold Secure data, stack and heap. */
+MEMORY
+{
+    CODE (rx) : ORIGIN = 0x00000000, LENGTH = @M55_GATEWAY_START@
+    NSC  (rx) : ORIGIN = @M55_GATEWAY_START@, LENGTH = 0x00001000
+    RAM  (rw) : ORIGIN = 0x20060000, LENGTH = 0x00020000
+}
+
+ENTRY(secure_reset)
+
+__gateway_start__ = ORIGIN(NSC);
+__gateway_limit__ = ORIGIN(NSC) + LENGTH(NSC) - 32;
+__manager_code_start__ = @MANAGER_CODE_ORIGIN@;
+__manager_code_limit__ = __manager_code_start__ + @MANAGER_CODE_LENGTH@ - 32;
+__manager_ram_start__ = 0x20000000;
+__manager_ram_limit__ = ORIGIN(RAM) - 32;
+
+SECTIONS
+{
+    .vectors : { KEEP(*(.vectors)) } > CODE
+    .text : { *(.text .text.*) *(.rodata .rodata.*) } > CODE
+    .ARM.exidx : { *(.ARM.exidx*) } > CODE
+
+    __data_load_start__ = LOADADDR(.data);
+    .data : ALIGN(4)
+    {
+        __data_start__ = .;
+        *(.data .data.*)
+        . = ALIGN(4);
+        __data_end__ = .;
+    } > RAM AT > CODE
+
+    .bss (NOLOAD) : ALIGN(4)
+    {
+        __bss_start__ = .;
+        *(.bss .bss.*)
+        *(COMMON)
+        . = ALIGN(4);
+        __bss_end__ = .;
+    } > RAM
+
+    .stack (NOLOAD) : ALIGN(8)
+    {
+        . += 2048;
+        __stack_end__ = .;
+    } > RAM
+
+    .gnu.sgstubs ORIGIN(NSC) : { *(.gnu.sgstubs*) } > NSC
+}

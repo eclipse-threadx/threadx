@@ -13,17 +13,13 @@
  * SPDX-License-Identifier: MIT and CC0-1.0
  **************************************************************************/
 
-/* Module manager image for QEMU's MPS2 AN385 and AN386.  Code, read-only data
-   and the embedded module images go in the 4 MB SSRAM1 at address 0, which the
-   board boots from; data, the main stack and the memory ThreadX hands out go
-   in the first megabyte of SSRAM2 at 0x20000000.  The megabyte above that holds
-   the area the manager shares with its modules (module_shared.h), and nothing
-   the linker places reaches it.  */
+/* MPS2 places code and data in SSRAM. MPS3 AN547 uses ITCM and DTCM.
+   The manager's RAM ends at the start of the shared area.  */
 
 MEMORY
 {
-    CODE (rx)  : ORIGIN = 0x00000000, LENGTH = 0x00400000
-    RAM  (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00100000
+    CODE (rx)  : ORIGIN = @MANAGER_CODE_ORIGIN@, LENGTH = @MANAGER_CODE_LENGTH@
+    RAM  (rwx) : ORIGIN = 0x20000000, LENGTH = @MANAGER_RAM_LENGTH@
 }
 
 ENTRY(reset_handler)

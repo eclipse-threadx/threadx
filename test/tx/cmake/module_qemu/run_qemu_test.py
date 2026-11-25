@@ -42,7 +42,7 @@ def as_text(stream):
     return stream
 
 
-def run(qemu, machine, elf, timeout):
+def run(qemu, machine, elf, secure_elf, timeout):
     command = [
         qemu,
         "-M", machine,
@@ -50,8 +50,10 @@ def run(qemu, machine, elf, timeout):
         "-monitor", "none",
         "-serial", "none",
         "-semihosting-config", "enable=on,target=native",
-        "-kernel", elf,
+        "-kernel", secure_elf or elf,
     ]
+    if secure_elf:
+        command += ["-device", f"loader,file={elf}"]
 
     print("Running:", " ".join(command), flush=True)
 
@@ -96,9 +98,10 @@ def main():
     parser.add_argument("--qemu", required=True, help="qemu-system-arm executable")
     parser.add_argument("--machine", required=True, help="QEMU machine, e.g. mps2-an385")
     parser.add_argument("--elf", required=True, help="image to run")
+    parser.add_argument("--secure-elf", help="secure boot image for a dual-state test")
     parser.add_argument("--timeout", type=int, default=60, help="seconds before a hang is declared")
     args = parser.parse_args()
-    return run(args.qemu, args.machine, args.elf, args.timeout)
+    return run(args.qemu, args.machine, args.elf, args.secure_elf, args.timeout)
 
 
 if __name__ == "__main__":

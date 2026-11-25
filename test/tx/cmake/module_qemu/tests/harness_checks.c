@@ -29,6 +29,14 @@
 
 VOID  harness_check_services(ULONG cycle)
 {
+#ifdef MODULE_QEMU_CORTEX_M55
+#ifdef TX_SINGLE_MODE_SECURE
+const ULONG secure_stack_status = (ULONG) TX_FEATURE_NOT_ENABLED;
+#else
+const ULONG secure_stack_status = (ULONG) TX_SUCCESS;
+#endif
+#endif
+
     harness_expect("module start thread ran", MODULE_SHARED[MODULE_OUT_STARTED], MODULE_STARTED_MAGIC);
     harness_expect("module saw the load cycle", MODULE_SHARED[MODULE_OUT_CYCLE_SEEN], cycle);
     harness_expect("module object allocation", MODULE_SHARED[MODULE_OUT_OBJECT_STATUS], (ULONG) TX_SUCCESS);
@@ -38,6 +46,10 @@ VOID  harness_check_services(ULONG cycle)
     harness_expect("module semaphore get", MODULE_SHARED[MODULE_OUT_SEMAPHORE_STATUS], (ULONG) TX_SUCCESS);
     harness_expect("module sleep lasted its ticks",
                    (ULONG) (MODULE_SHARED[MODULE_OUT_SLEEP_TICKS] >= EXPECTED_SLEEP_TICKS), (ULONG) TX_TRUE);
+#ifdef MODULE_QEMU_CORTEX_M55
+    harness_expect("module secure stack allocation", MODULE_SHARED[MODULE_OUT_SECURE_ALLOC], secure_stack_status);
+    harness_expect("module secure stack free", MODULE_SHARED[MODULE_OUT_SECURE_FREE], secure_stack_status);
+#endif
 }
 
 

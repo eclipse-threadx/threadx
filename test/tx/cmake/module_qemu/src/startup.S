@@ -13,8 +13,8 @@
  * SPDX-License-Identifier: MIT and CC0-1.0
  **************************************************************************/
 
-@ Vector table and reset handler for the module execution harness on QEMU's
-@ MPS2 boards.  The fault vectors go to the module port's handlers, which is
+@ Vector table and reset handler for the module execution harness. The fault
+@ vectors go to the module port's handlers, which is
 @ the point: a module's MemManage fault has to reach the Module Manager for the
 @ fault-notification test to mean anything.  HardFault is never expected and
 @ goes to the harness, which reports it and fails the image.
@@ -37,11 +37,20 @@ _vectors:
     .word   0
     .word   0
     .word   0
+#ifdef MODULE_QEMU_CORTEX_M55
+    .word   SVC_Handler                    @ SVCall, module port
+#else
     .word   __tx_SVCallHandler              @ SVCall, module port
+#endif
     .word   harness_unexpected_exception    @ Debug monitor
     .word   0
+#ifdef MODULE_QEMU_CORTEX_M55
+    .word   PendSV_Handler                 @ PendSV, module port
+    .word   SysTick_Handler                @ SysTick, module port
+#else
     .word   __tx_PendSVHandler              @ PendSV, module port
-    .word   __tx_SysTickHandler             @ SysTick, tx_initialize_low_level.S
+    .word   __tx_SysTickHandler             @ SysTick, test setup
+#endif
     .rept   32
     .word   harness_unexpected_exception    @ External interrupts, none enabled
     .endr

@@ -34,7 +34,9 @@
 #ifndef MODULE_SHARED_H
 #define MODULE_SHARED_H
 
+#ifndef MODULE_SHARED_BASE
 #define MODULE_SHARED_BASE          ((ULONG) 0x20100000UL)
+#endif
 #define MODULE_SHARED_SIZE          ((ULONG) 256UL)
 #define MODULE_SHARED_WORDS         (MODULE_SHARED_SIZE / ((ULONG) sizeof(ULONG)))
 
@@ -59,6 +61,8 @@
 #define MODULE_OUT_KERNEL_READ_DONE ((ULONG) 17UL)  /* Kernel word read completed           */
 #define MODULE_OUT_KERNEL_VALUE     ((ULONG) 18UL)  /* Value read from the kernel word      */
 #define MODULE_OUT_CONTROL          ((ULONG) 19UL)  /* CONTROL as seen by the start thread  */
+#define MODULE_OUT_SECURE_ALLOC     ((ULONG) 20UL)  /* Secure stack allocation status      */
+#define MODULE_OUT_SECURE_FREE      ((ULONG) 21UL)  /* Secure stack free status            */
 #define MODULE_DONE                 ((ULONG) 31UL)
 
 /* The context switch test points a thread's stack at the bottom of this area,

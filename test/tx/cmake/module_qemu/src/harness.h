@@ -67,4 +67,9 @@ extern UCHAR    harness_object_memory[];
 /* Each test image defines this; it runs on the manager thread.  */
 VOID    harness_test(VOID);
 
+#ifdef MODULE_QEMU_TEST_INITIALIZE
+/* Tests that exercise kernel initialization can supply this callback.  */
+VOID    harness_test_initialize(VOID);
+#endif
+
 #endif
