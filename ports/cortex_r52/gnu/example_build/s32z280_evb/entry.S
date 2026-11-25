@@ -46,9 +46,9 @@
 @/*        vector, syndrome and return address before parking.  Without    */
 @/*        this a fault would be indistinguishable from a hang.            */
 @/*                                                                        */
-@/*    Define TX_R52_BOOT_AT_EL1 to skip the EL2 configuration, for       */
+@/*    Define TX_R52_BOOT_AT_EL1 to skip the EL2 configuration, for        */
 @/*    targets where an earlier boot stage or a vendor EL2 monitor (for    */
-@/*    example NXP's EL2M, or Eclipse ThreadX ZoneX) has already dropped  */
+@/*    example NXP's EL2M, or Eclipse ThreadX ZoneX) has already dropped   */
 @/*    privilege to EL1.  The kernel then enters at el1_entry in A32       */
 @/*    state, and the register list that becomes the monitor's             */
 @/*    responsibility is enumerated at the #ifndef itself rather than      */
@@ -61,8 +61,8 @@
 @/*                                                                        */
 @/*    CNTFRQ is read and recorded rather than written.  The FVP leaves it */
 @/*    zero and its BSP programs a known value, but the correct frequency  */
-@/*    for this board is not yet established, and writing a wrong one would*/
-@/*    silently mis-scale every tick interval derived from it.             */
+@/*    for this board is not yet established, and writing a wrong one      */
+@/*    would silently mis-scale every tick interval derived from it.       */
 @/*                                                                        */
 @/**************************************************************************/
 
@@ -232,41 +232,41 @@ el1_vectors:
 @/*                            tick interval from it divides by zero.      */
 @/*    HCPTR.TCP10/TCP11       both reset SET, trapping every EL1 and EL0  */
 @/*                            floating-point access to EL2.               */
-@/*    HSCTLR.TE               an EL2 register; a guest cannot write it.    */
-@/*                            (SCTLR.TE is EL1's and el1_entry clears it   */
-@/*                            below, so the guest still handles its own.)  */
-@/*    ICC_HSRE.SRE            until it is set, every other ICC_* and       */
-@/*                            ICH_* system register is UNDEFINED -- so an  */
-@/*                            EL1 kernel cannot acknowledge an interrupt   */
+@/*    HSCTLR.TE               an EL2 register; a guest cannot write it.   */
+@/*                            (SCTLR.TE is EL1's and el1_entry clears it  */
+@/*                            below, so the guest still handles its own.) */
+@/*    ICC_HSRE.SRE            until it is set, every other ICC_* and      */
+@/*                            ICH_* system register is UNDEFINED -- so an */
+@/*                            EL1 kernel cannot acknowledge an interrupt  */
 @/*                            at all.                                     */
-@/*    IMP_PERIPHPREGIONR      the low-latency peripheral port enables      */
-@/*                            reset to zero and an EL1 write to this       */
-@/*                            register traps to EL2 when                   */
-@/*                            HACTLR.PERIPHPREGIONR is clear.  A guest     */
-@/*                            that needs the RTU peripheral window at      */
-@/*                            0x76000000 therefore depends on the monitor  */
-@/*                            having opened it; one that does not need it  */
+@/*    IMP_PERIPHPREGIONR      the low-latency peripheral port enables     */
+@/*                            reset to zero and an EL1 write to this      */
+@/*                            register traps to EL2 when                  */
+@/*                            HACTLR.PERIPHPREGIONR is clear.  A guest    */
+@/*                            that needs the RTU peripheral window at     */
+@/*                            0x76000000 therefore depends on the monitor */
+@/*                            having opened it; one that does not need it */
 @/*                            is unaffected.                              */
-@/*    IMP_ATCMREGIONR and     the TCM bases and enables are per-core, and  */
-@/*    IMP_BTCMREGIONR         ENABLEEL2 is silently IGNORED when written   */
-@/*                            from EL1 -- measured on this part, on both   */
-@/*                            BTCM and CTCM: the base took and bit 0 took  */
-@/*                            while bit 1 stayed clear.  A guest that      */
-@/*                            places anything in a TCM therefore needs     */
-@/*                            the monitor to program and ECC-preload it,   */
-@/*                            because ECC is enabled here and a TCM        */
-@/*                            location must be WRITTEN before it can be    */
-@/*                            read (TRM 6.2.2).                            */
+@/*    IMP_ATCMREGIONR and     the TCM bases and enables are per-core, and */
+@/*    IMP_BTCMREGIONR         ENABLEEL2 is silently IGNORED when written  */
+@/*                            from EL1 -- measured on this part, on both  */
+@/*                            BTCM and CTCM: the base took and bit 0 took */
+@/*                            while bit 1 stayed clear.  A guest that     */
+@/*                            places anything in a TCM therefore needs    */
+@/*                            the monitor to program and ECC-preload it,  */
+@/*                            because ECC is enabled here and a TCM       */
+@/*                            location must be WRITTEN before it can be   */
+@/*                            read (TRM 6.2.2).                           */
 @/*                                                                        */
-@/*  CNTHCTL.PL1PCTEN and PL1PCEN are the interesting omission from that    */
-@/*  list.  This path opens both, because a standalone kernel owns the      */
-@/*  physical timer.  A monitor that TIME-partitions its guests must NOT    */
-@/*  open them: a partition's physical time keeps running while it is       */
-@/*  descheduled, so a guest reading it can observe that it was not         */
-@/*  running.  Such a monitor gives its guests the virtual timer and a      */
-@/*  per-guest CNTVOFF instead.  That is the monitor's decision to make,    */
-@/*  not this file's, which is why this list says what a guest CANNOT do    */
-@/*  rather than what a monitor SHOULD do.                                  */
+@/*  CNTHCTL.PL1PCTEN and PL1PCEN are the interesting omission from that   */
+@/*  list.  This path opens both, because a standalone kernel owns the     */
+@/*  physical timer.  A monitor that TIME-partitions its guests must NOT   */
+@/*  open them: a partition's physical time keeps running while it is      */
+@/*  descheduled, so a guest reading it can observe that it was not        */
+@/*  running.  Such a monitor gives its guests the virtual timer and a     */
+@/*  per-guest CNTVOFF instead.  That is the monitor's decision to make,   */
+@/*  not this file's, which is why this list says what a guest CANNOT do   */
+@/*  rather than what a monitor SHOULD do.                                 */
 @/**************************************************************************/
 @/**************************************************************************/
 @/*  _start -- reset entry.  Entered in THUMB state, Hyp mode (EL2).       */
@@ -520,18 +520,18 @@ start_a32:
 @/**************************************************************************/
 @/*  _start, when an EL2 monitor has already dropped privilege.            */
 @/*                                                                        */
-@/*  A32, not T32, and that is the one real difference from the standalone  */
-@/*  entry above.  The core resets in Thumb state here because the RTU boot */
-@/*  instruction NXP plants is a T32 branch -- but a guest is not reached   */
-@/*  by reset.  It is reached by the monitor's ERET, and the monitor         */
-@/*  chooses the state through SPSR.T.  Both ZoneX and NXP's EL2M enter a    */
-@/*  guest in A32, matching the vector tables in this file, so this entry    */
-@/*  is A32 and needs no state switch of its own.                           */
+@/*  A32, not T32, and that is the one real difference from the standalone */
+@/*  entry above.  The core resets in Thumb state here because the RTU     */
+@/*  boot instruction NXP plants is a T32 branch -- but a guest is not     */
+@/*  reached by reset.  It is reached by the monitor's ERET, and the       */
+@/*  monitor chooses the state through SPSR.T.  Both ZoneX and NXP's EL2M  */
+@/*  enter a guest in A32, matching the vector tables in this file, so     */
+@/*  this entry is A32 and needs no state switch of its own.               */
 @/*                                                                        */
-@/*  SPSR.T MUST AGREE WITH THIS.  If it does not, the guest dies on its     */
-@/*  first instruction with an undefined-instruction exception -- which      */
-@/*  looks exactly like a bad entry address and sends the reader to the      */
-@/*  loader instead of to the ERET.                                         */
+@/*  SPSR.T MUST AGREE WITH THIS.  If it does not, the guest dies on its   */
+@/*  first instruction with an undefined-instruction exception -- which    */
+@/*  looks exactly like a bad entry address and sends the reader to the    */
+@/*  loader instead of to the ERET.                                        */
 @/**************************************************************************/
 
     .section .text.boot, "ax"

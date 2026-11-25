@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -137,13 +138,8 @@ volatile UINT   _tx_thread_preempt_disable;
    termination. This pointer is setup during mutex initialization.  */
 
 VOID            (*_tx_thread_mutex_release)(TX_THREAD *thread_ptr);
-
-
-/* Define the global function pointer that updates the priority inheritance of a mutex
-   after the priority of a thread waiting on it changes. This pointer is setup during
-   mutex initialization.  */
-
-VOID            (*_tx_thread_mutex_priority_update)(TX_MUTEX *mutex_ptr);
+/* Optional mutex inheritance update, installed by mutex creation. */
+UINT            (*_tx_thread_mutex_priority_update)(TX_THREAD *thread_ptr, UINT new_priority);
 
 
 /* Define the global build options variable.  This contains a bit map representing
@@ -354,8 +350,6 @@ VOID  _tx_thread_initialize(VOID)
 
     /* Initialize the thread mutex release function pointer.  */
     _tx_thread_mutex_release =      TX_NULL;
-
-    /* Initialize the thread mutex priority update function pointer.  */
     _tx_thread_mutex_priority_update =  TX_NULL;
 
 #ifdef TX_ENABLE_STACK_CHECKING

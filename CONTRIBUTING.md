@@ -116,9 +116,7 @@ ThreadX has six directly triggered GitHub Actions workflows and one reusable reg
 | `clang_check.yml` | Arm port assembly, C compilation, and example links with Arm Toolchain for Embedded. |
 | `ci_cortex_m.yml` | CMake and Ninja cross-builds for selected Cortex-M ports. |
 | `ports_arch_check.yml` | Generated-port consistency and port-tree checks. |
-| `r52_fvp.yml` | Cortex-R52 builds and FVP execution when the model is configured. |
-
-The Armv8-R AEM FVP is distributed behind a click-through licence. If the `FVP_AEMV8R_URL` repository variable is unset, the Cortex-R52 workflow builds the images but reports that it did not execute them. A green build in that state is not a runtime test.
+| `r52_fvp.yml` | Cortex-R52 builds, and execution of the FVP images on the Armv8-R AEM FVP. |
 
 ## Pull request acceptance criteria
 

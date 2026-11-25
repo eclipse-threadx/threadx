@@ -28,9 +28,9 @@
 /*    PMSAv8-R memory protection and cache enable for Cortex-R52.         */
 /*                                                                        */
 /*    The region set is described by a table rather than a sequence of    */
-/*    register writes.  That is deliberate and is a roadmap decision, not */
-/*    a style preference: AR2 programs a Stage-1 region set per ThreadX   */
-/*    module and AR3 programs Stage-2 regions per ZoneX partition, and    */
+/*    register writes.  That is deliberate, not a style preference:       */
+/*    the module port programs a Stage-1 region set per ThreadX           */
+/*    module and ZoneX programs Stage-2 regions per partition, and        */
 /*    both reuse this shape.  A table can be swapped at a partition       */
 /*    switch; open-coded register writes cannot.                          */
 /*                                                                        */

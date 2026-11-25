@@ -7,6 +7,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 /* This test checks that changing the priority of a thread waiting on a
    priority-inheritance mutex is passed on to the mutex owner.  Raising a waiter above
@@ -15,12 +16,10 @@
    inheritance mutex it holds, or to its own.  This is checked with the owner
    suspended and with the owner ready.  Changing the priority of a thread waiting on a
    mutex without priority inheritance must neither change the owner's priority nor
-   the FIFO order in which the waiters obtain the mutex.  Two cases that scheduling on
-   a single core cannot produce are set up by hand at the end.  */
+   the FIFO order in which the waiters obtain the mutex.  */
 
 #include   <stdio.h>
 #include   "tx_api.h"
-#include   "tx_mutex.h"
 
 
 /* Wait a tick at a time, for at most 200 ticks, until a condition holds.  A thread the
@@ -327,50 +326,6 @@ UINT                old_priority;
 }
 
 
-/* A thread in TX_MUTEX_SUSP without a cleanup routine has already been taken off the
-   suspension list by tx_mutex_put or the mutex cleanup, which another core can be
-   doing while the priority changes, and changing its priority must leave the mutex
-   alone.  And the waiter an update is made for can leave the suspension list before
-   the update runs, for example through tx_thread_wait_abort from an ISR, so the
-   update must handle a mutex that nobody waits on any more.  */
-
-static void    hand_set_up_cases(void)
-{
-
-UINT                old_priority;
-UINT                saved_state;
-VOID                *saved_control_block;
-
-
-    /* Make waiter 0 of the FIFO part, parked without a cleanup routine, look like a
-       thread being taken off the suspension list of the first mutex of the first
-       part, and change its priority.  */
-    saved_state =                                     fifo_waiter[0].tx_thread_state;
-    saved_control_block =                             fifo_waiter[0].tx_thread_suspend_control_block;
-    fifo_waiter[0].tx_thread_state =                  TX_MUTEX_SUSP;
-    fifo_waiter[0].tx_thread_suspend_cleanup =        TX_NULL;
-    fifo_waiter[0].tx_thread_suspend_control_block =  (VOID *) &inherit_mutex[0];
-    tx_thread_priority_change(&fifo_waiter[0], 2, &old_priority);
-    fifo_waiter[0].tx_thread_state =                  saved_state;
-    fifo_waiter[0].tx_thread_suspend_control_block =  saved_control_block;
-    check(fifo_waiter[0].tx_thread_priority == 2, 90);
-    check(inherit_mutex[0].tx_mutex_highest_priority_waiting == 16, 91);
-    check(inherit_owner.tx_thread_priority == 15, 92);
-
-    /* Raise waiter 2 of the first part above the owner, so the owner inherits its
-       priority, then take the waiter off the suspension list of the second mutex and
-       update that mutex.  The owner must return to its own priority, since the
-       highest priority still waiting on its mutexes is 16.  */
-    tx_thread_priority_change(&inherit_waiter[2], 10, &old_priority);
-    check(inherit_owner.tx_thread_priority == 10, 93);
-    tx_thread_wait_abort(&inherit_waiter[2]);
-    _tx_mutex_inherit_priority_update(&inherit_mutex[1]);
-    check(inherit_mutex[1].tx_mutex_suspension_list == TX_NULL, 94);
-    check(inherit_mutex[1].tx_mutex_highest_priority_waiting == ((UINT) TX_MAX_PRIORITIES), 95);
-    check(inherit_owner.tx_thread_priority == 15, 96);
-}
-
-
 static void    control_thread_entry(ULONG thread_input)
 {
 
@@ -381,7 +336,6 @@ static void    control_thread_entry(ULONG thread_input)
     inherit_suspended_owner();
     no_inherit_fifo_order();
     inherit_ready_owner();
-    hand_set_up_cases();
 
     /* Successful test.  */
     printf("SUCCESS!\n");

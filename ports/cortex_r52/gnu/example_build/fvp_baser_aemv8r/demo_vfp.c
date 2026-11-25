@@ -17,7 +17,7 @@
 /*                                                                        */
 /*  DEMONSTRATION                                          RELEASE        */
 /*                                                                        */
-/*    demo_m5.c                                        Cortex-R52/GNU     */
+/*    demo_vfp.c                                       Cortex-R52/GNU     */
 /*                                                           6.5.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -25,14 +25,14 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M5: lazy floating-point context save and restore.     */
+/*    Lazy floating-point context save and restore.                       */
 /*                                                                        */
 /*    Two paths must be covered, and they use different register sets:    */
 /*                                                                        */
-/*      solicited  tx_thread_system_return saves D8-D15 and FPSCR, because*/
-/*                 the callee-saved half is all a voluntary switch can    */
-/*                 lose.  Exercised by the checking thread, which keeps   */
-/*                 eight doubles live across tx_thread_sleep.             */
+/*      solicited  tx_thread_system_return saves D8-D15 and FPSCR,        */
+/*                 because the callee-saved half is all a voluntary       */
+/*                 switch can lose.  Exercised by the checking thread,    */
+/*                 which keeps eight doubles live across tx_thread_sleep. */
 /*      interrupt  tx_thread_context_restore restores D0-D15 and FPSCR,   */
 /*                 because an asynchronous interrupt can land anywhere.   */
 /*                 Exercised by a lower-priority thread doing continuous  */
@@ -278,7 +278,7 @@ void tx_application_define(void *first_unused_memory)
 
 void bsp_main(void)
 {
-    console_puts("\n=== ThreadX AR1/M5 lazy VFP context switch "
+    console_puts("\n=== ThreadX lazy VFP context switch "
                  "(Cortex-R52, Armv8-R AArch32, Armv8-R AEM FVP) ===\n");
 
     tx_kernel_enter();

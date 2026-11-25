@@ -27,7 +27,7 @@
 /*                                                                        */
 /*    Minimal console for the Armv8-R AEM FVP.  Backed by semihosting so  */
 /*    that early bring-up needs no peripheral base addresses; the PL011   */
-/*    UART implementation arrives in AR1/M3 behind this same interface.   */
+/*    UART console (TX_R52_CONSOLE_PL011) uses the same interface.        */
 /*                                                                        */
 /**************************************************************************/
 

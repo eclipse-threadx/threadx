@@ -17,7 +17,7 @@
 /*                                                                        */
 /*  DEMONSTRATION                                          RELEASE        */
 /*                                                                        */
-/*    demo_m2.c                                        Cortex-R52/GNU     */
+/*    demo_coop.c                                      Cortex-R52/GNU     */
 /*                                                           6.5.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -25,7 +25,7 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M2: two threads switching cooperatively, with no      */
+/*    Two threads switching cooperatively, with no                        */
 /*    interrupts and no timer tick.  This is the first real exercise of   */
 /*    the ported assembly -- _tx_thread_stack_build builds each thread's  */
 /*    initial frame, _tx_thread_schedule restores it, and                 */
@@ -35,10 +35,11 @@
 /*    The threads record their execution order in a trace buffer, and the */
 /*    expected alternating sequence is asserted at the end.  Counting     */
 /*    iterations alone would not prove a context switch happened: if      */
-/*    switching were broken, one thread could run to completion by itself.*/
+/*    switching were broken, one thread could run to completion by        */
+/*    itself.                                                             */
 /*                                                                        */
 /*    Only tx_thread_relinquish is used.  tx_thread_sleep would hang      */
-/*    without a tick, which AR1/M3 adds.                                  */
+/*    without a tick, which demo_tick.c adds.                             */
 /*                                                                        */
 /**************************************************************************/
 
@@ -193,8 +194,8 @@ static void thread_0_entry(ULONG thread_input)
 /**************************************************************************/
 /*  tx_application_define -- create the demo threads.                     */
 /*                                                                        */
-/*  Static stacks are used rather than a byte pool so that M2 exercises   */
-/*  only the context-switch path, with no allocator in the way.           */
+/*  Static stacks are used rather than a byte pool so that the demo       */
+/*  exercises only the context-switch path, with no allocator in the way. */
 /**************************************************************************/
 
 void tx_application_define(void *first_unused_memory)
@@ -217,7 +218,7 @@ void tx_application_define(void *first_unused_memory)
 
 void bsp_main(void)
 {
-    console_puts("\n=== ThreadX AR1/M2 cooperative switch "
+    console_puts("\n=== ThreadX cooperative switch "
                  "(Cortex-R52, Armv8-R AArch32, Armv8-R AEM FVP) ===\n");
 
     tx_kernel_enter();

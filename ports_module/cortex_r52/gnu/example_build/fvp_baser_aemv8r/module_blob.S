@@ -25,23 +25,23 @@
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
 @/*                                                                        */
-@/*    Carries the demonstration module into the manager image as data.     */
+@/*    Carries the demonstration module into the manager image as data.    */
 @/*                                                                        */
-@/*    The module is built as its own link unit and objcopied to a raw       */
-@/*    binary, which is included here verbatim.  It has to be a separate     */
-@/*    link: the module library defines shims named after the ThreadX API    */
-@/*    entry points the kernel also defines, and in one link the shims win   */
-@/*    -- objects beat archive members -- so the manager's own service calls */
-@/*    end up trapping into the module.                                     */
+@/*    The module is built as its own link unit and objcopied to a raw     */
+@/*    binary, which is included here verbatim.  It has to be a separate   */
+@/*    link: the module library defines shims named after the ThreadX API  */
+@/*    entry points the kernel also defines, and in one link the shims win */
+@/*    -- objects beat archive members -- so the manager's own service     */
+@/*    calls end up trapping into the module.                              */
 @/*                                                                        */
-@/*    Included as bytes rather than linked as objects, so the module's      */
-@/*    symbols never enter the manager's link at all.  Nothing here is       */
-@/*    called: the manager finds the preamble at the start of the image and   */
-@/*    reaches everything else through that.                                 */
+@/*    Included as bytes rather than linked as objects, so the module's    */
+@/*    symbols never enter the manager's link at all.  Nothing here is     */
+@/*    called: the manager finds the preamble at the start of the image    */
+@/*    and reaches everything else through that.                           */
 @/*                                                                        */
-@/*    A separate copy from the S32Z280 one, and identical to it: the two    */
-@/*    module examples are deliberately independent builds, and each names    */
-@/*    its own raw image through its own assembler include path.             */
+@/*    A separate copy from the S32Z280 one, and identical to it: the two  */
+@/*    module examples are deliberately independent builds, and each names */
+@/*    its own raw image through its own assembler include path.           */
 @/*                                                                        */
 @/**************************************************************************/
 

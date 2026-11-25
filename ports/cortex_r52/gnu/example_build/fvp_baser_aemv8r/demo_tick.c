@@ -17,7 +17,7 @@
 /*                                                                        */
 /*  DEMONSTRATION                                          RELEASE        */
 /*                                                                        */
-/*    demo_m3.c                                        Cortex-R52/GNU     */
+/*    demo_tick.c                                      Cortex-R52/GNU     */
 /*                                                           6.5.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -25,8 +25,8 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    AR1 milestone M3: periodic tick and preemptive scheduling.  This    */
-/*    exercises the parts of the port that M2 could not reach --          */
+/*    Periodic tick and preemptive scheduling.  This                      */
+/*    exercises the parts of the port that demo_coop.c cannot reach --    */
 /*    _tx_thread_context_save, _tx_timer_interrupt and                    */
 /*    _tx_thread_context_restore -- by driving them from a real generic   */
 /*    timer interrupt routed through GICv3.                               */
@@ -36,13 +36,13 @@
 /*      2. counter is enabled       -> the control frame was started      */
 /*      3. CNTPCT advances          -> the counter really runs            */
 /*      4. interrupts arrive        -> GICv3 + PPI + vector wiring work   */
-/*      5. tx_time_get advances     -> _tx_timer_interrupt drives the tick*/
-/*      6. tx_thread_sleep returns  -> timer-driven thread resumption     */
-/*      7. a lower-priority thread ran while we slept -> preemption and   */
-/*         context save/restore across an interrupt                       */
+/*      5. tx_time_get advances     -> _tx_timer_interrupt drives the     */
+/*      tick 6. tx_thread_sleep returns  -> timer-driven thread           */
+/*      resumption 7. a lower-priority thread ran while we slept ->       */
+/*         preemption and context save/restore across an interrupt        */
 /*                                                                        */
-/*    The timer PPI INTID is reported, not assumed: the whole PPI range is*/
-/*    enabled and whichever INTID the model drives is recorded.           */
+/*    The timer PPI INTID is reported, not assumed: the whole PPI range   */
+/*    is enabled and whichever INTID the model drives is recorded.        */
 /*                                                                        */
 /**************************************************************************/
 
@@ -81,7 +81,8 @@ static UINT report(const char *label_ptr, UINT passed)
 
 
 /**************************************************************************/
-/*  thread_busy_entry -- lowest priority; only runs when nothing else can.*/
+/*  thread_busy_entry -- lowest priority; only runs when nothing else     */
+/*  can.                                                                  */
 /**************************************************************************/
 
 static void thread_busy_entry(ULONG thread_input)
@@ -242,7 +243,7 @@ void tx_application_define(void *first_unused_memory)
 
 void bsp_main(void)
 {
-    console_puts("\n=== ThreadX AR1/M3 tick and preemption "
+    console_puts("\n=== ThreadX tick and preemption "
                  "(Cortex-R52, Armv8-R AArch32, Armv8-R AEM FVP) ===\n");
 
     tx_kernel_enter();

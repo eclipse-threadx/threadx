@@ -25,35 +25,35 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    Nested FIQ handling: _tx_thread_fiq_nesting_start and                */
-/*    _tx_thread_fiq_nesting_end, the last pair in this port that nothing  */
+/*    Nested FIQ handling: _tx_thread_fiq_nesting_start and               */
+/*    _tx_thread_fiq_nesting_end, the last pair in this port that nothing */
 /*    had ever called.                                                    */
 /*                                                                        */
-/*    FIQ needs more of the GIC than IRQ does.  With a single security     */
-/*    state the controller delivers Group 0 as FIQ and Group 1 as IRQ, so  */
-/*    an interrupt only arrives as an FIQ if it has been moved into Group  */
-/*    0, the distributor and CPU interface both have Group 0 enabled, and  */
-/*    it is acknowledged through the Group 0 registers.  Group 1's         */
-/*    acknowledge returns the spurious INTID for a Group 0 interrupt and   */
-/*    leaves it pending, which presents as a storm rather than an error.   */
+/*    FIQ needs more of the GIC than IRQ does.  With a single security    */
+/*    state the controller delivers Group 0 as FIQ and Group 1 as IRQ, so */
+/*    an interrupt only arrives as an FIQ if it has been moved into Group */
+/*    0, the distributor and CPU interface both have Group 0 enabled, and */
+/*    it is acknowledged through the Group 0 registers.  Group 1's        */
+/*    acknowledge returns the spurious INTID for a Group 0 interrupt and  */
+/*    leaves it pending, which presents as a storm rather than an error.  */
 /*                                                                        */
-/*    FIQ nesting means an FIQ taken while an FIQ handler is running, so   */
-/*    one source cannot demonstrate it.  Two Group 0 SGIs are used, the    */
-/*    second at a numerically lower priority so it can preempt the first,  */
-/*    and the first's handler raises it.                                   */
+/*    FIQ nesting means an FIQ taken while an FIQ handler is running, so  */
+/*    one source cannot demonstrate it.  Two Group 0 SGIs are used, the   */
+/*    second at a numerically lower priority so it can preempt the first, */
+/*    and the first's handler raises it.                                  */
 /*                                                                        */
 /*  WHAT EACH CHECK IS FOR                                                */
 /*                                                                        */
-/*    F1  an FIQ arrives at all.  Separate on purpose: it covers the whole */
-/*        Group 0 chain -- IGRPEN0, the ICC_SGI0R encoding, IAR0 and       */
-/*        EOIR0, the EL1 FIQ vector, and F being unmasked.  If F1 fails    */
-/*        the fault is in one of those and not in the nesting routines.    */
-/*    F2  an FIQ arrived while another FIQ handler was active, depth 2.    */
-/*    F3  the depth returned to zero, so the pairing unwound.              */
-/*    F4  the IRQ path is undisturbed: the tick still advances.            */
-/*    F5  threads still run, so FIQ context save and restore survived      */
+/*    F1  an FIQ arrives at all.  Separate on purpose: it covers the      */
+/*        whole Group 0 chain -- IGRPEN0, the ICC_SGI0R encoding, IAR0    */
+/*        and EOIR0, the EL1 FIQ vector, and F being unmasked.  If F1     */
+/*        fails the fault is in one of those and not in the nesting       */
+/*    routines. F2  an FIQ arrived while another FIQ handler was active,  */
+/*    depth 2. F3  the depth returned to zero, so the pairing unwound.    */
+/*    F4  the IRQ path is undisturbed: the tick still advances.           */
+/*    F5  threads still run, so FIQ context save and restore survived     */
 /*        being re-entered.                                               */
-/*    F6  no unexpected Group 0 INTID arrived.                             */
+/*    F6  no unexpected Group 0 INTID arrived.                            */
 /*                                                                        */
 /**************************************************************************/
 

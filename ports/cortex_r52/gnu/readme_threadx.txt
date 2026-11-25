@@ -50,19 +50,19 @@ baseline selects the soft ABI rather than removing the FPU.
     cmake -B build_r52 -G Ninja \
           -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_r52.cmake \
           -DTX_R52_BUILD_FVP_EXAMPLE=ON .
-    ninja -C build_r52 boot_check.elf demo_m2.elf demo_m3.elf \
+    ninja -C build_r52 boot_check.elf demo_coop.elf demo_tick.elf \
                        demo_threadx.elf demo_mpu.elf demo_clz.elf
     ctest --test-dir build_r52
 
 The images target the free Armv8-R AEM FVP (FVP_BaseR_AEMv8R):
 
     boot_check.elf      EL2 configuration, the drop to EL1 and the EL2 seam
-    demo_m2.elf         cooperative context switching, no interrupts
-    demo_m3.elf         generic timer tick, GICv3 and preemption
+    demo_coop.elf       cooperative context switching, no interrupts
+    demo_tick.elf       generic timer tick, GICv3 and preemption
     demo_threadx.elf    the standard eight-thread demo plus verification
     demo_mpu.elf        PMSAv8-R protection and cache enable
     demo_clz.elf        the CLZ lowest-set-bit priority search
-    demo_m5.elf         lazy VFP context save (needs TX_R52_ENABLE_VFP)
+    demo_vfp.elf        lazy VFP context save (needs TX_R52_ENABLE_VFP)
 
 Each image reports its own result and terminates the model through the
 semihosting SYS_EXIT call, so no host-side timeout is needed.  The test

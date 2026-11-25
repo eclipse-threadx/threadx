@@ -46,8 +46,8 @@
 /*    This function creates an entry in the MPU table for a shared        */
 /*    memory space. The start_address must be aligned to the PMSAv8-R     */
 /*    protection granule, which is 64 bytes on Cortex-R52 -- the comment  */
-/*    inherited from the Armv8-M port says 32, and TXM_MODULE_MPU_ALIGNMENT*/
-/*    below is what is actually enforced.                                 */
+/*    inherited from the Armv8-M port says 32, and                        */
+/*    TXM_MODULE_MPU_ALIGNMENT below is what is actually enforced.        */
 /*                                                                        */
 /*    The length must describe at least one byte and must not run off the */
 /*    top of the address space; either is TX_SIZE_ERROR. It need not be a */

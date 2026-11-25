@@ -25,55 +25,55 @@
 @/*                                                                        */
 @/*  DESCRIPTION                                                           */
 @/*                                                                        */
-@/*    Where a position-independent module fixes up its own data            */
+@/*    Where a position-independent module fixes up its own data           */
 @/*    references, before it has run a line of its own code.               */
 @/*                                                                        */
-@/*    The module's shell entry calls this once, on the start thread only,  */
-@/*    passing the address the module's code was actually loaded at.  Three */
-@/*    things happen here, and the module cannot touch a single global      */
-@/*    until all three have:                                               */
+@/*    The module's shell entry calls this once, on the start thread only, */
+@/*    passing the address the module's code was actually loaded at.       */
+@/*    Three things happen here, and the module cannot touch a single      */
+@/*    global until all three have:                                        */
 @/*                                                                        */
-@/*      1. The global offset table is copied out of the image into the     */
-@/*         module's own data, and every entry in it is rewritten from the  */
-@/*         nominal address the linker chose to the address the manager     */
+@/*      1. The global offset table is copied out of the image into the    */
+@/*         module's own data, and every entry in it is rewritten from the */
+@/*         nominal address the linker chose to the address the manager    */
 @/*         decided on.                                                    */
-@/*      2. .data is copied out of the image into the module's own data.    */
+@/*      2. .data is copied out of the image into the module's own data.   */
 @/*      3. .bss is zeroed.                                                */
 @/*                                                                        */
-@/*    Why any of this is needed: the module is built -fpic with            */
-@/*    -msingle-pic-base, so a reference to a global compiles to            */
-@/*    LDR rX, [r9, #offset] -- a load of a GOT entry, at a fixed offset    */
-@/*    from whatever r9 holds.  The manager seeds r9 with the module's data */
-@/*    base when it builds the thread's stack frame, so the offsets land in */
-@/*    the right place; but the entries there are zero until this function  */
-@/*    writes them, because the manager memsets the data area and nothing   */
-@/*    else populates it.                                                  */
+@/*    Why any of this is needed: the module is built -fpic with           */
+@/*    -msingle-pic-base, so a reference to a global compiles to           */
+@/*    LDR rX, [r9, #offset] -- a load of a GOT entry, at a fixed offset   */
+@/*    from whatever r9 holds.  The manager seeds r9 with the module's     */
+@/*    data base when it builds the thread's stack frame, so the offsets   */
+@/*    land in the right place; but the entries there are zero until this  */
+@/*    function writes them, because the manager memsets the data area and */
+@/*    nothing else populates it.                                          */
 @/*                                                                        */
-@/*    And .data has to be copied for the same reason.  The manager does    */
-@/*    not copy it: _txm_module_manager_internal_load allocates a data area */
-@/*    from its byte pool and zeroes it, so the module's linked .data --    */
-@/*    wherever it sits -- is outside every region the module owns.  A      */
-@/*    module reading an initialised global before this ran would fault, or */
-@/*    read a zero, depending on where it looked.                          */
+@/*    And .data has to be copied for the same reason.  The manager does   */
+@/*    not copy it: _txm_module_manager_internal_load allocates a data     */
+@/*    area from its byte pool and zeroes it, so the module's linked .data */
+@/*    -- wherever it sits -- is outside every region the module owns.  A  */
+@/*    module reading an initialised global before this ran would fault,   */
+@/*    or read a zero, depending on where it looked.                       */
 @/*                                                                        */
-@/*    This function may not use a global itself, which is the constraint   */
-@/*    that shapes it: it is what makes the GOT usable, so it cannot use    */
-@/*    the GOT.  Every address it needs comes from a literal pool load of a */
-@/*    linker-supplied nominal address, rebased by hand.  That is also why  */
-@/*    it is assembly and not C.                                           */
+@/*    This function may not use a global itself, which is the constraint  */
+@/*    that shapes it: it is what makes the GOT usable, so it cannot use   */
+@/*    the GOT.  Every address it needs comes from a literal pool load of  */
+@/*    a linker-supplied nominal address, rebased by hand.  That is also   */
+@/*    why it is assembly and not C.                                       */
 @/*                                                                        */
 @/*  INPUT                                                                 */
 @/*                                                                        */
-@/*    r0    Address the module's code was actually loaded at               */
-@/*    r9    Address of the module's data area, already seeded by           */
-@/*          _txm_module_manager_thread_stack_build.  Also the base the     */
-@/*          compiler measures every GOT offset from, so the GOT must go    */
+@/*    r0    Address the module's code was actually loaded at              */
+@/*    r9    Address of the module's data area, already seeded by          */
+@/*          _txm_module_manager_thread_stack_build.  Also the base the    */
+@/*          compiler measures every GOT offset from, so the GOT must go   */
 @/*          at exactly this address and nowhere else.                     */
 @/*                                                                        */
 @/*  OUTPUT                                                                */
 @/*                                                                        */
-@/*    None.  r9 is unchanged, and must be: it is the module's PIC base for */
-@/*    the rest of the thread's life.                                      */
+@/*    None.  r9 is unchanged, and must be: it is the module's PIC base    */
+@/*    for the rest of the thread's life.                                  */
 @/*                                                                        */
 @/*  CALLED BY                                                             */
 @/*                                                                        */

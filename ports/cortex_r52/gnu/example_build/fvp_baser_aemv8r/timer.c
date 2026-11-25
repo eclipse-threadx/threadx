@@ -46,7 +46,8 @@
 /*  MISRA C:2012 deviations (justified)                                   */
 /*                                                                        */
 /*    Directive 4.3 -- the generic timer is only reachable through CP15   */
-/*      registers; every such access is encapsulated in an accessor below.*/
+/*      registers; every such access is encapsulated in an accessor       */
+/*      below.                                                            */
 /*                                                                        */
 /**************************************************************************/
 

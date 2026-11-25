@@ -41,9 +41,9 @@
 /*      preempt   -- the sleeper resumed while the spinner was runnable,  */
 /*                   which is preemption rather than cooperative handoff  */
 /*                                                                        */
-/*    Counting alone would not distinguish these: a demo that only checked*/
-/*    that both threads ran would pass with a broken tick if the threads  */
-/*    happened to yield to each other.                                    */
+/*    Counting alone would not distinguish these: a demo that only        */
+/*    checked that both threads ran would pass with a broken tick if the  */
+/*    threads happened to yield to each other.                            */
 /*                                                                        */
 /**************************************************************************/
 
@@ -110,23 +110,24 @@ static void report(const char *name, unsigned long value)
 /*  Context-switch cost, stack in BTCM against stack in DRAM0.            */
 /*                                                                        */
 /*  Two pairs of equal-priority threads hand control back and forth with  */
-/*  tx_thread_relinquish, and the measuring thread of each pair times the  */
-/*  round trip.  One pair has both stacks in BTCM, the other in DRAM0.     */
+/*  tx_thread_relinquish, and the measuring thread of each pair times the */
+/*  round trip.  One pair has both stacks in BTCM, the other in DRAM0.    */
 /*                                                                        */
-/*  A round trip is two context switches plus the partner's loop, and the  */
-/*  partner's code is the same for both pairs, so the difference between   */
-/*  the pairs is the memory holding the stacks and nothing else.           */
+/*  A round trip is two context switches plus the partner's loop, and the */
+/*  partner's code is the same for both pairs, so the difference between  */
+/*  the pairs is the memory holding the stacks and nothing else.          */
 /*                                                                        */
-/*  Both pairs run in one image from one copy of the measuring code, which */
-/*  is what makes this comparison safe.  The alignment trap that invalid-  */
-/*  ated earlier work here bites when two builds with different layouts    */
-/*  are compared; a code shift moves both pairs equally and cancels.       */
+/*  Both pairs run in one image from one copy of the measuring code,      */
+/*  which is what makes this comparison safe.  The alignment trap that    */
+/*  invalid- ated earlier work here bites when two builds with different  */
+/*  layouts are compared; a code shift moves both pairs equally and       */
+/*  cancels.                                                              */
 /*                                                                        */
-/*  Cycles, from the PMU counter: CNTPCT at 8 MHz cannot resolve a context */
-/*  switch.  Priorities 2 and 3 put the BTCM pair first and keep both      */
-/*  above judge and spinner.  The sleeper at priority 1 still preempts     */
-/*  occasionally, which can land in max; min and mean are the robust       */
-/*  figures and all three are reported.                                    */
+/*  Cycles, from the PMU counter: CNTPCT at 8 MHz cannot resolve a        */
+/*  context switch.  Priorities 2 and 3 put the BTCM pair first and keep  */
+/*  both above judge and spinner.  The sleeper at priority 1 still        */
+/*  preempts occasionally, which can land in max; min and mean are the    */
+/*  robust figures and all three are reported.                            */
 /**************************************************************************/
 
 static void demo_dec(unsigned long value)
@@ -263,27 +264,27 @@ static void ctx_partner_entry(ULONG which)
 /**************************************************************************/
 /*  Stack-heavy work, stack in BTCM against stack in DRAM0.               */
 /*                                                                        */
-/*  #635 measured context switches and found BTCM worth about 7.4%, with   */
-/*  no determinism advantage, and said why: a switch saves sixteen          */
-/*  registers, roughly one cache line, so the stack's cache state has       */
-/*  almost nothing to contribute.  It also said the interesting case was    */
-/*  work with a large stack working set, that it had not been measured, and */
-/*  that it should not be assumed.  This measures it.                      */
+/*  #635 measured context switches and found BTCM worth about 7.4%, with  */
+/*  no determinism advantage, and said why: a switch saves sixteen        */
+/*  registers, roughly one cache line, so the stack's cache state has     */
+/*  almost nothing to contribute.  It also said the interesting case was  */
+/*  work with a large stack working set, that it had not been measured,   */
+/*  and that it should not be assumed.  This measures it.                 */
 /*                                                                        */
-/*  deep_touch recurses, writing a frame on the way down and reading it on  */
-/*  the way up, so the stack working set is the whole descent rather than   */
-/*  one frame.  The cache is cleaned and invalidated before each sample, so */
-/*  the descent starts cold: a stack in DRAM0 must fill a line per frame,   */
-/*  while a stack in BTCM has no cache in the path to miss.                */
+/*  deep_touch recurses, writing a frame on the way down and reading it   */
+/*  on the way up, so the stack working set is the whole descent rather   */
+/*  than one frame.  The cache is cleaned and invalidated before each     */
+/*  sample, so the descent starts cold: a stack in DRAM0 must fill a line */
+/*  per frame, while a stack in BTCM has no cache in the path to miss.    */
 /*                                                                        */
-/*  No partner threads and no relinquish here.  The measurement is entirely */
-/*  within one thread, which removes the confound that made the context     */
-/*  switch figure hard to read -- there, the timed region included the      */
-/*  partner's execution.                                                   */
+/*  No partner threads and no relinquish here.  The measurement is        */
+/*  entirely within one thread, which removes the confound that made the  */
+/*  context switch figure hard to read -- there, the timed region         */
+/*  included the partner's execution.                                     */
 /*                                                                        */
-/*  Samples are kept and post-processed rather than filtered against a      */
-/*  fixed threshold, because the cost of this workload was not known in     */
-/*  advance and a guessed threshold discarded every sample once already.    */
+/*  Samples are kept and post-processed rather than filtered against a    */
+/*  fixed threshold, because the cost of this workload was not known in   */
+/*  advance and a guessed threshold discarded every sample once already.  */
 /**************************************************************************/
 
 #define DEEP_SAMPLES    64U
@@ -442,20 +443,20 @@ static void deep_entry(ULONG which)
 /**************************************************************************/
 /*  Per-thread memory protection, demonstrated rather than asserted.      */
 /*                                                                        */
-/*  Two threads each own a 4 KB window at the top of DRAM2, carved out of  */
-/*  the broad data region in mpu.c so that nothing else grants access to   */
-/*  them.  Each thread writes its own window, which must succeed, and then */
-/*  reaches for the other thread's, which must fault.                     */
+/*  Two threads each own a 4 KB window at the top of DRAM2, carved out of */
+/*  the broad data region in mpu.c so that nothing else grants access to  */
+/*  them.  Each thread writes its own window, which must succeed, and     */
+/*  then reaches for the other thread's, which must fault.                */
 /*                                                                        */
-/*  The second half is the part that matters.  A test that only shows a    */
-/*  thread reaching its own memory proves nothing about isolation: it      */
+/*  The second half is the part that matters.  A test that only shows a   */
+/*  thread reaching its own memory proves nothing about isolation: it     */
 /*  would pass just as well with no protection at all.                    */
 /*                                                                        */
-/*  The fault is made survivable the same way the boot probes do it --     */
-/*  fault_expected tells the data abort handler to record the violation    */
-/*  and resume at the instruction after the faulting access, rather than   */
-/*  treating it as fatal.  That works in thread context because the        */
-/*  handler returns to where it came from rather than to a fixed recovery  */
+/*  The fault is made survivable the same way the boot probes do it --    */
+/*  fault_expected tells the data abort handler to record the violation   */
+/*  and resume at the instruction after the faulting access, rather than  */
+/*  treating it as fatal.  That works in thread context because the       */
+/*  handler returns to where it came from rather than to a fixed recovery */
 /*  point.                                                                */
 /**************************************************************************/
 

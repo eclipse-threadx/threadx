@@ -52,8 +52,8 @@
 /*                                                                        */
 /*    A negative array dimension is used rather than _Static_assert       */
 /*    because this project targets C99, where _Static_assert does not     */
-/*    exist.  If an assertion below fails, the compiler reports a negative*/
-/*    or zero-sized array for the named typedef.                          */
+/*    exist.  If an assertion below fails, the compiler reports a         */
+/*    negative or zero-sized array for the named typedef.                 */
 /*                                                                        */
 /**************************************************************************/
 

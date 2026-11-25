@@ -27,20 +27,20 @@
 @/*                                                                        */
 @/*    The only way a module reaches the kernel.                           */
 @/*                                                                        */
-@/*    A module runs in User mode and cannot execute kernel code or touch   */
-@/*    kernel memory.  When it calls a ThreadX service, the call arrives    */
-@/*    here: SVC 1 raises privilege, the dispatch function performs the     */
-@/*    service, SVC 2 drops back to User mode, and the module continues.    */
+@/*    A module runs in User mode and cannot execute kernel code or touch  */
+@/*    kernel memory.  When it calls a ThreadX service, the call arrives   */
+@/*    here: SVC 1 raises privilege, the dispatch function performs the    */
+@/*    service, SVC 2 drops back to User mode, and the module continues.   */
 @/*                                                                        */
-@/*    This function is the entire privileged surface a module can see.     */
-@/*    It gets an MPU region of its own -- the one at                       */
-@/*    TXM_MODULE_MPU_KERNEL_ENTRY_INDEX -- because a module must be able   */
-@/*    to execute these few instructions and nothing else on that side of   */
-@/*    the boundary.  Everything the module is allowed to ask for is        */
-@/*    decided inside _txm_module_manager_kernel_dispatch, in kernel        */
+@/*    This function is the entire privileged surface a module can see.    */
+@/*    It gets an MPU region of its own -- the one at                      */
+@/*    TXM_MODULE_MPU_KERNEL_ENTRY_INDEX -- because a module must be able  */
+@/*    to execute these few instructions and nothing else on that side of  */
+@/*    the boundary.  Everything the module is allowed to ask for is       */
+@/*    decided inside _txm_module_manager_kernel_dispatch, in kernel       */
 @/*    memory the module cannot reach.                                     */
 @/*                                                                        */
-@/*    SVC 1 and SVC 2 are handled by the port's supervisor call vector.    */
+@/*    SVC 1 and SVC 2 are handled by the port's supervisor call vector.   */
 @/*                                                                        */
 @/*  CALLS                                                                 */
 @/*                                                                        */

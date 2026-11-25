@@ -25,27 +25,28 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    The cache maintenance a loader owes the instruction side, and        */
+/*    The cache maintenance a loader owes the instruction side, and       */
 /*    nothing else.                                                       */
 /*                                                                        */
-/*    The S32Z280 board support carries a full cache driver -- enable,     */
-/*    disable, geometry, set/way sweeps -- because silicon bring-up needed  */
-/*    to ask the hardware what it had.  None of that is needed here: the    */
-/*    caches are turned on once in mpu_init and never turned off, and the   */
-/*    model's geometry is not in question.  What IS needed is the pair of    */
-/*    operations that make copied code executable, so that is all this is.  */
+/*    The S32Z280 board support carries a full cache driver -- enable,    */
+/*    disable, geometry, set/way sweeps -- because silicon bring-up       */
+/*    needed to ask the hardware what it had.  None of that is needed     */
+/*    here: the caches are turned on once in mpu_init and never turned    */
+/*    off, and the model's geometry is not in question.  What IS needed   */
+/*    is the pair of operations that make copied code executable, so that */
+/*    is all this is.                                                     */
 /*                                                                        */
-/*    Why it is needed at all: the module area is Normal write-back memory, */
-/*    so a byte copy of module code leaves the bytes in dirty data-cache    */
-/*    lines while the instruction side -- which is not coherent with the    */
-/*    data cache on this core -- fetches whatever main memory still holds.   */
-/*    Cleaning by address range and then invalidating the instruction cache  */
-/*    is what closes that gap.                                             */
+/*    Why it is needed at all: the module area is Normal write-back       */
+/*    memory, so a byte copy of module code leaves the bytes in dirty     */
+/*    data-cache lines while the instruction side -- which is not         */
+/*    coherent with the data cache on this core -- fetches whatever main  */
+/*    memory still holds. Cleaning by address range and then invalidating */
+/*    the instruction cache is what closes that gap.                      */
 /*                                                                        */
-/*    By range rather than by set/way, deliberately.  A set/way sweep needs */
-/*    the cache geometry and touches every line in the machine; the loader   */
-/*    knows exactly which bytes it wrote, so the range form is both tighter  */
-/*    and shorter to get right.                                             */
+/*    By range rather than by set/way, deliberately.  A set/way sweep     */
+/*    needs the cache geometry and touches every line in the machine; the */
+/*    loader knows exactly which bytes it wrote, so the range form is     */
+/*    both tighter and shorter to get right.                              */
 /*                                                                        */
 /**************************************************************************/
 

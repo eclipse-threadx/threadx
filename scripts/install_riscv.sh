@@ -56,11 +56,17 @@ fi
 # job that runs qemu-system-riscv64 headless. That download is what pushes the
 # install past its two-minute budget on a slow mirror, and a larger budget is
 # not available: TIMEOUT_LONG is already sized so three attempts fit the step cap.
+#
+# CMake is installed only when none is on PATH. The runner image carries a newer
+# one in /usr/local/bin, which shadows the apt package, so on a runner that
+# package was 13 MB downloaded and never run.
+packages=(qemu-system-misc ninja-build)
+if ! command -v cmake > /dev/null; then
+    packages+=(cmake)
+fi
 retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" install -y \
     --no-install-recommends \
-    qemu-system-misc \
-    ninja-build \
-    cmake || exit 1
+    "${packages[@]}" || exit 1
 
 echo "=== Downloading RISC-V GCC toolchain (${RELEASE_TAG}) ==="
 

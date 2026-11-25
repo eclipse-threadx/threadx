@@ -132,7 +132,7 @@ target_link_options(s32z280_demo.elf PRIVATE
 )
 
 # Lazy VFP context save and restore.  Only meaningful when the library was built
-# with TX_R52_ENABLE_VFP and a floating-point ABI, so like the FVP's demo_m5.elf
+# with TX_R52_ENABLE_VFP and a floating-point ABI, so like the FVP's demo_vfp.elf
 # the target exists only in that configuration.  The FPU hardware enable lives in
 # entry.S under __ARM_FP; tx_thread_vfp_enable() sets only the per-thread flag.
 if(TX_R52_ENABLE_VFP)
